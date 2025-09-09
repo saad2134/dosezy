@@ -36,8 +36,9 @@ Once you input the basics: name, dosage, timing, and frequency, the app intellig
 
 
 ## 🚀 Getting Started
-1. Enable `Install from Unknown Sources` in your android device settings.
-2. Download the latest `.apk` file from the `AndroidBuild` directory and install it on your device.
+* Android (Using the app)
+  1. Enable `Install from Unknown Sources` in your android device settings.
+  2. Download the latest `.apk` file from the `AndroidBuild` directory and install it on your device.
 
 
 ## 🖼️ App Icon 
