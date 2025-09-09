@@ -21,20 +21,23 @@ Once you input the basics: name, dosage, timing, and frequency, the app intellig
   <thead>
     <tr>
       <th>Platform</th>
+      <th>Min Version</th>
       <th>Supported?</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td>Android</td>
+      <td>v7.0 or later</td>
       <td>✅</td>
-    </tr>
-    <tr>
-      <td>iOS</td>
-      <td>❌</td>
     </tr>
   </tbody>
 </table>
+
+
+## 🚀 Getting Started
+1. Enable `Install from Unknown Sources` in your android device settings.
+2. Download the latest `.apk` file from the `AndroidBuild` directory and install it on your device.
 
 
 ## 🖼️ App Icon 
