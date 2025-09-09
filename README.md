@@ -15,6 +15,10 @@ Once you input the basics: name, dosage, timing, and frequency, the app intellig
 - 👨‍👩‍👧 **Caregiver Support** – Logs and adherence history help caregivers track missed doses.  
 
 
+## 🖼️ App Icon 
+![New Project](https://github.com/user-attachments/assets/99dd679a-d768-40ee-aa5a-76e1dd825407)
+
+
 ## 📄 License  
 
 This project is licensed under the [MIT License](LICENSE).  
