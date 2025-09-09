@@ -16,7 +16,7 @@ Once you input the basics: name, dosage, timing, and frequency, the app intellig
 
 
 ## 🖼️ App Icon 
-![New Project](https://github.com/user-attachments/assets/99dd679a-d768-40ee-aa5a-76e1dd825407)
+![New Project (1)](https://github.com/user-attachments/assets/e1de1e09-8d36-4af5-a6e9-b23df7eb7a92)
 
 
 ## 📄 License  
