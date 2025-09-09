@@ -1,4 +1,4 @@
-# 💊 Dosezy  
+# 💊 Dosezy 
 
 An Android medicine tracking app. **Dozezy** transforms medication management into a simple, stress-free experience.  
 Built with accessibility at its core, the app features **clear, large text** and **intuitive navigation**: perfect for elderly users and anyone managing multiple prescriptions.  
