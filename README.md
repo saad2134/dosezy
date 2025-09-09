@@ -1,6 +1,6 @@
 # 💊 Dosezy
 
-An Android medicine tracking app. **Dozezy** transforms medication management into a simple, stress-free experience.  
+An Android medicine tracking app. **Dosezy** transforms medication management into a simple, stress-free experience.  
 Built with accessibility at its core, the app features **clear, large text** and **intuitive navigation**: perfect for elderly users and anyone managing multiple prescriptions.  
 
 Once you input the basics: name, dosage, timing, and frequency, the app intelligently handles your medication schedule.  
@@ -16,7 +16,8 @@ Once you input the basics: name, dosage, timing, and frequency, the app intellig
 
 
 ## 🖼️ App Icon 
-![New Project (1)](https://github.com/user-attachments/assets/e1de1e09-8d36-4af5-a6e9-b23df7eb7a92)
+
+<img src="https://github.com/user-attachments/assets/e1de1e09-8d36-4af5-a6e9-b23df7eb7a92" alt="Dosezy Icon" title="Dosezy" style="width:500px;">
 
 
 ## 📄 License  
