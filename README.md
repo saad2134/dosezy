@@ -28,4 +28,4 @@ This project is licensed under the [MIT License](LICENSE).
 ## 🏷 Tags  
 
 `android` `mobile-app` `android-application`  
-`elderly-people` `medicine-management` `medicine-reminder` `elderly-care` `medicine-tracking` `dozezy`  
+`elderly-people` `medicine-management` `medicine-reminder` `elderly-care` `medicine-tracking` `dosezy`  
