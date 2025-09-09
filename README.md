@@ -15,9 +15,30 @@ Once you input the basics: name, dosage, timing, and frequency, the app intellig
 - 👨‍👩‍👧 **Caregiver Support** – Logs and adherence history help caregivers track missed doses.  
 
 
-## 🖼️ App Icon 
+## ⚙️ Platforms
 
-<img src="https://github.com/user-attachments/assets/e1de1e09-8d36-4af5-a6e9-b23df7eb7a92" alt="Dosezy Icon" title="Dosezy" style="width:500px;">
+<table border="1" cellpadding="10" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Platform</th>
+      <th>Supported?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Android</td>
+      <td>✅</td>
+    </tr>
+    <tr>
+      <td>iOS</td>
+      <td>❌</td>
+    </tr>
+  </tbody>
+</table>
+
+
+## 🖼️ App Icon 
+<img src="https://github.com/user-attachments/assets/213a3fc0-b737-4df2-9c70-693a7f6d7467" alt="Dosezy Icon" title="Dosezy" style="width:500px;">
 
 
 ## 📄 License  
