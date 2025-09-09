@@ -9,7 +9,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.dosezy.databinding.FragmentFirstBinding
 
 /**
- * A simple [Fragment] subclass as the default destination in the navigation.
+ * A simple [Fragment] subclass as the default destination in the navigation. Test
  */
 class FirstFragment : Fragment() {
 
