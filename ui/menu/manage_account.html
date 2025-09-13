@@ -112,11 +112,11 @@
 
             <header class="flex items-center justify-between mt-8 mb-2">
                 <a href="../menu.html"
-                    class="flex items-center justify-center rounded-full p-2 text-red-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#11D4D4]">
+                    class="flex items-center justify-center rounded-full p-2 text-[#0D1B1B] hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#11D4D4]">
                     <span class="material-symbols-outlined text-3xl">arrow_back</span>
                 </a>
-                <h1 class="flex-1 text-center text-3xl font-bold text-red-500">Emergency</h1>
-                <div class="w-10"></div>
+                <h1 class="flex-1 text-center text-3xl font-bold text-[#0D1B1B]">Manage Profile</h1>
+                <div class="w-8"></div>
             </header>
 
 
@@ -125,78 +125,49 @@
 
 
 
-        <main class="px-4 py-6 space-y-8 ">
-            <section>
-                <h2 class="text-2xl font-bold text-slate-800 mb-4">Information</h2>
-                <div class="space-y-3 ">
-                    <a class="flex items-center justify-between gap-4 bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
-                        href="#">
-                        <div class="flex items-center gap-4 ">
-                            <div class="flex items-center justify-center   size-12 text-[var(--primary-color)]">
-                                <span class="material-symbols-outlined text-4xl text-blue-500">contact_emergency</span>
-                            </div>
-                            <div>
-                                <p class="text-xl font-bold text-slate-800 ">View Information</p>
-                                <p class="text-slate-500 text-lg">See saved emergency information.</p>
-                            </div>
-                        </div>
-                        <span class="material-symbols-outlined text-slate-400">chevron_right</span>
-                    </a>
-                    <a class="flex items-center justify-between gap-4 bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
-                        href="#">
-                        <div class="flex items-center gap-4">
-                            <div class="flex items-center justify-center   size-12 text-[var(--primary-color)]">
-                                <span class="material-symbols-outlined text-4xl text-blue-500">edit_square</span>
-                            </div>
-                            <div>
-                                <p class="text-xl font-bold text-slate-800">Edit Information</p>
-                                <p class="text-slate-500 text-lg">Edit emergency information.</p>
-                            </div>
-                        </div>
-                        <span class="material-symbols-outlined text-slate-400">chevron_right</span>
-                    </a>
-                </div>
-            </section>
-            <section>
-                <h2 class="text-slate-800 text-2xl font-bold mb-4">Emergency Services</h2>
-                <div class="space-y-4">
-                    <a class="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:bg-slate-100 transition-colors"
-                        href="tel:999">
-                        <div class="flex items-center">
-                            <span class="material-symbols-outlined text-4xl text-red-500 mr-4">local_hospital</span>
-                            <div>
-                                <p class="text-xl font-bold text-slate-800">Ambulance</p>
-                                <p class="text-slate-500 text-lg">999</p>
-                            </div>
-                        </div>
-                        <span class="material-symbols-outlined text-3xl text-slate-400">call</span>
-                    </a>
-                    <a class="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:bg-slate-100 transition-colors"
-                        href="tel:999">
-                        <div class="flex items-center">
-                            <span
-                                class="material-symbols-outlined text-4xl text-orange-500 mr-4">local_fire_department</span>
-                            <div>
-                                <p class="text-xl font-bold text-slate-800">Fire</p>
-                                <p class="text-slate-500 text-lg">999</p>
-                            </div>
-                        </div>
-                        <span class="material-symbols-outlined text-3xl text-slate-400">call</span>
-                    </a>
-                    <a class="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:bg-slate-100 transition-colors"
-                        href="tel:999">
-                        <div class="flex items-center">
-                            <span class="material-symbols-outlined text-4xl text-blue-500 mr-4">local_police</span>
-                            <div>
-                                <p class="text-xl font-bold text-slate-800">Police</p>
-                                <p class="text-slate-500 text-lg">999</p>
-                            </div>
-                        </div>
-                        <span class="material-symbols-outlined text-3xl text-slate-400">call</span>
-                    </a>
-                </div>
-            </section>
+        <main class="flex flex-col gap-6 px-4 pt-4 pb-28">
+            <div class="flex flex-col gap-2">
+                <label class="text-[#0d171b] text-lg font-medium leading-normal" for="name">Name</label>
+                <input
+                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d171b] focus:outline-0 focus:ring-2 focus:ring-[#1193d4] border-2 border-slate-200 bg-white h-16 placeholder:text-slate-400 p-4 text-lg font-normal leading-normal"
+                    id="name" value="Eleanor Vance" />
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="text-[#0d171b] text-lg font-medium leading-normal" for="age">Age</label>
+                <input
+                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d171b] focus:outline-0 focus:ring-2 focus:ring-[#1193d4] border-2 border-slate-200 bg-white h-16 placeholder:text-slate-400 p-4 text-lg font-normal leading-normal"
+                    id="age" type="number" value="72" />
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="text-[#0d171b] text-lg font-medium leading-normal" for="gender">Gender (Optional)</label>
+                <input
+                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d171b] focus:outline-0 focus:ring-2 focus:ring-[#1193d4] border-2 border-slate-200 bg-white h-16 placeholder:text-slate-400 p-4 text-lg font-normal leading-normal"
+                    id="gender" placeholder="e.g. Female" />
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="text-[#0d171b] text-lg font-medium leading-normal" for="contact">Contact
+                    Information</label>
+                <input
+                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d171b] focus:outline-0 focus:ring-2 focus:ring-[#1193d4] border-2 border-slate-200 bg-white h-16 placeholder:text-slate-400 p-4 text-lg font-normal leading-normal"
+                    id="contact" type="tel" value="(123) 456-7890" />
+            </div>
 
+
+
+            <div class="pt-8">
+                <a href="../menu.html"
+                    class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-2xl h-16 px-5 bg-blue-500 text-white text-xl font-bold leading-normal tracking-[0.015em]">
+                    <span class="truncate">Save Changes</span>
+                </a>
+            </div>
+
+            <div class="flex justify-center">
+                <a href="../menu.html"
+                    class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-2xl h-16 px-5 bg-red-100 text-red-500 text-lg font-bold leading-normal tracking-[0.015em]">
+                    <span class="truncate">Delete Profile</span>
+                </a>
+            </div>
+            
         </main>
 
 

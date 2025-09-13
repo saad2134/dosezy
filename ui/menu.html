@@ -68,7 +68,7 @@
                     <img alt="User profile picture" class="h-12 w-12 rounded-2xl object-cover"
                         src="https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg" />
                     <div>
-                        <p class="text-2xl font-bold text-gray-800">Good Morning, John!</p>
+                        <p class="text-2xl font-bold text-gray-800">Hi, John!</p>
                         <p class="text-sm text-gray-500">"Health is a priceless wealth."</p>
                     </div>
                 </div>
@@ -104,14 +104,14 @@
                     <!-- Buttons row -->
                     <div class="flex gap-3">
                         <!-- Manage Profile -->
-                        <a href="#"
+                        <a href="menu/manage_account.html"
                             class="flex flex-1 items-center justify-center rounded-lg bg-gray-100 p-4 shadow-sm transition-colors hover:bg-gray-200">
                             <span class="material-symbols-outlined text-2xl text-primary-600 mr-2">account_circle</span>
                             <span class="text-lg font-medium text-gray-700">Manage</span>
                         </a>
 
                         <!-- Switch Profile -->
-                        <a href="#"
+                        <a id="switchacBtn"
                             class="flex flex-1 items-center justify-center rounded-lg bg-gray-100 p-4 shadow-sm transition-colors hover:bg-gray-200">
                             <span class="material-symbols-outlined text-2xl text-primary-600 mr-2">switch_account</span>
                             <span class="text-lg font-medium text-gray-700">Switch</span>
@@ -153,8 +153,8 @@
                 <div class="border-t-2 border-dashed border-gray-300 my-4"></div>
 
 
-                <a class="flex items-center rounded-lg bg-white p-5 shadow-sm transition-colors hover:bg-gray-100 h-20"
-                    href="#">
+                <a id="exportBtn"
+                    class="flex items-center rounded-lg bg-white p-5 shadow-sm transition-colors hover:bg-gray-100 h-20 cursor-pointer">
                     <span class="material-symbols-outlined text-3xl text-primary-600 mr-4">download</span>
                     <span class="flex-1 text-lg font-medium text-gray-700">Export Data as CSV</span>
                     <span class="material-symbols-outlined text-gray-400">chevron_right</span>
@@ -168,7 +168,7 @@
         <div class="fixed bottom-0 left-0 right-0 z-20">
             <nav class="flex justify-around items-center border-t border-gray-200 bg-white py-2">
                 <!-- Home -->
-                <a class="flex flex-col items-center gap-1 text-gray-400" href="index.html">
+                <a class="flex flex-col items-center gap-1 text-gray-400" href="home.html">
                     <span class="material-symbols-outlined text-3xl">home</span>
                     <p class="text-xs font-medium">Home</p>
                 </a>
@@ -199,6 +199,133 @@
             </nav>
         </div>
     </div>
+
+
+    <!-- Switch Account Modal (hidden by default) -->
+    <div id="switchacModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm m-4 overflow-hidden">
+            <div class="p-6 text-center">
+                <h1 class="text-2xl font-bold text-gray-800 leading-tight tracking-tight mb-6">
+                    Switch Profile
+                </h1>
+
+                <!-- Profiles List -->
+                <div class="space-y-4">
+                    <!-- Profile 1 -->
+                    <a href="#"
+                        class="flex items-center justify-between p-4 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <img alt="User profile picture" class="h-12 w-12 rounded-2xl object-cover"
+                                src="https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg" />
+                            <p class="text-lg font-medium text-gray-800">John Doe</p>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-400 text-2xl">chevron_right</span>
+                    </a>
+
+                    <!-- Profile 2 -->
+                    <a href="#"
+                        class="flex items-center justify-between p-4 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <img alt="User profile picture" class="h-12 w-12 rounded-2xl object-cover"
+                                src="https://avatarfiles.alphacoders.com/360/360040.jpg" />
+                            <p class="text-lg font-medium text-gray-800">Whoever</p>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-400 text-2xl">chevron_right</span>
+                    </a>
+                </div>
+
+                <!-- Add New Profile Button -->
+                <button
+                    class="mt-6 w-full flex items-center justify-center gap-2 rounded-xl h-14 px-6 bg-blue-500 text-white text-lg font-bold hover:bg-blue-600 transition-colors duration-300">
+                    <span class="material-symbols-outlined text-xl">person_add</span>
+                    <span>New Profile</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+    <!-- Export Modal (hidden by default) -->
+    <div id="exportModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm m-4 overflow-hidden">
+            <div class="p-8 text-center">
+                <div class="flex justify-center mb-4">
+                    <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-4xl text-blue-500">
+                            check_circle
+                        </span>
+                    </div>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800 leading-tight tracking-tight mb-2">
+                    Data Exported
+                </h1>
+                <p class="text-gray-600 mb-6">Your medication data has been successfully saved as a CSV file to your
+                    local device.</p>
+
+                <button id="shareModal"
+                    class="w-full flex items-center justify-center gap-2 rounded-xl h-14 px-6 bg-blue-500 text-white text-lg font-bold hover:bg-blue-600 transition-colors duration-300 mb-3">
+                    <span class="material-symbols-outlined">
+                        share
+                    </span>
+                    <span>Share to another app</span>
+                </button>
+
+                <!-- Close button -->
+                <button id="closeModal"
+                    class="w-full flex items-center justify-center  rounded-xl h-14 px-6 border border-gray-300 text-gray-600 hover:bg-gray-100 transition-colors duration-300">
+                    <span class="material-symbols-outlined">
+                        close
+                    </span>
+                    <span>Close</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const exportBtn = document.getElementById("exportBtn");
+        const exportModal = document.getElementById("exportModal");
+        const shareModal = document.getElementById("shareModal");
+        const closeModal = document.getElementById("closeModal");
+
+        exportBtn.addEventListener("click", () => {
+            exportModal.classList.remove("hidden");
+        });
+
+        shareModal.addEventListener("click", () => {
+            exportModal.classList.add("hidden");
+        });
+
+        closeModal.addEventListener("click", () => {
+            exportModal.classList.add("hidden");
+        });
+
+        // Optional: close when clicking outside the modal
+        exportModal.addEventListener("click", (e) => {
+            if (e.target === exportModal) {
+                exportModal.classList.add("hidden");
+            }
+        });
+
+        const switchacBtn = document.getElementById("switchacBtn");
+        const switchacModal = document.getElementById("switchacModal");
+
+        switchacBtn.addEventListener("click", () => {
+            switchacModal.classList.remove("hidden");
+        });
+
+        // Optional: close when clicking outside the modal
+        switchacModal.addEventListener("click", (e) => {
+            if (e.target === switchacModal) {
+                switchacModal.classList.add("hidden");
+            }
+        });
+    </script>
 
 </body>
 

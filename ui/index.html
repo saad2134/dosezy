@@ -1,26 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<!-- 
-
-5 dialogs
-Pfp
-Notif Bell
-New Med
-Switch Account
-CSV
-
-4 windows
-Edit Med
-Manage Account
-Emergency
-Help and Support
-
--->
-
 <head>
     <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect" />
     <link as="style"
         href="https://fonts.googleapis.com/css2?display=swap&amp;family=Lexend%3Awght%40400%3B500%3B700%3B900&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900"
@@ -29,11 +11,19 @@ Help and Support
     <title>Dozesy App</title>
     <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <style type="text/tailwindcss">
-        :root {
-            --primary-color: #2084e4;
+    <!-- <style type="text/tailwindcss">
+        @keyframes spin {
+        from {
+          transform: rotate(0deg);
         }
-    </style>
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .animate-spin-slow {
+        animation: spin 3s linear infinite;
+      }
+    </style> -->
     <style>
         body {
             min-height: max(884px, 100dvh);
@@ -41,178 +31,323 @@ Help and Support
     </style>
     <style>
         body {
-            min-height: max(884px, 100dvh);
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 50% 100%, #fff, #eee);
+        }
+
+        .content {
+            width: 50vmin;
+            height: 50vmin;
+            background: #fff0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pill {
+            background: #fff0;
+            width: 15vmin;
+            height: 40vmin;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transform: rotate(180deg);
+            animation: spin 2s linear 0s infinite;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(540deg);
+            }
+        }
+
+        .pill .side {
+            background: #1e9afe;
+            position: relative;
+            overflow: hidden;
+            width: 11vmin;
+            height: 15vmin;
+            border-radius: 6vmin 6vmin 0 0;
+        }
+
+        .pill .side+.side {
+            background: #dedede;
+            border-radius: 0 0 6vmin 6vmin;
+            border-top: 1vmin solid #6260ff;
+            animation: open 2s ease-in-out 0s infinite;
+        }
+
+        @keyframes open {
+
+            0%,
+            20%,
+            80%,
+            100% {
+                margin-top: 0;
+            }
+
+            30%,
+            70% {
+                margin-top: 10vmin;
+            }
+        }
+
+        .pill .side:before {
+            content: "";
+            position: absolute;
+            width: 2vmin;
+            height: 10vmin;
+            bottom: 0;
+            right: 1.5vmin;
+            background: #fff2;
+            border-radius: 1vmin 1vmin 0 0;
+            animation: shine 1s ease-out -1s infinite alternate-reverse;
+        }
+
+        .pill .side+.side:before {
+            bottom: inherit;
+            top: 0;
+            border-radius: 0 0 1vmin 1vmin;
+        }
+
+        .pill .side:after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            bottom: 0;
+            left: 0;
+            border-radius: 6vmin 6vmin 0 0;
+            border: 1.75vmin solid #00000022;
+            border-bottom-color: #fff0;
+            border-bottom-width: 0vmin;
+            border-top-width: 1vmin;
+            animation: shadow 1s ease -1s infinite alternate-reverse;
+        }
+
+        .pill .side+.side:after {
+            bottom: inherit;
+            top: 0;
+            border-radius: 0 0 6vmin 6vmin;
+            border-top-color: #fff0;
+            border-top-width: 0vmin;
+            border-bottom-width: 1vmin;
+        }
+
+        @keyframes shine {
+
+            0%,
+            46% {
+                right: 1.5vmin;
+            }
+
+            54%,
+            100% {
+                right: 7.5vmin;
+            }
+        }
+
+        @keyframes shadow {
+
+            0%,
+            49.999% {
+                transform: rotateY(0deg);
+                left: 0;
+            }
+
+            50%,
+            100% {
+                transform: rotateY(180deg);
+                left: -3vmin;
+            }
+        }
+
+        .medicine {
+            position: absolute;
+            width: calc(100% - 6vmin);
+            height: calc(100% - 12vmin);
+            background: #fff0;
+            border-radius: 5vmin;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .medicine i {
+            width: 1vmin;
+            height: 1vmin;
+            background: #6260ff;
+            border-radius: 100%;
+            position: absolute;
+            animation: medicine-dust 1.75s ease 0s infinite alternate;
+        }
+
+        .medicine i:nth-child(2n + 2) {
+            width: 1.5vmin;
+            height: 1.5vmin;
+            margin-top: -5vmin;
+            margin-right: -5vmin;
+            animation-delay: -0.2s;
+        }
+
+        .medicine i:nth-child(3n + 3) {
+            width: 2vmin;
+            height: 2vmin;
+            margin-top: 4vmin;
+            margin-right: 3vmin;
+            animation-delay: -0.33s;
+        }
+
+        .medicine i:nth-child(4) {
+            margin-top: -5vmin;
+            margin-right: 4vmin;
+            animation-delay: -0.4s;
+        }
+
+        .medicine i:nth-child(5) {
+            margin-top: 5vmin;
+            margin-right: -4vmin;
+            animation-delay: -0.5s;
+        }
+
+        .medicine i:nth-child(6) {
+            margin-top: 0vmin;
+            margin-right: -3.5vmin;
+            animation-delay: -0.66s;
+        }
+
+        .medicine i:nth-child(7) {
+            margin-top: -1vmin;
+            margin-right: 7vmin;
+            animation-delay: -0.7s;
+        }
+
+        .medicine i:nth-child(8) {
+            margin-top: 6vmin;
+            margin-right: -1vmin;
+            animation-delay: -0.8s;
+        }
+
+        .medicine i:nth-child(9) {
+            margin-top: 4vmin;
+            margin-right: -7vmin;
+            animation-delay: -0.99s;
+        }
+
+        .medicine i:nth-child(10) {
+            margin-top: -6vmin;
+            margin-right: 0vmin;
+            animation-delay: -1.11s;
+        }
+
+        .medicine i:nth-child(1n + 10) {
+            width: 0.6vmin;
+            height: 0.6vmin;
+        }
+
+        .medicine i:nth-child(11) {
+            margin-top: 6vmin;
+            margin-right: 6vmin;
+            animation-delay: -1.125s;
+        }
+
+        .medicine i:nth-child(12) {
+            margin-top: -7vmin;
+            margin-right: -7vmin;
+            animation-delay: -1.275s;
+        }
+
+        .medicine i:nth-child(13) {
+            margin-top: -1vmin;
+            margin-right: 3vmin;
+            animation-delay: -1.33s;
+        }
+
+        .medicine i:nth-child(14) {
+            margin-top: -3vmin;
+            margin-right: -1vmin;
+            animation-delay: -1.4s;
+        }
+
+        .medicine i:nth-child(15) {
+            margin-top: -1vmin;
+            margin-right: -7vmin;
+            animation-delay: -1.55s;
+        }
+
+        @keyframes medicine-dust {
+
+            0%,
+            100% {
+                transform: translate3d(0vmin, 0vmin, -0.1vmin);
+            }
+
+            25% {
+                transform: translate3d(0.25vmin, 5vmin, 0vmin);
+            }
+
+            75% {
+                transform: translate3d(-0.1vmin, -4vmin, 0.25vmin);
+            }
         }
     </style>
+
+    <!-- Redirect Script -->
+    <script>
+        setTimeout(() => {
+            window.location.href = "home.html";
+        }, 1000);
+    </script>
+
+
+
 </head>
 
-<body class="bg-gray-50">
-    <div class="relative flex size-full min-h-screen flex-col group/design-root overflow-x-hidden"
+<body>
+    <div class="relative flex size-full min-h-screen flex-col bg-gray-200 justify-center items-center group/design-root overflow-x-hidden p-7"
         style='font-family: Lexend, "Noto Sans", sans-serif;'>
-        <div class="flex flex-col pb-32 bg-gray-100">
-            <header class="bg-white p-4 shadow-sm sticky top-0 z-10">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <img alt="User profile picture" class="h-12 w-12 rounded-2xl object-cover"
-                            src="https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg" />
-                        <div>
-                            <p class="text-2xl font-bold text-gray-800">Good Morning, John!</p>
-                            <p class="text-sm text-gray-500">"Health is a priceless wealth."</p>
-                        </div>
+
+        <div class="flex flex-col items-center justify-center gap-18 text-center">
+            <div class="content">
+                <div class="pill">
+                    <div class="medicine">
+                        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <button aria-label="Notifications Status: All good"
-                            class="relative flex items-center justify-center rounded-xl h-10 w-10 bg-red-500 text-white">
-                            <span class="material-symbols-outlined text-xl"> notifications </span>
-                            <span
-                                class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-red-500">
-                                <span class="material-symbols-outlined text-sm">
-                                    <!-- check  -->
-                                    close
-                                </span>
-                            </span>
-                        </button>
-                    </div>
+                    <div class="side"></div>
+                    <div class="side"></div>
                 </div>
-                <div class="flex flex-col items-center mt-8 mb-2">
-                    <h1 class="text-4xl font-bold text-gray-800">Today's Meds</h1>
-                    <p class="text-lg text-gray-500">(Monday)</p>
-                </div>
+            </div>
 
-
-            </header>
-            <main class="flex-grow p-4 space-y-8 bg-gray-100">
-
-                <div class="text-center">
-                    <p class="text-5xl font-bold text-gray-800"> 8:00 <span class="text-3xl font-medium">AM</span> </p>
-                    <p class="text-gray-500">Next dose in 30 minutes</p>
-                </div>
-                <div class="flex items-center gap-4 rounded-xl bg-white p-4 shadow-md">
-                    <div class="flex size-16 items-center justify-center rounded-full bg-blue-100 text-blue-500">
-                        <span class="material-symbols-outlined text-4xl"> pill </span>
-                    </div>
-                    <div class="flex-grow">
-                        <p class="text-xl font-bold text-gray-800">Aspirin</p>
-                        <p class="text-lg text-gray-500">100mg</p>
-                    </div>
-                    <button
-                        class="flex h-12 min-w-[100px] cursor-pointer items-center justify-center overflow-hidden rounded-full bg-blue-400 px-6 text-lg font-bold text-white shadow-lg transition-transform hover:scale-105">
-                        <span class="truncate">Take</span>
-                    </button>
-                </div>
-
-
-                <div class="flex items-center gap-4 rounded-xl bg-white p-4 shadow-md">
-                    <div class="flex size-16 items-center justify-center rounded-full bg-blue-100 text-blue-500">
-                        <span class="material-symbols-outlined text-4xl"> pill </span>
-                    </div>
-                    <div class="flex-grow">
-                        <p class="text-xl font-bold text-gray-800">Lisinopril</p>
-                        <p class="text-lg text-gray-500">20mg</p>
-                    </div>
-                    <button
-                        class="flex h-12 min-w-[100px] cursor-pointer items-center justify-center overflow-hidden rounded-full bg-gray-200 px-6 text-lg font-bold text-gray-400">
-                        <span class="truncate">Taken</span>
-                    </button>
-                </div>
-
-
-                <div class="text-center">
-                    <p class="text-5xl font-bold text-gray-800"> 8:30 <span class="text-3xl font-medium">PM</span> </p>
-                    <p class="text-gray-500">Next dose in 30 minutes</p>
-                </div>
-                <div class="flex items-center gap-4 rounded-xl bg-white p-4 shadow-md">
-                    <div class="flex size-16 items-center justify-center rounded-full bg-blue-100 text-blue-500">
-                        <span class="material-symbols-outlined text-4xl"> pill </span>
-                    </div>
-                    <div class="flex-grow">
-                        <p class="text-xl font-bold text-gray-800">Aspirin</p>
-                        <p class="text-lg text-gray-500">100mg</p>
-                    </div>
-                    <button
-                        class="flex h-12 min-w-[100px] cursor-pointer items-center justify-center overflow-hidden rounded-full bg-blue-400 px-6 text-lg font-bold text-white shadow-lg transition-transform hover:scale-105">
-                        <span class="truncate">Take</span>
-                    </button>
-                </div>
-
-
-                <div class="flex items-center gap-4 rounded-xl bg-white p-4 shadow-md">
-                    <div class="flex size-16 items-center justify-center rounded-full bg-blue-100 text-blue-500">
-                        <span class="material-symbols-outlined text-4xl"> pill </span>
-                    </div>
-                    <div class="flex-grow">
-                        <p class="text-xl font-bold text-gray-800">Lisinopril</p>
-                        <p class="text-lg text-gray-500">20mg</p>
-                    </div>
-                    <button
-                        class="flex h-12 min-w-[100px] cursor-pointer items-center justify-center overflow-hidden rounded-full bg-gray-200 px-6 text-lg font-bold text-gray-400">
-                        <span class="truncate">Taken</span>
-                    </button>
-                </div>
-
-                <div class="border-t-2 border-dashed border-gray-300 my-4"></div>
-
-                <div class="flex flex-col items-center justify-center text-center py-10 px-6">
-                    <div class="flex items-center justify-center h-24 w-24 rounded-full bg-gray-200 mb-6">
-                        <span class="material-symbols-outlined text-6xl text-gray-400">medication</span>
-                    </div>
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">No medications yet</h2>
-                    <p class="text-lg text-gray-500 max-w-sm">It looks like you haven't added any medications to your
-                        schedule. Get started by tapping the <span class="font-bold text-blue-500">plus</span> button
-                        below.</p>
-                </div>
-
-                <div class="border-t-2 border-dashed border-gray-300 my-4"></div>
-
-                <div class="flex flex-col items-center justify-center text-center py-10 px-6">
-                    <div class="flex items-center justify-center h-24 w-24 rounded-full bg-green-200 mb-6">
-                        <span class="material-symbols-outlined text-6xl text-green-400">check</span>
-                    </div>
-                    <h2 class="text-2xl font-bold text-green-800 mb-2">All Good!</h2>
-                    <p class="text-lg text-gray-500 max-w-sm">No medications need to be taken today. If you need to add
-                        more, get started by tapping the <span class="font-bold text-blue-500">plus</span> button
-                        below.</p>
-                </div>
-
-
-            </main>
+            <div class="flex flex-col gap-2">
+                <h1 class="text-slate-800 text-4xl font-bold leading-tight tracking-tight">
+                    Loading...
+                </h1>
+                <!-- <p class="text-slate-500 text-4xl">Please wait a moment.</p> -->
+            </div>
+            <br><br>
         </div>
-        <div class="fixed bottom-0 left-0 right-0 z-20">
-            <nav class="flex justify-around items-center border-t border-gray-200 bg-white py-2">
-                <!-- Home -->
-                <a class="flex flex-col items-center gap-1 text-blue-500" href="index.html">
-                    <span class="material-symbols-outlined text-3xl">home</span>
-                    <p class="text-xs font-medium">Home</p>
-                </a>
 
-                <!-- Schedule -->
-                <a class="flex flex-col items-center gap-1 text-gray-400" href="schedule.html">
-                    <span class="material-symbols-outlined text-3xl">calendar_month</span>
-                    <p class="text-xs font-medium">Schedule</p>
-                </a>
 
-                <!-- Center Add Button -->
-                <button aria-label="Add New Medicine"
-                    class="flex items-center justify-center w-14 h-14 bg-blue-500 rounded-2xl text-white shadow-lg transform transition-transform hover:scale-105 active:scale-95">
-                    <span class="material-symbols-outlined text-4xl">add</span>
-                </button>
 
-                <!-- Medicines -->
-                <a class="flex flex-col items-center gap-1 text-gray-400" href="medicines.html">
-                    <span class="material-symbols-outlined text-3xl">medication</span>
-                    <p class="text-xs font-medium">Medicines</p>
-                </a>
-
-                <!-- Menu -->
-                <a class="flex flex-col items-center gap-1 text-gray-400" href="menu.html">
-                    <span class="material-symbols-outlined text-3xl">menu</span>
-                    <p class="text-xs font-medium">Menu</p>
-                </a>
-            </nav>
+        <!-- Watermark Footer -->
+        <div
+            class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center opacity-60 select-none text-gray-500 pr-8">
+            <img src="loader-icon.svg" alt="Dozesy Logo" class="w-12 h-12 mr-2 filter grayscale" />
+            <p class="h-16 text-4xl flex items-center font-semibold">Dozesy</p>
         </div>
+
 
     </div>
-
 </body>
+
 
 </html>
