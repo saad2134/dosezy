@@ -33,7 +33,7 @@ Once you input the basics: name, dosage, timing, and frequency, the app intellig
     </tr>
   </tbody>
 </table>
-
+  k
 
 ## 🚀 Getting Started
 * Android (Using the app)
