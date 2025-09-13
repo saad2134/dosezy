@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "com.example.dosezy.app-mergeDebugResources-46:/layout/fragment_first.xml",
+        "source": "com.example.dosezy.app-main-49:/layout/fragment_first.xml"
+    },
+    {
+        "merged": "com.example.dosezy.app-mergeDebugResources-46:/layout/fragment_second.xml",
+        "source": "com.example.dosezy.app-main-49:/layout/fragment_second.xml"
+    },
+    {
+        "merged": "com.example.dosezy.app-mergeDebugResources-46:/layout/content_main.xml",
+        "source": "com.example.dosezy.app-main-49:/layout/content_main.xml"
+    },
+    {
+        "merged": "com.example.dosezy.app-mergeDebugResources-46:/layout/activity_main.xml",
+        "source": "com.example.dosezy.app-main-49:/layout/activity_main.xml"
+    }
+]
