@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Dozesy App</title>
+    <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <style type="text/tailwindcss">
+        :root {
+      --primary-50: #eef7fe;
+      --primary-100: #dbeffd;
+      --primary-200: #c1e3fc;
+      --primary-300: #9ad2fa;
+      --primary-400: #6cbaf7;
+      --primary-500: #48a1f2;
+      --primary-600: #2e83d9;
+      --primary-700: #2569b2;
+      --primary-800: #21568e;
+      --primary-900: #204871;
+      --primary-950: #162f4b;
+      --secondary-50: #f0f9ff;
+      --secondary-100: #e0f2fe;
+      --secondary-200: #bae6fd;
+      --secondary-300: #7dd3fc;
+      --secondary-400: #38bdf8;
+      --secondary-500: #0ea5e9;
+      --secondary-600: #0284c7;
+      --secondary-700: #0369a1;
+      --secondary-800: #075985;
+      --secondary-900: #0c4a6e;
+      --secondary-950: #082f49;
+    }
+    body {
+      font-family: 'Lexend', sans-serif;
+    }
+    .material-symbols-outlined {
+        font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
+    }
+  </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+
+        .modal {
+            display: none;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .option-row {
+            cursor: pointer;
+        }
+
+        .option-row input {
+            pointer-events: none;
+        }
+
+        /* prevent tiny click-only */
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <div class="flex h-screen flex-col bg-gray-100">
+
+
+        <header class="bg-white p-4 shadow-sm sticky top-0 z-10">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <img alt="User profile picture" class="h-12 w-12 rounded-2xl object-cover"
+                        src="https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg" />
+                    <div>
+                        <p class="text-2xl font-bold text-gray-800">Good Morning, John!</p>
+                        <p class="text-sm text-gray-500">"Health is a priceless wealth."</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button aria-label="Notifications Status: All good"
+                        class="relative flex items-center justify-center rounded-xl h-10 w-10 bg-green-500 text-white">
+                        <span class="material-symbols-outlined text-xl"> notifications </span>
+                        <span
+                            class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-green-500">
+                            <span class="material-symbols-outlined text-sm"> check </span>
+                        </span>
+
+                </div>
+            </div>
+            <div class="flex justify-center  mt-8 mb-2">
+                <h1 class="text-4xl font-bold text-gray-800">Menu</h1>
+            </div>
+
+        </header>
+
+
+
+        <header class="flex items-center justify-between p-4">
+            <a href="../menu.html"
+                class="flex items-center justify-center rounded-full p-2 text-[#0D1B1B] hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#11D4D4]">
+                <span class="material-symbols-outlined text-3xl">arrow_back</span>
+            </a>
+            <h1 class="flex-1 text-center text-3xl font-bold text-[#0D1B1B]">Preferences</h1>
+            <div class="w-10"></div>
+        </header>
+
+        <main class="flex flex-col gap-6 px-4 py-6">
+            <!-- Theme -->
+            <section>
+                <button data-modal="themeModal"
+                    class="open-modal flex w-full items-center justify-between rounded-lg bg-white p-4 text-left shadow-sm">
+                    <div class="flex items-center gap-4">
+                        <span class="material-symbols-outlined text-3xl text-blue-500">palette</span>
+                        <div>
+                            <h2 class="text-xl font-bold text-[#0D1B1B]">Theme</h2>
+                            <p id="themeValue" class="text-lg text-gray-500">Light</p>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-3xl text-gray-400">chevron_right</span>
+                </button>
+            </section>
+
+            <!-- Time Format -->
+            <section>
+                <button data-modal="timeModal"
+                    class="open-modal flex w-full items-center justify-between rounded-lg bg-white p-4 text-left shadow-sm">
+                    <div class="flex items-center gap-4">
+                        <span class="material-symbols-outlined text-3xl text-blue-500">schedule</span>
+                        <div>
+                            <h2 class="text-xl font-bold text-[#0D1B1B]">Time Format</h2>
+                            <p id="timeValue" class="text-lg text-gray-500">24-hour</p>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-3xl text-gray-400">chevron_right</span>
+                </button>
+            </section>
+
+            <!-- Language -->
+            <section>
+                <button data-modal="languageModal"
+                    class="open-modal flex w-full items-center justify-between rounded-lg bg-white p-4 text-left shadow-sm">
+                    <div class="flex items-center gap-4">
+                        <span class="material-symbols-outlined text-3xl text-blue-500">language</span>
+                        <div>
+                            <h2 class="text-xl font-bold text-[#0D1B1B]">Language</h2>
+                            <p id="languageValue" class="text-lg text-gray-500">English</p>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-3xl text-gray-400">chevron_right</span>
+                </button>
+            </section>
+        </main>
+
+
+        <div class="fixed bottom-0 left-0 right-0 z-20">
+            <nav class="flex justify-around items-center border-t border-gray-200 bg-white py-2">
+                <!-- Home -->
+                <a class="flex flex-col items-center gap-1 text-gray-400" href="../index.html">
+                    <span class="material-symbols-outlined text-3xl">home</span>
+                    <p class="text-xs font-medium">Home</p>
+                </a>
+
+                <!-- Schedule -->
+                <a class="flex flex-col items-center gap-1 text-gray-400" href="../schedule.html">
+                    <span class="material-symbols-outlined text-3xl">calendar_month</span>
+                    <p class="text-xs font-medium">Schedule</p>
+                </a>
+
+                <!-- Center Add Button -->
+                <button aria-label="Add New Medicine"
+                    class="flex items-center justify-center w-14 h-14 bg-blue-500 rounded-2xl text-white shadow-lg transform transition-transform hover:scale-105 active:scale-95">
+                    <span class="material-symbols-outlined text-4xl">add</span>
+                </button>
+
+                <!-- Medicines -->
+                <a class="flex flex-col items-center gap-1 text-gray-400" href="../medicines.html">
+                    <span class="material-symbols-outlined text-3xl">medication</span>
+                    <p class="text-xs font-medium">Medicines</p>
+                </a>
+
+                <!-- Menu -->
+                <a class="flex flex-col items-center gap-1  text-blue-500" href="../menu.html">
+                    <span class="material-symbols-outlined text-3xl">menu</span>
+                    <p class="text-xs font-medium">Menu</p>
+                </a>
+            </nav>
+        </div>
+    </div>
+
+
+    <!-- Modals (same structure, reusable) -->
+    <div id="themeModal" class="modal fixed inset-0 z-50 hidden items-end bg-black bg-opacity-50">
+        <div class="w-full rounded-t-2xl bg-white p-6 shadow-lg">
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-bold text-[#0D1B1B]">Select Theme</h2>
+                <button class="close-modal text-gray-500 hover:text-gray-800" data-modal="themeModal">
+                    <span class="material-symbols-outlined text-3xl">close</span>
+                </button>
+            </div>
+            <div class="mt-6 flex flex-col gap-2">
+                <label class="option-row flex items-center justify-between rounded-lg bg-gray-100 p-4">
+                    <span class="text-lg font-medium text-[#0D1B1B]">Light</span>
+                    <input checked type="radio" name="theme" value="Light" />
+                </label>
+                <label class="option-row flex items-center justify-between rounded-lg p-4 hover:bg-gray-50">
+                    <span class="text-lg text-[#0D1B1B]">Dark</span>
+                    <input type="radio" name="theme" value="Dark" />
+                </label>
+            </div>
+            <button
+                class="save-modal mt-6 w-full rounded-full bg-blue-500 py-4 text-lg font-bold text-white hover:bg-blue-800"
+                data-modal="themeModal" data-target="themeValue" data-name="theme">Save</button>
+        </div>
+    </div>
+
+    <div id="timeModal" class="modal fixed inset-0 z-50 hidden items-end bg-black bg-opacity-50">
+        <div class="w-full rounded-t-2xl bg-white p-6 shadow-lg">
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-bold text-[#0D1B1B]">Select Time Format</h2>
+                <button class="close-modal text-gray-500 hover:text-gray-800" data-modal="timeModal">
+                    <span class="material-symbols-outlined text-3xl">close</span>
+                </button>
+            </div>
+            <div class="mt-6 flex flex-col gap-2">
+                <label class="option-row flex items-center justify-between rounded-lg bg-gray-100 p-4">
+                    <span class="text-lg font-medium text-[#0D1B1B]">24-hour</span>
+                    <input checked type="radio" name="time" value="24-hour" />
+                </label>
+                <label class="option-row flex items-center justify-between rounded-lg p-4 hover:bg-gray-50">
+                    <span class="text-lg text-[#0D1B1B]">12-hour</span>
+                    <input type="radio" name="time" value="12-hour" />
+                </label>
+            </div>
+            <button
+                class="save-modal mt-6 w-full rounded-full  bg-blue-500 py-4 text-lg font-bold text-white hover:bg-blue-800"
+                data-modal="timeModal" data-target="timeValue" data-name="time">Save</button>
+        </div>
+    </div>
+
+    <div id="languageModal" class="modal fixed inset-0 z-50 hidden items-end bg-black bg-opacity-50">
+        <div class="w-full rounded-t-2xl bg-white p-6 shadow-lg">
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-bold text-[#0D1B1B]">Select Language</h2>
+                <button class="close-modal text-gray-500 hover:text-gray-800" data-modal="languageModal">
+                    <span class="material-symbols-outlined text-3xl">close</span>
+                </button>
+            </div>
+            <div class="mt-6 flex flex-col gap-2">
+                <label class="option-row flex items-center justify-between rounded-lg bg-gray-100 p-4">
+                    <span class="text-lg font-medium text-[#0D1B1B]">English</span>
+                    <input checked type="radio" name="language" value="English" />
+                </label>
+                <label class="option-row flex items-center justify-between rounded-lg p-4 hover:bg-gray-50">
+                    <span class="text-lg text-[#0D1B1B]">Hindi</span>
+                    <input type="radio" name="language" value="Hindi" />
+                </label>
+                <label class="option-row flex items-center justify-between rounded-lg p-4 hover:bg-gray-50">
+                    <span class="text-lg text-[#0D1B1B]">Urdu</span>
+                    <input type="radio" name="language" value="Urdu" />
+                </label>
+            </div>
+            <button
+                class="save-modal mt-6 w-full rounded-full  bg-blue-500 py-4 text-lg font-bold text-white hover:bg-blue-800"
+                data-modal="languageModal" data-target="languageValue" data-name="language">Save</button>
+        </div>
+    </div>
+
+    <script>
+        // Open modal
+        document.querySelectorAll(".open-modal").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.getElementById(btn.dataset.modal).classList.add("active");
+            });
+        });
+
+        // Close modal
+        document.querySelectorAll(".close-modal").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.getElementById(btn.dataset.modal).classList.remove("active");
+            });
+        });
+
+        // Save and update
+        document.querySelectorAll(".save-modal").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const group = btn.dataset.name;
+                const selected = document.querySelector(`input[name="${group}"]:checked`);
+                if (selected) {
+                    document.getElementById(btn.dataset.target).textContent = selected.value;
+                }
+                document.getElementById(btn.dataset.modal).classList.remove("active");
+            });
+        });
+    </script>
+
+
+</body>
+
+</html>
