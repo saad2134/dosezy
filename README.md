@@ -4,7 +4,7 @@ An Android medicine tracking app. **Dosezy** transforms medication management in
 Built with accessibility at its core, the app features **clear, large text** and **intuitive navigation**: perfect for elderly users and anyone managing multiple prescriptions.  
 
 Once you input the basics: name, dosage, timing, and frequency, the app intelligently handles your medication schedule.  
-
+ 
 
 ## ✨ Features  
 
