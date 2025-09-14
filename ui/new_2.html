@@ -52,16 +52,6 @@
         body {
             min-height: max(884px, 100dvh);
         }
-    </style>
-    <style>
-        body {
-            min-height: max(884px, 100dvh);
-        }
-    </style>
-    <style>
-        body {
-            min-height: max(884px, 100dvh);
-        }
 
         .modal {
             display: none;
@@ -109,7 +99,7 @@
                 <div class="h-2.5 w-8 rounded-full bg-[var(--primary-500)]"></div>
                 <div class="h-2.5 w-2.5 rounded-full bg-slate-300"></div>
             </div>
-            <div class="text-center pt-8 pb-12">
+            <div class="text-center pt-0 pb-12">
                 <h2 class="text-slate-900 text-3xl font-bold leading-tight">Your Health, Simplified</h2>
                 <p class="text-slate-500 mt-2 text-base">Key features of Dosezy</p>
             </div>
@@ -149,20 +139,27 @@
                 </div>
             </div>
         </div>
-        <div class="sticky bottom-2 w-full bg-slate-50 py-4 px-6">
-            <div class="flex gap-4">
+
+
+
+        <div class="fixed bottom-0 left-0 right-0 z-20">
+            <nav class="flex justify-between items-center border-t border-gray-200 bg-white py-2 px-4 gap-4">
+
+                <!-- Back button (left side) -->
                 <a href="new_1.html"
-                    class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 px-5 bg-slate-200 text-slate-800 text-lg font-bold leading-normal">
+                    class="w-1/2 flex items-center justify-center overflow-hidden rounded-xl h-14 px-5 bg-slate-200 text-slate-800 text-lg font-bold leading-normal">
                     Back
                 </a>
 
+                <!-- Next button (right side) -->
                 <a href="new_3.html"
-                    class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 px-5 bg-[#2084e4] text-white text-lg font-bold leading-normal">
+                    class=" w-1/2 flex items-center justify-center overflow-hidden rounded-xl h-14 px-5 bg-[#2084e4] text-white text-lg font-bold leading-normal">
                     Next
                 </a>
 
-            </div>
+            </nav>
         </div>
+
     </div>
 
 </body>

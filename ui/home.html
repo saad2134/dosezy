@@ -74,8 +74,10 @@ Pfp
             <header class="bg-white p-4 shadow-sm sticky top-0 z-10">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <img alt="User profile picture" class="h-12 w-12 rounded-2xl object-cover"
-                            src="https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg" />
+                        <button id="pfpBtn">
+                            <img alt="User profile picture" class="h-12 w-12 rounded-2xl object-cover"
+                                src="https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg" />
+                        </button>
                         <div>
                             <p class="text-2xl font-bold text-gray-800">Hi, John!</p>
                             <p class="text-sm text-gray-500">"Health is a priceless wealth."</p>
@@ -237,7 +239,69 @@ Pfp
 
 
 
-    <!-- Switch Account Modal (hidden by default) -->
+    <!-- pfpModal (hidden by default) -->
+    <div id="pfpModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm m-4 overflow-hidden">
+            <div class="p-4 text-center">
+
+                <!-- Manage Profile -->
+                <a href="menu/manage_account.html"
+                    class="w-full flex items-center justify-center gap-2 rounded-xl h-14 px-6 bg-blue-500 text-white text-lg font-bold hover:bg-blue-600 transition-colors duration-300">
+                    <span class="material-symbols-outlined text-xl">account_circle</span>
+                    <span>Manage this Profile</span>
+                </a>
+
+                <!-- Switch Profile Button -->
+                <a href="switch.html"
+                    class="mt-4 w-full flex items-center justify-center gap-2 rounded-xl h-14 px-6 bg-blue-500 text-white text-lg font-bold hover:bg-blue-600 transition-colors duration-300">
+                    <span class="material-symbols-outlined text-xl">switch_account</span>
+                    <span>Switch Profile</span>
+                </a>
+
+                <!-- Add New Profile Button -->
+                <a href="new_1.html"
+                    class="mt-4 w-full flex items-center justify-center gap-2 rounded-xl h-14 px-6 bg-blue-500 text-white text-lg font-bold hover:bg-blue-600 transition-colors duration-300">
+                    <span class="material-symbols-outlined text-xl">person_add</span>
+                    <span>New Profile</span>
+                </a>
+
+                <!-- Close button -->
+                <button id="closePfp" 
+                    class="mt-4 w-full flex items-center justify-center  rounded-xl h-14 px-6 border border-gray-300 text-gray-600 hover:bg-gray-100 transition-colors duration-300">
+                    <span class="material-symbols-outlined">
+                        close
+                    </span>
+                    <span>Close</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const pfpBtn = document.getElementById("pfpBtn");
+        const closePfp = document.getElementById("closePfp");
+        const pfpModal = document.getElementById("pfpModal");
+
+        pfpBtn.addEventListener("click", () => {
+            pfpModal.classList.remove("hidden");
+        });
+
+        closePfp.addEventListener("click", () => {
+            pfpModal.classList.add("hidden");
+        });
+
+        // Optional: close when clicking outside the modal
+        pfpModal.addEventListener("click", (e) => {
+            if (e.target === pfpModal) {
+                pfpModal.classList.add("hidden");
+            }
+        });
+    </script>
+
+
+
+
+
+    <!-- Notification Status Modal (hidden by default) -->
     <div id="notifModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm m-4 overflow-hidden">
             <div class="p-6 text-center">
@@ -250,7 +314,7 @@ Pfp
                     </span>
                 </div>
 
-                <!-- Profiles List -->
+                <!-- Statuses List -->
                 <div class="space-y-2">
 
                     <a href="#"
@@ -304,7 +368,7 @@ Pfp
                     </a>
                 </div>
 
-                <!-- Add New Profile Button -->
+                <!-- Close Button -->
                 <button id="notifClose"
                     class="mt-6 w-full flex items-center justify-center gap-2 rounded-xl h-14 px-6 bg-blue-500 text-white text-lg font-bold hover:bg-blue-600 transition-colors duration-300">
                     <span>Ok</span>
@@ -312,8 +376,6 @@ Pfp
             </div>
         </div>
     </div>
-
-
     <script>
         const notifBtn = document.getElementById("notifBtn");
         const notifModal = document.getElementById("notifModal");
@@ -334,6 +396,9 @@ Pfp
             }
         });
     </script>
+
+
+
 
 </body>
 

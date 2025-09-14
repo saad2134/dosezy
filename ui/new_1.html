@@ -50,17 +50,12 @@
   </style>
     <style>
         body {
-            min-height: max(884px, 100dvh);
-        }
-    </style>
-    <style>
-        body {
-            min-height: max(884px, 100dvh);
-        }
-    </style>
-    <style>
-        body {
-            min-height: max(884px, 100dvh);
+            min-height: 100dvh;
+            /* Always fills the screen height */
+            height: auto;
+            /* Let content expand naturally */
+            overflow-x: hidden;
+            /* Prevent sideways scrolling */
         }
 
         .modal {
@@ -101,10 +96,11 @@
 </head>
 
 <body class="bg-white" style='font-family: Lexend, "Noto Sans", sans-serif;'>
-    <div
-        class="relative flex h-auto min-h-screen w-full flex-col items-center justify-center bg-white group/design-root overflow-x-hidden text-center">
-        <div class="flex flex-col items-center justify-center flex-grow p-8">
-            <div class="flex items-center justify-center w-60 h-60  rounded-2xl mb-8">
+    <div class="flex flex-col min-h-screen w-full bg-white overflow-x-hidden">
+
+        <!-- Main content (auto expand & center) -->
+        <main class="flex flex-col flex-grow items-center justify-center p-6 text-center">
+            <div class="flex items-center justify-center w-60 h-60 rounded-2xl mb-8">
                 <img src="loader-icon.svg" alt="Loading..." class="w-60 h-60">
             </div>
 
@@ -114,8 +110,10 @@
             <p class="text-2xl text-slate-600">
                 Your personal medication assistant.
             </p>
-        </div>
-        <div class="w-full p-6">
+        </main>
+
+        <!-- Bottom section (always pinned below main content) -->
+        <footer class="w-full p-6">
             <div class="flex w-full flex-row items-center justify-center gap-3 mb-6">
                 <div class="h-2.5 w-8 rounded-full bg-[var(--primary-500)]"></div>
                 <div class="h-2.5 w-2.5 rounded-full bg-slate-300"></div>
@@ -125,13 +123,75 @@
                 href="new_2.html">
                 <span class="truncate">Get Started</span>
             </a>
-            
-            <a class="mt-4 flex w-full items-center justify-center rounded-2xl h-14 px-8 bg-gray-700 text-white text-lg font-bold leading-normal tracking-wide shadow-lg shadow-sky-200 transition-transform duration-300 hover:scale-105"
-                href="index.html">
+
+            <a id="switchacBtn"
+                class="mt-4 flex w-full items-center justify-center rounded-2xl h-14 px-8 bg-gray-700 text-white text-lg font-bold leading-normal tracking-wide shadow-lg shadow-sky-200 transition-transform duration-300 hover:scale-105">
                 <span class="truncate">Existing Profile</span>
             </a>
+        </footer>
+    </div>
+
+
+
+
+    <!-- Switch Account Modal (hidden by default) -->
+    <div id="switchacModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm m-4 overflow-hidden">
+            <div class="p-6 text-center">
+                <h1 class="text-2xl font-bold text-gray-800 leading-tight tracking-tight mb-6">
+                    Existing Profiles
+                </h1>
+
+                <!-- Profiles List -->
+                <div class="space-y-4">
+                    <!-- Profile 1 -->
+                    <a href="index.html"
+                        class="flex items-center justify-between p-4 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <img alt="User profile picture" class="h-12 w-12 rounded-2xl object-cover"
+                                src="https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg" />
+                            <p class="text-lg font-medium text-gray-800">John Doe</p>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-400 text-2xl">chevron_right</span>
+                    </a>
+
+                    <!-- Profile 2 -->
+                    <a href="#"
+                        class="flex items-center justify-between p-4 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <img alt="User profile picture" class="h-12 w-12 rounded-2xl object-cover"
+                                src="https://avatarfiles.alphacoders.com/360/360040.jpg" />
+                            <p class="text-lg font-medium text-gray-800">Whoever</p>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-400 text-2xl">chevron_right</span>
+                    </a>
+                </div>
+
+                <!-- Add New Profile Button -->
+                <a href="new_1.html"
+                    class="mt-6 w-full flex items-center justify-center gap-2 rounded-xl h-14 px-6 bg-blue-500 text-white text-lg font-bold hover:bg-blue-600 transition-colors duration-300">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                    <span>Close</span>
+                </a>
+            </div>
         </div>
     </div>
+
+    <script>
+        const switchacBtn = document.getElementById("switchacBtn");
+        const switchacModal = document.getElementById("switchacModal");
+
+        switchacBtn.addEventListener("click", () => {
+            switchacModal.classList.remove("hidden");
+        });
+
+        // Optional: close when clicking outside the modal
+        switchacModal.addEventListener("click", (e) => {
+            if (e.target === switchacModal) {
+                switchacModal.classList.add("hidden");
+            }
+        });
+    </script>
 
 </body>
 

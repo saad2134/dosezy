@@ -52,16 +52,6 @@
         body {
             min-height: max(884px, 100dvh);
         }
-    </style>
-    <style>
-        body {
-            min-height: max(884px, 100dvh);
-        }
-    </style>
-    <style>
-        body {
-            min-height: max(884px, 100dvh);
-        }
 
         .modal {
             display: none;
@@ -90,15 +80,17 @@
         <header class="bg-white p-4 shadow-sm sticky top-0 z-10">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <img alt="User profile picture" class="h-12 w-12 rounded-2xl object-cover"
-                        src="https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg" />
+                    <button id="pfpBtn">
+                            <img alt="User profile picture" class="h-12 w-12 rounded-2xl object-cover"
+                                src="https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg" />
+                        </button>
                     <div>
                         <p class="text-2xl font-bold text-gray-800">Hi, John!</p>
                         <p class="text-sm text-gray-500">"Health is a priceless wealth."</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <button aria-label="Notifications Status: All good"
+                    <button aria-label="Notifications Status: All good" id="notifBtn"
                         class="relative flex items-center justify-center rounded-xl h-12 w-12 bg-green-500 text-white">
                         <span class="material-symbols-outlined text-3xl "> notifications </span>
                         <span
@@ -125,24 +117,42 @@
 
 
 
-        <main class="flex flex-col gap-6 px-4 pt-4 pb-28">
+        <main class="flex flex-col gap-2 px-4 pt-4 pb-28">
+
+
+            <div class="mt-8 flex justify-center">
+                <div class="relative">
+                    <img alt="Profile picture placeholder" class="h-32 w-32 rounded-full object-cover"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAag0s_VaM9-4hiDlo_krgNJeCFkN5fA7i2IB9e1JeGDbWX_Hm4rbH727lDULb-fVUqoAxdi7FIvkBEOXALk34yT6J2mZ7pMszAyz7PzRgChXexL4RGh5zWVOmK11ngS2ZhjAo1yRkhhmizFPq3a4hlioeTzZGJoSr2gmMfO1goW_aMMdcugzNmbekJaoz9xtmp0gwCyoH7eagZrdrC6Dh1iGKdxCv0nR5LN5cBK6ANn5hcEyMv2FoJt_w66Skuq25J1qsvnwYCkFc" />
+                    <button
+                        class="absolute bottom-0 right-0 flex h-10 w-10 items-center justify-center rounded-full bg-blue-500 text-white shadow-md transition-transform hover:scale-110">
+                        <span class="material-symbols-outlined"> edit </span>
+                        <input class="absolute h-full w-full cursor-pointer opacity-0" type="file" />
+                    </button>
+                </div>
+            </div>
+
             <div class="flex flex-col gap-2">
                 <label class="text-[#0d171b] text-lg font-medium leading-normal" for="name">Name</label>
                 <input
                     class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d171b] focus:outline-0 focus:ring-2 focus:ring-[#1193d4] border-2 border-slate-200 bg-white h-16 placeholder:text-slate-400 p-4 text-lg font-normal leading-normal"
-                    id="name" value="Eleanor Vance" />
+                    id="name" value="John Doe" />
             </div>
             <div class="flex flex-col gap-2">
                 <label class="text-[#0d171b] text-lg font-medium leading-normal" for="age">Age</label>
                 <input
                     class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d171b] focus:outline-0 focus:ring-2 focus:ring-[#1193d4] border-2 border-slate-200 bg-white h-16 placeholder:text-slate-400 p-4 text-lg font-normal leading-normal"
-                    id="age" type="number" value="72" />
+                    id="age" type="number" value="38" />
             </div>
             <div class="flex flex-col gap-2">
-                <label class="text-[#0d171b] text-lg font-medium leading-normal" for="gender">Gender (Optional)</label>
-                <input
+                <label class="text-[#0d171b] text-lg font-medium leading-normal" for="gender">Gender</label>
+                <select
                     class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d171b] focus:outline-0 focus:ring-2 focus:ring-[#1193d4] border-2 border-slate-200 bg-white h-16 placeholder:text-slate-400 p-4 text-lg font-normal leading-normal"
-                    id="gender" placeholder="e.g. Female" />
+                    id="gender" placeholder="Male/Female">
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Do not specify</option>
+                </select>
             </div>
             <div class="flex flex-col gap-2">
                 <label class="text-[#0d171b] text-lg font-medium leading-normal" for="contact">Contact
@@ -150,6 +160,8 @@
                 <input
                     class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d171b] focus:outline-0 focus:ring-2 focus:ring-[#1193d4] border-2 border-slate-200 bg-white h-16 placeholder:text-slate-400 p-4 text-lg font-normal leading-normal"
                     id="contact" type="tel" value="(123) 456-7890" />
+
+                    
             </div>
 
 
@@ -167,7 +179,7 @@
                     <span class="truncate">Delete Profile</span>
                 </a>
             </div>
-            
+
         </main>
 
 
