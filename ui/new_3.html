@@ -104,6 +104,13 @@
     style='font-family: Lexend, "Noto Sans", sans-serif;'>
     <main class="flex-grow px-4 pt-12 pb-8">
         <div class="mx-auto max-w-md">
+
+            <div class="flex w-full flex-row items-center justify-center gap-3 mb-6">
+                <div class="h-2.5 w-2.5 rounded-full bg-slate-300"></div>
+                <div class="h-2.5 w-2.5 rounded-full bg-slate-300"></div>
+                <div class="h-2.5 w-8 rounded-full bg-[var(--primary-500)]"></div>
+            </div>
+
             <h1 class="text-center text-3xl font-bold text-[var(--text-primary)]">Tell us about yourself</h1>
             <p class="mt-2 text-center text-base text-[var(--text-secondary)]">This helps us personalize your
                 experience.</p>
@@ -163,16 +170,20 @@
             </form>
         </div>
     </main>
-    <footer class="px-4 py-6">
-        <div class="mx-auto max-w-md">
-            <form action="index.html" method="get">
-                <button type="submit"
-                    class="w-full cursor-pointer rounded-xl bg-[var(--primary-color)] py-4 px-5 text-center text-lg font-bold text-slate-50 shadow-lg shadow-blue-500/20 transition-transform hover:scale-[1.02] active:scale-95">
-                    Submit
-                </button>
-            </form>
+    <div class="sticky bottom-2 w-full bg-slate-50 py-4 px-6">
+        <div class="flex gap-4">
+            <a href="new_2.html"
+                class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 px-5 bg-slate-200 text-slate-800 text-lg font-bold leading-normal">
+                Back
+            </a>
+
+            <a href="index.html"
+                class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 px-5 bg-[#2084e4] text-white text-lg font-bold leading-normal">
+                Submit
+            </a>
+
         </div>
-    </footer>
+    </div>
 </div>
 
 </body>
