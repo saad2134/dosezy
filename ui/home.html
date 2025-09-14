@@ -7,7 +7,6 @@ New user pages
 
 --dialogs
 Pfp
-Notif Bell
 New Med
 
 
@@ -39,12 +38,37 @@ New Med
             min-height: max(884px, 100dvh);
         }
     </style>
-    
+
+    <style>
+        @keyframes rotateSync {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            40% {
+                transform: rotate(360deg);
+            }
+
+            /* spin for 2s */
+            100% {
+                transform: rotate(360deg);
+            }
+
+            /* pause for 3s */
+        }
+
+        .animate-rotate-sync {
+            display: inline-block;
+            animation: rotateSync 5s linear infinite;
+            /* 2s spin + 3s pause */
+        }
+    </style>
+
 </head>
 
 <body class="bg-gray-50">
 
-    
+
     <div class="relative flex size-full min-h-screen flex-col group/design-root overflow-x-hidden"
         style='font-family: Lexend, "Noto Sans", sans-serif;'>
         <div class="flex flex-col pb-32 bg-gray-100">
@@ -59,11 +83,11 @@ New Med
                         </div>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <button aria-label="Notifications Status: All good"
-                            class="relative flex items-center justify-center rounded-xl h-10 w-10 bg-red-500 text-white">
-                            <span class="material-symbols-outlined text-xl"> notifications </span>
+                        <button aria-label="Notifications Status: All good" id="notifBtn"
+                            class="relative flex items-center justify-center rounded-xl h-12 w-12 bg-red-500 text-white">
+                            <span class="material-symbols-outlined text-3xl"> notifications </span>
                             <span
-                                class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-red-500">
+                                class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-white text-red-500">
                                 <span class="material-symbols-outlined text-sm">
                                     <!-- check  -->
                                     close
@@ -190,10 +214,11 @@ New Med
                 </a>
 
                 <!-- Center Add Button -->
-                <button aria-label="Add New Medicine"
+                <a href="add_med.html" aria-label="Add New Medicine"
                     class="flex items-center justify-center w-14 h-14 bg-blue-500 rounded-2xl text-white shadow-lg transform transition-transform hover:scale-105 active:scale-95">
                     <span class="material-symbols-outlined text-4xl">add</span>
-                </button>
+                </a>
+
 
                 <!-- Medicines -->
                 <a class="flex flex-col items-center gap-1 text-gray-400" href="medicines.html">
@@ -210,6 +235,106 @@ New Med
         </div>
 
     </div>
+
+
+
+    <!-- Switch Account Modal (hidden by default) -->
+    <div id="notifModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm m-4 overflow-hidden">
+            <div class="p-6 text-center">
+                <div class="flex items-center justify-center gap-2 pb-4">
+                    <h1 class="text-2xl font-bold text-gray-800 leading-tight tracking-tight mb-0">
+                        Notification Check
+                    </h1>
+                    <span class="material-symbols-outlined text-blue-400 text-3xl animate-rotate-sync">
+                        sync
+                    </span>
+                </div>
+
+                <!-- Profiles List -->
+                <div class="space-y-2">
+
+                    <a href="#"
+                        class="flex items-center justify-between p-4 bg-red-200 rounded-xl hover:bg-gray-200 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-red-400 text-3xl">notification_settings</span>
+                            <div class="flex flex-col items-start">
+                                <p class="text-lg font-medium text-red-800">Notification Permission</p>
+                                <p class="text-sm text-left text-red-600">No permission to send notifications.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-red-400 text-3xl">chevron_right</span>
+                    </a>
+
+                    <a href="#"
+                        class="flex items-center justify-between p-4 bg-green-200 rounded-xl hover:bg-gray-200 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="material-symbols-outlined text-green-400 text-3xl">battery_android_frame_question</span>
+                            <div class="flex flex-col items-start">
+                                <p class="text-lg font-medium text-green-800">Phone Battery</p>
+                                <p class="text-sm text-left text-green-600">Battery is at 78%</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-green-400 text-3xl">chevron_right</span>
+                    </a>
+
+
+                    <a href="#"
+                        class="flex items-center justify-between p-4 bg-green-200 rounded-xl hover:bg-gray-200 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-green-400 text-3xl">select_to_speak</span>
+                            <div class="flex flex-col items-start">
+                                <p class="text-lg font-medium text-green-800">Phone Sound</p>
+                                <p class="text-sm text-left text-green-600">Phone is not silent.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-green-400 text-3xl">chevron_right</span>
+                    </a>
+
+                    <a href="#"
+                        class="flex items-center justify-between p-4 bg-red-200 rounded-xl hover:bg-gray-200 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-red-400 text-3xl">tab_inactive</span>
+                            <div class="flex flex-col items-start">
+                                <p class="text-lg  font-medium text-red-800">Background Permission</p>
+                                <p class="text-sm text-left text-red-600">No permission to run in background.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-red-400 text-3xl">chevron_right</span>
+                    </a>
+                </div>
+
+                <!-- Add New Profile Button -->
+                <button id="notifClose"
+                    class="mt-6 w-full flex items-center justify-center gap-2 rounded-xl h-14 px-6 bg-blue-500 text-white text-lg font-bold hover:bg-blue-600 transition-colors duration-300">
+                    <span>Ok</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const notifBtn = document.getElementById("notifBtn");
+        const notifModal = document.getElementById("notifModal");
+        const notifClose = document.getElementById("notifClose");
+
+        notifBtn.addEventListener("click", () => {
+            notifModal.classList.remove("hidden");
+        });
+
+        notifClose.addEventListener("click", () => {
+            notifModal.classList.add("hidden");
+        });
+
+        // Optional: close when clicking outside the modal
+        notifModal.addEventListener("click", (e) => {
+            if (e.target === notifModal) {
+                notifModal.classList.add("hidden");
+            }
+        });
+    </script>
 
 </body>
 
