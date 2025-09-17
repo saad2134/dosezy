@@ -5,7 +5,7 @@ Built with accessibility at its core, the app features **clear, large text** and
 
 Once you input the basics: name, dosage, timing, and frequency, the app intelligently handles your medication schedule.  
  
-
+ 
 ## ✨ Features  
 
 - 📅 **Medication Adherence** – Automated reminders ensure timely medication consumption.  
