@@ -14,6 +14,7 @@ Once you input the basics: name, dosage, timing, and frequency, the app intellig
 - 🔒 **Data Security & Portability** – Local `Room` database storage with planned CSV export for doctors.  
 - 👨‍👩‍👧 **Caregiver Support** – Logs and adherence history help caregivers track missed doses.  
 
+---
 
 ## ⚙️ Platforms
 
@@ -38,7 +39,7 @@ Once you input the basics: name, dosage, timing, and frequency, the app intellig
 ## 🚀 Getting Started
 * Android (Using the app)
   1. Enable `Install from Unknown Sources` in your android device settings.
-  2. Download the latest `.apk` file from the `AndroidBuild` directory and install it on your device.
+  2. Download the latest `.apk` file from the [`apks`](apks/) directory and install it on your device.
 
 ## 📁 Project Architecture
 * Soon.
@@ -77,11 +78,21 @@ Once you input the basics: name, dosage, timing, and frequency, the app intellig
 ## 🖼️ App Icon 
 <img src="https://github.com/user-attachments/assets/213a3fc0-b737-4df2-9c70-693a7f6d7467" alt="Dosezy Icon" title="Dosezy" style="width:500px;">
 
+## 🔰 Banner
+<img width="1280" height="640" alt="New Project" src="https://github.com/user-attachments/assets/d2331448-fc78-41a0-920d-e0e5d8e171e2" />
+
 ---
 
-## 📄 License  
+## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).  
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+- ✅ Commercial use
+- ✅ Modification
+- ✅ Distribution
+- ✅ Private use
+- ❌ Liability
+- ❌ Warranty
 
 ---
 
