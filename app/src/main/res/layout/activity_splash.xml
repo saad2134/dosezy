@@ -1,62 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    android:gravity="center">
+    tools:context=".SplashActivity">
 
-    <!-- Pill Spinner -->
-    <FrameLayout
-        android:id="@+id/pillContainer"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_centerInParent="true">
+    <!-- This container holds the central animation and text -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical">
 
-        <View
-            android:id="@+id/pillTop"
-            android:layout_width="80dp"
-            android:layout_height="40dp"
-            android:background="@drawable/pill_top"
-            android:layout_gravity="top" />
+        <!-- Pill Spinner -->
+        <FrameLayout
+            android:id="@+id/pillContainer"
+            android:layout_width="120dp"
+            android:layout_height="120dp">
 
-        <View
-            android:id="@+id/pillBottom"
-            android:layout_width="80dp"
-            android:layout_height="40dp"
-            android:background="@drawable/pill_bottom"
-            android:layout_gravity="bottom" />
-    </FrameLayout>
+            <!-- Ensure you have 'pill_top.xml' and 'pill_bottom.xml' in your /drawable folder -->
+            <View
+                android:id="@+id/pillTop"
+                android:layout_width="80dp"
+                android:layout_height="60dp"
+                android:layout_gravity="top|center_horizontal"
+                android:background="@drawable/pill_top" />
 
-    <!-- Loading Text -->
-    <TextView
-        android:id="@+id/loadingText"
-        android:layout_below="@id/pillContainer"
-        android:layout_marginTop="24dp"
-        android:layout_centerHorizontal="true"
-        android:text="Loading..."
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black" />
+            <View
+                android:id="@+id/pillBottom"
+                android:layout_width="80dp"
+                android:layout_height="60dp"
+                android:layout_gravity="bottom|center_horizontal"
+                android:background="@drawable/pill_bottom" />
+        </FrameLayout>
+
+        <!-- Loading Text -->
+        <TextView
+            android:id="@+id/loadingText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Loading..."
+            android:textColor="@android:color/black"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 
     <!-- Footer -->
-    <LinearLayout
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginBottom="24dp">
-
-        <ImageView
-            android:src="@drawable/loader_icon"
-            android:layout_width="48dp"
-            android:layout_height="48dp" />
-
-        <TextView
-            android:text="Dozesy"
-            android:textSize="20sp"
-            android:textColor="#888888"
-            android:layout_marginStart="8dp"
-            android:textStyle="bold" />
-    </LinearLayout>
+        android:layout_marginBottom="24dp"
+        android:text="Dozesy"
+        android:textColor="#888888"
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
 </RelativeLayout>
