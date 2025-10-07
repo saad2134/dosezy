@@ -1,4 +1,6 @@
 package com.example.dosezy;
 
-public class SplashActivity {
+import android.app.Activity;
+
+public class SplashActivity extends Activity {
 }
