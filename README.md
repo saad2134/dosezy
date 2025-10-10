@@ -96,6 +96,11 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 
+## ✍️ Endnote
+<p align="center">Thanks for reading!</p>
+
+---
+
 ## 🏷 Tags  
 
 `android` `mobile-app` `android-application`  
