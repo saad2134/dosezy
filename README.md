@@ -34,15 +34,104 @@ Once you input the basics: name, dosage, timing, and frequency, the app intellig
     </tr>
   </tbody>
 </table>
-  
+
+
+## 🛠️ Tech Stack
+
+- Language: Kotlin
+- UI Framework: Jetpack Compose
+- Build System: Gradle (Kotlin DSL)
+- Storage & Data: DataStore (evidenced by libdatastore_shared_counter.so native libs). Shared Preferences for simple data persistence. File-based storage for assets and resources.
+
 
 ## 🚀 Getting Started
-* Android (Using the app)
+
+### Android (Using the app)
   1. Enable `Install from Unknown Sources` in your android device settings.
   2. Download the latest `.apk` file from the [`apks`](apks/) directory and install it on your device.
 
+### Android (Source)
+  1. Fork the repo.
+  2. Download & Install Android Studio
+  3. Enable Git Version Control & Clone the Repo
+  4. Wait for gradle to initialize
+  5. Enjoy.
+
+
 ## 📁 Project Architecture
-* Soon.
+```
+dosezy-uidesign-webview/
+├── apks/
+│ └── dosezy-uidesign-webview.apk
+├── app/
+│ ├── build.gradle.kts
+│ ├── proguard-rules.pro
+│ ├── src/
+│ │ ├── main/
+│ │ │ ├── java/com/example/dosezy/
+│ │ │ │ ├── MainActivity.kt
+│ │ │ │ ├── SplashActivity.kt
+│ │ │ │ ├── notifications/
+│ │ │ │ │ ├── MedicineAlarmReceiver.kt
+│ │ │ │ │ ├── MedicineForegroundService.kt
+│ │ │ │ │ └── MedicineReminderService.kt
+│ │ │ │ ├── ui/
+│ │ │ │ │ ├── components/
+│ │ │ │ │ │ ├── NavigationBar.kt
+│ │ │ │ │ │ ├── TopBar.kt
+│ │ │ │ │ │ └── ...
+│ │ │ │ │ ├── screens/
+│ │ │ │ │ │ ├── HomeScreen.kt
+│ │ │ │ │ │ ├── MedicinesScreen.kt
+│ │ │ │ │ │ ├── NewUserScreen.kt
+│ │ │ │ │ │ └── ...
+│ │ │ │ │ ├── subscreens/
+│ │ │ │ │ │ ├── AddMedScreen.kt
+│ │ │ │ │ │ ├── EditMedScreen.kt
+│ │ │ │ │ │ └── ...
+│ │ │ │ │ └── theme/
+│ │ │ │ │ ├── Color.kt
+│ │ │ │ │ ├── Theme.kt
+│ │ │ │ │ └── Type.kt
+│ │ │ │ └── utils/
+│ │ │ ├── res/
+│ │ │ │ ├── drawable/
+│ │ │ │ ├── mipmap-*/
+│ │ │ │ ├── values/
+│ │ │ │ └── xml/
+│ │ │ └── AndroidManifest.xml
+│ │ ├── androidTest/
+│ │ └── test/
+│ └── build/ (generated build outputs)
+├── assets/
+│ ├── banner.png
+│ └── icon-squircle-1000px.png
+├── gradle/
+│ ├── libs.versions.toml
+│ └── wrapper/
+└── build/ (project build files)
+```
+
+
+### Key Components
+
+**Main Source Files:**
+- `MainActivity.kt` - Main application entry point
+- `SplashActivity.kt` - Splash screen activity
+- **UI Components** - Jetpack Compose based UI
+- **Notification Services** - Medicine reminder system
+- **Theme System** - Custom theming with colors and typography
+
+**UI Structure:**
+- Screens: Home, Medicines, Schedule, Settings, New User
+- Subscreens: Add/Edit Medicine, Emergency, Help, Preferences
+- Components: Navigation bars, dialogs, custom elements
+
+**Resources:**
+- Drawables for icons and backgrounds
+- Multiple mipmap densities for launcher icons
+- Values for colors, strings, and themes
+- XML configurations for backup and data extraction
 
 ## 📱 Screenshots
 * Soon.

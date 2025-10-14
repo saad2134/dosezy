@@ -1,59 +1,107 @@
 package com.example.dosezy
 
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import android.view.Menu
-import android.view.MenuItem
-import com.example.dosezy.databinding.ActivityMainBinding
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.dosezy.ui.screens.HomeScreen
+import com.example.dosezy.ui.screens.LoadingScreen
+import com.example.dosezy.ui.screens.NewUserScreen
+import com.example.dosezy.ui.theme.DosezyTheme
 
-class MainActivity : AppCompatActivity() {
-
-    private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var binding: ActivityMainBinding
-
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContent {
+            DosezyTheme {
+                DosezyApp()
+            }
+        }
+    }
+}
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+@Composable
+fun DosezyApp() {
+    val navController = rememberNavController()
+    var isLoading by remember { mutableStateOf(true) }
+    var hasUserData by remember { mutableStateOf(false) }
 
-        setSupportActionBar(binding.toolbar)
+    // Check user data on app start
+    LaunchedEffect(Unit) {
+        val userHasData = checkIfUserHasData()
+        hasUserData = userHasData
+        isLoading = false
 
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
-        setupActionBarWithNavController(navController, appBarConfiguration)
-
-        binding.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Add Medicine Screen", Snackbar.LENGTH_LONG)
-                .setAction("Action", null)
-                .setAnchorView(R.id.fab).show()
+        if (userHasData) {
+            navController.navigate("home") {
+                popUpTo("loading") { inclusive = true }
+            }
+        } else {
+            navController.navigate("newuser/1") {
+                popUpTo("loading") { inclusive = true }
+            }
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        return when (item.itemId) {
-            R.id.action_settings -> true
-            else -> super.onOptionsItemSelected(item)
+    NavHost(
+        navController = navController,
+        startDestination = "loading"
+    ) {
+        composable("loading") {
+            LoadingScreen()
+        }
+        composable("home") {
+            HomeScreen(navController)
+        }
+        // ... rest of your screens remain the same
+        composable("newuser/{frameNumber}") { backStackEntry ->
+            val frame = backStackEntry.arguments?.getString("frameNumber")?.toIntOrNull() ?: 1
+            NewUserScreen(
+                currentFrame = frame,
+                onNext = { nextFrame ->
+                    if (nextFrame <= 3) {
+                        navController.navigate("newuser/$nextFrame")
+                    } else {
+                        navController.navigate("home") {
+                            popUpTo("loading") { inclusive = true }
+                        }
+                    }
+                },
+                onSkip = {
+                    navController.navigate("home") {
+                        popUpTo("loading") { inclusive = true }
+                    }
+                }
+            )
         }
     }
+}
 
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        return navController.navigateUp(appBarConfiguration)
-                || super.onSupportNavigateUp()
-    }
+// Your existing LoadingScreen and other composables remain the same
+
+// Add this function after the DosezyApp composable
+private suspend fun checkIfUserHasData(): Boolean {
+    // TODO: Replace with your actual data check logic
+    // For now, we'll simulate a check and return false to show onboarding
+
+    // Simulate network/database check with delay
+    kotlinx.coroutines.delay(1000) // 1 second delay
+
+    // Check if user has any medicines or data in your storage
+    // You'll replace this with actual checks later
+
+    // For now, always return false to see the onboarding flow
+    return false
+
+    // Later, you'll implement real checks like:
+    // return medicineRepository.hasAnyMedicines()
+    // return sharedPreferences.getBoolean("has_completed_onboarding", false)
 }
