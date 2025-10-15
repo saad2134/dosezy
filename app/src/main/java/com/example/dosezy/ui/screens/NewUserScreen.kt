@@ -20,7 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.ManageHistory
 import androidx.compose.material.icons.filled.Notifications
@@ -51,6 +50,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -60,11 +60,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.dosezy.R
 import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.User
+import com.example.dosezy.ui.components.ProfilePicturePicker
 import com.example.dosezy.ui.theme.LightBlue40
 import com.example.dosezy.ui.viewmodels.UserViewModel
+import java.io.File
 
 @Composable
 fun NewUserScreen(
@@ -298,38 +302,6 @@ fun ProfileSetupPage(
         fullName.isNotBlank() && age.isNotBlank() && gender != null
     }
 
-    // Notify parent about validation state
-    LaunchedEffect(isFormValid) {
-        onValidationChange(isFormValid)
-    }
-
-    // Handle completion
-    val completeSetup: () -> Unit = {
-        // Validate all fields
-        fullNameError = fullName.isBlank()
-        ageError = age.isBlank()
-        genderError = gender == null
-
-        if (!fullNameError && !ageError && !genderError) {
-            val user = User(
-                profilePicPath = profilePicPath,
-                fullName = fullName.trim(),
-                age = age.toIntOrNull() ?: 0,
-                gender = gender!!,
-                contactNumber = contactNumber.trim(),
-                isCurrentUser = true
-            )
-            onComplete(user)
-        }
-    }
-
-
-
-    // Set the complete action for the bottom bar
-    LaunchedEffect(Unit) {
-        setCompleteAction(completeSetup)
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -371,57 +343,27 @@ fun ProfileSetupPage(
         Spacer(modifier = Modifier.height(32.dp))
 
         // Profile Picture with upload functionality
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .size(128.dp)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Image(
-                painter = if (profilePicPath != null) {
-                    // For demo, we'll use the default image. In real app, load from profilePicPath
-                    painterResource(id = R.drawable.default_profile)
-                } else {
-                    painterResource(id = R.drawable.default_profile)
+            ProfilePicturePicker(
+                profilePicPath = profilePicPath,
+                onProfilePictureSelected = { path ->
+                    profilePicPath = path
                 },
-                contentDescription = "Profile Picture",
-                modifier = Modifier
-                    .size(128.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
+                modifier = Modifier.size(128.dp)
             )
 
-            // Upload/Edit Button
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF2084E4))
-                    .clickable {
-                        // Handle image picker - in real app, implement image picker logic
-                        // For now, we'll simulate setting a profile picture path
-                        profilePicPath = "profile_${System.currentTimeMillis()}.jpg"
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "Upload Profile Picture",
-                    tint = Color.White,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-        }
+            Spacer(modifier = Modifier.height(8.dp))
 
-        Text(
-            text = "Upload Profile Picture",
-            style = MaterialTheme.typography.bodySmall,
-            color = Color(0xFF64748B),
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp)
-        )
+            Text(
+                text = if (profilePicPath != null) "Change Profile Picture" else "Upload Profile Picture",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color(0xFF64748B),
+                textAlign = TextAlign.Center
+            )
+        }
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -566,11 +508,35 @@ fun ProfileSetupPage(
         genderError = false
     }
 
+    // Notify parent about validation state
+    LaunchedEffect(isFormValid) {
+        onValidationChange(isFormValid)
+    }
 
+    // Handle completion
+    val completeSetup: () -> Unit = {
+        // Validate all fields
+        fullNameError = fullName.isBlank()
+        ageError = age.isBlank()
+        genderError = gender == null
 
-    // Update the bottom bar to use the validation state
-    // We'll need to modify how the bottom bar communicates with this page
-    // For now, we'll assume the completeSetup function is passed to the bottom bar
+        if (!fullNameError && !ageError && !genderError) {
+            val user = User(
+                profilePicPath = profilePicPath,
+                fullName = fullName.trim(),
+                age = age.toIntOrNull() ?: 0,
+                gender = gender!!,
+                contactNumber = contactNumber.trim(),
+                isCurrentUser = true
+            )
+            onComplete(user)
+        }
+    }
+
+    // Set the complete action for the bottom bar
+    LaunchedEffect(Unit) {
+        setCompleteAction(completeSetup)
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -898,6 +864,8 @@ fun ExistingProfilesModal(
 
 @Composable
 fun ProfileItem(user: User, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val context = LocalContext.current // Add this line
+
     Surface(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
@@ -914,22 +882,46 @@ fun ProfileItem(user: User, onClick: () -> Unit, modifier: Modifier = Modifier) 
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.default_profile),
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(12.dp)),
-                    contentScale = ContentScale.Crop
-                )
+                // Profile picture with fallback
+                if (!user.profilePicPath.isNullOrEmpty()) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(context)
+                            .data(File(user.profilePicPath))
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(RoundedCornerShape(12.dp)),
+                        placeholder = painterResource(id = R.drawable.default_profile),
+                        error = painterResource(id = R.drawable.default_profile),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.default_profile),
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(RoundedCornerShape(12.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                }
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                Text(
-                    text = user.fullName,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium
-                )
+                Column {
+                    Text(
+                        text = user.fullName,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = "${user.age} years • ${user.gender.displayName}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF6B7280)
+                    )
+                }
             }
 
             Icon(
