@@ -18,7 +18,7 @@ import java.time.LocalTime
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index("userId")] // Add this index
+    indices = [Index("userId")]
 )
 @TypeConverters(Converters::class)
 data class Medicine(
@@ -29,7 +29,8 @@ data class Medicine(
     val dosageUnit: DosageUnit,
     val timesPerDay: Int,
     val frequency: Frequency,
-    val scheduledTimes: List<LocalTime> // Multiple times per day
+    val scheduledTimes: List<LocalTime>, // Multiple times per day
+    val imageUri: String? = null
 )
 
 enum class DosageUnit {

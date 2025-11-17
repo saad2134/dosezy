@@ -1,11 +1,9 @@
 // ui/components/ProfilePicturePicker.kt
 package com.example.dosezy.ui.components
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -40,12 +38,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.dosezy.R
-import com.example.dosezy.utils.rememberImagePicker
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun ProfilePicturePicker(
@@ -55,80 +55,75 @@ fun ProfilePicturePicker(
 ) {
     val context = LocalContext.current
     var showImageSourceDialog by remember { mutableStateOf(false) }
-    var showPermissionDialog by remember { mutableStateOf(false) }
-    var permissionMessage by remember { mutableStateOf("") }
-    var pendingAction by remember { mutableStateOf<(() -> Unit)?>(null) }
+    var tempUri by remember { mutableStateOf<Uri?>(null) }
+    var showError by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
 
-    val imagePicker = rememberImagePicker(context) { uri ->
-        if (uri != null) {
-            val savedPath = saveImageToInternalStorage(context, uri)
-            onProfilePictureSelected(savedPath)
-        }
-    }
-
-    // Camera Permission Launcher
-    val cameraPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
-            if (isGranted) {
-                pendingAction?.invoke()
-            } else {
-                permissionMessage = "Camera permission is required to take photos. Please enable it in app settings."
-                showPermissionDialog = true
+    // Gallery launcher
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            if (uri != null) {
+                try {
+                    val savedPath = saveImageToInternalStorage(context, uri)
+                    onProfilePictureSelected(savedPath)
+                } catch (e: Exception) {
+                    Log.e("ProfilePicturePicker", "Gallery error: ${e.message}", e)
+                    errorMessage = "Failed to load image from gallery"
+                    showError = true
+                }
             }
-            pendingAction = null
         }
     )
 
-    // Storage Permission Launcher (for Android 12 and below, for Android 13+ use READ_MEDIA_IMAGES)
-    val storagePermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
-            if (isGranted) {
-                pendingAction?.invoke()
+    // Camera launcher
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture(),
+        onResult = { success ->
+            if (success) {
+                tempUri?.let { uri ->
+                    try {
+                        val savedPath = saveImageToInternalStorage(context, uri)
+                        onProfilePictureSelected(savedPath)
+                    } catch (e: Exception) {
+                        Log.e("ProfilePicturePicker", "Camera save error: ${e.message}", e)
+                        errorMessage = "Failed to save captured image"
+                        showError = true
+                    }
+                }
             } else {
-                permissionMessage = "Storage permission is required to access photos. Please enable it in app settings."
-                showPermissionDialog = true
+                Log.e("ProfilePicturePicker", "Camera capture failed")
+                errorMessage = "Camera capture failed"
+                showError = true
             }
-            pendingAction = null
+            tempUri = null
         }
     )
 
-    // Check and request permissions
-    @Composable
-    fun checkCameraPermission(action: @Composable () -> Unit) {
-        val hasPermission = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED
-
-        if (hasPermission) {
-            action()
-        } else {
-            pendingAction = action as (() -> Unit)?
-            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+    fun openCamera() {
+        try {
+            val uri = createImageFileUri(context)
+            if (uri != null) {
+                tempUri = uri
+                cameraLauncher.launch(uri)
+            } else {
+                errorMessage = "Cannot create temporary file for camera"
+                showError = true
+            }
+        } catch (e: Exception) {
+            Log.e("ProfilePicturePicker", "Camera open error: ${e.message}", e)
+            errorMessage = "Cannot open camera: ${e.message}"
+            showError = true
         }
     }
 
-    @Composable
-    fun checkStoragePermission(action: @Composable () -> Unit) {
-        // For Android 13+, use READ_MEDIA_IMAGES instead of READ_EXTERNAL_STORAGE
-        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            Manifest.permission.READ_MEDIA_IMAGES
-        } else {
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        }
-
-        val hasPermission = ContextCompat.checkSelfPermission(
-            context,
-            permission
-        ) == PackageManager.PERMISSION_GRANTED
-
-        if (hasPermission) {
-            action()
-        } else {
-            pendingAction = action as (() -> Unit)?
-            storagePermissionLauncher.launch(permission)
+    fun openGallery() {
+        try {
+            galleryLauncher.launch("image/*")
+        } catch (e: Exception) {
+            Log.e("ProfilePicturePicker", "Gallery open error: ${e.message}", e)
+            errorMessage = "Cannot open gallery"
+            showError = true
         }
     }
 
@@ -197,25 +192,26 @@ fun ProfilePicturePicker(
             onDismiss = { showImageSourceDialog = false },
             onCameraSelected = {
                 showImageSourceDialog = false
-                checkCameraPermission {
-                    val tempUri = imagePicker.prepareCameraIntent()
-                    imagePicker.getCameraLauncher().launch(tempUri)
-                }
+                openCamera()
             },
             onGallerySelected = {
                 showImageSourceDialog = false
-                checkStoragePermission {
-                    imagePicker.getGalleryLauncher().launch("image/*")
-                }
+                openGallery()
             }
         )
     }
 
-    // Permission Dialog
-    if (showPermissionDialog) {
-        PermissionAlertDialog(
-            message = permissionMessage,
-            onDismiss = { showPermissionDialog = false }
+    // Error Dialog
+    if (showError) {
+        AlertDialog(
+            onDismissRequest = { showError = false },
+            title = { Text("Error") },
+            text = { Text(errorMessage) },
+            confirmButton = {
+                TextButton(onClick = { showError = false }) {
+                    Text("OK")
+                }
+            }
         )
     }
 }
@@ -223,8 +219,8 @@ fun ProfilePicturePicker(
 @Composable
 fun ImageSourceDialog(
     onDismiss: () -> Unit,
-    onCameraSelected: @Composable () -> Unit,
-    onGallerySelected: @Composable () -> Unit
+    onCameraSelected: () -> Unit,
+    onGallerySelected: () -> Unit
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -246,7 +242,7 @@ fun ImageSourceDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onGallerySelected as () -> Unit) {
+            TextButton(onClick = onGallerySelected) {
                 Icon(
                     imageVector = Icons.Default.PhotoLibrary,
                     contentDescription = null,
@@ -256,7 +252,7 @@ fun ImageSourceDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onCameraSelected as () -> Unit) {
+            TextButton(onClick = onCameraSelected) {
                 Icon(
                     imageVector = Icons.Default.CameraAlt,
                     contentDescription = null,
@@ -268,34 +264,55 @@ fun ImageSourceDialog(
     )
 }
 
-@Composable
-fun PermissionAlertDialog(
-    message: String,
-    onDismiss: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Permission Required") },
-        text = { Text(message) },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("OK")
-            }
+// Utility function to create a file URI for camera
+private fun createImageFileUri(context: Context): Uri? {
+    return try {
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir = context.externalCacheDir ?: context.cacheDir
+
+        // Ensure directory exists
+        storageDir?.mkdirs()
+
+        val tempFile = File.createTempFile(
+            "JPEG_${timeStamp}_",
+            ".jpg",
+            storageDir
+        ).apply {
+            createNewFile()
         }
-    )
+
+        FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.provider", // ✅ FIXED: Changed from "fileprovider" to "provider"
+            tempFile
+        ).also { uri ->
+            Log.d("ProfilePicturePicker", "Created temp file: $uri")
+        }
+    } catch (e: Exception) {
+        Log.e("ProfilePicturePicker", "Error creating temp file: ${e.message}", e)
+        null
+    }
 }
 
 // Utility function to save image to internal storage
 private fun saveImageToInternalStorage(context: Context, uri: Uri): String {
-    val inputStream = context.contentResolver.openInputStream(uri)
-    val timeStamp = System.currentTimeMillis()
-    val file = File(context.filesDir, "profile_$timeStamp.jpg")
+    return try {
+        val inputStream = context.contentResolver.openInputStream(uri)
+            ?: throw IllegalStateException("Cannot open input stream")
 
-    inputStream?.use { input ->
-        file.outputStream().use { output ->
-            input.copyTo(output)
+        val timeStamp = System.currentTimeMillis()
+        val file = File(context.filesDir, "profile_$timeStamp.jpg")
+
+        inputStream.use { input ->
+            file.outputStream().use { output ->
+                input.copyTo(output)
+            }
         }
-    }
 
-    return file.absolutePath
+        Log.d("ProfilePicturePicker", "Image saved to: ${file.absolutePath}")
+        file.absolutePath
+    } catch (e: Exception) {
+        Log.e("ProfilePicturePicker", "Error saving image: ${e.message}", e)
+        throw e
+    }
 }

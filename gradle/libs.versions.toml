@@ -20,6 +20,7 @@ navigationCompose = "2.7.5"
 room = "2.6.0"
 hilt = "2.48.1"
 coroutines = "1.7.3"
+firebaseAnnotations = "17.0.0"
 
 [libraries]
 # Core Android
@@ -60,6 +61,7 @@ androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navig
 
 # Coroutines
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+firebase-annotations = { group = "com.google.firebase", name = "firebase-annotations", version.ref = "firebaseAnnotations" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

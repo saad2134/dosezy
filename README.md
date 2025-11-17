@@ -186,7 +186,8 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 ---
 
 ## ✍️ Endnote
-<p align="center">Thanks for reading!</p>
+
+<p align="center">⭐ Star this repo if you found it helpful! Thanks for reading.</p>
 
 ---
 

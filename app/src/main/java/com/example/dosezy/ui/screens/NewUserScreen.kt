@@ -89,8 +89,9 @@ fun NewUserScreen(
     // Auto-navigate to home when current user is set
     LaunchedEffect(currentUser) {
         if (currentUser != null) {
-            // Let the MainActivity handle the navigation
-            // This just ensures we don't block here
+            navController.navigate("home") {
+                popUpTo("new_user") { inclusive = true }
+            }
         }
     }
 
@@ -125,7 +126,7 @@ fun NewUserScreen(
                     existingUsers = users,
                     onSelectUser = { user ->
                         userViewModel.setCurrentUser(user)
-                        // Navigation will be handled by MainActivity
+                        // Navigation will be handled by the LaunchedEffect above
                     },
                     onCreateNewProfile = { onNext(2) }
                 )
@@ -134,7 +135,7 @@ fun NewUserScreen(
                     onComplete = { user ->
                         userViewModel.addUser(user)
                         // Current user will be set automatically in addUser
-                        // Navigation will be handled by MainActivity
+                        // Navigation will be handled by the LaunchedEffect above
                     },
                     onValidationChange = { isValid ->
                         isProfileSetupValid = isValid
@@ -200,15 +201,8 @@ fun WelcomePage(
             ProgressDot(active = false)
             ProgressDot(active = false)
         }
-    }
 
-    // Existing Profiles Modal
-    if (showExistingProfiles) {
-        ExistingProfilesModal(
-            users = existingUsers,
-            onSelectUser = onSelectUser,
-            onClose = { showExistingProfiles = false }
-        )
+
     }
 }
 
@@ -370,19 +364,13 @@ fun ProfileSetupPage(
         // Form Fields with validation
         // Name Field
         Column {
-            Text(
-                text = "Name *",
-                style = MaterialTheme.typography.bodyMedium,
-                color = if (fullNameError) Color.Red else Color(0xFF374151),
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
             OutlinedTextField(
                 value = fullName,
                 onValueChange = {
                     fullName = it
                     fullNameError = it.isBlank()
                 },
-                label = { Text("Enter your full name") },
+                label = { Text("Name *") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -411,12 +399,6 @@ fun ProfileSetupPage(
         ) {
             // Age Field
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "Age *",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (ageError) Color.Red else Color(0xFF374151),
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
                 OutlinedTextField(
                     value = age,
                     onValueChange = {
@@ -425,7 +407,7 @@ fun ProfileSetupPage(
                             ageError = it.isBlank()
                         }
                     },
-                    label = { Text("Age") },
+                    label = { Text("Age *") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     shape = RoundedCornerShape(16.dp),
@@ -447,12 +429,6 @@ fun ProfileSetupPage(
 
             // Gender Field
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "Gender *",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (genderError) Color.Red else Color(0xFF374151),
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
                 GenderDropdown(
                     selectedGender = gender,
                     onGenderSelected = {
@@ -479,16 +455,10 @@ fun ProfileSetupPage(
 
         // Contact Number Field (Optional)
         Column {
-            Text(
-                text = "Contact Number",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF374151),
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
             OutlinedTextField(
                 value = contactNumber,
                 onValueChange = { contactNumber = it },
-                label = { Text("Phone number (optional)") },
+                label = { Text("Phone Number (optional)") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 shape = RoundedCornerShape(16.dp),
@@ -562,7 +532,7 @@ fun GenderDropdown(
             modifier = Modifier
                 .fillMaxWidth()
                 .menuAnchor(),
-            label = {  },
+            label = { Text("Gender *") },
             shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = if (isError) Color.Red else Color(0xFF2084E4),
@@ -835,7 +805,10 @@ fun ExistingProfilesModal(
                 users.forEach { user ->
                     ProfileItem(
                         user = user,
-                        onClick = { onSelectUser(user) },
+                        onClick = {
+                            onSelectUser(user)
+                            onClose()
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp)
@@ -864,7 +837,7 @@ fun ExistingProfilesModal(
 
 @Composable
 fun ProfileItem(user: User, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val context = LocalContext.current // Add this line
+    val context = LocalContext.current
 
     Surface(
         modifier = modifier
