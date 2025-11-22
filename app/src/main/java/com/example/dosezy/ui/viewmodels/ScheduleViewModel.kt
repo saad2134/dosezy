@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.combine
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -59,7 +58,7 @@ class ScheduleViewModel @Inject constructor(
         }
     }
 
-    private fun loadScheduleForDate(userId: String, date: LocalDate) {
+    fun loadScheduleForDate(userId: String, date: LocalDate) {
         viewModelScope.launch {
             scheduleRepository.getScheduleForDate(userId, date).collect { entries ->
                 _scheduleEntries.value = entries

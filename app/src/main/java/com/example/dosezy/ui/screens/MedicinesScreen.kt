@@ -22,6 +22,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,7 +30,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -63,35 +63,41 @@ fun MedicinesScreen(
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize()
+    // Consistent light theme approach
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
     ) {
-        TopBar(
-            navController = navController,
-            currentUser = currentUser,
-            title = "Medicines",
-            actions = {} // Add empty actions
-        )
-
-        if (isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        } else {
-            MedicinesContent(
-                medicines = medicines,
-                onMedicineClick = { medicine ->
-                    navController.navigate("edit_med/${medicine.medicineId}")
-                },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            TopBar(
+                navController = navController,
+                currentUser = currentUser,
+                title = "Medicines",
+                actions = {}
             )
+
+            if (isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                MedicinesContent(
+                    medicines = medicines,
+                    onMedicineClick = { medicine ->
+                        navController.navigate("edit_med/${medicine.medicineId}")
+                    },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                )
+            }
         }
     }
 }
@@ -131,7 +137,9 @@ fun MedicineItem(
     Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
         onClick = onClick
     ) {
         androidx.compose.material3.ListItem(
@@ -140,14 +148,14 @@ fun MedicineItem(
                     text = medicine.medicationName,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF1E293B)
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             },
             supportingContent = {
                 Text(
                     text = formatDosageInfo(medicine),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFF64748B)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             },
             leadingContent = {
@@ -160,7 +168,7 @@ fun MedicineItem(
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
                     contentDescription = "Edit medicine",
-                    tint = Color(0xFF94A3B8)
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             },
             modifier = Modifier.padding(8.dp)
@@ -176,8 +184,8 @@ fun MedicineImage(
     Box(
         modifier = modifier
             .background(
-                Color(0xFFDBEAFE),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp) // Changed to rounded square
+                MaterialTheme.colorScheme.surfaceVariant,
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp) // Squircle shape
             ),
         contentAlignment = Alignment.Center
     ) {
@@ -193,8 +201,8 @@ fun MedicineImage(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
-                        Color(0xFFDBEAFE),
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp) // Rounded square
+                        MaterialTheme.colorScheme.surfaceVariant,
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp) // Squircle shape
                     ),
                 contentScale = ContentScale.Crop
             )
@@ -202,7 +210,7 @@ fun MedicineImage(
             Icon(
                 imageVector = Icons.Default.Medication,
                 contentDescription = "Default medicine icon",
-                tint = Color(0xFF3B82F6),
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -223,7 +231,7 @@ fun EmptyMedicinesState() {
             modifier = Modifier
                 .size(96.dp)
                 .background(
-                    Color(0xFFE5E7EB),
+                    MaterialTheme.colorScheme.surfaceVariant,
                     shape = androidx.compose.foundation.shape.CircleShape
                 ),
             contentAlignment = Alignment.Center
@@ -231,7 +239,7 @@ fun EmptyMedicinesState() {
             Icon(
                 imageVector = Icons.Default.Medication,
                 contentDescription = "No medications",
-                tint = Color(0xFF9CA3AF),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(48.dp)
             )
         }
@@ -242,7 +250,7 @@ fun EmptyMedicinesState() {
             text = "No medications yet",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF1F2937),
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 24.sp
         )
 
@@ -251,7 +259,7 @@ fun EmptyMedicinesState() {
         Text(
             text = "It looks like you haven't added any medications. Get started by tapping the plus button below.",
             style = MaterialTheme.typography.bodyMedium,
-            color = Color(0xFF6B7280),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             lineHeight = 20.sp,
             modifier = Modifier.padding(horizontal = 16.dp)
@@ -279,7 +287,12 @@ private val DosageUnit.displayName: String
 @Composable
 fun MedicinesScreenPreview() {
     DosezyTheme {
-        MedicinesScreen(navController = androidx.navigation.compose.rememberNavController())
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            MedicinesScreen(navController = androidx.navigation.compose.rememberNavController())
+        }
     }
 }
 
@@ -287,23 +300,28 @@ fun MedicinesScreenPreview() {
 @Composable
 fun MedicineItemPreview() {
     DosezyTheme {
-        val sampleMedicine = Medicine(
-            medicineId = "1",
-            userId = "user1",
-            medicationName = "Metformin",
-            dosage = 1.0,
-            dosageUnit = DosageUnit.TABLET,
-            timesPerDay = 2,
-            frequency = com.example.dosezy.data.model.Frequency(
-                pattern = com.example.dosezy.data.model.FrequencyPattern.DAILY
-            ),
-            scheduledTimes = listOf()
-        )
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            val sampleMedicine = Medicine(
+                medicineId = "1",
+                userId = "user1",
+                medicationName = "Metformin",
+                dosage = 1.0,
+                dosageUnit = DosageUnit.TABLET,
+                timesPerDay = 2,
+                frequency = com.example.dosezy.data.model.Frequency(
+                    pattern = com.example.dosezy.data.model.FrequencyPattern.DAILY
+                ),
+                scheduledTimes = listOf()
+            )
 
-        MedicineItem(
-            medicine = sampleMedicine,
-            onClick = {}
-        )
+            MedicineItem(
+                medicine = sampleMedicine,
+                onClick = {}
+            )
+        }
     }
 }
 
@@ -311,6 +329,11 @@ fun MedicineItemPreview() {
 @Composable
 fun EmptyMedicinesStatePreview() {
     DosezyTheme {
-        EmptyMedicinesState()
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            EmptyMedicinesState()
+        }
     }
 }

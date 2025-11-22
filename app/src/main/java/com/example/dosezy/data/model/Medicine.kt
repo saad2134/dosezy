@@ -46,3 +46,4 @@ data class Frequency(
 enum class FrequencyPattern {
     DAILY, WEEKLY, MONTHLY, CUSTOM
 }
+

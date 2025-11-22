@@ -1,8 +1,6 @@
 package com.example.dosezy.ui.subscreens
 
-import android.net.Uri
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,9 +15,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.Medication
-import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -44,9 +39,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,15 +48,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.example.dosezy.data.model.DosageUnit
 import com.example.dosezy.data.model.FrequencyPattern
 import com.example.dosezy.data.model.Medicine
+import com.example.dosezy.ui.components.ProfilePicturePicker
 import com.example.dosezy.ui.theme.DosezyTheme
 import com.example.dosezy.ui.viewmodels.MedicineViewModel
 import com.example.dosezy.ui.viewmodels.UserViewModel
-import com.example.dosezy.utils.rememberImagePicker
 import java.time.LocalTime
 import java.util.UUID
 
@@ -79,25 +71,14 @@ fun AddMedScreen(
     var medicationName by remember { mutableStateOf("") }
     var dosage by remember { mutableStateOf("") }
     var selectedDosageUnit by remember { mutableStateOf(DosageUnit.MG) }
-    var selectedTime by remember { mutableStateOf(LocalTime.of(8, 30)) }
+    var selectedTime by remember { mutableStateOf(LocalTime.now().withMinute(0)) }
     var selectedFrequency by remember { mutableStateOf(FrequencyPattern.DAILY) }
-    var medicineImageUri by remember { mutableStateOf<Uri?>(null) }
+    var medicineImagePath by remember { mutableStateOf<String?>(null) }
+    var showTimePicker by remember { mutableStateOf(false) }
 
     // Dropdown states
     var dosageUnitExpanded by remember { mutableStateOf(false) }
     var frequencyExpanded by remember { mutableStateOf(false) }
-
-    // Image Picker - FIXED: Use proper context and handle camera permissions
-    val context = LocalContext.current
-    val imagePicker = rememberImagePicker(
-        context = context,
-        onImageSelected = { uri ->
-            medicineImageUri = uri
-        }
-    )
-
-    val cameraLauncher = imagePicker.getCameraLauncher()
-    val galleryLauncher = imagePicker.getGalleryLauncher()
 
     Scaffold(
         topBar = {
@@ -147,120 +128,36 @@ fun AddMedScreen(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                // Use ProfilePicturePicker for medicine image selection
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    // Image Preview - FIXED: Rounded square shape
                     Box(
                         modifier = Modifier
-                            .size(80.dp)
-                            .background(
-                                Color(0xFFDBEAFE),
-                                shape = RoundedCornerShape(12.dp) // Rounded square
-                            ),
-                        contentAlignment = Alignment.Center
+                            .size(128.dp)
+                            .clip(RoundedCornerShape(16.dp)) // Squircle shape
                     ) {
-                        if (medicineImageUri != null) {
-                            Image(
-                                painter = rememberAsyncImagePainter(
-                                    model = ImageRequest.Builder(LocalContext.current)
-                                        .data(medicineImageUri)
-                                        .crossfade(true)
-                                        .build()
-                                ),
-                                contentDescription = "Selected medicine image",
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(
-                                        Color(0xFFDBEAFE),
-                                        shape = RoundedCornerShape(12.dp) // Rounded square
-                                    ),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.Medication,
-                                contentDescription = "Default medicine icon",
-                                tint = Color(0xFF3B82F6),
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
+                        ProfilePicturePicker(
+                            profilePicPath = medicineImagePath,
+                            onProfilePictureSelected = { path ->
+                                medicineImagePath = path
+                            },
+                            modifier = Modifier.size(128.dp)
+                        )
                     }
 
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                    // Camera and Gallery Buttons
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        // Camera Button - FIXED: Handle camera properly
-                        Button(
-                            onClick = {
-                                try {
-                                    val tempUri = imagePicker.prepareCameraIntent()
-                                    cameraLauncher.launch(tempUri)
-                                } catch (e: Exception) {
-                                    // Handle camera error (permissions, etc.)
-                                    e.printStackTrace()
-                                }
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(48.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFFEFF6FF),
-                                contentColor = Color(0xFF3B82F6)
-                            )
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.CameraAlt,
-                                contentDescription = "Take photo",
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                "Take Photo",
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = FontWeight.Medium
-                                )
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        // Gallery Button
-                        Button(
-                            onClick = {
-                                galleryLauncher.launch("image/*")
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(48.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFFEFF6FF),
-                                contentColor = Color(0xFF3B82F6)
-                            )
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.PhotoLibrary,
-                                contentDescription = "Choose from gallery",
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                "Choose from Gallery",
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = FontWeight.Medium
-                                )
-                            )
-                        }
-                    }
+                    Text(
+                        text = if (medicineImagePath != null) "Change Medicine Image" else "Upload Medicine Image",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF64748B),
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Rest of the form fields remain the same...
                 // Medication Name
                 Text(
                     text = "Medication Name",
@@ -387,7 +284,7 @@ fun AddMedScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Time
+                // Time Selection
                 Text(
                     text = "Time",
                     style = MaterialTheme.typography.bodyLarge.copy(
@@ -398,12 +295,14 @@ fun AddMedScreen(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
+                // Time Picker
                 OutlinedTextField(
                     value = String.format("%02d:%02d", selectedTime.hour, selectedTime.minute),
-                    onValueChange = { /* Would open time picker dialog */ },
+                    onValueChange = { /* Read-only, opens time picker */ },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(64.dp),
+                        .height(64.dp)
+                        .clickable { showTimePicker = true },
                     readOnly = true,
                     placeholder = {
                         Text(
@@ -418,11 +317,15 @@ fun AddMedScreen(
                         unfocusedLabelColor = Color(0xFF6B7280)
                     ),
                     trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Schedule,
-                            contentDescription = "Select time",
-                            tint = Color(0xFF6B7280)
-                        )
+                        IconButton(
+                            onClick = { showTimePicker = true }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Schedule,
+                                contentDescription = "Select time",
+                                tint = Color(0xFF6B7280)
+                            )
+                        }
                     }
                 )
 
@@ -498,13 +401,15 @@ fun AddMedScreen(
                                 dosageUnit = selectedDosageUnit,
                                 timesPerDay = when (selectedFrequency) {
                                     FrequencyPattern.DAILY -> 1
-                                    else -> 1
+                                    FrequencyPattern.WEEKLY -> 7
+                                    FrequencyPattern.MONTHLY -> 30
+                                    FrequencyPattern.CUSTOM -> 1
                                 },
                                 frequency = com.example.dosezy.data.model.Frequency(
                                     pattern = selectedFrequency
                                 ),
                                 scheduledTimes = listOf(selectedTime),
-                                imageUri = medicineImageUri?.toString()
+                                imageUri = medicineImagePath
                             )
                             medicineViewModel.addMedicine(newMedicine)
                             navController.popBackStack()
@@ -530,9 +435,76 @@ fun AddMedScreen(
             }
         }
     )
+
+    // Time Picker Dialog
+    if (showTimePicker) {
+        TimePickerDialog(
+            initialTime = selectedTime,
+            onTimeSelected = { time ->
+                selectedTime = time
+                showTimePicker = false
+            },
+            onDismiss = { showTimePicker = false }
+        )
+    }
 }
 
-// Extension properties remain the same...
+@Composable
+fun TimePickerDialog(
+    initialTime: LocalTime,
+    onTimeSelected: (LocalTime) -> Unit,
+    onDismiss: () -> Unit
+) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Select Time", style = MaterialTheme.typography.headlineSmall) },
+        text = {
+            // Simple time picker implementation
+            // For a more advanced time picker, you might want to use a library
+            // or implement a custom time picker with hours and minutes selection
+            Column {
+                Text(
+                    "Selected: ${String.format("%02d:%02d", initialTime.hour, initialTime.minute)}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                // Simple hour selection
+                Text("Hour: ${initialTime.hour}", style = MaterialTheme.typography.bodyMedium)
+                androidx.compose.material3.Slider(
+                    value = initialTime.hour.toFloat(),
+                    onValueChange = { newHour ->
+                        onTimeSelected(initialTime.withHour(newHour.toInt()))
+                    },
+                    valueRange = 0f..23f,
+                    steps = 22
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Simple minute selection
+                Text("Minute: ${initialTime.minute}", style = MaterialTheme.typography.bodyMedium)
+                androidx.compose.material3.Slider(
+                    value = initialTime.minute.toFloat(),
+                    onValueChange = { newMinute ->
+                        onTimeSelected(initialTime.withMinute(newMinute.toInt()))
+                    },
+                    valueRange = 0f..59f,
+                    steps = 58
+                )
+            }
+        },
+        confirmButton = {
+            androidx.compose.material3.TextButton(
+                onClick = { onDismiss() }
+            ) {
+                Text("OK")
+            }
+        }
+    )
+}
+
+// Extension properties
 private val DosageUnit.displayName: String
     get() = when (this) {
         DosageUnit.MG -> "mg"
