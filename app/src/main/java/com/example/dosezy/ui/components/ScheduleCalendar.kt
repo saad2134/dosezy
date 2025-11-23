@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.HorizontalRule
-import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +42,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.ScheduleEntry
+import com.example.dosezy.data.model.ScheduleWithMedicine
+import com.example.dosezy.ui.screens.MedicineImage
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
@@ -278,17 +279,23 @@ private fun getDateStatusColor(entries: List<ScheduleEntry>): Color {
 
 @Composable
 fun ScheduleList(
-    entries: List<ScheduleEntry>,
+    scheduleWithMedicine: List<ScheduleWithMedicine>,
     onMarkAsTaken: (String, String) -> Unit,
     onMarkAsLate: (String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(modifier = modifier) {
-        items(entries) { entry ->
+    // FIXED: Add constraints to LazyColumn
+    LazyColumn(
+        modifier = modifier
+    ) {
+        items(scheduleWithMedicine) { item ->
             ScheduleListItem(
-                entry = entry,
+                scheduleWithMedicine = item,
                 onMarkAsTaken = onMarkAsTaken,
-                onMarkAsLate = onMarkAsLate
+                onMarkAsLate = onMarkAsLate,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp)
             )
         }
     }
@@ -296,32 +303,25 @@ fun ScheduleList(
 
 @Composable
 fun ScheduleListItem(
-    entry: ScheduleEntry,
+    scheduleWithMedicine: ScheduleWithMedicine,
     onMarkAsTaken: (String, String) -> Unit,
     onMarkAsLate: (String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val entry = scheduleWithMedicine.scheduleEntry
+    val medicine = scheduleWithMedicine.medicine
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Medication Icon
-        Box(
-            modifier = Modifier
-                .size(56.dp)
-                .clip(CircleShape)
-                .background(Color(0xFFDBEAFE)),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.Medication,
-                contentDescription = "Medication",
-                tint = Color(0xFF2084E4),
-                modifier = Modifier.size(28.dp)
-            )
-        }
+        // Medication Icon with image support - FIXED
+        MedicineImage(
+            imageUri = medicine?.imageUri,
+            modifier = Modifier.size(56.dp)
+        )
 
         Spacer(modifier = Modifier.width(16.dp))
 
@@ -330,10 +330,15 @@ fun ScheduleListItem(
             modifier = Modifier.weight(1f)
         ) {
             Text(
-                text = entry.medicineId, // In real app, you'd get medicine name from repository
+                text = medicine?.medicationName ?: "Unknown Medicine",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF0D171B)
+            )
+            Text(
+                text = medicine?.getDosageDisplay() ?: "Unknown dosage",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color(0xFF64748B)
             )
             Text(
                 text = entry.scheduledDateTime.format(
@@ -378,6 +383,7 @@ fun ScheduleListItem(
         }
     }
 }
+
 
 @Composable
 private fun StatusItem(

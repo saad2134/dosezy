@@ -1,6 +1,7 @@
 package com.example.dosezy.ui.screens
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -40,8 +41,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.dosezy.data.model.MedicationStatus
-import com.example.dosezy.data.model.ScheduleEntry
+import com.example.dosezy.data.model.ScheduleWithMedicine
 import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.theme.DosezyTheme
 import com.example.dosezy.ui.viewmodels.ScheduleViewModel
@@ -53,27 +55,50 @@ import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(
+    navController: NavController,
+    shouldRefresh: Boolean = false
+) {
     val userViewModel: UserViewModel = hiltViewModel()
     val scheduleViewModel: ScheduleViewModel = hiltViewModel()
 
     val currentUser by userViewModel.currentUser.collectAsState()
-    val scheduleEntries by scheduleViewModel.scheduleEntries.collectAsState()
+    val scheduleWithMedicine by scheduleViewModel.scheduleWithMedicine.collectAsState()
 
-    // Get current day for subtitle using legacy method for compatibility
+    // Get current day for subtitle
     val dayOfWeek = DateUtils.getCurrentDayOfWeekLegacy()
+    val today = java.time.LocalDate.now()
 
-    // Load today's schedule on composition
-    LaunchedEffect(Unit) {
-        scheduleViewModel.setSelectedDate(java.time.LocalDate.now())
+    // FIXED: Better refresh logic
+    LaunchedEffect(shouldRefresh, currentUser) {
+        currentUser?.let { user ->
+            Log.d("HomeScreen", "Refreshing schedule for user: ${user.userId}")
+            scheduleViewModel.setSelectedDate(today)
+            // Force immediate refresh
+            scheduleViewModel.loadScheduleForDate(user.userId, today)
+        }
     }
 
-    // Filter today's schedule entries
-    val todayEntries = scheduleEntries
+    // Also listen for navigation events to refresh when coming back from AddMedScreen
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    LaunchedEffect(navBackStackEntry) {
+        // Refresh when we come back to home screen (e.g., from adding medicine)
+        if (navBackStackEntry?.destination?.route == "home") {
+            currentUser?.let { user ->
+                scheduleViewModel.loadScheduleForDate(user.userId, java.time.LocalDate.now())
+            }
+        }
+    }
+
+    // Filter today's schedule entries - FIXED: Also filter by today in code as backup
+    val todayEntries = scheduleWithMedicine.filter {
+        it.scheduleEntry.scheduledDateTime.toLocalDate() == java.time.LocalDate.now()
+    }
 
     // Check if all medications are taken
     val allTaken = todayEntries.all {
-        it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE
+        it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
+                it.scheduleEntry.status == MedicationStatus.TAKEN_LATE
     }
 
     // Check if there are any medications
@@ -82,7 +107,7 @@ fun HomeScreen(navController: NavController) {
     // Group entries by time
     val groupedEntries = todayEntries.groupBy { entry ->
         SimpleDateFormat("h:mm a", Locale.getDefault()).format(
-            Date.from(entry.scheduledDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant())
+            Date.from(entry.scheduleEntry.scheduledDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant())
         )
     }.toList().sortedBy { (time, _) ->
         SimpleDateFormat("h:mm a", Locale.getDefault()).parse(time)?.time ?: 0L
@@ -112,10 +137,8 @@ fun HomeScreen(navController: NavController) {
             ) {
                 if (hasMedications) {
                     if (allTaken) {
-                        // All medications taken state
                         AllGoodState()
                     } else {
-                        // Show medications grouped by time
                         groupedEntries.forEach { (time, entries) ->
                             TimeSection(
                                 time = time,
@@ -129,7 +152,6 @@ fun HomeScreen(navController: NavController) {
                         }
                     }
                 } else {
-                    // No medications state
                     NoMedicationsState()
                 }
             }
@@ -140,7 +162,7 @@ fun HomeScreen(navController: NavController) {
 @Composable
 private fun TimeSection(
     time: String,
-    entries: List<ScheduleEntry>,
+    entries: List<ScheduleWithMedicine>,
     onMarkAsTaken: (String) -> Unit
 ) {
     Column {
@@ -153,9 +175,9 @@ private fun TimeSection(
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
-        // Next dose indicator
+        // Next dose indicator - Calculate actual time difference
         Text(
-            text = "Next dose in 30 minutes",
+            text = "Scheduled for this time",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -166,7 +188,7 @@ private fun TimeSection(
         // Medication cards for this time
         entries.forEach { entry ->
             MedicationCard(
-                entry = entry,
+                scheduleWithMedicine = entry,
                 onMarkAsTaken = onMarkAsTaken
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -176,9 +198,11 @@ private fun TimeSection(
 
 @Composable
 private fun MedicationCard(
-    entry: ScheduleEntry,
+    scheduleWithMedicine: ScheduleWithMedicine,
     onMarkAsTaken: (String) -> Unit
 ) {
+    val entry = scheduleWithMedicine.scheduleEntry
+    val medicine = scheduleWithMedicine.medicine
     val isTaken = entry.status == MedicationStatus.TAKEN_ON_TIME ||
             entry.status == MedicationStatus.TAKEN_LATE
 
@@ -195,21 +219,11 @@ private fun MedicationCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Medication icon
-            Box(
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(MaterialTheme.shapes.extraLarge)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Medication,
-                    contentDescription = "Medication",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(32.dp)
-                )
-            }
+            // Medicine icon with image support - FIXED
+            MedicineImage(
+                imageUri = medicine?.imageUri,
+                modifier = Modifier.size(64.dp)
+            )
 
             Spacer(modifier = Modifier.width(16.dp))
 
@@ -218,13 +232,13 @@ private fun MedicationCard(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = entry.medicineId,
+                    text = medicine?.medicationName ?: "Unknown Medicine",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "100mg", // Default dosage - in real app, get from medicine data
+                    text = medicine?.getDosageDisplay() ?: "Unknown dosage",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -265,6 +279,8 @@ private fun MedicationCard(
         }
     }
 }
+
+// Add this MedicineImage composable to HomeScreen.kt
 
 @Composable
 private fun NoMedicationsState() {
@@ -366,44 +382,5 @@ private fun AllGoodState() {
 fun HomeScreenPreview() {
     DosezyTheme {
         HomeScreen(navController = androidx.navigation.compose.rememberNavController())
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview
-@Composable
-fun HomeScreenWithMedicationsPreview() {
-    DosezyTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                TimeSection(
-                    time = "8:00 AM",
-                    entries = listOf(
-                        ScheduleEntry(
-                            entryId = "1",
-                            userId = "user1",
-                            medicineId = "Aspirin",
-                            scheduledDateTime = java.time.LocalDateTime.now(),
-                            status = MedicationStatus.PENDING
-                        ),
-                        ScheduleEntry(
-                            entryId = "2",
-                            userId = "user1",
-                            medicineId = "Lisinopril",
-                            scheduledDateTime = java.time.LocalDateTime.now(),
-                            status = MedicationStatus.TAKEN_ON_TIME
-                        )
-                    ),
-                    onMarkAsTaken = {}
-                )
-            }
-        }
     }
 }

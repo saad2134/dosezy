@@ -1,17 +1,24 @@
 package com.example.dosezy.data.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
 import com.example.dosezy.data.model.ScheduleEntry
+import com.example.dosezy.data.model.ScheduleWithMedicine
 import kotlinx.coroutines.flow.Flow
-import java.time.LocalDate
 
 @Dao
 interface ScheduleDao {
-    @Query("SELECT * FROM schedule_entries WHERE userId = :userId AND date(scheduledDateTime) = :date")
-    fun getScheduleForDate(userId: String, date: LocalDate): Flow<List<ScheduleEntry>>
+
+    // Get ALL schedule entries for a user - we'll filter manually
+    @Query("SELECT * FROM schedule_entries WHERE userId = :userId")
+    fun getScheduleForUser(userId: String): Flow<List<ScheduleEntry>>
 
     @Query("SELECT * FROM schedule_entries WHERE userId = :userId AND scheduledDateTime BETWEEN :startDate AND :endDate")
-    fun getScheduleForDateRange(userId: String, startDate: LocalDate, endDate: LocalDate): Flow<List<ScheduleEntry>>
+    fun getScheduleForDateRange(userId: String, startDate: String, endDate: String): Flow<List<ScheduleEntry>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertScheduleEntry(entry: ScheduleEntry)
@@ -24,4 +31,25 @@ interface ScheduleDao {
 
     @Query("DELETE FROM schedule_entries WHERE userId = :userId")
     suspend fun deleteScheduleByUser(userId: String)
+
+    // Get ALL schedule entries with medicine for a user - we'll filter manually
+    @Transaction
+    @Query("SELECT * FROM schedule_entries WHERE userId = :userId")
+    fun getScheduleWithMedicineForUser(userId: String): Flow<List<ScheduleWithMedicine>>
+
+    // ADD THIS METHOD: Get schedule entries by medicine ID
+    @Query("SELECT * FROM schedule_entries WHERE medicineId = :medicineId")
+    suspend fun getScheduleEntriesByMedicine(medicineId: String): List<ScheduleEntry>
+
+    // ADD THIS METHOD: Delete a specific schedule entry by ID
+    @Query("DELETE FROM schedule_entries WHERE entryId = :entryId")
+    suspend fun deleteScheduleEntry(entryId: String)
+
+    // ADD THIS METHOD: Bulk delete all schedule entries for a medicine
+    @Query("DELETE FROM schedule_entries WHERE medicineId = :medicineId")
+    suspend fun deleteScheduleEntriesByMedicine(medicineId: String)
+
+    // ADD THIS FOR DEBUGGING: Get all schedule entries
+    @Query("SELECT * FROM schedule_entries WHERE userId = :userId")
+    suspend fun getAllScheduleEntries(userId: String): List<ScheduleEntry>
 }

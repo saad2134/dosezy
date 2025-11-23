@@ -1,6 +1,7 @@
 package com.example.dosezy.ui.screens
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -8,8 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -40,11 +39,12 @@ fun ScheduleScreen(navController: NavController) {
 
     val currentUser by userViewModel.currentUser.collectAsState()
     val selectedDate by scheduleViewModel.selectedDate.collectAsState()
-    val scheduleEntries by scheduleViewModel.scheduleEntries.collectAsState()
+    val scheduleWithMedicine by scheduleViewModel.scheduleWithMedicine.collectAsState()
 
     // Load initial schedule when screen is first composed
     LaunchedEffect(Unit) {
         currentUser?.let { user ->
+            Log.d("ScheduleScreen", "Initial load for user: ${user.userId}")
             scheduleViewModel.loadScheduleForDate(user.userId, selectedDate)
         }
     }
@@ -52,6 +52,15 @@ fun ScheduleScreen(navController: NavController) {
     // Reload schedule when selected date changes
     LaunchedEffect(selectedDate) {
         currentUser?.let { user ->
+            Log.d("ScheduleScreen", "Date changed to: $selectedDate")
+            scheduleViewModel.loadScheduleForDate(user.userId, selectedDate)
+        }
+    }
+
+    // Reload when user changes
+    LaunchedEffect(currentUser) {
+        currentUser?.let { user ->
+            Log.d("ScheduleScreen", "User changed, reloading schedule")
             scheduleViewModel.loadScheduleForDate(user.userId, selectedDate)
         }
     }
@@ -71,30 +80,30 @@ fun ScheduleScreen(navController: NavController) {
                 actions = {}
             )
 
+            // FIXED: Remove the outer verticalScroll and use proper layout
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .verticalScroll(rememberScrollState())
+                    .fillMaxSize()
             ) {
-                // Calendar Section
+                // Calendar Section - fixed height
                 ScheduleCalendar(
                     selectedDate = selectedDate,
-                    scheduleEntries = scheduleEntries,
+                    scheduleEntries = scheduleWithMedicine.map { it.scheduleEntry },
                     onDateSelected = { date ->
                         scheduleViewModel.setSelectedDate(date)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.surface)
-                        .padding(vertical = 8.dp)
                 )
 
-                // Schedule List Section
+                // Schedule List Section - takes remaining space
                 Column(
                     modifier = Modifier
+                        .weight(1f)
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.surface)
-                        .padding(top = 16.dp)
                 ) {
                     // Date Header
                     Text(
@@ -107,22 +116,28 @@ fun ScheduleScreen(navController: NavController) {
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                     )
 
-                    // Schedule Items
-                    if (scheduleEntries.isNotEmpty()) {
-                        ScheduleList(
-                            entries = scheduleEntries,
-                            onMarkAsTaken = { entryId, takenAt ->
-                                scheduleViewModel.markAsTaken(entryId, takenAt)
-                            },
-                            onMarkAsLate = { entryId, takenAt ->
-                                scheduleViewModel.markAsLate(entryId, takenAt)
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                    // Schedule Items - FIXED: Use Box with constraint instead of direct LazyColumn
+                    if (scheduleWithMedicine.isNotEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(bottom = 16.dp)
+                        ) {
+                            ScheduleList(
+                                scheduleWithMedicine = scheduleWithMedicine,
+                                onMarkAsTaken = { entryId, takenAt ->
+                                    scheduleViewModel.markAsTaken(entryId, takenAt)
+                                },
+                                onMarkAsLate = { entryId, takenAt ->
+                                    scheduleViewModel.markAsLate(entryId, takenAt)
+                                },
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
                     } else {
                         Box(
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .fillMaxSize()
                                 .padding(32.dp),
                             contentAlignment = Alignment.Center
                         ) {

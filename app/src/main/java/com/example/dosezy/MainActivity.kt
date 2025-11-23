@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.dosezy.ui.components.CustomNavigationBar
+import com.example.dosezy.ui.screens.DebugScreen
 import com.example.dosezy.ui.screens.HomeScreen
 import com.example.dosezy.ui.screens.LoadingScreen
 import com.example.dosezy.ui.screens.MedicinesScreen
@@ -139,10 +140,13 @@ fun DosezyApp() {
                 )
             }
             composable("home") {
-                HomeScreen(navController)
+                HomeScreen(
+                    navController = navController,
+                    shouldRefresh = true // Or use a shared viewmodel to trigger refresh
+                )
             }
             composable("schedule") {
-                ScheduleScreen(navController)
+                ScheduleScreen(navController = navController)
             }
             composable("medicines") {
                 MedicinesScreen(navController)
@@ -150,6 +154,11 @@ fun DosezyApp() {
             composable("menu") {
                 MenuScreen(navController)
             }
+
+            composable("debug") {
+                DebugScreen()
+            }
+
             // Update your MainActivity.kt NavHost to include all subscreens:
             composable("add_med") {
                 AddMedScreen(navController)

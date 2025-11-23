@@ -143,7 +143,7 @@ fun ProfilePicturePicker(
                 contentDescription = "Profile Picture",
                 modifier = Modifier
                     .size(128.dp)
-                    .clip(CircleShape),
+                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp)),
                 placeholder = painterResource(id = R.drawable.default_profile),
                 error = painterResource(id = R.drawable.default_profile),
                 contentScale = ContentScale.Crop

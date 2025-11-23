@@ -1,5 +1,7 @@
 package com.example.dosezy.ui.viewmodels
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dosezy.data.model.Medicine
@@ -59,6 +61,7 @@ class MedicineViewModel @Inject constructor(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun addMedicine(medicine: Medicine) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -70,6 +73,7 @@ class MedicineViewModel @Inject constructor(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun updateMedicine(medicine: Medicine) {
         viewModelScope.launch {
             medicineRepository.updateMedicine(medicine)

@@ -30,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -200,9 +201,10 @@ fun MedicineImage(
                 contentDescription = "Medicine image",
                 modifier = Modifier
                     .fillMaxSize()
+                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp)) // Add clip here
                     .background(
                         MaterialTheme.colorScheme.surfaceVariant,
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp) // Squircle shape
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                     ),
                 contentScale = ContentScale.Crop
             )
@@ -211,7 +213,7 @@ fun MedicineImage(
                 imageVector = Icons.Default.Medication,
                 contentDescription = "Default medicine icon",
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(36.dp)
             )
         }
     }
@@ -221,19 +223,16 @@ fun MedicineImage(
 fun EmptyMedicinesState() {
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
+            .fillMaxWidth()
+            .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(80.dp))
-
+        // Empty state icon
         Box(
             modifier = Modifier
                 .size(96.dp)
-                .background(
-                    MaterialTheme.colorScheme.surfaceVariant,
-                    shape = androidx.compose.foundation.shape.CircleShape
-                ),
+                .clip(MaterialTheme.shapes.extraLarge)
+                .background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -246,12 +245,13 @@ fun EmptyMedicinesState() {
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // Title
         Text(
             text = "No medications yet",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface,
-            fontSize = 24.sp
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
 
         Spacer(modifier = Modifier.height(8.dp))
