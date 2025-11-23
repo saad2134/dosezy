@@ -102,7 +102,7 @@ fun MenuScreen(navController: NavController) {
             item {
                 MenuItem(
                     icon = Icons.Default.Tune,
-                    title = "Preferences (Theme, etc)",
+                    title = "Preferences (Format, etc)",
                     color = Color(0xFF1E293B),
                     onClick = { navController.navigate("preferences") }
                 )
