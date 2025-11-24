@@ -12,7 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.SwitchAccount
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -76,6 +75,8 @@ fun ProfileDialog(
                     }
                 }
 
+                Spacer(modifier = Modifier.height(8.dp))
+
                 // Switch Profile Button
                 Button(
                     onClick = {
@@ -84,8 +85,8 @@ fun ProfileDialog(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp)
-                        .padding(top = 16.dp),
+                        .height(56.dp),
+
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF2084E4)
@@ -109,7 +110,7 @@ fun ProfileDialog(
                 }
 
                 // Add New Profile Button
-                Button(
+                /*Button(
                     onClick = {
                         onDismiss()
                         navController.navigate("newuser/1")
@@ -138,7 +139,9 @@ fun ProfileDialog(
                             fontWeight = FontWeight.Bold
                         )
                     }
-                }
+                }*/
+
+
 
                 // Close Button
                 Button(

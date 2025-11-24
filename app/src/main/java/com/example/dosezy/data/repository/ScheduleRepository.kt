@@ -7,6 +7,7 @@ import com.example.dosezy.data.DosezyDatabase
 import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.data.model.ScheduleWithMedicine
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 
@@ -59,6 +60,10 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
     fun getScheduleForDateRange(userId: String, startDate: LocalDate, endDate: LocalDate): Flow<List<ScheduleEntry>> =
         database.scheduleDao().getScheduleForDateRange(userId, startDate.toString(), endDate.toString())
+
+    // Add this method to get schedules as list (not Flow) - FIXED NAME
+    suspend fun getSchedulesByUserSync(userId: String): List<ScheduleEntry> =
+        database.scheduleDao().getScheduleForUser(userId).first()
 
     suspend fun insertScheduleEntry(entry: ScheduleEntry) =
         database.scheduleDao().insertScheduleEntry(entry)

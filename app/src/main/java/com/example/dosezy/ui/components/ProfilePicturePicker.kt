@@ -38,6 +38,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -58,6 +59,21 @@ fun ProfilePicturePicker(
     var tempUri by remember { mutableStateOf<Uri?>(null) }
     var showError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+
+    // Camera permission launcher
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted) {
+                // Permission granted, open camera
+                openCamera(context)
+            } else {
+                // Permission denied
+                errorMessage = "Camera permission is required to take photos"
+                showError = true
+            }
+        }
+    )
 
     // Gallery launcher
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -100,7 +116,7 @@ fun ProfilePicturePicker(
         }
     )
 
-    fun openCamera() {
+    fun openCamera(context: Context) {
         try {
             val uri = createImageFileUri(context)
             if (uri != null) {
@@ -113,6 +129,27 @@ fun ProfilePicturePicker(
         } catch (e: Exception) {
             Log.e("ProfilePicturePicker", "Camera open error: ${e.message}", e)
             errorMessage = "Cannot open camera: ${e.message}"
+            showError = true
+        }
+    }
+
+    fun openCameraWithPermissionCheck() {
+        try {
+            val permission = android.Manifest.permission.CAMERA
+            val hasPermission = ContextCompat.checkSelfPermission(
+                context,
+                permission
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+            if (hasPermission) {
+                openCamera(context)
+            } else {
+                // Request camera permission
+                cameraPermissionLauncher.launch(permission)
+            }
+        } catch (e: Exception) {
+            Log.e("ProfilePicturePicker", "Camera permission check error: ${e.message}", e)
+            errorMessage = "Cannot access camera: ${e.message}"
             showError = true
         }
     }
@@ -192,7 +229,7 @@ fun ProfilePicturePicker(
             onDismiss = { showImageSourceDialog = false },
             onCameraSelected = {
                 showImageSourceDialog = false
-                openCamera()
+                openCameraWithPermissionCheck()
             },
             onGallerySelected = {
                 showImageSourceDialog = false
@@ -215,6 +252,8 @@ fun ProfilePicturePicker(
         )
     }
 }
+
+fun openCamera(context: android.content.Context) {}
 
 @Composable
 fun ImageSourceDialog(
@@ -283,7 +322,7 @@ private fun createImageFileUri(context: Context): Uri? {
 
         FileProvider.getUriForFile(
             context,
-            "${context.packageName}.provider", // ✅ FIXED: Changed from "fileprovider" to "provider"
+            "${context.packageName}.provider",
             tempFile
         ).also { uri ->
             Log.d("ProfilePicturePicker", "Created temp file: $uri")

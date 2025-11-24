@@ -82,15 +82,17 @@ fun NewUserScreen(
     val users by userViewModel.users.collectAsState()
     val currentUser by userViewModel.currentUser.collectAsState()
 
-    // State to track if profile setup is valid
     var isProfileSetupValid by remember { mutableStateOf(false) }
     var completeProfileSetup by remember { mutableStateOf({}) }
+    var showExistingProfiles by remember { mutableStateOf(false) }
 
-    // Auto-navigate to home when current user is set
+    // Handle navigation when current user changes (for profile selection)
     LaunchedEffect(currentUser) {
-        if (currentUser != null) {
+        if (currentUser != null && showExistingProfiles) {
+            // Profile was selected from the modal - navigate to home
+            showExistingProfiles = false
             navController.navigate("home") {
-                popUpTo("new_user") { inclusive = true }
+                popUpTo("newuser/1") { inclusive = true }
             }
         }
     }
@@ -108,7 +110,7 @@ fun NewUserScreen(
                 },
                 onNext = { onNext(currentFrame + 1) },
                 onSkip = onSkip,
-                onShowExistingProfiles = { /* Handled in WelcomePage */ },
+                onShowExistingProfiles = { showExistingProfiles = true },
                 isProfileSetupValid = isProfileSetupValid,
                 onCompleteProfileSetup = { completeProfileSetup() }
             )
@@ -134,8 +136,10 @@ fun NewUserScreen(
                 3 -> ProfileSetupPage(
                     onComplete = { user ->
                         userViewModel.addUser(user)
-                        // Current user will be set automatically in addUser
-                        // Navigation will be handled by the LaunchedEffect above
+                        // Navigate to home after profile creation
+                        navController.navigate("home") {
+                            popUpTo("newuser/1") { inclusive = true }
+                        }
                     },
                     onValidationChange = { isValid ->
                         isProfileSetupValid = isValid
@@ -143,6 +147,18 @@ fun NewUserScreen(
                     setCompleteAction = { action ->
                         completeProfileSetup = action
                     }
+                )
+            }
+
+            // Existing Profiles Modal
+            if (showExistingProfiles) {
+                ExistingProfilesModal(
+                    users = users,
+                    onSelectUser = { user ->
+                        userViewModel.setCurrentUser(user)
+                    },
+                    onClose = { showExistingProfiles = false },
+                    navController = navController // Pass navController
                 )
             }
         }
@@ -201,8 +217,6 @@ fun WelcomePage(
             ProgressDot(active = false)
             ProgressDot(active = false)
         }
-
-
     }
 }
 
@@ -483,7 +497,6 @@ fun ProfileSetupPage(
         onValidationChange(isFormValid)
     }
 
-    // Handle completion
     val completeSetup: () -> Unit = {
         // Validate all fields
         fullNameError = fullName.isBlank()
@@ -499,7 +512,7 @@ fun ProfileSetupPage(
                 contactNumber = contactNumber.trim(),
                 isCurrentUser = true
             )
-            onComplete(user)
+            onComplete(user) // This will now trigger navigation
         }
     }
 
@@ -642,7 +655,50 @@ fun NewUserBottomBar(
             ) {
                 when (currentFrame) {
                     1 -> {
-                        // Frame 1: Get Started and Existing Profile buttons
+                        // Frame 1: Go Back (left) and Get Started (right) buttons
+                        if (isCreatingNewProfile && existingUsers.isNotEmpty()) {
+                            // Show "Go Back" button on the left when creating new profile from switch screen
+                            Button(
+                                onClick = onBack, // This will navigate back to switch profile screen
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(56.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFFF1F5F9),
+                                    contentColor = Color(0xFF475569)
+                                )
+                            ) {
+                                Text(
+                                    text = "Go Back",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        } else if (!isCreatingNewProfile && existingUsers.isNotEmpty()) {
+                            // Show "Existing Profile" button on the left when in regular onboarding with existing users
+                            Button(
+                                onClick = { onShowExistingProfiles() },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(56.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF374151)
+                                )
+                            ) {
+                                Text(
+                                    text = "Existing Profile",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        } else {
+                            // No existing users or first time setup - show empty space to maintain layout
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+
+                        // Get Started button always on the right
                         Button(
                             onClick = onNext,
                             modifier = Modifier
@@ -658,25 +714,6 @@ fun NewUserBottomBar(
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
                             )
-                        }
-
-                        if (!isCreatingNewProfile && existingUsers.isNotEmpty()) {
-                            Button(
-                                onClick = onShowExistingProfiles,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(56.dp),
-                                shape = RoundedCornerShape(16.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF374151)
-                                )
-                            ) {
-                                Text(
-                                    text = "Existing Profile",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
                         }
                     }
                     2 -> {
@@ -772,7 +809,8 @@ fun NewUserBottomBar(
 fun ExistingProfilesModal(
     users: List<User>,
     onSelectUser: (User) -> Unit,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    navController: NavController // Add navController parameter
 ) {
     Box(
         modifier = Modifier
@@ -807,7 +845,10 @@ fun ExistingProfilesModal(
                         user = user,
                         onClick = {
                             onSelectUser(user)
-                            onClose()
+                            // Remove the immediate navigation here - let parent handle it
+                            // navController.navigate("home") {
+                            //     popUpTo("newuser/1") { inclusive = true }
+                            // }
                         },
                         modifier = Modifier
                             .fillMaxWidth()

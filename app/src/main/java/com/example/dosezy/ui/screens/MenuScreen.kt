@@ -19,17 +19,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Emergency
 import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.SwitchAccount
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +41,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,10 +63,12 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.dosezy.R
+import com.example.dosezy.data.export.DataExporter
 import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.User
 import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.viewmodels.UserViewModel
+import kotlinx.coroutines.launch
 import java.io.File
 
 @Composable
@@ -69,6 +76,21 @@ fun MenuScreen(navController: NavController) {
     val userViewModel: UserViewModel = hiltViewModel()
     val currentUser by userViewModel.currentUser.collectAsState()
     var showExportDialog by remember { mutableStateOf(false) }
+    var showExportProgress by remember { mutableStateOf(false) }
+    var exportFile by remember { mutableStateOf<File?>(null) }
+    var exportError by remember { mutableStateOf<String?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    // Initialize DataExporter using the repositories from UserViewModel
+    val dataExporter = remember {
+        DataExporter(
+            context = context,
+            userRepository = userViewModel.userRepository,
+            medicineRepository = userViewModel.medicineRepository,
+            scheduleRepository = userViewModel.scheduleRepository
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -146,21 +168,136 @@ fun MenuScreen(navController: NavController) {
                     icon = Icons.Default.Download,
                     title = "Export Data as CSV",
                     color = Color(0xFF1E293B),
-                    onClick = { showExportDialog = true }
+                    onClick = {
+                        showExportProgress = true
+                        exportError = null
+                        coroutineScope.launch {
+                            try {
+                                exportFile = dataExporter.exportAllUsersToCsv()
+                                showExportProgress = false
+                                showExportDialog = true
+                            } catch (e: Exception) {
+                                exportError = e.message ?: "Export failed"
+                                showExportProgress = false
+                            }
+                        }
+                    }
                 )
             }
         }
     }
 
-    // Export Data Dialog
+    // Export Progress Dialog
+    if (showExportProgress) {
+        Dialog(onDismissRequest = { showExportProgress = false }) {
+            Surface(
+                shape = RoundedCornerShape(24.dp),
+                color = Color.White
+            ) {
+                Column(
+                    modifier = Modifier.padding(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(48.dp),
+                        color = Color(0xFF2084E4)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "Exporting Data",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1E293B)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Please wait while we prepare your data for export...",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF6B7280),
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        }
+    }
+
+    // Export Success Dialog
     if (showExportDialog) {
         ExportDataDialog(
             onDismiss = { showExportDialog = false },
             onShare = {
-                // Handle share functionality
+                exportFile?.let { file ->
+                    dataExporter.shareFile(file)
+                }
                 showExportDialog = false
             }
         )
+    }
+
+    // Export Error Dialog
+    exportError?.let { error ->
+        Dialog(onDismissRequest = { exportError = null }) {
+            Surface(
+                shape = RoundedCornerShape(24.dp),
+                color = Color.White
+            ) {
+                Column(
+                    modifier = Modifier.padding(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Error",
+                        modifier = Modifier
+                            .size(48.dp)
+                            .background(Color(0xFFFEE2E2), RoundedCornerShape(24.dp))
+                            .padding(12.dp),
+                        tint = Color(0xFFDC2626)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "Export Failed",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1E293B)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = error,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF6B7280),
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Button(
+                        onClick = { exportError = null },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF2084E4)
+                        )
+                    ) {
+                        Text(
+                            text = "OK",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -408,7 +545,7 @@ fun ExportDataDialog(
 
                 // Description
                 Text(
-                    text = "Your medication data has been successfully saved as a CSV file to your local device.",
+                    text = "Your medication data has been successfully saved as a CSV file to your local device at 'Android/data/com.example.dosezy/files'.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color(0xFF6B7280),
                     textAlign = TextAlign.Center
@@ -428,7 +565,7 @@ fun ExportDataDialog(
                     )
                 ) {
                     Icon(
-                        imageVector = Icons.Default.AccountCircle, // Using account circle as share icon placeholder
+                        imageVector = Icons.Default.Share,
                         contentDescription = "Share",
                         modifier = Modifier.size(20.dp)
                     )
@@ -443,22 +580,18 @@ fun ExportDataDialog(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // Close Button
-                Button(
+                OutlinedButton(
                     onClick = onDismiss,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
                     shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent,
+                    colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = Color(0xFF6B7280)
-                    ),
-                    border = ButtonDefaults.outlinedButtonBorder.copy(
-
                     )
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ChevronRight, // Using chevron as close icon placeholder
+                        imageVector = Icons.Default.Close,
                         contentDescription = "Close",
                         modifier = Modifier.size(20.dp)
                     )
@@ -493,8 +626,8 @@ fun ProfileCardPreview() {
                 age = 30,
                 gender = Gender.MALE,
                 profilePicPath = null,
-                contactNumber = TODO(),
-                isCurrentUser = TODO()
+                contactNumber = "+1234567890",
+                isCurrentUser = true
             ),
             onManageProfile = {},
             onSwitchProfile = {}

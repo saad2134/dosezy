@@ -132,6 +132,7 @@ fun DosezyApp() {
             startDestination = "loading",
             modifier = Modifier.padding(innerPadding)
         ) {
+            // Main Screens
             composable("loading") {
                 LoadingScreen(
                     isLoading = isLoading,
@@ -142,7 +143,7 @@ fun DosezyApp() {
             composable("home") {
                 HomeScreen(
                     navController = navController,
-                    shouldRefresh = true // Or use a shared viewmodel to trigger refresh
+                    shouldRefresh = true
                 )
             }
             composable("schedule") {
@@ -155,62 +156,22 @@ fun DosezyApp() {
                 MenuScreen(navController)
             }
 
+            // Debug Screen
             composable("debug") {
                 DebugScreen()
             }
 
-            // Update your MainActivity.kt NavHost to include all subscreens:
-            composable("add_med") {
-                AddMedScreen(navController)
-            }
-            composable("edit_med") {
-                EditMedScreen(navController)
-            }
-            composable("emergency") {
-                EmergencyScreen(navController)
-            }
-            composable("help_support") {
-                HelpSupportScreen(navController)
-            }
+            // Profile Management Screens
             composable("manage_profile") {
                 ManageProfileScreen(navController)
-            }
-            composable("preferences") {
-                PreferencesScreen(navController)
             }
             composable("switch_profile") {
                 SwitchProfileScreen(navController)
             }
-            composable("newuser/{frameNumber}") { backStackEntry ->
-                val frame = backStackEntry.arguments?.getString("frameNumber")?.toIntOrNull() ?: 1
-                NewUserScreen(
-                    navController = navController,
-                    currentFrame = frame,
-                    onNext = { nextFrame ->
-                        if (nextFrame <= 3) {
-                            navController.navigate("newuser/$nextFrame")
-                        } else {
-                            // Onboarding complete - navigate to home
-                            navController.navigate("home") {
-                                popUpTo("newuser/1") { inclusive = true }
-                            }
-                        }
-                    },
-                    onSkip = {
-                        // Skip onboarding - navigate to home
-                        navController.navigate("home") {
-                            popUpTo("newuser/1") { inclusive = true }
-                        }
-                    },
-                    isCreatingNewProfile = users.isEmpty() // Show existing profiles if users exist
-                )
-            }
 
-            composable("medicines") {
-                MedicinesScreen(navController = navController)
-            }
+            // Medicine Management Screens
             composable("add_med") {
-                AddMedScreen(navController = navController)
+                AddMedScreen(navController)
             }
             composable("edit_med/{medicineId}") { backStackEntry ->
                 val medicineId = backStackEntry.arguments?.getString("medicineId")
@@ -218,6 +179,69 @@ fun DosezyApp() {
                     navController = navController,
                     medicineId = medicineId
                 )
+            }
+
+            // Support Screens
+            composable("emergency") {
+                EmergencyScreen(navController)
+            }
+            composable("help_support") {
+                HelpSupportScreen(navController)
+            }
+            composable("preferences") {
+                PreferencesScreen(navController)
+            }
+
+            // New User Onboarding Flow - UPDATED
+            composable("newuser/{frameNumber}") { backStackEntry ->
+                val frame = backStackEntry.arguments?.getString("frameNumber")?.toIntOrNull() ?: 1
+                val userViewModel: UserViewModel = hiltViewModel()
+                val users by userViewModel.users.collectAsState()
+                val currentUser by userViewModel.currentUser.collectAsState()
+
+                // Check if we're coming from switch profile screen
+                val previousEntry = navController.previousBackStackEntry
+                val isFromSwitchProfile = previousEntry?.destination?.route == "switch_profile"
+
+                NewUserScreen(
+                    navController = navController,
+                    currentFrame = frame,
+                    onNext = { nextFrame ->
+                        if (nextFrame <= 3) {
+                            navController.navigate("newuser/$nextFrame")
+                        } else {
+                            // Onboarding complete - handle navigation based on context
+                            if (isFromSwitchProfile) {
+                                // If coming from switch profile, go back to switch profile
+                                navController.popBackStack("switch_profile", false)
+                            } else {
+                                // Regular onboarding flow - go to home
+                                navController.navigate("home") {
+                                    popUpTo("newuser/1") { inclusive = true }
+                                }
+                            }
+                        }
+                    },
+                    onSkip = {
+                        // Skip onboarding - handle navigation based on context
+                        if (isFromSwitchProfile) {
+                            navController.popBackStack("switch_profile", false)
+                        } else {
+                            navController.navigate("home") {
+                                popUpTo("newuser/1") { inclusive = true }
+                            }
+                        }
+                    },
+                    isCreatingNewProfile = users.isEmpty() || isFromSwitchProfile
+                )
+
+                // Handle navigation when current user changes (for profile creation)
+                LaunchedEffect(currentUser) {
+                    if (currentUser != null && isFromSwitchProfile) {
+                        // New profile was created from switch profile - go back to switch profile
+                        navController.popBackStack("switch_profile", false)
+                    }
+                }
             }
         }
     }

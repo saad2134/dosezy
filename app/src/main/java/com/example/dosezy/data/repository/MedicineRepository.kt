@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi
 import com.example.dosezy.data.DosezyDatabase
 import com.example.dosezy.data.model.Medicine
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import java.time.LocalDate
 
 class MedicineRepository(private val database: DosezyDatabase) {
@@ -14,8 +15,13 @@ class MedicineRepository(private val database: DosezyDatabase) {
         private const val TAG = "MedicineRepository"
     }
 
+    // This method exists - returns Flow
     fun getMedicinesByUser(userId: String): Flow<List<Medicine>> =
         database.medicineDao().getMedicinesByUser(userId)
+
+    // Add this method to get medicines as list (not Flow) - FIXED NAME
+    suspend fun getMedicinesByUserSync(userId: String): List<Medicine> =
+        database.medicineDao().getMedicinesByUser(userId).first()
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun insertMedicine(medicine: Medicine) {

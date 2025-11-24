@@ -9,6 +9,7 @@ import android.os.BatteryManager
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
+import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 
@@ -71,14 +72,20 @@ object NotificationUtils {
     }
 
     /**
-     * Check if app is ignoring battery optimizations
+     * Check if app is ignoring battery optimizations - IMPROVED VERSION
      */
     fun isIgnoringBatteryOptimizations(context: Context): Boolean {
-        val powerManager = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            powerManager?.isIgnoringBatteryOptimizations(context.packageName) ?: false
+            try {
+                val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+                powerManager.isIgnoringBatteryOptimizations(context.packageName)
+            } catch (e: Exception) {
+                // Log the error for debugging
+                e.printStackTrace()
+                false
+            }
         } else {
-            // For older versions, assume permission is granted
+            // For older versions, assume optimization is not enabled
             true
         }
     }
@@ -87,10 +94,117 @@ object NotificationUtils {
      * Get background permission status description
      */
     fun getBackgroundPermissionStatus(context: Context): String {
-        return if (isIgnoringBatteryOptimizations(context)) {
+        val isIgnoring = isIgnoringBatteryOptimizations(context)
+        return if (isIgnoring) {
             "App can run in background."
         } else {
-            "No permission to run in background."
+            "Background restrictions may prevent notifications."
+        }
+    }
+
+    /**
+     * Direct request for battery optimization exemption (Android 6.0+)
+     * This shows a system dialog that returns immediately
+     */
+    fun requestBatteryOptimizationExemption(context: Context): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            try {
+                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                    data = Uri.parse("package:${context.packageName}")
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+
+                // Check if the intent can be resolved
+                if (intent.resolveActivity(context.packageManager) != null) {
+                    context.startActivity(intent)
+                    return true
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        return false
+    }
+
+    /**
+     * Open battery optimization settings
+     */
+    fun openBatteryOptimizationSettings(context: Context) {
+        try {
+            // First try the direct request (shows a dialog)
+            val directRequestSuccess = requestBatteryOptimizationExemption(context)
+
+            if (!directRequestSuccess) {
+                // Fallback to settings page
+                val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                context.startActivity(intent)
+            }
+        } catch (e: Exception) {
+            // Final fallback: open app info page
+            try {
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.parse("package:${context.packageName}")
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                context.startActivity(intent)
+            } catch (e2: Exception) {
+                Toast.makeText(context, "Please enable 'Don't optimize' in Battery settings", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    /**
+     * Request notification permission (opens app settings for Android 13+)
+     */
+    fun requestNotificationPermission(context: Context) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                    putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                context.startActivity(intent)
+            } else {
+                // For older versions, open general notification settings
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", context.packageName, null)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                context.startActivity(intent)
+            }
+        } catch (e: Exception) {
+            Toast.makeText(context, "Cannot open notification settings", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * Open sound settings
+     */
+    fun openSoundSettings(context: Context) {
+        try {
+            val intent = Intent(Settings.ACTION_SOUND_SETTINGS).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(context, "Cannot open sound settings", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * Open app notification settings
+     */
+    fun openAppNotificationSettings(context: Context) {
+        try {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.fromParts("package", context.packageName, null)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(context, "Cannot open app settings", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -102,92 +216,6 @@ object NotificationUtils {
                 isBatterySufficient(context) &&
                 isPhoneNotSilent(context) &&
                 isIgnoringBatteryOptimizations(context)
-    }
-
-    /**
-     * Request notification permission (opens app settings for Android 13+)
-     */
-    fun requestNotificationPermission(context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
-                putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-            }
-            context.startActivity(intent)
-        } else {
-            // For older versions, open general notification settings
-            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                data = Uri.fromParts("package", context.packageName, null)
-            }
-            context.startActivity(intent)
-        }
-    }
-
-    /**
-     * Check if battery optimization exemption can be requested
-     */
-    fun canRequestBatteryOptimizationExemption(context: Context): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return false
-        }
-        val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
-            data = Uri.parse("package:${context.packageName}")
-        }
-        return intent.resolveActivity(context.packageManager) != null
-    }
-
-    /**
-     * Request battery optimization exemption with fallback
-     */
-    fun requestBatteryOptimizationExemption(context: Context): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return try {
-                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
-                    data = Uri.parse("package:${context.packageName}")
-                }
-                if (intent.resolveActivity(context.packageManager) != null) {
-                    context.startActivity(intent)
-                    true
-                } else {
-                    // Fallback to battery optimization settings
-                    openBatteryOptimizationSettings(context)
-                    false
-                }
-            } catch (e: Exception) {
-                openBatteryOptimizationSettings(context)
-                false
-            }
-        }
-        return false
-    }
-
-    /**
-     * Open battery optimization settings
-     */
-    fun openBatteryOptimizationSettings(context: Context) {
-        val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-        if (intent.resolveActivity(context.packageManager) != null) {
-            context.startActivity(intent)
-        }
-    }
-
-    /**
-     * Open sound settings
-     */
-    fun openSoundSettings(context: Context) {
-        val intent = Intent(Settings.ACTION_SOUND_SETTINGS)
-        if (intent.resolveActivity(context.packageManager) != null) {
-            context.startActivity(intent)
-        }
-    }
-
-    /**
-     * Open app notification settings
-     */
-    fun openAppNotificationSettings(context: Context) {
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            data = Uri.fromParts("package", context.packageName, null)
-        }
-        context.startActivity(intent)
     }
 
     /**
@@ -230,11 +258,14 @@ object NotificationUtils {
      */
     fun requestExactAlarmPermission(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
-                data = Uri.parse("package:${context.packageName}")
-            }
-            if (intent.resolveActivity(context.packageManager) != null) {
+            try {
+                val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                    data = Uri.parse("package:${context.packageName}")
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
                 context.startActivity(intent)
+            } catch (e: Exception) {
+                Toast.makeText(context, "Cannot open exact alarm settings", Toast.LENGTH_SHORT).show()
             }
         }
     }

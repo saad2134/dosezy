@@ -66,12 +66,12 @@ fun NotificationStatusDialog(
     var notificationStatuses by remember { mutableStateOf<List<NotificationStatus>>(emptyList()) }
     var refreshCounter by remember { mutableStateOf(0) }
 
-    // Auto-refresh status every 2 seconds when dialog is open
+    // Auto-refresh status every 2 seconds
     LaunchedEffect(refreshCounter) {
         notificationStatuses = createNotificationStatuses(context, refreshCounter)
     }
 
-    // Auto-refresh loop
+    // Auto-refresh loop - simple and reliable
     LaunchedEffect(Unit) {
         while (true) {
             delay(2000) // Refresh every 2 seconds
@@ -115,34 +115,12 @@ fun NotificationStatusDialog(
                             status = status,
                             onClick = {
                                 status.onFixClick?.invoke()
-                                // Trigger immediate refresh after user action
-                                refreshCounter++
                             }
                         )
                     }
                 }
 
-                // Spacer(modifier = Modifier.height(24.dp))
-
-                // Refresh Button
-//                Button(
-//                    onClick = { refreshCounter++ },
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .height(56.dp),
-//                    shape = RoundedCornerShape(16.dp),
-//                    colors = ButtonDefaults.buttonColors(
-//                        containerColor = Color(0xFF6B7280)
-//                    )
-//                ) {
-//                    Text(
-//                        text = "Refresh Status",
-//                        fontSize = 18.sp,
-//                        fontWeight = FontWeight.Bold
-//                    )
-//                }
-
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 // OK Button
                 Button(
@@ -167,27 +145,35 @@ fun NotificationStatusDialog(
 }
 
 // Non-composable function to create notification statuses
-private fun createNotificationStatuses(context: Context, refreshCounter: Int): List<NotificationStatus> {
-    // The refreshCounter parameter ensures the function is recomputed when it changes
+private fun createNotificationStatuses(
+    context: Context,
+    refreshCounter: Int
+): List<NotificationStatus> {
+    // Force recomputation by using refreshCounter
+    val backgroundPermStatus = NotificationUtils.isIgnoringBatteryOptimizations(context)
+    val notificationPermStatus = NotificationUtils.hasNotificationPermission(context)
+    val batteryStatus = NotificationUtils.isBatterySufficient(context)
+    val soundStatus = NotificationUtils.isPhoneNotSilent(context)
+
     return listOf(
         NotificationStatus(
             title = "Notification Permission",
-            description = if (NotificationUtils.hasNotificationPermission(context)) {
+            description = if (notificationPermStatus) {
                 "Permission granted to send notifications."
             } else {
                 "No permission to send notifications."
             },
-            isPassed = NotificationUtils.hasNotificationPermission(context),
+            isPassed = notificationPermStatus,
             icon = {
                 Icon(
                     imageVector = Icons.Default.Notifications,
                     contentDescription = "Notification Permission",
                     modifier = Modifier.size(32.dp),
-                    tint = if (NotificationUtils.hasNotificationPermission(context)) Color(0xFF10B981) else Color(0xFFEF4444)
+                    tint = if (notificationPermStatus) Color(0xFF10B981) else Color(0xFFEF4444)
                 )
             },
             onFixClick = {
-                if (!NotificationUtils.hasNotificationPermission(context)) {
+                if (!notificationPermStatus) {
                     NotificationUtils.requestNotificationPermission(context)
                 }
             }
@@ -196,16 +182,17 @@ private fun createNotificationStatuses(context: Context, refreshCounter: Int): L
         NotificationStatus(
             title = "Phone Battery",
             description = NotificationUtils.getBatteryStatus(context),
-            isPassed = NotificationUtils.isBatterySufficient(context),
+            isPassed = batteryStatus,
             icon = {
                 Icon(
                     imageVector = Icons.Default.BatteryStd,
                     contentDescription = "Phone Battery",
                     modifier = Modifier.size(32.dp),
-                    tint = if (NotificationUtils.isBatterySufficient(context)) Color(0xFF10B981) else Color(0xFFEF4444)
+                    tint = if (batteryStatus) Color(0xFF10B981) else Color(0xFFEF4444)
                 )
             },
             onFixClick = {
+                // Battery level can't be fixed via settings, but we can show battery optimization
                 NotificationUtils.openBatteryOptimizationSettings(context)
             }
         ),
@@ -213,39 +200,41 @@ private fun createNotificationStatuses(context: Context, refreshCounter: Int): L
         NotificationStatus(
             title = "Phone Sound",
             description = NotificationUtils.getSoundStatus(context),
-            isPassed = NotificationUtils.isPhoneNotSilent(context),
+            isPassed = soundStatus,
             icon = {
                 Icon(
                     imageVector = Icons.Default.VolumeUp,
                     contentDescription = "Phone Sound",
                     modifier = Modifier.size(32.dp),
-                    tint = if (NotificationUtils.isPhoneNotSilent(context)) Color(0xFF10B981) else Color(0xFFEF4444)
+                    tint = if (soundStatus) Color(0xFF10B981) else Color(0xFFEF4444)
                 )
             },
             onFixClick = {
-                NotificationUtils.openSoundSettings(context)
+                if (!soundStatus) {
+                    NotificationUtils.openSoundSettings(context)
+                }
             }
         ),
 
         NotificationStatus(
             title = "Background Permission",
-            description = NotificationUtils.getBackgroundPermissionStatus(context),
-            isPassed = NotificationUtils.isIgnoringBatteryOptimizations(context),
+            description = if (backgroundPermStatus) {
+                "App can run in background."
+            } else {
+                "Background restrictions may prevent notifications."
+            },
+            isPassed = backgroundPermStatus,
             icon = {
                 Icon(
                     imageVector = Icons.Default.WorkOutline,
                     contentDescription = "Background Permission",
                     modifier = Modifier.size(32.dp),
-                    tint = if (NotificationUtils.isIgnoringBatteryOptimizations(context)) Color(0xFF10B981) else Color(0xFFEF4444)
+                    tint = if (backgroundPermStatus) Color(0xFF10B981) else Color(0xFFEF4444)
                 )
             },
             onFixClick = {
-                if (!NotificationUtils.isIgnoringBatteryOptimizations(context)) {
-                    val success = NotificationUtils.requestBatteryOptimizationExemption(context)
-                    if (!success) {
-                        // If direct request failed, open battery optimization settings
-                        NotificationUtils.openBatteryOptimizationSettings(context)
-                    }
+                if (!backgroundPermStatus) {
+                    NotificationUtils.openBatteryOptimizationSettings(context)
                 }
             }
         )
@@ -316,7 +305,7 @@ fun RotatingSyncIcon() {
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
-            animation = tween(5000, easing = LinearEasing),
+            animation = tween(2000, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         )
     )

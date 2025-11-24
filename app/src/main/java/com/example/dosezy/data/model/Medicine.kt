@@ -113,9 +113,9 @@ data class Medicine(
 
         // Remove decimal if it's a whole number
         return if (dosage % 1 == 0.0) {
-            "${dosage.toInt()}$unitAbbr"
+            "${dosage.toInt()} $unitAbbr"
         } else {
-            "$dosage$unitAbbr"
+            "$dosage $unitAbbr"
         }
     }
 
