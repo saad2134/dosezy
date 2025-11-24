@@ -24,6 +24,10 @@
     <!-- Optional but useful permissions -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name=".DosezyApplication"
@@ -54,11 +58,6 @@
             android:exported="false"
             android:theme="@style/Theme.Dosezy" />
 
-        <!-- Services for background tasks -->
-        <service
-            android:name=".notifications.MedicineReminderService"
-            android:enabled="true"
-            android:exported="false" />
 
         <!-- Alarm Receiver for scheduled medicines -->
         <receiver
@@ -68,15 +67,15 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.REBOOT" />
             </intent-filter>
         </receiver>
 
-        <!-- Foreground Service for ongoing reminders -->
-        <service
-            android:name=".notifications.MedicineForegroundService"
+        <receiver
+            android:name=".notifications.NotificationActionReceiver"
             android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="shortService" />
+            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

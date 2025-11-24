@@ -1,8 +1,6 @@
 package com.example.dosezy.ui.subscreens
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,11 +11,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -29,7 +28,6 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -101,6 +99,7 @@ fun EditMedScreen(
         mutableStateOf<String?>(null)
     }
     var showTimePicker by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     // Dropdown states
     var dosageUnitExpanded by remember { mutableStateOf(false) }
@@ -153,116 +152,77 @@ fun EditMedScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()) // Added scroll here
             ) {
-                // Medicine Image Selection
-                Text(
-                    text = "Medicine Image",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp
-                    ),
-                    color = Color(0xFF0D1B1B),
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                // Use ProfilePicturePicker for medicine image selection
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(128.dp)
-                            .clip(RoundedCornerShape(16.dp)) // Squircle shape
+                    // Medicine Image Selection
+                    Text(
+                        text = "Medicine Image",
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 18.sp
+                        ),
+                        color = Color(0xFF0D1B1B),
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    // Use ProfilePicturePicker for medicine image selection
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        ProfilePicturePicker(
-                            profilePicPath = medicineImagePath,
-                            onProfilePictureSelected = { path ->
-                                medicineImagePath = path
-                            },
-                            modifier = Modifier.size(128.dp)
+                        Box(
+                            modifier = Modifier
+                                .size(128.dp)
+                                .clip(RoundedCornerShape(16.dp)) // Squircle shape
+                        ) {
+                            ProfilePicturePicker(
+                                profilePicPath = medicineImagePath,
+                                onProfilePictureSelected = { path ->
+                                    medicineImagePath = path
+                                },
+                                modifier = Modifier.size(128.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = if (medicineImagePath != null) "Change Medicine Image" else "Upload Medicine Image",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFF64748B),
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
+                    // Medication Name
                     Text(
-                        text = if (medicineImagePath != null) "Change Medicine Image" else "Upload Medicine Image",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xFF64748B),
+                        text = "Medication Name",
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 18.sp
+                        ),
+                        color = Color(0xFF0D1B1B),
+                        modifier = Modifier.padding(bottom = 8.dp)
                     )
-                }
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Medication Name
-                Text(
-                    text = "Medication Name",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp
-                    ),
-                    color = Color(0xFF0D1B1B),
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                OutlinedTextField(
-                    value = medicationName,
-                    onValueChange = { medicationName = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(64.dp),
-                    placeholder = {
-                        Text(
-                            "Enter medication name",
-                            color = Color(0xFF94A3B8)
-                        )
-                    },
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = Color(0xFF1193D4),
-                        unfocusedBorderColor = Color(0xFFE2E8F0),
-                        focusedLabelColor = Color(0xFF1193D4),
-                        unfocusedLabelColor = Color(0xFF6B7280),
-                        cursorColor = Color(0xFF1193D4)
-                    ),
-                    singleLine = true
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Dosage
-                Text(
-                    text = "Dosage",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp
-                    ),
-                    color = Color(0xFF0D1B1B),
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
                     OutlinedTextField(
-                        value = dosage,
-                        onValueChange = {
-                            if (it.all { char -> char.isDigit() || char == '.' }) {
-                                dosage = it
-                            }
-                        },
+                        value = medicationName,
+                        onValueChange = { medicationName = it },
                         modifier = Modifier
-                            .weight(1f)
+                            .fillMaxWidth()
                             .height(64.dp),
                         placeholder = {
                             Text(
-                                "0",
+                                "Enter medication name",
                                 color = Color(0xFF94A3B8)
                             )
                         },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
                             focusedBorderColor = Color(0xFF1193D4),
                             unfocusedBorderColor = Color(0xFFE2E8F0),
@@ -273,128 +233,122 @@ fun EditMedScreen(
                         singleLine = true
                     )
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                    // Dosage Unit Dropdown
-                    Box(
-                        modifier = Modifier.weight(1f)
+                    // Dosage
+                    Text(
+                        text = "Dosage",
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 18.sp
+                        ),
+                        color = Color(0xFF0D1B1B),
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        ExposedDropdownMenuBox(
-                            expanded = dosageUnitExpanded,
-                            onExpandedChange = { dosageUnitExpanded = !dosageUnitExpanded }
-                        ) {
-                            OutlinedTextField(
-                                value = selectedDosageUnit.displayName,
-                                onValueChange = {},
-                                readOnly = true,
-                                trailingIcon = {
-                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = dosageUnitExpanded)
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(64.dp)
-                                    .menuAnchor(),
-                                colors = TextFieldDefaults.outlinedTextFieldColors(
-                                    focusedBorderColor = Color(0xFF1193D4),
-                                    unfocusedBorderColor = Color(0xFFE2E8F0),
-                                    focusedLabelColor = Color(0xFF1193D4),
-                                    unfocusedLabelColor = Color(0xFF6B7280)
+                        OutlinedTextField(
+                            value = dosage,
+                            onValueChange = {
+                                if (it.all { char -> char.isDigit() || char == '.' }) {
+                                    dosage = it
+                                }
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(64.dp),
+                            placeholder = {
+                                Text(
+                                    "0",
+                                    color = Color(0xFF94A3B8)
                                 )
-                            )
+                            },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = Color(0xFF1193D4),
+                                unfocusedBorderColor = Color(0xFFE2E8F0),
+                                focusedLabelColor = Color(0xFF1193D4),
+                                unfocusedLabelColor = Color(0xFF6B7280),
+                                cursorColor = Color(0xFF1193D4)
+                            ),
+                            singleLine = true
+                        )
 
-                            ExposedDropdownMenu(
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        // Dosage Unit Dropdown
+                        Box(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            ExposedDropdownMenuBox(
                                 expanded = dosageUnitExpanded,
-                                onDismissRequest = { dosageUnitExpanded = false }
+                                onExpandedChange = { dosageUnitExpanded = !dosageUnitExpanded }
                             ) {
-                                DosageUnit.values().forEach { unit ->
-                                    DropdownMenuItem(
-                                        text = { Text(unit.displayName) },
-                                        onClick = {
-                                            selectedDosageUnit = unit
-                                            dosageUnitExpanded = false
-                                        }
+                                OutlinedTextField(
+                                    value = selectedDosageUnit.displayName,
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    trailingIcon = {
+                                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = dosageUnitExpanded)
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(64.dp)
+                                        .menuAnchor(),
+                                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                                        focusedBorderColor = Color(0xFF1193D4),
+                                        unfocusedBorderColor = Color(0xFFE2E8F0),
+                                        focusedLabelColor = Color(0xFF1193D4),
+                                        unfocusedLabelColor = Color(0xFF6B7280)
                                     )
+                                )
+
+                                ExposedDropdownMenu(
+                                    expanded = dosageUnitExpanded,
+                                    onDismissRequest = { dosageUnitExpanded = false }
+                                ) {
+                                    DosageUnit.values().forEach { unit ->
+                                        DropdownMenuItem(
+                                            text = { Text(unit.displayName) },
+                                            onClick = {
+                                                selectedDosageUnit = unit
+                                                dosageUnitExpanded = false
+                                            }
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                // Time Selection
-                Text(
-                    text = "Time",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp
-                    ),
-                    color = Color(0xFF0D1B1B),
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
+                    // Time Selection
+                    Text(
+                        text = "Time",
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 18.sp
+                        ),
+                        color = Color(0xFF0D1B1B),
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
 
-                // Time Picker
-                OutlinedTextField(
-                    value = String.format("%02d:%02d", selectedTime.hour, selectedTime.minute),
-                    onValueChange = { /* Read-only, opens time picker */ },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(64.dp)
-                        .clickable { showTimePicker = true },
-                    readOnly = true,
-                    placeholder = {
-                        Text(
-                            "Select time",
-                            color = Color(0xFF94A3B8)
-                        )
-                    },
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = Color(0xFF1193D4),
-                        unfocusedBorderColor = Color(0xFFE2E8F0),
-                        focusedLabelColor = Color(0xFF1193D4),
-                        unfocusedLabelColor = Color(0xFF6B7280)
-                    ),
-                    trailingIcon = {
-                        IconButton(
-                            onClick = { showTimePicker = true }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Schedule,
-                                contentDescription = "Select time",
-                                tint = Color(0xFF6B7280)
-                            )
-                        }
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Frequency
-                Text(
-                    text = "Frequency",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp
-                    ),
-                    color = Color(0xFF0D1B1B),
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                ExposedDropdownMenuBox(
-                    expanded = frequencyExpanded,
-                    onExpandedChange = { frequencyExpanded = !frequencyExpanded }
-                ) {
+                    // Time Picker
                     OutlinedTextField(
-                        value = selectedFrequency.displayName,
-                        onValueChange = {},
-                        readOnly = true,
+                        value = String.format("%02d:%02d", selectedTime.hour, selectedTime.minute),
+                        onValueChange = { /* Read-only, opens time picker */ },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(64.dp)
-                            .menuAnchor(),
+                            .clickable { showTimePicker = true },
+                        readOnly = true,
                         placeholder = {
                             Text(
-                                "Select frequency",
+                                "Select time",
                                 color = Color(0xFF94A3B8)
                             )
                         },
@@ -405,116 +359,154 @@ fun EditMedScreen(
                             unfocusedLabelColor = Color(0xFF6B7280)
                         ),
                         trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = frequencyExpanded)
+                            IconButton(
+                                onClick = { showTimePicker = true }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Schedule,
+                                    contentDescription = "Select time",
+                                    tint = Color(0xFF6B7280)
+                                )
+                            }
                         }
                     )
 
-                    ExposedDropdownMenu(
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Frequency
+                    Text(
+                        text = "Frequency",
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 18.sp
+                        ),
+                        color = Color(0xFF0D1B1B),
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    ExposedDropdownMenuBox(
                         expanded = frequencyExpanded,
-                        onDismissRequest = { frequencyExpanded = false }
+                        onExpandedChange = { frequencyExpanded = !frequencyExpanded }
                     ) {
-                        FrequencyPattern.values().forEach { frequency ->
-                            DropdownMenuItem(
-                                text = { Text(frequency.displayName) },
-                                onClick = {
-                                    selectedFrequency = frequency
-                                    frequencyExpanded = false
-                                }
-                            )
+                        OutlinedTextField(
+                            value = selectedFrequency.displayName,
+                            onValueChange = {},
+                            readOnly = true,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(64.dp)
+                                .menuAnchor(),
+                            placeholder = {
+                                Text(
+                                    "Select frequency",
+                                    color = Color(0xFF94A3B8)
+                                )
+                            },
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = Color(0xFF1193D4),
+                                unfocusedBorderColor = Color(0xFFE2E8F0),
+                                focusedLabelColor = Color(0xFF1193D4),
+                                unfocusedLabelColor = Color(0xFF6B7280)
+                            ),
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = frequencyExpanded)
+                            }
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = frequencyExpanded,
+                            onDismissRequest = { frequencyExpanded = false }
+                        ) {
+                            FrequencyPattern.values().forEach { frequency ->
+                                DropdownMenuItem(
+                                    text = { Text(frequency.displayName) },
+                                    onClick = {
+                                        selectedFrequency = frequency
+                                        frequencyExpanded = false
+                                    }
+                                )
+                            }
                         }
                     }
-                }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(32.dp))
 
-                // Save Changes Button
-                Button(
-                    onClick = {
-                        if (medicationName.isNotBlank() && dosage.isNotBlank()) {
-                            val updatedMedicine = Medicine(
-                                medicineId = medicineToEdit?.medicineId ?: UUID.randomUUID().toString(),
-                                userId = currentUser?.userId ?: "",
-                                medicationName = medicationName,
-                                dosage = dosage.toDoubleOrNull() ?: 0.0,
-                                dosageUnit = selectedDosageUnit,
-                                timesPerDay = when (selectedFrequency) {
-                                    FrequencyPattern.DAILY -> 1
-                                    FrequencyPattern.WEEKLY -> 7
-                                    FrequencyPattern.MONTHLY -> 30
-                                    FrequencyPattern.CUSTOM -> 1
-                                },
-                                frequency = com.example.dosezy.data.model.Frequency(
-                                    pattern = selectedFrequency
-                                ),
-                                scheduledTimes = listOf(selectedTime),
-                                imageUri = medicineImagePath
-                            )
-
-                            if (medicineToEdit != null) {
-                                medicineViewModel.updateMedicine(updatedMedicine)
-                            } else {
-                                medicineViewModel.addMedicine(updatedMedicine)
-                            }
-                            navController.popBackStack()
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(64.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF2084E4),
-                        contentColor = Color.White
-                    ),
-                    enabled = medicationName.isNotBlank() && dosage.isNotBlank()
-                ) {
-                    Text(
-                        "Save Changes",
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
-                        )
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Delete Medication Button (only show for existing medicines)
-                if (medicineToEdit != null) {
-                    OutlinedButton(
+                    // Save Changes Button
+                    Button(
                         onClick = {
-                            medicineViewModel.deleteMedicine(medicineToEdit)
-                            navController.popBackStack()
+                            if (medicationName.isNotBlank() && dosage.isNotBlank()) {
+                                val updatedMedicine = Medicine(
+                                    medicineId = medicineToEdit?.medicineId ?: UUID.randomUUID().toString(),
+                                    userId = currentUser?.userId ?: "",
+                                    medicationName = medicationName,
+                                    dosage = dosage.toDoubleOrNull() ?: 0.0,
+                                    dosageUnit = selectedDosageUnit,
+                                    timesPerDay = when (selectedFrequency) {
+                                        FrequencyPattern.DAILY -> 1
+                                        FrequencyPattern.WEEKLY -> 7
+                                        FrequencyPattern.MONTHLY -> 30
+                                        FrequencyPattern.CUSTOM -> 1
+                                    },
+                                    frequency = com.example.dosezy.data.model.Frequency(
+                                        pattern = selectedFrequency
+                                    ),
+                                    scheduledTimes = listOf(selectedTime),
+                                    imageUri = medicineImagePath
+                                )
+
+                                if (medicineToEdit != null) {
+                                    medicineViewModel.updateMedicine(updatedMedicine)
+                                } else {
+                                    medicineViewModel.addMedicine(updatedMedicine)
+                                }
+                                navController.popBackStack()
+                            }
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = Color(0xFFEF4444)
+                            .height(64.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF2084E4),
+                            contentColor = Color.White
                         ),
-                        border = BorderStroke(
-                            width = 1.dp,
-                            color = Color(0xFFEF4444)
-                        )
+                        enabled = medicationName.isNotBlank() && dosage.isNotBlank()
                     ) {
-                        Row(
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete",
-                                modifier = Modifier.size(20.dp)
+                        Text(
+                            "Save Changes",
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Delete Medication Button (only show for existing medicines)
+                    if (medicineToEdit != null) {
+                        Button(
+                            onClick = {
+                                showDeleteDialog = true
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFFFEE2E2),
+                                contentColor = Color(0xFFDC2626)
+                            )
+                        ) {
                             Text(
-                                "Delete Medication",
-                                style = MaterialTheme.typography.bodyLarge.copy(
-                                    fontWeight = FontWeight.Medium,
-                                    fontSize = 16.sp
-                                )
+                                text = "Delete Medication",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
                             )
                         }
                     }
+
+                    // Add extra space at the bottom to ensure everything is visible
+                    Spacer(modifier = Modifier.height(32.dp))
                 }
             }
         }
@@ -529,6 +521,39 @@ fun EditMedScreen(
                 showTimePicker = false
             },
             onDismiss = { showTimePicker = false }
+        )
+    }
+
+    // Delete Confirmation Dialog
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete Medication") },
+            text = { Text("Are you sure you want to delete this medication? This action cannot be undone.") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        medicineViewModel.deleteMedicine(medicineToEdit!!)
+                        showDeleteDialog = false
+                        navController.popBackStack()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFDC2626)
+                    )
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showDeleteDialog = false },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF6B7280)
+                    )
+                ) {
+                    Text("Cancel")
+                }
+            }
         )
     }
 }

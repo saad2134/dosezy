@@ -5,16 +5,19 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.data.model.ScheduleWithMedicine
 import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.data.repository.UserRepository
+import com.example.dosezy.utils.TimeCalculationUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -120,6 +123,50 @@ class ScheduleViewModel @Inject constructor(
             }
         }
     }
+
+    // Add this method to ScheduleViewModel.kt
+    fun markAsMissed(entryId: String) {
+        viewModelScope.launch {
+            scheduleRepository.updateMedicationStatus(entryId, "MISSED", null)
+            // Refresh the schedule after updating status
+            _currentUserId.value?.let { userId ->
+                loadScheduleForDate(userId, _selectedDate.value)
+            }
+        }
+    }
+
+    // Update ScheduleViewModel.kt - Add these methods
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun autoMarkMissedMedications(userId: String, missedAfterHours: Int) {
+        viewModelScope.launch {
+            val currentTime = LocalDateTime.now()
+            try {
+                // Get all schedule entries for the user
+                val allEntries = scheduleRepository.getSchedulesByUserSync(userId)
+
+                allEntries.forEach { entry ->
+                    if (entry.status == MedicationStatus.PENDING) {
+                        val isMissed = TimeCalculationUtils.isMissed(
+                            entry.scheduledDateTime,
+                            currentTime,
+                            missedAfterHours
+                        )
+                        if (isMissed) {
+                            scheduleRepository.updateMedicationStatus(entry.entryId, "MISSED", null)
+                        }
+                    }
+                }
+
+                // Refresh the current view after updating
+                _currentUserId.value?.let { currentUserId ->
+                    loadScheduleForDate(currentUserId, _selectedDate.value)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error auto-marking missed medications", e)
+            }
+        }
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun getFormattedDate(): String {

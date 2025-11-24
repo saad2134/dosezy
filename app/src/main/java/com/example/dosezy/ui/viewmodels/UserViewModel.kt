@@ -1,11 +1,13 @@
 package com.example.dosezy.ui.viewmodels
 
+import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dosezy.data.model.User
 import com.example.dosezy.data.repository.MedicineRepository
 import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.data.repository.UserRepository
+import com.example.dosezy.notifications.MedicineNotificationManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +19,8 @@ import javax.inject.Inject
 class UserViewModel @Inject constructor(
     val userRepository: UserRepository,
     val medicineRepository: MedicineRepository,
-    val scheduleRepository: ScheduleRepository
+    val scheduleRepository: ScheduleRepository,
+    private val medicineNotificationManager: MedicineNotificationManager // UPDATED
 ) : ViewModel() {
 
     private val _users = MutableStateFlow<List<User>>(emptyList())
@@ -62,6 +65,10 @@ class UserViewModel @Inject constructor(
                 allUsers.forEach { existingUser ->
                     if (existingUser.isCurrentUser && existingUser.userId != user.userId) {
                         userRepository.updateUser(existingUser.copy(isCurrentUser = false))
+                        // Cancel alarms for the previous current user
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            medicineNotificationManager.cancelAllAlarmsForUser(existingUser.userId) // UPDATED
+                        }
                     }
                 }
 
@@ -70,10 +77,14 @@ class UserViewModel @Inject constructor(
                 userRepository.updateUser(updatedUser)
                 _currentUser.value = updatedUser
 
+                // Schedule alarms for the new current user
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    medicineNotificationManager.scheduleAlarmsForUser(updatedUser.userId) // UPDATED
+                }
+
                 _isLoading.value = false
             } catch (e: Exception) {
                 _isLoading.value = false
-                // Error is handled by the flow
             }
         }
     }

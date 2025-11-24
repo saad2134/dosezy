@@ -1,12 +1,18 @@
-# 💊 Dosezy 
+<h1 align="center"> 💊 Dosezy – Medicine Adherence Simplified</h1>
 
-An Android medicine tracking app. **Dosezy** transforms medication management into a simple, stress-free experience.  
-Built with accessibility at its core, the app features **clear, large text** and **intuitive navigation**: perfect for elderly users and anyone managing multiple prescriptions.  
+> <p align="center">🚨 <strong> An Android medicine tracking app. **Dosezy** transforms medication management into a simple, stress-free experience. Built with accessibility at its core, the app features **clear, large text** and **intuitive navigation**: perfect for elderly users and anyone managing multiple prescriptions.</strong></p>  
 
-Once you input the basics: name, dosage, timing, and frequency, the app intelligently handles your medication schedule.  
- 
+
+<div align="center">
+
+![Phase](https://img.shields.io/badge/🛠️%20Phase-Released%20v1%2E0%2E0-blue?style=for-the-badge)
+![Platforms](https://img.shields.io/badge/🌐%20Platforms-Android-28a745?style=for-the-badge)
+
+</div>
  
 ## ✨ Features  
+
+Once you input the basics: name, dosage, timing, and frequency, the app intelligently handles your medication schedule.
 
 - 📅 **Medication Adherence** – Automated reminders ensure timely medication consumption.  
 - ♿ **Accessibility-First Design** – Large text, high-contrast colors, and simple controls for elderly users.  
@@ -134,7 +140,46 @@ dosezy-uidesign-webview/
 - XML configurations for backup and data extraction
 
 ## 📱 Screenshots
-* Soon.
+
+<table> 
+
+<tr> 
+<td>
+<strong>Home Screen</strong><br><br> 
+</td> 
+<td>
+<strong>Schedule Screen</strong><br><br> 
+</td>
+<td>
+<strong>Medicines Screen</strong><br><br> 
+</td>
+</tr> 
+
+<tr> 
+<td>
+<strong>Add New Medicine Screen</strong><br><br> 
+</td> 
+<td>
+<strong>Menu List Screen</strong><br><br> 
+</td>
+<td>
+<strong>Notification Status Dialog</strong><br><br> 
+</td>
+</tr> 
+
+<tr> 
+<td>
+<strong>Profile Actions Dialog</strong><br><br> 
+</td> 
+<td>
+<strong>Data Export Feature</strong><br><br> 
+</td>
+<td>
+<strong>Preferences Setting</strong><br><br> 
+</td>
+</tr> 
+
+</table>
 
 ## 📊 **Project Stats**
 

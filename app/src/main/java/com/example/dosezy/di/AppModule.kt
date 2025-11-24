@@ -1,3 +1,4 @@
+// AppModule.kt
 package com.example.dosezy.di
 
 import android.content.Context
@@ -6,6 +7,7 @@ import com.example.dosezy.data.DosezyDatabase
 import com.example.dosezy.data.repository.MedicineRepository
 import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.data.repository.UserRepository
+import com.example.dosezy.notifications.MedicineNotificationManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -35,13 +37,25 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideMedicineRepository(database: DosezyDatabase): MedicineRepository {
-        return MedicineRepository(database)
+    fun provideMedicineRepository(
+        database: DosezyDatabase,
+        scheduleRepository: ScheduleRepository // Add this parameter
+    ): MedicineRepository {
+        return MedicineRepository(database, scheduleRepository) // Pass both dependencies
     }
 
     @Provides
     @Singleton
     fun provideScheduleRepository(database: DosezyDatabase): ScheduleRepository {
         return ScheduleRepository(database)
+    }
+
+    @Provides
+    @Singleton
+    fun provideMedicineNotificationManager(
+        @ApplicationContext context: Context,
+        database: DosezyDatabase
+    ): MedicineNotificationManager {
+        return MedicineNotificationManager(context, database)
     }
 }

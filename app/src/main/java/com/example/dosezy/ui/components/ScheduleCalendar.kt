@@ -43,11 +43,11 @@ import androidx.compose.ui.unit.sp
 import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.data.model.ScheduleWithMedicine
+import com.example.dosezy.data.model.TimeFormat
 import com.example.dosezy.ui.screens.MedicineImage
+import com.example.dosezy.utils.TimeFormatUtils
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.YearMonth
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun ScheduleCalendar(
@@ -277,20 +277,22 @@ private fun getDateStatusColor(entries: List<ScheduleEntry>): Color {
     }
 }
 
+// In ScheduleCalendar.kt, update the ScheduleList composable:
 @Composable
 fun ScheduleList(
     scheduleWithMedicine: List<ScheduleWithMedicine>,
+    timeFormat: TimeFormat, // Add time format parameter
     onMarkAsTaken: (String, String) -> Unit,
     onMarkAsLate: (String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // FIXED: Add constraints to LazyColumn
     LazyColumn(
         modifier = modifier
     ) {
         items(scheduleWithMedicine) { item ->
             ScheduleListItem(
                 scheduleWithMedicine = item,
+                timeFormat = timeFormat, // Pass to list item
                 onMarkAsTaken = onMarkAsTaken,
                 onMarkAsLate = onMarkAsLate,
                 modifier = Modifier
@@ -304,6 +306,7 @@ fun ScheduleList(
 @Composable
 fun ScheduleListItem(
     scheduleWithMedicine: ScheduleWithMedicine,
+    timeFormat: TimeFormat, // Add time format parameter
     onMarkAsTaken: (String, String) -> Unit,
     onMarkAsLate: (String, String) -> Unit,
     modifier: Modifier = Modifier
@@ -317,7 +320,7 @@ fun ScheduleListItem(
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Medication Icon with image support - FIXED
+        // Medication Icon with image support
         MedicineImage(
             imageUri = medicine?.imageUri,
             modifier = Modifier.size(56.dp)
@@ -333,19 +336,18 @@ fun ScheduleListItem(
                 text = medicine?.medicationName ?: "Unknown Medicine",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF0D171B)
+                color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = medicine?.getDosageDisplay() ?: "Unknown dosage",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF64748B)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            // Use TimeFormatUtils to format time according to user preference
             Text(
-                text = entry.scheduledDateTime.format(
-                    DateTimeFormatter.ofPattern("h:mm a")
-                ),
+                text = TimeFormatUtils.formatTime(entry.scheduledDateTime, timeFormat),
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF64748B)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 
@@ -354,14 +356,14 @@ fun ScheduleListItem(
         // Status Button
         val (icon, color, onClick) = when (entry.status) {
             MedicationStatus.TAKEN_ON_TIME ->
-                Triple(Icons.Default.Done, Color(0xFF10B981), null as (() -> Unit)?)
+                Triple(Icons.Default.Done, MaterialTheme.colorScheme.primary, null as (() -> Unit)?)
             MedicationStatus.TAKEN_LATE ->
-                Triple(Icons.Default.Done, Color(0xFFF59E0B), null)
+                Triple(Icons.Default.Done, MaterialTheme.colorScheme.tertiary, null)
             MedicationStatus.MISSED ->
-                Triple(Icons.Default.Close, Color(0xFFEF4444), null)
+                Triple(Icons.Default.Close, MaterialTheme.colorScheme.error, null)
             MedicationStatus.PENDING ->
-                Triple(Icons.Default.HorizontalRule, Color(0xFF94A3B8)) {
-                    val takenAt = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                Triple(Icons.Default.HorizontalRule, MaterialTheme.colorScheme.onSurfaceVariant) {
+                    val takenAt = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME)
                     onMarkAsTaken(entry.entryId, takenAt)
                 }
         }

@@ -1,5 +1,6 @@
 package com.example.dosezy.ui.subscreens
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -43,18 +44,23 @@ fun HelpSupportScreen(navController: NavController) {
     val userViewModel: UserViewModel = hiltViewModel()
     val currentUser by userViewModel.currentUser.collectAsState()
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        TopBar(
-            navController = navController,
-            currentUser = currentUser,
-            title = "Help & Support",
-            showBackButton = true,
-            actions = {}
-        )
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            TopBar(
+                navController = navController,
+                currentUser = currentUser,
+                title = "Help & Support",
+                showBackButton = true,
+                actions = {}
+            )
 
-        HelpSupportContent(navController)
+            HelpSupportContent(navController)
+        }
+
+        // Version info in bottom right corner
+        CornerVersion()
     }
 }
 
@@ -86,8 +92,6 @@ fun HelpSupportContent(navController: NavController) {
             title = "FAQs",
             description = "Answers to common questions.",
             onClick = {
-                // Navigate to FAQs screen or open FAQs
-                // navController.navigate("faqs_screen")
                 openUrl(context, "https://github.com/saad2134/dosezy/blob/main/resources/FAQs.md")
             }
         )
@@ -100,8 +104,6 @@ fun HelpSupportContent(navController: NavController) {
             title = "User Manual",
             description = "Browse the user guide.",
             onClick = {
-                // Navigate to User Manual screen or open user manual
-                // navController.navigate("user_manual_screen")
                 openUrl(context, "https://github.com/saad2134/dosezy/blob/main/resources/UserManual.md")
             }
         )
@@ -125,7 +127,6 @@ fun HelpSupportContent(navController: NavController) {
             title = "Email Support",
             description = "Get help via email.",
             onClick = {
-                // Open email client
                 openEmail(context, "reach.saad@outlook.com", "Help & Support Request")
             }
         )
@@ -138,9 +139,64 @@ fun HelpSupportContent(navController: NavController) {
             title = "Phone Support",
             description = "Call us for immediate help.",
             onClick = {
-                // Open phone dialer
                 openPhone(context, "+91 98765 43210")
             }
+        )
+
+        // Add bottom padding for version info
+        Spacer(modifier = Modifier.height(48.dp))
+    }
+}
+
+@Composable
+fun CornerVersion() {
+    val context = LocalContext.current
+    val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+    val versionName = packageInfo.versionName
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "v$versionName",
+            fontSize = 12.sp,
+            color = Color(0xFF94A3B8),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+        )
+    }
+}
+
+// If you want a centered version at the bottom instead:
+@Composable
+fun BottomVersion() {
+    val context = LocalContext.current
+    val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+    val versionName = packageInfo.versionName
+    val versionCode = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+        packageInfo.longVersionCode
+    } else {
+        packageInfo.versionCode.toLong()
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Dosezy v$versionName",
+            fontSize = 14.sp,
+            color = Color(0xFF64748B),
+            fontWeight = FontWeight.Medium
+        )
+        Text(
+            text = "Build $versionCode",
+            fontSize = 12.sp,
+            color = Color(0xFF94A3B8)
         )
     }
 }
@@ -167,17 +223,15 @@ fun SupportCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Icon
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color(0xFF3B82F6), // Blue color matching the design
+                tint = Color(0xFF3B82F6),
                 modifier = Modifier.size(48.dp)
             )
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            // Text Content
             Column(
                 modifier = Modifier.weight(1f)
             ) {
@@ -196,7 +250,6 @@ fun SupportCard(
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            // Arrow Icon
             Icon(
                 imageVector = Icons.Outlined.ArrowOutward,
                 contentDescription = "Open",
@@ -212,7 +265,6 @@ private fun openUrl(context: android.content.Context, url: String) {
         val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))
         context.startActivity(intent)
     } catch (e: Exception) {
-        // Handle error (e.g., no browser available)
         android.widget.Toast.makeText(context, "Cannot open link", android.widget.Toast.LENGTH_SHORT).show()
     }
 }

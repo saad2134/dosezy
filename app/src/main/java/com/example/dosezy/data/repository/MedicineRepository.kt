@@ -1,5 +1,7 @@
+// MedicineRepository.kt
 package com.example.dosezy.data.repository
 
+import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -8,8 +10,12 @@ import com.example.dosezy.data.model.Medicine
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import java.time.LocalDate
+import javax.inject.Inject
 
-class MedicineRepository(private val database: DosezyDatabase) {
+class MedicineRepository @Inject constructor(
+    private val database: DosezyDatabase,
+    private val scheduleRepository: ScheduleRepository
+) {
 
     companion object {
         private const val TAG = "MedicineRepository"
@@ -24,7 +30,7 @@ class MedicineRepository(private val database: DosezyDatabase) {
         database.medicineDao().getMedicinesByUser(userId).first()
 
     @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun insertMedicine(medicine: Medicine) {
+    suspend fun insertMedicine(medicine: Medicine, context: Context? = null) {
         Log.d(TAG, "Inserting medicine: ${medicine.medicationName} for user: ${medicine.userId}")
 
         // First insert the medicine
@@ -40,6 +46,12 @@ class MedicineRepository(private val database: DosezyDatabase) {
             Log.d(TAG, "Inserted schedule entry for: ${entry.scheduledDateTime}")
         }
         Log.d(TAG, "All schedule entries inserted")
+
+        // SCHEDULE ALARMS IMMEDIATELY - ADD THIS
+        context?.let {
+            scheduleRepository.scheduleAlarmsForMedicine(medicine.medicineId, it)
+            Log.d(TAG, "Immediately scheduled alarms for new medicine")
+        }
 
         // Debug: Check what's in the database
         val allEntries = database.scheduleDao().getAllScheduleEntries(medicine.userId)
@@ -66,10 +78,48 @@ class MedicineRepository(private val database: DosezyDatabase) {
         }
     }
 
+    // Keep the original delete method that takes Medicine object
     suspend fun deleteMedicine(medicine: Medicine) {
         // Delete schedule entries first
         database.scheduleDao().deleteScheduleEntriesByMedicine(medicine.medicineId)
         // Then delete the medicine
         database.medicineDao().deleteMedicine(medicine)
+    }
+
+    // Add this overloaded method that takes medicineId
+    suspend fun deleteMedicine(medicineId: String) {
+        // Delete schedule entries first
+        database.scheduleDao().deleteScheduleEntriesByMedicine(medicineId)
+        // Then delete the medicine using the new method
+        database.medicineDao().deleteMedicineById(medicineId)
+    }
+
+    // Add these methods to MedicineRepository.kt
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun addMedicineWithAlarms(medicine: Medicine, context: Context) {
+        // Insert the medicine
+        insertMedicine(medicine)
+
+        // Schedule alarms for this medicine
+        scheduleRepository.scheduleAlarmsForMedicine(medicine.medicineId, context)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun updateMedicineWithAlarms(medicine: Medicine, context: Context) {
+        // Update the medicine
+        updateMedicine(medicine)
+
+        // Cancel existing alarms and reschedule
+        scheduleRepository.cancelAlarmsForMedicine(medicine.medicineId, context)
+        scheduleRepository.scheduleAlarmsForMedicine(medicine.medicineId, context)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun deleteMedicineWithAlarms(medicineId: String, context: Context) {
+        // Cancel alarms first
+        scheduleRepository.cancelAlarmsForMedicine(medicineId, context)
+
+        // Then delete the medicine (which will cascade delete schedule entries)
+        deleteMedicine(medicineId) // This now uses the overloaded method
     }
 }

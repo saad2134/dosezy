@@ -14,7 +14,9 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
+        buildConfigField("String", "VERSION_NAME", "\"$versionName\"")
+        buildConfigField("int", "VERSION_CODE", "$versionCode")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -36,6 +38,7 @@ android {
         viewBinding = true
         dataBinding = true
         compose = true
+        buildConfig = true
     }
 
     composeOptions {

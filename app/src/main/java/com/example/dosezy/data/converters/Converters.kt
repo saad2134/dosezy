@@ -7,7 +7,10 @@ import com.example.dosezy.data.model.DosageUnit
 import com.example.dosezy.data.model.Frequency
 import com.example.dosezy.data.model.FrequencyPattern
 import com.example.dosezy.data.model.Gender
+import com.example.dosezy.data.model.Language
 import com.example.dosezy.data.model.MedicationStatus
+import com.example.dosezy.data.model.Theme
+import com.example.dosezy.data.model.TimeFormat
 import org.json.JSONArray
 import org.json.JSONObject
 import java.time.LocalDate
@@ -122,4 +125,23 @@ class Converters {
             Frequency(pattern, daysPerWeek, daysPerMonth)
         }
     }
+
+
+    @TypeConverter
+    fun fromTheme(theme: Theme): String = theme.name
+
+    @TypeConverter
+    fun toTheme(themeString: String): Theme = Theme.valueOf(themeString)
+
+    @TypeConverter
+    fun fromTimeFormat(timeFormat: TimeFormat): String = timeFormat.name
+
+    @TypeConverter
+    fun toTimeFormat(timeFormatString: String): TimeFormat = TimeFormat.valueOf(timeFormatString)
+
+    @TypeConverter
+    fun fromLanguage(language: Language): String = language.name
+
+    @TypeConverter
+    fun toLanguage(languageString: String): Language = Language.valueOf(languageString)
 }

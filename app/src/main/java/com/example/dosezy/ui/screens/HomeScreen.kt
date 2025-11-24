@@ -31,10 +31,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,14 +46,15 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.ScheduleWithMedicine
+import com.example.dosezy.data.model.TimeFormat
 import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.theme.DosezyTheme
 import com.example.dosezy.ui.viewmodels.ScheduleViewModel
 import com.example.dosezy.ui.viewmodels.UserViewModel
 import com.example.dosezy.utils.DateUtils
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import com.example.dosezy.utils.TimeCalculationUtils
+import com.example.dosezy.utils.TimeFormatUtils
+import kotlinx.coroutines.delay
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -68,6 +71,26 @@ fun HomeScreen(
     // Get current day for subtitle
     val dayOfWeek = DateUtils.getCurrentDayOfWeekLegacy()
     val today = java.time.LocalDate.now()
+    val currentDateTime = java.time.LocalDateTime.now()
+
+    // State for real-time updates
+    var currentTime by remember { mutableStateOf(java.time.LocalDateTime.now()) }
+
+    // Auto-refresh every minute for real-time updates
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(60000) // Update every minute
+            currentTime = java.time.LocalDateTime.now()
+
+            // Auto-mark as missed using ViewModel
+            currentUser?.let { user ->
+                scheduleViewModel.autoMarkMissedMedications(
+                    user.userId,
+                    user.considerMissedAfter
+                )
+            }
+        }
+    }
 
     // FIXED: Better refresh logic
     LaunchedEffect(shouldRefresh, currentUser) {
@@ -105,12 +128,11 @@ fun HomeScreen(
     val hasMedications = todayEntries.isNotEmpty()
 
     // Group entries by time
+    val timeFormat = currentUser?.timeFormat ?: TimeFormat.HOUR_12
     val groupedEntries = todayEntries.groupBy { entry ->
-        SimpleDateFormat("h:mm a", Locale.getDefault()).format(
-            Date.from(entry.scheduleEntry.scheduledDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant())
-        )
+        TimeFormatUtils.formatTime(entry.scheduleEntry.scheduledDateTime, timeFormat)
     }.toList().sortedBy { (time, _) ->
-        SimpleDateFormat("h:mm a", Locale.getDefault()).parse(time)?.time ?: 0L
+        TimeFormatUtils.parseTime(time, timeFormat)?.time ?: 0L
     }
 
     Surface(
@@ -143,9 +165,15 @@ fun HomeScreen(
                             TimeSection(
                                 time = time,
                                 entries = entries,
+                                currentDateTime = currentTime,
+                                currentUser = currentUser,
                                 onMarkAsTaken = { entryId ->
                                     val takenAt = java.time.LocalDateTime.now().toString()
                                     scheduleViewModel.markAsTaken(entryId, takenAt)
+                                },
+                                onMarkAsLate = { entryId ->
+                                    val takenAt = java.time.LocalDateTime.now().toString()
+                                    scheduleViewModel.markAsLate(entryId, takenAt)
                                 }
                             )
                             Spacer(modifier = Modifier.height(16.dp))
@@ -163,7 +191,10 @@ fun HomeScreen(
 private fun TimeSection(
     time: String,
     entries: List<ScheduleWithMedicine>,
-    onMarkAsTaken: (String) -> Unit
+    currentDateTime: java.time.LocalDateTime,
+    currentUser: com.example.dosezy.data.model.User?,
+    onMarkAsTaken: (String) -> Unit,
+    onMarkAsLate: (String) -> Unit
 ) {
     Column {
         // Time header
@@ -175,11 +206,53 @@ private fun TimeSection(
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
-        // Next dose indicator - Calculate actual time difference
+        // Calculate time difference only for pending/late entries (not taken ones)
+        val pendingEntries = entries.filter {
+            it.scheduleEntry.status == MedicationStatus.PENDING ||
+                    it.scheduleEntry.status == MedicationStatus.MISSED
+        }
+
+        val firstPendingEntry = pendingEntries.firstOrNull()
+        val timeDiff = firstPendingEntry?.let { entry ->
+            TimeCalculationUtils.calculateTimeDifference(
+                entry.scheduleEntry.scheduledDateTime,
+                currentDateTime
+            )
+        }
+
+        // Next dose indicator - Show time difference only for pending entries
+        val statusText = when {
+            // If all entries in this time slot are taken
+            entries.all { it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
+                    it.scheduleEntry.status == MedicationStatus.TAKEN_LATE } -> {
+                "All medications taken"
+            }
+            // If there are missed medications
+            entries.any { it.scheduleEntry.status == MedicationStatus.MISSED } -> {
+                "Missed medications"
+            }
+            // Show time difference for pending/late entries
+            timeDiff != null -> TimeCalculationUtils.formatTimeDifference(timeDiff)
+            // Default case
+            else -> "Scheduled for this time"
+        }
+
+        val statusColor = when {
+            entries.any { it.scheduleEntry.status == MedicationStatus.MISSED } ->
+                MaterialTheme.colorScheme.error
+            timeDiff?.isLate == true ->
+                MaterialTheme.colorScheme.error
+            entries.all { it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
+                    it.scheduleEntry.status == MedicationStatus.TAKEN_LATE } ->
+                MaterialTheme.colorScheme.primary
+            else ->
+                MaterialTheme.colorScheme.onSurfaceVariant
+        }
+
         Text(
-            text = "Scheduled for this time",
+            text = statusText,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = statusColor,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
@@ -189,7 +262,10 @@ private fun TimeSection(
         entries.forEach { entry ->
             MedicationCard(
                 scheduleWithMedicine = entry,
-                onMarkAsTaken = onMarkAsTaken
+                currentDateTime = currentDateTime,
+                currentUser = currentUser,
+                onMarkAsTaken = onMarkAsTaken,
+                onMarkAsLate = onMarkAsLate
             )
             Spacer(modifier = Modifier.height(8.dp))
         }
@@ -199,12 +275,52 @@ private fun TimeSection(
 @Composable
 private fun MedicationCard(
     scheduleWithMedicine: ScheduleWithMedicine,
-    onMarkAsTaken: (String) -> Unit
+    currentDateTime: java.time.LocalDateTime,
+    currentUser: com.example.dosezy.data.model.User?,
+    onMarkAsTaken: (String) -> Unit,
+    onMarkAsLate: (String) -> Unit
 ) {
     val entry = scheduleWithMedicine.scheduleEntry
     val medicine = scheduleWithMedicine.medicine
     val isTaken = entry.status == MedicationStatus.TAKEN_ON_TIME ||
             entry.status == MedicationStatus.TAKEN_LATE
+    val isMissed = entry.status == MedicationStatus.MISSED
+
+    // Calculate if it's currently late (only for pending medications)
+    val isLate = !isTaken && !isMissed && currentDateTime.isAfter(entry.scheduledDateTime)
+
+    // Calculate if it should be marked as missed (only for pending medications)
+    val shouldBeMissed = !isTaken && currentUser?.let { user ->
+        TimeCalculationUtils.isMissed(
+            entry.scheduledDateTime,
+            currentDateTime,
+            user.considerMissedAfter
+        )
+    } ?: false
+
+    // Determine button properties
+    val buttonText = when {
+        isTaken -> "Taken"
+        isMissed -> "Missed"
+        isLate -> "Mark Late"
+        else -> "Take"
+    }
+
+    val buttonColor = when {
+        isTaken -> MaterialTheme.colorScheme.surfaceVariant
+        isMissed -> MaterialTheme.colorScheme.error
+        isLate -> MaterialTheme.colorScheme.tertiary
+        else -> MaterialTheme.colorScheme.primary
+    }
+
+    val textColor = when {
+        isTaken -> MaterialTheme.colorScheme.onSurfaceVariant
+        isMissed -> MaterialTheme.colorScheme.onError
+        isLate -> MaterialTheme.colorScheme.onTertiary
+        else -> MaterialTheme.colorScheme.onPrimary
+    }
+
+    val enabled = !isTaken && !isMissed
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -219,7 +335,7 @@ private fun MedicationCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Medicine icon with image support - FIXED
+            // Medicine icon with image support
             MedicineImage(
                 imageUri = medicine?.imageUri,
                 modifier = Modifier.size(64.dp)
@@ -242,6 +358,31 @@ private fun MedicationCard(
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+
+                // Show individual medication status
+                if (isTaken) {
+                    Text(
+                        text = "Taken",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                } else if (isMissed) {
+                    Text(
+                        text = "Missed",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                } else if (isLate) {
+                    val timeDiff = TimeCalculationUtils.calculateTimeDifference(
+                        entry.scheduledDateTime,
+                        currentDateTime
+                    )
+                    Text(
+                        text = "${timeDiff.hours}h ${timeDiff.minutes}m late",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -249,38 +390,29 @@ private fun MedicationCard(
             // Action button
             Button(
                 onClick = {
-                    if (!isTaken) {
-                        onMarkAsTaken(entry.entryId)
+                    when {
+                        isLate -> onMarkAsLate(entry.entryId)
+                        !isTaken && !isMissed -> onMarkAsTaken(entry.entryId)
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isTaken) {
-                        MaterialTheme.colorScheme.surfaceVariant
-                    } else {
-                        MaterialTheme.colorScheme.primary
-                    },
-                    contentColor = if (isTaken) {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    } else {
-                        MaterialTheme.colorScheme.onPrimary
-                    }
+                    containerColor = buttonColor,
+                    contentColor = textColor
                 ),
-                enabled = !isTaken,
+                enabled = enabled,
                 modifier = Modifier
                     .height(48.dp)
-                    .width(100.dp)
+                    .width(120.dp)
             ) {
                 Text(
-                    text = if (isTaken) "Taken" else "Take",
+                    text = buttonText,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 14.sp
                 )
             }
         }
     }
 }
-
-// Add this MedicineImage composable to HomeScreen.kt
 
 @Composable
 private fun NoMedicationsState() {
@@ -342,13 +474,13 @@ private fun AllGoodState() {
             modifier = Modifier
                 .size(96.dp)
                 .clip(MaterialTheme.shapes.extraLarge)
-                .background(Color(0xFFC6F6D5)),
+                .background(MaterialTheme.colorScheme.primaryContainer),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Check,
                 contentDescription = "All good",
-                tint = Color(0xFF059669),
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(48.dp)
             )
         }
@@ -360,7 +492,7 @@ private fun AllGoodState() {
             text = "All Good!",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF065F46),
+            color = MaterialTheme.colorScheme.primary,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
 

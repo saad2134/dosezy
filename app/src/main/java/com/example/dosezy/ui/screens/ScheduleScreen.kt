@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.dosezy.data.model.TimeFormat
 import com.example.dosezy.ui.components.ScheduleCalendar
 import com.example.dosezy.ui.components.ScheduleList
 import com.example.dosezy.ui.components.TopBar
@@ -40,6 +41,9 @@ fun ScheduleScreen(navController: NavController) {
     val currentUser by userViewModel.currentUser.collectAsState()
     val selectedDate by scheduleViewModel.selectedDate.collectAsState()
     val scheduleWithMedicine by scheduleViewModel.scheduleWithMedicine.collectAsState()
+
+    // Get user's time format preference
+    val timeFormat = currentUser?.timeFormat ?: TimeFormat.HOUR_12
 
     // Load initial schedule when screen is first composed
     LaunchedEffect(Unit) {
@@ -80,7 +84,6 @@ fun ScheduleScreen(navController: NavController) {
                 actions = {}
             )
 
-            // FIXED: Remove the outer verticalScroll and use proper layout
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -116,7 +119,7 @@ fun ScheduleScreen(navController: NavController) {
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                     )
 
-                    // Schedule Items - FIXED: Use Box with constraint instead of direct LazyColumn
+                    // Schedule Items
                     if (scheduleWithMedicine.isNotEmpty()) {
                         Box(
                             modifier = Modifier
@@ -125,6 +128,7 @@ fun ScheduleScreen(navController: NavController) {
                         ) {
                             ScheduleList(
                                 scheduleWithMedicine = scheduleWithMedicine,
+                                timeFormat = timeFormat, // Pass time format to ScheduleList
                                 onMarkAsTaken = { entryId, takenAt ->
                                     scheduleViewModel.markAsTaken(entryId, takenAt)
                                 },
