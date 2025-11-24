@@ -173,7 +173,7 @@ fun ThemeSelectionDialog(
 ) {
     com.example.dosezy.ui.components.SelectionDialog(
         title = "Select Theme",
-        options = listOf("Light" to Theme.LIGHT, "Dark" to Theme.DARK),
+        options = listOf("Light" to Theme.LIGHT),
         currentSelection = currentTheme,
         onOptionSelected = onThemeSelected,
         onDismiss = onDismiss

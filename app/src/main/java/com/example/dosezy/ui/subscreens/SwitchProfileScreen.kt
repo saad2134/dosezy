@@ -139,8 +139,8 @@ fun SwitchProfileScreen(navController: NavController) {
 
                     Button(
                         onClick = {
-                            // Navigate to the correct route that exists in your navigation graph
-                            navController.navigate("newuser/1") {
+                            // Use the new create_profile route
+                            navController.navigate("create_profile/1") {
                                 launchSingleTop = true
                             }
                         },

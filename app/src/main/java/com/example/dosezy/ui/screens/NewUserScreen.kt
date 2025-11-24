@@ -86,33 +86,34 @@ fun NewUserScreen(
     var completeProfileSetup by remember { mutableStateOf({}) }
     var showExistingProfiles by remember { mutableStateOf(false) }
 
-    // Handle navigation when current user changes (for profile selection)
-    LaunchedEffect(currentUser) {
-        if (currentUser != null && showExistingProfiles) {
-            // Profile was selected from the modal - navigate to home
-            showExistingProfiles = false
-            navController.navigate("home") {
-                popUpTo("newuser/1") { inclusive = true }
-            }
-        }
-    }
-
     Scaffold(
         bottomBar = {
-            // Show bottom navigation bar for all frames
             NewUserBottomBar(
                 currentFrame = currentFrame,
                 isCreatingNewProfile = isCreatingNewProfile,
                 existingUsers = users,
                 onBack = {
-                    if (currentFrame > 1) onNext(currentFrame - 1)
-                    else navController.popBackStack()
+                    if (currentFrame > 1) {
+                        onNext(currentFrame - 1)
+                    } else {
+                        navController.popBackStack()
+                    }
                 },
                 onNext = { onNext(currentFrame + 1) },
                 onSkip = onSkip,
                 onShowExistingProfiles = { showExistingProfiles = true },
                 isProfileSetupValid = isProfileSetupValid,
-                onCompleteProfileSetup = { completeProfileSetup() }
+                onCompleteProfileSetup = {
+                    completeProfileSetup()
+                    // Handle navigation immediately after completion
+                    if (isCreatingNewProfile) {
+                        navController.popBackStack("switch_profile", false)
+                    } else {
+                        navController.navigate("home") {
+                            popUpTo("newuser/1") { inclusive = true }
+                        }
+                    }
+                }
             )
         }
     ) { innerPadding ->
@@ -128,7 +129,6 @@ fun NewUserScreen(
                     existingUsers = users,
                     onSelectUser = { user ->
                         userViewModel.setCurrentUser(user)
-                        // Navigation will be handled by the LaunchedEffect above
                     },
                     onCreateNewProfile = { onNext(2) }
                 )
@@ -136,10 +136,7 @@ fun NewUserScreen(
                 3 -> ProfileSetupPage(
                     onComplete = { user ->
                         userViewModel.addUser(user)
-                        // Navigate to home after profile creation
-                        navController.navigate("home") {
-                            popUpTo("newuser/1") { inclusive = true }
-                        }
+                        // User is added to database, navigation handled by bottom bar
                     },
                     onValidationChange = { isValid ->
                         isProfileSetupValid = isValid
@@ -150,7 +147,6 @@ fun NewUserScreen(
                 )
             }
 
-            // Existing Profiles Modal
             if (showExistingProfiles) {
                 ExistingProfilesModal(
                     users = users,
@@ -158,7 +154,7 @@ fun NewUserScreen(
                         userViewModel.setCurrentUser(user)
                     },
                     onClose = { showExistingProfiles = false },
-                    navController = navController // Pass navController
+                    navController = navController
                 )
             }
         }
@@ -655,54 +651,58 @@ fun NewUserBottomBar(
             ) {
                 when (currentFrame) {
                     1 -> {
-                        // Frame 1: Go Back (left) and Get Started (right) buttons
-                        if (isCreatingNewProfile && existingUsers.isNotEmpty()) {
-                            // Show "Go Back" button on the left when creating new profile from switch screen
-                            Button(
-                                onClick = onBack, // This will navigate back to switch profile screen
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(56.dp),
-                                shape = RoundedCornerShape(16.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFFF1F5F9),
-                                    contentColor = Color(0xFF475569)
-                                )
-                            ) {
-                                Text(
-                                    text = "Go Back",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        } else if (!isCreatingNewProfile && existingUsers.isNotEmpty()) {
-                            // Show "Existing Profile" button on the left when in regular onboarding with existing users
-                            Button(
-                                onClick = { onShowExistingProfiles() },
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(56.dp),
-                                shape = RoundedCornerShape(16.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF374151)
-                                )
-                            ) {
-                                Text(
-                                    text = "Existing Profile",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
+                        val showLeftButton = isCreatingNewProfile && existingUsers.isNotEmpty() ||
+                                (!isCreatingNewProfile && existingUsers.isNotEmpty())
+
+                        if (showLeftButton) {
+                            if (isCreatingNewProfile && existingUsers.isNotEmpty()) {
+                                // Show "Go Back" button on the left when creating new profile from switch screen
+                                Button(
+                                    onClick = onBack, // This will navigate back to switch profile screen
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(56.dp),
+                                    shape = RoundedCornerShape(16.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFFF1F5F9),
+                                        contentColor = Color(0xFF475569)
+                                    )
+                                ) {
+                                    Text(
+                                        text = "Go Back",
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            } else if (!isCreatingNewProfile && existingUsers.isNotEmpty()) {
+                                // Show "Existing Profile" button on the left when in regular onboarding with existing users
+                                Button(
+                                    onClick = { onShowExistingProfiles() },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(56.dp),
+                                    shape = RoundedCornerShape(16.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFF374151)
+                                    )
+                                ) {
+                                    Text(
+                                        text = "Existing Profile",
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
                             }
                         } else {
-                            // No existing users or first time setup - show empty space to maintain layout
-                            Spacer(modifier = Modifier.weight(1f))
+                            // No left button needed - Get Started will take full width
                         }
 
-                        // Get Started button always on the right
+                        // Get Started button - takes full width when no left button is shown
                         Button(
                             onClick = onNext,
                             modifier = Modifier
-                                .weight(1f)
+                                .weight(if (showLeftButton) 1f else 1f)
+                                .fillMaxWidth(if (showLeftButton) 0.5f else 1f)
                                 .height(56.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
@@ -717,7 +717,7 @@ fun NewUserBottomBar(
                         }
                     }
                     2 -> {
-                        // Frame 2: Back and Next buttons
+                        // Frame 2: Back and Next buttons (both always visible)
                         Button(
                             onClick = onBack,
                             modifier = Modifier
@@ -754,7 +754,7 @@ fun NewUserBottomBar(
                         }
                     }
                     3 -> {
-                        // Frame 3: Back and Complete buttons
+                        // Frame 3: Back and Complete buttons (both always visible)
                         Button(
                             onClick = onBack,
                             modifier = Modifier

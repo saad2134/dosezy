@@ -24,16 +24,16 @@ val LightColorScheme = lightColorScheme(
 )
 
 val DarkColorScheme = darkColorScheme(
-    primary = LightBlue80,
-    onPrimary = Color.Black,
-    primaryContainer = LightBlue40,
-    onPrimaryContainer = Color.White,
-    secondary = LightBlue80,
-    onSecondary = Color.Black,
-    secondaryContainer = LightBlue40,
-    onSecondaryContainer = Color.White,
-    background = Color(0xFF121212),
-    onBackground = Color.White,
-    surface = Color(0xFF1E1E1E),
-    onSurface = Color.White
+    primary = LightBlue40,
+    onPrimary = Color.White,
+    primaryContainer = LightBlue80,
+    onPrimaryContainer = Color.Black,
+    secondary = LightBlue40,
+    onSecondary = Color.White,
+    secondaryContainer = LightBlue80,
+    onSecondaryContainer = Color.Black,
+    background = Color(0xFFF8F9FA),
+    onBackground = Color.Black,
+    surface = Color.White,
+    onSurface = Color.Black
 )

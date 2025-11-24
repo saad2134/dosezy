@@ -57,6 +57,7 @@ fun DosezyApp() {
     var isLoading by remember { mutableStateOf(true) }
     var dataCheckComplete by remember { mutableStateOf(false) }
 
+
     val userViewModel: UserViewModel = hiltViewModel()
     val users by userViewModel.users.collectAsState()
     val currentUser by userViewModel.currentUser.collectAsState()
@@ -196,12 +197,6 @@ fun DosezyApp() {
             composable("newuser/{frameNumber}") { backStackEntry ->
                 val frame = backStackEntry.arguments?.getString("frameNumber")?.toIntOrNull() ?: 1
                 val userViewModel: UserViewModel = hiltViewModel()
-                val users by userViewModel.users.collectAsState()
-                val currentUser by userViewModel.currentUser.collectAsState()
-
-                // Check if we're coming from switch profile screen
-                val previousEntry = navController.previousBackStackEntry
-                val isFromSwitchProfile = previousEntry?.destination?.route == "switch_profile"
 
                 NewUserScreen(
                     navController = navController,
@@ -210,38 +205,44 @@ fun DosezyApp() {
                         if (nextFrame <= 3) {
                             navController.navigate("newuser/$nextFrame")
                         } else {
-                            // Onboarding complete - handle navigation based on context
-                            if (isFromSwitchProfile) {
-                                // If coming from switch profile, go back to switch profile
-                                navController.popBackStack("switch_profile", false)
-                            } else {
-                                // Regular onboarding flow - go to home
-                                navController.navigate("home") {
-                                    popUpTo("newuser/1") { inclusive = true }
-                                }
-                            }
-                        }
-                    },
-                    onSkip = {
-                        // Skip onboarding - handle navigation based on context
-                        if (isFromSwitchProfile) {
-                            navController.popBackStack("switch_profile", false)
-                        } else {
+                            // Onboarding complete - go to home
                             navController.navigate("home") {
                                 popUpTo("newuser/1") { inclusive = true }
                             }
                         }
                     },
-                    isCreatingNewProfile = users.isEmpty() || isFromSwitchProfile
+                    onSkip = {
+                        // Skip onboarding - go to home
+                        navController.navigate("home") {
+                            popUpTo("newuser/1") { inclusive = true }
+                        }
+                    },
+                    isCreatingNewProfile = false // This is regular onboarding
                 )
+            }
 
-                // Handle navigation when current user changes (for profile creation)
-                LaunchedEffect(currentUser) {
-                    if (currentUser != null && isFromSwitchProfile) {
-                        // New profile was created from switch profile - go back to switch profile
+            // Create New Profile Flow (from Switch Profile screen)
+            composable("create_profile/{frameNumber}") { backStackEntry ->
+                val frame = backStackEntry.arguments?.getString("frameNumber")?.toIntOrNull() ?: 1
+                val userViewModel: UserViewModel = hiltViewModel()
+
+                NewUserScreen(
+                    navController = navController,
+                    currentFrame = frame,
+                    onNext = { nextFrame ->
+                        if (nextFrame <= 3) {
+                            navController.navigate("create_profile/$nextFrame")
+                        } else {
+                            // Profile creation complete - go back to switch profile
+                            navController.popBackStack("switch_profile", false)
+                        }
+                    },
+                    onSkip = {
+                        // Skip profile creation - go back to switch profile
                         navController.popBackStack("switch_profile", false)
-                    }
-                }
+                    },
+                    isCreatingNewProfile = true // This is creating from switch screen
+                )
             }
         }
     }

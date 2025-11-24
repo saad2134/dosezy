@@ -31,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -67,10 +68,9 @@ fun MedicinesScreen(
     // Consistent light theme approach
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().background(Color(0xFFF3F4F6))
         ) {
             TopBar(
                 navController = navController,
@@ -232,13 +232,13 @@ fun EmptyMedicinesState() {
             modifier = Modifier
                 .size(96.dp)
                 .clip(MaterialTheme.shapes.extraLarge)
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .background(Color(0xffe6e6e6)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Medication,
                 contentDescription = "No medications",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = Color(0xFF1E293B),
                 modifier = Modifier.size(48.dp)
             )
         }
@@ -250,7 +250,7 @@ fun EmptyMedicinesState() {
             text = "No medications yet",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = Color(0xFF1E293B),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
 
@@ -259,7 +259,7 @@ fun EmptyMedicinesState() {
         Text(
             text = "It looks like you haven't added any medications. Get started by tapping the plus button below.",
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = Color(0xFF1E293B),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             lineHeight = 20.sp,
             modifier = Modifier.padding(horizontal = 16.dp)

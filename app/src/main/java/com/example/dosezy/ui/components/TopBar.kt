@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -68,11 +67,12 @@ fun TopBar(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+
+            .background(Color.White)
     ) {
         // First Row: Profile info and Notification button
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -114,11 +114,11 @@ fun TopBar(
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        //Spacer(modifier = Modifier.height(32.dp))
 
         // Second Row: Screen Title
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(bottom=16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (showBackButton) {

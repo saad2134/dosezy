@@ -37,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -137,10 +138,10 @@ fun HomeScreen(
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().background(Color(0xFFF3F4F6))
         ) {
             TopBar(
                 navController = navController,
@@ -422,18 +423,17 @@ private fun NoMedicationsState() {
             .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Empty state icon
         Box(
             modifier = Modifier
                 .size(96.dp)
                 .clip(MaterialTheme.shapes.extraLarge)
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .background(Color(0xffe6e6e6)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Medication,
                 contentDescription = "No medications",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = Color(0xFF1E293B),
                 modifier = Modifier.size(48.dp)
             )
         }
@@ -445,7 +445,7 @@ private fun NoMedicationsState() {
             text = "No medications yet",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = Color(0xFF1E293B),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
 
@@ -455,7 +455,7 @@ private fun NoMedicationsState() {
         Text(
             text = "It looks like you haven't added any medications to your schedule. Get started by tapping the plus button below.",
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = Color(0xFF1E293B),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
     }
@@ -509,9 +509,18 @@ private fun AllGoodState() {
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
+    DosezyTheme {
+        HomeScreen(navController = androidx.navigation.compose.rememberNavController())
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun HomeScreenDarkPreview() {
     DosezyTheme {
         HomeScreen(navController = androidx.navigation.compose.rememberNavController())
     }

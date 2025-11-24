@@ -1,5 +1,6 @@
 package com.example.dosezy.ui.subscreens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -153,6 +154,7 @@ fun EditMedScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
                     .verticalScroll(rememberScrollState()) // Added scroll here
+                    .background(Color(0xFFF3F4F6))
             ) {
                 Column(
                     modifier = Modifier

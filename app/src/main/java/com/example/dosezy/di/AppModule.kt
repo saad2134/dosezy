@@ -2,7 +2,6 @@
 package com.example.dosezy.di
 
 import android.content.Context
-import androidx.room.Room
 import com.example.dosezy.data.DosezyDatabase
 import com.example.dosezy.data.repository.MedicineRepository
 import com.example.dosezy.data.repository.ScheduleRepository
@@ -22,11 +21,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): DosezyDatabase {
-        return Room.databaseBuilder(
-            context.applicationContext,
-            DosezyDatabase::class.java,
-            "dosezy_database"
-        ).build()
+        return DosezyDatabase.getInstance(context)
     }
 
     @Provides

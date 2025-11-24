@@ -9,10 +9,13 @@ import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.data.repository.UserRepository
 import com.example.dosezy.notifications.MedicineNotificationManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,6 +26,7 @@ class UserViewModel @Inject constructor(
     private val medicineNotificationManager: MedicineNotificationManager // UPDATED
 ) : ViewModel() {
 
+    // Add debouncing to prevent rapid updates
     private val _users = MutableStateFlow<List<User>>(emptyList())
     val users: StateFlow<List<User>> = _users.asStateFlow()
 
@@ -40,18 +44,22 @@ class UserViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                userRepository.getAllUsers().collect { userList ->
-                    _users.value = userList
+                // Use distinctUntilChanged to prevent unnecessary recompositions
+                userRepository.getAllUsers()
+                    .distinctUntilChanged()
+                    .collect { userList ->
+                        _users.value = userList
 
-                    // Find current user
-                    val current = userList.find { it.isCurrentUser }
-                    _currentUser.value = current
+                        // Find current user - use firstOrNull to avoid exceptions
+                        val current = userList.firstOrNull { it.isCurrentUser }
+                        _currentUser.value = current
 
-                    _isLoading.value = false
-                }
+                        _isLoading.value = false
+                    }
             } catch (e: Exception) {
                 _isLoading.value = false
-                // Error is handled by the flow
+                // Log the error properly
+                android.util.Log.e("UserViewModel", "Error loading users", e)
             }
         }
     }
@@ -60,31 +68,38 @@ class UserViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // Clear current user flag from all users
-                val allUsers = _users.value
-                allUsers.forEach { existingUser ->
-                    if (existingUser.isCurrentUser && existingUser.userId != user.userId) {
-                        userRepository.updateUser(existingUser.copy(isCurrentUser = false))
-                        // Cancel alarms for the previous current user
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            medicineNotificationManager.cancelAllAlarmsForUser(existingUser.userId) // UPDATED
+                // Use coroutine scope to run in background
+                withContext(Dispatchers.IO) {
+                    // Clear current user flag from all users
+                    val allUsers = userRepository.getAllUsersList()
+                    allUsers.forEach { existingUser ->
+                        if (existingUser.isCurrentUser && existingUser.userId != user.userId) {
+                            userRepository.updateUser(existingUser.copy(isCurrentUser = false))
+                            // Cancel alarms for the previous current user
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                medicineNotificationManager.cancelAllAlarmsForUser(existingUser.userId)
+                            }
                         }
                     }
+
+                    // Set new current user
+                    val updatedUser = user.copy(isCurrentUser = true)
+                    userRepository.updateUser(updatedUser)
+
+                    // Update state on main thread
+                    withContext(Dispatchers.Main) {
+                        _currentUser.value = updatedUser
+                    }
+
+                    // Schedule alarms for the new current user
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        medicineNotificationManager.scheduleAlarmsForUser(updatedUser.userId)
+                    }
                 }
-
-                // Set new current user
-                val updatedUser = user.copy(isCurrentUser = true)
-                userRepository.updateUser(updatedUser)
-                _currentUser.value = updatedUser
-
-                // Schedule alarms for the new current user
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    medicineNotificationManager.scheduleAlarmsForUser(updatedUser.userId) // UPDATED
-                }
-
                 _isLoading.value = false
             } catch (e: Exception) {
                 _isLoading.value = false
+                android.util.Log.e("UserViewModel", "Error setting current user", e)
             }
         }
     }
@@ -93,17 +108,19 @@ class UserViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                userRepository.insertUser(user)
+                withContext(Dispatchers.IO) {
+                    userRepository.insertUser(user)
 
-                // If this is the first user, automatically set as current
-                if (_users.value.isEmpty() || _users.value.none { it.isCurrentUser }) {
-                    setCurrentUser(user)
+                    // If this is the first user, automatically set as current
+                    val allUsers = userRepository.getAllUsersList()
+                    if (allUsers.isEmpty() || allUsers.none { it.isCurrentUser }) {
+                        setCurrentUser(user)
+                    }
                 }
-
                 _isLoading.value = false
             } catch (e: Exception) {
                 _isLoading.value = false
-                // Error is handled by the flow
+                android.util.Log.e("UserViewModel", "Error adding user", e)
             }
         }
     }
