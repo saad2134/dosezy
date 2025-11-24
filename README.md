@@ -145,37 +145,36 @@ dosezy-uidesign-webview/
 
 <tr> 
 <td>
-<strong>Home Screen</strong><br><br> 
+<strong>Home Screen</strong><br><br> <img width="411" height="915" alt="image" src="https://github.com/user-attachments/assets/116b4a0b-fa72-496c-b56c-305712dd8047" />
 </td> 
 <td>
-<strong>Schedule Screen</strong><br><br> 
+<strong>Schedule Screen</strong><br><br> <img width="410" height="915" alt="image" src="https://github.com/user-attachments/assets/ae1b400c-594c-4575-a419-0a60b3a24b2e" />
 </td>
 <td>
-<strong>Medicines Screen</strong><br><br> 
+<strong>Medicines Screen</strong><br><br> <img width="410" height="914" alt="image" src="https://github.com/user-attachments/assets/7f772ce5-1412-4781-a9cd-29c40661d6df" />
+</td>
+</tr> 
+<tr> 
+<td>
+<strong>Add New Medicine Screen</strong><br><br> <img width="410" height="912" alt="image" src="https://github.com/user-attachments/assets/3684738e-a7c1-420f-aae3-9ce822a78ac7" />
+</td> 
+<td>
+<strong>Menu List Screen</strong><br><br> <img width="410" height="912" alt="image" src="https://github.com/user-attachments/assets/9b7a72d3-5e09-4d12-9b08-feb1584eae17" />
+</td>
+<td>
+<strong>Notification Status Dialog</strong><br><br> <img width="411" height="914" alt="image" src="https://github.com/user-attachments/assets/19baf470-34de-42b6-bc80-9caaaa84e613" />
 </td>
 </tr> 
 
 <tr> 
 <td>
-<strong>Add New Medicine Screen</strong><br><br> 
+<strong>Profile Actions Dialog</strong><br><br> <img width="410" height="913" alt="image" src="https://github.com/user-attachments/assets/8d2c10ee-0c32-48a7-b2fd-b606f0db61ae" />
 </td> 
 <td>
-<strong>Menu List Screen</strong><br><br> 
+<strong>Data Export Feature</strong><br><br> <img width="410" height="911" alt="image" src="https://github.com/user-attachments/assets/bdc43e8a-1814-44b2-81e1-55b36fbf09df" />
 </td>
 <td>
-<strong>Notification Status Dialog</strong><br><br> 
-</td>
-</tr> 
-
-<tr> 
-<td>
-<strong>Profile Actions Dialog</strong><br><br> 
-</td> 
-<td>
-<strong>Data Export Feature</strong><br><br> 
-</td>
-<td>
-<strong>Preferences Setting</strong><br><br> 
+<strong>Preferences Setting</strong><br><br> <img width="409" height="910" alt="image" src="https://github.com/user-attachments/assets/887d0b85-233e-4e13-8c08-389e2ec73c0c" />
 </td>
 </tr> 
 
