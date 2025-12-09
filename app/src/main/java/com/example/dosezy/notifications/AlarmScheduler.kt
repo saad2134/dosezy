@@ -1,6 +1,7 @@
 // AlarmScheduler.kt
 package com.example.dosezy.notifications
 
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -20,6 +21,7 @@ class AlarmScheduler(private val context: Context) {
     private val alarmManager: AlarmManager =
         context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
+    @SuppressLint("ScheduleExactAlarm")
     @RequiresApi(Build.VERSION_CODES.O)
     fun scheduleMedicineAlarm(entry: ScheduleEntry, medicineName: String) {
         val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
@@ -55,6 +57,7 @@ class AlarmScheduler(private val context: Context) {
         Log.d(TAG, "Scheduled alarm for medicine: $medicineName at ${entry.scheduledDateTime}")
     }
 
+    @SuppressLint("ScheduleExactAlarm")
     fun scheduleSnooze(entryId: String, minutes: Int) {
         val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
             putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, entryId)

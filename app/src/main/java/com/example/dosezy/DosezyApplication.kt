@@ -20,8 +20,8 @@ class DosezyApplication : Application()
 
         // Initialize anything that might crash here
         try {
-            // This will trigger database initialization
-            // and reveal any Room database issues
+            // trigger database initialization
+            // reveal any Room database issues
         } catch (e: Exception) {
             Log.e("DosezyApp", "Error during initialization", e)
         }

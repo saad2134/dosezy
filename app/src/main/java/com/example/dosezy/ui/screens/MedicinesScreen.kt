@@ -65,7 +65,7 @@ fun MedicinesScreen(
         }
     }
 
-    // Consistent light theme approach
+    // light theme
     Surface(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -201,7 +201,7 @@ fun MedicineImage(
                 contentDescription = "Medicine image",
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp)) // Add clip here
+                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
                     .background(
                         MaterialTheme.colorScheme.surfaceVariant,
                         shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)

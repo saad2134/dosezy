@@ -153,7 +153,7 @@ fun EditMedScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .verticalScroll(rememberScrollState()) // Added scroll here
+                    .verticalScroll(rememberScrollState())
                     .background(Color(0xFFF3F4F6))
             ) {
                 Column(
@@ -172,7 +172,7 @@ fun EditMedScreen(
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
-                    // Use ProfilePicturePicker for medicine image selection
+                    // ProfilePicturePicker for medicine image selection
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxWidth()
@@ -507,7 +507,7 @@ fun EditMedScreen(
                         }
                     }
 
-                    // Add extra space at the bottom to ensure everything is visible
+
                     Spacer(modifier = Modifier.height(32.dp))
                 }
             }

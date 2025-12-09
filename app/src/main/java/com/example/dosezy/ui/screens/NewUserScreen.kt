@@ -508,7 +508,7 @@ fun ProfileSetupPage(
                 contactNumber = contactNumber.trim(),
                 isCurrentUser = true
             )
-            onComplete(user) // This will now trigger navigation
+            onComplete(user)
         }
     }
 
@@ -658,7 +658,7 @@ fun NewUserBottomBar(
                             if (isCreatingNewProfile && existingUsers.isNotEmpty()) {
                                 // Show "Go Back" button on the left when creating new profile from switch screen
                                 Button(
-                                    onClick = onBack, // This will navigate back to switch profile screen
+                                    onClick = onBack,
                                     modifier = Modifier
                                         .weight(1f)
                                         .height(56.dp),
@@ -845,7 +845,6 @@ fun ExistingProfilesModal(
                         user = user,
                         onClick = {
                             onSelectUser(user)
-                            // Remove the immediate navigation here - let parent handle it
                             // navController.navigate("home") {
                             //     popUpTo("newuser/1") { inclusive = true }
                             // }
@@ -947,7 +946,6 @@ fun ProfileItem(user: User, onClick: () -> Unit, modifier: Modifier = Modifier) 
     }
 }
 
-// Keep all your existing previews the same...
 @Preview(name = "Welcome Page")
 @Composable
 fun PreviewWelcomePage() {

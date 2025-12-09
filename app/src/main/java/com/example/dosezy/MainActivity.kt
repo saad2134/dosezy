@@ -193,7 +193,7 @@ fun DosezyApp() {
                 PreferencesScreen(navController)
             }
 
-            // New User Onboarding Flow - UPDATED
+            // New User Onboarding Flow
             composable("newuser/{frameNumber}") { backStackEntry ->
                 val frame = backStackEntry.arguments?.getString("frameNumber")?.toIntOrNull() ?: 1
                 val userViewModel: UserViewModel = hiltViewModel()

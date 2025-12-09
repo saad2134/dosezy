@@ -1,4 +1,4 @@
-// Update User.kt
+// User.kt
 package com.example.dosezy.data.model
 
 import androidx.room.Entity
@@ -10,7 +10,7 @@ import java.util.UUID
 
 @Entity(
     tableName = "users",
-    indices = [Index("userId")] // Add index for primary key (good practice)
+    indices = [Index("userId")]
 )
 @TypeConverters(Converters::class)
 data class User(

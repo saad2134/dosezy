@@ -89,7 +89,7 @@ fun ScheduleScreen(navController: NavController) {
                     .weight(1f)
                     .fillMaxSize()
             ) {
-                // Calendar Section - fixed height
+                // Calendar Section
                 ScheduleCalendar(
                     selectedDate = selectedDate,
                     scheduleEntries = scheduleWithMedicine.map { it.scheduleEntry },
@@ -128,7 +128,7 @@ fun ScheduleScreen(navController: NavController) {
                         ) {
                             ScheduleList(
                                 scheduleWithMedicine = scheduleWithMedicine,
-                                timeFormat = timeFormat, // Pass time format to ScheduleList
+                                timeFormat = timeFormat,
                                 onMarkAsTaken = { entryId, takenAt ->
                                     scheduleViewModel.markAsTaken(entryId, takenAt)
                                 },

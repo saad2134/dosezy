@@ -4,7 +4,9 @@ package com.example.dosezy.notifications
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.example.dosezy.data.DosezyDatabase
 import com.example.dosezy.data.repository.ScheduleRepository
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,6 +27,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
         private const val TAG = "NotificationActionReceiver"
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onReceive(context: Context, intent: Intent?) {
         val action = intent?.action
         val entryId = intent?.getStringExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID)
@@ -36,6 +39,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private suspend fun handleAction(context: Context, action: String?, entryId: String) {
         val scheduleRepository = ScheduleRepository(database)
 

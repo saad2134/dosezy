@@ -40,7 +40,7 @@ fun PreferencesScreen(navController: NavController) {
                 currentUser = currentUser,
                 title = "Preferences",
                 showBackButton = true,
-                actions = {} // Add empty actions
+                actions = {}
             )
         }
     ) { paddingValues ->

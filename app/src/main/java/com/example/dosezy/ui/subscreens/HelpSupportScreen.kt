@@ -59,7 +59,6 @@ fun HelpSupportScreen(navController: NavController) {
             HelpSupportContent(navController)
         }
 
-        // Version info in bottom right corner
         CornerVersion()
     }
 }
@@ -169,7 +168,6 @@ fun CornerVersion() {
     }
 }
 
-// If you want a centered version at the bottom instead:
 @Composable
 fun BottomVersion() {
     val context = LocalContext.current

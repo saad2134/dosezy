@@ -175,7 +175,7 @@ private fun CalendarGrid(
                         null
                     }
 
-                    // FIXED: Use a different variable name to avoid conflict
+
                     val dayEntries = date?.let { currentDate ->
                         scheduleEntries.filter { entry ->
                             entry.scheduledDateTime.toLocalDate() == currentDate
@@ -281,7 +281,7 @@ private fun getDateStatusColor(entries: List<ScheduleEntry>): Color {
 @Composable
 fun ScheduleList(
     scheduleWithMedicine: List<ScheduleWithMedicine>,
-    timeFormat: TimeFormat, // Add time format parameter
+    timeFormat: TimeFormat, // time format parameter
     onMarkAsTaken: (String, String) -> Unit,
     onMarkAsLate: (String, String) -> Unit,
     modifier: Modifier = Modifier
@@ -306,7 +306,7 @@ fun ScheduleList(
 @Composable
 fun ScheduleListItem(
     scheduleWithMedicine: ScheduleWithMedicine,
-    timeFormat: TimeFormat, // Add time format parameter
+    timeFormat: TimeFormat, // time format parameter
     onMarkAsTaken: (String, String) -> Unit,
     onMarkAsLate: (String, String) -> Unit,
     modifier: Modifier = Modifier
@@ -343,7 +343,7 @@ fun ScheduleListItem(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            // Use TimeFormatUtils to format time according to user preference
+            // TimeFormatUtils to format time according to user preference
             Text(
                 text = TimeFormatUtils.formatTime(entry.scheduledDateTime, timeFormat),
                 style = MaterialTheme.typography.bodyMedium,

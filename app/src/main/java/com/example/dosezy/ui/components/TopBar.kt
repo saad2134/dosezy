@@ -62,7 +62,7 @@ fun TopBar(
     var showNotificationDialog by remember { mutableStateOf(false) }
 
     // Calculate notification status (red if any checks fail)
-    val allNotificationsPassed = false // You can implement actual logic here
+    val allNotificationsPassed = false
 
     Column(
         modifier = Modifier
@@ -255,7 +255,7 @@ private fun NotificationStatusButton(
 
     // Auto-refresh status every 5 seconds
     LaunchedEffect(refreshCounter) {
-        // This ensures the status is rechecked periodically
+        // ensures the status is rechecked periodically
     }
 
     LaunchedEffect(Unit) {
@@ -294,7 +294,7 @@ private fun NotificationStatusButton(
             modifier = Modifier
                 .size(20.dp)
                 .align(Alignment.TopEnd)           // Position relative to parent Box
-                .offset(x = 4.dp, y = (-4).dp)      // Optional: nudge outwards
+                .offset(x = 4.dp, y = (-4).dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(Color.White),
             contentAlignment = Alignment.Center

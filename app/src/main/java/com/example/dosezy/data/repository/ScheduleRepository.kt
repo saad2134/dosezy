@@ -63,7 +63,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         }
     }
 
-    // FIXED: Handle null medicine case properly
+
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun scheduleAlarmsForMedicine(medicineId: String, context: Context) {
         val alarmScheduler = AlarmScheduler(context)
@@ -77,7 +77,6 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 if (entry.status == MedicationStatus.PENDING &&
                     entry.scheduledDateTime.isAfter(LocalDateTime.now())) {
 
-                    // Use medicine.medicationName directly since medicine is not null here
                     alarmScheduler.scheduleMedicineAlarm(entry, medicine.medicationName)
                     scheduledCount++
                 }
@@ -135,7 +134,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         }
     }
 
-    // Add method to schedule alarms for a specific date range
+    // method to schedule alarms for a specific date range
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun scheduleAlarmsForDateRange(userId: String, startDate: LocalDate, endDate: LocalDate, context: Context) {
         val alarmScheduler = AlarmScheduler(context)
@@ -150,7 +149,6 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
                     val medicine = database.medicineDao().getMedicineById(entry.medicineId).first()
                     medicine?.let {
-                        // Use it.medicationName directly since medicine is not null here
                         alarmScheduler.scheduleMedicineAlarm(entry, it.medicationName)
                         scheduledCount++
                     }
@@ -166,7 +164,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
     fun getScheduleForDateRange(userId: String, startDate: LocalDate, endDate: LocalDate): Flow<List<ScheduleEntry>> =
         database.scheduleDao().getScheduleForDateRange(userId, startDate.toString(), endDate.toString())
 
-    // Add this method to get schedules as list (not Flow) - FIXED NAME
+    // method to get schedules as list (not Flow)
     suspend fun getSchedulesByUserSync(userId: String): List<ScheduleEntry> =
         database.scheduleDao().getScheduleForUser(userId).first()
 

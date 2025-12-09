@@ -93,7 +93,7 @@ fun HomeScreen(
         }
     }
 
-    // FIXED: Better refresh logic
+
     LaunchedEffect(shouldRefresh, currentUser) {
         currentUser?.let { user ->
             Log.d("HomeScreen", "Refreshing schedule for user: ${user.userId}")
@@ -106,7 +106,7 @@ fun HomeScreen(
     // Also listen for navigation events to refresh when coming back from AddMedScreen
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     LaunchedEffect(navBackStackEntry) {
-        // Refresh when we come back to home screen (e.g., from adding medicine)
+        // Refresh when we come back to home screen (eg from adding medicine)
         if (navBackStackEntry?.destination?.route == "home") {
             currentUser?.let { user ->
                 scheduleViewModel.loadScheduleForDate(user.userId, java.time.LocalDate.now())
@@ -114,7 +114,7 @@ fun HomeScreen(
         }
     }
 
-    // Filter today's schedule entries - FIXED: Also filter by today in code as backup
+    // Filter today's schedule entries
     val todayEntries = scheduleWithMedicine.filter {
         it.scheduleEntry.scheduledDateTime.toLocalDate() == java.time.LocalDate.now()
     }
@@ -336,7 +336,7 @@ private fun MedicationCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Medicine icon with image support
+            // Medicine icon
             MedicineImage(
                 imageUri = medicine?.imageUri,
                 modifier = Modifier.size(64.dp)

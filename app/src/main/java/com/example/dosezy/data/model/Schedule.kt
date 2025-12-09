@@ -6,7 +6,6 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.example.dosezy.data.converters.Converters
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Entity(
@@ -26,7 +25,7 @@ import java.time.LocalDateTime
         )
     ],
     indices = [
-        Index("userId"), // Add these indexes
+        Index("userId"),
         Index("medicineId"),
         Index("scheduledDateTime")
     ]

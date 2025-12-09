@@ -35,7 +35,7 @@ abstract class DosezyDatabase : RoomDatabase() {
                     DosezyDatabase::class.java,
                     "dosezy_database"
                 )
-                    .fallbackToDestructiveMigration() // This will clear database on version change
+                    .fallbackToDestructiveMigration() // clear database on version change
                     .build()
                 INSTANCE = instance
                 instance

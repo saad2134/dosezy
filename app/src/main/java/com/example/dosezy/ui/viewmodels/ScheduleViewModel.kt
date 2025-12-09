@@ -135,7 +135,6 @@ class ScheduleViewModel @Inject constructor(
         }
     }
 
-    // Update ScheduleViewModel.kt - Add these methods
     @RequiresApi(Build.VERSION_CODES.O)
     fun autoMarkMissedMedications(userId: String, missedAfterHours: Int) {
         viewModelScope.launch {

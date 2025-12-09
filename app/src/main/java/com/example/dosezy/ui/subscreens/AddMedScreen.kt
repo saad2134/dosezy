@@ -461,9 +461,8 @@ fun TimePickerDialog(
         onDismissRequest = onDismiss,
         title = { Text("Select Time", style = MaterialTheme.typography.headlineSmall) },
         text = {
-            // Simple time picker implementation
-            // For a more advanced time picker, you might want to use a library
-            // or implement a custom time picker with hours and minutes selection
+            // time picker implementation (work to do)
+
             Column {
                 Text(
                     "Selected: ${String.format("%02d:%02d", initialTime.hour, initialTime.minute)}",

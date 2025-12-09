@@ -34,9 +34,9 @@ object AppModule {
     @Singleton
     fun provideMedicineRepository(
         database: DosezyDatabase,
-        scheduleRepository: ScheduleRepository // Add this parameter
+        scheduleRepository: ScheduleRepository
     ): MedicineRepository {
-        return MedicineRepository(database, scheduleRepository) // Pass both dependencies
+        return MedicineRepository(database, scheduleRepository)
     }
 
     @Provides

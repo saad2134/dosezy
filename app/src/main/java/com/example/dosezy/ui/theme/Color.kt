@@ -4,7 +4,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
-// Light blue color scheme for your app
+// Light blue color scheme
 val LightBlue80 = Color(0xFF4FC3F7)
 val LightBlue40 = Color(0xFF0277BD)
 

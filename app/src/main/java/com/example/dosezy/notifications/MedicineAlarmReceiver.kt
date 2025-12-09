@@ -180,8 +180,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
     // Helper function to convert Compose icons to NotificationCompat.Action
     private fun getNotificationIcon(context: Context, icon: androidx.compose.ui.graphics.vector.ImageVector): Int {
-        // For notification actions, we need to use a resource ID
-        // We'll use different built-in system icons for the actions
+        // Using different built-in system icons for the actions
         return when (icon) {
             Icons.Filled.Check -> android.R.drawable.ic_menu_edit
             Icons.Filled.Snooze -> android.R.drawable.ic_menu_recent_history

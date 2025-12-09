@@ -139,7 +139,7 @@ fun SwitchProfileScreen(navController: NavController) {
 
                     Button(
                         onClick = {
-                            // Use the new create_profile route
+                            // Use new create_profile route
                             navController.navigate("create_profile/1") {
                                 launchSingleTop = true
                             }

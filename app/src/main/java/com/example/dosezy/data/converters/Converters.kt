@@ -34,14 +34,14 @@ class Converters {
     @TypeConverter
     fun toDosageUnit(unit: String): DosageUnit = enumValueOf(unit)
 
-    // MedicationStatus converters - USE ONLY ONE SET
+    // MedicationStatus converters
     @TypeConverter
     fun fromMedicationStatus(status: MedicationStatus): String = status.name
 
     @TypeConverter
     fun toMedicationStatus(status: String): MedicationStatus = enumValueOf(status)
 
-    // LocalDateTime converters - FIXED: Store as milliseconds for proper querying
+    // LocalDateTime converters
     @RequiresApi(Build.VERSION_CODES.O)
     @TypeConverter
     fun fromLocalDateTime(dateTime: LocalDateTime?): Long? = dateTime?.atZone(java.time.ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
@@ -52,7 +52,7 @@ class Converters {
         java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime()
     }
 
-    // LocalDate converters - FIXED: Store as milliseconds for proper querying
+    // LocalDate converters
     @RequiresApi(Build.VERSION_CODES.O)
     @TypeConverter
     fun fromLocalDate(date: LocalDate?): Long? = date?.atStartOfDay(java.time.ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
@@ -63,7 +63,7 @@ class Converters {
         java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
     }
 
-    // LocalTime converters - FIXED: Store as strings for simplicity
+    // LocalTime converters
     @RequiresApi(Build.VERSION_CODES.O)
     @TypeConverter
     fun fromLocalTime(time: LocalTime?): String? = time?.format(DateTimeFormatter.ISO_LOCAL_TIME)

@@ -71,7 +71,7 @@ fun NotificationStatusDialog(
         notificationStatuses = createNotificationStatuses(context, refreshCounter)
     }
 
-    // Auto-refresh loop - simple and reliable
+    // Auto-refresh loop
     LaunchedEffect(Unit) {
         while (true) {
             delay(2000) // Refresh every 2 seconds
@@ -192,7 +192,7 @@ private fun createNotificationStatuses(
                 )
             },
             onFixClick = {
-                // Battery level can't be fixed via settings, but we can show battery optimization
+                // Battery level can't be fixed via settings, show battery optimization
                 NotificationUtils.openBatteryOptimizationSettings(context)
             }
         ),

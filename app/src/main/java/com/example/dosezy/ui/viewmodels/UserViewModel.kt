@@ -23,10 +23,10 @@ class UserViewModel @Inject constructor(
     val userRepository: UserRepository,
     val medicineRepository: MedicineRepository,
     val scheduleRepository: ScheduleRepository,
-    private val medicineNotificationManager: MedicineNotificationManager // UPDATED
+    private val medicineNotificationManager: MedicineNotificationManager
 ) : ViewModel() {
 
-    // Add debouncing to prevent rapid updates
+    // debouncing to prevent rapid updates
     private val _users = MutableStateFlow<List<User>>(emptyList())
     val users: StateFlow<List<User>> = _users.asStateFlow()
 
@@ -44,13 +44,12 @@ class UserViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // Use distinctUntilChanged to prevent unnecessary recompositions
                 userRepository.getAllUsers()
                     .distinctUntilChanged()
                     .collect { userList ->
                         _users.value = userList
 
-                        // Find current user - use firstOrNull to avoid exceptions
+                        // Find current user
                         val current = userList.firstOrNull { it.isCurrentUser }
                         _currentUser.value = current
 
@@ -58,7 +57,8 @@ class UserViewModel @Inject constructor(
                     }
             } catch (e: Exception) {
                 _isLoading.value = false
-                // Log the error properly
+
+                // Log error
                 android.util.Log.e("UserViewModel", "Error loading users", e)
             }
         }
@@ -68,7 +68,7 @@ class UserViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // Use coroutine scope to run in background
+                // coroutine scope to run in background
                 withContext(Dispatchers.IO) {
                     // Clear current user flag from all users
                     val allUsers = userRepository.getAllUsersList()
@@ -138,7 +138,7 @@ class UserViewModel @Inject constructor(
     fun deleteUser(user: User) {
         viewModelScope.launch {
             userRepository.deleteUser(user)
-            // If we deleted the current user, select a new one
+            // If deleted the current user, select a new one
             if (user.isCurrentUser && _users.value.isNotEmpty()) {
                 setCurrentUser(_users.value.first())
             }

@@ -42,7 +42,7 @@ class DataExporter(
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun exportUserToCsv(userId: String): File = withContext(Dispatchers.IO) {
         val user = userRepository.getUserByIdSync(userId) ?: throw Exception("User not found")
-        // FIXED: Use correct method names
+
         val medicines = medicineRepository.getMedicinesByUserSync(userId)
         val schedules = scheduleRepository.getSchedulesByUserSync(userId)
 
@@ -65,7 +65,7 @@ class DataExporter(
             ZipOutputStream(fileOutputStream).use { zipOutputStream ->
                 users.forEach { user ->
                     try {
-                        // FIXED: Use correct method names
+
                         val medicines = medicineRepository.getMedicinesByUserSync(user.userId)
                         val schedules = scheduleRepository.getSchedulesByUserSync(user.userId)
 

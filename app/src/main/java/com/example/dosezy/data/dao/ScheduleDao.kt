@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ScheduleDao {
 
-    // Get ALL schedule entries for a user - we'll filter manually
+    // Get ALL schedule entries for a user (manual filter)
     @Query("SELECT * FROM schedule_entries WHERE userId = :userId")
     fun getScheduleForUser(userId: String): Flow<List<ScheduleEntry>>
 
@@ -32,7 +32,7 @@ interface ScheduleDao {
     @Query("DELETE FROM schedule_entries WHERE userId = :userId")
     suspend fun deleteScheduleByUser(userId: String)
 
-    // Get ALL schedule entries with medicine for a user - we'll filter manually
+    // Get ALL schedule entries with medicine for a user (manual filter)
     @Transaction
     @Query("SELECT * FROM schedule_entries WHERE userId = :userId")
     fun getScheduleWithMedicineForUser(userId: String): Flow<List<ScheduleWithMedicine>>

@@ -54,7 +54,7 @@ data class Medicine(
             if (shouldTakeOnDate(currentDate)) {
                 scheduledTimes.forEach { time ->
                     val scheduledDateTime = LocalDateTime.of(currentDate, time)
-                    // FIXED: Better unique ID generation
+
                     val entryId = "${medicineId}_${currentDate}_${time}".replace(":", "_").replace("-", "_")
                     val entry = ScheduleEntry(
                         entryId = entryId,
