@@ -73,8 +73,8 @@ import java.util.UUID
 fun EditMedScreen(
     navController: NavController,
     medicineId: String? = null,
-    medicineViewModel: MedicineViewModel = hiltViewModel(),
-    userViewModel: UserViewModel = hiltViewModel()
+    medicineViewModel: MedicineViewModel = com.example.dosezy.utils.sharedMedicineViewModel(),
+    userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
 ) {
     val currentUser by userViewModel.currentUser.collectAsState()
     val medicines by medicineViewModel.medicines.collectAsState()

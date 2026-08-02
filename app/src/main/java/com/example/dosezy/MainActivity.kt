@@ -17,6 +17,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import com.example.dosezy.ui.components.CustomNavigationBar
 import com.example.dosezy.ui.screens.DebugScreen
 import com.example.dosezy.ui.screens.HomeScreen
@@ -148,7 +150,11 @@ fun DosezyApp() {
         NavHost(
             navController = navController,
             startDestination = "loading",
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None },
+            popEnterTransition = { EnterTransition.None },
+            popExitTransition = { ExitTransition.None }
         ) {
             // Main Screens
             composable("loading") {

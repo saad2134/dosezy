@@ -46,7 +46,7 @@ import com.example.dosezy.ui.viewmodels.UserViewModel
 
 @Composable
 fun EmergencyScreen(navController: NavController) {
-    val userViewModel: UserViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
     val currentUser by userViewModel.currentUser.collectAsState()
 
     Column(

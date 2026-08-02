@@ -1,0 +1,2 @@
+• Instant screen transitions: disabled default slide/fade animations for a faster and snappier navigation experience.
+• Updated app version to v1.3.5.

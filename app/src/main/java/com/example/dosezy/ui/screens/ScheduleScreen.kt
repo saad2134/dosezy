@@ -36,8 +36,8 @@ import java.time.format.DateTimeFormatter
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ScheduleScreen(navController: NavController) {
-    val userViewModel: UserViewModel = hiltViewModel()
-    val scheduleViewModel: ScheduleViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
+    val scheduleViewModel: ScheduleViewModel = com.example.dosezy.utils.sharedScheduleViewModel()
 
     val currentUser by userViewModel.currentUser.collectAsState()
     val selectedDate by scheduleViewModel.selectedDate.collectAsState()

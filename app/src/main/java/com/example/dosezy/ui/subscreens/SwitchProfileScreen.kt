@@ -53,7 +53,7 @@ import java.io.File
 
 @Composable
 fun SwitchProfileScreen(navController: NavController) {
-    val userViewModel: UserViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
     val currentUser by userViewModel.currentUser.collectAsState()
     val users by userViewModel.users.collectAsState()
     val isLoading by userViewModel.isLoading.collectAsState()

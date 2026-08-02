@@ -64,8 +64,8 @@ fun HomeScreen(
     navController: NavController,
     shouldRefresh: Boolean = false
 ) {
-    val userViewModel: UserViewModel = hiltViewModel()
-    val scheduleViewModel: ScheduleViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
+    val scheduleViewModel: ScheduleViewModel = com.example.dosezy.utils.sharedScheduleViewModel()
 
     val currentUser by userViewModel.currentUser.collectAsState()
     val scheduleWithMedicine by scheduleViewModel.scheduleWithMedicine.collectAsState()

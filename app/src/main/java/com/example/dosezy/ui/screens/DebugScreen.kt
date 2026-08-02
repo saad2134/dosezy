@@ -21,9 +21,9 @@ import com.example.dosezy.ui.viewmodels.UserViewModel
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DebugScreen(
-    userViewModel: UserViewModel = hiltViewModel(),
-    medicineViewModel: MedicineViewModel = hiltViewModel(),
-    scheduleViewModel: ScheduleViewModel = hiltViewModel()
+    userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel(),
+    medicineViewModel: MedicineViewModel = com.example.dosezy.utils.sharedMedicineViewModel(),
+    scheduleViewModel: ScheduleViewModel = com.example.dosezy.utils.sharedScheduleViewModel()
 ) {
     val currentUser by userViewModel.currentUser.collectAsState()
     val medicines by medicineViewModel.medicines.collectAsState()

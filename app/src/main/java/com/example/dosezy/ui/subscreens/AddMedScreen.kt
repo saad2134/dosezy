@@ -65,8 +65,8 @@ import java.util.UUID
 @Composable
 fun AddMedScreen(
     navController: NavController,
-    medicineViewModel: MedicineViewModel = hiltViewModel(),
-    userViewModel: UserViewModel = hiltViewModel()
+    medicineViewModel: MedicineViewModel = com.example.dosezy.utils.sharedMedicineViewModel(),
+    userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
 ) {
     val currentUser by userViewModel.currentUser.collectAsState()
 

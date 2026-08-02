@@ -46,6 +46,9 @@ class ScheduleViewModel @Inject constructor(
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
+    private var scheduleJob: kotlinx.coroutines.Job? = null
+    private var rawScheduleJob: kotlinx.coroutines.Job? = null
+
     init {
         loadCurrentUserAndSchedule()
     }
@@ -73,27 +76,33 @@ class ScheduleViewModel @Inject constructor(
     }
 
     fun loadScheduleForDate(userId: String, date: LocalDate) {
-        viewModelScope.launch {
-            _isRefreshing.value = true
+        scheduleJob?.cancel()
+        rawScheduleJob?.cancel()
+
+        _isRefreshing.value = true
+
+        scheduleJob = viewModelScope.launch {
             try {
                 Log.d(TAG, "Loading schedule for user: $userId, date: $date")
-
-                // Load schedule with medicine using our manual filtering
                 scheduleRepository.getScheduleWithMedicineForDate(userId, date).collect { scheduleWithMedicine ->
                     Log.d(TAG, "Successfully loaded ${scheduleWithMedicine.size} schedule entries with medicine")
                     _scheduleWithMedicine.value = scheduleWithMedicine
                 }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error loading schedule with medicine", e)
+            } finally {
+                _isRefreshing.value = false
+            }
+        }
 
-                // Also load regular schedule entries
+        rawScheduleJob = viewModelScope.launch {
+            try {
                 scheduleRepository.getScheduleForDate(userId, date).collect { entries ->
                     Log.d(TAG, "Successfully loaded ${entries.size} raw schedule entries")
                     _scheduleEntries.value = entries
                 }
-
             } catch (e: Exception) {
-                Log.e(TAG, "Error loading schedule", e)
-            } finally {
-                _isRefreshing.value = false
+                Log.e(TAG, "Error loading raw schedule", e)
             }
         }
     }

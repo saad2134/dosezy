@@ -27,7 +27,7 @@ import com.example.dosezy.ui.viewmodels.UserViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PreferencesScreen(navController: NavController) {
-    val userViewModel: UserViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
     val currentUser by userViewModel.currentUser.collectAsState()
 
     // State for showing dialogs

@@ -74,7 +74,7 @@ import java.io.File
 
 @Composable
 fun MenuScreen(navController: NavController) {
-    val userViewModel: UserViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
     val currentUser by userViewModel.currentUser.collectAsState()
     var showExportDialog by remember { mutableStateOf(false) }
     var showExportProgress by remember { mutableStateOf(false) }
