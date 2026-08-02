@@ -110,7 +110,7 @@ fun ExportDialog(
                         text = "Export Data",
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1E293B)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
@@ -121,7 +121,7 @@ fun ExportDialog(
                     text = "Export Format",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF1E293B),
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
@@ -148,7 +148,7 @@ fun ExportDialog(
                             Text(
                                 text = format.fileExtension,
                                 style = MaterialTheme.typography.bodySmall,
-                                color = Color(0xFF6B7280)
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -161,7 +161,7 @@ fun ExportDialog(
                     text = "Save To",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF1E293B),
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
@@ -218,7 +218,7 @@ fun ExportDialog(
                                     Text(
                                         text = location.description,
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = Color(0xFF6B7280)
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
                             }
@@ -314,7 +314,7 @@ fun ExportSuccessDialog(
                     text = "Export Successful",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1E293B),
+                    color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center
                 )
 
@@ -326,7 +326,7 @@ fun ExportSuccessDialog(
                         "Your data has been exported to:\n${it.name}"
                     } ?: "Your data has been successfully exported.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFF6B7280),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
 

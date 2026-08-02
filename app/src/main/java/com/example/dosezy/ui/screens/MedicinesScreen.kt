@@ -3,6 +3,8 @@ package com.example.dosezy.ui.screens
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -70,7 +72,7 @@ fun MedicinesScreen(
         modifier = Modifier.fillMaxSize(),
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().background(Color(0xFFF3F4F6))
+            modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
         ) {
             TopBar(
                 navController = navController,
@@ -135,13 +137,13 @@ fun MedicineItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        onClick = onClick
+    Surface(
+        modifier = modifier
+            .clickable { onClick() },
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 0.dp,
+        shadowElevation = 2.dp
     ) {
         androidx.compose.material3.ListItem(
             headlineContent = {
@@ -232,13 +234,13 @@ fun EmptyMedicinesState() {
             modifier = Modifier
                 .size(96.dp)
                 .clip(MaterialTheme.shapes.extraLarge)
-                .background(Color(0xffe6e6e6)),
+                .background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Medication,
                 contentDescription = "No medications",
-                tint = Color(0xFF1E293B),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(48.dp)
             )
         }
@@ -250,7 +252,7 @@ fun EmptyMedicinesState() {
             text = "No medications yet",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF1E293B),
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
 
@@ -259,7 +261,7 @@ fun EmptyMedicinesState() {
         Text(
             text = "It looks like you haven't added any medications. Get started by tapping the plus button below.",
             style = MaterialTheme.typography.bodyMedium,
-            color = Color(0xFF1E293B),
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             lineHeight = 20.sp,
             modifier = Modifier.padding(horizontal = 16.dp)

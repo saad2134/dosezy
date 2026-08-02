@@ -2,6 +2,7 @@ package com.example.dosezy.ui.subscreens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -101,6 +103,8 @@ fun EditMedScreen(
     }
     var showTimePicker by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var selectedDaysOfWeek by remember { mutableStateOf(listOf<Int>()) }
+    var selectedDaysOfMonth by remember { mutableStateOf(listOf<Int>()) }
 
     // Dropdown states
     var dosageUnitExpanded by remember { mutableStateOf(false) }
@@ -115,6 +119,8 @@ fun EditMedScreen(
             selectedTime = medicineToEdit.scheduledTimes.firstOrNull() ?: LocalTime.now().withMinute(0)
             selectedFrequency = medicineToEdit.frequency.pattern
             medicineImagePath = medicineToEdit.imageUri
+            selectedDaysOfWeek = medicineToEdit.frequency.selectedDaysOfWeek ?: listOf()
+            selectedDaysOfMonth = medicineToEdit.frequency.selectedDaysOfMonth ?: listOf()
         }
     }
 
@@ -129,7 +135,7 @@ fun EditMedScreen(
                             fontSize = 24.sp
                         ),
                         modifier = Modifier.fillMaxWidth(),
-                        color = Color(0xFF0D1B1B)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 navigationIcon = {
@@ -139,12 +145,12 @@ fun EditMedScreen(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color(0xFF0D1B1B)
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.surface
                 )
             )
         },
@@ -154,7 +160,7 @@ fun EditMedScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
                     .verticalScroll(rememberScrollState())
-                    .background(Color(0xFFF3F4F6))
+                    .background(MaterialTheme.colorScheme.background)
             ) {
                 Column(
                     modifier = Modifier
@@ -168,7 +174,7 @@ fun EditMedScreen(
                             fontWeight = FontWeight.Medium,
                             fontSize = 18.sp
                         ),
-                        color = Color(0xFF0D1B1B),
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
@@ -196,7 +202,7 @@ fun EditMedScreen(
                         Text(
                             text = if (medicineImagePath != null) "Change Medicine Image" else "Upload Medicine Image",
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFF64748B),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
 
@@ -209,11 +215,12 @@ fun EditMedScreen(
                             fontWeight = FontWeight.Medium,
                             fontSize = 18.sp
                         ),
-                        color = Color(0xFF0D1B1B),
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
                     OutlinedTextField(
+                    shape = RoundedCornerShape(16.dp),
                         value = medicationName,
                         onValueChange = { medicationName = it },
                         modifier = Modifier
@@ -222,12 +229,12 @@ fun EditMedScreen(
                         placeholder = {
                             Text(
                                 "Enter medication name",
-                                color = Color(0xFF94A3B8)
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         },
                         colors = TextFieldDefaults.outlinedTextFieldColors(
                             focusedBorderColor = Color(0xFF1193D4),
-                            unfocusedBorderColor = Color(0xFFE2E8F0),
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                             focusedLabelColor = Color(0xFF1193D4),
                             unfocusedLabelColor = Color(0xFF6B7280),
                             cursorColor = Color(0xFF1193D4)
@@ -244,7 +251,7 @@ fun EditMedScreen(
                             fontWeight = FontWeight.Medium,
                             fontSize = 18.sp
                         ),
-                        color = Color(0xFF0D1B1B),
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
@@ -253,6 +260,7 @@ fun EditMedScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         OutlinedTextField(
+                    shape = RoundedCornerShape(16.dp),
                             value = dosage,
                             onValueChange = {
                                 if (it.all { char -> char.isDigit() || char == '.' }) {
@@ -265,13 +273,13 @@ fun EditMedScreen(
                             placeholder = {
                                 Text(
                                     "0",
-                                    color = Color(0xFF94A3B8)
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             colors = TextFieldDefaults.outlinedTextFieldColors(
                                 focusedBorderColor = Color(0xFF1193D4),
-                                unfocusedBorderColor = Color(0xFFE2E8F0),
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                                 focusedLabelColor = Color(0xFF1193D4),
                                 unfocusedLabelColor = Color(0xFF6B7280),
                                 cursorColor = Color(0xFF1193D4)
@@ -290,6 +298,7 @@ fun EditMedScreen(
                                 onExpandedChange = { dosageUnitExpanded = !dosageUnitExpanded }
                             ) {
                                 OutlinedTextField(
+                    shape = RoundedCornerShape(16.dp),
                                     value = selectedDosageUnit.displayName,
                                     onValueChange = {},
                                     readOnly = true,
@@ -302,26 +311,28 @@ fun EditMedScreen(
                                         .menuAnchor(),
                                     colors = TextFieldDefaults.outlinedTextFieldColors(
                                         focusedBorderColor = Color(0xFF1193D4),
-                                        unfocusedBorderColor = Color(0xFFE2E8F0),
+                                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                                         focusedLabelColor = Color(0xFF1193D4),
                                         unfocusedLabelColor = Color(0xFF6B7280)
                                     )
                                 )
 
                                 ExposedDropdownMenu(
-                                    expanded = dosageUnitExpanded,
-                                    onDismissRequest = { dosageUnitExpanded = false }
-                                ) {
-                                    DosageUnit.values().forEach { unit ->
-                                        DropdownMenuItem(
-                                            text = { Text(unit.displayName) },
-                                            onClick = {
-                                                selectedDosageUnit = unit
-                                                dosageUnitExpanded = false
-                                            }
-                                        )
-                                    }
+                                expanded = dosageUnitExpanded,
+                                onDismissRequest = { dosageUnitExpanded = false },
+                                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                            ) {
+                                DosageUnit.values().forEach { unit ->
+                                    DropdownMenuItem(
+                                        text = { Text(unit.displayName) },
+                                        onClick = {
+                                            selectedDosageUnit = unit
+                                            dosageUnitExpanded = false
+                                        },
+                                        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                                    )
                                 }
+                            }
                             }
                         }
                     }
@@ -335,12 +346,13 @@ fun EditMedScreen(
                             fontWeight = FontWeight.Medium,
                             fontSize = 18.sp
                         ),
-                        color = Color(0xFF0D1B1B),
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
                     // Time Picker
                     OutlinedTextField(
+                    shape = RoundedCornerShape(16.dp),
                         value = String.format("%02d:%02d", selectedTime.hour, selectedTime.minute),
                         onValueChange = { /* Read-only, opens time picker */ },
                         modifier = Modifier
@@ -351,12 +363,12 @@ fun EditMedScreen(
                         placeholder = {
                             Text(
                                 "Select time",
-                                color = Color(0xFF94A3B8)
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         },
                         colors = TextFieldDefaults.outlinedTextFieldColors(
                             focusedBorderColor = Color(0xFF1193D4),
-                            unfocusedBorderColor = Color(0xFFE2E8F0),
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                             focusedLabelColor = Color(0xFF1193D4),
                             unfocusedLabelColor = Color(0xFF6B7280)
                         ),
@@ -367,7 +379,7 @@ fun EditMedScreen(
                                 Icon(
                                     imageVector = Icons.Default.Schedule,
                                     contentDescription = "Select time",
-                                    tint = Color(0xFF6B7280)
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
@@ -382,7 +394,7 @@ fun EditMedScreen(
                             fontWeight = FontWeight.Medium,
                             fontSize = 18.sp
                         ),
-                        color = Color(0xFF0D1B1B),
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
@@ -391,6 +403,7 @@ fun EditMedScreen(
                         onExpandedChange = { frequencyExpanded = !frequencyExpanded }
                     ) {
                         OutlinedTextField(
+                    shape = RoundedCornerShape(16.dp),
                             value = selectedFrequency.displayName,
                             onValueChange = {},
                             readOnly = true,
@@ -401,12 +414,12 @@ fun EditMedScreen(
                             placeholder = {
                                 Text(
                                     "Select frequency",
-                                    color = Color(0xFF94A3B8)
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             },
                             colors = TextFieldDefaults.outlinedTextFieldColors(
                                 focusedBorderColor = Color(0xFF1193D4),
-                                unfocusedBorderColor = Color(0xFFE2E8F0),
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                                 focusedLabelColor = Color(0xFF1193D4),
                                 unfocusedLabelColor = Color(0xFF6B7280)
                             ),
@@ -417,7 +430,8 @@ fun EditMedScreen(
 
                         ExposedDropdownMenu(
                             expanded = frequencyExpanded,
-                            onDismissRequest = { frequencyExpanded = false }
+                            onDismissRequest = { frequencyExpanded = false },
+                            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                         ) {
                             FrequencyPattern.values().forEach { frequency ->
                                 DropdownMenuItem(
@@ -425,8 +439,114 @@ fun EditMedScreen(
                                     onClick = {
                                         selectedFrequency = frequency
                                         frequencyExpanded = false
-                                    }
+                                    },
+                                    colors = MenuDefaults.itemColors(
+                                        containerColor = MaterialTheme.colorScheme.surface
+                                    )
                                 )
+                            }
+                        }
+                    }
+
+                    if (selectedFrequency == FrequencyPattern.WEEKLY) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Select Days of the Week",
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        
+                        val daysOfWeekNames = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            daysOfWeekNames.forEachIndexed { index, name ->
+                                val dayValue = index + 1
+                                val isSelected = selectedDaysOfWeek.contains(dayValue)
+                                Box(
+                                    modifier = Modifier
+                                        .size(42.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(
+                                            if (isSelected) MaterialTheme.colorScheme.primary 
+                                            else MaterialTheme.colorScheme.surfaceVariant
+                                        )
+                                        .clickable {
+                                            selectedDaysOfWeek = if (isSelected) {
+                                                selectedDaysOfWeek - dayValue
+                                            } else {
+                                                selectedDaysOfWeek + dayValue
+                                            }
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = name.take(2), // Mo, Tu, We, etc.
+                                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary 
+                                                else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    if (selectedFrequency == FrequencyPattern.MONTHLY) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Select Days of the Month",
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            val chunkedDays = (1..31).chunked(7)
+                            chunkedDays.forEach { rowDays ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    rowDays.forEach { day ->
+                                        val isSelected = selectedDaysOfMonth.contains(day)
+                                        Box(
+                                            modifier = Modifier
+                                                .size(42.dp)
+                                                .clip(RoundedCornerShape(8.dp))
+                                                .background(
+                                                    if (isSelected) MaterialTheme.colorScheme.primary 
+                                                    else MaterialTheme.colorScheme.surfaceVariant
+                                                )
+                                                .clickable {
+                                                    selectedDaysOfMonth = if (isSelected) {
+                                                        selectedDaysOfMonth - day
+                                                    } else {
+                                                        selectedDaysOfMonth + day
+                                                    }
+                                                },
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                text = day.toString(),
+                                                color = if (isSelected) MaterialTheme.colorScheme.onPrimary 
+                                                        else MaterialTheme.colorScheme.onSurfaceVariant,
+                                                fontSize = 12.sp,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                        }
+                                    }
+                                    if (rowDays.size < 7) {
+                                        repeat(7 - rowDays.size) {
+                                            Spacer(modifier = Modifier.size(42.dp))
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -445,12 +565,16 @@ fun EditMedScreen(
                                     dosageUnit = selectedDosageUnit,
                                     timesPerDay = when (selectedFrequency) {
                                         FrequencyPattern.DAILY -> 1
-                                        FrequencyPattern.WEEKLY -> 7
-                                        FrequencyPattern.MONTHLY -> 30
+                                        FrequencyPattern.WEEKLY -> selectedDaysOfWeek.size
+                                        FrequencyPattern.MONTHLY -> selectedDaysOfMonth.size
                                         FrequencyPattern.CUSTOM -> 1
                                     },
                                     frequency = com.example.dosezy.data.model.Frequency(
-                                        pattern = selectedFrequency
+                                        pattern = selectedFrequency,
+                                        daysPerWeek = if (selectedFrequency == FrequencyPattern.WEEKLY) selectedDaysOfWeek.size else null,
+                                        daysPerMonth = if (selectedFrequency == FrequencyPattern.MONTHLY) selectedDaysOfMonth.size else null,
+                                        selectedDaysOfWeek = if (selectedFrequency == FrequencyPattern.WEEKLY) selectedDaysOfWeek else null,
+                                        selectedDaysOfMonth = if (selectedFrequency == FrequencyPattern.MONTHLY) selectedDaysOfMonth else null
                                     ),
                                     scheduledTimes = listOf(selectedTime),
                                     imageUri = medicineImagePath
@@ -466,18 +590,24 @@ fun EditMedScreen(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(64.dp),
+                            .height(56.dp),
+                        shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF2084E4),
                             contentColor = Color.White
                         ),
-                        enabled = medicationName.isNotBlank() && dosage.isNotBlank()
+                        enabled = medicationName.isNotBlank() && dosage.isNotBlank() && (
+                            selectedFrequency == FrequencyPattern.DAILY ||
+                            (selectedFrequency == FrequencyPattern.WEEKLY && selectedDaysOfWeek.isNotEmpty()) ||
+                            (selectedFrequency == FrequencyPattern.MONTHLY && selectedDaysOfMonth.isNotEmpty()) ||
+                            selectedFrequency == FrequencyPattern.CUSTOM
+                        )
                     ) {
                         Text(
                             "Save Changes",
                             style = MaterialTheme.typography.bodyLarge.copy(
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 20.sp
+                                fontSize = 16.sp
                             )
                         )
                     }
@@ -566,23 +696,27 @@ fun CustomTimePickerDialog(
     onTimeSelected: (LocalTime) -> Unit,
     onDismiss: () -> Unit
 ) {
+    var selectedTimeState by remember { mutableStateOf(initialTime) }
+
     AlertDialog(
         onDismissRequest = onDismiss,
+        tonalElevation = 0.dp,
+        containerColor = MaterialTheme.colorScheme.surface,
         title = { Text("Select Time", style = MaterialTheme.typography.headlineSmall) },
         text = {
             Column {
                 Text(
-                    "Selected: ${String.format("%02d:%02d", initialTime.hour, initialTime.minute)}",
+                    "Selected: ${String.format("%02d:%02d", selectedTimeState.hour, selectedTimeState.minute)}",
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
                 // Simple hour selection
-                Text("Hour: ${initialTime.hour}", style = MaterialTheme.typography.bodyMedium)
+                Text("Hour: ${selectedTimeState.hour}", style = MaterialTheme.typography.bodyMedium)
                 Slider(
-                    value = initialTime.hour.toFloat(),
+                    value = selectedTimeState.hour.toFloat(),
                     onValueChange = { newHour ->
-                        onTimeSelected(initialTime.withHour(newHour.toInt()))
+                        selectedTimeState = selectedTimeState.withHour(newHour.toInt())
                     },
                     valueRange = 0f..23f,
                     steps = 22
@@ -591,11 +725,11 @@ fun CustomTimePickerDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Simple minute selection
-                Text("Minute: ${initialTime.minute}", style = MaterialTheme.typography.bodyMedium)
+                Text("Minute: ${selectedTimeState.minute}", style = MaterialTheme.typography.bodyMedium)
                 Slider(
-                    value = initialTime.minute.toFloat(),
+                    value = selectedTimeState.minute.toFloat(),
                     onValueChange = { newMinute ->
-                        onTimeSelected(initialTime.withMinute(newMinute.toInt()))
+                        selectedTimeState = selectedTimeState.withMinute(newMinute.toInt())
                     },
                     valueRange = 0f..59f,
                     steps = 58
@@ -604,9 +738,16 @@ fun CustomTimePickerDialog(
         },
         confirmButton = {
             TextButton(
-                onClick = { onDismiss() }
+                onClick = { onTimeSelected(selectedTimeState) }
             ) {
                 Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss
+            ) {
+                Text("Cancel")
             }
         }
     )

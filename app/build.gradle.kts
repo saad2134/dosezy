@@ -10,11 +10,11 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.dosezy"
+        applicationId = "com.saad.dosezy"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
-        versionName = "1.1.0"
+        versionName = "1.3.1"
         buildConfigField("String", "VERSION_NAME", "\"$versionName\"")
         buildConfigField("int", "VERSION_CODE", "$versionCode")
 

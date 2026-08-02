@@ -34,9 +34,10 @@ object AppModule {
     @Singleton
     fun provideMedicineRepository(
         database: DosezyDatabase,
-        scheduleRepository: ScheduleRepository
+        scheduleRepository: ScheduleRepository,
+        @ApplicationContext context: Context
     ): MedicineRepository {
-        return MedicineRepository(database, scheduleRepository)
+        return MedicineRepository(database, scheduleRepository, context)
     }
 
     @Provides

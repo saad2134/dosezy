@@ -54,10 +54,11 @@ fun TopBar(
     subtitle: String? = null,
     showBackButton: Boolean = false,
     showNotificationStatus: Boolean = true,
-    titleColor: Color = Color(0xFF1E293B),
+    titleColor: Color = Color.Unspecified,
     onBackClick: (() -> Unit)? = null,
     actions: @Composable () -> Unit
 ) {
+    val resolvedTitleColor = if (titleColor == Color.Unspecified) MaterialTheme.colorScheme.onSurface else titleColor
     var showProfileDialog by remember { mutableStateOf(false) }
     var showNotificationDialog by remember { mutableStateOf(false) }
 
@@ -68,7 +69,7 @@ fun TopBar(
         modifier = Modifier
             .fillMaxWidth()
 
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.surface)
     ) {
         // First Row: Profile info and Notification button
         Row(
@@ -95,12 +96,12 @@ fun TopBar(
                         text = "Hi, ${currentUser?.fullName?.split(" ")?.get(0) ?: "User"}!",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1E293B)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = "\"Health is a priceless wealth.\"",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xFF6B7280)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -134,7 +135,7 @@ fun TopBar(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color(0xFF6B7280),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -149,14 +150,14 @@ fun TopBar(
                             text = title,
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
-                            color = titleColor,
+                            color = resolvedTitleColor,
                             textAlign = TextAlign.Center
                         )
                         subtitle?.let {
                             Text(
                                 text = it,
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = Color(0xFF6B7280),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 textAlign = TextAlign.Center
                             )
                         }
@@ -174,14 +175,14 @@ fun TopBar(
                         text = title,
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
-                        color = titleColor,
+                        color = resolvedTitleColor,
                         textAlign = TextAlign.Center
                     )
                     subtitle?.let {
                         Text(
                             text = it,
                             style = MaterialTheme.typography.bodyLarge,
-                            color = Color(0xFF6B7280),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -296,7 +297,7 @@ private fun NotificationStatusButton(
                 .align(Alignment.TopEnd)           // Position relative to parent Box
                 .offset(x = 4.dp, y = (-4).dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(Color.White),
+                .background(MaterialTheme.colorScheme.surface),
             contentAlignment = Alignment.Center
         ) {
             Icon(

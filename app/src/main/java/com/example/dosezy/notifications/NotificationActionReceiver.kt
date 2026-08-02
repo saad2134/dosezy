@@ -17,6 +17,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
+import kotlinx.coroutines.flow.first
+
 @AndroidEntryPoint
 class NotificationActionReceiver : BroadcastReceiver() {
 
@@ -58,15 +60,21 @@ class NotificationActionReceiver : BroadcastReceiver() {
             }
             "SNOOZE_ACTION" -> {
                 Log.d(TAG, "Snoozing medicine reminder for entry: $entryId")
+                
+                // Fetch the medicine name from database
+                val entry = database.scheduleDao().getScheduleEntryById(entryId)
+                val medicine = entry?.let { database.medicineDao().getMedicineById(it.medicineId).first() }
+                val medicineName = medicine?.medicationName ?: "Medicine"
+
                 val alarmScheduler = AlarmScheduler(context)
-                alarmScheduler.scheduleSnooze(entryId, 10) // 10 minutes snooze
+                alarmScheduler.scheduleSnooze(entryId, 10, medicineName) // 10 minutes snooze
 
                 // Cancel the current notification
                 val notificationManager =
                     context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
                 notificationManager.cancel(entryId.hashCode())
 
-                Log.d(TAG, "Medicine reminder snoozed for 10 minutes for entry: $entryId")
+                Log.d(TAG, "Medicine reminder snoozed for 10 minutes for entry: $entryId ($medicineName)")
             }
             else -> {
                 Log.w(TAG, "Unknown action received: $action for entry: $entryId")

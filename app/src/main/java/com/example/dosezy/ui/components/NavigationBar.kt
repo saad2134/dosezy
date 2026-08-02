@@ -62,10 +62,10 @@ fun CustomNavigationBar(
         modifier = modifier
             .fillMaxWidth()
             .height(70.dp)
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.surface)
             .border(
                 width = 1.dp,
-                color = Color(0xFFE5E7EB),
+                color = MaterialTheme.colorScheme.outline,
                 shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
             )
             .padding(horizontal = 8.dp),
@@ -234,10 +234,10 @@ fun CustomNavigationBarPreview() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(70.dp)
-                    .background(Color.White)
+                    .background(MaterialTheme.colorScheme.surface)
                     .border(
                         width = 1.dp,
-                        color = Color(0xFFE5E7EB),
+                        color = MaterialTheme.colorScheme.outline,
                         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                     )
                     .padding(horizontal = 8.dp),
@@ -319,10 +319,10 @@ fun CustomNavigationBarAllUnselectedPreview() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(70.dp)
-                    .background(Color.White)
+                    .background(MaterialTheme.colorScheme.surface)
                     .border(
                         width = 1.dp,
-                        color = Color(0xFFE5E7EB),
+                        color = MaterialTheme.colorScheme.outline,
                         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                     )
                     .padding(horizontal = 8.dp),

@@ -18,6 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.ui.graphics.Color
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T> SelectionDialog(
@@ -29,6 +32,8 @@ fun <T> SelectionDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
+        tonalElevation = 0.dp,
+        containerColor = MaterialTheme.colorScheme.surface,
         title = { Text(text = title, style = MaterialTheme.typography.titleLarge) },
         text = {
             Column(
@@ -49,6 +54,9 @@ fun <T> SelectionDialog(
                                 onClick = { onOptionSelected(optionValue) }
                             )
                         },
+                        colors = ListItemDefaults.colors(
+                            containerColor = Color.Transparent
+                        ),
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { onOptionSelected(optionValue) }

@@ -36,7 +36,7 @@ fun PreferenceItem(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clickable { onClick() },
-        tonalElevation = 1.dp,
+        tonalElevation = 0.dp,
         shape = MaterialTheme.shapes.medium
     ) {
         Row(

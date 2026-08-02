@@ -95,7 +95,7 @@ fun MenuScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF3F4F6))
+            .background(MaterialTheme.colorScheme.background)
     ) {
         TopBar(
             navController = navController,
@@ -109,7 +109,7 @@ fun MenuScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
             // Profile Card
             item {
@@ -125,7 +125,7 @@ fun MenuScreen(navController: NavController) {
                 MenuItem(
                     icon = Icons.Default.Tune,
                     title = "Preferences (Format, etc)",
-                    color = Color(0xFF1E293B),
+                    color = MaterialTheme.colorScheme.onSurface,
                     onClick = { navController.navigate("preferences") }
                 )
             }
@@ -145,21 +145,35 @@ fun MenuScreen(navController: NavController) {
                 MenuItem(
                     icon = Icons.Default.HelpOutline,
                     title = "Help and Support",
-                    color = Color(0xFF1E293B),
+                    color = MaterialTheme.colorScheme.onSurface,
                     onClick = { navController.navigate("help_support") }
                 )
             }
 
             // Divider
             item {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
+                val outlineColor = MaterialTheme.colorScheme.outline
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(2.dp)
-                        .background(Color(0xFFD1D5DB))
-                )
-                Spacer(modifier = Modifier.height(16.dp))
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    androidx.compose.foundation.Canvas(
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .height(2.dp)
+                    ) {
+                        val pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(12f, 12f), 0f)
+                        drawLine(
+                            color = outlineColor,
+                            start = androidx.compose.ui.geometry.Offset(0f, size.height / 2),
+                            end = androidx.compose.ui.geometry.Offset(size.width, size.height / 2),
+                            strokeWidth = 2.dp.toPx(),
+                            pathEffect = pathEffect
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(12.dp))
             }
 
             // Export Data
@@ -167,7 +181,7 @@ fun MenuScreen(navController: NavController) {
                 MenuItem(
                     icon = Icons.Default.Download,
                     title = "Export Data as CSV",
-                    color = Color(0xFF1E293B),
+                    color = MaterialTheme.colorScheme.onSurface,
                     onClick = {
                         showExportProgress = true
                         exportError = null
@@ -192,7 +206,7 @@ fun MenuScreen(navController: NavController) {
         Dialog(onDismissRequest = { showExportProgress = false }) {
             Surface(
                 shape = RoundedCornerShape(24.dp),
-                color = Color.White
+                color = MaterialTheme.colorScheme.surface
             ) {
                 Column(
                     modifier = Modifier.padding(32.dp),
@@ -209,7 +223,7 @@ fun MenuScreen(navController: NavController) {
                         text = "Exporting Data",
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1E293B)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -217,7 +231,7 @@ fun MenuScreen(navController: NavController) {
                     Text(
                         text = "Please wait while we prepare your data for export...",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFF6B7280),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -243,7 +257,7 @@ fun MenuScreen(navController: NavController) {
         Dialog(onDismissRequest = { exportError = null }) {
             Surface(
                 shape = RoundedCornerShape(24.dp),
-                color = Color.White
+                color = MaterialTheme.colorScheme.surface
             ) {
                 Column(
                     modifier = Modifier.padding(32.dp),
@@ -265,7 +279,7 @@ fun MenuScreen(navController: NavController) {
                         text = "Export Failed",
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1E293B)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -273,7 +287,7 @@ fun MenuScreen(navController: NavController) {
                     Text(
                         text = error,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFF6B7280),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
                     )
 
@@ -308,16 +322,13 @@ fun ProfileCard(
     onSwitchProfile: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    Surface(
         modifier = modifier
             .fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp
-        )
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 0.dp,
+        shadowElevation = 2.dp
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -338,7 +349,7 @@ fun ProfileCard(
                     text = currentUser?.fullName ?: "User",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1E293B)
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -416,7 +427,7 @@ fun ProfileActionButton(
         modifier = modifier
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(8.dp),
-        color = Color(0xFFF3F4F6),
+        color = MaterialTheme.colorScheme.background,
         shadowElevation = 1.dp
     ) {
         Row(
@@ -437,7 +448,7 @@ fun ProfileActionButton(
                 text = text,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Medium,
-                color = Color(0xFF374151)
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -451,17 +462,14 @@ fun MenuItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    Surface(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp
-        )
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 0.dp,
+        shadowElevation = 2.dp
     ) {
         Row(
             modifier = Modifier
@@ -504,11 +512,12 @@ fun ExportDataDialog(
     onShare: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             modifier = modifier,
             shape = RoundedCornerShape(24.dp),
-            color = Color.White
+            color = MaterialTheme.colorScheme.surface
         ) {
             Column(
                 modifier = Modifier.padding(32.dp),
@@ -537,7 +546,7 @@ fun ExportDataDialog(
                     text = "Data Exported",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1E293B),
+                    color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center
                 )
 
@@ -545,9 +554,9 @@ fun ExportDataDialog(
 
                 // Description
                 Text(
-                    text = "Your medication data has been successfully saved as a CSV file to your local device at 'Android/data/com.example.dosezy/files'.",
+                    text = "Your medication data has been successfully saved as a CSV file to your local device at 'Android/data/${context.packageName}/files'.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFF6B7280),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
 
@@ -642,7 +651,7 @@ fun MenuItemPreview() {
         MenuItem(
             icon = Icons.Default.Tune,
             title = "Preferences (Theme, etc)",
-            color = Color(0xFF1E293B),
+            color = MaterialTheme.colorScheme.onSurface,
             onClick = {}
         )
     }

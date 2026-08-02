@@ -121,7 +121,7 @@ fun NewUserScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             when (currentFrame) {
                 1 -> WelcomePage(
@@ -192,13 +192,13 @@ fun WelcomePage(
             text = "Welcome to Dosezy",
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF1E293B)
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Text(
             text = "Your personal medication assistant.",
             style = MaterialTheme.typography.bodyLarge,
-            color = Color(0xFF64748B),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 8.dp)
         )
 
@@ -241,7 +241,7 @@ fun FeaturesPage() {
             text = "Your Health, Simplified!",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF1E293B),
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
@@ -249,7 +249,7 @@ fun FeaturesPage() {
         Text(
             text = "Key features of Dosezy",
             style = MaterialTheme.typography.bodyMedium,
-            color = Color(0xFF64748B),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
@@ -329,7 +329,7 @@ fun ProfileSetupPage(
             text = "Tell us about yourself!",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF1E293B),
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
@@ -337,7 +337,7 @@ fun ProfileSetupPage(
         Text(
             text = "This helps us personalize your experience.",
             style = MaterialTheme.typography.bodyMedium,
-            color = Color(0xFF64748B),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
@@ -364,7 +364,7 @@ fun ProfileSetupPage(
             Text(
                 text = if (profilePicPath != null) "Change Profile Picture" else "Upload Profile Picture",
                 style = MaterialTheme.typography.bodySmall,
-                color = Color(0xFF64748B),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
         }
@@ -474,7 +474,7 @@ fun ProfileSetupPage(
                 shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF2084E4),
-                    unfocusedBorderColor = Color(0xFFE2E8F0)
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
                 )
             )
         }
@@ -578,7 +578,7 @@ fun FeatureItem(icon: ImageVector, title: String, description: String) {
             modifier = Modifier
                 .size(56.dp)
                 .clip(CircleShape)
-                .background(Color(0xFFE0F2FE)),
+                .background(MaterialTheme.colorScheme.primaryContainer),
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -598,13 +598,13 @@ fun FeatureItem(icon: ImageVector, title: String, description: String) {
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF1E293B)
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF64748B),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 4.dp)
             )
         }
@@ -639,18 +639,36 @@ fun NewUserBottomBar(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = Color.White,
+        color = MaterialTheme.colorScheme.surface,
         shadowElevation = 8.dp
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                when (currentFrame) {
-                    1 -> {
+            when (currentFrame) {
+                1 -> {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        // Get Started button
+                        Button(
+                            onClick = onNext,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF2084E4)
+                            )
+                        ) {
+                            Text(
+                                text = "Get Started",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
                         val showLeftButton = isCreatingNewProfile && existingUsers.isNotEmpty() ||
                                 (!isCreatingNewProfile && existingUsers.isNotEmpty())
 
@@ -660,7 +678,7 @@ fun NewUserBottomBar(
                                 Button(
                                     onClick = onBack,
                                     modifier = Modifier
-                                        .weight(1f)
+                                        .fillMaxWidth()
                                         .height(56.dp),
                                     shape = RoundedCornerShape(16.dp),
                                     colors = ButtonDefaults.buttonColors(
@@ -679,7 +697,7 @@ fun NewUserBottomBar(
                                 Button(
                                     onClick = { onShowExistingProfiles() },
                                     modifier = Modifier
-                                        .weight(1f)
+                                        .fillMaxWidth()
                                         .height(56.dp),
                                     shape = RoundedCornerShape(16.dp),
                                     colors = ButtonDefaults.buttonColors(
@@ -693,30 +711,14 @@ fun NewUserBottomBar(
                                     )
                                 }
                             }
-                        } else {
-                            // No left button needed - Get Started will take full width
-                        }
-
-                        // Get Started button - takes full width when no left button is shown
-                        Button(
-                            onClick = onNext,
-                            modifier = Modifier
-                                .weight(if (showLeftButton) 1f else 1f)
-                                .fillMaxWidth(if (showLeftButton) 0.5f else 1f)
-                                .height(56.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF2084E4)
-                            )
-                        ) {
-                            Text(
-                                text = "Get Started",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
-                            )
                         }
                     }
-                    2 -> {
+                }
+                2 -> {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
                         // Frame 2: Back and Next buttons (both always visible)
                         Button(
                             onClick = onBack,
@@ -753,7 +755,12 @@ fun NewUserBottomBar(
                             )
                         }
                     }
-                    3 -> {
+                }
+                3 -> {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
                         // Frame 3: Back and Complete buttons (both always visible)
                         Button(
                             onClick = onBack,
@@ -824,7 +831,7 @@ fun ExistingProfilesModal(
                 .fillMaxWidth()
                 .padding(24.dp),
             shape = RoundedCornerShape(24.dp),
-            color = Color.White
+            color = MaterialTheme.colorScheme.surface
         ) {
             Column(
                 modifier = Modifier.padding(24.dp)
@@ -845,9 +852,9 @@ fun ExistingProfilesModal(
                         user = user,
                         onClick = {
                             onSelectUser(user)
-                            // navController.navigate("home") {
-                            //     popUpTo("newuser/1") { inclusive = true }
-                            // }
+                            navController.navigate("home") {
+                                popUpTo("newuser/1") { inclusive = true }
+                            }
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -932,7 +939,7 @@ fun ProfileItem(user: User, onClick: () -> Unit, modifier: Modifier = Modifier) 
                     Text(
                         text = "${user.age} years • ${user.gender.displayName}",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xFF6B7280)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -999,7 +1006,7 @@ fun PreviewNewUserScreenFrame1() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.surface)
         ) {
             WelcomePage(
                 isCreatingNewProfile = false,
@@ -1018,7 +1025,7 @@ fun PreviewNewUserScreenFrame2() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.surface)
         ) {
             FeaturesPage()
         }
@@ -1032,7 +1039,7 @@ fun PreviewNewUserScreenFrame3() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.surface)
         ) {
             ProfileSetupPage(onComplete = {})
         }

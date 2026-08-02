@@ -60,28 +60,13 @@ fun ProfilePicturePicker(
     var showError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
-    // Camera permission launcher
-    val cameraPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
-            if (isGranted) {
-                // Permission granted, open camera
-                openCamera(context)
-            } else {
-                // Permission denied
-                errorMessage = "Camera permission is required to take photos"
-                showError = true
-            }
-        }
-    )
-
     // Gallery launcher
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
             if (uri != null) {
                 try {
-                    val savedPath = saveImageToInternalStorage(context, uri)
+                    val savedPath = saveImageToInternalStorage(context, uri, profilePicPath)
                     onProfilePictureSelected(savedPath)
                 } catch (e: Exception) {
                     Log.e("ProfilePicturePicker", "Gallery error: ${e.message}", e)
@@ -99,7 +84,7 @@ fun ProfilePicturePicker(
             if (success) {
                 tempUri?.let { uri ->
                     try {
-                        val savedPath = saveImageToInternalStorage(context, uri)
+                        val savedPath = saveImageToInternalStorage(context, uri, profilePicPath)
                         onProfilePictureSelected(savedPath)
                     } catch (e: Exception) {
                         Log.e("ProfilePicturePicker", "Camera save error: ${e.message}", e)
@@ -116,7 +101,8 @@ fun ProfilePicturePicker(
         }
     )
 
-    fun openCamera(context: Context) {
+    // Camera open action (lambda)
+    val openCamera = {
         try {
             val uri = createImageFileUri(context)
             if (uri != null) {
@@ -133,6 +119,21 @@ fun ProfilePicturePicker(
         }
     }
 
+    // Camera permission launcher
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted) {
+                // Permission granted, open camera
+                openCamera()
+            } else {
+                // Permission denied
+                errorMessage = "Camera permission is required to take photos"
+                showError = true
+            }
+        }
+    )
+
     fun openCameraWithPermissionCheck() {
         try {
             val permission = android.Manifest.permission.CAMERA
@@ -142,7 +143,7 @@ fun ProfilePicturePicker(
             ) == android.content.pm.PackageManager.PERMISSION_GRANTED
 
             if (hasPermission) {
-                openCamera(context)
+                openCamera()
             } else {
                 // Request camera permission
                 cameraPermissionLauncher.launch(permission)
@@ -253,7 +254,7 @@ fun ProfilePicturePicker(
     }
 }
 
-fun openCamera(context: android.content.Context) {}
+
 
 @Composable
 fun ImageSourceDialog(
@@ -334,7 +335,20 @@ private fun createImageFileUri(context: Context): Uri? {
 }
 
 // Utility function to save image to internal storage
-private fun saveImageToInternalStorage(context: Context, uri: Uri): String {
+private fun saveImageToInternalStorage(context: Context, uri: Uri, oldPath: String? = null): String {
+    // Delete old profile picture if it exists to prevent storage leak
+    if (!oldPath.isNullOrEmpty()) {
+        try {
+            val oldFile = File(oldPath)
+            if (oldFile.exists() && oldFile.parentFile?.absolutePath == context.filesDir.absolutePath) {
+                val deleted = oldFile.delete()
+                Log.d("ProfilePicturePicker", "Deleted old image: $oldPath, success=$deleted")
+            }
+        } catch (e: Exception) {
+            Log.e("ProfilePicturePicker", "Failed to delete old image: ${e.message}")
+        }
+    }
+
     return try {
         val inputStream = context.contentResolver.openInputStream(uri)
             ?: throw IllegalStateException("Cannot open input stream")

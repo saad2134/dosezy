@@ -167,7 +167,10 @@ class DataExporter(
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
 
-        context.startActivity(Intent.createChooser(shareIntent, "Share Export File"))
+        val chooserIntent = Intent.createChooser(shareIntent, "Share Export File").apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(chooserIntent)
     }
 }
 

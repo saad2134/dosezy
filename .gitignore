@@ -13,6 +13,7 @@ captures/
 .externalNativeBuild/
 .cxx/
 *.aab
+apks/
 *.apk
 output-metadata.json
 
@@ -32,3 +33,6 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# Kotlin compiler cache
+.kotlin/

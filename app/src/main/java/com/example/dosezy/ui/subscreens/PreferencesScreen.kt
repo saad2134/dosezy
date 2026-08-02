@@ -2,6 +2,9 @@ package com.example.dosezy.ui.subscreens
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -50,6 +53,7 @@ fun PreferencesScreen(navController: NavController) {
                 .padding(paddingValues)
         ) {
             item {
+                Spacer(modifier = Modifier.height(12.dp))
                 // Theme Preference
                 PreferenceItem(
                     title = "Theme",
@@ -57,8 +61,9 @@ fun PreferencesScreen(navController: NavController) {
                         when (it) {
                             Theme.LIGHT -> "Light"
                             Theme.DARK -> "Dark"
+                            Theme.SYSTEM -> "System Default"
                         }
-                    } ?: "Light",
+                    } ?: "System Default",
                     iconName = "palette",
                     onClick = { showThemeDialog = true }
                 )
@@ -109,7 +114,7 @@ fun PreferencesScreen(navController: NavController) {
         // Theme Selection Dialog
         if (showThemeDialog) {
             ThemeSelectionDialog(
-                currentTheme = currentUser?.theme ?: Theme.LIGHT,
+                currentTheme = currentUser?.theme ?: Theme.SYSTEM,
                 onThemeSelected = { newTheme ->
                     currentUser?.let { user ->
                         userViewModel.updateUser(user.copy(theme = newTheme))
@@ -173,7 +178,11 @@ fun ThemeSelectionDialog(
 ) {
     com.example.dosezy.ui.components.SelectionDialog(
         title = "Select Theme",
-        options = listOf("Light" to Theme.LIGHT),
+        options = listOf(
+            "Light" to Theme.LIGHT,
+            "Dark" to Theme.DARK,
+            "System Default" to Theme.SYSTEM
+        ),
         currentSelection = currentTheme,
         onOptionSelected = onThemeSelected,
         onDismiss = onDismiss

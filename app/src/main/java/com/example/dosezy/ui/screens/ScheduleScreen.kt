@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -89,24 +90,32 @@ fun ScheduleScreen(navController: NavController) {
                     .weight(1f)
                     .fillMaxSize()
             ) {
-                // Calendar Section
-                ScheduleCalendar(
-                    selectedDate = selectedDate,
-                    scheduleEntries = scheduleWithMedicine.map { it.scheduleEntry },
-                    onDateSelected = { date ->
-                        scheduleViewModel.setSelectedDate(date)
-                    },
+                // Calendar Section wrapped in Card-styled Surface
+                Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surface)
-                )
+                        .padding(12.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 0.dp,
+                    shadowElevation = 2.dp
+                ) {
+                    ScheduleCalendar(
+                        selectedDate = selectedDate,
+                        scheduleEntries = scheduleWithMedicine.map { it.scheduleEntry },
+                        onDateSelected = { date ->
+                            scheduleViewModel.setSelectedDate(date)
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
 
                 // Schedule List Section - takes remaining space
                 Column(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surface)
+                        .background(MaterialTheme.colorScheme.background)
                 ) {
                     // Date Header
                     Text(

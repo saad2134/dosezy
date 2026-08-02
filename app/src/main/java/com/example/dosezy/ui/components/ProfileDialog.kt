@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.SwitchAccount
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,7 +39,7 @@ fun ProfileDialog(
         Surface(
             modifier = modifier,
             shape = RoundedCornerShape(24.dp),
-            color = Color.White
+            color = MaterialTheme.colorScheme.surface
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -153,7 +154,7 @@ fun ProfileDialog(
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Transparent,
-                        contentColor = Color(0xFF6B7280)
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
                     border = ButtonDefaults.outlinedButtonBorder.copy(
                         //color = Color(0xFFD1D5DB)

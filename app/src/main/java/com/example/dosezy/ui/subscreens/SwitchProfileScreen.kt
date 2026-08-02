@@ -73,7 +73,7 @@ fun SwitchProfileScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
@@ -90,7 +90,7 @@ fun SwitchProfileScreen(navController: NavController) {
                         text = "Select a Profile",
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1E293B),
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
@@ -112,7 +112,7 @@ fun SwitchProfileScreen(navController: NavController) {
                             Text(
                                 text = "No profiles found",
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = Color(0xFF64748B)
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     } else {
@@ -184,7 +184,8 @@ fun ProfileListItem(
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .clickable(onClick = onClick),
-        color = if (isCurrentUser) Color(0xFFE0F2FE) else Color(0xFFF8FAFC),
+        color = if (isCurrentUser) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
+        tonalElevation = 0.dp,
         shadowElevation = if (isCurrentUser) 2.dp else 0.dp
     ) {
         Row(
@@ -230,18 +231,18 @@ fun ProfileListItem(
                         text = user.fullName,
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium,
-                        color = Color(0xFF1E293B)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = "${user.age} years • ${user.gender.displayName}",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xFF6B7280)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     if (isCurrentUser) {
                         Text(
                             text = "Current Profile",
                             style = MaterialTheme.typography.labelSmall,
-                            color = Color(0xFF2084E4),
+                            color = Color(0xFF10B981),
                             modifier = Modifier.padding(top = 2.dp)
                         )
                     }

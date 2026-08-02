@@ -134,9 +134,9 @@ private fun WeekdayHeaders(modifier: Modifier = Modifier) {
                     .weight(1f)
                     .padding(4.dp),
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                fontSize = 13.sp,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF64748B)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -206,7 +206,7 @@ private fun CalendarGrid(
                                     .fillMaxSize()
                                     .clickable(enabled = false) {},
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                                color = Color(0xFF94A3B8)
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -227,7 +227,7 @@ private fun CalendarDay(
     modifier: Modifier = Modifier
 ) {
     val backgroundColor = if (isSelected) Color(0xFF2084E4) else Color.Transparent
-    val textColor = if (isSelected) Color.White else Color(0xFF0D171B)
+    val textColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
 
     Box(
         modifier = modifier
@@ -243,7 +243,7 @@ private fun CalendarDay(
             Text(
                 text = day.toString(),
                 color = textColor,
-                fontSize = 14.sp,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Medium
             )
 
@@ -363,8 +363,13 @@ fun ScheduleListItem(
                 Triple(Icons.Default.Close, MaterialTheme.colorScheme.error, null)
             MedicationStatus.PENDING ->
                 Triple(Icons.Default.HorizontalRule, MaterialTheme.colorScheme.onSurfaceVariant) {
-                    val takenAt = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-                    onMarkAsTaken(entry.entryId, takenAt)
+                    val now = java.time.LocalDateTime.now()
+                    val takenAt = now.format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                    if (now.isAfter(entry.scheduledDateTime)) {
+                        onMarkAsLate(entry.entryId, takenAt)
+                    } else {
+                        onMarkAsTaken(entry.entryId, takenAt)
+                    }
                 }
         }
 

@@ -19,20 +19,39 @@ object NotificationUtils {
      * Check if the app has notification permission
      */
     fun hasNotificationPermission(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            NotificationManagerCompat.from(context).areNotificationsEnabled()
-        } else {
-            // For older versions, notification permission is granted by default
-            true
-        }
+        return NotificationManagerCompat.from(context).areNotificationsEnabled()
     }
 
     /**
      * Get current battery level as percentage
      */
     fun getBatteryLevel(context: Context): Int {
-        val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as? BatteryManager
-        return batteryManager?.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) ?: 100
+        try {
+            val filter = android.content.IntentFilter(android.content.Intent.ACTION_BATTERY_CHANGED)
+            val batteryStatus = context.registerReceiver(null, filter)
+            if (batteryStatus != null) {
+                val level = batteryStatus.getIntExtra(android.os.BatteryManager.EXTRA_LEVEL, -1)
+                val scale = batteryStatus.getIntExtra(android.os.BatteryManager.EXTRA_SCALE, -1)
+                if (level >= 0 && scale > 0) {
+                    val pct = (level * 100f / scale).toInt()
+                    if (pct in 0..100) return pct
+                }
+            }
+        } catch (e: Exception) {
+            // ignore
+        }
+
+        try {
+            val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as? BatteryManager
+            val capacity = batteryManager?.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) ?: 100
+            if (capacity in 0..100) {
+                return capacity
+            }
+        } catch (e: Exception) {
+            // ignore
+        }
+
+        return 100
     }
 
     /**

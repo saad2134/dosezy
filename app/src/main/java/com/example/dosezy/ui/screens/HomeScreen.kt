@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Medication
@@ -141,7 +142,7 @@ fun HomeScreen(
 
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().background(Color(0xFFF3F4F6))
+            modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
         ) {
             TopBar(
                 navController = navController,
@@ -323,12 +324,12 @@ private fun MedicationCard(
 
     val enabled = !isTaken && !isMissed
 
-    Card(
+    Surface(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 0.dp,
+        shadowElevation = 4.dp
     ) {
         Row(
             modifier = Modifier
@@ -427,13 +428,13 @@ private fun NoMedicationsState() {
             modifier = Modifier
                 .size(96.dp)
                 .clip(MaterialTheme.shapes.extraLarge)
-                .background(Color(0xffe6e6e6)),
+                .background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Medication,
                 contentDescription = "No medications",
-                tint = Color(0xFF1E293B),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(48.dp)
             )
         }
@@ -445,7 +446,7 @@ private fun NoMedicationsState() {
             text = "No medications yet",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF1E293B),
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
 
@@ -455,7 +456,7 @@ private fun NoMedicationsState() {
         Text(
             text = "It looks like you haven't added any medications to your schedule. Get started by tapping the plus button below.",
             style = MaterialTheme.typography.bodyLarge,
-            color = Color(0xFF1E293B),
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
     }

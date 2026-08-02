@@ -32,6 +32,7 @@ import com.example.dosezy.ui.subscreens.HelpSupportScreen
 import com.example.dosezy.ui.subscreens.ManageProfileScreen
 import com.example.dosezy.ui.subscreens.PreferencesScreen
 import com.example.dosezy.ui.subscreens.SwitchProfileScreen
+import androidx.compose.foundation.isSystemInDarkTheme
 import com.example.dosezy.ui.theme.DosezyTheme
 import com.example.dosezy.ui.viewmodels.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,8 +41,18 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (resources.configuration.smallestScreenWidthDp < 600) {
+            requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
         setContent {
-            DosezyTheme {
+            val userViewModel: UserViewModel = hiltViewModel()
+            val currentUser by userViewModel.currentUser.collectAsState()
+            val isDark = when (currentUser?.theme) {
+                com.example.dosezy.data.model.Theme.DARK -> true
+                com.example.dosezy.data.model.Theme.LIGHT -> false
+                else -> isSystemInDarkTheme()
+            }
+            DosezyTheme(darkTheme = isDark) {
                 DosezyApp()
             }
         }
@@ -61,14 +72,14 @@ fun DosezyApp() {
     val userViewModel: UserViewModel = hiltViewModel()
     val users by userViewModel.users.collectAsState()
     val currentUser by userViewModel.currentUser.collectAsState()
+    val isViewModelLoading by userViewModel.isLoading.collectAsState()
 
     // Check user data on app start
-    LaunchedEffect(users, currentUser) {
+    LaunchedEffect(users, currentUser, isViewModelLoading) {
         if (isLoading) {
             try {
-                // Wait for data to load
-                if (users.isNotEmpty() || currentUser != null) {
-                    // Data is loaded, now decide navigation
+                // Wait for data loading to complete from view model
+                if (!isViewModelLoading) {
                     val shouldGoToHome = currentUser != null
 
                     if (shouldGoToHome) {
@@ -76,13 +87,9 @@ fun DosezyApp() {
                         navController.navigate("home") {
                             popUpTo("loading") { inclusive = true }
                         }
-                    } else if (users.isNotEmpty()) {
-                        // Users exist but no current user selected - show onboarding with existing profiles
-                        navController.navigate("newuser/1") {
-                            popUpTo("loading") { inclusive = true }
-                        }
                     } else {
-                        // No users at all - show full onboarding
+                        // Either no users at all, or users exist but none selected (no current user)
+                        // Both should lead to onboarding / profile select
                         navController.navigate("newuser/1") {
                             popUpTo("loading") { inclusive = true }
                         }
@@ -91,7 +98,6 @@ fun DosezyApp() {
                     isLoading = false
                     dataCheckComplete = true
                 }
-                // If both are empty, we'll stay in loading until timeout
             } catch (e: Exception) {
                 // If there's an error, default to onboarding
                 isLoading = false
@@ -196,7 +202,6 @@ fun DosezyApp() {
             // New User Onboarding Flow
             composable("newuser/{frameNumber}") { backStackEntry ->
                 val frame = backStackEntry.arguments?.getString("frameNumber")?.toIntOrNull() ?: 1
-                val userViewModel: UserViewModel = hiltViewModel()
 
                 NewUserScreen(
                     navController = navController,
@@ -224,7 +229,6 @@ fun DosezyApp() {
             // Create New Profile Flow (from Switch Profile screen)
             composable("create_profile/{frameNumber}") { backStackEntry ->
                 val frame = backStackEntry.arguments?.getString("frameNumber")?.toIntOrNull() ?: 1
-                val userViewModel: UserViewModel = hiltViewModel()
 
                 NewUserScreen(
                     navController = navController,

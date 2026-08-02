@@ -65,23 +65,56 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
 
     @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun autoExtendSchedules(userId: String) {
+        try {
+            val medicines = database.medicineDao().getMedicinesByUser(userId).first()
+            medicines.forEach { medicine ->
+                val scheduleEntries = database.scheduleDao().getScheduleEntriesByMedicine(medicine.medicineId)
+                val latestEntry = scheduleEntries.maxByOrNull { it.scheduledDateTime }
+
+                // If no entries exist, or the latest entry is less than 15 days in the future,
+                // auto-generate/append next 30 days of schedules
+                if (latestEntry == null || latestEntry.scheduledDateTime.isBefore(LocalDateTime.now().plusDays(15))) {
+                    val startGenerateFrom = latestEntry?.scheduledDateTime?.toLocalDate()?.plusDays(1) ?: LocalDate.now()
+                    val newEntries = medicine.generateScheduleEntries(startGenerateFrom, 30)
+                    if (newEntries.isNotEmpty()) {
+                        database.scheduleDao().insertScheduleEntries(newEntries)
+                        Log.d(TAG, "Auto-extended schedule for medicine: ${medicine.medicationName} by 30 days starting from $startGenerateFrom")
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error auto-extending schedules for user: $userId", e)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun scheduleAlarmsForMedicine(medicineId: String, context: Context) {
         val alarmScheduler = AlarmScheduler(context)
         val medicine = database.medicineDao().getMedicineById(medicineId).first()
 
         if (medicine != null) {
+            // First check and extend schedules for this user
+            autoExtendSchedules(medicine.userId)
+
             val scheduleEntries = database.scheduleDao().getScheduleEntriesByMedicine(medicineId)
             var scheduledCount = 0
+            val limitTime = LocalDateTime.now().plusDays(7)
 
             scheduleEntries.forEach { entry ->
                 if (entry.status == MedicationStatus.PENDING &&
-                    entry.scheduledDateTime.isAfter(LocalDateTime.now())) {
+                    entry.scheduledDateTime.isAfter(LocalDateTime.now()) &&
+                    entry.scheduledDateTime.isBefore(limitTime)) {
 
                     alarmScheduler.scheduleMedicineAlarm(entry, medicine.medicationName)
                     scheduledCount++
+                } else {
+                    // Cancel alarms that are further in the future or no longer pending
+                    alarmScheduler.cancelAlarm(entry.entryId)
+                    alarmScheduler.cancelSnooze(entry.entryId)
                 }
             }
-            Log.d(TAG, "Scheduled alarms for medicine: ${medicine.medicationName} ($scheduledCount/${scheduleEntries.size} entries)")
+            Log.d(TAG, "Scheduled alarms for medicine: ${medicine.medicationName} ($scheduledCount/${scheduleEntries.size} entries, limit 7 days)")
         } else {
             Log.w(TAG, "Medicine not found for ID: $medicineId - cannot schedule alarms")
         }
@@ -103,6 +136,9 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         val alarmScheduler = AlarmScheduler(context)
 
         try {
+            // First check and extend schedules
+            autoExtendSchedules(userId)
+
             // Get all schedule entries for the user
             val allEntries = database.scheduleDao().getAllScheduleEntries(userId)
 
@@ -112,22 +148,23 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 alarmScheduler.cancelSnooze(entry.entryId)
             }
 
-            // Schedule new alarms for pending future entries
+            // Schedule new alarms for pending future entries within the 7-day window
             var scheduledCount = 0
+            val limitTime = LocalDateTime.now().plusDays(7)
             allEntries.forEach { entry ->
                 if (entry.status == MedicationStatus.PENDING &&
-                    entry.scheduledDateTime.isAfter(LocalDateTime.now())) {
+                    entry.scheduledDateTime.isAfter(LocalDateTime.now()) &&
+                    entry.scheduledDateTime.isBefore(limitTime)) {
 
                     val medicine = database.medicineDao().getMedicineById(entry.medicineId).first()
                     medicine?.let {
-                        // Use it.medicationName directly since medicine is not null here
                         alarmScheduler.scheduleMedicineAlarm(entry, it.medicationName)
                         scheduledCount++
                     }
                 }
             }
 
-            Log.d(TAG, "Rescheduled $scheduledCount alarms for user: $userId (from ${allEntries.size} total entries)")
+            Log.d(TAG, "Rescheduled $scheduledCount alarms for user: $userId (from ${allEntries.size} total entries, limit 7 days)")
         } catch (e: Exception) {
             Log.e(TAG, "Error rescheduling alarms for user: $userId", e)
             throw e

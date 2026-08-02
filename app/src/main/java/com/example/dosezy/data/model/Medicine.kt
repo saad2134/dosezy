@@ -80,19 +80,29 @@ data class Medicine(
         return when (frequency.pattern) {
             FrequencyPattern.DAILY -> true
             FrequencyPattern.WEEKLY -> {
-                val daysPerWeek = frequency.daysPerWeek ?: 7
-                // For weekly frequency, take medicine on specific days of week
-                // Example: if daysPerWeek = 3, take medicine on Monday, Tuesday, Wednesday
-                date.dayOfWeek.value <= daysPerWeek
+                val selectedDays = frequency.selectedDaysOfWeek
+                if (!selectedDays.isNullOrEmpty()) {
+                    // Use explicitly selected days (1=Mon ... 7=Sun, ISO standard)
+                    date.dayOfWeek.value in selectedDays
+                } else {
+                    // Fallback: treat daysPerWeek as "first N days of the week"
+                    val daysPerWeek = frequency.daysPerWeek ?: 7
+                    date.dayOfWeek.value <= daysPerWeek
+                }
             }
             FrequencyPattern.MONTHLY -> {
-                val daysPerMonth = frequency.daysPerMonth ?: 30
-                // For monthly frequency, take medicine on specific days of month
-                date.dayOfMonth <= daysPerMonth
+                val selectedDays = frequency.selectedDaysOfMonth
+                if (!selectedDays.isNullOrEmpty()) {
+                    // Use explicitly selected days of month
+                    date.dayOfMonth in selectedDays
+                } else {
+                    // Fallback: treat daysPerMonth as "first N days of the month"
+                    val daysPerMonth = frequency.daysPerMonth ?: 30
+                    date.dayOfMonth <= daysPerMonth
+                }
             }
             FrequencyPattern.CUSTOM -> {
-                // For custom frequency, you can implement more complex logic
-                // For now, default to daily
+                // For custom frequency, default to daily
                 true
             }
         }
@@ -173,7 +183,9 @@ enum class DosageUnit {
 data class Frequency(
     val pattern: FrequencyPattern,
     val daysPerWeek: Int? = null,
-    val daysPerMonth: Int? = null
+    val daysPerMonth: Int? = null,
+    val selectedDaysOfWeek: List<Int>? = null,  // 1=Mon, 2=Tue, ..., 7=Sun (ISO)
+    val selectedDaysOfMonth: List<Int>? = null   // 1-31
 )
 
 enum class FrequencyPattern {

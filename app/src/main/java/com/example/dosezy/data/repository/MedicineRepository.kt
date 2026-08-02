@@ -12,9 +12,12 @@ import kotlinx.coroutines.flow.first
 import java.time.LocalDate
 import javax.inject.Inject
 
+import dagger.hilt.android.qualifiers.ApplicationContext
+
 class MedicineRepository @Inject constructor(
     private val database: DosezyDatabase,
-    private val scheduleRepository: ScheduleRepository
+    private val scheduleRepository: ScheduleRepository,
+    @ApplicationContext private val context: Context
 ) {
 
     companion object {
@@ -48,10 +51,8 @@ class MedicineRepository @Inject constructor(
         Log.d(TAG, "All schedule entries inserted")
 
         // SCHEDULE ALARMS IMMEDIATELY
-        context?.let {
-            scheduleRepository.scheduleAlarmsForMedicine(medicine.medicineId, it)
-            Log.d(TAG, "Immediately scheduled alarms for new medicine")
-        }
+        scheduleRepository.scheduleAlarmsForMedicine(medicine.medicineId, this.context)
+        Log.d(TAG, "Immediately scheduled alarms for new medicine")
 
         // Debug
         val allEntries = database.scheduleDao().getAllScheduleEntries(medicine.userId)
@@ -76,10 +77,17 @@ class MedicineRepository @Inject constructor(
         scheduleEntries.forEach { entry ->
             database.scheduleDao().insertScheduleEntry(entry)
         }
+
+        // Reschedule alarms
+        scheduleRepository.cancelAlarmsForMedicine(medicine.medicineId, this.context)
+        scheduleRepository.scheduleAlarmsForMedicine(medicine.medicineId, this.context)
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun deleteMedicine(medicine: Medicine) {
+        // Cancel alarms first
+        scheduleRepository.cancelAlarmsForMedicine(medicine.medicineId, this.context)
         // Delete schedule entries first
         database.scheduleDao().deleteScheduleEntriesByMedicine(medicine.medicineId)
         // Then delete the medicine
@@ -87,7 +95,10 @@ class MedicineRepository @Inject constructor(
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun deleteMedicine(medicineId: String) {
+        // Cancel alarms first
+        scheduleRepository.cancelAlarmsForMedicine(medicineId, this.context)
         // Delete schedule entries first
         database.scheduleDao().deleteScheduleEntriesByMedicine(medicineId)
         // Then delete the medicine using the new method

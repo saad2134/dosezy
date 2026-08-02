@@ -5,7 +5,7 @@
 
 <div align="center">
 
-![Phase](https://img.shields.io/badge/🛠️%20Phase-Released%20v1%2E1%2E0-blue?style=for-the-badge)
+![Phase](https://img.shields.io/badge/🛠️%20Phase-Released%20v1%2E3%2E1-blue?style=for-the-badge)
 ![Platforms](https://img.shields.io/badge/🌐%20Platforms-Android-28a745?style=for-the-badge)
 
 </div>
@@ -16,8 +16,10 @@ Once you input the basics: name, dosage, timing, and frequency, the app intellig
 
 - 📅 **Medication Adherence** – Automated reminders ensure timely medication consumption.  
 - ♿ **Accessibility-First Design** – Large text, high-contrast colors, and simple controls for elderly users.  
-- 🔔 **Reliable Notification System** – Persistent alerts powered by Android’s `WorkManager` and `AlarmManager`.  
-- 🔒 **Data Security & Portability** – Local `Room` database storage with planned CSV export for doctors.  
+- 🔔 **Reliable Notification System** – Persistent alerts with precise emulator battery level indicators and snooze/taken action triggers.  
+- 🎨 **Adaptive System Dark/Light Theme** – Complete theme support respecting the Android system default settings with fully optimized high-contrast elements.
+- 📅 **Custom Calendar Scheduling** – Full interactive support for weekly (specific days of the week) and monthly (specific days of the month) frequencies.
+- 🔒 **Data Security & Portability** – Local `Room` database storage with CSV export capabilities.  
 - 👨‍👩‍👧 **Caregiver Support** – Logs and adherence history help caregivers track missed doses.  
 
 ---
@@ -226,6 +228,12 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 - ✅ Private use
 - ❌ Liability
 - ❌ Warranty
+
+---
+
+## 👤 Publisher
+
+Developed and published by **Saad (@saad2134)**.
 
 ---
 

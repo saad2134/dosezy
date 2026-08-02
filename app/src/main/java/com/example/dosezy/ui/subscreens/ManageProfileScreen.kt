@@ -111,7 +111,7 @@ fun ManageProfileScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
@@ -163,7 +163,7 @@ fun ManageProfileScreen(navController: NavController) {
                         Text(
                             text = "Change Profile Picture",
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFF64748B),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -270,7 +270,7 @@ fun ManageProfileScreen(navController: NavController) {
                             shape = RoundedCornerShape(16.dp),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = Color(0xFF2084E4),
-                                unfocusedBorderColor = Color(0xFFE2E8F0)
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline
                             )
                         )
                     }
@@ -298,6 +298,7 @@ fun ManageProfileScreen(navController: NavController) {
                                     scope.launch {
                                         snackbarHostState.showSnackbar("Profile updated successfully!")
                                     }
+                                    navController.popBackStack()
                                 }
                             }
                         },

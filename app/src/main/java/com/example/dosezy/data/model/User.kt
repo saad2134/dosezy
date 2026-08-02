@@ -21,7 +21,7 @@ data class User(
     val gender: Gender,
     val contactNumber: String,
     val isCurrentUser: Boolean = false,
-    val theme: Theme = Theme.LIGHT,
+    val theme: Theme = Theme.SYSTEM,
     val timeFormat: TimeFormat = TimeFormat.HOUR_12,
     val language: Language = Language.ENGLISH,
     val considerMissedAfter: Int = 3 // hours, default 3
@@ -34,7 +34,7 @@ enum class Gender(val displayName: String) {
 }
 
 enum class Theme {
-    LIGHT, DARK
+    LIGHT, DARK, SYSTEM
 }
 
 enum class TimeFormat {

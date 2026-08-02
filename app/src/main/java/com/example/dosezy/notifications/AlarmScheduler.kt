@@ -21,6 +21,14 @@ class AlarmScheduler(private val context: Context) {
     private val alarmManager: AlarmManager =
         context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
+    private fun canScheduleExact(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            alarmManager.canScheduleExactAlarms()
+        } else {
+            true
+        }
+    }
+
     @SuppressLint("ScheduleExactAlarm")
     @RequiresApi(Build.VERSION_CODES.O)
     fun scheduleMedicineAlarm(entry: ScheduleEntry, medicineName: String) {
@@ -43,25 +51,33 @@ class AlarmScheduler(private val context: Context) {
         val triggerTime = entry.scheduledDateTime.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                triggerTime,
-                pendingIntent
-            )
+            if (canScheduleExact()) {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerTime,
+                    pendingIntent
+                )
+            } else {
+                alarmManager.setAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerTime,
+                    pendingIntent
+                )
+            }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
         } else {
             alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
         }
 
-        Log.d(TAG, "Scheduled alarm for medicine: $medicineName at ${entry.scheduledDateTime}")
+        Log.d(TAG, "Scheduled alarm for medicine: $medicineName at ${entry.scheduledDateTime} (exact=${canScheduleExact()})")
     }
 
     @SuppressLint("ScheduleExactAlarm")
-    fun scheduleSnooze(entryId: String, minutes: Int) {
+    fun scheduleSnooze(entryId: String, minutes: Int, medicineName: String) {
         val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
             putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, entryId)
-            putExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME, "Snoozed Medicine")
+            putExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME, medicineName)
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
@@ -74,16 +90,24 @@ class AlarmScheduler(private val context: Context) {
         val triggerTime = System.currentTimeMillis() + (minutes * 60 * 1000)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                triggerTime,
-                pendingIntent
-            )
+            if (canScheduleExact()) {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerTime,
+                    pendingIntent
+                )
+            } else {
+                alarmManager.setAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerTime,
+                    pendingIntent
+                )
+            }
         } else {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
         }
 
-        Log.d(TAG, "Scheduled snooze for entry: $entryId in $minutes minutes")
+        Log.d(TAG, "Scheduled snooze for entry: $entryId in $minutes minutes (exact=${canScheduleExact()})")
     }
 
     fun cancelAlarm(entryId: String) {

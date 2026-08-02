@@ -83,7 +83,7 @@ fun NotificationStatusDialog(
         Surface(
             modifier = modifier,
             shape = RoundedCornerShape(24.dp),
-            color = Color.White
+            color = MaterialTheme.colorScheme.surface
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
@@ -98,7 +98,7 @@ fun NotificationStatusDialog(
                         text = "Notification Check",
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1E293B)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     RotatingSyncIcon()

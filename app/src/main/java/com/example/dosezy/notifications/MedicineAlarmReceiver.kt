@@ -41,8 +41,13 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onReceive(context: Context, intent: Intent?) {
-        if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
-            // Reschedule all alarms after boot
+        val action = intent?.action
+        if (action == Intent.ACTION_BOOT_COMPLETED ||
+            action == Intent.ACTION_TIMEZONE_CHANGED ||
+            action == Intent.ACTION_TIME_CHANGED) {
+            
+            Log.d(TAG, "Received system broadcast action: $action - rescheduling all alarms")
+            // Reschedule all alarms after system time/zone change or boot
             CoroutineScope(Dispatchers.IO).launch {
                 rescheduleAllAlarms(context)
             }
@@ -182,8 +187,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
     private fun getNotificationIcon(context: Context, icon: androidx.compose.ui.graphics.vector.ImageVector): Int {
         // Using different built-in system icons for the actions
         return when (icon) {
-            Icons.Filled.Check -> android.R.drawable.ic_menu_edit
-            Icons.Filled.Snooze -> android.R.drawable.ic_menu_recent_history
+            Icons.Filled.Check -> android.R.drawable.checkbox_on_background
+            Icons.Filled.Snooze -> android.R.drawable.ic_lock_idle_alarm
             else -> android.R.drawable.ic_dialog_info
         }
     }
