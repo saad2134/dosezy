@@ -31,6 +31,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -153,7 +154,8 @@ fun MenuScreen(navController: NavController) {
             // Divider
             item {
                 Spacer(modifier = Modifier.height(12.dp))
-                val outlineColor = MaterialTheme.colorScheme.outline
+                val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+                val outlineColor = if (isDark) Color(0xFF475569) else Color(0xFFD1D5DB)
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center

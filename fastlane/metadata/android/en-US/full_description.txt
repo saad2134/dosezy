@@ -1,0 +1,13 @@
+A simple medicine tracking and notifier app. Once you input the basics like name, dosage, timing, and frequency: the app intelligently handles your medication schedule.
+
+- 📅 Medication Adherence – Automated reminders ensure timely medication consumption.
+- ♿ Accessibility-First Design – Large text, high-contrast colors, and simple controls for elderly users.
+- 🔔 Reliable Notification System – Persistent alerts with snooze and taken actions.
+- 🎨 Adaptive System Dark/Light Theme – Automatically matches the Android system theme.
+- 📅 Custom Calendar Scheduling – Supports daily, weekly, and monthly medication schedules.
+- 💊 Smart Medication Management – Add medicine name, dosage, timing, frequency, and duration.
+- ✅ Dose Tracking – Mark medications as Taken, Snoozed, or Missed.
+- 📊 Medication History – View complete adherence and missed dose logs.
+- 📱 Offline-First Experience – Fully functional without an internet connection.
+- 🔒 Data Security & Portability – Local Room database with CSV export support.
+- 👨‍👩‍👧 Caregiver Support – Adherence history helps caregivers monitor missed doses.

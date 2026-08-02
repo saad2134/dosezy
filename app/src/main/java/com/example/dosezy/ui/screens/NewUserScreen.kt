@@ -94,9 +94,15 @@ fun NewUserScreen(
                 existingUsers = users,
                 onBack = {
                     if (currentFrame > 1) {
-                        onNext(currentFrame - 1)
-                    } else {
                         navController.popBackStack()
+                    } else {
+                        if (users.isNotEmpty()) {
+                            navController.navigate("switch_profile") {
+                                popUpTo(navController.currentBackStackEntry?.destination?.route ?: "newuser/1") { inclusive = true }
+                            }
+                        } else {
+                            navController.popBackStack()
+                        }
                     }
                 },
                 onNext = { onNext(currentFrame + 1) },
@@ -384,8 +390,8 @@ fun ProfileSetupPage(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = if (fullNameError) Color.Red else Color(0xFF2084E4),
-                    unfocusedBorderColor = if (fullNameError) Color.Red else Color(0xFFE2E8F0),
+                    focusedBorderColor = if (fullNameError) Color.Red else MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = if (fullNameError) Color.Red else MaterialTheme.colorScheme.outline,
                     errorBorderColor = Color.Red
                 ),
                 isError = fullNameError
@@ -422,8 +428,8 @@ fun ProfileSetupPage(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     shape = RoundedCornerShape(16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = if (ageError) Color.Red else Color(0xFF2084E4),
-                        unfocusedBorderColor = if (ageError) Color.Red else Color(0xFFE2E8F0)
+                        focusedBorderColor = if (ageError) Color.Red else MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = if (ageError) Color.Red else MaterialTheme.colorScheme.outline
                     ),
                     isError = ageError
                 )
@@ -473,7 +479,7 @@ fun ProfileSetupPage(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF2084E4),
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = MaterialTheme.colorScheme.outline
                 )
             )
@@ -544,8 +550,8 @@ fun GenderDropdown(
             label = { Text("Gender *") },
             shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = if (isError) Color.Red else Color(0xFF2084E4),
-                unfocusedBorderColor = if (isError) Color.Red else Color(0xFFE2E8F0),
+                focusedBorderColor = if (isError) Color.Red else MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = if (isError) Color.Red else MaterialTheme.colorScheme.outline,
                 errorBorderColor = Color.Red
             ),
             isError = isError
@@ -553,7 +559,8 @@ fun GenderDropdown(
 
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { onExpandedChange(false) }
+            onDismissRequest = { onExpandedChange(false) },
+            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
         ) {
             Gender.entries.forEach { gender ->
                 DropdownMenuItem(
@@ -561,7 +568,8 @@ fun GenderDropdown(
                     onClick = {
                         onGenderSelected(gender)
                         onExpandedChange(false)
-                    }
+                    },
+                    modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                 )
             }
         }
@@ -570,6 +578,9 @@ fun GenderDropdown(
 
 @Composable
 fun FeatureItem(icon: ImageVector, title: String, description: String) {
+    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+    val iconBg = if (isDark) Color(0xFF1E293B) else Color(0xFFF1F5F9)
+    val iconTint = if (isDark) Color(0xFF38BDF8) else Color(0xFF0284C7)
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top
@@ -578,13 +589,13 @@ fun FeatureItem(icon: ImageVector, title: String, description: String) {
             modifier = Modifier
                 .size(56.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer),
+                .background(iconBg),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color(0xFF1193D4),
+                tint = iconTint,
                 modifier = Modifier.size(28.dp)
             )
         }
@@ -659,7 +670,7 @@ fun NewUserBottomBar(
                                 .height(56.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF2084E4)
+                                containerColor = MaterialTheme.colorScheme.primary
                             )
                         ) {
                             Text(
@@ -669,47 +680,25 @@ fun NewUserBottomBar(
                             )
                         }
 
-                        val showLeftButton = isCreatingNewProfile && existingUsers.isNotEmpty() ||
-                                (!isCreatingNewProfile && existingUsers.isNotEmpty())
+                        val showLeftButton = existingUsers.isNotEmpty()
 
                         if (showLeftButton) {
-                            if (isCreatingNewProfile && existingUsers.isNotEmpty()) {
-                                // Show "Go Back" button on the left when creating new profile from switch screen
-                                Button(
-                                    onClick = onBack,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(56.dp),
-                                    shape = RoundedCornerShape(16.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(0xFFF1F5F9),
-                                        contentColor = Color(0xFF475569)
-                                    )
-                                ) {
-                                    Text(
-                                        text = "Go Back",
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                            } else if (!isCreatingNewProfile && existingUsers.isNotEmpty()) {
-                                // Show "Existing Profile" button on the left when in regular onboarding with existing users
-                                Button(
-                                    onClick = { onShowExistingProfiles() },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(56.dp),
-                                    shape = RoundedCornerShape(16.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(0xFF374151)
-                                    )
-                                ) {
-                                    Text(
-                                        text = "Existing Profile",
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
+                            Button(
+                                onClick = onBack,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            ) {
+                                Text(
+                                    text = "Go Back",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
                         }
                     }
@@ -745,7 +734,7 @@ fun NewUserBottomBar(
                                 .height(56.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF2084E4)
+                                containerColor = MaterialTheme.colorScheme.primary
                             )
                         ) {
                             Text(
@@ -792,7 +781,7 @@ fun NewUserBottomBar(
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = if (isProfileSetupValid) {
-                                    Color(0xFF2084E4)
+                                    MaterialTheme.colorScheme.primary
                                 } else {
                                     Color(0xFF9CA3AF)
                                 }
@@ -872,7 +861,7 @@ fun ExistingProfilesModal(
                         .height(56.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF2084E4)
+                        containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
                     Text("Close")

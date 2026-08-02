@@ -31,6 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -247,8 +248,17 @@ fun NotificationStatusItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val backgroundColor = if (status.isPassed) Color(0xFFD1FAE5) else Color(0xFFFEE2E2)
-    val textColor = if (status.isPassed) Color(0xFF065F46) else Color(0xFF991B1B)
+    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+    val backgroundColor = if (status.isPassed) {
+        if (isDark) Color(0xFF064E3B) else Color(0xFFD1FAE5)
+    } else {
+        if (isDark) Color(0xFF7F1D1D) else Color(0xFFFEE2E2)
+    }
+    val textColor = if (status.isPassed) {
+        if (isDark) Color(0xFF34D399) else Color(0xFF065F46)
+    } else {
+        if (isDark) Color(0xFFF87171) else Color(0xFF991B1B)
+    }
 
     Surface(
         modifier = modifier

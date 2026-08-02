@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.luminance
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -58,6 +59,9 @@ fun CustomNavigationBar(
         BottomNavItem("Menu", Icons.Default.Menu, "menu")
     )
 
+    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+    val borderColor = if (isDark) Color(0xFF303235) else Color(0xFFD1D5DB)
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -65,7 +69,7 @@ fun CustomNavigationBar(
             .background(MaterialTheme.colorScheme.surface)
             .border(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.outline,
+                color = borderColor,
                 shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
             )
             .padding(horizontal = 8.dp),

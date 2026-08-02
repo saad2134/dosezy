@@ -145,7 +145,7 @@ fun ManageProfileScreen(navController: NavController) {
                                 modifier = Modifier
                                     .size(40.dp)
                                     .clip(CircleShape)
-                                    .background(Color(0xFF2084E4))
+                                    .background(MaterialTheme.colorScheme.primary)
                                     .align(Alignment.BottomEnd),
                                 contentAlignment = Alignment.Center
                             ) {
@@ -183,8 +183,8 @@ fun ManageProfileScreen(navController: NavController) {
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(16.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = if (fullNameError) Color.Red else Color(0xFF2084E4),
-                                unfocusedBorderColor = if (fullNameError) Color.Red else Color(0xFFE2E8F0),
+                                focusedBorderColor = if (fullNameError) Color.Red else MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = if (fullNameError) Color.Red else MaterialTheme.colorScheme.outline,
                                 errorBorderColor = Color.Red
                             ),
                             isError = fullNameError
@@ -216,8 +216,8 @@ fun ManageProfileScreen(navController: NavController) {
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             shape = RoundedCornerShape(16.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = if (ageError) Color.Red else Color(0xFF2084E4),
-                                unfocusedBorderColor = if (ageError) Color.Red else Color(0xFFE2E8F0)
+                                focusedBorderColor = if (ageError) Color.Red else MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = if (ageError) Color.Red else MaterialTheme.colorScheme.outline
                             ),
                             isError = ageError
                         )
@@ -269,7 +269,7 @@ fun ManageProfileScreen(navController: NavController) {
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                             shape = RoundedCornerShape(16.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFF2084E4),
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
                                 unfocusedBorderColor = MaterialTheme.colorScheme.outline
                             )
                         )
@@ -307,7 +307,7 @@ fun ManageProfileScreen(navController: NavController) {
                             .height(56.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF2084E4)
+                            containerColor = MaterialTheme.colorScheme.primary
                         )
                     ) {
                         Text(
@@ -348,6 +348,8 @@ fun ManageProfileScreen(navController: NavController) {
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
+            tonalElevation = 0.dp,
+            containerColor = MaterialTheme.colorScheme.surface,
             title = { Text("Delete Profile") },
             text = { Text("Are you sure you want to delete this profile? This action cannot be undone.") },
             confirmButton = {
@@ -420,8 +422,8 @@ fun GenderDropdown(
             label = { Text("Gender *") },
             shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = if (isError) Color.Red else Color(0xFF2084E4),
-                unfocusedBorderColor = if (isError) Color.Red else Color(0xFFE2E8F0),
+                focusedBorderColor = if (isError) Color.Red else MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = if (isError) Color.Red else MaterialTheme.colorScheme.outline,
                 errorBorderColor = Color.Red
             ),
             isError = isError
@@ -429,7 +431,8 @@ fun GenderDropdown(
 
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { onExpandedChange(false) }
+            onDismissRequest = { onExpandedChange(false) },
+            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
         ) {
             Gender.entries.forEach { gender ->
                 DropdownMenuItem(
@@ -437,7 +440,8 @@ fun GenderDropdown(
                     onClick = {
                         onGenderSelected(gender)
                         onExpandedChange(false)
-                    }
+                    },
+                    modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                 )
             }
         }

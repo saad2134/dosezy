@@ -10,11 +10,11 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.saad.dosezy"
+        applicationId = "com.saad2134.dosezy"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.3.2"
+        versionCode = 5
+        versionName = "1.3.4"
         buildConfigField("String", "VERSION_NAME", "\"$versionName\"")
         buildConfigField("int", "VERSION_CODE", "$versionCode")
 
@@ -84,7 +84,6 @@ dependencies {
     // Room Database
     implementation("androidx.room:room-runtime:2.6.0")
     implementation("androidx.room:room-ktx:2.6.0")
-    implementation(libs.firebase.annotations)
     kapt("androidx.room:room-compiler:2.6.0")
 
     // Hilt
