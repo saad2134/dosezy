@@ -440,9 +440,7 @@ fun EditMedScreen(
                                         selectedFrequency = frequency
                                         frequencyExpanded = false
                                     },
-                                    colors = MenuDefaults.itemColors(
-                                        containerColor = MaterialTheme.colorScheme.surface
-                                    )
+                                    modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                                 )
                             }
                         }
