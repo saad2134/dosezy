@@ -24,7 +24,7 @@ class MedicineViewModel @Inject constructor(
     val medicines: StateFlow<List<Medicine>> = _medicines.asStateFlow()
 
     private val _currentUserId = MutableStateFlow<String?>(null)
-    private val _isLoading = MutableStateFlow(false)
+    private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private var medicinesJob: kotlinx.coroutines.Job? = null
@@ -41,6 +41,8 @@ class MedicineViewModel @Inject constructor(
 
                 currentUser?.let { user ->
                     loadUserMedicines(user.userId)
+                } ?: run {
+                    _isLoading.value = false
                 }
             }
         }
@@ -55,9 +57,11 @@ class MedicineViewModel @Inject constructor(
 
     private fun loadUserMedicines(userId: String) {
         medicinesJob?.cancel()
+        _isLoading.value = true
         medicinesJob = viewModelScope.launch {
             medicineRepository.getMedicinesByUser(userId).collect { medicines ->
                 _medicines.value = medicines
+                _isLoading.value = false
             }
         }
     }

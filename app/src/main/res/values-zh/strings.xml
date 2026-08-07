@@ -1,0 +1,246 @@
+<resources>
+    <string name="app_name">Dosezy</string>
+    <string name="app_tagline">简化服药管理</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">首页</string>
+    <string name="nav_schedule">日程表</string>
+    <string name="nav_add">添加</string>
+    <string name="nav_medicines">药物</string>
+    <string name="nav_menu">菜单</string>
+
+    <!-- Greetings -->
+    <string name="greeting_morning">早上好，</string>
+    <string name="greeting_afternoon">下午好，</string>
+    <string name="greeting_evening">晚上好，</string>
+    <string name="greeting_night">晚安，</string>
+    <string name="health_quote">\"健康是无价之宝。\"</string>
+
+    <!-- Home Screen -->
+    <string name="home_todays_meds">今日药物</string>
+    <string name="home_todays_adherence">今日服药依从性</string>
+    <string name="home_upcoming_doses">即将服用的剂量</string>
+    <string name="home_all_taken">所有药物已服用！</string>
+    <string name="home_no_doses_today">今天没有安排服药。</string>
+    <string name="home_medication_progress">服药进度</string>
+
+    <!-- Schedule Screen -->
+    <string name="schedule_title">每日日程</string>
+    <string name="schedule_no_doses">当天没有安排剂量</string>
+
+    <!-- Medicines Screen -->
+    <string name="medicines_title">您的药物</string>
+    <string name="medicines_add_new">添加新药物</string>
+    <string name="medicines_empty">尚未添加药物</string>
+    <string name="medicines_empty_sub">您还没有添加任何药物。点击下方的加号按钮开始添加。</string>
+
+    <!-- Form Add/Edit Medicine -->
+    <string name="form_add_medicine">添加药物</string>
+    <string name="form_edit_medicine">编辑药物</string>
+    <string name="form_medicine_image">药物图片</string>
+    <string name="form_med_name">药物名称</string>
+    <string name="form_med_name_placeholder">例如：阿莫西林</string>
+    <string name="form_dosage">剂量</string>
+    <string name="form_dosage_placeholder">例如：500毫克，1片</string>
+    <string name="form_frequency">频率</string>
+    <string name="form_time">时间</string>
+    <string name="form_save">保存药物</string>
+    <string name="form_save_changes">保存更改</string>
+    <string name="form_delete">删除药物</string>
+    <string name="form_delete_medicine">删除该药物</string>
+    <string name="form_upload_img">上传药物图片</string>
+    <string name="form_change_img">更换药物图片</string>
+    <string name="freq_daily">每天</string>
+    <string name="freq_weekly">每周</string>
+    <string name="freq_monthly">每月</string>
+    <string name="freq_custom">自定义</string>
+    <string name="form_select_days_week">选择一周中的天数</string>
+    <string name="form_select_days_month">选择一月中的日期</string>
+    <string name="day_mon">周一</string>
+    <string name="day_tue">周二</string>
+    <string name="day_wed">周三</string>
+    <string name="day_thu">周四</string>
+    <string name="day_fri">周五</string>
+    <string name="day_sat">周六</string>
+    <string name="day_sun">周日</string>
+    <string name="times_per_day_format">每天 %1$d 次</string>
+    <string name="times_per_week_format">每周 %1$d 次</string>
+    <string name="times_per_month_format">每月 %1$d 次</string>
+
+    <!-- Menu Screen -->
+    <string name="menu_title">菜单</string>
+    <string name="menu_account_profile">账户与个人资料</string>
+    <string name="menu_preferences">偏好设置</string>
+    <string name="menu_emergency">紧急联系人</string>
+    <string name="menu_help_support">帮助与支持</string>
+    <string name="menu_data">数据</string>
+    <string name="menu_export_data">导出数据为 CSV</string>
+    <string name="menu_switch_profile">切换配置文件</string>
+    <string name="menu_manage_profiles">管理配置文件</string>
+    <string name="menu_manage_profile">管理此配置文件</string>
+
+    <!-- Preferences Screen -->
+    <string name="pref_title">偏好设置</string>
+    <string name="pref_theme">主题</string>
+    <string name="pref_time_format">时间格式</string>
+    <string name="pref_language">语言</string>
+    <string name="pref_late_after">判定迟服时间</string>
+    <string name="pref_missed_after">判定漏服时间</string>
+    <string name="mark_late">标记迟服</string>
+
+    <!-- Dialog Titles & Options -->
+    <string name="pref_select_theme">选择主题</string>
+    <string name="theme_light">浅色模式</string>
+    <string name="theme_dark">深色模式</string>
+    <string name="theme_system">系统默认</string>
+
+    <string name="pref_select_time_format">选择时间格式</string>
+    <string name="time_format_12">12小时制</string>
+    <string name="time_format_24">24小时制</string>
+
+    <string name="pref_mark_missed_after">判定超时时间</string>
+    <string name="hours_format">%1$d 小时</string>
+
+    <!-- Notification Check Dialog -->
+    <string name="notif_check_title">通知状态检查</string>
+    <string name="notif_perm_title">通知权限</string>
+    <string name="notif_perm_granted">已授予发送通知的权限。</string>
+    <string name="notif_battery_title">手机电量</string>
+    <string name="notif_battery_status">电池电量为 %1$d%%</string>
+    <string name="notif_sound_title">手机声音</string>
+    <string name="notif_sound_normal">手机未开启静音。</string>
+    <string name="notif_sound_vibrate">手机处于振动模式。</string>
+    <string name="notif_sound_silent">手机已静音。</string>
+    <string name="notif_sound_unknown">未知声音模式。</string>
+    <string name="notif_bg_title">后台运行权限</string>
+    <string name="notif_bg_desc">后台限制可能会影响通知推送。</string>
+    <string name="notif_bg_granted">应用可在后台运行。</string>
+    <string name="ok">确定</string>
+    <string name="close">关闭</string>
+
+    <!-- Profiles & Gender -->
+    <string name="select_profile">选择配置文件</string>
+    <string name="current_profile">当前配置文件</string>
+    <string name="new_profile">新建配置文件</string>
+    <string name="years_format">%1$d 岁</string>
+    <string name="gender_male">男</string>
+    <string name="gender_female">女</string>
+    <string name="gender_other">其他</string>
+
+    <!-- Manage Profile Screen -->
+    <string name="profile_change_pic">更换头像</string>
+    <string name="profile_upload_pic">上传头像</string>
+    <string name="profile_full_name">姓名</string>
+    <string name="profile_name_placeholder">请输入姓名</string>
+    <string name="profile_age">年龄</string>
+    <string name="profile_gender">性别</string>
+    <string name="profile_contact_number">联系电话</string>
+    <string name="profile_save_btn">保存个人资料</string>
+    <string name="profile_delete_btn">删除个人资料</string>
+    <string name="profile_name_required">请输入姓名</string>
+    <string name="profile_age_required">请输入年龄</string>
+    <string name="profile_gender_required">请选择性别</string>
+    <string name="profile_cannot_delete_only">无法删除唯一的配置文件，请先创建新的配置文件。</string>
+    <string name="profile_updated_success">个人资料更新成功！</string>
+    <string name="profile_deleted_success">配置文件删除成功</string>
+    <string name="profile_delete_confirm_desc">您确定要删除此配置文件吗？此操作不可撤销。</string>
+
+    <!-- Dosage Units -->
+    <string name="unit_mg">毫克</string>
+    <string name="unit_mcg">微克</string>
+    <string name="unit_ml">毫升</string>
+    <string name="unit_drop">滴</string>
+    <string name="unit_tablet">片</string>
+    <string name="unit_capsule">粒</string>
+
+    <!-- Help & Support -->
+    <string name="help_title">帮助与支持</string>
+    <string name="help_resources">资源</string>
+    <string name="help_faqs_title">常见问题</string>
+    <string name="help_faqs_desc">解答常见疑问。</string>
+    <string name="help_user_manual_title">用户手册</string>
+    <string name="help_user_manual_desc">浏览用户指南。</string>
+    <string name="help_contact_support">联系支持团队</string>
+    <string name="help_email_support_title">邮件支持</string>
+    <string name="help_email_support_desc">通过电子邮件获取帮助。</string>
+    <string name="help_phone_support_title">电话支持</string>
+    <string name="help_phone_support_desc">致电我们获取即时帮助。</string>
+
+    <!-- Emergency Services -->
+    <string name="emergency_title">紧急联系人</string>
+    <string name="emergency_services">紧急救援服务</string>
+    <string name="emergency_select_country">选择地区 / 国家</string>
+    <string name="emergency_universal">通用紧急电话</string>
+    <string name="emergency_ambulance">救护车</string>
+    <string name="emergency_fire">火警</string>
+    <string name="emergency_police">报警电话</string>
+    <string name="manage_profile_title">管理配置文件</string>
+
+    <!-- Setup / Onboarding Screens -->
+    <string name="setup_welcome_title">欢迎使用 Dosezy</string>
+    <string name="setup_welcome_sub">您的贴心服药助手。</string>
+    <string name="setup_features_title">关注健康，轻松便捷！</string>
+    <string name="setup_features_sub">Dosezy 的核心功能</string>
+    <string name="setup_feat1_title">按时服药提醒</string>
+    <string name="setup_feat1_desc">为您准时发送服药提醒，保障健康无忧。</string>
+    <string name="setup_feat2_title">简单高效的管理</string>
+    <string name="setup_feat2_desc">界面简洁直观，轻松管理所有药品。</string>
+    <string name="setup_feat3_title">紧急救援支持</string>
+    <string name="setup_feat3_desc">快速呼叫紧急联系人与救援服务。</string>
+    <string name="setup_profile_title">填写您的个人信息</string>
+    <string name="setup_profile_sub">帮助我们为您量身定制服药体验。</string>
+    <string name="setup_next">下一步</string>
+    <string name="setup_get_started">开始使用</string>
+
+    <!-- Dialogs & Buttons -->
+    <string name="select_language">选择语言</string>
+    <string name="system_default">系统默认</string>
+    <string name="export_data">导出数据</string>
+    <string name="export_current_profile">仅导出当前配置文件</string>
+    <string name="export_all_profiles">导出所有配置文件 (ZIP)</string>
+    <string name="export_choose_title">导出数据选项</string>
+    <string name="export_choose_desc">请选择要导出的数据：</string>
+    <string name="export_success_title">导出成功</string>
+    <string name="export_success_desc">数据已导出至：</string>
+    <string name="export_share_file">分享文件</string>
+    <string name="export_done">完成</string>
+    <string name="export_progress_title">正在导出数据</string>
+    <string name="export_progress_desc">请稍候，正在为您打包导出数据…</string>
+    <string name="export_failed_title">导出失败</string>
+    <string name="cancel">取消</string>
+    <string name="export">导出</string>
+    <string name="save">保存</string>
+    <!-- Personal Contacts -->
+    <string name="personal_contacts">个人联系人</string>
+    <string name="personal_contacts_add">添加</string>
+    <string name="personal_contacts_empty">尚未添加个人联系人。\n点击\"+ 添加\"来添加。</string>
+    <string name="personal_contacts_add_title">添加个人联系人</string>
+    <string name="personal_contacts_name">联系人姓名</string>
+    <string name="personal_contacts_phone">电话号码</string>
+    <string name="personal_contacts_save">保存</string>
+    <string name="personal_contacts_cancel">取消</string>
+    <!-- Alarm Activity -->
+    <string name="alarm_medication_reminder">服药提醒</string>
+    <string name="alarm_reminder_for">%s 的提醒</string>
+    <string name="alarm_scheduled">计划时间：%s</string>
+    <string name="alarm_take_now">立即服用</string>
+    <string name="alarm_snooze">稍后提醒（%1$d分钟）</string>
+    <string name="alarm_mark_late">标记为迟到</string>
+
+    <string name="pref_snooze_duration">稍后提醒时间</string>
+    <string name="pref_select_snooze_duration">选择稍后提醒时间</string>
+    <string name="minutes_format">%1$d 分钟</string>
+    <string name="profile">个人资料</string>
+
+
+    <string name="manage">管理</string>
+    <string name="profile_switch">切换</string>
+    <string name="schedule_no_meds_date">此日期没有安排用药</string>
+
+
+    <string name="home_all_good">一切安好！</string>
+    <string name="home_all_good_desc">今天无需服药。如果您需要添加更多，请点击下方的加号按钮开始。</string>
+    <string name="no_profiles_found">未找到个人资料</string>
+    <string name="status_taken">已服用</string>
+
+</resources>

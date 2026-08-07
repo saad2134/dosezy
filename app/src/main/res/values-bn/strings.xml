@@ -1,0 +1,229 @@
+<resources>
+    <string name="app_name">Dosezy</string>
+    <string name="app_tagline">ওষুধের সময়সূচী এখন আরও সহজ</string>
+
+    <string name="nav_home">হোম</string>
+    <string name="nav_schedule">সময়সূচী</string>
+    <string name="nav_add">যোগ করুন</string>
+    <string name="nav_medicines">ওষুধসমূহ</string>
+    <string name="nav_menu">মেনু</string>
+
+    <string name="greeting_morning">শুভ সকাল,</string>
+    <string name="greeting_afternoon">শুভ দুপুর,</string>
+    <string name="greeting_evening">শুভ সন্ধ্যা,</string>
+    <string name="greeting_night">শুভ রাত্রি,</string>
+    <string name="health_quote">\"স্বাস্থ্যই অমূল্য সম্পদ।\"</string>
+
+    <string name="home_todays_meds">আজকের ওষুধসমূহ</string>
+    <string name="home_todays_adherence">আজকের অনুসৃতি</string>
+    <string name="home_upcoming_doses">পরবর্তী ডোজ</string>
+    <string name="home_all_taken">আজকের সব ডোজ গ্রহণ করা হয়েছে!</string>
+    <string name="home_no_doses_today">আজকের জন্য কোনো ডোজ নির্ধারিত নেই।</string>
+    <string name="home_medication_progress">ওষুধ সেবনের অগ্রগতি</string>
+
+    <string name="schedule_title">দৈনিক সময়সূচী</string>
+    <string name="schedule_no_doses">এই দিনের জন্য কোনো ডোজ নেই</string>
+
+    <string name="medicines_title">আপনার ওষুধসমূহ</string>
+    <string name="medicines_add_new">নতুন ওষুধ যোগ করুন</string>
+    <string name="medicines_empty">এখনো কোনো ওষুধ যোগ করা হয়নি</string>
+    <string name="medicines_empty_sub">মনে হচ্ছে আপনি এখনো কোনো ওষুধ যোগ করেননি। শুরু করতে নিচের প্লাস বোতামে আলতো চাপুন।</string>
+
+    <string name="form_add_medicine">ওষুধ যোগ করুন</string>
+    <string name="form_edit_medicine">ওষুধ সম্পাদনা করুন</string>
+    <string name="form_medicine_image">ওষুধের ছবি</string>
+    <string name="form_med_name">ওষুধের নাম</string>
+    <string name="form_med_name_placeholder">যেমন: অ্যাটোরভাস্ট্যাটিন</string>
+    <string name="form_dosage">ডোজের মাত্রা</string>
+    <string name="form_dosage_placeholder">যেমন: ৫০০ মিগ্রা, ১টি ট্যাবলেট</string>
+    <string name="form_frequency">পুনরাবৃত্তি</string>
+    <string name="form_time">সময়</string>
+    <string name="form_save">ওষুধ সংরক্ষণ করুন</string>
+    <string name="form_save_changes">পরিবর্তন সংরক্ষণ করুন</string>
+    <string name="form_delete">ওষুধ মুছে ফেলুন</string>
+    <string name="form_delete_medicine">ওষুধ মুছে ফেলুন</string>
+    <string name="form_upload_img">ছবি আপলোড করুন</string>
+    <string name="form_change_img">ছবি পরিবর্তন করুন</string>
+    <string name="freq_daily">প্রতিদিন</string>
+    <string name="freq_weekly">সাপ্তাহিক</string>
+    <string name="freq_monthly">মাসিক</string>
+    <string name="freq_custom">কাস্টম</string>
+    <string name="form_select_days_week">সপ্তাহের দিন নির্বাচন করুন</string>
+    <string name="form_select_days_month">মাসের দিন নির্বাচন করুন</string>
+    <string name="day_mon">সোম</string>
+    <string name="day_tue">মঙ্গল</string>
+    <string name="day_wed">বুধ</string>
+    <string name="day_thu">বৃহ</string>
+    <string name="day_fri">শুক্রবার</string>
+    <string name="day_sat">শনি</string>
+    <string name="day_sun">রবি</string>
+    <string name="times_per_day_format">দিনে %1$d বার</string>
+    <string name="times_per_week_format">সপ্তাহে %1$d বার</string>
+    <string name="times_per_month_format">মাসে %1$d বার</string>
+
+    <string name="menu_title">মেনু</string>
+    <string name="menu_account_profile">একাউন্ট ও প্রোফাইল</string>
+    <string name="menu_preferences">পছন্দসমূহ</string>
+    <string name="menu_emergency">জরুরি যোগাযোগ</string>
+    <string name="menu_help_support">সাহায্য ও সহায়তা</string>
+    <string name="menu_export_data">CSV হিসেবে ডেটা এক্সপোর্ট</string>
+    <string name="menu_switch_profile">প্রোফাইল পরিবর্তন করুন</string>
+    <string name="menu_manage_profiles">প্রোফাইল পরিচালনা</string>
+    <string name="menu_manage_profile">এই প্রোফাইল পরিচালনা করুন</string>
+
+    <string name="pref_title">পছন্দসমূহ</string>
+    <string name="pref_theme">থিম</string>
+    <string name="pref_time_format">সময় বিন্যাস</string>
+    <string name="pref_language">ভাষা</string>
+    <string name="pref_late_after">দেরি হিসেবে ধরুন এর পর</string>
+    <string name="pref_missed_after">মিসড হিসেবে ধরুন এর পর</string>
+    <string name="mark_late">দেরি হিসেবে চিহ্নিত করুন</string>
+
+    <string name="pref_select_theme">থিম নির্বাচন করুন</string>
+    <string name="theme_light">লাইট</string>
+    <string name="theme_dark">ডার্ক</string>
+    <string name="theme_system">সিস্টেম ডিফল্ট</string>
+
+    <string name="pref_select_time_format">সময় ফরম্যাট নির্বাচন করুন</string>
+    <string name="time_format_12">১২ ঘণ্টা</string>
+    <string name="time_format_24">২৪ ঘণ্টা</string>
+
+    <string name="pref_mark_missed_after">মিস বিবেচনা করার সময়</string>
+    <string name="hours_format">%1$d ঘণ্টা পর</string>
+
+    <string name="notif_check_title">নোটিফিকেশন চেক</string>
+    <string name="notif_perm_title">নোটিফিকেশন অনুমতি</string>
+    <string name="notif_perm_granted">নোটিফিকেশন পাঠানোর অনুমতি দেওয়া হয়েছে।</string>
+    <string name="notif_battery_title">ফোনের ব্যাটারি</string>
+    <string name="notif_battery_status">ব্যাটারি %1$d%% এ আছে</string>
+    <string name="notif_sound_title">ফোনের সাউন্ড</string>
+    <string name="notif_sound_normal">ফোন সাইলেন্ট মুডে নেই।</string>
+    <string name="notif_sound_vibrate">ফোন ভাইব্রেশন মুডে আছে।</string>
+    <string name="notif_sound_silent">ফোন সাইলেন্ট মুডে আছে।</string>
+    <string name="notif_sound_unknown">অজানা সাউন্ড মুড।</string>
+    <string name="notif_bg_title">ব্যাকগ্রাউন্ড অনুমতি</string>
+    <string name="notif_bg_desc">ব্যাকগ্রাউন্ড সীমা নোটিফিকেশনে বাধা দিতে পারে।</string>
+    <string name="notif_bg_granted">অ্যাপ ব্যাকগ্রাউন্ডে চলতে পারবে।</string>
+    <string name="ok">ঠিক আছে</string>
+    <string name="close">বন্ধ করুন</string>
+
+    <string name="select_profile">প্রোফাইল নির্বাচন করুন</string>
+    <string name="current_profile">বর্তমান প্রোফাইল</string>
+    <string name="new_profile">নতুন প্রোফাইল</string>
+    <string name="years_format">%1$d বছর</string>
+    <string name="gender_male">পুরুষ</string>
+    <string name="gender_female">মহিলা</string>
+    <string name="gender_other">অন্যান্য</string>
+
+    <string name="profile_change_pic">প্রোফাইল ছবি পরিবর্তন করুন</string>
+    <string name="profile_upload_pic">প্রোফাইল ছবি আপলোড করুন</string>
+    <string name="profile_full_name">পুরা নাম</string>
+    <string name="profile_name_placeholder">যেমন: রহিম আহমেদ</string>
+    <string name="profile_age">বয়স</string>
+    <string name="profile_gender">লিঙ্গ</string>
+    <string name="profile_contact_number">যোগাযোগ নম্বর</string>
+    <string name="profile_save_btn">প্রোফাইল সংরক্ষণ করুন</string>
+    <string name="profile_delete_btn">প্রোফাইল মুছে ফেলুন</string>
+    <string name="profile_name_required">নাম আবশ্যক</string>
+    <string name="profile_age_required">বয়স আবশ্যক</string>
+    <string name="profile_gender_required">লিঙ্গ আবশ্যক</string>
+    <string name="profile_cannot_delete_only">একমাত্র প্রোফাইল মুছে ফেলা যাবে না। প্রথমে নতুন প্রোফাইল তৈরি করুন।</string>
+    <string name="profile_updated_success">প্রোফাইল সফলভাবে আপডেট করা হয়েছে!</string>
+    <string name="profile_deleted_success">প্রোফাইল সফলভাবে মুছে ফেলা হয়েছে!</string>
+    <string name="profile_delete_confirm_desc">আপনি কি নিশ্চিত যে আপনি এই প্রোফাইলটি মুছতে চান? এটি পুনরায় ফিরে পাওয়া যাবে না।</string>
+
+    <string name="unit_mg">মিগ্রা</string>
+    <string name="unit_mcg">মাইক্রোগ্রাম</string>
+    <string name="unit_ml">মিলি</string>
+    <string name="unit_drop">ফোটা</string>
+    <string name="unit_tablet">ট্যাবলেট</string>
+    <string name="unit_capsule">ক্যাপসুল</string>
+
+    <string name="help_title">সাহায্য ও সহায়তা</string>
+    <string name="help_resources">সম্পদসমূহ</string>
+    <string name="help_faqs_title">সাধারণ প্রশ্নাবলী</string>
+    <string name="help_faqs_desc">সাধারণ প্রশ্নের উত্তরসমূহ।</string>
+    <string name="help_user_manual_title">ব্যবহারকারী ম্যানুয়াল</string>
+    <string name="help_user_manual_desc">ব্যবহারকারী নির্দেশিকা দেখুন।</string>
+    <string name="help_contact_support">সাপোর্টে যোগাযোগ করুন</string>
+    <string name="help_email_support_title">ইমেইল সহায়তা</string>
+    <string name="help_email_support_desc">ইমেইলের মাধ্যমে সাহায্য নিন।</string>
+    <string name="help_phone_support_title">ফোন সহায়তা</string>
+    <string name="help_phone_support_desc">জরুরি সাহায্যের জন্য কল করুন।</string>
+
+    <!-- Emergency Services -->
+    <string name="emergency_title">জরুরি যোগাযোগ</string>
+    <string name="emergency_services">জরুরি সেবা</string>
+    <string name="emergency_select_country">অঞ্চল / দেশ নির্বাচন করুন</string>
+    <string name="emergency_universal">সার্বজনীন জরুরি সেবা</string>
+    <string name="emergency_ambulance">অ্যাম্বুলেন্স</string>
+    <string name="emergency_fire">ফায়ার সার্ভিস</string>
+    <string name="emergency_police">পুলিশ</string>
+    <string name="manage_profile_title">প্রোফাইল ব্যবস্থাপনা</string>
+
+    <string name="setup_welcome_title">Dosezy-তে স্বাগতম</string>
+    <string name="setup_welcome_sub">আপনার ব্যক্তিগত ওষুধ সহকারী।</string>
+    <string name="setup_features_title">আপনার স্বাস্থ্য, সহজ ও সুন্দর!</string>
+    <string name="setup_features_sub">Dosezy-র প্রধান সুবিধাসমূহ</string>
+    <string name="setup_feat1_title">কখনোই ডোজ মিস করবেন না</string>
+    <string name="setup_feat1_desc">প্রতিটি ওষুধের জন্য সময়মতো রিমাইন্ডার পান।</string>
+    <string name="setup_feat2_title">সহজ ওষুধ ব্যবস্থাপনা</string>
+    <string name="setup_feat2_desc">সহজ ইন্টারফেসে ওষুধ পরিচালনা করুন।</string>
+    <string name="setup_feat3_title">জরুরি সাহায্য</string>
+    <string name="setup_feat3_desc">দ্রুত জরুরি নম্বরসমূহে কল করুন।</string>
+    <string name="setup_profile_title">আপনার নিজের সম্পর্কে বলুন!</string>
+    <string name="setup_profile_sub">এটি আমাদের সুবিধা দিতে সাহায্য করবে।</string>
+    <string name="setup_next">পরবর্তী</string>
+    <string name="setup_get_started">শুরু করুন</string>
+
+    <string name="select_language">ভাষা নির্বাচন করুন</string>
+    <string name="system_default">সিস্টেম ডিফল্ট</string>
+    <string name="export_data">ডেটা এক্সপোর্ট করুন</string>
+    <string name="export_current_profile">শুধু বর্তমান প্রোফাইল এক্সপোর্ট করুন</string>
+    <string name="export_all_profiles">সব প্রোফাইল এক্সপোর্ট করুন (ZIP)</string>
+    <string name="export_choose_title">ডেটা এক্সপোর্ট বিকল্প</string>
+    <string name="export_choose_desc">কোন ডেটা এক্সপোর্ট করতে চান নির্বাচন করুন:</string>
+    <string name="export_success_title">এক্সপোর্ট সফল হয়েছে</string>
+    <string name="export_success_desc">ডেটা এক্সপোর্ট করা হয়েছে:</string>
+    <string name="export_share_file">ফাইল শেয়ার করুন</string>
+    <string name="export_done">সম্পন্ন</string>
+    <string name="export_progress_title">ডেটা এক্সপোর্ট করা হচ্ছে</string>
+    <string name="export_progress_desc">অনুগ্ৰহ করে অপেক্ষা করুন...</string>
+    <string name="export_failed_title">এক্সপোর্ট ব্যর্থ হয়েছে</string>
+    <string name="cancel">বাতিল</string>
+    <string name="export">এক্সপোর্ট</string>
+    <string name="save">সংরক্ষণ</string>
+    <!-- Personal Contacts -->
+    <string name="personal_contacts">ব্যক্তিগত পরিচিতি</string>
+    <string name="personal_contacts_add">যোগ করুন</string>
+    <string name="personal_contacts_empty">এখনো কোনো ব্যক্তিগত পরিচিতি যোগ করা হয়নি।\n\"+ যোগ করুন\" ট্যাপ করুন।</string>
+    <string name="personal_contacts_add_title">ব্যক্তিগত পরিচিতি যোগ করুন</string>
+    <string name="personal_contacts_name">পরিচিতির নাম</string>
+    <string name="personal_contacts_phone">ফোন নম্বর</string>
+    <string name="personal_contacts_save">সংরক্ষণ</string>
+    <string name="personal_contacts_cancel">বাতিল</string>
+    <!-- Alarm Activity -->
+    <string name="alarm_medication_reminder">ওষুধের অনুস্মারক</string>
+    <string name="alarm_reminder_for">%s এর জন্য অনুস্মারক</string>
+    <string name="alarm_scheduled">নির্ধারিত: %s</string>
+    <string name="alarm_take_now">এখনই নিন</string>
+    <string name="alarm_snooze">স্নুজ (%1$d মিনিট)</string>
+    <string name="alarm_mark_late">দেরি হিসেবে চিহ্নিত করুন</string>
+
+    <string name="pref_snooze_duration">স্নুজ সময়কাল</string>
+    <string name="pref_select_snooze_duration">স্নুজ সময়কাল নির্বাচন করুন</string>
+    <string name="minutes_format">%1$d মিনিট</string>
+    <string name="profile">প্রোফাইল</string>
+
+
+    <string name="manage">পরিচালনা</string>
+    <string name="profile_switch">পরিবর্তন</string>
+    <string name="schedule_no_meds_date">এই তারিখের জন্য কোন ওষুধ নির্ধারিত নেই</string>
+
+
+    <string name="home_all_good">সব ঠিক আছে!</string>
+    <string name="home_all_good_desc">আজ কোনো ওষুধ খাওয়ার প্রয়োজন নেই। আপনি যদি আরও যোগ করতে চান, তবে নিচের প্লাস বোতামটি ট্যাপ করে শুরু করুন।</string>
+    <string name="no_profiles_found">কোনো প্রোফাইল পাওয়া যায়নি</string>
+    <string name="status_taken">গৃহীত</string>
+
+</resources>

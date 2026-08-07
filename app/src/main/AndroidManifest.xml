@@ -50,6 +50,16 @@
             android:exported="false"
             android:theme="@style/Theme.Dosezy" />
 
+        <!-- Full-Screen Alarm Activity for medicine reminders -->
+        <activity
+            android:name=".notifications.AlarmActivity"
+            android:exported="false"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:theme="@style/Theme.Dosezy" />
+
 
         <!-- Alarm Receiver for scheduled medicines -->
         <receiver

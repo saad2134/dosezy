@@ -18,6 +18,9 @@ interface MedicineDao {
     @Query("SELECT * FROM medicines WHERE medicineId = :medicineId")
     fun getMedicineById(medicineId: String): Flow<Medicine?>
 
+    @Query("SELECT * FROM medicines WHERE medicineId = :medicineId")
+    suspend fun getMedicineByIdDirect(medicineId: String): Medicine?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMedicine(medicine: Medicine)
 

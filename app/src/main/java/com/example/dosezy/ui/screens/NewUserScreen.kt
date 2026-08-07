@@ -52,6 +52,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -65,6 +66,7 @@ import coil.request.ImageRequest
 import com.example.dosezy.R
 import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.User
+import com.example.dosezy.data.model.getLocalizedName
 import com.example.dosezy.ui.components.ProfilePicturePicker
 import com.example.dosezy.ui.theme.LightBlue40
 import com.example.dosezy.ui.viewmodels.UserViewModel
@@ -195,14 +197,14 @@ fun WelcomePage(
 
         // Welcome Text
         Text(
-            text = "Welcome to Dosezy",
+            text = stringResource(R.string.setup_welcome_title),
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
         )
 
         Text(
-            text = "Your personal medication assistant.",
+            text = stringResource(R.string.setup_welcome_sub),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 8.dp)
@@ -244,7 +246,7 @@ fun FeaturesPage() {
 
         // Header
         Text(
-            text = "Your Health, Simplified!",
+            text = stringResource(R.string.setup_features_title),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface,
@@ -253,7 +255,7 @@ fun FeaturesPage() {
         )
 
         Text(
-            text = "Key features of Dosezy",
+            text = stringResource(R.string.setup_features_sub),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -267,24 +269,24 @@ fun FeaturesPage() {
         // Features List
         FeatureItem(
             icon = Icons.Filled.Notifications,
-            title = "Never Miss a Dose",
-            description = "Receive timely reminders for every medication, ensuring you stay on track."
+            title = stringResource(R.string.setup_feat1_title),
+            description = stringResource(R.string.setup_feat1_desc)
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
         FeatureItem(
             icon = Icons.Filled.ManageHistory,
-            title = "Easy Medication Management",
-            description = "Manage your medications with a user-friendly interface, designed for simplicity."
+            title = stringResource(R.string.setup_feat2_title),
+            description = stringResource(R.string.setup_feat2_desc)
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
         FeatureItem(
             icon = Icons.Filled.Info,
-            title = "Emergency Support",
-            description = "Quickly access emergency contacts and information, ensuring peace of mind."
+            title = stringResource(R.string.setup_feat3_title),
+            description = stringResource(R.string.setup_feat3_desc)
         )
     }
 }
@@ -332,7 +334,7 @@ fun ProfileSetupPage(
 
         // Header
         Text(
-            text = "Tell us about yourself!",
+            text = stringResource(R.string.setup_profile_title),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface,
@@ -341,7 +343,7 @@ fun ProfileSetupPage(
         )
 
         Text(
-            text = "This helps us personalize your experience.",
+            text = stringResource(R.string.setup_profile_sub),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -368,7 +370,7 @@ fun ProfileSetupPage(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = if (profilePicPath != null) "Change Profile Picture" else "Upload Profile Picture",
+                text = if (profilePicPath != null) stringResource(R.string.profile_change_pic) else stringResource(R.string.profile_upload_pic),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
@@ -386,7 +388,8 @@ fun ProfileSetupPage(
                     fullName = it
                     fullNameError = it.isBlank()
                 },
-                label = { Text("Name *") },
+                label = { Text(stringResource(R.string.profile_full_name) + " *") },
+                placeholder = { Text(stringResource(R.string.profile_name_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -398,7 +401,7 @@ fun ProfileSetupPage(
             )
             if (fullNameError) {
                 Text(
-                    text = "Name is required",
+                    text = stringResource(R.string.profile_name_required),
                     color = Color.Red,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(start = 16.dp, top = 4.dp)
@@ -423,7 +426,7 @@ fun ProfileSetupPage(
                             ageError = it.isBlank()
                         }
                     },
-                    label = { Text("Age *") },
+                    label = { Text(stringResource(R.string.profile_age) + " *") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     shape = RoundedCornerShape(16.dp),
@@ -435,7 +438,7 @@ fun ProfileSetupPage(
                 )
                 if (ageError) {
                     Text(
-                        text = "Age is required",
+                        text = stringResource(R.string.profile_age_required),
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(start = 16.dp, top = 4.dp)
@@ -458,7 +461,7 @@ fun ProfileSetupPage(
                 )
                 if (genderError) {
                     Text(
-                        text = "Gender is required",
+                        text = stringResource(R.string.profile_gender_required),
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(start = 16.dp, top = 4.dp)
@@ -474,7 +477,7 @@ fun ProfileSetupPage(
             OutlinedTextField(
                 value = contactNumber,
                 onValueChange = { contactNumber = it },
-                label = { Text("Phone Number (optional)") },
+                label = { Text(stringResource(R.string.profile_contact_number)) },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 shape = RoundedCornerShape(16.dp),
@@ -540,14 +543,14 @@ fun GenderDropdown(
         modifier = modifier
     ) {
         OutlinedTextField(
-            value = selectedGender?.displayName ?: "Select",
+            value = selectedGender?.getLocalizedName() ?: stringResource(R.string.profile_gender),
             onValueChange = {},
             readOnly = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .fillMaxWidth()
                 .menuAnchor(),
-            label = { Text("Gender *") },
+            label = { Text(stringResource(R.string.profile_gender) + " *") },
             shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = if (isError) Color.Red else MaterialTheme.colorScheme.primary,
@@ -564,7 +567,7 @@ fun GenderDropdown(
         ) {
             Gender.entries.forEach { gender ->
                 DropdownMenuItem(
-                    text = { Text(gender.displayName) },
+                    text = { Text(gender.getLocalizedName()) },
                     onClick = {
                         onGenderSelected(gender)
                         onExpandedChange(false)
@@ -674,7 +677,7 @@ fun NewUserBottomBar(
                             )
                         ) {
                             Text(
-                                text = "Get Started",
+                                text = stringResource(R.string.setup_get_started),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -695,7 +698,7 @@ fun NewUserBottomBar(
                                 )
                             ) {
                                 Text(
-                                    text = "Go Back",
+                                    text = stringResource(R.string.cancel),
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -721,7 +724,7 @@ fun NewUserBottomBar(
                             )
                         ) {
                             Text(
-                                text = "Back",
+                                text = stringResource(R.string.cancel),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -738,7 +741,7 @@ fun NewUserBottomBar(
                             )
                         ) {
                             Text(
-                                text = "Next",
+                                text = stringResource(R.string.setup_next),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -763,7 +766,7 @@ fun NewUserBottomBar(
                             )
                         ) {
                             Text(
-                                text = "Back",
+                                text = stringResource(R.string.cancel),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -789,7 +792,7 @@ fun NewUserBottomBar(
                             enabled = isProfileSetupValid
                         ) {
                             Text(
-                                text = "Complete",
+                                text = stringResource(R.string.save),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
                             )

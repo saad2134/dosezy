@@ -24,43 +24,16 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun getScheduleForDate(userId: String, date: LocalDate): Flow<List<ScheduleEntry>> {
-        Log.d(TAG, "Getting schedule for date: $date")
-        return database.scheduleDao().getScheduleForUser(userId).map { entries ->
-            // Manual filtering by date
-            val filteredEntries = entries.filter { entry ->
-                try {
-                    val entryDate = entry.scheduledDateTime.toLocalDate()
-                    entryDate == date
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error parsing date for entry: ${entry.scheduledDateTime}", e)
-                    false
-                }
-            }
-            Log.d(TAG, "Filtered ${filteredEntries.size} entries for date $date from ${entries.size} total entries")
-            filteredEntries
-        }
+        val startOfDay = date.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val endOfDay = date.atTime(java.time.LocalTime.MAX).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        return database.scheduleDao().getScheduleForDateRange(userId, startOfDay, endOfDay)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun getScheduleWithMedicineForDate(userId: String, date: LocalDate): Flow<List<ScheduleWithMedicine>> {
-        Log.d(TAG, "Getting schedule with medicine for date: $date")
-        return database.scheduleDao().getScheduleWithMedicineForUser(userId).map { scheduleWithMedicine ->
-            // Manual filtering by date
-            val filteredEntries = scheduleWithMedicine.filter { item ->
-                try {
-                    val entryDate = item.scheduleEntry.scheduledDateTime.toLocalDate()
-                    entryDate == date
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error parsing date for entry: ${item.scheduleEntry.scheduledDateTime}", e)
-                    false
-                }
-            }
-            Log.d(TAG, "Filtered ${filteredEntries.size} schedule with medicine entries for date $date from ${scheduleWithMedicine.size} total entries")
-            filteredEntries.forEach { item ->
-                Log.d(TAG, "Found: ${item.medicine?.medicationName} at ${item.scheduleEntry.scheduledDateTime}")
-            }
-            filteredEntries
-        }
+        val startOfDay = date.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val endOfDay = date.atTime(java.time.LocalTime.MAX).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        return database.scheduleDao().getScheduleWithMedicineForDateRange(userId, startOfDay, endOfDay)
     }
 
 
@@ -177,7 +150,9 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         val alarmScheduler = AlarmScheduler(context)
 
         try {
-            val entries = database.scheduleDao().getScheduleForDateRange(userId, startDate.toString(), endDate.toString()).first()
+            val startMillis = startDate.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+            val endMillis = endDate.atTime(java.time.LocalTime.MAX).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+            val entries = database.scheduleDao().getScheduleForDateRange(userId, startMillis, endMillis).first()
 
             var scheduledCount = 0
             entries.forEach { entry ->
@@ -198,8 +173,12 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         }
     }
 
-    fun getScheduleForDateRange(userId: String, startDate: LocalDate, endDate: LocalDate): Flow<List<ScheduleEntry>> =
-        database.scheduleDao().getScheduleForDateRange(userId, startDate.toString(), endDate.toString())
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getScheduleForDateRange(userId: String, startDate: LocalDate, endDate: LocalDate): Flow<List<ScheduleEntry>> {
+        val startMillis = startDate.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val endMillis = endDate.atTime(java.time.LocalTime.MAX).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        return database.scheduleDao().getScheduleForDateRange(userId, startMillis, endMillis)
+    }
 
     // method to get schedules as list (not Flow)
     suspend fun getSchedulesByUserSync(userId: String): List<ScheduleEntry> =

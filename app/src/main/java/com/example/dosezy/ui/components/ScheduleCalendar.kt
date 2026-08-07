@@ -28,6 +28,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,6 +47,7 @@ import com.example.dosezy.data.model.ScheduleWithMedicine
 import com.example.dosezy.data.model.TimeFormat
 import com.example.dosezy.ui.screens.MedicineImage
 import com.example.dosezy.utils.TimeFormatUtils
+import com.example.dosezy.utils.TimeCalculationUtils
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -103,8 +105,15 @@ private fun MonthNavigation(
             )
         }
 
+        val userViewModel: com.example.dosezy.ui.viewmodels.UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
+        val currentUser by userViewModel.currentUser.collectAsState()
+        val targetLocale = remember(currentUser?.language) {
+            com.example.dosezy.utils.LocaleHelper.getLocale(currentUser?.language ?: com.example.dosezy.data.model.Language.SYSTEM)
+        }
+        val monthDisplay = currentMonth.month.getDisplayName(java.time.format.TextStyle.FULL, targetLocale).replaceFirstChar { it.titlecase(targetLocale) }
+
         Text(
-            text = currentMonth.month.toString() + " " + currentMonth.year.toString(),
+            text = "$monthDisplay ${currentMonth.year}",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
@@ -289,7 +298,7 @@ fun ScheduleList(
     LazyColumn(
         modifier = modifier
     ) {
-        items(scheduleWithMedicine) { item ->
+        items(scheduleWithMedicine, key = { it.scheduleEntry.entryId }) { item ->
             ScheduleListItem(
                 scheduleWithMedicine = item,
                 timeFormat = timeFormat, // Pass to list item
@@ -313,6 +322,8 @@ fun ScheduleListItem(
 ) {
     val entry = scheduleWithMedicine.scheduleEntry
     val medicine = scheduleWithMedicine.medicine
+    val userViewModel: com.example.dosezy.ui.viewmodels.UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
+    val currentUser by userViewModel.currentUser.collectAsState()
 
     Row(
         modifier = modifier
@@ -343,9 +354,12 @@ fun ScheduleListItem(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            // TimeFormatUtils to format time according to user preference
+            val targetLocale = remember(currentUser?.language) {
+                com.example.dosezy.utils.LocaleHelper.getLocale(currentUser?.language ?: com.example.dosezy.data.model.Language.SYSTEM)
+            }
+            // TimeFormatUtils to format time according to user preference & locale
             Text(
-                text = TimeFormatUtils.formatTime(entry.scheduledDateTime, timeFormat),
+                text = TimeFormatUtils.formatTime(entry.scheduledDateTime, timeFormat, targetLocale),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -354,7 +368,18 @@ fun ScheduleListItem(
         Spacer(modifier = Modifier.width(16.dp))
 
         // Status Button
-        val (icon, color, onClick) = when (entry.status) {
+        val now = java.time.LocalDateTime.now()
+        val missedAfter = currentUser?.considerMissedAfter ?: 6
+        val isPassed = now.isAfter(entry.scheduledDateTime)
+        
+        val resolvedStatus = when {
+            entry.status == MedicationStatus.TAKEN_ON_TIME || entry.status == MedicationStatus.TAKEN_LATE -> entry.status
+            entry.status == MedicationStatus.MISSED -> MedicationStatus.MISSED
+            isPassed && TimeCalculationUtils.isMissed(entry.scheduledDateTime, now, missedAfter) -> MedicationStatus.MISSED
+            else -> MedicationStatus.PENDING
+        }
+
+        val (icon, color, onClick) = when (resolvedStatus) {
             MedicationStatus.TAKEN_ON_TIME ->
                 Triple(Icons.Default.Done, MaterialTheme.colorScheme.primary, null as (() -> Unit)?)
             MedicationStatus.TAKEN_LATE ->
@@ -363,7 +388,6 @@ fun ScheduleListItem(
                 Triple(Icons.Default.Close, MaterialTheme.colorScheme.error, null)
             MedicationStatus.PENDING ->
                 Triple(Icons.Default.HorizontalRule, MaterialTheme.colorScheme.onSurfaceVariant) {
-                    val now = java.time.LocalDateTime.now()
                     val takenAt = now.format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME)
                     if (now.isAfter(entry.scheduledDateTime)) {
                         onMarkAsLate(entry.entryId, takenAt)

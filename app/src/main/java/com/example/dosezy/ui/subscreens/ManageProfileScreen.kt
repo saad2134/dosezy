@@ -51,7 +51,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.compose.ui.res.stringResource
+import com.example.dosezy.R
 import com.example.dosezy.data.model.Gender
+import com.example.dosezy.data.model.getLocalizedName
 import com.example.dosezy.ui.components.ProfilePicturePicker
 import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.viewmodels.UserViewModel
@@ -100,7 +103,7 @@ fun ManageProfileScreen(navController: NavController) {
             TopBar(
                 navController = navController,
                 currentUser = currentUser,
-                title = "Manage Profile",
+                title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.manage_profile_title),
                 showBackButton = true,
                 actions = {}
             )
@@ -161,7 +164,7 @@ fun ManageProfileScreen(navController: NavController) {
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "Change Profile Picture",
+                            text = if (profilePicPath != null) stringResource(R.string.profile_change_pic) else stringResource(R.string.profile_upload_pic),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
@@ -179,7 +182,8 @@ fun ManageProfileScreen(navController: NavController) {
                                 fullName = it
                                 fullNameError = it.isBlank()
                             },
-                            label = { Text("Name *") },
+                            label = { Text(stringResource(R.string.profile_full_name) + " *") },
+                            placeholder = { Text(stringResource(R.string.profile_name_placeholder)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(16.dp),
                             colors = OutlinedTextFieldDefaults.colors(
@@ -191,7 +195,7 @@ fun ManageProfileScreen(navController: NavController) {
                         )
                         if (fullNameError) {
                             Text(
-                                text = "Name is required",
+                                text = stringResource(R.string.profile_name_required),
                                 color = Color.Red,
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(start = 16.dp, top = 4.dp)
@@ -211,7 +215,7 @@ fun ManageProfileScreen(navController: NavController) {
                                     ageError = it.isBlank()
                                 }
                             },
-                            label = { Text("Age *") },
+                            label = { Text(stringResource(R.string.profile_age) + " *") },
                             modifier = Modifier.fillMaxWidth(),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             shape = RoundedCornerShape(16.dp),
@@ -223,7 +227,7 @@ fun ManageProfileScreen(navController: NavController) {
                         )
                         if (ageError) {
                             Text(
-                                text = "Age is required",
+                                text = stringResource(R.string.profile_age_required),
                                 color = Color.Red,
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(start = 16.dp, top = 4.dp)
@@ -249,7 +253,7 @@ fun ManageProfileScreen(navController: NavController) {
                         )
                         if (genderError) {
                             Text(
-                                text = "Gender is required",
+                                text = stringResource(R.string.profile_gender_required),
                                 color = Color.Red,
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(start = 16.dp, top = 4.dp)
@@ -264,7 +268,7 @@ fun ManageProfileScreen(navController: NavController) {
                         OutlinedTextField(
                             value = contactNumber,
                             onValueChange = { contactNumber = it },
-                            label = { Text("Contact Number") },
+                            label = { Text(stringResource(R.string.profile_contact_number)) },
                             modifier = Modifier.fillMaxWidth(),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                             shape = RoundedCornerShape(16.dp),
@@ -276,6 +280,9 @@ fun ManageProfileScreen(navController: NavController) {
                     }
 
                     Spacer(modifier = Modifier.height(32.dp))
+
+                    val updatedSuccessStr = stringResource(R.string.profile_updated_success)
+                    val cannotDeleteStr = stringResource(R.string.profile_cannot_delete_only)
 
                     // Save Changes Button
                     Button(
@@ -296,7 +303,7 @@ fun ManageProfileScreen(navController: NavController) {
                                     )
                                     userViewModel.updateUser(updatedUser)
                                     scope.launch {
-                                        snackbarHostState.showSnackbar("Profile updated successfully!")
+                                        snackbarHostState.showSnackbar(updatedSuccessStr)
                                     }
                                     navController.popBackStack()
                                 }
@@ -311,7 +318,7 @@ fun ManageProfileScreen(navController: NavController) {
                         )
                     ) {
                         Text(
-                            text = "Save Changes",
+                            text = stringResource(R.string.form_save_changes),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -334,7 +341,7 @@ fun ManageProfileScreen(navController: NavController) {
                         )
                     ) {
                         Text(
-                            text = "Delete Profile",
+                            text = stringResource(R.string.profile_delete_btn),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -346,12 +353,13 @@ fun ManageProfileScreen(navController: NavController) {
 
     // Delete Confirmation Dialog
     if (showDeleteDialog) {
+        val cannotDeleteMsg = stringResource(R.string.profile_cannot_delete_only)
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
             tonalElevation = 0.dp,
             containerColor = MaterialTheme.colorScheme.surface,
-            title = { Text("Delete Profile") },
-            text = { Text("Are you sure you want to delete this profile? This action cannot be undone.") },
+            title = { Text(stringResource(R.string.profile_delete_btn)) },
+            text = { Text(stringResource(R.string.profile_delete_confirm_desc)) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -361,7 +369,7 @@ fun ManageProfileScreen(navController: NavController) {
                                 navController.popBackStack()
                             } else {
                                 scope.launch {
-                                    snackbarHostState.showSnackbar("Cannot delete the only profile. Create a new profile first.")
+                                    snackbarHostState.showSnackbar(cannotDeleteMsg)
                                 }
                             }
                         }
@@ -371,7 +379,7 @@ fun ManageProfileScreen(navController: NavController) {
                         containerColor = Color(0xFFDC2626)
                     )
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.form_delete))
                 }
             },
             dismissButton = {
@@ -381,7 +389,7 @@ fun ManageProfileScreen(navController: NavController) {
                         containerColor = Color(0xFF6B7280)
                     )
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -389,8 +397,9 @@ fun ManageProfileScreen(navController: NavController) {
 
     // Success Message
     if (showSuccessMessage) {
+        val updatedStr = stringResource(R.string.profile_updated_success)
         LaunchedEffect(showSuccessMessage) {
-            snackbarHostState.showSnackbar("Profile updated successfully!")
+            snackbarHostState.showSnackbar(updatedStr)
             showSuccessMessage = false
         }
     }
@@ -412,14 +421,14 @@ fun GenderDropdown(
         modifier = modifier
     ) {
         OutlinedTextField(
-            value = selectedGender?.displayName ?: "Select Gender",
+            value = selectedGender?.getLocalizedName() ?: stringResource(R.string.profile_gender),
             onValueChange = {},
             readOnly = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .fillMaxWidth()
                 .menuAnchor(),
-            label = { Text("Gender *") },
+            label = { Text(stringResource(R.string.profile_gender) + " *") },
             shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = if (isError) Color.Red else MaterialTheme.colorScheme.primary,
@@ -436,7 +445,7 @@ fun GenderDropdown(
         ) {
             Gender.entries.forEach { gender ->
                 DropdownMenuItem(
-                    text = { Text(gender.displayName) },
+                    text = { Text(gender.getLocalizedName()) },
                     onClick = {
                         onGenderSelected(gender)
                         onExpandedChange(false)

@@ -91,15 +91,25 @@ fun TopBar(
                 Spacer(modifier = Modifier.width(12.dp))
 
                 // User Info
+                val currentHour = java.time.LocalTime.now().hour
+                val greetingRes = when (currentHour) {
+                    in 5..11 -> R.string.greeting_morning
+                    in 12..16 -> R.string.greeting_afternoon
+                    in 17..21 -> R.string.greeting_evening
+                    else -> R.string.greeting_night
+                }
+                val greetingText = androidx.compose.ui.res.stringResource(greetingRes)
+                val userName = currentUser?.fullName?.split(" ")?.get(0) ?: "User"
+
                 Column {
                     Text(
-                        text = "Hi, ${currentUser?.fullName?.split(" ")?.get(0) ?: "User"}!",
+                        text = "$greetingText $userName!",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "\"Health is a priceless wealth.\"",
+                        text = androidx.compose.ui.res.stringResource(R.string.health_quote),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

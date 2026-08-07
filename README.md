@@ -5,7 +5,7 @@
 
 <div align="center">
 
-![Phase](https://img.shields.io/badge/🛠️%20Phase-Released%20v1%2E3%2E5-blue?style=for-the-badge)
+![Phase](https://img.shields.io/badge/🛠️%20Phase-Released%20v2%2E0%2E0-blue?style=for-the-badge)
 ![Platforms](https://img.shields.io/badge/🌐%20Platforms-Android-28a745?style=for-the-badge)
 
 </div>
@@ -14,13 +14,18 @@
 
 Once you input the basics: name, dosage, timing, and frequency, the app intelligently handles your medication schedule.
 
-- 📅 **Medication Adherence** – Automated reminders ensure timely medication consumption.  
+- 📅 **Medication Adherence** – Automated reminders ensure timely medication consumption.
+- 🌐 **12 Global Languages** – Full native localization in English, Chinese (中文), Spanish (Español), Hindi (हिन्दी), Portuguese (Português), Arabic (العربية), French (Français), German (Deutsch), Japanese (日本語), Russian (Русский), Italian (Italiano), and Bengali (বাংলা).
+- 🌍 **International Emergency Services** – Interactive country/region emergency dialer supporting India, USA/Canada, UK, EU, China, Japan, Russia, Brazil, Bangladesh, and Australia with automatic country detection based on language.
+- ⏰ **Configurable Late & Missed Thresholds** – Custom **Consider Late After** (1-3h) and **Consider Missed After** (3-9h) settings with orange high-visibility late status badges (`Xh Xm ago`) and "Mark Late" actions.
+- 🕒 **12-First Grid Time Picker** – Easy 12-hour (12 first layout) and 24-hour interactive grid time selector with quick minute chips.
 - ♿ **Accessibility-First Design** – Large text, high-contrast colors, and simple controls for elderly users.  
-- 🔔 **Reliable Notification System** – Persistent alerts with precise emulator battery level indicators and snooze/taken action triggers.  
-- 🎨 **Adaptive System Dark/Light Theme** – Complete theme support respecting the Android system default settings with fully optimized high-contrast elements.
-- 📅 **Custom Calendar Scheduling** – Full interactive support for weekly (specific days of the week) and monthly (specific days of the month) frequencies.
-- 🔒 **Data Security & Portability** – Local `Room` database storage with CSV export capabilities.  
-- 👨‍👩‍👧 **Caregiver Support** – Logs and adherence history help caregivers track missed doses.  
+- 🔔 **Reliable Notification System** – Persistent alerts with precise battery & sound indicators and snooze/taken/late action triggers.  
+- 🎨 **Adaptive System Dark/Light Theme** – Complete theme support respecting the Android system default settings with zero white flash transitions.
+- 📅 **Custom Calendar Scheduling** – Full interactive support for daily, weekly (specific days of the week), and monthly (specific days of the month) frequencies.
+- 👤 **Multi-Profile Management** – Create, edit, and switch between family member profiles.
+- 📄 **Data Security & Export** – Local `Room` database storage with PDF report and JSON data export capabilities.  
+- 👨‍👩‍👧 **Caregiver Support** – Logs and adherence history help caregivers track missed and late doses.  
 
 ---
 

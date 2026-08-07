@@ -1,0 +1,245 @@
+<resources>
+    <string name="app_name">Dosezy</string>
+    <string name="app_tagline">दवा का पालन सरल बनाया गया</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">होम</string>
+    <string name="nav_schedule">शेड्यूल</string>
+    <string name="nav_add">जोड़ें</string>
+    <string name="nav_medicines">दवाएं</string>
+    <string name="nav_menu">मेनू</string>
+
+    <!-- Greetings -->
+    <string name="greeting_morning">सुप्रभात,</string>
+    <string name="greeting_afternoon">शुभ दोपहर,</string>
+    <string name="greeting_evening">शुभ संध्या,</string>
+    <string name="greeting_night">शुभ रात्रि,</string>
+    <string name="health_quote">\"स्वास्थ्य अनमोल धन है।\"</string>
+
+    <!-- Home Screen -->
+    <string name="home_todays_meds">आज की दवाएं</string>
+    <string name="home_todays_adherence">आज का पालन</string>
+    <string name="home_upcoming_doses">आगामी खुराक</string>
+    <string name="home_all_taken">सभी खुराक ले ली गईं!</string>
+    <string name="home_no_doses_today">आज के लिए कोई खुराक निर्धारित नहीं है।</string>
+    <string name="home_medication_progress">दवा की प्रगति</string>
+
+    <!-- Schedule Screen -->
+    <string name="schedule_title">दैनिक शेड्यूल</string>
+    <string name="schedule_no_doses">इस दिन के लिए कोई खुराक निर्धारित नहीं है</string>
+
+    <!-- Medicines Screen -->
+    <string name="medicines_title">आपकी दवाएं</string>
+    <string name="medicines_add_new">नई दवा जोड़ें</string>
+    <string name="medicines_empty">अभी तक कोई दवा नहीं जोड़ी गई है</string>
+    <string name="medicines_empty_sub">आपने कोई दवा नहीं जोड़ी है। शुरू करने के लिए नीचे दिए गए प्लस बटन पर टैप करें।</string>
+
+    <!-- Form Add/Edit Medicine -->
+    <string name="form_add_medicine">दवा जोड़ें</string>
+    <string name="form_edit_medicine">दवा संपादित करें</string>
+    <string name="form_medicine_image">दवा की तस्वीर</string>
+    <string name="form_med_name">दवा का नाम</string>
+    <string name="form_med_name_placeholder">जैसे: अमोक्सिसिलिन</string>
+    <string name="form_dosage">खुराक</string>
+    <string name="form_dosage_placeholder">जैसे: 500mg, 1 गोली</string>
+    <string name="form_frequency">आवृत्ति</string>
+    <string name="form_time">समय</string>
+    <string name="form_save">दवा सहेजें</string>
+    <string name="form_save_changes">बदलाव सहेजें</string>
+    <string name="form_delete">दवा हटाएं</string>
+    <string name="form_delete_medicine">इस दवा को हटाएं</string>
+    <string name="form_upload_img">दवा की तस्वीर अपलोड करें</string>
+    <string name="form_change_img">दवा की तस्वीर बदलें</string>
+    <string name="freq_daily">दैनिक</string>
+    <string name="freq_weekly">साप्ताहिक</string>
+    <string name="freq_monthly">मासिक</string>
+    <string name="freq_custom">कस्टम</string>
+    <string name="form_select_days_week">सप्ताह के दिन चुनें</string>
+    <string name="form_select_days_month">महीने के दिन चुनें</string>
+    <string name="day_mon">सोम</string>
+    <string name="day_tue">मंगल</string>
+    <string name="day_wed">बुध</string>
+    <string name="day_thu">गुरु</string>
+    <string name="day_fri">शुक्र</string>
+    <string name="day_sat">शनि</string>
+    <string name="day_sun">रवि</string>
+    <string name="times_per_day_format">दिन में %1$d बार</string>
+    <string name="times_per_week_format">सप्ताह में %1$d बार</string>
+    <string name="times_per_month_format">महीने में %1$d बार</string>
+
+    <!-- Menu Screen -->
+    <string name="menu_title">मेनू</string>
+    <string name="menu_account_profile">खाता और प्रोफ़ाइल</string>
+    <string name="menu_preferences">प्राथमिकताएं</string>
+    <string name="menu_emergency">आपातकालीन संपर्क</string>
+    <string name="menu_help_support">सहायता और सहायता</string>
+    <string name="menu_export_data">CSV के रूप में डेटा निर्यात करें</string>
+    <string name="menu_switch_profile">प्रोफ़ाइल बदलें</string>
+    <string name="menu_manage_profiles">प्रोफ़ाइल प्रबंधित करें</string>
+    <string name="menu_manage_profile">इस प्रोफ़ाइल को प्रबंधित करें</string>
+
+    <!-- Preferences Screen -->
+    <string name="pref_title">प्राथमिकताएं</string>
+    <string name="pref_theme">थीम</string>
+    <string name="pref_time_format">समय प्रारूप</string>
+    <string name="pref_language">भाषा</string>
+    <string name="pref_late_after">देरी के बाद समझें</string>
+    <string name="pref_missed_after">छूट जाने के बाद समझें</string>
+    <string name="mark_late">देरी के रूप में चिह्नित करें</string>
+
+    <!-- Dialog Titles & Options -->
+    <string name="pref_select_theme">थीम चुनें</string>
+    <string name="theme_light">लाइट</string>
+    <string name="theme_dark">डार्क</string>
+    <string name="theme_system">सिस्टम डिफ़ॉल्ट</string>
+
+    <string name="pref_select_time_format">समय प्रारूप चुनें</string>
+    <string name="time_format_12">12 घंटे</string>
+    <string name="time_format_24">24 घंटे</string>
+
+    <string name="pref_mark_missed_after">इसके बाद छूटा हुआ मानें</string>
+    <string name="hours_format">%1$d घंटे</string>
+
+    <!-- Notification Check Dialog -->
+    <string name="notif_check_title">सूचना जांच</string>
+    <string name="notif_perm_title">सूचना अनुमति</string>
+    <string name="notif_perm_granted">सूचनाएं भेजने की अनुमति दी गई।</string>
+    <string name="notif_battery_title">फ़ोन की बैटरी</string>
+    <string name="notif_battery_status">बैटरी %1$d%% पर है</string>
+    <string name="notif_sound_title">फ़ोन की ध्वनि</string>
+    <string name="notif_sound_normal">फ़ोन साइलेंट नहीं है।</string>
+    <string name="notif_sound_vibrate">फ़ोन वाइब्रेट मोड में है।</string>
+    <string name="notif_sound_silent">फ़ोन साइलेंट है।</string>
+    <string name="notif_sound_unknown">अज्ञात ध्वनि मोड।</string>
+    <string name="notif_bg_title">बैकग्राउंड अनुमति</string>
+    <string name="notif_bg_desc">बैकग्राउंड सीमाएं सूचनाओं को रोक सकती हैं।</string>
+    <string name="notif_bg_granted">ऐप बैकग्राउंड में चल सकता है।</string>
+    <string name="ok">ठीक है</string>
+    <string name="close">बंद करें</string>
+
+    <!-- Profiles & Gender -->
+    <string name="select_profile">प्रोफ़ाइल चुनें</string>
+    <string name="current_profile">वर्तमान प्रोफ़ाइल</string>
+    <string name="new_profile">नई प्रोफ़ाइल</string>
+    <string name="years_format">%1$d वर्ष</string>
+    <string name="gender_male">पुरुष</string>
+    <string name="gender_female">महिला</string>
+    <string name="gender_other">अन्य</string>
+
+    <!-- Manage Profile Screen -->
+    <string name="profile_change_pic">प्रोफ़ाइल फ़ोटो बदलें</string>
+    <string name="profile_upload_pic">प्रोफ़ाइल फ़ोटो अपलोड करें</string>
+    <string name="profile_full_name">नाम</string>
+    <string name="profile_name_placeholder">पूरा नाम दर्ज करें</string>
+    <string name="profile_age">आयु</string>
+    <string name="profile_gender">लिंग</string>
+    <string name="profile_contact_number">संपर्क नंबर</string>
+    <string name="profile_save_btn">प्रोफ़ाइल सहेजें</string>
+    <string name="profile_delete_btn">प्रोफ़ाइल हटाएं</string>
+    <string name="profile_name_required">नाम आवश्यक है</string>
+    <string name="profile_age_required">आयु आवश्यक है</string>
+    <string name="profile_gender_required">लिंग आवश्यक है</string>
+    <string name="profile_cannot_delete_only">एकमात्र प्रोफ़ाइल को नहीं हटाया जा सकता। पहले नई प्रोफ़ाइल बनाएं।</string>
+    <string name="profile_updated_success">प्रोफ़ाइल सफलतापूर्वक अपडेट की गई!</string>
+    <string name="profile_deleted_success">प्रोफ़ाइल सफलतापूर्वक हटाई गई</string>
+    <string name="profile_delete_confirm_desc">क्या आप निश्चित रूप से इस प्रोफ़ाइल को हटाना चाहते हैं? इस क्रिया को बदला नहीं जा सकता।</string>
+
+    <!-- Dosage Units -->
+    <string name="unit_mg">मिग्रा (mg)</string>
+    <string name="unit_mcg">माइक्रोग्राम (mcg)</string>
+    <string name="unit_ml">मिली (mL)</string>
+    <string name="unit_drop">बूंद</string>
+    <string name="unit_tablet">गोली (tablet)</string>
+    <string name="unit_capsule">कैप्सूल (capsule)</string>
+
+    <!-- Help & Support -->
+    <string name="help_title">सहायता और सहायता</string>
+    <string name="help_resources">संसाधन</string>
+    <string name="help_faqs_title">सामान्य प्रश्न (FAQs)</string>
+    <string name="help_faqs_desc">आम सवालों के जवाब।</string>
+    <string name="help_user_manual_title">उपयोगकर्ता पुस्तिका</string>
+    <string name="help_user_manual_desc">उपयोगकर्ता मार्गदर्शिका देखें।</string>
+    <string name="help_contact_support">सहायता टीम से संपर्क करें</string>
+    <string name="help_email_support_title">ईमेल सहायता</string>
+    <string name="help_email_support_desc">ईमेल के माध्यम से मदद पाएं।</string>
+    <string name="help_phone_support_title">फ़ोन सहायता</string>
+    <string name="help_phone_support_desc">तुरंत मदद के लिए हमें कॉल करें।</string>
+
+    <!-- Emergency Services -->
+    <string name="emergency_title">आपातकालीन संपर्क</string>
+    <string name="emergency_services">आपातकालीन सेवाएं</string>
+    <string name="emergency_select_country">क्षेत्र / देश चुनें</string>
+    <string name="emergency_universal">सार्वभौमिक आपातकाल</string>
+    <string name="emergency_ambulance">एम्बुलेंस</string>
+    <string name="emergency_fire">फायर ब्रिगेड</string>
+    <string name="emergency_police">पुलिस</string>
+    <string name="manage_profile_title">प्रोफ़ाइल प्रबंधित करें</string>
+
+    <!-- Setup / Onboarding Screens -->
+    <string name="setup_welcome_title">Dosezy में आपका स्वागत है</string>
+    <string name="setup_welcome_sub">आपका व्यक्तिगत दवा सहायक।</string>
+    <string name="setup_features_title">आपका स्वास्थ्य, सरल बनाया गया!</string>
+    <string name="setup_features_sub">Dosezy की मुख्य विशेषताएं</string>
+    <string name="setup_feat1_title">कभी खुराक न भूलें</string>
+    <string name="setup_feat1_desc">हर दवा के लिए समय पर रिमाइंडर प्राप्त करें।</string>
+    <string name="setup_feat2_title">आसान दवा प्रबंधन</string>
+    <string name="setup_feat2_desc">सरल और उपयोग में आसान इंटरफ़ेस के साथ दवाएं प्रबंधित करें।</string>
+    <string name="setup_feat3_title">आपातकालीन सहायता</string>
+    <string name="setup_feat3_desc">आपातकालीन संपर्कों और जानकारी तक तुरंत पहुंच प्राप्त करें।</string>
+    <string name="setup_profile_title">हमें अपने बारे में बताएं!</string>
+    <string name="setup_profile_sub">यह आपके अनुभव को व्यक्तिगत बनाने में मदद करता है।</string>
+    <string name="setup_next">आगे</string>
+    <string name="setup_get_started">शुरू करें</string>
+
+    <!-- Dialogs & Buttons -->
+    <string name="select_language">भाषा चुनें</string>
+    <string name="system_default">सिस्टम डिफ़ॉल्ट</string>
+    <string name="export_data">डेटा निर्यात करें</string>
+    <string name="export_current_profile">केवल वर्तमान प्रोफ़ाइल का निर्यात करें</string>
+    <string name="export_all_profiles">सभी प्रोफ़ाइल का निर्यात करें (ZIP)</string>
+    <string name="export_choose_title">डेटा निर्यात विकल्प</string>
+    <string name="export_choose_desc">चुनें कि आप कौन सा डेटा निर्यात करना चाहते हैं:</string>
+    <string name="export_success_title">निर्यात सफल</string>
+    <string name="export_success_desc">डेटा यहाँ निर्यात किया गया:</string>
+    <string name="export_share_file">फ़ाइल साझा करें</string>
+    <string name="export_done">हो गया</string>
+    <string name="export_progress_title">डेटा निर्यात हो रहा है</string>
+    <string name="export_progress_desc">कृपया प्रतीक्षा करें जब तक हम आपका डेटा तैयार करते हैं…</string>
+    <string name="export_failed_title">निर्यात विफल</string>
+    <string name="cancel">रद्द करें</string>
+    <string name="export">निर्यात</string>
+    <string name="save">सहेजें</string>
+    <!-- Personal Contacts -->
+    <string name="personal_contacts">व्यक्तिगत संपर्क</string>
+    <string name="personal_contacts_add">जोड़ें</string>
+    <string name="personal_contacts_empty">अभी तक कोई व्यक्तिगत संपर्क नहीं जोड़ा गया।\n\"+ जोड़ें\" पर टैप करें।</string>
+    <string name="personal_contacts_add_title">व्यक्तिगत संपर्क जोड़ें</string>
+    <string name="personal_contacts_name">संपर्क का नाम</string>
+    <string name="personal_contacts_phone">फ़ोन नंबर</string>
+    <string name="personal_contacts_save">सहेजें</string>
+    <string name="personal_contacts_cancel">रद्द करें</string>
+    <!-- Alarm Activity -->
+    <string name="alarm_medication_reminder">दवा अनुस्मारक</string>
+    <string name="alarm_reminder_for">%s के लिए अनुस्मारक</string>
+    <string name="alarm_scheduled">निर्धारित: %s</string>
+    <string name="alarm_take_now">अभी लें</string>
+    <string name="alarm_snooze">स्नूज़ (%1$d मिनट)</string>
+    <string name="alarm_mark_late">देर से चिह्नित करें</string>
+
+    <string name="pref_snooze_duration">स्नूज़ अवधि</string>
+    <string name="pref_select_snooze_duration">स्नूज़ अवधि चुनें</string>
+    <string name="minutes_format">%1$d मिनट</string>
+    <string name="profile">प्रोफ़ाइल</string>
+
+
+    <string name="manage">प्रबंधित करें</string>
+    <string name="profile_switch">बदलें</string>
+    <string name="schedule_no_meds_date">इस तिथि के लिए कोई दवा निर्धारित नहीं है</string>
+
+
+    <string name="home_all_good">सब ठीक है!</string>
+    <string name="home_all_good_desc">आज कोई दवा लेने की आवश्यकता नहीं है। यदि आपको और जोड़ने की आवश्यकता है, तो नीचे दिए गए प्लस बटन को दबाकर प्रारंभ करें।</string>
+    <string name="no_profiles_found">कोई प्रोफ़ाइल नहीं मिली</string>
+    <string name="status_taken">लिया गया</string>
+
+</resources>

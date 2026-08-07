@@ -38,6 +38,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,6 +49,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.dosezy.R
 import com.example.dosezy.data.model.User
+import com.example.dosezy.data.model.getLocalizedName
 import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.viewmodels.UserViewModel
 import java.io.File
@@ -63,7 +66,7 @@ fun SwitchProfileScreen(navController: NavController) {
             TopBar(
                 navController = navController,
                 currentUser = currentUser,
-                title = "Switch Profile",
+                title = stringResource(R.string.menu_switch_profile),
                 showBackButton = true,
                 actions = {}
             )
@@ -87,7 +90,7 @@ fun SwitchProfileScreen(navController: NavController) {
                 ) {
                     // Profiles List
                     Text(
-                        text = "Select a Profile",
+                        text = stringResource(R.string.select_profile),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -110,7 +113,7 @@ fun SwitchProfileScreen(navController: NavController) {
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "No profiles found",
+                                text = stringResource(R.string.no_profiles_found),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -120,7 +123,7 @@ fun SwitchProfileScreen(navController: NavController) {
                             modifier = Modifier.weight(1f),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(users) { user ->
+                            items(users, key = { it.userId }) { user ->
                                 ProfileListItem(
                                     user = user,
                                     isCurrentUser = user.userId == currentUser?.userId,
@@ -159,7 +162,7 @@ fun SwitchProfileScreen(navController: NavController) {
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "New Profile",
+                            text = stringResource(R.string.new_profile),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -171,7 +174,7 @@ fun SwitchProfileScreen(navController: NavController) {
 }
 
 @Composable
-fun ProfileListItem(
+private fun ProfileListItem(
     user: User,
     isCurrentUser: Boolean,
     onClick: () -> Unit,
@@ -234,13 +237,13 @@ fun ProfileListItem(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "${user.age} years • ${user.gender.displayName}",
+                        text = "${stringResource(R.string.years_format, user.age)} • ${user.gender.getLocalizedName()}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     if (isCurrentUser) {
                         Text(
-                            text = "Current Profile",
+                            text = stringResource(R.string.current_profile),
                             style = MaterialTheme.typography.labelSmall,
                             color = Color(0xFF10B981),
                             modifier = Modifier.padding(top = 2.dp)

@@ -55,7 +55,7 @@ fun HelpSupportScreen(navController: NavController) {
             TopBar(
                 navController = navController,
                 currentUser = currentUser,
-                title = "Help & Support",
+                title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_title),
                 showBackButton = true,
                 actions = {}
             )
@@ -80,7 +80,7 @@ fun HelpSupportContent(navController: NavController) {
     ) {
         // Resources Section
         Text(
-            text = "Resources",
+            text = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_resources),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface,
@@ -92,8 +92,8 @@ fun HelpSupportContent(navController: NavController) {
         // FAQ Card
         SupportCard(
             icon = Icons.Outlined.Help,
-            title = "FAQs",
-            description = "Answers to common questions.",
+            title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_faqs_title),
+            description = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_faqs_desc),
             onClick = {
                 openUrl(context, "https://github.com/saad2134/dosezy/blob/main/resources/FAQs.md")
             }
@@ -104,8 +104,8 @@ fun HelpSupportContent(navController: NavController) {
         // User Manual Card
         SupportCard(
             icon = Icons.Outlined.Book,
-            title = "User Manual",
-            description = "Browse the user guide.",
+            title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_user_manual_title),
+            description = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_user_manual_desc),
             onClick = {
                 openUrl(context, "https://github.com/saad2134/dosezy/blob/main/resources/UserManual.md")
             }
@@ -115,7 +115,7 @@ fun HelpSupportContent(navController: NavController) {
 
         // Contact Support Section
         Text(
-            text = "Contact Support",
+            text = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_contact_support),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface,
@@ -127,8 +127,8 @@ fun HelpSupportContent(navController: NavController) {
         // Email Support Card
         SupportCard(
             icon = Icons.Outlined.Email,
-            title = "Email Support",
-            description = "Get help via email.",
+            title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_email_support_title),
+            description = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_email_support_desc),
             onClick = {
                 openEmail(context, "reach.saad@outlook.com", "Help & Support Request")
             }
@@ -139,8 +139,8 @@ fun HelpSupportContent(navController: NavController) {
         // Phone Support Card
         SupportCard(
             icon = Icons.Outlined.Call,
-            title = "Phone Support",
-            description = "Call us for immediate help.",
+            title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_phone_support_title),
+            description = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_phone_support_desc),
             onClick = {
                 openPhone(context, "+91 98765 43210")
             }

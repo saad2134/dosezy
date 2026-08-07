@@ -42,10 +42,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.compose.ui.res.stringResource
+import com.example.dosezy.R
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.dosezy.data.model.DosageUnit
 import com.example.dosezy.data.model.Medicine
+import com.example.dosezy.data.model.getLocalizedDosageDisplay
 import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.theme.DosezyTheme
 import com.example.dosezy.ui.viewmodels.MedicineViewModel
@@ -77,19 +80,12 @@ fun MedicinesScreen(
             TopBar(
                 navController = navController,
                 currentUser = currentUser,
-                title = "Medicines",
+                title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.medicines_title),
                 actions = {}
             )
 
-            if (isLoading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
+            if (isLoading && medicines.isEmpty()) {
+                com.example.dosezy.ui.components.MedicineListSkeleton(count = 4)
             } else {
                 MedicinesContent(
                     medicines = medicines,
@@ -117,7 +113,7 @@ fun MedicinesContent(
         LazyColumn(
             modifier = modifier
         ) {
-            items(medicines) { medicine ->
+            items(medicines, key = { it.medicineId }) { medicine ->
                 MedicineItem(
                     medicine = medicine,
                     onClick = { onMedicineClick(medicine) },
@@ -182,7 +178,8 @@ fun MedicineItem(
 @Composable
 fun MedicineImage(
     imageUri: String?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    iconSize: androidx.compose.ui.unit.Dp = 36.dp
 ) {
     Box(
         modifier = modifier
@@ -215,7 +212,7 @@ fun MedicineImage(
                 imageVector = Icons.Default.Medication,
                 contentDescription = "Default medicine icon",
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(36.dp)
+                modifier = Modifier.size(iconSize)
             )
         }
     }
@@ -249,7 +246,7 @@ fun EmptyMedicinesState() {
 
         // Title
         Text(
-            text = "No medications yet",
+            text = stringResource(R.string.medicines_empty),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface,
@@ -259,7 +256,7 @@ fun EmptyMedicinesState() {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "It looks like you haven't added any medications. Get started by tapping the plus button below.",
+            text = stringResource(R.string.medicines_empty_sub),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -269,9 +266,10 @@ fun EmptyMedicinesState() {
     }
 }
 
+@Composable
 private fun formatDosageInfo(medicine: Medicine): String {
-    val dosageText = "${medicine.dosage} ${medicine.dosageUnit.displayName.toLowerCase()}"
-    val timesText = if (medicine.timesPerDay == 1) "1 time a day" else "${medicine.timesPerDay} times a day"
+    val dosageText = medicine.getLocalizedDosageDisplay()
+    val timesText = stringResource(R.string.times_per_day_format, medicine.timesPerDay)
     return "$dosageText, $timesText"
 }
 

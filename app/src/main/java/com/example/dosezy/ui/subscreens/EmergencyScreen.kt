@@ -18,7 +18,11 @@ import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.LocalFireDepartment
 import androidx.compose.material.icons.outlined.LocalHospital
 import androidx.compose.material.icons.outlined.LocalPolice
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -33,16 +37,46 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringResource
+import com.example.dosezy.R
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.viewmodels.UserViewModel
+
+data class CountryEmergency(
+    val code: String,
+    val flag: String,
+    val name: String,
+    val ambulance: String,
+    val fire: String,
+    val police: String,
+    val universal: String? = null
+)
+
+val emergencyCountries = listOf(
+    CountryEmergency("IN", "🇮🇳", "India", ambulance = "108", fire = "101", police = "100", universal = "112"),
+    CountryEmergency("US", "🇺🇸", "United States / Canada", ambulance = "911", fire = "911", police = "911", universal = "911"),
+    CountryEmergency("GB", "🇬🇧", "United Kingdom", ambulance = "999", fire = "999", police = "999", universal = "112"),
+    CountryEmergency("EU", "🇪🇺", "European Union", ambulance = "112", fire = "112", police = "112", universal = "112"),
+    CountryEmergency("CN", "🇨🇳", "China", ambulance = "120", fire = "119", police = "110"),
+    CountryEmergency("JP", "🇯🇵", "Japan", ambulance = "119", fire = "119", police = "110"),
+    CountryEmergency("RU", "🇷🇺", "Russia", ambulance = "103", fire = "101", police = "102", universal = "112"),
+    CountryEmergency("BR", "🇧🇷", "Brazil", ambulance = "192", fire = "193", police = "190"),
+    CountryEmergency("BD", "🇧🇩", "Bangladesh", ambulance = "999", fire = "999", police = "999", universal = "999"),
+    CountryEmergency("AU", "🇦🇺", "Australia", ambulance = "000", fire = "000", police = "000", universal = "000")
+)
 
 @Composable
 fun EmergencyScreen(navController: NavController) {
@@ -55,22 +89,71 @@ fun EmergencyScreen(navController: NavController) {
         TopBar(
             navController = navController,
             currentUser = currentUser,
-            title = "Emergency",
+            title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.emergency_title),
             showBackButton = true,
             titleColor = Color(0xFFEF4444),
             actions = {}
         )
 
-        EmergencyContent(navController)
+        EmergencyContent(currentUser?.language ?: com.example.dosezy.data.model.Language.SYSTEM)
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EmergencyContent(navController: NavController) {
+fun EmergencyContent(userLanguage: com.example.dosezy.data.model.Language) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
-    var showEmergencyInfo by remember { mutableStateOf(false) }
-    var showEditEmergencyInfo by remember { mutableStateOf(false) }
+
+    val defaultCountry = remember(userLanguage) {
+        when (userLanguage) {
+            com.example.dosezy.data.model.Language.BENGALI -> emergencyCountries.find { it.code == "BD" }
+            com.example.dosezy.data.model.Language.CHINESE -> emergencyCountries.find { it.code == "CN" }
+            com.example.dosezy.data.model.Language.JAPANESE -> emergencyCountries.find { it.code == "JP" }
+            com.example.dosezy.data.model.Language.RUSSIAN -> emergencyCountries.find { it.code == "RU" }
+            com.example.dosezy.data.model.Language.SPANISH,
+            com.example.dosezy.data.model.Language.FRENCH,
+            com.example.dosezy.data.model.Language.GERMAN,
+            com.example.dosezy.data.model.Language.ITALIAN,
+            com.example.dosezy.data.model.Language.PORTUGUESE -> emergencyCountries.find { it.code == "EU" }
+            com.example.dosezy.data.model.Language.HINDI -> emergencyCountries.find { it.code == "IN" }
+            else -> emergencyCountries.first() // India default
+        } ?: emergencyCountries.first()
+    }
+
+    var selectedCountry by remember { mutableStateOf(defaultCountry) }
+    var countryDropdownExpanded by remember { mutableStateOf(false) }
+
+    // Persist personal contacts via SharedPreferences
+    val prefs = context.getSharedPreferences("emergency_contacts", android.content.Context.MODE_PRIVATE)
+    val customContacts = remember {
+        val saved = prefs.getString("contacts_json", null)
+        val list = androidx.compose.runtime.mutableStateListOf<Pair<String, String>>()
+        if (!saved.isNullOrEmpty()) {
+            try {
+                val arr = org.json.JSONArray(saved)
+                for (i in 0 until arr.length()) {
+                    val obj = arr.getJSONObject(i)
+                    list.add(Pair(obj.getString("name"), obj.getString("phone")))
+                }
+            } catch (_: Exception) {}
+        }
+        list
+    }
+
+    // Helper to persist contacts
+    fun saveContacts() {
+        val arr = org.json.JSONArray()
+        customContacts.forEach { (name, phone) ->
+            val obj = org.json.JSONObject()
+            obj.put("name", name)
+            obj.put("phone", phone)
+            arr.put(obj)
+        }
+        prefs.edit().putString("contacts_json", arr.toString()).apply()
+    }
+
+    var showAddContactDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -78,62 +161,74 @@ fun EmergencyContent(navController: NavController) {
             .verticalScroll(scrollState)
             .padding(16.dp)
     ) {
-        // Information Section
-        /*Text(
-            text = "Information",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+        // Country Dropdown Picker (no redundant header — TopBar already shows title)
+        ExposedDropdownMenuBox(
+            expanded = countryDropdownExpanded,
+            onExpandedChange = { countryDropdownExpanded = !countryDropdownExpanded }
+        ) {
+            OutlinedTextField(
+                value = "${selectedCountry.flag} ${selectedCountry.name}",
+                onValueChange = {},
+                readOnly = true,
+                label = { Text(androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.emergency_select_country)) },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = countryDropdownExpanded) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(),
+                shape = RoundedCornerShape(16.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface
+                )
+            )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // View Information Card
-        EmergencyCard(
-            icon = Icons.Outlined.ContactEmergency,
-            iconColor = Color(0xFF3B82F6),
-            title = "View Information",
-            description = "See saved emergency information.",
-            onClick = {
-                showEmergencyInfo = true
+            ExposedDropdownMenu(
+                expanded = countryDropdownExpanded,
+                onDismissRequest = { countryDropdownExpanded = false },
+                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+            ) {
+                emergencyCountries.forEach { country ->
+                    DropdownMenuItem(
+                        text = { Text("${country.flag} ${country.name}", color = MaterialTheme.colorScheme.onSurface) },
+                        onClick = {
+                            selectedCountry = country
+                            countryDropdownExpanded = false
+                        },
+                        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                    )
+                }
             }
-        )
+        }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
-        // Edit Information Card
-        EmergencyCard(
-            icon = Icons.Outlined.Edit,
-            iconColor = Color(0xFF3B82F6),
-            title = "Edit Information",
-            description = "Edit emergency information.",
-            onClick = {
-                showEditEmergencyInfo = true
-            }
-        )
+        // Universal Emergency Card if available
+        if (selectedCountry.universal != null) {
+            EmergencyServiceCard(
+                icon = Icons.Outlined.Call,
+                iconColor = Color(0xFF8B5CF6),
+                title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.emergency_universal),
+                phoneNumber = selectedCountry.universal!!,
+                onClick = {
+                    openPhone(context, selectedCountry.universal!!)
+                }
+            )
 
-        Spacer(modifier = Modifier.height(32.dp))*/
-
-        // Emergency Services Section
-        Text(
-            text = "Emergency Services (India)",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+        }
 
         // Ambulance Card
         EmergencyServiceCard(
             icon = Icons.Outlined.LocalHospital,
             iconColor = Color(0xFFEF4444),
-            title = "Ambulance",
-            phoneNumber = "108",
+            title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.emergency_ambulance),
+            phoneNumber = selectedCountry.ambulance,
             onClick = {
-                openPhone(context, "108")
+                openPhone(context, selectedCountry.ambulance)
             }
         )
 
@@ -143,10 +238,10 @@ fun EmergencyContent(navController: NavController) {
         EmergencyServiceCard(
             icon = Icons.Outlined.LocalFireDepartment,
             iconColor = Color(0xFFF97316),
-            title = "Fire",
-            phoneNumber = "101",
+            title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.emergency_fire),
+            phoneNumber = selectedCountry.fire,
             onClick = {
-                openPhone(context, "101")
+                openPhone(context, selectedCountry.fire)
             }
         )
 
@@ -156,29 +251,160 @@ fun EmergencyContent(navController: NavController) {
         EmergencyServiceCard(
             icon = Icons.Outlined.LocalPolice,
             iconColor = Color(0xFF3B82F6),
-            title = "Police",
-            phoneNumber = "100",
+            title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.emergency_police),
+            phoneNumber = selectedCountry.police,
             onClick = {
-                openPhone(context, "100")
+                openPhone(context, selectedCountry.police)
             }
         )
-    }
 
-    // Dialogs
-    if (showEmergencyInfo) {
-        EmergencyInfoDialog(
-            onDismiss = { showEmergencyInfo = false },
-            onEdit = {
-                showEmergencyInfo = false
-                showEditEmergencyInfo = true
+        Spacer(modifier = Modifier.height(28.dp))
+
+        // ═══ Personal Emergency Contacts Section ═══
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.personal_contacts),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            androidx.compose.material3.TextButton(
+                onClick = { showAddContactDialog = true }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add Contact",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(stringResource(R.string.personal_contacts_add), color = MaterialTheme.colorScheme.primary)
             }
-        )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        if (customContacts.isEmpty()) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.surface,
+                tonalElevation = 0.dp,
+                shadowElevation = 1.dp
+            ) {
+                Text(
+                    text = stringResource(R.string.personal_contacts_empty),
+                    modifier = Modifier.padding(20.dp),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        } else {
+            customContacts.forEachIndexed { index, (name, phone) ->
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                        .clickable { openPhone(context, phone) },
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 0.dp,
+                    shadowElevation = 2.dp
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(40.dp)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = name,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = phone,
+                                fontSize = 15.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        androidx.compose.material3.IconButton(onClick = { customContacts.removeAt(index); saveContacts() }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Remove",
+                                tint = Color(0xFFEF4444)
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    if (showEditEmergencyInfo) {
-        EditEmergencyInfoDialog(
-            onDismiss = { showEditEmergencyInfo = false },
-            onSave = { showEditEmergencyInfo = false }
+    // Add Contact Dialog
+    if (showAddContactDialog) {
+        var contactName by remember { mutableStateOf("") }
+        var contactPhone by remember { mutableStateOf("") }
+
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showAddContactDialog = false },
+            title = { Text("Add Personal Contact", fontWeight = FontWeight.Bold) },
+            containerColor = MaterialTheme.colorScheme.surface,
+            tonalElevation = 0.dp,
+            text = {
+                Column {
+                    OutlinedTextField(
+                        value = contactName,
+                        onValueChange = { contactName = it },
+                        label = { Text("Contact Name") },
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    OutlinedTextField(
+                        value = contactPhone,
+                        onValueChange = { contactPhone = it },
+                        label = { Text("Phone Number") },
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                            keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone
+                        )
+                    )
+                }
+            },
+            confirmButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = {
+                        if (contactName.isNotBlank() && contactPhone.isNotBlank()) {
+                            customContacts.add(Pair(contactName, contactPhone))
+                            saveContacts()
+                            showAddContactDialog = false
+                        }
+                    }
+                ) { Text("Save") }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { showAddContactDialog = false }) {
+                    Text("Cancel")
+                }
+            }
         )
     }
 }

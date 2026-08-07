@@ -1,0 +1,245 @@
+<resources>
+    <string name="app_name">Dosezy</string>
+    <string name="app_tagline">Adherencia a los medicamentos simplificada</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_schedule">Horario</string>
+    <string name="nav_add">Añadir</string>
+    <string name="nav_medicines">Medicamentos</string>
+    <string name="nav_menu">Menú</string>
+
+    <!-- Greetings -->
+    <string name="greeting_morning">Buenos días,</string>
+    <string name="greeting_afternoon">Buenas tardes,</string>
+    <string name="greeting_evening">Buenas noches,</string>
+    <string name="greeting_night">Buenas noches,</string>
+    <string name="health_quote">\"La salud es una riqueza inestimable.\"</string>
+
+    <!-- Home Screen -->
+    <string name="home_todays_meds">Meds de hoy</string>
+    <string name="home_todays_adherence">Adherencia de hoy</string>
+    <string name="home_upcoming_doses">Próximas dosis</string>
+    <string name="home_all_taken">¡Todas las dosis tomadas!</string>
+    <string name="home_no_doses_today">No hay dosis programadas para hoy.</string>
+    <string name="home_medication_progress">Progreso de medicación</string>
+
+    <!-- Schedule Screen -->
+    <string name="schedule_title">Horario diario</string>
+    <string name="schedule_no_doses">Sin dosis programadas para este día</string>
+
+    <!-- Medicines Screen -->
+    <string name="medicines_title">Sus medicamentos</string>
+    <string name="medicines_add_new">Añadir nuevo medicamento</string>
+    <string name="medicines_empty">Aún no se han añadido medicamentos</string>
+    <string name="medicines_empty_sub">Parece que no ha añadido medicamentos. Toque el botón más para comenzar.</string>
+
+    <!-- Form Add/Edit Medicine -->
+    <string name="form_add_medicine">Añadir medicamento</string>
+    <string name="form_edit_medicine">Editar medicamento</string>
+    <string name="form_medicine_image">Imagen del medicamento</string>
+    <string name="form_med_name">Nombre del medicamento</string>
+    <string name="form_med_name_placeholder">ej. Amoxicilina</string>
+    <string name="form_dosage">Dosis</string>
+    <string name="form_dosage_placeholder">ej. 500mg, 1 pastilla</string>
+    <string name="form_frequency">Frecuencia</string>
+    <string name="form_time">Hora</string>
+    <string name="form_save">Guardar medicamento</string>
+    <string name="form_save_changes">Guardar cambios</string>
+    <string name="form_delete">Eliminar medicamento</string>
+    <string name="form_delete_medicine">Eliminar medicamento</string>
+    <string name="form_upload_img">Subir imagen del medicamento</string>
+    <string name="form_change_img">Cambiar imagen del medicamento</string>
+    <string name="freq_daily">Diario</string>
+    <string name="freq_weekly">Semanal</string>
+    <string name="freq_monthly">Mensual</string>
+    <string name="freq_custom">Personalizado</string>
+    <string name="form_select_days_week">Seleccionar días de la semana</string>
+    <string name="form_select_days_month">Seleccionar días del mes</string>
+    <string name="day_mon">Lun</string>
+    <string name="day_tue">Mar</string>
+    <string name="day_wed">Mié</string>
+    <string name="day_thu">Jue</string>
+    <string name="day_fri">Vie</string>
+    <string name="day_sat">Sáb</string>
+    <string name="day_sun">Dom</string>
+    <string name="times_per_day_format">%1$d vez/veces al día</string>
+    <string name="times_per_week_format">%1$d vez/veces por semana</string>
+    <string name="times_per_month_format">%1$d vez/veces al mes</string>
+
+    <!-- Menu Screen -->
+    <string name="menu_title">Menú</string>
+    <string name="menu_account_profile">Cuenta y Perfil</string>
+    <string name="menu_preferences">Preferencias</string>
+    <string name="menu_emergency">Contactos de emergencia</string>
+    <string name="menu_help_support">Ayuda y soporte</string>
+    <string name="menu_export_data">Exportar datos como CSV</string>
+    <string name="menu_switch_profile">Cambiar perfil</string>
+    <string name="menu_manage_profiles">Gestionar perfiles</string>
+    <string name="menu_manage_profile">Gestionar este perfil</string>
+
+    <!-- Preferences Screen -->
+    <string name="pref_title">Preferencias</string>
+    <string name="pref_theme">Tema</string>
+    <string name="pref_time_format">Formato de hora</string>
+    <string name="pref_language">Idioma</string>
+    <string name="pref_late_after">Considerar atrasado después de</string>
+    <string name="pref_missed_after">Considerar omitido después de</string>
+    <string name="mark_late">Marcar atrasado</string>
+
+    <!-- Dialog Titles & Options -->
+    <string name="pref_select_theme">Seleccionar tema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="theme_system">Predeterminado del sistema</string>
+
+    <string name="pref_select_time_format">Seleccionar formato de hora</string>
+    <string name="time_format_12">12 horas</string>
+    <string name="time_format_24">24 horas</string>
+
+    <string name="pref_mark_missed_after">Considerar omitido después de</string>
+    <string name="hours_format">%1$d hora(s)</string>
+
+    <!-- Notification Check Dialog -->
+    <string name="notif_check_title">Comprobación de notificaciones</string>
+    <string name="notif_perm_title">Permiso de notificación</string>
+    <string name="notif_perm_granted">Permiso concedido para enviar notificaciones.</string>
+    <string name="notif_battery_title">Batería del teléfono</string>
+    <string name="notif_battery_status">La batería está al %1$d%%</string>
+    <string name="notif_sound_title">Sonido del teléfono</string>
+    <string name="notif_sound_normal">El teléfono no está en silencio.</string>
+    <string name="notif_sound_vibrate">El teléfono está en modo vibración.</string>
+    <string name="notif_sound_silent">El teléfono está en silencio.</string>
+    <string name="notif_sound_unknown">Modo de sonido desconocido.</string>
+    <string name="notif_bg_title">Permiso en segundo plano</string>
+    <string name="notif_bg_desc">Las restricciones en segundo plano pueden evitar notificaciones.</string>
+    <string name="notif_bg_granted">La aplicación puede ejecutarse en segundo plano.</string>
+    <string name="ok">Aceptar</string>
+    <string name="close">Cerrar</string>
+
+    <!-- Profiles & Gender -->
+    <string name="select_profile">Seleccionar un perfil</string>
+    <string name="current_profile">Perfil actual</string>
+    <string name="new_profile">Nuevo perfil</string>
+    <string name="years_format">%1$d años</string>
+    <string name="gender_male">Masculino</string>
+    <string name="gender_female">Femenino</string>
+    <string name="gender_other">Otro</string>
+
+    <!-- Manage Profile Screen -->
+    <string name="profile_change_pic">Cambiar foto de perfil</string>
+    <string name="profile_upload_pic">Subir foto de perfil</string>
+    <string name="profile_full_name">Nombre</string>
+    <string name="profile_name_placeholder">Ingrese su nombre</string>
+    <string name="profile_age">Edad</string>
+    <string name="profile_gender">Género</string>
+    <string name="profile_contact_number">Número de contacto</string>
+    <string name="profile_save_btn">Guardar perfil</string>
+    <string name="profile_delete_btn">Eliminar perfil</string>
+    <string name="profile_name_required">El nombre es obligatorio</string>
+    <string name="profile_age_required">La edad es obligatoria</string>
+    <string name="profile_gender_required">El género es obligatorio</string>
+    <string name="profile_cannot_delete_only">No se puede eliminar el único perfil. Cree uno nuevo primero.</string>
+    <string name="profile_updated_success">¡Perfil actualizado correctamente!</string>
+    <string name="profile_deleted_success">Perfil eliminado correctamente</string>
+    <string name="profile_delete_confirm_desc">¿Está seguro de que desea eliminar este perfil? Esta acción no se puede deshacer.</string>
+
+    <!-- Dosage Units -->
+    <string name="unit_mg">mg</string>
+    <string name="unit_mcg">mcg</string>
+    <string name="unit_ml">mL</string>
+    <string name="unit_drop">gota(s)</string>
+    <string name="unit_tablet">pastilla(s)</string>
+    <string name="unit_capsule">cápsula(s)</string>
+
+    <!-- Help & Support -->
+    <string name="help_title">Ayuda y soporte</string>
+    <string name="help_resources">Recursos</string>
+    <string name="help_faqs_title">Preguntas frecuentes</string>
+    <string name="help_faqs_desc">Respuestas a preguntas comunes.</string>
+    <string name="help_user_manual_title">Manual de usuario</string>
+    <string name="help_user_manual_desc">Examine la guía del usuario.</string>
+    <string name="help_contact_support">Contactar con soporte</string>
+    <string name="help_email_support_title">Soporte por correo</string>
+    <string name="help_email_support_desc">Obtenga ayuda por correo electrónico.</string>
+    <string name="help_phone_support_title">Soporte telefónico</string>
+    <string name="help_phone_support_desc">Llámenos para ayuda inmediata.</string>
+
+    <!-- Emergency Services -->
+    <string name="emergency_title">Contactos de emergencia</string>
+    <string name="emergency_services">Servicios de emergencia</string>
+    <string name="emergency_select_country">Seleccionar región / país</string>
+    <string name="emergency_universal">Emergencia universal</string>
+    <string name="emergency_ambulance">Ambulancia</string>
+    <string name="emergency_fire">Bomberos</string>
+    <string name="emergency_police">Policía</string>
+    <string name="manage_profile_title">Gestionar perfil</string>
+
+    <!-- Setup / Onboarding Screens -->
+    <string name="setup_welcome_title">Bienvenido a Dosezy</string>
+    <string name="setup_welcome_sub">Su asistente personal de medicamentos.</string>
+    <string name="setup_features_title">¡Su salud, simplificada!</string>
+    <string name="setup_features_sub">Funciones clave de Dosezy</string>
+    <string name="setup_feat1_title">Nunca pierda una dosis</string>
+    <string name="setup_feat1_desc">Reciba recordatorios oportunos para cada medicamento.</string>
+    <string name="setup_feat2_title">Gestión sencilla</string>
+    <string name="setup_feat2_desc">Administre sus medicamentos con una interfaz intuitiva.</string>
+    <string name="setup_feat3_title">Soporte de emergencia</string>
+    <string name="setup_feat3_desc">Acceda rápidamente a contactos de emergencia.</string>
+    <string name="setup_profile_title">¡Cuéntenos sobre usted!</string>
+    <string name="setup_profile_sub">Esto nos ayuda a personalizar su experiencia.</string>
+    <string name="setup_next">Siguiente</string>
+    <string name="setup_get_started">Comenzar</string>
+
+    <!-- Dialogs & Buttons -->
+    <string name="select_language">Seleccionar idioma</string>
+    <string name="system_default">Predeterminado del sistema</string>
+    <string name="export_data">Exportar datos</string>
+    <string name="export_current_profile">Exportar solo el perfil actual</string>
+    <string name="export_all_profiles">Exportar todos los perfiles (ZIP)</string>
+    <string name="export_choose_title">Opciones de exportación de datos</string>
+    <string name="export_choose_desc">Elija qué datos desea exportar:</string>
+    <string name="export_success_title">Exportación exitosa</string>
+    <string name="export_success_desc">Datos exportados a:</string>
+    <string name="export_share_file">Compartir archivo</string>
+    <string name="export_done">Listo</string>
+    <string name="export_progress_title">Exportando datos</string>
+    <string name="export_progress_desc">Por favor espere mientras preparamos los datos…</string>
+    <string name="export_failed_title">Error al exportar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="export">Exportar</string>
+    <string name="save">Guardar</string>
+    <!-- Personal Contacts -->
+    <string name="personal_contacts">Contactos Personales</string>
+    <string name="personal_contacts_add">Agregar</string>
+    <string name="personal_contacts_empty">Aún no se han agregado contactos.\nToca \"+ Agregar\" para añadir uno.</string>
+    <string name="personal_contacts_add_title">Agregar Contacto Personal</string>
+    <string name="personal_contacts_name">Nombre del Contacto</string>
+    <string name="personal_contacts_phone">Número de Teléfono</string>
+    <string name="personal_contacts_save">Guardar</string>
+    <string name="personal_contacts_cancel">Cancelar</string>
+    <!-- Alarm Activity -->
+    <string name="alarm_medication_reminder">RECORDATORIO DE MEDICAMENTO</string>
+    <string name="alarm_reminder_for">Recordatorio para %s</string>
+    <string name="alarm_scheduled">Programado: %s</string>
+    <string name="alarm_take_now">TOMAR AHORA</string>
+    <string name="alarm_snooze">POSPONER (%1$d MIN)</string>
+    <string name="alarm_mark_late">MARCAR TARDE</string>
+
+    <string name="pref_snooze_duration">Duración de posponer</string>
+    <string name="pref_select_snooze_duration">Seleccionar duración de posponer</string>
+    <string name="minutes_format">%1$d minutos</string>
+    <string name="profile">Perfil</string>
+
+
+    <string name="manage">Gestionar</string>
+    <string name="profile_switch">Cambiar</string>
+    <string name="schedule_no_meds_date">No hay medicamentos programados para esta fecha</string>
+
+
+    <string name="home_all_good">¡Todo bien!</string>
+    <string name="home_all_good_desc">No es necesario tomar medicamentos hoy. Si necesita agregar más, comience tocando el botón más de abajo.</string>
+    <string name="no_profiles_found">No se encontraron perfiles</string>
+    <string name="status_taken">Tomado</string>
+
+</resources>

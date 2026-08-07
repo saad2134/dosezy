@@ -1,0 +1,229 @@
+<resources>
+    <string name="app_name">Dosezy</string>
+    <string name="app_tagline">Прием лекарств — это просто</string>
+
+    <string name="nav_home">Главная</string>
+    <string name="nav_schedule">Расписание</string>
+    <string name="nav_add">Добавить</string>
+    <string name="nav_medicines">Лекарства</string>
+    <string name="nav_menu">Меню</string>
+
+    <string name="greeting_morning">Доброе утро,</string>
+    <string name="greeting_afternoon">Добрый день,</string>
+    <string name="greeting_evening">Добрый вечер,</string>
+    <string name="greeting_night">Доброй ночи,</string>
+    <string name="health_quote">\"Здоровье — это бесценное богатство.\"</string>
+
+    <string name="home_todays_meds">Лекарства на сегодня</string>
+    <string name="home_todays_adherence">Прием за сегодня</string>
+    <string name="home_upcoming_doses">Предстоящие приемы</string>
+    <string name="home_all_taken">Все лекарства приняты!</string>
+    <string name="home_no_doses_today">На сегодня приемов не запланировано.</string>
+    <string name="home_medication_progress">Прогресс лечения</string>
+
+    <string name="schedule_title">Дневное расписание</string>
+    <string name="schedule_no_doses">На этот день приемов не запланировано</string>
+
+    <string name="medicines_title">Ваши лекарства</string>
+    <string name="medicines_add_new">Добавить новое лекарство</string>
+    <string name="medicines_empty">Лекарства еще не добавлены</string>
+    <string name="medicines_empty_sub">Похоже, вы еще не добавили лекарства. Нажмите кнопку «плюс» ниже, чтобы начать.</string>
+
+    <string name="form_add_medicine">Добавить лекарство</string>
+    <string name="form_edit_medicine">Редактировать лекарство</string>
+    <string name="form_medicine_image">Изображение лекарства</string>
+    <string name="form_med_name">Название лекарства</string>
+    <string name="form_med_name_placeholder">напр. Амоксициллин</string>
+    <string name="form_dosage">Дозировка</string>
+    <string name="form_dosage_placeholder">напр. 500 мг, 1 таблетка</string>
+    <string name="form_frequency">Частота</string>
+    <string name="form_time">Время</string>
+    <string name="form_save">Сохранить лекарство</string>
+    <string name="form_save_changes">Сохранить изменения</string>
+    <string name="form_delete">Удалить лекарство</string>
+    <string name="form_delete_medicine">Удалить лекарство</string>
+    <string name="form_upload_img">Загрузить изображение</string>
+    <string name="form_change_img">Изменить изображение</string>
+    <string name="freq_daily">Ежедневно</string>
+    <string name="freq_weekly">Еженедельно</string>
+    <string name="freq_monthly">Ежемесячно</string>
+    <string name="freq_custom">Другое</string>
+    <string name="form_select_days_week">Выберите дни недели</string>
+    <string name="form_select_days_month">Выберите дни месяца</string>
+    <string name="day_mon">Пн</string>
+    <string name="day_tue">Вт</string>
+    <string name="day_wed">Ср</string>
+    <string name="day_thu">Чт</string>
+    <string name="day_fri">Пт</string>
+    <string name="day_sat">Сб</string>
+    <string name="day_sun">Вс</string>
+    <string name="times_per_day_format">%1$d раз(а) в день</string>
+    <string name="times_per_week_format">%1$d раз(а) в неделю</string>
+    <string name="times_per_month_format">%1$d раз(а) в месяц</string>
+
+    <string name="menu_title">Меню</string>
+    <string name="menu_account_profile">Аккаунт и профиль</string>
+    <string name="menu_preferences">Настройки</string>
+    <string name="menu_emergency">Экстренные контакты</string>
+    <string name="menu_help_support">Справка и поддержка</string>
+    <string name="menu_export_data">Экспорт данных в CSV</string>
+    <string name="menu_switch_profile">Сменить профиль</string>
+    <string name="menu_manage_profiles">Управление профилями</string>
+    <string name="menu_manage_profile">Управление этим профилем</string>
+
+    <string name="pref_title">Настройки</string>
+    <string name="pref_theme">Тема</string>
+    <string name="pref_time_format">Формат времени</string>
+    <string name="pref_language">Язык</string>
+    <string name="pref_late_after">Считать опозданием через</string>
+    <string name="pref_missed_after">Считать пропущенным через</string>
+    <string name="mark_late">Отметить как опоздание</string>
+
+    <string name="pref_select_theme">Выберите тему</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Темная</string>
+    <string name="theme_system">Системная</string>
+
+    <string name="pref_select_time_format">Выберите формат времени</string>
+    <string name="time_format_12">12-часовой</string>
+    <string name="time_format_24">24-часовой</string>
+
+    <string name="pref_mark_missed_after">Считать пропущенным через</string>
+    <string name="hours_format">%1$d час(ов)</string>
+
+    <string name="notif_check_title">Проверка уведомлений</string>
+    <string name="notif_perm_title">Разрешение на уведомления</string>
+    <string name="notif_perm_granted">Разрешение на отправку уведомлений получено.</string>
+    <string name="notif_battery_title">Батарея телефона</string>
+    <string name="notif_battery_status">Заряд батареи %1$d%%</string>
+    <string name="notif_sound_title">Звук телефона</string>
+    <string name="notif_sound_normal">Телефон не в беззвучном режиме.</string>
+    <string name="notif_sound_vibrate">Телефон в режиме вибрации.</string>
+    <string name="notif_sound_silent">Телефон в беззвучном режиме.</string>
+    <string name="notif_sound_unknown">Неизвестный звуковой режим.</string>
+    <string name="notif_bg_title">Фоновые разрешения</string>
+    <string name="notif_bg_desc">Фоновые ограничения могут препятствовать доставке уведомлений.</string>
+    <string name="notif_bg_granted">Приложение может работать в фоновом режиме.</string>
+    <string name="ok">ОК</string>
+    <string name="close">Закрыть</string>
+
+    <string name="select_profile">Выберите профиль</string>
+    <string name="current_profile">Текущий профиль</string>
+    <string name="new_profile">Новый профиль</string>
+    <string name="years_format">%1$d лет</string>
+    <string name="gender_male">Мужской</string>
+    <string name="gender_female">Женский</string>
+    <string name="gender_other">Другой</string>
+
+    <string name="profile_change_pic">Изменить фото профиля</string>
+    <string name="profile_upload_pic">Загрузить фото профиля</string>
+    <string name="profile_full_name">Полное имя</string>
+    <string name="profile_name_placeholder">напр. Иван Иванов</string>
+    <string name="profile_age">Возраст</string>
+    <string name="profile_gender">Пол</string>
+    <string name="profile_contact_number">Контактный телефон</string>
+    <string name="profile_save_btn">Сохранить профиль</string>
+    <string name="profile_delete_btn">Удалить профиль</string>
+    <string name="profile_name_required">Имя обязательно</string>
+    <string name="profile_age_required">Возраст обязателен</string>
+    <string name="profile_gender_required">Пол обязателен</string>
+    <string name="profile_cannot_delete_only">Нельзя удалить единственный профиль. Сначала создайте новый.</string>
+    <string name="profile_updated_success">Профиль успешно обновлен!</string>
+    <string name="profile_deleted_success">Профиль успешно удален!</string>
+    <string name="profile_delete_confirm_desc">Вы уверены, что хотите удалить этот профиль? Это действие нельзя отменить.</string>
+
+    <string name="unit_mg">мг</string>
+    <string name="unit_mcg">мкг</string>
+    <string name="unit_ml">мл</string>
+    <string name="unit_drop">капля</string>
+    <string name="unit_tablet">таблетка</string>
+    <string name="unit_capsule">капсула</string>
+
+    <string name="help_title">Справка и поддержка</string>
+    <string name="help_resources">Ресурсы</string>
+    <string name="help_faqs_title">Часто задаваемые вопросы</string>
+    <string name="help_faqs_desc">Ответы на популярные вопросы.</string>
+    <string name="help_user_manual_title">Руководство пользователя</string>
+    <string name="help_user_manual_desc">Инструкция по использованию.</string>
+    <string name="help_contact_support">Связаться с поддержкой</string>
+    <string name="help_email_support_title">Поддержка по email</string>
+    <string name="help_email_support_desc">Получить помощь по почте.</string>
+    <string name="help_phone_support_title">Поддержка по телефону</string>
+    <string name="help_phone_support_desc">Позвоните нам для срочной помощи.</string>
+
+    <!-- Emergency Services -->
+    <string name="emergency_title">Экстренные контакты</string>
+    <string name="emergency_services">Экстренные службы</string>
+    <string name="emergency_select_country">Выбрать регион / страну</string>
+    <string name="emergency_universal">Единая экстренная служба</string>
+    <string name="emergency_ambulance">Скорая помощь</string>
+    <string name="emergency_fire">Пожарная служба</string>
+    <string name="emergency_police">Полиция</string>
+    <string name="manage_profile_title">Управление профилем</string>
+
+    <string name="setup_welcome_title">Добро пожаловать в Dosezy</string>
+    <string name="setup_welcome_sub">Ваш личный помощник по приему лекарств.</string>
+    <string name="setup_features_title">Ваше здоровье — это просто!</string>
+    <string name="setup_features_sub">Ключевые возможности Dosezy</string>
+    <string name="setup_feat1_title">Никогда не пропускайте прием</string>
+    <string name="setup_feat1_desc">Получайте своевременные напоминания о каждом лекарстве.</string>
+    <string name="setup_feat2_title">Удобное управление лекарствами</string>
+    <string name="setup_feat2_desc">Управляйте приемом с помощью простого интерфейса.</string>
+    <string name="setup_feat3_title">Экстренная поддержка</string>
+    <string name="setup_feat3_desc">Быстрый доступ к экстренным контактам.</string>
+    <string name="setup_profile_title">Расскажите о себе!</string>
+    <string name="setup_profile_sub">Это поможет нам персонализировать приложение.</string>
+    <string name="setup_next">Далее</string>
+    <string name="setup_get_started">Начать</string>
+
+    <string name="select_language">Выберите язык</string>
+    <string name="system_default">Системная</string>
+    <string name="export_data">Экспорт данных</string>
+    <string name="export_current_profile">Экспортировать только текущий профиль</string>
+    <string name="export_all_profiles">Экспортировать все профили (ZIP)</string>
+    <string name="export_choose_title">Параметры экспорта данных</string>
+    <string name="export_choose_desc">Выберите данные для экспорта:</string>
+    <string name="export_success_title">Экспорт завершен</string>
+    <string name="export_success_desc">Данные экспортированы в:</string>
+    <string name="export_share_file">Поделиться файлом</string>
+    <string name="export_done">Готово</string>
+    <string name="export_progress_title">Экспорт данных</string>
+    <string name="export_progress_desc">Пожалуйста, подождите, идет подготовка...</string>
+    <string name="export_failed_title">Ошибка экспорта</string>
+    <string name="cancel">Отмена</string>
+    <string name="export">Экспорт</string>
+    <string name="save">Сохранить</string>
+    <!-- Personal Contacts -->
+    <string name="personal_contacts">Личные контакты</string>
+    <string name="personal_contacts_add">Добавить</string>
+    <string name="personal_contacts_empty">Личные контакты ещё не добавлены.\nНажмите \"+ Добавить\".</string>
+    <string name="personal_contacts_add_title">Добавить личный контакт</string>
+    <string name="personal_contacts_name">Имя контакта</string>
+    <string name="personal_contacts_phone">Номер телефона</string>
+    <string name="personal_contacts_save">Сохранить</string>
+    <string name="personal_contacts_cancel">Отмена</string>
+    <!-- Alarm Activity -->
+    <string name="alarm_medication_reminder">НАПОМИНАНИЕ О ЛЕКАРСТВЕ</string>
+    <string name="alarm_reminder_for">Напоминание для %s</string>
+    <string name="alarm_scheduled">Запланировано: %s</string>
+    <string name="alarm_take_now">ПРИНЯТЬ СЕЙЧАС</string>
+    <string name="alarm_snooze">ОТЛОЖИТЬ (%1$d МИН)</string>
+    <string name="alarm_mark_late">ОТМЕТИТЬ ОПОЗДАНИЕ</string>
+
+    <string name="pref_snooze_duration">Время отложения</string>
+    <string name="pref_select_snooze_duration">Выберите время отложения</string>
+    <string name="minutes_format">%1$d мин</string>
+    <string name="profile">Профиль</string>
+
+
+    <string name="manage">Управление</string>
+    <string name="profile_switch">Сменить</string>
+    <string name="schedule_no_meds_date">На эту дату лекарств не запланировано</string>
+
+
+    <string name="home_all_good">Все отлично!</string>
+    <string name="home_all_good_desc">Сегодня принимать лекарства не нужно. Если хотите добавить еще, нажмите на кнопку с плюсом внизу.</string>
+    <string name="no_profiles_found">Профили не найдены</string>
+    <string name="status_taken">Принято</string>
+
+</resources>

@@ -1,0 +1,229 @@
+<resources>
+    <string name="app_name">Dosezy</string>
+    <string name="app_tagline">服薬管理をシンプルに</string>
+
+    <string name="nav_home">ホーム</string>
+    <string name="nav_schedule">スケジュール</string>
+    <string name="nav_add">追加</string>
+    <string name="nav_medicines">お薬一覧</string>
+    <string name="nav_menu">メニュー</string>
+
+    <string name="greeting_morning">おはようございます、</string>
+    <string name="greeting_afternoon">こんにちは、</string>
+    <string name="greeting_evening">こんばんは、</string>
+    <string name="greeting_night">おやすみなさい、</string>
+    <string name="health_quote">\"健康はプライスレスな財産です。\"</string>
+
+    <string name="home_todays_meds">今日のお薬</string>
+    <string name="home_todays_adherence">今日の服薬率</string>
+    <string name="home_upcoming_doses">次のお薬</string>
+    <string name="home_all_taken">すべての服薬が完了しました！</string>
+    <string name="home_no_doses_today">本日の服薬予定はありません。</string>
+    <string name="home_medication_progress">服薬進捗状況</string>
+
+    <string name="schedule_title">毎日のスケジュール</string>
+    <string name="schedule_no_doses">この日の服薬予定はありません</string>
+
+    <string name="medicines_title">登録中のお薬</string>
+    <string name="medicines_add_new">新しいお薬を追加</string>
+    <string name="medicines_empty">まだお薬が登録されていません</string>
+    <string name="medicines_empty_sub">まだお薬が登録されていないようです。下のプラスボタンをタップして開始してください。</string>
+
+    <string name="form_add_medicine">お薬を追加</string>
+    <string name="form_edit_medicine">お薬を編集</string>
+    <string name="form_medicine_image">お薬の画像</string>
+    <string name="form_med_name">お薬の名前</string>
+    <string name="form_med_name_placeholder">例: アモキシシリン</string>
+    <string name="form_dosage">服用量</string>
+    <string name="form_dosage_placeholder">例: 500mg, 1錠</string>
+    <string name="form_frequency">頻度</string>
+    <string name="form_time">時間</string>
+    <string name="form_save">お薬を保存</string>
+    <string name="form_save_changes">変更を保存</string>
+    <string name="form_delete">お薬を削除</string>
+    <string name="form_delete_medicine">お薬を削除</string>
+    <string name="form_upload_img">お薬画像をアップロード</string>
+    <string name="form_change_img">お薬画像を変更</string>
+    <string name="freq_daily">毎日</string>
+    <string name="freq_weekly">毎週</string>
+    <string name="freq_monthly">毎月</string>
+    <string name="freq_custom">カスタム</string>
+    <string name="form_select_days_week">曜日を選択</string>
+    <string name="form_select_days_month">日付を選択</string>
+    <string name="day_mon">月</string>
+    <string name="day_tue">火</string>
+    <string name="day_wed">水</string>
+    <string name="day_thu">木</string>
+    <string name="day_fri">金</string>
+    <string name="day_sat">土</string>
+    <string name="day_sun">日</string>
+    <string name="times_per_day_format">1日 %1$d 回</string>
+    <string name="times_per_week_format">1週間 %1$d 回</string>
+    <string name="times_per_month_format">1ヶ月 %1$d 回</string>
+
+    <string name="menu_title">メニュー</string>
+    <string name="menu_account_profile">アカウントとプロフィール</string>
+    <string name="menu_preferences">環境設定</string>
+    <string name="menu_emergency">緊急連絡先</string>
+    <string name="menu_help_support">ヘルプとサポート</string>
+    <string name="menu_export_data">CSV形式でデータをエクスポート</string>
+    <string name="menu_switch_profile">プロフィールを切り替え</string>
+    <string name="menu_manage_profiles">プロフィールを管理</string>
+    <string name="menu_manage_profile">このプロフィールを管理</string>
+
+    <string name="pref_title">環境設定</string>
+    <string name="pref_theme">テーマ</string>
+    <string name="pref_time_format">時間形式</string>
+    <string name="pref_language">言語</string>
+    <string name="pref_late_after">遅延判定時間</string>
+    <string name="pref_missed_after">飲み忘れ判定時間</string>
+    <string name="mark_late">遅延としてマーク</string>
+
+    <string name="pref_select_theme">テーマを選択</string>
+    <string name="theme_light">ライト</string>
+    <string name="theme_dark">ダーク</string>
+    <string name="theme_system">システムデフォルト</string>
+
+    <string name="pref_select_time_format">時間表示形式を選択</string>
+    <string name="time_format_12">12時間表示</string>
+    <string name="time_format_24">24時間表示</string>
+
+    <string name="pref_mark_missed_after">飲み忘れ判定時間</string>
+    <string name="hours_format">%1$d 時間後</string>
+
+    <string name="notif_check_title">通知設定の確認</string>
+    <string name="notif_perm_title">通知権限</string>
+    <string name="notif_perm_granted">通知送信権限が許可されています。</string>
+    <string name="notif_battery_title">バッテリー残量</string>
+    <string name="notif_battery_status">バッテリー残量: %1$d%%</string>
+    <string name="notif_sound_title">サウンドモード</string>
+    <string name="notif_sound_normal">マナーモードではありません。</string>
+    <string name="notif_sound_vibrate">バイブレーションモードです。</string>
+    <string name="notif_sound_silent">サイレントモードです。</string>
+    <string name="notif_sound_unknown">不明なサウンドモードです。</string>
+    <string name="notif_bg_title">バックグラウンド実行権限</string>
+    <string name="notif_bg_desc">バックグラウンド制限により通知が届かない場合があります。</string>
+    <string name="notif_bg_granted">アプリはバックグラウンドで実行可能です。</string>
+    <string name="ok">OK</string>
+    <string name="close">閉じる</string>
+
+    <string name="select_profile">プロフィールを選択</string>
+    <string name="current_profile">現在のプロフィール</string>
+    <string name="new_profile">新規プロフィール</string>
+    <string name="years_format">%1$d 歳</string>
+    <string name="gender_male">男性</string>
+    <string name="gender_female">女性</string>
+    <string name="gender_other">その他</string>
+
+    <string name="profile_change_pic">プロフィール画像を変更</string>
+    <string name="profile_upload_pic">プロフィール画像をアップロード</string>
+    <string name="profile_full_name">氏名</string>
+    <string name="profile_name_placeholder">例: 山田 太郎</string>
+    <string name="profile_age">年齢</string>
+    <string name="profile_gender">性別</string>
+    <string name="profile_contact_number">電話番号</string>
+    <string name="profile_save_btn">プロフィールを保存</string>
+    <string name="profile_delete_btn">プロフィールを削除</string>
+    <string name="profile_name_required">氏名は必須です</string>
+    <string name="profile_age_required">年齢は必須です</string>
+    <string name="profile_gender_required">性別は必須です</string>
+    <string name="profile_cannot_delete_only">唯一のプロフィールは削除できません。まず新しいプロフィールを作成してください。</string>
+    <string name="profile_updated_success">プロフィールを更新しました！</string>
+    <string name="profile_deleted_success">プロフィールを削除しました！</string>
+    <string name="profile_delete_confirm_desc">本当にこのプロフィールを削除しますか？この操作は取り消せません。</string>
+
+    <string name="unit_mg">mg</string>
+    <string name="unit_mcg">mcg</string>
+    <string name="unit_ml">mL</string>
+    <string name="unit_drop">滴</string>
+    <string name="unit_tablet">錠</string>
+    <string name="unit_capsule">カプセル</string>
+
+    <string name="help_title">ヘルプとサポート</string>
+    <string name="help_resources">リソース</string>
+    <string name="help_faqs_title">よくある質問</string>
+    <string name="help_faqs_desc">よくある質問への回答。</string>
+    <string name="help_user_manual_title">取扱説明書</string>
+    <string name="help_user_manual_desc">ユーザーガイドを参照。</string>
+    <string name="help_contact_support">サポートへお問合せ</string>
+    <string name="help_email_support_title">メールサポート</string>
+    <string name="help_email_support_desc">メールでサポートを受ける。</string>
+    <string name="help_phone_support_title">電話サポート</string>
+    <string name="help_phone_support_desc">お電話で即時サポート。</string>
+
+    <!-- Emergency Services -->
+    <string name="emergency_title">緊急連絡先</string>
+    <string name="emergency_services">緊急通報サービス</string>
+    <string name="emergency_select_country">地域・国を選択</string>
+    <string name="emergency_universal">共通緊急通報</string>
+    <string name="emergency_ambulance">救急車</string>
+    <string name="emergency_fire">消防</string>
+    <string name="emergency_police">警察</string>
+    <string name="manage_profile_title">プロフィール管理</string>
+
+    <string name="setup_welcome_title">Dosezyへようこそ</string>
+    <string name="setup_welcome_sub">あなたのパーソナル服薬アシスタント。</string>
+    <string name="setup_features_title">健康管理をよりシンプルに！</string>
+    <string name="setup_features_sub">Dosezyの主な機能</string>
+    <string name="setup_feat1_title">飲み忘れをゼロに</string>
+    <string name="setup_feat1_desc">お薬ごとに適切なタイミングでリマインダーを送信します。</string>
+    <string name="setup_feat2_title">簡単なお薬管理</string>
+    <string name="setup_feat2_desc">使いやすいインターフェースでお薬を簡単に管理できます。</string>
+    <string name="setup_feat3_title">緊急サポート</string>
+    <string name="setup_feat3_desc">緊急連絡先へ迅速にアクセスできます。</string>
+    <string name="setup_profile_title">あなたについて教えてください！</string>
+    <string name="setup_profile_sub">最適な体験を提供するために役立ちます。</string>
+    <string name="setup_next">次へ</string>
+    <string name="setup_get_started">はじめる</string>
+
+    <string name="select_language">言語を選択</string>
+    <string name="system_default">システムデフォルト</string>
+    <string name="export_data">データをエクスポート</string>
+    <string name="export_current_profile">現在のプロフィールのみエクスポート</string>
+    <string name="export_all_profiles">すべてのプロフィールをエクスポート(ZIP)</string>
+    <string name="export_choose_title">データエクスポートオプション</string>
+    <string name="export_choose_desc">エクスポートするデータを選択してください:</string>
+    <string name="export_success_title">エクスポート成功</string>
+    <string name="export_success_desc">保存先:</string>
+    <string name="export_share_file">ファイルを共有</string>
+    <string name="export_done">完了</string>
+    <string name="export_progress_title">データをエクスポート中</string>
+    <string name="export_progress_desc">エクスポートの準備中です。しばらくお待ちください...</string>
+    <string name="export_failed_title">エクスポート失敗</string>
+    <string name="cancel">キャンセル</string>
+    <string name="export">エクスポート</string>
+    <string name="save">保存</string>
+    <!-- Personal Contacts -->
+    <string name="personal_contacts">個人連絡先</string>
+    <string name="personal_contacts_add">追加</string>
+    <string name="personal_contacts_empty">個人連絡先はまだ追加されていません。\n\"+ 追加\"をタップしてください。</string>
+    <string name="personal_contacts_add_title">個人連絡先を追加</string>
+    <string name="personal_contacts_name">連絡先名</string>
+    <string name="personal_contacts_phone">電話番号</string>
+    <string name="personal_contacts_save">保存</string>
+    <string name="personal_contacts_cancel">キャンセル</string>
+    <!-- Alarm Activity -->
+    <string name="alarm_medication_reminder">服薬リマインダー</string>
+    <string name="alarm_reminder_for">%s へのリマインダー</string>
+    <string name="alarm_scheduled">予定: %s</string>
+    <string name="alarm_take_now">今すぐ服用</string>
+    <string name="alarm_snooze">スヌーズ（%1$d分）</string>
+    <string name="alarm_mark_late">遅延としてマーク</string>
+
+    <string name="pref_snooze_duration">スヌーズ時間</string>
+    <string name="pref_select_snooze_duration">スヌーズ時間を選択</string>
+    <string name="minutes_format">%1$d分</string>
+    <string name="profile">プロフィール</string>
+
+
+    <string name="manage">管理</string>
+    <string name="profile_switch">切替</string>
+    <string name="schedule_no_meds_date">この日に予定されている薬はありません</string>
+
+
+    <string name="home_all_good">すべて順調です！</string>
+    <string name="home_all_good_desc">今日服用する必要のある薬はありません。追加する場合は、下のプラスボタンをタップして開始してください。</string>
+    <string name="no_profiles_found">プロフィールが見つかりません</string>
+    <string name="status_taken">服用済み</string>
+
+</resources>

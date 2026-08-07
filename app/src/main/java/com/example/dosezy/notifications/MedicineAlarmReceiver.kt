@@ -113,13 +113,36 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Create notification with Compose icons
+        // Full screen alarm intent
+        val alarmIntent = Intent(context, AlarmActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra(EXTRA_ENTRY_ID, entryId)
+            putExtra(EXTRA_MEDICINE_NAME, medicineName)
+            putExtra(EXTRA_SCHEDULED_TIME, scheduledTime ?: "")
+        }
+
+        val fullScreenPendingIntent = PendingIntent.getActivity(
+            context,
+            entryId.hashCode() + 10,
+            alarmIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Launch AlarmActivity directly to wake screen up and interrupt user
+        try {
+            context.startActivity(alarmIntent)
+        } catch (e: Exception) {
+            Log.e(TAG, "Could not start AlarmActivity directly", e)
+        }
+
+        // Create notification with Compose icons and fullScreenIntent
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_medicine_notification) // Keep a simple notification icon
+            .setSmallIcon(R.drawable.ic_medicine_notification)
             .setContentTitle("Medicine Reminder: $medicineName")
             .setContentText(contentText)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setFullScreenIntent(fullScreenPendingIntent, true)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .addAction(
@@ -139,7 +162,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(entryId.hashCode(), notification)
 
-        Log.d(TAG, "Showing notification for: $medicineName")
+        Log.d(TAG, "Showing notification and launching full-screen alarm for: $medicineName")
     }
 
     private fun createNotificationChannel(context: Context) {

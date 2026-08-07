@@ -28,22 +28,28 @@ object TimeCalculationUtils {
         }
     }
 
+    fun isLate(scheduledTime: LocalDateTime, currentTime: LocalDateTime, lateAfterHours: Int, missedAfterHours: Int): Boolean {
+        val duration = Duration.between(scheduledTime, currentTime)
+        val hours = duration.toHours()
+        return hours >= lateAfterHours.toLong() && hours < missedAfterHours.toLong()
+    }
+
     fun isMissed(scheduledTime: LocalDateTime, currentTime: LocalDateTime, missedAfterHours: Int): Boolean {
         val duration = Duration.between(scheduledTime, currentTime)
         return duration.toHours() >= missedAfterHours.toLong()
     }
 
-    fun getStatus(scheduledTime: LocalDateTime, currentTime: LocalDateTime, missedAfterHours: Int): MedicationStatus {
+    fun getStatus(scheduledTime: LocalDateTime, currentTime: LocalDateTime, lateAfterHours: Int, missedAfterHours: Int): MedicationStatus {
         return when {
             currentTime.isBefore(scheduledTime) -> MedicationStatus.PENDING
             isMissed(scheduledTime, currentTime, missedAfterHours) -> MedicationStatus.MISSED
-            else -> MedicationStatus.PENDING // Will be marked as late when taken
+            else -> MedicationStatus.PENDING
         }
     }
 
     fun formatTimeDifference(timeDiff: TimeDifference): String {
         return if (timeDiff.isLate) {
-            "${timeDiff.hours}h ${timeDiff.minutes}m late"
+            "${timeDiff.hours}h ${timeDiff.minutes}m ago"
         } else {
             "To be taken in ${timeDiff.hours}h ${timeDiff.minutes}m"
         }

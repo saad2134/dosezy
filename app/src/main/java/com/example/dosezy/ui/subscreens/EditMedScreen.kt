@@ -39,6 +39,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.ui.res.stringResource
+import com.example.dosezy.R
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -61,6 +63,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.dosezy.data.model.DosageUnit
 import com.example.dosezy.data.model.FrequencyPattern
 import com.example.dosezy.data.model.Medicine
+import com.example.dosezy.data.model.getLocalizedName
 import com.example.dosezy.ui.components.ProfilePicturePicker
 import com.example.dosezy.ui.theme.DosezyTheme
 import com.example.dosezy.ui.viewmodels.MedicineViewModel
@@ -129,7 +132,7 @@ fun EditMedScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Edit Medicine",
+                        stringResource(R.string.form_edit_medicine),
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = 24.sp
@@ -169,7 +172,7 @@ fun EditMedScreen(
                 ) {
                     // Medicine Image Selection
                     Text(
-                        text = "Medicine Image",
+                        text = stringResource(R.string.form_medicine_image),
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.Medium,
                             fontSize = 18.sp
@@ -200,7 +203,7 @@ fun EditMedScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = if (medicineImagePath != null) "Change Medicine Image" else "Upload Medicine Image",
+                            text = if (medicineImagePath != null) stringResource(R.string.form_change_img) else stringResource(R.string.form_upload_img),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -210,7 +213,7 @@ fun EditMedScreen(
 
                     // Medication Name
                     Text(
-                        text = "Medication Name",
+                        text = stringResource(R.string.form_med_name),
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.Medium,
                             fontSize = 18.sp
@@ -246,7 +249,7 @@ fun EditMedScreen(
 
                     // Dosage
                     Text(
-                        text = "Dosage",
+                        text = stringResource(R.string.form_dosage),
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.Medium,
                             fontSize = 18.sp
@@ -298,8 +301,8 @@ fun EditMedScreen(
                                 onExpandedChange = { dosageUnitExpanded = !dosageUnitExpanded }
                             ) {
                                 OutlinedTextField(
-                    shape = RoundedCornerShape(16.dp),
-                                    value = selectedDosageUnit.displayName,
+                                    shape = RoundedCornerShape(16.dp),
+                                    value = selectedDosageUnit.getLocalizedName(),
                                     onValueChange = {},
                                     readOnly = true,
                                     trailingIcon = {
@@ -318,21 +321,21 @@ fun EditMedScreen(
                                 )
 
                                 ExposedDropdownMenu(
-                                expanded = dosageUnitExpanded,
-                                onDismissRequest = { dosageUnitExpanded = false },
-                                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-                            ) {
-                                DosageUnit.values().forEach { unit ->
-                                    DropdownMenuItem(
-                                        text = { Text(unit.displayName) },
-                                        onClick = {
-                                            selectedDosageUnit = unit
-                                            dosageUnitExpanded = false
-                                        },
-                                        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-                                    )
+                                    expanded = dosageUnitExpanded,
+                                    onDismissRequest = { dosageUnitExpanded = false },
+                                    modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                                ) {
+                                    DosageUnit.values().forEach { unit ->
+                                        DropdownMenuItem(
+                                            text = { Text(unit.getLocalizedName()) },
+                                            onClick = {
+                                                selectedDosageUnit = unit
+                                                dosageUnitExpanded = false
+                                            },
+                                            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                                        )
+                                    }
                                 }
-                            }
                             }
                         }
                     }
@@ -341,7 +344,7 @@ fun EditMedScreen(
 
                     // Time Selection
                     Text(
-                        text = "Time",
+                        text = stringResource(R.string.form_time),
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.Medium,
                             fontSize = 18.sp
@@ -350,10 +353,14 @@ fun EditMedScreen(
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
+                    val activeLocale = remember(currentUser?.language) {
+                        com.example.dosezy.utils.LocaleHelper.getLocale(currentUser?.language ?: com.example.dosezy.data.model.Language.SYSTEM)
+                    }
+
                     // Time Picker
                     OutlinedTextField(
-                    shape = RoundedCornerShape(16.dp),
-                        value = String.format("%02d:%02d", selectedTime.hour, selectedTime.minute),
+                        shape = RoundedCornerShape(16.dp),
+                        value = com.example.dosezy.utils.TimeFormatUtils.formatLocalTime(selectedTime, currentUser?.timeFormat ?: com.example.dosezy.data.model.TimeFormat.HOUR_12, activeLocale),
                         onValueChange = { /* Read-only, opens time picker */ },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -362,7 +369,7 @@ fun EditMedScreen(
                         readOnly = true,
                         placeholder = {
                             Text(
-                                "Select time",
+                                stringResource(R.string.form_time),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         },
@@ -389,7 +396,7 @@ fun EditMedScreen(
 
                     // Frequency
                     Text(
-                        text = "Frequency",
+                        text = stringResource(R.string.form_frequency),
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.Medium,
                             fontSize = 18.sp
@@ -403,8 +410,8 @@ fun EditMedScreen(
                         onExpandedChange = { frequencyExpanded = !frequencyExpanded }
                     ) {
                         OutlinedTextField(
-                    shape = RoundedCornerShape(16.dp),
-                            value = selectedFrequency.displayName,
+                            shape = RoundedCornerShape(16.dp),
+                            value = selectedFrequency.getLocalizedName(),
                             onValueChange = {},
                             readOnly = true,
                             modifier = Modifier
@@ -413,7 +420,7 @@ fun EditMedScreen(
                                 .menuAnchor(),
                             placeholder = {
                                 Text(
-                                    "Select frequency",
+                                    stringResource(R.string.form_frequency),
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             },
@@ -435,7 +442,7 @@ fun EditMedScreen(
                         ) {
                             FrequencyPattern.values().forEach { frequency ->
                                 DropdownMenuItem(
-                                    text = { Text(frequency.displayName) },
+                                    text = { Text(frequency.getLocalizedName()) },
                                     onClick = {
                                         selectedFrequency = frequency
                                         frequencyExpanded = false
@@ -449,13 +456,21 @@ fun EditMedScreen(
                     if (selectedFrequency == FrequencyPattern.WEEKLY) {
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Select Days of the Week",
+                            text = stringResource(R.string.form_select_days_week),
                             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         
-                        val daysOfWeekNames = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+                        val daysOfWeekNames = listOf(
+                            stringResource(R.string.day_mon),
+                            stringResource(R.string.day_tue),
+                            stringResource(R.string.day_wed),
+                            stringResource(R.string.day_thu),
+                            stringResource(R.string.day_fri),
+                            stringResource(R.string.day_sat),
+                            stringResource(R.string.day_sun)
+                        )
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
@@ -481,7 +496,7 @@ fun EditMedScreen(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = name.take(2), // Mo, Tu, We, etc.
+                                        text = name,
                                         color = if (isSelected) MaterialTheme.colorScheme.onPrimary 
                                                 else MaterialTheme.colorScheme.onSurfaceVariant,
                                         fontWeight = FontWeight.Bold,
@@ -495,7 +510,7 @@ fun EditMedScreen(
                     if (selectedFrequency == FrequencyPattern.MONTHLY) {
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Select Days of the Month",
+                            text = stringResource(R.string.form_select_days_month),
                             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
                             color = MaterialTheme.colorScheme.onSurface
                         )
@@ -602,7 +617,7 @@ fun EditMedScreen(
                         )
                     ) {
                         Text(
-                            "Save Changes",
+                            stringResource(R.string.form_save_changes),
                             style = MaterialTheme.typography.bodyLarge.copy(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp
@@ -628,9 +643,11 @@ fun EditMedScreen(
                             )
                         ) {
                             Text(
-                                text = "Delete Medication",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
+                                stringResource(R.string.form_delete_medicine),
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp
+                                )
                             )
                         }
                     }
@@ -646,6 +663,7 @@ fun EditMedScreen(
     if (showTimePicker) {
         CustomTimePickerDialog(
             initialTime = selectedTime,
+            timeFormat = currentUser?.timeFormat ?: com.example.dosezy.data.model.TimeFormat.HOUR_12,
             onTimeSelected = { time ->
                 selectedTime = time
                 showTimePicker = false
@@ -688,64 +706,204 @@ fun EditMedScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomTimePickerDialog(
     initialTime: LocalTime,
+    timeFormat: com.example.dosezy.data.model.TimeFormat = com.example.dosezy.data.model.TimeFormat.HOUR_12,
     onTimeSelected: (LocalTime) -> Unit,
     onDismiss: () -> Unit
 ) {
     var selectedTimeState by remember { mutableStateOf(initialTime) }
 
+    val is12Hour = timeFormat == com.example.dosezy.data.model.TimeFormat.HOUR_12
+    val isAm = selectedTimeState.hour < 12
+    val hour12Display = run {
+        val h = selectedTimeState.hour % 12
+        if (h == 0) 12 else h
+    }
+
+    val activeLocale = remember {
+        com.example.dosezy.utils.LocaleHelper.getLocale(com.example.dosezy.data.model.Language.SYSTEM)
+    }
+    val displayString = com.example.dosezy.utils.TimeFormatUtils.formatLocalTime(selectedTimeState, timeFormat, activeLocale)
+
     AlertDialog(
         onDismissRequest = onDismiss,
         tonalElevation = 0.dp,
         containerColor = MaterialTheme.colorScheme.surface,
-        title = { Text("Select Time", style = MaterialTheme.typography.headlineSmall) },
+        title = { Text(stringResource(R.string.form_time), style = MaterialTheme.typography.headlineSmall) },
         text = {
-            Column {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState())
+            ) {
                 Text(
-                    "Selected: ${String.format("%02d:%02d", selectedTimeState.hour, selectedTimeState.minute)}",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    "Selected: $displayString",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(bottom = 12.dp)
                 )
 
-                // Simple hour selection
-                Text("Hour: ${selectedTimeState.hour}", style = MaterialTheme.typography.bodyMedium)
-                Slider(
-                    value = selectedTimeState.hour.toFloat(),
-                    onValueChange = { newHour ->
-                        selectedTimeState = selectedTimeState.withHour(newHour.toInt())
-                    },
-                    valueRange = 0f..23f,
-                    steps = 22
-                )
+                if (is12Hour) {
+                    // AM / PM Toggle chips
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        androidx.compose.material3.FilterChip(
+                            selected = isAm,
+                            onClick = {
+                                if (!isAm) {
+                                    selectedTimeState = selectedTimeState.minusHours(12)
+                                }
+                            },
+                            label = { Text("AM", fontWeight = FontWeight.Bold) },
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        androidx.compose.material3.FilterChip(
+                            selected = !isAm,
+                            onClick = {
+                                if (isAm) {
+                                    selectedTimeState = selectedTimeState.plusHours(12)
+                                }
+                            },
+                            label = { Text("PM", fontWeight = FontWeight.Bold) }
+                        )
+                    }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    Text("Hour (12 is First):", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Spacer(modifier = Modifier.height(6.dp))
 
-                // Simple minute selection
-                Text("Minute: ${selectedTimeState.minute}", style = MaterialTheme.typography.bodyMedium)
+                    // 12-hour grid with 12 FIRST: 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+                    val hours12 = listOf(12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+                    val rows12 = hours12.chunked(4)
+
+                    rows12.forEach { rowHours ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 2.dp),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            rowHours.forEach { h12 ->
+                                val isSelected = hour12Display == h12
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(40.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(
+                                            if (isSelected) MaterialTheme.colorScheme.primary 
+                                            else MaterialTheme.colorScheme.surfaceVariant
+                                        )
+                                        .clickable {
+                                            val hour24 = if (isAm) {
+                                                if (h12 == 12) 0 else h12
+                                            } else {
+                                                if (h12 == 12) 12 else h12 + 12
+                                            }
+                                            selectedTimeState = selectedTimeState.withHour(hour24)
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = h12.toString(),
+                                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary 
+                                                else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    Text("Hour (24h):", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    val hours24 = (0..23).toList().chunked(6)
+                    hours24.forEach { rowHours ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 2.dp),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            rowHours.forEach { h24 ->
+                                val isSelected = selectedTimeState.hour == h24
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(36.dp)
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(
+                                            if (isSelected) MaterialTheme.colorScheme.primary 
+                                            else MaterialTheme.colorScheme.surfaceVariant
+                                        )
+                                        .clickable {
+                                            selectedTimeState = selectedTimeState.withHour(h24)
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = String.format("%02d", h24),
+                                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary 
+                                                else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                Text("Minute: ${String.format("%02d", selectedTimeState.minute)}", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                
+                // Quick Minute Chips
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    listOf(0, 15, 30, 45).forEach { min ->
+                        val isSelected = selectedTimeState.minute == min
+                        androidx.compose.material3.FilterChip(
+                            selected = isSelected,
+                            onClick = { selectedTimeState = selectedTimeState.withMinute(min) },
+                            label = { Text(":$min", fontWeight = FontWeight.Bold) },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+
                 Slider(
                     value = selectedTimeState.minute.toFloat(),
                     onValueChange = { newMinute ->
-                        selectedTimeState = selectedTimeState.withMinute(newMinute.toInt())
+                        selectedTimeState = selectedTimeState.withMinute(newMinute.toInt().coerceIn(0, 59))
                     },
-                    valueRange = 0f..59f,
-                    steps = 58
+                    valueRange = 0f..59f
                 )
             }
         },
         confirmButton = {
-            TextButton(
+            androidx.compose.material3.TextButton(
                 onClick = { onTimeSelected(selectedTimeState) }
             ) {
-                Text("OK")
+                Text(stringResource(R.string.ok))
             }
         },
         dismissButton = {
-            TextButton(
+            androidx.compose.material3.TextButton(
                 onClick = onDismiss
             ) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )

@@ -3,7 +3,9 @@ package com.example.dosezy
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,20 +44,48 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        window.decorView.setBackgroundColor(android.graphics.Color.parseColor("#0F172A"))
         super.onCreate(savedInstanceState)
         if (resources.configuration.smallestScreenWidthDp < 600) {
             requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         }
         setContent {
-            val userViewModel: UserViewModel = hiltViewModel()
+            val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
             val currentUser by userViewModel.currentUser.collectAsState()
-            val isDark = when (currentUser?.theme) {
-                com.example.dosezy.data.model.Theme.DARK -> true
-                com.example.dosezy.data.model.Theme.LIGHT -> false
+            val context = androidx.compose.ui.platform.LocalContext.current
+
+            // Read theme from SharedPreferences synchronously to prevent launch flash
+            val prefs = remember { context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE) }
+            var spTheme by remember { mutableStateOf(prefs.getString("theme", "system")) }
+
+            LaunchedEffect(currentUser?.theme) {
+                currentUser?.theme?.let { theme ->
+                    val themeStr = theme.name.lowercase()
+                    if (prefs.getString("theme", "system") != themeStr) {
+                        prefs.edit().putString("theme", themeStr).apply()
+                        spTheme = themeStr
+                    }
+                }
+            }
+
+            LaunchedEffect(currentUser?.language) {
+                currentUser?.language?.let { lang ->
+                    com.example.dosezy.utils.LocaleHelper.applyLanguage(context, lang)
+                }
+            }
+
+            val isDark = when (spTheme) {
+                "dark" -> true
+                "light" -> false
                 else -> isSystemInDarkTheme()
             }
             DosezyTheme(darkTheme = isDark) {
-                DosezyApp()
+                androidx.compose.material3.Surface(
+                    modifier = androidx.compose.ui.Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    DosezyApp()
+                }
             }
         }
     }
@@ -66,6 +96,7 @@ fun DosezyApp() {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     val permissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
@@ -76,59 +107,42 @@ fun DosezyApp() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         }
+        // Delay slightly to prevent standard permission dialog overlap
+        kotlinx.coroutines.delay(1000)
+        if (!com.example.dosezy.utils.NotificationUtils.isIgnoringBatteryOptimizations(context)) {
+            com.example.dosezy.utils.NotificationUtils.requestBatteryOptimizationExemption(context)
+        }
     }
 
-    var isLoading by remember { mutableStateOf(true) }
-    var dataCheckComplete by remember { mutableStateOf(false) }
-
-
-    val userViewModel: UserViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
     val users by userViewModel.users.collectAsState()
     val currentUser by userViewModel.currentUser.collectAsState()
     val isViewModelLoading by userViewModel.isLoading.collectAsState()
 
+    var isInitialized by remember { mutableStateOf(false) }
+
     // Check user data on app start
     LaunchedEffect(users, currentUser, isViewModelLoading) {
-        if (isLoading) {
-            try {
-                // Wait for data loading to complete from view model
-                if (!isViewModelLoading) {
-                    val shouldGoToHome = currentUser != null
-
-                    if (shouldGoToHome) {
-                        // Current user exists - go directly to home
-                        navController.navigate("home") {
-                            popUpTo("loading") { inclusive = true }
-                        }
-                    } else {
-                        // Either no users at all, or users exist but none selected (no current user)
-                        // Both should lead to onboarding / profile select
-                        navController.navigate("newuser/1") {
-                            popUpTo("loading") { inclusive = true }
-                        }
-                    }
-
-                    isLoading = false
-                    dataCheckComplete = true
-                }
-            } catch (e: Exception) {
-                // If there's an error, default to onboarding
-                isLoading = false
+        if (!isInitialized && !isViewModelLoading) {
+            isInitialized = true
+            if (currentUser == null) {
                 navController.navigate("newuser/1") {
-                    popUpTo("loading") { inclusive = true }
+                    popUpTo("home") { inclusive = true }
                 }
             }
         }
     }
 
-    // Timeout fallback - if loading takes too long, go to onboarding
+    // Timeout fallback - if loading takes too long and no user, go to onboarding
     LaunchedEffect(Unit) {
-        if (isLoading) {
-            kotlinx.coroutines.delay(5000) // 5 second timeout
-            if (isLoading) {
-                isLoading = false
-                navController.navigate("newuser/1") {
-                    popUpTo("loading") { inclusive = true }
+        if (!isInitialized) {
+            kotlinx.coroutines.delay(2000)
+            if (!isInitialized) {
+                isInitialized = true
+                if (currentUser == null) {
+                    navController.navigate("newuser/1") {
+                        popUpTo("home") { inclusive = true }
+                    }
                 }
             }
         }
@@ -149,7 +163,7 @@ fun DosezyApp() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = "loading",
+            startDestination = "home",
             modifier = Modifier.padding(innerPadding),
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None },
@@ -158,11 +172,7 @@ fun DosezyApp() {
         ) {
             // Main Screens
             composable("loading") {
-                LoadingScreen(
-                    isLoading = isLoading,
-                    hasError = false,
-                    message = if (isLoading) "Loading your data..." else "Redirecting..."
-                )
+                com.example.dosezy.ui.components.HomeSkeletonView()
             }
             composable("home") {
                 HomeScreen(

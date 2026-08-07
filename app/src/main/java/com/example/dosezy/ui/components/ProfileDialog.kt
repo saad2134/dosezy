@@ -69,7 +69,7 @@ fun ProfileDialog(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Manage this Profile",
+                            text = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.menu_manage_profile),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -103,7 +103,7 @@ fun ProfileDialog(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Switch Profile",
+                            text = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.menu_switch_profile),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -170,7 +170,7 @@ fun ProfileDialog(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Close",
+                            text = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.close),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )

@@ -7,6 +7,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,8 +27,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -52,29 +58,43 @@ fun CustomNavigationBar(
     modifier: Modifier = Modifier
 ) {
     val navItems = listOf(
-        BottomNavItem("Home", Icons.Default.Home, "home"),
-        BottomNavItem("Schedule", Icons.Default.CalendarMonth, "schedule"),
-        BottomNavItem("Add", Icons.Default.Add, "add_med"),
-        BottomNavItem("Medicines", Icons.Default.Medication, "medicines"),
-        BottomNavItem("Menu", Icons.Default.Menu, "menu")
+        BottomNavItem(androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.nav_home), Icons.Default.Home, "home"),
+        BottomNavItem(androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.nav_schedule), Icons.Default.CalendarMonth, "schedule"),
+        BottomNavItem(androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.nav_add), Icons.Default.Add, "add_med"),
+        BottomNavItem(androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.nav_medicines), Icons.Default.Medication, "medicines"),
+        BottomNavItem(androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.nav_menu), Icons.Default.Menu, "menu")
     )
 
     val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
     val borderColor = if (isDark) Color(0xFF303235) else Color(0xFFD1D5DB)
 
-    Row(
+    val shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+
+    Box(
         modifier = modifier
             .fillMaxWidth()
             .height(70.dp)
-            .background(MaterialTheme.colorScheme.surface)
-            .border(
-                width = 1.dp,
-                color = borderColor,
-                shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
-            )
-            .padding(horizontal = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
     ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(shape)
+                .background(MaterialTheme.colorScheme.surface)
+                .drawBehind {
+                    val strokeWidth = 1.dp.toPx()
+                    val r = 16.dp.toPx()
+                    val path = Path().apply {
+                        moveTo(0f, r)
+                        arcTo(Rect(0f, 0f, r * 2, r * 2), startAngleDegrees = 180f, sweepAngleDegrees = 90f, forceMoveTo = false)
+                        lineTo(size.width - r, 0f)
+                        arcTo(Rect(size.width - r * 2, 0f, size.width, r * 2), startAngleDegrees = 270f, sweepAngleDegrees = 90f, forceMoveTo = false)
+                        lineTo(size.width, r)
+                    }
+                    drawPath(path = path, color = borderColor, style = Stroke(width = strokeWidth))
+                }
+                .padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
         // Home
         CustomNavItem(
             item = navItems[0],
@@ -174,6 +194,7 @@ fun CustomNavigationBar(
             },
             modifier = Modifier.weight(1f)
         )
+        }
     }
 }
 

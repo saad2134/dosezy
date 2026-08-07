@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.dosezy.R
 import com.example.dosezy.data.model.Language
 import com.example.dosezy.data.model.Theme
 import com.example.dosezy.data.model.TimeFormat
@@ -33,7 +34,9 @@ fun PreferencesScreen(navController: NavController) {
     // State for showing dialogs
     var showThemeDialog by remember { mutableStateOf(false) }
     var showTimeFormatDialog by remember { mutableStateOf(false) }
+    var showLateAfterDialog by remember { mutableStateOf(false) }
     var showMissedAfterDialog by remember { mutableStateOf(false) }
+    var showSnoozeDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -41,7 +44,7 @@ fun PreferencesScreen(navController: NavController) {
             TopBar(
                 navController = navController,
                 currentUser = currentUser,
-                title = "Preferences",
+                title = androidx.compose.ui.res.stringResource(R.string.pref_title),
                 showBackButton = true,
                 actions = {}
             )
@@ -56,14 +59,14 @@ fun PreferencesScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(12.dp))
                 // Theme Preference
                 PreferenceItem(
-                    title = "Theme",
+                    title = androidx.compose.ui.res.stringResource(R.string.pref_theme),
                     currentValue = currentUser?.theme?.let {
                         when (it) {
-                            Theme.LIGHT -> "Light"
-                            Theme.DARK -> "Dark"
-                            Theme.SYSTEM -> "System Default"
+                            Theme.LIGHT -> androidx.compose.ui.res.stringResource(R.string.theme_light)
+                            Theme.DARK -> androidx.compose.ui.res.stringResource(R.string.theme_dark)
+                            Theme.SYSTEM -> androidx.compose.ui.res.stringResource(R.string.theme_system)
                         }
-                    } ?: "System Default",
+                    } ?: androidx.compose.ui.res.stringResource(R.string.theme_system),
                     iconName = "palette",
                     onClick = { showThemeDialog = true }
                 )
@@ -72,39 +75,76 @@ fun PreferencesScreen(navController: NavController) {
             item {
                 // Time Format Preference
                 PreferenceItem(
-                    title = "Time Format",
+                    title = androidx.compose.ui.res.stringResource(R.string.pref_time_format),
                     currentValue = currentUser?.timeFormat?.let {
                         when (it) {
-                            TimeFormat.HOUR_12 -> "12-hour"
-                            TimeFormat.HOUR_24 -> "24-hour"
+                            TimeFormat.HOUR_12 -> androidx.compose.ui.res.stringResource(R.string.time_format_12)
+                            TimeFormat.HOUR_24 -> androidx.compose.ui.res.stringResource(R.string.time_format_24)
                         }
-                    } ?: "12-hour",
+                    } ?: androidx.compose.ui.res.stringResource(R.string.time_format_12),
                     iconName = "schedule",
                     onClick = { showTimeFormatDialog = true }
                 )
             }
 
             item {
+                // Consider Late After Preference
+                PreferenceItem(
+                    title = androidx.compose.ui.res.stringResource(R.string.pref_late_after),
+                    currentValue = currentUser?.considerLateAfter?.let {
+                        androidx.compose.ui.res.stringResource(R.string.hours_format, it)
+                    } ?: androidx.compose.ui.res.stringResource(R.string.hours_format, 3),
+                    iconName = "timer",
+                    onClick = { showLateAfterDialog = true }
+                )
+            }
+
+            item {
                 // Consider Missed After Preference
                 PreferenceItem(
-                    title = "Consider Missed After",
+                    title = androidx.compose.ui.res.stringResource(R.string.pref_missed_after),
                     currentValue = currentUser?.considerMissedAfter?.let {
-                        "$it hour${if (it > 1) "s" else ""}"
-                    } ?: "3 hours",
-                    iconName = "timer",
+                        androidx.compose.ui.res.stringResource(R.string.hours_format, it)
+                    } ?: androidx.compose.ui.res.stringResource(R.string.hours_format, 6),
+                    iconName = "timer_off",
                     onClick = { showMissedAfterDialog = true }
                 )
             }
 
             item {
-                // Language Preference
+                // Snooze Duration Preference
                 PreferenceItem(
-                    title = "Language",
+                    title = androidx.compose.ui.res.stringResource(R.string.pref_snooze_duration),
+                    currentValue = currentUser?.snoozeDuration?.let {
+                        androidx.compose.ui.res.stringResource(R.string.minutes_format, it)
+                    } ?: androidx.compose.ui.res.stringResource(R.string.minutes_format, 10),
+                    iconName = "snooze",
+                    onClick = { showSnoozeDialog = true }
+                )
+            }
+
+            item {
+                // Language Preference
+                val sysLangName = com.example.dosezy.utils.LocaleHelper.getSystemLanguageDisplayName()
+                PreferenceItem(
+                    title = androidx.compose.ui.res.stringResource(R.string.pref_language),
                     currentValue = currentUser?.language?.let {
                         when (it) {
+                            Language.SYSTEM -> "${androidx.compose.ui.res.stringResource(R.string.system_default)} ($sysLangName)"
                             Language.ENGLISH -> "English"
+                            Language.SPANISH -> "Español"
+                            Language.HINDI -> "हिन्दी"
+                            Language.CHINESE -> "中文"
+                            Language.PORTUGUESE -> "Português"
+                            Language.ARABIC -> "العربية"
+                            Language.FRENCH -> "Français"
+                            Language.GERMAN -> "Deutsch"
+                            Language.JAPANESE -> "日本語"
+                            Language.RUSSIAN -> "Русский"
+                            Language.ITALIAN -> "Italiano"
+                            Language.BENGALI -> "বাংলা"
                         }
-                    } ?: "English",
+                    } ?: "${androidx.compose.ui.res.stringResource(R.string.system_default)} ($sysLangName)",
                     iconName = "language",
                     onClick = { showLanguageDialog = true }
                 )
@@ -139,10 +179,24 @@ fun PreferencesScreen(navController: NavController) {
             )
         }
 
+        // Late After Selection Dialog
+        if (showLateAfterDialog) {
+            LateAfterSelectionDialog(
+                currentHours = currentUser?.considerLateAfter ?: 3,
+                onHoursSelected = { newHours ->
+                    currentUser?.let { user ->
+                        userViewModel.updateUser(user.copy(considerLateAfter = newHours))
+                    }
+                    showLateAfterDialog = false
+                },
+                onDismiss = { showLateAfterDialog = false }
+            )
+        }
+
         // Missed After Selection Dialog
         if (showMissedAfterDialog) {
             MissedAfterSelectionDialog(
-                currentHours = currentUser?.considerMissedAfter ?: 3,
+                currentHours = currentUser?.considerMissedAfter ?: 6,
                 onHoursSelected = { newHours ->
                     currentUser?.let { user ->
                         userViewModel.updateUser(user.copy(considerMissedAfter = newHours))
@@ -155,15 +209,31 @@ fun PreferencesScreen(navController: NavController) {
 
         // Language Selection Dialog
         if (showLanguageDialog) {
+            val context = androidx.compose.ui.platform.LocalContext.current
             LanguageSelectionDialog(
-                currentLanguage = currentUser?.language ?: Language.ENGLISH,
+                currentLanguage = currentUser?.language ?: Language.SYSTEM,
                 onLanguageSelected = { newLanguage ->
                     currentUser?.let { user ->
                         userViewModel.updateUser(user.copy(language = newLanguage))
+                        com.example.dosezy.utils.LocaleHelper.applyLanguage(context, newLanguage, forceRecreate = true)
                     }
                     showLanguageDialog = false
                 },
                 onDismiss = { showLanguageDialog = false }
+            )
+        }
+
+        // Snooze Selection Dialog
+        if (showSnoozeDialog) {
+            SnoozeSelectionDialog(
+                currentMinutes = currentUser?.snoozeDuration ?: 10,
+                onMinutesSelected = { newMinutes ->
+                    currentUser?.let { user ->
+                        userViewModel.updateUser(user.copy(snoozeDuration = newMinutes))
+                    }
+                    showSnoozeDialog = false
+                },
+                onDismiss = { showSnoozeDialog = false }
             )
         }
     }
@@ -177,11 +247,11 @@ fun ThemeSelectionDialog(
     onDismiss: () -> Unit
 ) {
     com.example.dosezy.ui.components.SelectionDialog(
-        title = "Select Theme",
+        title = androidx.compose.ui.res.stringResource(R.string.pref_select_theme),
         options = listOf(
-            "Light" to Theme.LIGHT,
-            "Dark" to Theme.DARK,
-            "System Default" to Theme.SYSTEM
+            androidx.compose.ui.res.stringResource(R.string.theme_light) to Theme.LIGHT,
+            androidx.compose.ui.res.stringResource(R.string.theme_dark) to Theme.DARK,
+            androidx.compose.ui.res.stringResource(R.string.theme_system) to Theme.SYSTEM
         ),
         currentSelection = currentTheme,
         onOptionSelected = onThemeSelected,
@@ -197,13 +267,32 @@ fun TimeFormatSelectionDialog(
     onDismiss: () -> Unit
 ) {
     com.example.dosezy.ui.components.SelectionDialog(
-        title = "Select Time Format",
+        title = androidx.compose.ui.res.stringResource(R.string.pref_select_time_format),
         options = listOf(
-            "12-hour" to TimeFormat.HOUR_12,
-            "24-hour" to TimeFormat.HOUR_24
+            androidx.compose.ui.res.stringResource(R.string.time_format_12) to TimeFormat.HOUR_12,
+            androidx.compose.ui.res.stringResource(R.string.time_format_24) to TimeFormat.HOUR_24
         ),
         currentSelection = currentTimeFormat,
         onOptionSelected = onTimeFormatSelected,
+        onDismiss = onDismiss
+    )
+}
+
+// Dialog Composable for Late After Selection
+@Composable
+fun LateAfterSelectionDialog(
+    currentHours: Int,
+    onHoursSelected: (Int) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val hourOptionStrings = (1..3).map { hours ->
+        androidx.compose.ui.res.stringResource(R.string.hours_format, hours) to hours
+    }
+    com.example.dosezy.ui.components.SelectionDialog(
+        title = androidx.compose.ui.res.stringResource(R.string.pref_late_after),
+        options = hourOptionStrings,
+        currentSelection = currentHours,
+        onOptionSelected = onHoursSelected,
         onDismiss = onDismiss
     )
 }
@@ -215,11 +304,12 @@ fun MissedAfterSelectionDialog(
     onHoursSelected: (Int) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val hourOptionStrings = (3..9).map { hours ->
+        androidx.compose.ui.res.stringResource(R.string.hours_format, hours) to hours
+    }
     com.example.dosezy.ui.components.SelectionDialog(
-        title = "Mark Missed After",
-        options = (1..6).map { hours ->
-            "$hours hour${if (hours > 1) "s" else ""}" to hours
-        },
+        title = androidx.compose.ui.res.stringResource(R.string.pref_mark_missed_after),
+        options = hourOptionStrings,
         currentSelection = currentHours,
         onOptionSelected = onHoursSelected,
         onDismiss = onDismiss
@@ -233,11 +323,45 @@ fun LanguageSelectionDialog(
     onLanguageSelected: (Language) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val sysDefaultStr = androidx.compose.ui.res.stringResource(R.string.system_default)
     com.example.dosezy.ui.components.SelectionDialog(
-        title = "Select Language",
-        options = listOf("English" to Language.ENGLISH),
+        title = androidx.compose.ui.res.stringResource(R.string.select_language),
+        options = listOf(
+            sysDefaultStr to Language.SYSTEM,
+            "English" to Language.ENGLISH,
+            "Español (Spanish)" to Language.SPANISH,
+            "हिन्दी (Hindi)" to Language.HINDI,
+            "中文 (Chinese)" to Language.CHINESE,
+            "Português (Portuguese)" to Language.PORTUGUESE,
+            "العربية (Arabic)" to Language.ARABIC,
+            "Français (French)" to Language.FRENCH,
+            "Deutsch (German)" to Language.GERMAN,
+            "日本語 (Japanese)" to Language.JAPANESE,
+            "Русский (Russian)" to Language.RUSSIAN,
+            "Italiano (Italian)" to Language.ITALIAN,
+            "বাংলা (Bengali)" to Language.BENGALI
+        ),
         currentSelection = currentLanguage,
         onOptionSelected = onLanguageSelected,
+        onDismiss = onDismiss
+    )
+}
+
+// Dialog Composable for Snooze Duration Selection
+@Composable
+fun SnoozeSelectionDialog(
+    currentMinutes: Int,
+    onMinutesSelected: (Int) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val options = listOf(5, 10, 15, 20, 30).map { mins ->
+        androidx.compose.ui.res.stringResource(R.string.minutes_format, mins) to mins
+    }
+    com.example.dosezy.ui.components.SelectionDialog(
+        title = androidx.compose.ui.res.stringResource(R.string.pref_select_snooze_duration),
+        options = options,
+        currentSelection = currentMinutes,
+        onOptionSelected = onMinutesSelected,
         onDismiss = onDismiss
     )
 }

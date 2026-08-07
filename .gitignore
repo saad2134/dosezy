@@ -36,3 +36,4 @@ google-services.json
 
 # Kotlin compiler cache
 .kotlin/
+/scratch

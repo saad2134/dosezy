@@ -43,7 +43,7 @@ class ScheduleViewModel @Inject constructor(
     val scheduleWithMedicine: StateFlow<List<ScheduleWithMedicine>> = _scheduleWithMedicine.asStateFlow()
 
     private val _currentUserId = MutableStateFlow<String?>(null)
-    private val _isRefreshing = MutableStateFlow(false)
+    private val _isRefreshing = MutableStateFlow(true)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
     private var scheduleJob: kotlinx.coroutines.Job? = null
@@ -63,6 +63,8 @@ class ScheduleViewModel @Inject constructor(
                 currentUser?.let { user ->
                     // Load schedule for current date
                     loadScheduleForDate(user.userId, LocalDate.now())
+                } ?: run {
+                    _isRefreshing.value = false
                 }
             }
         }

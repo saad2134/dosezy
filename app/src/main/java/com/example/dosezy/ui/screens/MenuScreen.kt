@@ -37,6 +37,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
+import com.example.dosezy.R
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -63,7 +65,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.example.dosezy.R
 import com.example.dosezy.data.export.DataExporter
 import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.User
@@ -75,9 +76,11 @@ import java.io.File
 @Composable
 fun MenuScreen(navController: NavController) {
     val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
+    val users by userViewModel.users.collectAsState()
     val currentUser by userViewModel.currentUser.collectAsState()
     var showExportDialog by remember { mutableStateOf(false) }
     var showExportProgress by remember { mutableStateOf(false) }
+    var showExportScopeDialog by remember { mutableStateOf(false) }
     var exportFile by remember { mutableStateOf<File?>(null) }
     var exportError by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
@@ -93,6 +96,27 @@ fun MenuScreen(navController: NavController) {
         )
     }
 
+    fun startExport(exportAll: Boolean) {
+        showExportProgress = true
+        exportError = null
+        coroutineScope.launch {
+            try {
+                exportFile = if (exportAll) {
+                    dataExporter.exportAllUsersToCsv()
+                } else {
+                    currentUser?.userId?.let { uid ->
+                        dataExporter.exportUserToCsv(uid)
+                    } ?: dataExporter.exportAllUsersToCsv()
+                }
+                showExportProgress = false
+                showExportDialog = true
+            } catch (e: Exception) {
+                exportError = e.message ?: "Export failed"
+                showExportProgress = false
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -101,7 +125,7 @@ fun MenuScreen(navController: NavController) {
         TopBar(
             navController = navController,
             currentUser = currentUser,
-            title = "Menu",
+            title = androidx.compose.ui.res.stringResource(R.string.menu_title),
             showBackButton = false,
             actions = {}
         )
@@ -125,7 +149,7 @@ fun MenuScreen(navController: NavController) {
             item {
                 MenuItem(
                     icon = Icons.Default.Tune,
-                    title = "Preferences (Format, etc)",
+                    title = androidx.compose.ui.res.stringResource(R.string.menu_preferences),
                     color = MaterialTheme.colorScheme.onSurface,
                     onClick = { navController.navigate("preferences") }
                 )
@@ -135,7 +159,7 @@ fun MenuScreen(navController: NavController) {
             item {
                 MenuItem(
                     icon = Icons.Default.Emergency,
-                    title = "Emergency",
+                    title = androidx.compose.ui.res.stringResource(R.string.menu_emergency),
                     color = Color(0xFFEF4444),
                     onClick = { navController.navigate("emergency") }
                 )
@@ -145,62 +169,88 @@ fun MenuScreen(navController: NavController) {
             item {
                 MenuItem(
                     icon = Icons.Default.HelpOutline,
-                    title = "Help and Support",
+                    title = androidx.compose.ui.res.stringResource(R.string.menu_help_support),
                     color = MaterialTheme.colorScheme.onSurface,
                     onClick = { navController.navigate("help_support") }
                 )
             }
 
-            // Divider
+            // Data Section Header
             item {
-                Spacer(modifier = Modifier.height(12.dp))
-                val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
-                val outlineColor = if (isDark) Color(0xFF475569) else Color(0xFFD1D5DB)
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    androidx.compose.foundation.Canvas(
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .height(2.dp)
-                    ) {
-                        val pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(12f, 12f), 0f)
-                        drawLine(
-                            color = outlineColor,
-                            start = androidx.compose.ui.geometry.Offset(0f, size.height / 2),
-                            end = androidx.compose.ui.geometry.Offset(size.width, size.height / 2),
-                            strokeWidth = 2.dp.toPx(),
-                            pathEffect = pathEffect
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = androidx.compose.ui.res.stringResource(R.string.menu_data),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
             }
 
             // Export Data
             item {
                 MenuItem(
                     icon = Icons.Default.Download,
-                    title = "Export Data as CSV",
+                    title = androidx.compose.ui.res.stringResource(R.string.menu_export_data),
                     color = MaterialTheme.colorScheme.onSurface,
                     onClick = {
-                        showExportProgress = true
-                        exportError = null
-                        coroutineScope.launch {
-                            try {
-                                exportFile = dataExporter.exportAllUsersToCsv()
-                                showExportProgress = false
-                                showExportDialog = true
-                            } catch (e: Exception) {
-                                exportError = e.message ?: "Export failed"
-                                showExportProgress = false
-                            }
+                        if (users.size > 1) {
+                            showExportScopeDialog = true
+                        } else {
+                            startExport(exportAll = false)
                         }
                     }
                 )
             }
         }
+    }
+
+    // Export Scope Selection Dialog (Current Profile vs All Profiles)
+    if (showExportScopeDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showExportScopeDialog = false },
+            title = { Text(stringResource(R.string.export_choose_title), style = MaterialTheme.typography.headlineSmall) },
+            text = {
+                Column {
+                    Text(
+                        stringResource(R.string.export_choose_desc),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    Button(
+                        onClick = {
+                            showExportScopeDialog = false
+                            startExport(exportAll = false)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("${stringResource(R.string.export_current_profile)} (${currentUser?.fullName ?: ""})")
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            showExportScopeDialog = false
+                            startExport(exportAll = true)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("${stringResource(R.string.export_all_profiles)} (${users.size})")
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = { showExportScopeDialog = false }
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
     }
 
     // Export Progress Dialog
@@ -222,7 +272,7 @@ fun MenuScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Exporting Data",
+                        text = stringResource(R.string.export_progress_title),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -231,7 +281,7 @@ fun MenuScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Please wait while we prepare your data for export...",
+                        text = stringResource(R.string.export_progress_desc),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
@@ -363,7 +413,7 @@ fun ProfileCard(
                 // Manage Profile Button
                 ProfileActionButton(
                     icon = Icons.Default.AccountCircle,
-                    text = "Manage",
+                    text = stringResource(R.string.manage),
                     onClick = onManageProfile,
                     modifier = Modifier.weight(1f)
                 )
@@ -371,7 +421,7 @@ fun ProfileCard(
                 // Switch Profile Button
                 ProfileActionButton(
                     icon = Icons.Default.SwitchAccount,
-                    text = "Switch",
+                    text = stringResource(R.string.profile_switch),
                     onClick = onSwitchProfile,
                     modifier = Modifier.weight(1f)
                 )
@@ -545,7 +595,7 @@ fun ExportDataDialog(
 
                 // Title
                 Text(
-                    text = "Data Exported",
+                    text = stringResource(R.string.export_success_title),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -556,7 +606,7 @@ fun ExportDataDialog(
 
                 // Description
                 Text(
-                    text = "Your medication data has been successfully saved as a CSV file to your local device at 'Android/data/${context.packageName}/files'.",
+                    text = "${stringResource(R.string.export_success_desc)} 'Android/data/${context.packageName}/files'",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
@@ -582,7 +632,7 @@ fun ExportDataDialog(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Share to another app",
+                        text = stringResource(R.string.export_share_file),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -608,7 +658,7 @@ fun ExportDataDialog(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Close",
+                        text = stringResource(R.string.close),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )

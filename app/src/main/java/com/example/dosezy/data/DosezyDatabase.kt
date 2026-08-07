@@ -15,7 +15,7 @@ import com.example.dosezy.data.model.User
 
 @Database(
     entities = [User::class, Medicine::class, ScheduleEntry::class],
-    version = 2,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

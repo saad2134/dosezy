@@ -23,14 +23,25 @@ data class User(
     val isCurrentUser: Boolean = false,
     val theme: Theme = Theme.SYSTEM,
     val timeFormat: TimeFormat = TimeFormat.HOUR_12,
-    val language: Language = Language.ENGLISH,
-    val considerMissedAfter: Int = 3 // hours, default 3
+    val language: Language = Language.SYSTEM,
+    val considerLateAfter: Int = 3, // hours, default 3 (options 1-3)
+    val considerMissedAfter: Int = 6, // hours, default 6 (options 3-9)
+    val snoozeDuration: Int = 10 // minutes, default 10 (options 5, 10, 15, 20, 30)
 )
 
 enum class Gender(val displayName: String) {
     MALE("Male"),
     FEMALE("Female"),
     DO_NOT_SPECIFY("Do not specify")
+}
+
+@androidx.compose.runtime.Composable
+fun Gender.getLocalizedName(): String {
+    return when (this) {
+        Gender.MALE -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.gender_male)
+        Gender.FEMALE -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.gender_female)
+        Gender.DO_NOT_SPECIFY -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.gender_other)
+    }
 }
 
 enum class Theme {
@@ -42,6 +53,5 @@ enum class TimeFormat {
 }
 
 enum class Language {
-    ENGLISH
-
+    SYSTEM, ENGLISH, SPANISH, HINDI, CHINESE, PORTUGUESE, ARABIC, FRENCH, GERMAN, JAPANESE, RUSSIAN, ITALIAN, BENGALI
 }

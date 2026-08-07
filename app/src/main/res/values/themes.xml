@@ -4,13 +4,19 @@
         <item name="colorPrimary">@color/blue_500</item>
         <item name="colorPrimaryVariant">@color/blue_700</item>
         <item name="colorOnPrimary">@color/white</item>
-        <!-- Customize your theme here -->
+        <item name="android:windowBackground">#0F172A</item>
+        <item name="android:statusBarColor">#0F172A</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
-    <style name="Theme.Dosezy" parent="Base.Theme.Dosezy" />
+    <style name="Theme.Dosezy" parent="Base.Theme.Dosezy">
+        <item name="android:windowBackground">#0F172A</item>
+        <item name="android:statusBarColor">#0F172A</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
 
     <!-- Simple splash screen theme - compatible with all Android versions -->
-    <style name="Theme.AppStarting" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Theme.AppStarting" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@drawable/splash_background</item>
         <item name="android:windowFullscreen">true</item>
     </style>

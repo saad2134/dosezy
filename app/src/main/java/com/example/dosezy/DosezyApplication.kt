@@ -3,6 +3,10 @@ package com.example.dosezy
 import android.app.Application
 import android.os.Build
 import android.util.Log
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.disk.DiskCache
+import coil.memory.MemoryCache
 import com.example.dosezy.notifications.MedicineNotificationManager
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
@@ -11,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltAndroidApp
-class DosezyApplication : Application()
+class DosezyApplication : Application(), ImageLoaderFactory
 {
 
     override fun onCreate() {
@@ -32,6 +36,24 @@ class DosezyApplication : Application()
                 medicineNotificationManager.scheduleAllAlarmsForCurrentUser() // UPDATED
             }
         }
+    }
+
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(this)
+            .memoryCache {
+                MemoryCache.Builder(this)
+                    .maxSizePercent(0.25)
+                    .build()
+            }
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(cacheDir.resolve("image_cache"))
+                    .maxSizeBytes(50 * 1024 * 1024)
+                    .build()
+            }
+            .crossfade(true)
+            .respectCacheHeaders(false)
+            .build()
     }
 
     @Inject

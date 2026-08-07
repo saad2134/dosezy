@@ -18,7 +18,11 @@ interface ScheduleDao {
     fun getScheduleForUser(userId: String): Flow<List<ScheduleEntry>>
 
     @Query("SELECT * FROM schedule_entries WHERE userId = :userId AND scheduledDateTime BETWEEN :startDate AND :endDate")
-    fun getScheduleForDateRange(userId: String, startDate: String, endDate: String): Flow<List<ScheduleEntry>>
+    fun getScheduleForDateRange(userId: String, startDate: Long, endDate: Long): Flow<List<ScheduleEntry>>
+
+    @Transaction
+    @Query("SELECT * FROM schedule_entries WHERE userId = :userId AND scheduledDateTime BETWEEN :startDate AND :endDate")
+    fun getScheduleWithMedicineForDateRange(userId: String, startDate: Long, endDate: Long): Flow<List<ScheduleWithMedicine>>
 
     @Query("SELECT * FROM schedule_entries WHERE entryId = :entryId")
     suspend fun getScheduleEntryById(entryId: String): ScheduleEntry?

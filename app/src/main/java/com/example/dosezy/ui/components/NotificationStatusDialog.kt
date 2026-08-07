@@ -96,7 +96,7 @@ fun NotificationStatusDialog(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Notification Check",
+                        text = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.notif_check_title),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -135,7 +135,7 @@ fun NotificationStatusDialog(
                     )
                 ) {
                     Text(
-                        text = "OK",
+                        text = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.ok),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -158,11 +158,11 @@ private fun createNotificationStatuses(
 
     return listOf(
         NotificationStatus(
-            title = "Notification Permission",
+            title = context.getString(com.example.dosezy.R.string.notif_perm_title),
             description = if (notificationPermStatus) {
-                "Permission granted to send notifications."
+                context.getString(com.example.dosezy.R.string.notif_perm_granted)
             } else {
-                "No permission to send notifications."
+                context.getString(com.example.dosezy.R.string.notif_perm_title)
             },
             isPassed = notificationPermStatus,
             icon = {
@@ -181,7 +181,7 @@ private fun createNotificationStatuses(
         ),
 
         NotificationStatus(
-            title = "Phone Battery",
+            title = context.getString(com.example.dosezy.R.string.notif_battery_title),
             description = NotificationUtils.getBatteryStatus(context),
             isPassed = batteryStatus,
             icon = {
@@ -199,7 +199,7 @@ private fun createNotificationStatuses(
         ),
 
         NotificationStatus(
-            title = "Phone Sound",
+            title = context.getString(com.example.dosezy.R.string.notif_sound_title),
             description = NotificationUtils.getSoundStatus(context),
             isPassed = soundStatus,
             icon = {
@@ -218,11 +218,11 @@ private fun createNotificationStatuses(
         ),
 
         NotificationStatus(
-            title = "Background Permission",
+            title = context.getString(com.example.dosezy.R.string.notif_bg_title),
             description = if (backgroundPermStatus) {
-                "App can run in background."
+                context.getString(com.example.dosezy.R.string.notif_bg_granted)
             } else {
-                "Background restrictions may prevent notifications."
+                context.getString(com.example.dosezy.R.string.notif_bg_desc)
             },
             isPassed = backgroundPermStatus,
             icon = {

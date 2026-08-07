@@ -94,7 +94,11 @@ data class Medicine(
                 val selectedDays = frequency.selectedDaysOfMonth
                 if (!selectedDays.isNullOrEmpty()) {
                     // Use explicitly selected days of month
-                    date.dayOfMonth in selectedDays
+                    val maxDayInMonth = date.lengthOfMonth()
+                    selectedDays.any { targetDay ->
+                        val effectiveDay = targetDay.coerceAtMost(maxDayInMonth)
+                        date.dayOfMonth == effectiveDay
+                    }
                 } else {
                     // Fallback: treat daysPerMonth as "first N days of the month"
                     val daysPerMonth = frequency.daysPerMonth ?: 30
@@ -180,6 +184,18 @@ enum class DosageUnit {
     MG, MCG, ML, DROP, TABLET, CAPSULE
 }
 
+@androidx.compose.runtime.Composable
+fun DosageUnit.getLocalizedName(): String {
+    return when (this) {
+        DosageUnit.MG -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_mg)
+        DosageUnit.MCG -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_mcg)
+        DosageUnit.ML -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_ml)
+        DosageUnit.DROP -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_drop)
+        DosageUnit.TABLET -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_tablet)
+        DosageUnit.CAPSULE -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_capsule)
+    }
+}
+
 data class Frequency(
     val pattern: FrequencyPattern,
     val daysPerWeek: Int? = null,
@@ -190,4 +206,36 @@ data class Frequency(
 
 enum class FrequencyPattern {
     DAILY, WEEKLY, MONTHLY, CUSTOM
+}
+
+@androidx.compose.runtime.Composable
+fun FrequencyPattern.getLocalizedName(): String {
+    return when (this) {
+        FrequencyPattern.DAILY -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_daily)
+        FrequencyPattern.WEEKLY -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_weekly)
+        FrequencyPattern.MONTHLY -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_monthly)
+        FrequencyPattern.CUSTOM -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_custom)
+    }
+}
+
+@androidx.compose.runtime.Composable
+fun Medicine.getLocalizedDosageDisplay(): String {
+    val countStr = if (dosage % 1.0 == 0.0) dosage.toInt().toString() else dosage.toString()
+    return "$countStr ${dosageUnit.getLocalizedName()}"
+}
+
+@androidx.compose.runtime.Composable
+fun Medicine.getLocalizedFrequencyDisplay(): String {
+    return when (frequency.pattern) {
+        FrequencyPattern.DAILY -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_daily)
+        FrequencyPattern.WEEKLY -> {
+            val days = frequency.daysPerWeek ?: 7
+            androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.times_per_week_format, days)
+        }
+        FrequencyPattern.MONTHLY -> {
+            val days = frequency.daysPerMonth ?: 30
+            androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.times_per_month_format, days)
+        }
+        FrequencyPattern.CUSTOM -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_custom)
+    }
 }

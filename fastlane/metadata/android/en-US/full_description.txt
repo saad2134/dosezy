@@ -1,13 +1,15 @@
-A simple medicine tracking and notifier app. Once you input the basics like name, dosage, timing, and frequency: the app intelligently handles your medication schedule.
+A comprehensive, accessible medicine tracking and notifier app designed for stress-free medication management. Once you input the basics—name, dosage, timing, and frequency—Dosezy intelligently handles your medication schedule with zero privacy compromises.
 
-- 📅 Medication Adherence – Automated reminders ensure timely medication consumption.
-- ♿ Accessibility-First Design – Large text, high-contrast colors, and simple controls for elderly users.
-- 🔔 Reliable Notification System – Persistent alerts with snooze and taken actions.
-- 🎨 Adaptive System Dark/Light Theme – Automatically matches the Android system theme.
-- 📅 Custom Calendar Scheduling – Supports daily, weekly, and monthly medication schedules.
-- 💊 Smart Medication Management – Add medicine name, dosage, timing, frequency, and duration.
-- ✅ Dose Tracking – Mark medications as Taken, Snoozed, or Missed.
-- 📊 Medication History – View complete adherence and missed dose logs.
-- 📱 Offline-First Experience – Fully functional without an internet connection.
-- 🔒 Data Security & Portability – Local Room database with CSV export support.
-- 👨‍👩‍👧 Caregiver Support – Adherence history helps caregivers monitor missed doses.
+✨ Key Features in Version 2.0.0:
+
+• 🌐 12 Global Languages – Full native localization in English, Chinese (中文), Spanish (Español), Hindi (हिन्दी), Portuguese (Português), Arabic (العربية), French (Français), German (Deutsch), Japanese (日本語), Russian (Русский), Italian (Italiano), and Bengali (বাংলা).
+• 🌍 International Emergency Contacts – Quick country & region selector supporting India, USA/Canada, UK, EU, China, Japan, Russia, Brazil, Bangladesh, and Australia with automatic country detection based on app language.
+• ⏰ Customizable Late & Missed Thresholds – Configure "Consider Late After" (1–3 hours) and "Consider Missed After" (3–9 hours) preferences with high-visibility orange late indicators ("Xh Xm ago").
+• 🕒 12-First Interactive Grid Time Picker – Convenient 12-hour (12 first layout) and 24-hour time selector with quick minute chips.
+• ♿ Accessibility-First Design – High-contrast colors, clear typography, and simplified navigation for elderly users and multi-prescription management.
+• 🔔 Reliable Notification System – Persistent alarm notifications with battery and sound state checks.
+• 🎨 Dark & Light Theme System – Full adaptive theme support with zero white flash transitions.
+• 📅 Flexible Scheduling – Daily, weekly, and monthly custom schedule patterns.
+• 👤 Multi-Profile Support – Create, edit, and switch between family profiles easily.
+• 🔒 Offline Data Security & Export – Local Room database with PDF report and JSON backup export options.
+• 👨‍👩‍👧 Caregiver Tools – Detailed adherence logs and missed dose history.

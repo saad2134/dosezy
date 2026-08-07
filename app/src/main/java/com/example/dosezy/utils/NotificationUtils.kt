@@ -66,7 +66,7 @@ object NotificationUtils {
      */
     fun getBatteryStatus(context: Context): String {
         val batteryLevel = getBatteryLevel(context)
-        return "Battery is at $batteryLevel%"
+        return context.getString(com.example.dosezy.R.string.notif_battery_status, batteryLevel)
     }
 
     /**
@@ -75,10 +75,10 @@ object NotificationUtils {
     fun getSoundStatus(context: Context): String {
         val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager
         return when (audioManager?.ringerMode) {
-            AudioManager.RINGER_MODE_NORMAL -> "Phone is not silent."
-            AudioManager.RINGER_MODE_VIBRATE -> "Phone is in vibrate mode."
-            AudioManager.RINGER_MODE_SILENT -> "Phone is silent."
-            else -> "Unknown sound mode."
+            AudioManager.RINGER_MODE_NORMAL -> context.getString(com.example.dosezy.R.string.notif_sound_normal)
+            AudioManager.RINGER_MODE_VIBRATE -> context.getString(com.example.dosezy.R.string.notif_sound_vibrate)
+            AudioManager.RINGER_MODE_SILENT -> context.getString(com.example.dosezy.R.string.notif_sound_silent)
+            else -> context.getString(com.example.dosezy.R.string.notif_sound_unknown)
         }
     }
 

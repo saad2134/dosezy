@@ -161,5 +161,9 @@ class Converters {
     fun fromLanguage(language: Language): String = language.name
 
     @TypeConverter
-    fun toLanguage(languageString: String): Language = Language.valueOf(languageString)
+    fun toLanguage(languageString: String): Language = try {
+        Language.valueOf(languageString)
+    } catch (e: Exception) {
+        Language.SYSTEM
+    }
 }

@@ -1,0 +1,229 @@
+<resources>
+    <string name="app_name">Dosezy</string>
+    <string name="app_tagline">الالتزام بالدواء بشكل مبسط</string>
+
+    <string name="nav_home">الرئيسية</string>
+    <string name="nav_schedule">الجدول الزمني</string>
+    <string name="nav_add">إضافة</string>
+    <string name="nav_medicines">الأدوية</string>
+    <string name="nav_menu">القائمة</string>
+
+    <string name="greeting_morning">صباح الخير،</string>
+    <string name="greeting_afternoon">مساء الخير،</string>
+    <string name="greeting_evening">مساء الخير،</string>
+    <string name="greeting_night">طليت ليلتكم،</string>
+    <string name="health_quote">\"الصحة ثروة لا تقدر بثمن.\"</string>
+
+    <string name="home_todays_meds">أدوية اليوم</string>
+    <string name="home_todays_adherence">التزام اليوم</string>
+    <string name="home_upcoming_doses">الجرعات القادمة</string>
+    <string name="home_all_taken">تم أخذ جميع الجرعات!</string>
+    <string name="home_no_doses_today">لا توجد جرعات مجدولة اليوم.</string>
+    <string name="home_medication_progress">تقدم الدواء</string>
+
+    <string name="schedule_title">الجدول اليومي</string>
+    <string name="schedule_no_doses">لا توجد جرعات مجدولة لهذا اليوم</string>
+
+    <string name="medicines_title">أدويتك</string>
+    <string name="medicines_add_new">إضافة دواء جديد</string>
+    <string name="medicines_empty">لم يتم إضافة أي أدوية بعد</string>
+    <string name="medicines_empty_sub">يبدو أنك لم تضف أي أدوية بعد. ابدأ بالضغط على زر الزائد أدناه.</string>
+
+    <string name="form_add_medicine">إضافة دواء</string>
+    <string name="form_edit_medicine">تعديل الدواء</string>
+    <string name="form_medicine_image">صورة الدواء</string>
+    <string name="form_med_name">اسم الدواء</string>
+    <string name="form_med_name_placeholder">مثال: أموكسيسيلين</string>
+    <string name="form_dosage">الجرعة</string>
+    <string name="form_dosage_placeholder">مثال: 500 ملغ، قرص واحد</string>
+    <string name="form_frequency">التكرار</string>
+    <string name="form_time">الوقت</string>
+    <string name="form_save">حفظ الدواء</string>
+    <string name="form_save_changes">حفظ التغييرات</string>
+    <string name="form_delete">حذف الدواء</string>
+    <string name="form_delete_medicine">حذف الدواء</string>
+    <string name="form_upload_img">تحميل صورة الدواء</string>
+    <string name="form_change_img">تغيير صورة الدواء</string>
+    <string name="freq_daily">يوميًا</string>
+    <string name="freq_weekly">أسبوعيًا</string>
+    <string name="freq_monthly">شهريًا</string>
+    <string name="freq_custom">مخصص</string>
+    <string name="form_select_days_week">حدد أيام الأسبوع</string>
+    <string name="form_select_days_month">حدد أيام الشهر</string>
+    <string name="day_mon">الإثنين</string>
+    <string name="day_tue">الثلاثاء</string>
+    <string name="day_wed">الأربعاء</string>
+    <string name="day_thu">الخميس</string>
+    <string name="day_fri">الجمعة</string>
+    <string name="day_sat">السبت</string>
+    <string name="day_sun">الأحد</string>
+    <string name="times_per_day_format">%1$d مرة في اليوم</string>
+    <string name="times_per_week_format">%1$d مرة في الأسبوع</string>
+    <string name="times_per_month_format">%1$d مرة في الشهر</string>
+
+    <string name="menu_title">القائمة</string>
+    <string name="menu_account_profile">الحساب والملف الشخصي</string>
+    <string name="menu_preferences">التفضيلات</string>
+    <string name="menu_emergency">جهات اتصال الطوارئ</string>
+    <string name="menu_help_support">المساعدة والدعم</string>
+    <string name="menu_export_data">تصدير البيانات كـ CSV</string>
+    <string name="menu_switch_profile">تبديل الملف الشخصي</string>
+    <string name="menu_manage_profiles">إدارة الملفات الشخصية</string>
+    <string name="menu_manage_profile">إدارة هذا الملف الشخصي</string>
+
+    <string name="pref_title">التفضيلات</string>
+    <string name="pref_theme">المظهر</string>
+    <string name="pref_time_format">تنسيق الوقت</string>
+    <string name="pref_language">اللغة</string>
+    <string name="pref_late_after">اعتبار متأخر بعد</string>
+    <string name="pref_missed_after">اعتبار فائت بعد</string>
+    <string name="mark_late">تحديد كمتأخر</string>
+
+    <string name="pref_select_theme">اختر المظهر</string>
+    <string name="theme_light">فاتح</string>
+    <string name="theme_dark">داكن</string>
+    <string name="theme_system">افتراضي النظام</string>
+
+    <string name="pref_select_time_format">اختر صيغة الوقت</string>
+    <string name="time_format_12">12 ساعة</string>
+    <string name="time_format_24">24 ساعة</string>
+
+    <string name="pref_mark_missed_after">اعتبار الجرعة فائتة بعد</string>
+    <string name="hours_format">%1$d ساعة</string>
+
+    <string name="notif_check_title">فحص الإشعارات</string>
+    <string name="notif_perm_title">إذن الإشعارات</string>
+    <string name="notif_perm_granted">تم منح الإذن لإرسال الإشعارات.</string>
+    <string name="notif_battery_title">بطارية الهاتف</string>
+    <string name="notif_battery_status">البطارية عند %1$d%%</string>
+    <string name="notif_sound_title">صوت الهاتف</string>
+    <string name="notif_sound_normal">الهاتف ليس في الوضع الصامت.</string>
+    <string name="notif_sound_vibrate">الهاتف في وضع الاهتزاز.</string>
+    <string name="notif_sound_silent">الهاتف في الوضع الصامت.</string>
+    <string name="notif_sound_unknown">وضع الصوت غير معروف.</string>
+    <string name="notif_bg_title">إذن العمل في الخلفية</string>
+    <string name="notif_bg_desc">قد تمنع قيود الخلفية وصول الإشعارات.</string>
+    <string name="notif_bg_granted">يمكن للتطبيق العمل في الخلفية.</string>
+    <string name="ok">موافق</string>
+    <string name="close">إغلاق</string>
+
+    <string name="select_profile">اختر ملفًا شخصيًا</string>
+    <string name="current_profile">الملف الشخصي الحالي</string>
+    <string name="new_profile">ملف شخصي جديد</string>
+    <string name="years_format">%1$d سنة</string>
+    <string name="gender_male">ذكر</string>
+    <string name="gender_female">أنثى</string>
+    <string name="gender_other">آخر</string>
+
+    <string name="profile_change_pic">تغيير الصورة الشخصية</string>
+    <string name="profile_upload_pic">تحميل صورة شخصية</string>
+    <string name="profile_full_name">الاسم الكامل</string>
+    <string name="profile_name_placeholder">مثال: أحمد محمد</string>
+    <string name="profile_age">العمر</string>
+    <string name="profile_gender">الجنس</string>
+    <string name="profile_contact_number">رقم الاتصال</string>
+    <string name="profile_save_btn">حفظ الملف الشخصي</string>
+    <string name="profile_delete_btn">حذف الملف الشخصي</string>
+    <string name="profile_name_required">الاسم مطلوب</string>
+    <string name="profile_age_required">العمر مطلوب</string>
+    <string name="profile_gender_required">الجنس مطلوب</string>
+    <string name="profile_cannot_delete_only">لا يمكن حذف الملف الشخصي الوحيد. أنشئ ملفًا جديدًا أولاً.</string>
+    <string name="profile_updated_success">تم تحديث الملف الشخصي بنجاح!</string>
+    <string name="profile_deleted_success">تم حذف الملف الشخصي بنجاح!</string>
+    <string name="profile_delete_confirm_desc">هل أنت تأكد من رغبتك في حذف هذا الملف الشخصي؟ لا يمكن التراجع عن هذا الإجراء.</string>
+
+    <string name="unit_mg">ملغ</string>
+    <string name="unit_mcg">ميكروغرام</string>
+    <string name="unit_ml">مليلتر</string>
+    <string name="unit_drop">قطرة</string>
+    <string name="unit_tablet">قرص</string>
+    <string name="unit_capsule">كبسولة</string>
+
+    <string name="help_title">المساعدة والدعم</string>
+    <string name="help_resources">الموارد</string>
+    <string name="help_faqs_title">الأسئلة الشائعة</string>
+    <string name="help_faqs_desc">إجابات الأسئلة الشائعة.</string>
+    <string name="help_user_manual_title">دليل المستخدم</string>
+    <string name="help_user_manual_desc">تصفح دليل المستخدم.</string>
+    <string name="help_contact_support">الاتصال بالدعم</string>
+    <string name="help_email_support_title">الدعم عبر البريد الإلكتروني</string>
+    <string name="help_email_support_desc">الحصول على المساعدة عبر البريد الإلكتروني.</string>
+    <string name="help_phone_support_title">الدعم عبر الهاتف</string>
+    <string name="help_phone_support_desc">اتصل بنا للحصول على مساعدة فورية.</string>
+
+    <!-- Emergency Services -->
+    <string name="emergency_title">جهات اتصال الطوارئ</string>
+    <string name="emergency_services">خدمات الطوارئ</string>
+    <string name="emergency_select_country">اختر المنطقة / الدولة</string>
+    <string name="emergency_universal">الطوارئ العامة</string>
+    <string name="emergency_ambulance">الإسعاف</string>
+    <string name="emergency_fire">الإطفاء</string>
+    <string name="emergency_police">الشرطة</string>
+    <string name="manage_profile_title">إدارة الملف الشخصي</string>
+
+    <string name="setup_welcome_title">مرحبًا بك في Dosezy</string>
+    <string name="setup_welcome_sub">مساعدك الشخصي لإدارة الأدوية.</string>
+    <string name="setup_features_title">صحتك، مبسطة!</string>
+    <string name="setup_features_sub">الميزات الرئيسية لـ Dosezy</string>
+    <string name="setup_feat1_title">لا تفوت جرعة أبدًا</string>
+    <string name="setup_feat1_desc">احصل على تذكيرات في الوقت المناسب لكل دواء.</string>
+    <string name="setup_feat2_title">إدارة سهلة للأدوية</string>
+    <string name="setup_feat2_desc">إدارة أدويتك بواجهة سهلة الاستخدام.</string>
+    <string name="setup_feat3_title">دعم الطوارئ</string>
+    <string name="setup_feat3_desc">الوصول السريع لجهات اتصال الطوارئ.</string>
+    <string name="setup_profile_title">أخبرنا عن نفسك!</string>
+    <string name="setup_profile_sub">هذا يساعدنا في تخصيص تجربتك.</string>
+    <string name="setup_next">التالي</string>
+    <string name="setup_get_started">البدء</string>
+
+    <string name="select_language">اختر اللغة</string>
+    <string name="system_default">افتراضي النظام</string>
+    <string name="export_data">تصدير البيانات</string>
+    <string name="export_current_profile">تصدير الملف الشخصي الحالي فقط</string>
+    <string name="export_all_profiles">تصدير جميع الملفات الشخصية (ZIP)</string>
+    <string name="export_choose_title">خيارات تصدير البيانات</string>
+    <string name="export_choose_desc">اختر البيانات التي ترغب في تصديرها:</string>
+    <string name="export_success_title">تم التصدير بنجاح</string>
+    <string name="export_success_desc">تم تصدير البيانات إلى:</string>
+    <string name="export_share_file">مشاركة الملف</string>
+    <string name="export_done">تم</string>
+    <string name="export_progress_title">جاري تصدير البيانات</string>
+    <string name="export_progress_desc">يرجى الانتظار أثناء تجهيز بياناتك...</string>
+    <string name="export_failed_title">فشل التصدير</string>
+    <string name="cancel">إلغاء</string>
+    <string name="export">تصدير</string>
+    <string name="save">حفظ</string>
+    <!-- Personal Contacts -->
+    <string name="personal_contacts">جهات الاتصال الشخصية</string>
+    <string name="personal_contacts_add">إضافة</string>
+    <string name="personal_contacts_empty">لم تتم إضافة جهات اتصال شخصية بعد.\nانقر على \"+ إضافة\" لإضافة جهة اتصال.</string>
+    <string name="personal_contacts_add_title">إضافة جهة اتصال شخصية</string>
+    <string name="personal_contacts_name">اسم جهة الاتصال</string>
+    <string name="personal_contacts_phone">رقم الهاتف</string>
+    <string name="personal_contacts_save">حفظ</string>
+    <string name="personal_contacts_cancel">إلغاء</string>
+    <!-- Alarm Activity -->
+    <string name="alarm_medication_reminder">تذكير بالدواء</string>
+    <string name="alarm_reminder_for">تذكير لـ %s</string>
+    <string name="alarm_scheduled">مُجدول: %s</string>
+    <string name="alarm_take_now">تناول الآن</string>
+    <string name="alarm_snooze">تأجيل (%1$d دقائق)</string>
+    <string name="alarm_mark_late">تحديد متأخر</string>
+
+    <string name="pref_snooze_duration">مدة الغفوة</string>
+    <string name="pref_select_snooze_duration">اختر مدة الغفوة</string>
+    <string name="minutes_format">%1$d دقائق</string>
+    <string name="profile">الملف الشخصي</string>
+
+
+    <string name="manage">إدارة</string>
+    <string name="profile_switch">تبديل</string>
+    <string name="schedule_no_meds_date">لا توجد أدوية مجدولة لهذا التاريخ</string>
+
+
+    <string name="home_all_good">كل شيء جيد!</string>
+    <string name="home_all_good_desc">لا توجد أدوية يجب تناولها اليوم. إذا كنت بحاجة إلى إضافة المزيد، فابدأ بالنقر فوق زر علامة الزائد أدناه.</string>
+    <string name="no_profiles_found">لم يتم العثور على ملفات شخصية</string>
+    <string name="status_taken">تم تناوله</string>
+
+</resources>
