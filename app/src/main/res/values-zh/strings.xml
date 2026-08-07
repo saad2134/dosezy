@@ -243,4 +243,18 @@
     <string name="no_profiles_found">未找到个人资料</string>
     <string name="status_taken">已服用</string>
 
+    <string name="image_picker_select_source">选择图片来源</string>
+    <string name="image_picker_choose_method">选择添加图片的方式</string>
+    <string name="image_picker_camera_desc">相机：拍摄新照片</string>
+    <string name="image_picker_gallery_desc">相册：从您的照片中选择</string>
+    <string name="image_picker_camera">相机</string>
+    <string name="image_picker_gallery">相册</string>
+    <string name="image_picker_error_title">错误</string>
+    <string name="image_picker_remove">删除图片</string>
+    <string name="delete_contact_title">删除联系人</string>
+    <string name="delete_contact_desc">您确定要删除此联系人吗？</string>
+    <string name="delete_contact_confirm">删除</string>
+    <string name="delete_contact_cancel">取消</string>
+    <string name="personal_contacts_name_label">联系人姓名</string>
+    <string name="personal_contacts_phone_label">电话号码</string>
 </resources>

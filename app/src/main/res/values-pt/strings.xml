@@ -225,4 +225,18 @@
     <string name="no_profiles_found">Nenhum perfil encontrado</string>
     <string name="status_taken">Tomado</string>
 
+    <string name="image_picker_select_source">Selecionar origem da imagem</string>
+    <string name="image_picker_choose_method">Escolha como deseja adicionar a sua foto</string>
+    <string name="image_picker_camera_desc">Câmara: Tirar uma nova foto</string>
+    <string name="image_picker_gallery_desc">Galeria: Escolher das suas fotos</string>
+    <string name="image_picker_camera">Câmara</string>
+    <string name="image_picker_gallery">Galeria</string>
+    <string name="image_picker_error_title">Erro</string>
+    <string name="image_picker_remove">Remover imagem</string>
+    <string name="delete_contact_title">Excluir contacto</string>
+    <string name="delete_contact_desc">Tem certeza de que deseja excluir este contacto?</string>
+    <string name="delete_contact_confirm">Excluir</string>
+    <string name="delete_contact_cancel">Cancelar</string>
+    <string name="personal_contacts_name_label">Nome do contacto</string>
+    <string name="personal_contacts_phone_label">Número de telefone</string>
 </resources>

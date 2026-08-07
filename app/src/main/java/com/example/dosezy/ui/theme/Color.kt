@@ -20,7 +20,8 @@ val LightColorScheme = lightColorScheme(
     background = Color(0xFFF8F9FA),
     onBackground = Color.Black,
     surface = Color.White,
-    onSurface = Color.Black
+    onSurface = Color.Black,
+    surfaceTint = Color.Transparent
 )
 
 val DarkColorScheme = darkColorScheme(
@@ -42,5 +43,6 @@ val DarkColorScheme = darkColorScheme(
     tertiary = Color(0xFF03DAC5),
     onTertiary = Color.Black,
     error = Color(0xFFCF6679),
-    onError = Color.Black
+    onError = Color.Black,
+    surfaceTint = Color.Transparent
 )

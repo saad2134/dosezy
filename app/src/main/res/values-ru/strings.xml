@@ -226,4 +226,18 @@
     <string name="no_profiles_found">Профили не найдены</string>
     <string name="status_taken">Принято</string>
 
+    <string name="image_picker_select_source">Выберите источник изображения</string>
+    <string name="image_picker_choose_method">Выберите способ добавления фотографии</string>
+    <string name="image_picker_camera_desc">Камера: Сделать новый снимок</string>
+    <string name="image_picker_gallery_desc">Галерея: Выбрать из ваших фотографий</string>
+    <string name="image_picker_camera">Камера</string>
+    <string name="image_picker_gallery">Галерея</string>
+    <string name="image_picker_error_title">Ошибка</string>
+    <string name="image_picker_remove">Удалить изображение</string>
+    <string name="delete_contact_title">Удалить контакт</string>
+    <string name="delete_contact_desc">Вы уверены, что хотите удалить этот контакт?</string>
+    <string name="delete_contact_confirm">Удалить</string>
+    <string name="delete_contact_cancel">Отмена</string>
+    <string name="personal_contacts_name_label">Имя контакта</string>
+    <string name="personal_contacts_phone_label">Номер телефона</string>
 </resources>

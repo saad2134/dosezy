@@ -208,6 +208,8 @@ fun MenuScreen(navController: NavController) {
     if (showExportScopeDialog) {
         androidx.compose.material3.AlertDialog(
             onDismissRequest = { showExportScopeDialog = false },
+            tonalElevation = 0.dp,
+            containerColor = MaterialTheme.colorScheme.surface,
             title = { Text(stringResource(R.string.export_choose_title), style = MaterialTheme.typography.headlineSmall) },
             text = {
                 Column {

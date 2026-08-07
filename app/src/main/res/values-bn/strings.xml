@@ -226,4 +226,18 @@
     <string name="no_profiles_found">কোনো প্রোফাইল পাওয়া যায়নি</string>
     <string name="status_taken">গৃহীত</string>
 
+    <string name="image_picker_select_source">ছবির উৎস নির্বাচন করুন</string>
+    <string name="image_picker_choose_method">আপনি কীভাবে আপনার ছবি যোগ করতে চান তা চয়ন করুন</string>
+    <string name="image_picker_camera_desc">ক্যামেরা: একটি নতুন ছবি তুলুন</string>
+    <string name="image_picker_gallery_desc">গ্যালারি: আপনার ছবি থেকে চয়ন করুন</string>
+    <string name="image_picker_camera">ক্যামেরা</string>
+    <string name="image_picker_gallery">গ্যালারি</string>
+    <string name="image_picker_error_title">ত্রুটি</string>
+    <string name="image_picker_remove">ছবি সরান</string>
+    <string name="delete_contact_title">যোগাযোগ মুছুন</string>
+    <string name="delete_contact_desc">আপনি কি নিশ্চিত যে আপনি এই যোগাযোগটি মুছতে চান?</string>
+    <string name="delete_contact_confirm">মুছে ফেলুন</string>
+    <string name="delete_contact_cancel">বাতিল করুন</string>
+    <string name="personal_contacts_name_label">যোগাযোগের নাম</string>
+    <string name="personal_contacts_phone_label">ফোন নম্বর</string>
 </resources>

@@ -226,4 +226,18 @@
     <string name="no_profiles_found">Keine Profile gefunden</string>
     <string name="status_taken">Eingenommen</string>
 
+    <string name="image_picker_select_source">Bildquelle auswählen</string>
+    <string name="image_picker_choose_method">Wählen Sie, wie Sie Ihr Bild hinzufügen möchten</string>
+    <string name="image_picker_camera_desc">Kamera: Ein neues Foto aufnehmen</string>
+    <string name="image_picker_gallery_desc">Galerie: Aus Ihren Fotos auswählen</string>
+    <string name="image_picker_camera">Kamera</string>
+    <string name="image_picker_gallery">Galerie</string>
+    <string name="image_picker_error_title">Fehler</string>
+    <string name="image_picker_remove">Bild entfernen</string>
+    <string name="delete_contact_title">Kontakt löschen</string>
+    <string name="delete_contact_desc">Sind Sie sicher, dass Sie diesen Kontakt löschen möchten?</string>
+    <string name="delete_contact_confirm">Löschen</string>
+    <string name="delete_contact_cancel">Abbrechen</string>
+    <string name="personal_contacts_name_label">Kontaktname</string>
+    <string name="personal_contacts_phone_label">Telefonnummer</string>
 </resources>

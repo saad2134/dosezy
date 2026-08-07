@@ -154,6 +154,7 @@ fun EmergencyContent(userLanguage: com.example.dosezy.data.model.Language) {
     }
 
     var showAddContactDialog by remember { mutableStateOf(false) }
+    var contactIndexToDelete by remember { mutableStateOf<Int?>(null) }
 
     Column(
         modifier = Modifier
@@ -345,7 +346,7 @@ fun EmergencyContent(userLanguage: com.example.dosezy.data.model.Language) {
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        androidx.compose.material3.IconButton(onClick = { customContacts.removeAt(index); saveContacts() }) {
+                        androidx.compose.material3.IconButton(onClick = { contactIndexToDelete = index }) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = "Remove",
@@ -365,7 +366,7 @@ fun EmergencyContent(userLanguage: com.example.dosezy.data.model.Language) {
 
         androidx.compose.material3.AlertDialog(
             onDismissRequest = { showAddContactDialog = false },
-            title = { Text("Add Personal Contact", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.personal_contacts_add_title), fontWeight = FontWeight.Bold) },
             containerColor = MaterialTheme.colorScheme.surface,
             tonalElevation = 0.dp,
             text = {
@@ -373,14 +374,14 @@ fun EmergencyContent(userLanguage: com.example.dosezy.data.model.Language) {
                     OutlinedTextField(
                         value = contactName,
                         onValueChange = { contactName = it },
-                        label = { Text("Contact Name") },
+                        label = { Text(stringResource(R.string.personal_contacts_name_label)) },
                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                         shape = RoundedCornerShape(12.dp)
                     )
                     OutlinedTextField(
                         value = contactPhone,
                         onValueChange = { contactPhone = it },
-                        label = { Text("Phone Number") },
+                        label = { Text(stringResource(R.string.personal_contacts_phone_label)) },
                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                         shape = RoundedCornerShape(12.dp),
                         keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
@@ -398,11 +399,59 @@ fun EmergencyContent(userLanguage: com.example.dosezy.data.model.Language) {
                             showAddContactDialog = false
                         }
                     }
-                ) { Text("Save") }
+                ) { Text(stringResource(R.string.personal_contacts_save)) }
             },
             dismissButton = {
                 androidx.compose.material3.TextButton(onClick = { showAddContactDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.delete_contact_cancel))
+                }
+            }
+        )
+    }
+
+    // Delete Contact Confirmation Dialog
+    contactIndexToDelete?.let { index ->
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { contactIndexToDelete = null },
+            tonalElevation = 0.dp,
+            containerColor = MaterialTheme.colorScheme.surface,
+            title = {
+                Text(
+                    text = stringResource(R.string.delete_contact_title),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.delete_contact_desc),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            confirmButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = {
+                        if (index < customContacts.size) {
+                            customContacts.removeAt(index)
+                            saveContacts()
+                        }
+                        contactIndexToDelete = null
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.delete_contact_confirm),
+                        color = Color(0xFFEF4444)
+                    )
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = { contactIndexToDelete = null }
+                ) {
+                    Text(
+                        text = stringResource(R.string.delete_contact_cancel),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
         )

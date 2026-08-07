@@ -226,4 +226,18 @@
     <string name="no_profiles_found">プロフィールが見つかりません</string>
     <string name="status_taken">服用済み</string>
 
+    <string name="image_picker_select_source">画像ソースの選択</string>
+    <string name="image_picker_choose_method">写真の追加方法を選択してください</string>
+    <string name="image_picker_camera_desc">カメラ：新しい写真を撮る</string>
+    <string name="image_picker_gallery_desc">ギャラリー：写真から選択する</string>
+    <string name="image_picker_camera">カメラ</string>
+    <string name="image_picker_gallery">ギャラリー</string>
+    <string name="image_picker_error_title">エラー</string>
+    <string name="image_picker_remove">画像を削除</string>
+    <string name="delete_contact_title">連絡先の削除</string>
+    <string name="delete_contact_desc">この連絡先を削除してもよろしいですか？</string>
+    <string name="delete_contact_confirm">削除</string>
+    <string name="delete_contact_cancel">キャンセル</string>
+    <string name="personal_contacts_name_label">連絡先名</string>
+    <string name="personal_contacts_phone_label">電話番号</string>
 </resources>

@@ -1,0 +1,6 @@
+* Minor Release v2.1.0: Refined UI Popups, Safety Checks, and Image Actions.
+* Emergency Contacts Deletion Safety: Added a confirmation popup when deleting a personal contact to prevent accidental deletion.
+* Image Management: Added a "Remove Picture" option in both Profile and Medication add/manage screens to allow returning to an imageless state.
+* Tintless UI Popups: Disabled blueish elevation tint globally across all dialogs, bottom sheets, and select image source screens.
+* Calendar Loading Fix: Resolved an infinite skeleton loader hang when navigating daily schedules.
+* Support Improvements: Removed phone support option in Help and Support for simplified communication.

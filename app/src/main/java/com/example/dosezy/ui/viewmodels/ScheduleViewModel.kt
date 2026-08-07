@@ -89,10 +89,10 @@ class ScheduleViewModel @Inject constructor(
                 scheduleRepository.getScheduleWithMedicineForDate(userId, date).collect { scheduleWithMedicine ->
                     Log.d(TAG, "Successfully loaded ${scheduleWithMedicine.size} schedule entries with medicine")
                     _scheduleWithMedicine.value = scheduleWithMedicine
+                    _isRefreshing.value = false
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error loading schedule with medicine", e)
-            } finally {
                 _isRefreshing.value = false
             }
         }

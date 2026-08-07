@@ -134,18 +134,6 @@ fun HelpSupportContent(navController: NavController) {
             }
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Phone Support Card
-        SupportCard(
-            icon = Icons.Outlined.Call,
-            title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_phone_support_title),
-            description = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_phone_support_desc),
-            onClick = {
-                openPhone(context, "+91 98765 43210")
-            }
-        )
-
         // Add bottom padding for version info
         Spacer(modifier = Modifier.height(48.dp))
     }

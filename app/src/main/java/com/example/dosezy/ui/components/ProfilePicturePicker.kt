@@ -19,6 +19,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.ui.res.stringResource
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -186,6 +188,28 @@ fun ProfilePicturePicker(
                 error = painterResource(id = R.drawable.default_profile),
                 contentScale = ContentScale.Crop
             )
+            
+            // Remove Picture Button
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .size(36.dp)
+                    .clickable { 
+                        deleteOldImage(profilePicPath)
+                        onProfilePictureSelected(null) 
+                    }
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = stringResource(R.string.image_picker_remove),
+                        tint = Color.White,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
         } else {
             Surface(
                 shape = CircleShape,
@@ -243,18 +267,18 @@ fun ProfilePicturePicker(
     if (showError) {
         AlertDialog(
             onDismissRequest = { showError = false },
-            title = { Text("Error") },
+            tonalElevation = 0.dp,
+            containerColor = MaterialTheme.colorScheme.surface,
+            title = { Text(stringResource(R.string.image_picker_error_title)) },
             text = { Text(errorMessage) },
             confirmButton = {
                 TextButton(onClick = { showError = false }) {
-                    Text("OK")
+                    Text(stringResource(android.R.string.ok))
                 }
             }
         )
     }
 }
-
-
 
 @Composable
 fun ImageSourceDialog(
@@ -264,18 +288,20 @@ fun ImageSourceDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Select Image Source") },
+        tonalElevation = 0.dp,
+        containerColor = MaterialTheme.colorScheme.surface,
+        title = { Text(stringResource(R.string.image_picker_select_source)) },
         text = {
             Column {
-                Text("Choose how you want to add your profile picture")
+                Text(stringResource(R.string.image_picker_choose_method))
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    "Camera: Take a new photo",
+                    stringResource(R.string.image_picker_camera_desc),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    "Gallery: Choose from your photos",
+                    stringResource(R.string.image_picker_gallery_desc),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -288,7 +314,7 @@ fun ImageSourceDialog(
                     contentDescription = null,
                     modifier = Modifier.size(18.dp)
                 )
-                Text("Gallery", modifier = Modifier.padding(start = 8.dp))
+                Text(stringResource(R.string.image_picker_gallery), modifier = Modifier.padding(start = 8.dp))
             }
         },
         dismissButton = {
@@ -298,7 +324,7 @@ fun ImageSourceDialog(
                     contentDescription = null,
                     modifier = Modifier.size(18.dp)
                 )
-                Text("Camera", modifier = Modifier.padding(start = 8.dp))
+                Text(stringResource(R.string.image_picker_camera), modifier = Modifier.padding(start = 8.dp))
             }
         }
     )
@@ -367,5 +393,17 @@ private fun saveImageToInternalStorage(context: Context, uri: Uri, oldPath: Stri
     } catch (e: Exception) {
         Log.e("ProfilePicturePicker", "Error saving image: ${e.message}", e)
         throw e
+    }
+}
+
+private fun deleteOldImage(path: String) {
+    try {
+        val file = File(path)
+        if (file.exists()) {
+            val deleted = file.delete()
+            Log.d("ProfilePicturePicker", "Deleted image: $path, success=$deleted")
+        }
+    } catch (e: Exception) {
+        Log.e("ProfilePicturePicker", "Failed to delete old image: ${e.message}")
     }
 }

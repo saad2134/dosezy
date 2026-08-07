@@ -226,4 +226,18 @@
     <string name="no_profiles_found">لم يتم العثور على ملفات شخصية</string>
     <string name="status_taken">تم تناوله</string>
 
+    <string name="image_picker_select_source">تحديد مصدر الصورة</string>
+    <string name="image_picker_choose_method">اختر طريقة إضافة صورتك</string>
+    <string name="image_picker_camera_desc">الكاميرا: التقاط صورة جديدة</string>
+    <string name="image_picker_gallery_desc">المعرض: اختر من صورك</string>
+    <string name="image_picker_camera">الكاميرا</string>
+    <string name="image_picker_gallery">المعرض</string>
+    <string name="image_picker_error_title">خطأ</string>
+    <string name="image_picker_remove">إزالة الصورة</string>
+    <string name="delete_contact_title">حذف جهة الاتصال</string>
+    <string name="delete_contact_desc">هل أنت متأكد من أنك تريد حذف جهة الاتصال هذه؟</string>
+    <string name="delete_contact_confirm">حذف</string>
+    <string name="delete_contact_cancel">إلغاء</string>
+    <string name="personal_contacts_name_label">اسم جهة الاتصال</string>
+    <string name="personal_contacts_phone_label">رقم الهاتف</string>
 </resources>

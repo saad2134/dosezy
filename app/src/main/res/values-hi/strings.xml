@@ -242,4 +242,18 @@
     <string name="no_profiles_found">कोई प्रोफ़ाइल नहीं मिली</string>
     <string name="status_taken">लिया गया</string>
 
+    <string name="image_picker_select_source">छवि स्रोत चुनें</string>
+    <string name="image_picker_choose_method">चुनें कि आप अपनी तस्वीर कैसे जोड़ना चाहते हैं</string>
+    <string name="image_picker_camera_desc">कैमरा: एक नई फोटो लें</string>
+    <string name="image_picker_gallery_desc">गैलरी: अपनी तस्वीरों में से चुनें</string>
+    <string name="image_picker_camera">कैमरा</string>
+    <string name="image_picker_gallery">गैलरी</string>
+    <string name="image_picker_error_title">त्रुटि</string>
+    <string name="image_picker_remove">तस्वीर हटाएं</string>
+    <string name="delete_contact_title">संपर्क हटाएं</string>
+    <string name="delete_contact_desc">क्या आप वाकई इस संपर्क को हटाना चाहते हैं?</string>
+    <string name="delete_contact_confirm">हटाएं</string>
+    <string name="delete_contact_cancel">रद्द करें</string>
+    <string name="personal_contacts_name_label">संपर्क का नाम</string>
+    <string name="personal_contacts_phone_label">फ़ोन नंबर</string>
 </resources>

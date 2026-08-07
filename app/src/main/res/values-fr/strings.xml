@@ -226,4 +226,18 @@
     <string name="no_profiles_found">Aucun profil trouvé</string>
     <string name="status_taken">Pris</string>
 
+    <string name="image_picker_select_source">Sélectionner la source de l\'image</string>
+    <string name="image_picker_choose_method">Choisissez comment vous souhaitez ajouter votre photo</string>
+    <string name="image_picker_camera_desc">Appareil photo : Prendre une nouvelle photo</string>
+    <string name="image_picker_gallery_desc">Galerie : Choisir parmi vos photos</string>
+    <string name="image_picker_camera">Appareil photo</string>
+    <string name="image_picker_gallery">Galerie</string>
+    <string name="image_picker_error_title">Erreur</string>
+    <string name="image_picker_remove">Supprimer l\'image</string>
+    <string name="delete_contact_title">Supprimer le contact</string>
+    <string name="delete_contact_desc">Êtes-vous sûr de vouloir supprimer ce contact ?</string>
+    <string name="delete_contact_confirm">Supprimer</string>
+    <string name="delete_contact_cancel">Annuler</string>
+    <string name="personal_contacts_name_label">Nom du contact</string>
+    <string name="personal_contacts_phone_label">Numéro de téléphone</string>
 </resources>
