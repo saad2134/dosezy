@@ -1,6 +1,6 @@
 <h1 align="center"> 💊 Dosezy – Medicine Adherence Simplified</h1>
 
-> <p align="center">🚨 <strong> An Android medicine tracking app. **Dosezy** transforms medication management into a simple, stress-free experience. Built with accessibility at its core, the app features **clear, large text** and **intuitive navigation**: perfect for elderly users and anyone managing multiple prescriptions.</strong></p>  
+> <p align="center">🚨 <strong> A smart medicine tracking app that is free, open source, offline and private by default. Dosezy transforms medication management into a simple, stress-free experience. Built with accessibility at its core, the app features clear, large text and intuitive navigation: perfect for elderly users and anyone managing multiple prescriptions.</strong></p>  
 
 
 <div align="center">
