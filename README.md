@@ -211,16 +211,6 @@ dosezy/
 
 </div>
 
-## ⭐ Star History
-
-<a href="https://www.star-history.com/?type=date&repos=saad2134%2Fdosezy">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=saad2134/dosezy&type=date&theme=dark&legend=top-left&sealed_token=IxQzYbJCwvWZotY69Wsw4z2IOr0LpyI7E4jAS22tbkCxUE8_kUqbiS7jvvT397WpfrmlQHlrWKB58gn3Rgx5xHBZNpCUKv0JGNCDWCXPyrEc6JKZNbR3rGWEAzU_TVVzUPzmwyILtubIjhwtBfDSORidBUPEXYQWscAu-tAxnh_UnDgwW9UYzmunEr0b" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=saad2134/dosezy&type=date&legend=top-left&sealed_token=IxQzYbJCwvWZotY69Wsw4z2IOr0LpyI7E4jAS22tbkCxUE8_kUqbiS7jvvT397WpfrmlQHlrWKB58gn3Rgx5xHBZNpCUKv0JGNCDWCXPyrEc6JKZNbR3rGWEAzU_TVVzUPzmwyILtubIjhwtBfDSORidBUPEXYQWscAu-tAxnh_UnDgwW9UYzmunEr0b" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=saad2134/dosezy&type=date&legend=top-left&sealed_token=IxQzYbJCwvWZotY69Wsw4z2IOr0LpyI7E4jAS22tbkCxUE8_kUqbiS7jvvT397WpfrmlQHlrWKB58gn3Rgx5xHBZNpCUKv0JGNCDWCXPyrEc6JKZNbR3rGWEAzU_TVVzUPzmwyILtubIjhwtBfDSORidBUPEXYQWscAu-tAxnh_UnDgwW9UYzmunEr0b" />
- </picture>
-</a>
-
 ## 🖼️ App Icon 
 <img src="https://github.com/user-attachments/assets/213a3fc0-b737-4df2-9c70-693a7f6d7467" alt="Dosezy Icon" title="Dosezy" style="width:500px;">
 
