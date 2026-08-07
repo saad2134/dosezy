@@ -9,7 +9,15 @@
 ![Platforms](https://img.shields.io/badge/🌐%20Platforms-Android-28a745?style=for-the-badge)
 
 </div>
- 
+
+## 🛍️ Download Now  
+
+<div align="center">
+  <a href="https://github.com/saad2134/dosezy/releases">
+    <img width="197" height="59" alt="get-github-1189403918" src="https://github.com/user-attachments/assets/e9ae5d41-fb6c-468b-b1cc-cc4fb534aa10" />
+  </a>
+</div>
+
 ## ✨ Features  
 
 Once you input the basics: name, dosage, timing, and frequency, the app intelligently handles your medication schedule.
@@ -73,9 +81,7 @@ Once you input the basics: name, dosage, timing, and frequency, the app intellig
 
 ## 📁 Project Architecture
 ```
-dosezy-uidesign-webview/
-├── apks/
-│ └── dosezy-uidesign-webview.apk
+dosezy/
 ├── app/
 │ ├── build.gradle.kts
 │ ├── proguard-rules.pro
