@@ -213,11 +213,11 @@ dosezy/
 
 ## ⭐ Star History
 
-<a href="https://www.star-history.com/#saad2134/dosezy&Date">
+<a href="https://www.star-history.com/?type=date&repos=saad2134%2Fdosezy">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=saad2134/dosezy&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=saad2134/dosezy&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=saad2134/dosezy&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=saad2134/dosezy&type=date&theme=dark&legend=top-left&sealed_token=zt1R6V1vLVTYpumQSpTDGr0Fd8Lz9mOsH12_zUImgwONXZEvjnEiENwBZQXI-50io3myLCFyrZwLrL6GNcJ55nPVS3a0PeugByob-eTCXw1Cvu2KFvVX9g" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=saad2134/dosezy&type=date&legend=top-left&sealed_token=zt1R6V1vLVTYpumQSpTDGr0Fd8Lz9mOsH12_zUImgwONXZEvjnEiENwBZQXI-50io3myLCFyrZwLrL6GNcJ55nPVS3a0PeugByob-eTCXw1Cvu2KFvVX9g" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=saad2134/dosezy&type=date&legend=top-left&sealed_token=zt1R6V1vLVTYpumQSpTDGr0Fd8Lz9mOsH12_zUImgwONXZEvjnEiENwBZQXI-50io3myLCFyrZwLrL6GNcJ55nPVS3a0PeugByob-eTCXw1Cvu2KFvVX9g" />
  </picture>
 </a>
 
