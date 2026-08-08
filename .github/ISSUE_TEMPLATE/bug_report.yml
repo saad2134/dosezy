@@ -1,0 +1,96 @@
+name: 🐛 Bug Report
+description: Report a reproducible problem in Dosezy.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug in Dosezy!
+
+        Please do not include personal medical information, medication details,
+        credentials, API keys, or other sensitive information.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Clearly describe the problem.
+      placeholder: Tell us what went wrong.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Provide the smallest set of steps that reproduces the problem.
+      placeholder: |
+        1. Open...
+        2. Navigate to...
+        3. Tap...
+        4. Observe...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: What did you expect Dosezy to do?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      placeholder: What did Dosezy actually do?
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Dosezy version
+      placeholder: "e.g. 2.2.1"
+    validations:
+      required: true
+
+  - type: input
+    id: android
+    attributes:
+      label: Android version
+      placeholder: "e.g. Android 15"
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Device
+      placeholder: "e.g. Pixel 8"
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or error messages
+      description: Remove personal information, tokens, credentials, and other secrets before posting.
+      render: text
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or recordings
+      description: Drag and drop images or recordings here if they help explain the problem.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and could not find a duplicate.
+          required: true
+        - label: I have removed private or sensitive information from this report.
+          required: true

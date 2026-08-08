@@ -1,0 +1,77 @@
+name: ✨ Feature Request
+description: Suggest an improvement or new feature for Dosezy.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Dosezy!
+
+        Please focus on the user problem rather than only describing a technical implementation.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe the problem users currently experience.
+      placeholder: |
+        Users currently have difficulty...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe what you would like Dosezy to do.
+      placeholder: |
+        Dosezy could...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe any existing workaround or alternative you considered.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Medication management
+        - Reminders
+        - Accessibility
+        - Caregiver features
+        - Profiles
+        - Data export
+        - Privacy
+        - Offline / local-first
+        - Synchronization
+        - UI / UX
+        - Performance
+        - Localization
+        - Developer experience
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: considerations
+    attributes:
+      label: Additional considerations
+      description: Mention accessibility, privacy, offline-first, security, or other considerations.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and could not find a duplicate.
+          required: true
+        - label: This request does not require sharing personal medical information.
+          required: true

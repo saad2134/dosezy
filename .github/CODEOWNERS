@@ -1,7 +1,14 @@
-# Default owner
+# Default maintainer
 * @saad2134
 
-# Security-sensitive files
-/.github/ @saad2134
+# Project governance and community files
+/CODE_OF_CONDUCT.md @saad2134
+/CONTRIBUTING.md @saad2134
+/GOVERNANCE.md @saad2134
 /SECURITY.md @saad2134
-/package.json @saad2134
+/SUPPORT.md @saad2134
+/CITATION.cff @saad2134
+/FUNDING.yml @saad2134
+
+# GitHub configuration
+/.github/ @saad2134

@@ -1,0 +1,47 @@
+name: 💬 Question
+description: Ask a question about using or contributing to Dosezy.
+title: "[Question]: "
+labels:
+  - question
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For security vulnerabilities, please do not use this form.
+        Follow the instructions in SECURITY.md instead.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: What would you like to know?
+      placeholder: Ask your question here.
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Provide relevant details that help us understand your question.
+
+  - type: input
+    id: version
+    attributes:
+      label: Dosezy version
+      placeholder: "e.g. 2.2.1"
+
+  - type: input
+    id: android
+    attributes:
+      label: Android version
+      placeholder: "e.g. Android 15"
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and discussions first.
+          required: true
+        - label: I have not included private or sensitive information.
+          required: true

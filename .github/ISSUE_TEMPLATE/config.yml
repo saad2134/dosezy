@@ -1,0 +1,10 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/saad2134/dosezy/discussions
+    about: Ask questions, discuss ideas, and talk about Dosezy with the community.
+
+  - name: 🔐 Security Vulnerability
+    url: https://github.com/saad2134/dosezy/security/policy
+    about: Please report security vulnerabilities privately according to SECURITY.md.
