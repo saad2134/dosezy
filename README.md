@@ -10,7 +10,7 @@
 
 </div>
 
-## 🛍️ Download Now  
+## 🛍️ Download Now (Patient App)
 
 <div align="center">
   <a href="https://github.com/saad2134/dosezy/releases">
@@ -57,6 +57,8 @@ Once you input the basics: name, dosage, timing, and frequency, the app intellig
 
 ## ⚙️ Platforms
 
+### Patient App
+
 <table border="1" cellpadding="10" cellspacing="0">
   <thead>
     <tr>
@@ -100,53 +102,30 @@ Once you input the basics: name, dosage, timing, and frequency, the app intellig
 ## 📁 Project Architecture
 ```
 dosezy/
-├── app/
-│ ├── build.gradle.kts
-│ ├── proguard-rules.pro
-│ ├── src/
-│ │ ├── main/
-│ │ │ ├── java/com/example/dosezy/
-│ │ │ │ ├── MainActivity.kt
-│ │ │ │ ├── SplashActivity.kt
-│ │ │ │ ├── notifications/
-│ │ │ │ │ ├── MedicineAlarmReceiver.kt
-│ │ │ │ │ ├── MedicineForegroundService.kt
-│ │ │ │ │ └── MedicineReminderService.kt
-│ │ │ │ ├── ui/
-│ │ │ │ │ ├── components/
-│ │ │ │ │ │ ├── NavigationBar.kt
-│ │ │ │ │ │ ├── TopBar.kt
-│ │ │ │ │ │ └── ...
-│ │ │ │ │ ├── screens/
-│ │ │ │ │ │ ├── HomeScreen.kt
-│ │ │ │ │ │ ├── MedicinesScreen.kt
-│ │ │ │ │ │ ├── NewUserScreen.kt
-│ │ │ │ │ │ └── ...
-│ │ │ │ │ ├── subscreens/
-│ │ │ │ │ │ ├── AddMedScreen.kt
-│ │ │ │ │ │ ├── EditMedScreen.kt
-│ │ │ │ │ │ └── ...
-│ │ │ │ │ └── theme/
-│ │ │ │ │ ├── Color.kt
-│ │ │ │ │ ├── Theme.kt
-│ │ │ │ │ └── Type.kt
-│ │ │ │ └── utils/
-│ │ │ ├── res/
-│ │ │ │ ├── drawable/
-│ │ │ │ ├── mipmap-*/
-│ │ │ │ ├── values/
-│ │ │ │ └── xml/
-│ │ │ └── AndroidManifest.xml
-│ │ ├── androidTest/
-│ │ └── test/
-│ └── build/ (generated build outputs)
-├── assets/
-│ ├── banner.png
-│ └── icon-squircle-1000px.png
-├── gradle/
-│ ├── libs.versions.toml
-│ └── wrapper/
-└── build/ (project build files)
+├── .github/                  # CI/CD workflows, issue templates, and repository automation
+├── api/                      # (Future Plan) REST API backend services for cloud sync and telemetry
+├── caregiver/                # (Future Plan) Companion mobile/web dashboard for caregivers and family
+├── docs/                     # (Future Plan) Technical specifications, architecture docs, and developer guides
+├── patient/                  # Patient application module
+│   └── android/              # Native Android patient app (Jetpack Compose & Kotlin)
+│       ├── app/              # Android app source code, assets, and UI components
+│       ├── assets/           # App branding banners and launcher artwork
+│       ├── fastlane/         # Fastlane store metadata and localized changelogs
+│       ├── gradle/           # Gradle build wrappers and version catalogs
+│       └── ui/               # Prototyping UI templates and mockup assets
+├── resources/                # Documentation, FAQs, and user support resources
+│   ├── FAQs.md
+│   └── UserManual.md
+├── scripts/                  # (Future Plan) Automation scripts for release builds and translation syncing
+├── server/                   # (Future Plan) Self-hosted sync backend and notification dispatch service
+├── website/                  # Next.js marketing and landing page web app
+│   ├── src/                  # React 19 pages, layout, and Tailwind CSS v4 styling
+│   ├── public/               # Static web assets
+│   ├── package.json          # Web dependencies and scripts
+│   └── next.config.ts        # Next.js configuration
+├── CONTRIBUTING.md           # Contribution guidelines
+├── LICENSE                   # Open-source MIT license
+└── README.md                 # Project documentation and guide
 ```
 
 
