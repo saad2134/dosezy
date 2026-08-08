@@ -1,12 +1,5 @@
-cff-version: "1.2.0"
-message: "If you use Dosezy in your work, research, or project, please cite it using the information below."
-
-title: "Dosezy"
-version: "2.2.1"
-date-released: "2026-08-08"
-
-type: "software"
-license: "MIT"
+cff-version: 1.2.0
+message: "If you use Dosezy, please cite it as below."
 
 authors:
 
@@ -14,21 +7,7 @@ authors:
   given-names: "Saad"
   website: "https://github.com/saad2134"
 
-repository-code: "https://github.com/saad2134/dosezy"
+title: "Dosezy"
+version: 2.2.1
+date-released: 2026-08-08
 url: "https://github.com/saad2134/dosezy"
-
-abstract: "Dosezy is a free and open-source, local-first Android medicine tracking and medication adherence application designed with accessibility and privacy at its core."
-
-keywords:
-
-* "android"
-* "medication-adherence"
-* "medication-management"
-* "medicine-reminder"
-* "medicine-tracking"
-* "medication-scheduling"
-* "accessibility"
-* "privacy"
-* "local-first"
-* "offline-first"
-* "open-source"
