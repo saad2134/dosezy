@@ -1,0 +1,7 @@
+# Default owner
+* @saad2134
+
+# Security-sensitive files
+/.github/ @saad2134
+/SECURITY.md @saad2134
+/package.json @saad2134
