@@ -240,4 +240,24 @@
     <string name="delete_contact_cancel">Annuler</string>
     <string name="personal_contacts_name_label">Nom du contact</string>
     <string name="personal_contacts_phone_label">Numéro de téléphone</string>
+
+    <!-- Analytics &amp; Menu Additions -->
+    <string name="menu_analytics">Statistiques</string>
+    <string name="analytics_title">Statistiques de Prise</string>
+    <string name="analytics_adherence_rate">Taux d\'Observance</string>
+    <string name="analytics_adherence_sub">Doses programmées prises</string>
+    <string name="analytics_using_since">Utilise Dosezy depuis %s</string>
+    <string name="analytics_using_today">Utilise Dosezy depuis aujourd\'hui</string>
+    <string name="analytics_taken_on_time">Pris à l\'Heure</string>
+    <string name="analytics_taken_late">Pris en Retard</string>
+    <string name="analytics_missed_doses">Doses Manquées</string>
+    <string name="analytics_total_doses">Total des Doses Enregistrées</string>
+    <string name="analytics_weekly_overview">Tendance Hebdomadaire</string>
+    <string name="analytics_insights_title">Analyse d\'Observance</string>
+    <string name="analytics_insights_excellent">Excellente observance ! Vous maintenez une régularité exemplaire pour votre santé.</string>
+    <string name="analytics_insights_good">Bonne progression ! Continuez à prendre vos médicaments à l\'heure.</string>
+    <string name="analytics_insights_start">Commencez à enregistrer vos doses pour afficher vos statistiques détaillées.</string>
+    <string name="menu_backup_restore">Sauvegarde et Restauration</string>
+    <string name="menu_sharing">Partage avec les Proches</string>
+    <string name="coming_soon">Bientôt Disponible</string>
 </resources>

@@ -240,4 +240,24 @@
     <string name="delete_contact_cancel">إلغاء</string>
     <string name="personal_contacts_name_label">اسم جهة الاتصال</string>
     <string name="personal_contacts_phone_label">رقم الهاتف</string>
+
+    <!-- Analytics &amp; Menu Additions -->
+    <string name="menu_analytics">التحليلات</string>
+    <string name="analytics_title">تحليلات الأدوية</string>
+    <string name="analytics_adherence_rate">معدل الالتزام</string>
+    <string name="analytics_adherence_sub">إجمالي الجرعات المأخوذة في موعدها</string>
+    <string name="analytics_using_since">استخدام دوزي منذ %s</string>
+    <string name="analytics_using_today">استخدام دوزي منذ اليوم</string>
+    <string name="analytics_taken_on_time">أُخذت في الوقت المحدد</string>
+    <string name="analytics_taken_late">أُخذت متأخرة</string>
+    <string name="analytics_missed_doses">جرعات فائتة</string>
+    <string name="analytics_total_doses">إجمالي الجرعات المسجلة</string>
+    <string name="analytics_weekly_overview">اتجاه الالتزام الأسبوعي</string>
+    <string name="analytics_insights_title">رؤى الالتزام</string>
+    <string name="analytics_insights_excellent">التزام ممتاز! أنت تحافظ على انتظام أدويتك وصحتك.</string>
+    <string name="analytics_insights_good">تقدم جيد! استمر في تناول أدويتك في الموعد المحدد.</string>
+    <string name="analytics_insights_start">ابدأ في تسجيل الجرعات لعرض تحليلاتك التفصيلية.</string>
+    <string name="menu_backup_restore">النسخ الاحتياطي والاستعادة</string>
+    <string name="menu_sharing">مشاركة مقدم الرعاية</string>
+    <string name="coming_soon">قريباً</string>
 </resources>

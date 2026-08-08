@@ -240,4 +240,24 @@
     <string name="delete_contact_cancel">Annulla</string>
     <string name="personal_contacts_name_label">Nome contatto</string>
     <string name="personal_contacts_phone_label">Numero di telefono</string>
+
+    <!-- Analytics &amp; Menu Additions -->
+    <string name="menu_analytics">Statistiche</string>
+    <string name="analytics_title">Statistiche Farmaci</string>
+    <string name="analytics_adherence_rate">Tasso di Aderenza</string>
+    <string name="analytics_adherence_sub">Dosi programmate assunte</string>
+    <string name="analytics_using_since">Usa Dosezy dal %s</string>
+    <string name="analytics_using_today">Usa Dosezy da oggi</string>
+    <string name="analytics_taken_on_time">Assunto in Orario</string>
+    <string name="analytics_taken_late">Assunto in Ritardo</string>
+    <string name="analytics_missed_doses">Dosi Mancate</string>
+    <string name="analytics_total_doses">Totale Dosi Registrate</string>
+    <string name="analytics_weekly_overview">Andamento Settimanale</string>
+    <string name="analytics_insights_title">Analisi Aderenza</string>
+    <string name="analytics_insights_excellent">Aderenza eccellente! Stai mantenendo una perfetta costanza per la tua salute.</string>
+    <string name="analytics_insights_good">Ottimo progresso! Continua ad assumere i farmaci in orario.</string>
+    <string name="analytics_insights_start">Inizia a registrare le dosi per visualizzare statistiche dettagliate.</string>
+    <string name="menu_backup_restore">Backup e Ripristino</string>
+    <string name="menu_sharing">Condivisione con Caregiver</string>
+    <string name="coming_soon">Prossimamente</string>
 </resources>

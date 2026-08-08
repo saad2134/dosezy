@@ -20,9 +20,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Emergency
 import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.filled.Insights
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.SwitchAccount
 import androidx.compose.material.icons.filled.Tune
@@ -145,6 +148,16 @@ fun MenuScreen(navController: NavController) {
                 )
             }
 
+            // Analytics
+            item {
+                MenuItem(
+                    icon = Icons.Default.Insights,
+                    title = androidx.compose.ui.res.stringResource(R.string.menu_analytics),
+                    color = MaterialTheme.colorScheme.primary,
+                    onClick = { navController.navigate("analytics") }
+                )
+            }
+
             // Preferences
             item {
                 MenuItem(
@@ -183,6 +196,30 @@ fun MenuScreen(navController: NavController) {
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+
+            // Backup & Restore (Disabled, Coming Soon)
+            item {
+                MenuItem(
+                    icon = Icons.Default.CloudSync,
+                    title = androidx.compose.ui.res.stringResource(R.string.menu_backup_restore),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    enabled = false,
+                    badge = androidx.compose.ui.res.stringResource(R.string.coming_soon),
+                    onClick = {}
+                )
+            }
+
+            // Sharing (Disabled, Coming Soon)
+            item {
+                MenuItem(
+                    icon = Icons.Default.People,
+                    title = androidx.compose.ui.res.stringResource(R.string.menu_sharing),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    enabled = false,
+                    badge = androidx.compose.ui.res.stringResource(R.string.coming_soon),
+                    onClick = {}
                 )
             }
 
@@ -514,16 +551,19 @@ fun MenuItem(
     title: String,
     color: Color,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    badge: String? = null
 ) {
+    val alpha = if (enabled) 1f else 0.45f
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier),
         shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surface,
+        color = MaterialTheme.colorScheme.surface.copy(alpha = if (enabled) 1f else 0.7f),
         tonalElevation = 0.dp,
-        shadowElevation = 2.dp
+        shadowElevation = if (enabled) 2.dp else 0.dp
     ) {
         Row(
             modifier = Modifier
@@ -533,29 +573,52 @@ fun MenuItem(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f, fill = false)
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = title,
                     modifier = Modifier.size(32.dp),
-                    tint = color
+                    tint = color.copy(alpha = alpha)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
                     text = title,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
-                    color = color,
+                    color = color.copy(alpha = alpha),
                     fontSize = 18.sp
                 )
             }
-            Icon(
-                imageVector = Icons.Default.ChevronRight,
-                contentDescription = "Navigate",
-                tint = Color(0xFF9CA3AF),
-                modifier = Modifier.size(24.dp)
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (badge != null) {
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                    ) {
+                        Text(
+                            text = badge,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            fontSize = 11.sp
+                        )
+                    }
+                }
+                if (enabled) {
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = "Navigate",
+                        tint = Color(0xFF9CA3AF),
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
         }
     }
 }

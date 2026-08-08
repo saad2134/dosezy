@@ -87,7 +87,7 @@
     <string name="pref_missed_after">छूट जाने के बाद समझें</string>
     <string name="mark_late">देरी के रूप में चिह्नित करें</string>
 
-    <!-- Dialog Titles & Options -->
+    <!-- Dialog Titles &amp; Options -->
     <string name="pref_select_theme">थीम चुनें</string>
     <string name="theme_light">लाइट</string>
     <string name="theme_dark">डार्क</string>
@@ -117,7 +117,7 @@
     <string name="ok">ठीक है</string>
     <string name="close">बंद करें</string>
 
-    <!-- Profiles & Gender -->
+    <!-- Profiles &amp; Gender -->
     <string name="select_profile">प्रोफ़ाइल चुनें</string>
     <string name="current_profile">वर्तमान प्रोफ़ाइल</string>
     <string name="new_profile">नई प्रोफ़ाइल</string>
@@ -152,7 +152,7 @@
     <string name="unit_tablet">गोली (tablet)</string>
     <string name="unit_capsule">कैप्सूल (capsule)</string>
 
-    <!-- Help & Support -->
+    <!-- Help &amp; Support -->
     <string name="help_title">सहायता और सहायता</string>
     <string name="help_resources">संसाधन</string>
     <string name="help_faqs_title">सामान्य प्रश्न (FAQs)</string>
@@ -191,7 +191,7 @@
     <string name="setup_next">आगे</string>
     <string name="setup_get_started">शुरू करें</string>
 
-    <!-- Dialogs & Buttons -->
+    <!-- Dialogs &amp; Buttons -->
     <string name="select_language">भाषा चुनें</string>
     <string name="system_default">सिस्टम डिफ़ॉल्ट</string>
     <string name="export_data">डेटा निर्यात करें</string>
@@ -256,4 +256,24 @@
     <string name="delete_contact_cancel">रद्द करें</string>
     <string name="personal_contacts_name_label">संपर्क का नाम</string>
     <string name="personal_contacts_phone_label">फ़ोन नंबर</string>
+
+    <!-- Analytics &amp; Menu Additions -->
+    <string name="menu_analytics">एनालिटिक्स</string>
+    <string name="analytics_title">दवा एनालिटिक्स</string>
+    <string name="analytics_adherence_rate">दवा पालन दर</string>
+    <string name="analytics_adherence_sub">कुल निर्धारित खुराक ली गई</string>
+    <string name="analytics_using_since">%s से डोज़ी का उपयोग कर रहे हैं</string>
+    <string name="analytics_using_today">आज से डोज़ी का उपयोग कर रहे हैं</string>
+    <string name="analytics_taken_on_time">समय पर ली गई</string>
+    <string name="analytics_taken_late">देर से ली गई</string>
+    <string name="analytics_missed_doses">छूटी हुई खुराक</string>
+    <string name="analytics_total_doses">कुल दर्ज खुराक</string>
+    <string name="analytics_weekly_overview">साप्ताहिक दवा पालन रुझান</string>
+    <string name="analytics_insights_title">पालन अंतर्दृष्टि</string>
+    <string name="analytics_insights_excellent">शानदार दवा पालन! आप अपने स्वास्थ्य नियम का लगातार पालन कर रहे हैं।</string>
+    <string name="analytics_insights_good">अच्छी प्रगति! सर्वोत्तम स्वास्थ्य परिणामों के लिए समय पर दवा लेते रहें।</string>
+    <string name="analytics_insights_start">विस्तृत आँकड़े देखने के लिए अपनी दवाएँ दर्ज करना शुरू करें।</string>
+    <string name="menu_backup_restore">बैकअप और रीस्टोर</string>
+    <string name="menu_sharing">देखभालकर्ता साझाकरण</string>
+    <string name="coming_soon">जल्द आ रहा है</string>
 </resources>

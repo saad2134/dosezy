@@ -240,4 +240,24 @@
     <string name="delete_contact_cancel">বাতিল করুন</string>
     <string name="personal_contacts_name_label">যোগাযোগের নাম</string>
     <string name="personal_contacts_phone_label">ফোন নম্বর</string>
+
+    <!-- Analytics &amp; Menu Additions -->
+    <string name="menu_analytics">অ্যানালিটিক্স</string>
+    <string name="analytics_title">ওষুধের অ্যানালিটিক্স</string>
+    <string name="analytics_adherence_rate">ওষুধ গ্রহণের হার</string>
+    <string name="analytics_adherence_sub">নির্ধারিত ডোজ সঠিকভাবে গ্রহণ করা হয়েছে</string>
+    <string name="analytics_using_since">%s থেকে ডোজী ব্যবহার করছেন</string>
+    <string name="analytics_using_today">আজ থেকে ডোজী ব্যবহার করছেন</string>
+    <string name="analytics_taken_on_time">সময়মতো গৃহীত</string>
+    <string name="analytics_taken_late">দেরিতে গৃহীত</string>
+    <string name="analytics_missed_doses">বাদ পড়া ডোজ</string>
+    <string name="analytics_total_doses">মোট নথিভুক্ত ডোজ</string>
+    <string name="analytics_weekly_overview">সাপ্তাহিক ওষুধ গ্রহণের ধারা</string>
+    <string name="analytics_insights_title">ওষুধ গ্রহণের মূল্যায়ন</string>
+    <string name="analytics_insights_excellent">চমৎকার নিয়মনিষ্ঠা! আপনি আপনার স্বাস্থ্যবিধি সুন্দরভাবে মেনে চলছেন।</string>
+    <string name="analytics_insights_good">ভালো অগ্রগতি! সেরা ফলাফলের জন্য সময়মতো ওষুধ গ্রহণ চালিয়ে যান।</string>
+    <string name="analytics_insights_start">বিস্তারিত পরিসংখ্যান দেখতে আপনার ওষুধ গ্রহণ রেকর্ড করা শুরু করুন।</string>
+    <string name="menu_backup_restore">ব্যাকআপ ও রিস্টোর</string>
+    <string name="menu_sharing">পরিচর্যাকারী শেয়ারিং</string>
+    <string name="coming_soon">শীঘ্রই আসছে</string>
 </resources>

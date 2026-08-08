@@ -240,4 +240,24 @@
     <string name="delete_contact_cancel">キャンセル</string>
     <string name="personal_contacts_name_label">連絡先名</string>
     <string name="personal_contacts_phone_label">電話番号</string>
+
+    <!-- Analytics &amp; Menu Additions -->
+    <string name="menu_analytics">統計・分析</string>
+    <string name="analytics_title">服薬統計・分析</string>
+    <string name="analytics_adherence_rate">服薬達成率</string>
+    <string name="analytics_adherence_sub">予定された服薬の達成度</string>
+    <string name="analytics_using_since">%s から Dosezy を利用中</string>
+    <string name="analytics_using_today">今日から Dosezy を利用中</string>
+    <string name="analytics_taken_on_time">時間通りに服用</string>
+    <string name="analytics_taken_late">遅れて服用</string>
+    <string name="analytics_missed_doses">飲み忘れ</string>
+    <string name="analytics_total_doses">記録された総服用回数</string>
+    <string name="analytics_weekly_overview">週間服薬トレンド</string>
+    <string name="analytics_insights_title">服薬アドバイス</string>
+    <string name="analytics_insights_excellent">素晴らしい達成率です！規則正しい服薬習慣が維持できています。</string>
+    <string name="analytics_insights_good">順調です！健康のために時間通りの服用を続けましょう。</string>
+    <string name="analytics_insights_start">服薬を記録すると詳細な分析が表示されます。</string>
+    <string name="menu_backup_restore">バックアップと復元</string>
+    <string name="menu_sharing">介護者・家族共有</string>
+    <string name="coming_soon">近日公開</string>
 </resources>

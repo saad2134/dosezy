@@ -88,7 +88,7 @@
     <string name="pref_missed_after">判定漏服时间</string>
     <string name="mark_late">标记迟服</string>
 
-    <!-- Dialog Titles & Options -->
+    <!-- Dialog Titles &amp; Options -->
     <string name="pref_select_theme">选择主题</string>
     <string name="theme_light">浅色模式</string>
     <string name="theme_dark">深色模式</string>
@@ -118,7 +118,7 @@
     <string name="ok">确定</string>
     <string name="close">关闭</string>
 
-    <!-- Profiles & Gender -->
+    <!-- Profiles &amp; Gender -->
     <string name="select_profile">选择配置文件</string>
     <string name="current_profile">当前配置文件</string>
     <string name="new_profile">新建配置文件</string>
@@ -153,7 +153,7 @@
     <string name="unit_tablet">片</string>
     <string name="unit_capsule">粒</string>
 
-    <!-- Help & Support -->
+    <!-- Help &amp; Support -->
     <string name="help_title">帮助与支持</string>
     <string name="help_resources">资源</string>
     <string name="help_faqs_title">常见问题</string>
@@ -192,7 +192,7 @@
     <string name="setup_next">下一步</string>
     <string name="setup_get_started">开始使用</string>
 
-    <!-- Dialogs & Buttons -->
+    <!-- Dialogs &amp; Buttons -->
     <string name="select_language">选择语言</string>
     <string name="system_default">系统默认</string>
     <string name="export_data">导出数据</string>
@@ -257,4 +257,24 @@
     <string name="delete_contact_cancel">取消</string>
     <string name="personal_contacts_name_label">联系人姓名</string>
     <string name="personal_contacts_phone_label">电话号码</string>
+
+    <!-- Analytics &amp; Menu Additions -->
+    <string name="menu_analytics">统计分析</string>
+    <string name="analytics_title">用药统计分析</string>
+    <string name="analytics_adherence_rate">用药依从率</string>
+    <string name="analytics_adherence_sub">已按计划服用的总剂量</string>
+    <string name="analytics_using_since">自 %s 起使用 Dosezy</string>
+    <string name="analytics_using_today">自今日起使用 Dosezy</string>
+    <string name="analytics_taken_on_time">准时服用</string>
+    <string name="analytics_taken_late">延迟服用</string>
+    <string name="analytics_missed_doses">漏服剂量</string>
+    <string name="analytics_total_doses">已记录总剂量</string>
+    <string name="analytics_weekly_overview">每周用药趋势</string>
+    <string name="analytics_insights_title">用药分析洞察</string>
+    <string name="analytics_insights_excellent">极佳的服药依从性！您始终坚持良好的健康管理。</string>
+    <string name="analytics_insights_good">进展良好！请继续按时服药以获得最佳健康效果。</string>
+    <string name="analytics_insights_start">开始记录服药情况以查看详细分析统计。</string>
+    <string name="menu_backup_restore">备份与恢复</string>
+    <string name="menu_sharing">照护者共享</string>
+    <string name="coming_soon">即将推出</string>
 </resources>

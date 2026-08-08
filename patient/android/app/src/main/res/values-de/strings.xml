@@ -240,4 +240,24 @@
     <string name="delete_contact_cancel">Abbrechen</string>
     <string name="personal_contacts_name_label">Kontaktname</string>
     <string name="personal_contacts_phone_label">Telefonnummer</string>
+
+    <!-- Analytics &amp; Menu Additions -->
+    <string name="menu_analytics">Statistiken</string>
+    <string name="analytics_title">Medikamenten-Statistik</string>
+    <string name="analytics_adherence_rate">Einnahmetreue</string>
+    <string name="analytics_adherence_sub">Geplante Dosen eingenommen</string>
+    <string name="analytics_using_since">Nutzt Dosezy seit %s</string>
+    <string name="analytics_using_today">Nutzt Dosezy seit heute</string>
+    <string name="analytics_taken_on_time">Pünktlich Eingenommen</string>
+    <string name="analytics_taken_late">Verspätet Eingenommen</string>
+    <string name="analytics_missed_doses">Verpasste Dosen</string>
+    <string name="analytics_total_doses">Gesamte Dosen Erfasst</string>
+    <string name="analytics_weekly_overview">Wöchentlicher Trend</string>
+    <string name="analytics_insights_title">Einnahme-Einblick</string>
+    <string name="analytics_insights_excellent">Hervorragende Einnahmetreue! Sie halten Ihre Gesundheitsroutine zuverlässig ein.</string>
+    <string name="analytics_insights_good">Guter Fortschritt! Nehmen Sie Ihre Medikamente weiterhin pünktlich ein.</string>
+    <string name="analytics_insights_start">Erfassen Sie Dosen, um detaillierte Statistiken anzuzeigen.</string>
+    <string name="menu_backup_restore">Sichern &amp; Wiederherstellen</string>
+    <string name="menu_sharing">Freigabe für Betreuer</string>
+    <string name="coming_soon">Demnächst</string>
 </resources>

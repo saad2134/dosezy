@@ -239,4 +239,24 @@
     <string name="delete_contact_cancel">Cancelar</string>
     <string name="personal_contacts_name_label">Nome do contacto</string>
     <string name="personal_contacts_phone_label">Número de telefone</string>
+
+    <!-- Analytics &amp; Menu Additions -->
+    <string name="menu_analytics">Estatísticas</string>
+    <string name="analytics_title">Estatísticas de Medicação</string>
+    <string name="analytics_adherence_rate">Taxa de Adesão</string>
+    <string name="analytics_adherence_sub">Doses programadas tomadas</string>
+    <string name="analytics_using_since">Usando Dosezy desde %s</string>
+    <string name="analytics_using_today">Usando Dosezy desde hoje</string>
+    <string name="analytics_taken_on_time">Tomado no Horário</string>
+    <string name="analytics_taken_late">Tomado com Atraso</string>
+    <string name="analytics_missed_doses">Doses Perdidas</string>
+    <string name="analytics_total_doses">Total de Doses Registradas</string>
+    <string name="analytics_weekly_overview">Tendência Semanal</string>
+    <string name="analytics_insights_title">Visão de Adesão</string>
+    <string name="analytics_insights_excellent">Excelente adesão! Você mantém uma rotina consistente com seus remédios.</string>
+    <string name="analytics_insights_good">Bom progresso! Continue tomando seus medicamentos no horário.</string>
+    <string name="analytics_insights_start">Comece a registrar doses para ver suas estatísticas detalhadas.</string>
+    <string name="menu_backup_restore">Backup e Restauração</string>
+    <string name="menu_sharing">Compartilhamento com Cuidadores</string>
+    <string name="coming_soon">Em Breve</string>
 </resources>

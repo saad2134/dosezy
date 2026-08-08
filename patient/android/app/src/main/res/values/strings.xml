@@ -92,7 +92,7 @@
     <string name="profile">Profile</string>
     <string name="mark_late">Mark Late</string>
 
-    <!-- Dialog Titles & Options -->
+    <!-- Dialog Titles &amp; Options -->
     <string name="pref_select_theme">Select Theme</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
@@ -122,7 +122,7 @@
     <string name="ok">OK</string>
     <string name="close">Close</string>
 
-    <!-- Profiles & Gender -->
+    <!-- Profiles &amp; Gender -->
     <string name="select_profile">Select a Profile</string>
     <string name="current_profile">Current Profile</string>
     <string name="new_profile">New Profile</string>
@@ -157,7 +157,7 @@
     <string name="unit_tablet">tablet</string>
     <string name="unit_capsule">capsule</string>
 
-    <!-- Help & Support -->
+    <!-- Help &amp; Support -->
     <string name="help_title">Help &amp; Support</string>
     <string name="help_resources">Resources</string>
     <string name="help_faqs_title">FAQs</string>
@@ -212,7 +212,7 @@
     <string name="setup_next">Next</string>
     <string name="setup_get_started">Get Started</string>
 
-    <!-- Dialogs & Buttons -->
+    <!-- Dialogs &amp; Buttons -->
     <string name="select_language">Select Language</string>
     <string name="system_default">System Default</string>
     <string name="export_data">Export Data</string>
@@ -255,4 +255,24 @@
     <string name="delete_contact_cancel">Cancel</string>
     <string name="personal_contacts_name_label">Contact Name</string>
     <string name="personal_contacts_phone_label">Phone Number</string>
+
+    <!-- Analytics &amp; Menu Additions -->
+    <string name="menu_analytics">Analytics</string>
+    <string name="analytics_title">Medication Analytics</string>
+    <string name="analytics_adherence_rate">Adherence Rate</string>
+    <string name="analytics_adherence_sub">Overall scheduled doses taken</string>
+    <string name="analytics_using_since">Using Dosezy since %s</string>
+    <string name="analytics_using_today">Using Dosezy since today</string>
+    <string name="analytics_taken_on_time">Taken on Time</string>
+    <string name="analytics_taken_late">Taken Late</string>
+    <string name="analytics_missed_doses">Missed Doses</string>
+    <string name="analytics_total_doses">Total Doses Logged</string>
+    <string name="analytics_weekly_overview">Weekly Adherence Trend</string>
+    <string name="analytics_insights_title">Adherence Insight</string>
+    <string name="analytics_insights_excellent">Excellent adherence! You are staying consistent with your health routine.</string>
+    <string name="analytics_insights_good">Good progress! Keep taking your medications on time for the best health outcomes.</string>
+    <string name="analytics_insights_start">Start logging doses to view personalized adherence insights.</string>
+    <string name="menu_backup_restore">Backup &amp; Restore</string>
+    <string name="menu_sharing">Caregiver Sharing</string>
+    <string name="coming_soon">Coming Soon</string>
 </resources>

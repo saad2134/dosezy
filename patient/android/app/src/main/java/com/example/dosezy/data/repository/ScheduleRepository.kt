@@ -180,6 +180,10 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         return database.scheduleDao().getScheduleForDateRange(userId, startMillis, endMillis)
     }
 
+    // method to get all schedules for a user as Flow
+    fun getScheduleForUser(userId: String): Flow<List<ScheduleEntry>> =
+        database.scheduleDao().getScheduleForUser(userId)
+
     // method to get schedules as list (not Flow)
     suspend fun getSchedulesByUserSync(userId: String): List<ScheduleEntry> =
         database.scheduleDao().getScheduleForUser(userId).first()

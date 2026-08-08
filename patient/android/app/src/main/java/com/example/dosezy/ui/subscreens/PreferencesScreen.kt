@@ -94,7 +94,7 @@ fun PreferencesScreen(navController: NavController) {
                     currentValue = currentUser?.considerLateAfter?.let {
                         androidx.compose.ui.res.stringResource(R.string.hours_format, it)
                     } ?: androidx.compose.ui.res.stringResource(R.string.hours_format, 3),
-                    iconName = "timer",
+                    iconName = "late_after",
                     onClick = { showLateAfterDialog = true }
                 )
             }
@@ -106,7 +106,7 @@ fun PreferencesScreen(navController: NavController) {
                     currentValue = currentUser?.considerMissedAfter?.let {
                         androidx.compose.ui.res.stringResource(R.string.hours_format, it)
                     } ?: androidx.compose.ui.res.stringResource(R.string.hours_format, 6),
-                    iconName = "timer_off",
+                    iconName = "missed_after",
                     onClick = { showMissedAfterDialog = true }
                 )
             }

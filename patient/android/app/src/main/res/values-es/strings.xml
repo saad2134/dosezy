@@ -87,7 +87,7 @@
     <string name="pref_missed_after">Considerar omitido después de</string>
     <string name="mark_late">Marcar atrasado</string>
 
-    <!-- Dialog Titles & Options -->
+    <!-- Dialog Titles &amp; Options -->
     <string name="pref_select_theme">Seleccionar tema</string>
     <string name="theme_light">Claro</string>
     <string name="theme_dark">Oscuro</string>
@@ -117,7 +117,7 @@
     <string name="ok">Aceptar</string>
     <string name="close">Cerrar</string>
 
-    <!-- Profiles & Gender -->
+    <!-- Profiles &amp; Gender -->
     <string name="select_profile">Seleccionar un perfil</string>
     <string name="current_profile">Perfil actual</string>
     <string name="new_profile">Nuevo perfil</string>
@@ -152,7 +152,7 @@
     <string name="unit_tablet">pastilla(s)</string>
     <string name="unit_capsule">cápsula(s)</string>
 
-    <!-- Help & Support -->
+    <!-- Help &amp; Support -->
     <string name="help_title">Ayuda y soporte</string>
     <string name="help_resources">Recursos</string>
     <string name="help_faqs_title">Preguntas frecuentes</string>
@@ -191,7 +191,7 @@
     <string name="setup_next">Siguiente</string>
     <string name="setup_get_started">Comenzar</string>
 
-    <!-- Dialogs & Buttons -->
+    <!-- Dialogs &amp; Buttons -->
     <string name="select_language">Seleccionar idioma</string>
     <string name="system_default">Predeterminado del sistema</string>
     <string name="export_data">Exportar datos</string>
@@ -256,4 +256,24 @@
     <string name="delete_contact_cancel">Cancelar</string>
     <string name="personal_contacts_name_label">Nombre del contacto</string>
     <string name="personal_contacts_phone_label">Número de teléfono</string>
+
+    <!-- Analytics &amp; Menu Additions -->
+    <string name="menu_analytics">Analíticas</string>
+    <string name="analytics_title">Analíticas de Medicamentos</string>
+    <string name="analytics_adherence_rate">Tasa de Adherencia</string>
+    <string name="analytics_adherence_sub">Dosis programadas tomadas</string>
+    <string name="analytics_using_since">Usando Dosezy desde %s</string>
+    <string name="analytics_using_today">Usando Dosezy desde hoy</string>
+    <string name="analytics_taken_on_time">Tomado a Tiempo</string>
+    <string name="analytics_taken_late">Tomado Tarde</string>
+    <string name="analytics_missed_doses">Dosis Omitidas</string>
+    <string name="analytics_total_doses">Total de Dosis Registradas</string>
+    <string name="analytics_weekly_overview">Tendencia Semanal</string>
+    <string name="analytics_insights_title">Información de Adherencia</string>
+    <string name="analytics_insights_excellent">¡Excelente adherencia! Mantienes una rutina constante con tu salud.</string>
+    <string name="analytics_insights_good">¡Buen progreso! Sigue tomando tus medicamentos a tiempo.</string>
+    <string name="analytics_insights_start">Comienza a registrar dosis para ver tus estadísticas detalladas.</string>
+    <string name="menu_backup_restore">Copia de Seguridad y Restauración</string>
+    <string name="menu_sharing">Compartir con Cuidadores</string>
+    <string name="coming_soon">Próximamente</string>
 </resources>

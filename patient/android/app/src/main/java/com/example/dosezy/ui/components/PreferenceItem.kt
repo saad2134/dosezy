@@ -8,11 +8,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AlarmOff
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Snooze
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -86,7 +89,9 @@ fun PreferenceItem(
 private fun getIconVector(iconName: String) = when (iconName) {
     "palette" -> Icons.Default.Palette
     "schedule" -> Icons.Default.Schedule
-    "timer" -> Icons.Default.Timer
+    "late_after", "timer", "hourglass" -> Icons.Default.HourglassTop
+    "missed_after", "timer_off", "alarm_off" -> Icons.Default.AlarmOff
+    "snooze" -> Icons.Default.Snooze
     "language" -> Icons.Default.Language
     else -> Icons.Default.Settings
 }

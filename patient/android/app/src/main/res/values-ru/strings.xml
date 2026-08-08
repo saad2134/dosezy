@@ -240,4 +240,24 @@
     <string name="delete_contact_cancel">Отмена</string>
     <string name="personal_contacts_name_label">Имя контакта</string>
     <string name="personal_contacts_phone_label">Номер телефона</string>
+
+    <!-- Analytics &amp; Menu Additions -->
+    <string name="menu_analytics">Аналитика</string>
+    <string name="analytics_title">Аналитика Приема Лекарств</string>
+    <string name="analytics_adherence_rate">Уровень Соблюдения</string>
+    <string name="analytics_adherence_sub">Принятые запланированные дозы</string>
+    <string name="analytics_using_since">Использует Dosezy с %s</string>
+    <string name="analytics_using_today">Использует Dosezy с сегодняшнего дня</string>
+    <string name="analytics_taken_on_time">Принято Вовремя</string>
+    <string name="analytics_taken_late">Принято с Опозданием</string>
+    <string name="analytics_missed_doses">Пропущенные Дозы</string>
+    <string name="analytics_total_doses">Всего Записано Доз</string>
+    <string name="analytics_weekly_overview">Еженедельный Тренд</string>
+    <string name="analytics_insights_title">Оценка Соблюдения</string>
+    <string name="analytics_insights_excellent">Отличная дисциплина приема! Вы поддерживаете надежный распорядок здоровья.</string>
+    <string name="analytics_insights_good">Хороший прогресс! Продолжайте принимать лекарства вовремя.</string>
+    <string name="analytics_insights_start">Начните отмечать дозы для просмотра подробной аналитики.</string>
+    <string name="menu_backup_restore">Резервное Копирование и Восстановление</string>
+    <string name="menu_sharing">Общий Доступ для Опекунов</string>
+    <string name="coming_soon">Скоро</string>
 </resources>
