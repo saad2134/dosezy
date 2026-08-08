@@ -18,6 +18,15 @@
   </a>
 </div>
 
+### Coming Soon On
+
+<div align="center">
+  <a href="https://gitlab.com/fdroid/fdroiddata/-/merge_requests/44626">
+    <img width="197" height="59" alt="get-github-1189403918" src="https://github.com/user-attachments/assets/9a463d23-368b-4974-9686-e28649e00b04" />
+  </a>
+</div>
+
+
 ## ✨ Features  
 
 Once you input the basics: name, dosage, timing, and frequency, the app intelligently handles your medication schedule.
