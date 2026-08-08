@@ -21,8 +21,17 @@
 ### Coming Soon On
 
 <div align="center">
+  <a href="">
+    <img width="197" height="59" alt="Google Play" src="https://github.com/user-attachments/assets/7c8720ee-4c1e-4c9a-86c0-8086acd12c71" />
+  </a>
+  <a href="">
+    <img width="197" height="59" alt="Galaxy Store" src="https://github.com/user-attachments/assets/52b16b2f-1517-45b2-93b4-d3b6011b7608" />
+  </a>
+  <a href="">
+    <img width="197" height="59" alt="Huawei AppGallery" src="https://github.com/user-attachments/assets/3cbafa74-a2eb-4f33-9b87-202db77e5280" />
+  </a>
   <a href="https://gitlab.com/fdroid/fdroiddata/-/merge_requests/44626">
-    <img width="197" height="59" alt="get-github-1189403918" src="https://github.com/user-attachments/assets/9a463d23-368b-4974-9686-e28649e00b04" />
+    <img width="197" height="59" alt="F-Droid" src="https://github.com/user-attachments/assets/9a463d23-368b-4974-9686-e28649e00b04" />
   </a>
 </div>
 
