@@ -37,6 +37,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.res.stringResource
@@ -235,7 +236,7 @@ fun EditMedScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         },
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                        colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color(0xFF1193D4),
                             unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                             focusedLabelColor = Color(0xFF1193D4),
@@ -280,7 +281,7 @@ fun EditMedScreen(
                                 )
                             },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                            colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = Color(0xFF1193D4),
                                 unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                                 focusedLabelColor = Color(0xFF1193D4),
@@ -312,7 +313,7 @@ fun EditMedScreen(
                                         .fillMaxWidth()
                                         .height(64.dp)
                                         .menuAnchor(),
-                                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    colors = OutlinedTextFieldDefaults.colors(
                                         focusedBorderColor = Color(0xFF1193D4),
                                         unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                                         focusedLabelColor = Color(0xFF1193D4),
@@ -373,7 +374,7 @@ fun EditMedScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         },
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                        colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color(0xFF1193D4),
                             unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                             focusedLabelColor = Color(0xFF1193D4),
@@ -424,7 +425,7 @@ fun EditMedScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             },
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                            colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = Color(0xFF1193D4),
                                 unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                                 focusedLabelColor = Color(0xFF1193D4),
