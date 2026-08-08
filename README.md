@@ -1,4 +1,6 @@
-<h1 align="center"> 💊 Dosezy – Medicine Adherence Simplified</h1>
+<h1 align="center">
+  <img width="1440" height="310" alt="💊 Dosezy – Medicine Tracking Simplified" src="https://github.com/user-attachments/assets/c57df39a-b714-4e82-8420-42c003c072f7" />
+</h1>
 
 > <p align="center">🚨 <strong> A smart medicine tracking app that is free, open source, offline and private by default with coming soon, optional Caregiver Cloud Platform for analytics, multi-device sync and family sharing. Dosezy transforms medication management into a simple, stress-free experience. Built with accessibility at its core, the app features clear, large text and intuitive navigation: perfect for elderly users and anyone managing multiple prescriptions.</strong></p>  
 
