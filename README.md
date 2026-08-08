@@ -1,6 +1,6 @@
 <h1 align="center"> 💊 Dosezy – Medicine Adherence Simplified</h1>
 
-> <p align="center">🚨 <strong> A smart medicine tracking app that is free, open source, offline and private by default. Dosezy transforms medication management into a simple, stress-free experience. Built with accessibility at its core, the app features clear, large text and intuitive navigation: perfect for elderly users and anyone managing multiple prescriptions.</strong></p>  
+> <p align="center">🚨 <strong> A smart medicine tracking app that is free, open source, offline and private by default with coming soon, optional Caregiver Cloud Platform for analytics, multi-device sync and family sharing. Dosezy transforms medication management into a simple, stress-free experience. Built with accessibility at its core, the app features clear, large text and intuitive navigation: perfect for elderly users and anyone managing multiple prescriptions.</strong></p>  
 
 
 <div align="center">
@@ -10,7 +10,9 @@
 
 </div>
 
-## 🛍️ Download Now (Patient App)
+## 🛍️ Download Now 
+
+### 💊 Patient App (Free, Open-source, Offline & Private by Default)
 
 <div align="center">
   <a href="https://github.com/saad2134/dosezy/releases">
@@ -18,10 +20,10 @@
   </a>
 </div>
 
-### Coming Soon On
+#### Coming Soon On
 
 <div align="center">
-  <a href="">
+  <!-- <a href="">
     <img width="197" height="59" alt="Google Play" src="https://github.com/user-attachments/assets/7c8720ee-4c1e-4c9a-86c0-8086acd12c71" />
   </a>
   <a href="">
@@ -29,16 +31,21 @@
   </a>
   <a href="">
     <img width="197" height="59" alt="Huawei AppGallery" src="https://github.com/user-attachments/assets/3cbafa74-a2eb-4f33-9b87-202db77e5280" />
-  </a>
+  </a> -->
   <a href="https://gitlab.com/fdroid/fdroiddata/-/merge_requests/44626">
     <img width="197" height="59" alt="F-Droid" src="https://github.com/user-attachments/assets/9a463d23-368b-4974-9686-e28649e00b04" />
   </a>
 </div>
 
+### 🩺 Caregiver Cloud Platform (Optional, Self-Hostable, Coming Soon)
+
+- coming soon
 
 ## ✨ Features  
 
-Once you input the basics: name, dosage, timing, and frequency, the app intelligently handles your medication schedule.
+### 💊 Patient App (Free, Open-source, Offline & Private by Default)
+
+Once you input the basics: name, dosage, timings, and frequency, the app intelligently handles your medication schedule.
 
 - 📅 **Medication Adherence** – Automated reminders ensure timely medication consumption.
 - 🌐 **12 Global Languages** – Full native localization in English, Chinese (中文), Spanish (Español), Hindi (हिन्दी), Portuguese (Português), Arabic (العربية), French (Français), German (Deutsch), Japanese (日本語), Russian (Русский), Italian (Italiano), and Bengali (বাংলা).
@@ -52,6 +59,10 @@ Once you input the basics: name, dosage, timing, and frequency, the app intellig
 - 👤 **Multi-Profile Management** – Create, edit, and switch between family member profiles.
 - 📄 **Data Security & Export** – Local `Room` database storage with PDF report and JSON data export capabilities.  
 - 👨‍👩‍👧 **Caregiver Support** – Logs and adherence history help caregivers track missed and late doses.  
+
+### 🩺 Caregiver Cloud Platform (Optional, Self-Hostable, Coming Soon)
+
+- coming soon
 
 ---
 
@@ -73,83 +84,157 @@ Once you input the basics: name, dosage, timing, and frequency, the app intellig
       <td>v7.0 or later</td>
       <td>✅</td>
     </tr>
+    <tr>
+      <td>iOS</td>
+      <td>Coming Soon</td>
+      <td>⏳</td>
+    </tr>
   </tbody>
 </table>
 
 
 ## 🛠️ Tech Stack
 
+### Patient App (Android)
+
 - Language: Kotlin
 - UI Framework: Jetpack Compose
 - Build System: Gradle (Kotlin DSL)
-- Storage & Data: DataStore (evidenced by libdatastore_shared_counter.so native libs). Shared Preferences for simple data persistence. File-based storage for assets and resources.
+- Storage & Data: Room Database, DataStore, SharedPreferences, File-based storage
+
+### Caregiver Cloud Platform (Self-Hostable, Coming Soon)
+
+- coming soon
 
 
-## 🚀 Getting Started
+## 🚀 Getting Started (Working on Source Code)
 
-### Android (Using the app)
-  1. Enable `Install from Unknown Sources` in your android device settings.
-  2. Download the latest `.apk` file from the [`apks`](apks/) directory and install it on your device.
-
-### Android (Source)
+### Patient App (Android)
   1. Fork the repo.
   2. Download & Install Android Studio
   3. Enable Git Version Control & Clone the Repo
+  4. Navigate to `/patient/android`
   4. Wait for gradle to initialize
   5. Enjoy.
 
 
-## 📁 Project Architecture
+## 🏛️ Core Philosophy & Product Architecture
+
+Dosezy is architected as an **open-source, local-first monorepo** with an optional connected cloud layer:
+
+> **"Dosezy Cloud enhances Dosezy, never holds Dosezy hostage."**
+
+```
+                         ┌─────────────────────────────────────────────────────────────┐
+                         │                       DOSEZY MONOREPO                       │
+                         └──────────────────────────────┬──────────────────────────────┘
+                                                        │
+           ┌─────────────────────────────┬──────────────┴──────────────┬─────────────────────────────┐
+           │                             │                             │                             │
+┌──────────┴──────────┐       ┌──────────┴──────────┐       ┌──────────┴──────────┐       ┌──────────┴──────────┐
+│   PATIENT CLIENTS   │       │   OPENAPI SCHEMAS   │       │   CAREGIVER & WEB   │       │   SYNC SERVER & API │
+│ (100% Local-First)  │       │  (Shared Contract)  │       │ (Connected Portal)  │       │ (Self-Hostable Core)│
+├─────────────────────┤       ├─────────────────────┤       ├─────────────────────┤       ├─────────────────────┤
+│ patient/android/    │       │ api/openapi.yaml    │       │ caregiver/          │       │ server/             │
+│ patient/ios/        │       │ docs/               │       │ website/            │       │ • Incremental Sync  │
+│ • Offline Room DB   │       │ • Domain Models     │       │ • Web Dashboard     │       │ • Multi-Device Sync │
+│ • 12 Localizations  │       │ • DTO Definitions   │       │ • Adherence Monitor │       │ • PostgreSQL        │
+│ • High-Contrast UI  │       │ • Sync Protocol     │       │ • Next.js Website   │       │ • Zero-Telemetry    │
+└─────────────────────┘       └─────────────────────┘       └─────────────────────┘       └─────────────────────┘
+```
+
+- **Local-First by Default:** All fundamental features—scheduling, persistent notifications, history tracking, data exports, and emergency services—operate completely offline without requiring an account or network connectivity.
+- **Server-Agnostic Sync:** The app supports both the official hosted service (`cloud.dosezy.app`) and Self-Hostable community servers (`server/`).
+- **Contract-Driven Development:** Client apps (`patient/android`, `patient/ios`, `caregiver/`) conform to a shared OpenAPI specification (`api/openapi.yaml`), ensuring consistent data models and seamless interoperability.
+
+
+
+## 📁 Monorepo Architecture
+
 ```
 dosezy/
-├── .github/                  # CI/CD workflows, issue templates, and repository automation
-├── api/                      # (Future Plan) REST API backend services for cloud sync and telemetry
-├── caregiver/                # (Future Plan) Companion mobile/web dashboard for caregivers and family
-├── docs/                     # (Future Plan) Technical specifications, architecture docs, and developer guides
-├── patient/                  # Patient application module
-│   └── android/              # Native Android patient app (Jetpack Compose & Kotlin)
-│       ├── app/              # Android app source code, assets, and UI components
-│       ├── assets/           # App branding banners and launcher artwork
-│       ├── fastlane/         # Fastlane store metadata and localized changelogs
-│       ├── gradle/           # Gradle build wrappers and version catalogs
-│       └── ui/               # Prototyping UI templates and mockup assets
-├── resources/                # Documentation, FAQs, and user support resources
+├── .github/                  # CI/CD workflows, build pipelines, and repository automation
+├── api/                      # OpenAPI 3.0 contract (openapi.yaml) defining shared client/server schemas
+├── caregiver/                # Caregiver companion application & web dashboard (app.dosezy.com)
+├── docs/                     # Architecture Decision Records (ADRs), domain specifications, and guides
+│   ├── architecture/         # Data layer, sync protocols, and encryption designs
+│   ├── privacy/              # Data safety declarations and health privacy compliance
+│   └── product/              # Product specs, wireframes, and accessibility requirements
+├── patient/                  # Patient application modules
+│   ├── android/              # Native Android patient app (Jetpack Compose & Kotlin)
+│   │   ├── app/              # Source code, UI components, Room DB, and background services
+│   │   ├── assets/           # App branding artwork and density icons
+│   │   ├── fastlane/         # F-Droid & store metadata and localized changelogs
+│   │   ├── gradle/           # Build wrappers and version catalogs
+│   │   └── ui/               # Interactive prototyping templates and wireframes
+│   └── ios/                  # (Roadmap) Native iOS patient app (SwiftUI & Swift)
+├── resources/                # Offline user documentation, FAQs, and support manuals
 │   ├── FAQs.md
 │   └── UserManual.md
-├── scripts/                  # (Future Plan) Automation scripts for release builds and translation syncing
-├── server/                   # (Future Plan) Self-hosted sync backend and notification dispatch service
-├── website/                  # Next.js marketing and landing page web app
-│   ├── src/                  # React 19 pages, layout, and Tailwind CSS v4 styling
-│   ├── public/               # Static web assets
-│   ├── package.json          # Web dependencies and scripts
-│   └── next.config.ts        # Next.js configuration
-├── CONTRIBUTING.md           # Contribution guidelines
-├── LICENSE                   # Open-source MIT license
-└── README.md                 # Project documentation and guide
+├── scripts/                  # Code generation, release packaging, and translation sync automation
+├── server/                   # Open-source self-hostable sync server (PostgreSQL + REST API)
+├── website/                  # Next.js marketing and landing page web app (React 19 & Tailwind CSS v4)
+├── CONTRIBUTING.md           # Contribution guidelines and coding standards
+├── LICENSE                   # Open-source MIT License
+└── README.md                 # Master project documentation
 ```
 
+## 🗺️ Product Roadmap
 
-### Key Components
+<table border="1" cellpadding="10" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Phase / Version</th>
+      <th>Milestone</th>
+      <th>Focus Areas</th>
+      <th>Key Deliverables</th>
+      <th align="center">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>v1.0 – v2.1</strong></td>
+      <td><strong>Local-First Android Client</strong></td>
+      <td>Core Medication Adherence</td>
+      <td>Jetpack Compose UI, 12 native localizations, Room offline database, customizable late/missed thresholds, full-screen alarms, emergency dialer, zero account barrier.</td>
+      <td align="center">🟢 Released</td>
+    </tr>
+    <tr>
+      <td><strong>v2.5</strong></td>
+      <td><strong>Domain & API Contract</strong></td>
+      <td>Schema & Boundary Decoupling</td>
+      <td>Canonical domain models (<code>Medication</code>, <code>Schedule</code>, <code>DoseEvent</code>), <code>api/openapi.yaml</code> OpenAPI 3.0 specification, multi-platform client generation.</td>
+      <td align="center">🟡 In Design</td>
+    </tr>
+    <tr>
+      <td><strong>v3.0</strong></td>
+      <td><strong>Self-Hostable Backend & Sync</strong></td>
+      <td>Incremental Cloud Sync</td>
+      <td>Open-source server (<code>server/</code>), PostgreSQL DB, conflict-free sync engine, offline mutation queues, optional cloud connection.</td>
+      <td align="center">⏳ Planned</td>
+    </tr>
+    <tr>
+      <td><strong>v3.5</strong></td>
+      <td><strong>Native iOS Patient Client</strong></td>
+      <td>Multi-Platform Expansion</td>
+      <td>Native Swift & SwiftUI app (<code>patient/ios/</code>), SwiftData/CoreData local database, Apple UserNotifications, zero-account local operation.</td>
+      <td align="center">⏳ Planned</td>
+    </tr>
+    <tr>
+      <td><strong>v4.0</strong></td>
+      <td><strong>Caregiver Cloud Platform</strong></td>
+      <td>Connected Family Care</td>
+      <td>Dedicated Caregiver web portal (<code>caregiver/</code> at <code>app.dosezy.com</code>), remote adherence monitoring, patient-controlled granular sharing permissions.</td>
+      <td align="center">⏳ Planned</td>
+    </tr>
+  </tbody>
+</table>
 
-**Main Source Files:**
-- `MainActivity.kt` - Main application entry point
-- `SplashActivity.kt` - Splash screen activity
-- **UI Components** - Jetpack Compose based UI
-- **Notification Services** - Medicine reminder system
-- **Theme System** - Custom theming with colors and typography
 
-**UI Structure:**
-- Screens: Home, Medicines, Schedule, Settings, New User
-- Subscreens: Add/Edit Medicine, Emergency, Help, Preferences
-- Components: Navigation bars, dialogs, custom elements
-
-**Resources:**
-- Drawables for icons and backgrounds
-- Multiple mipmap densities for launcher icons
-- Values for colors, strings, and themes
-- XML configurations for backup and data extraction
 
 ## 📱 Screenshots
+
+### Patient App
 
 <table> 
 
@@ -189,6 +274,8 @@ dosezy/
 </tr> 
 
 </table>
+
+---
 
 ## 📊 **Project Stats**
 
@@ -243,5 +330,5 @@ Developed and published by **Saad (@saad2134)**.
 
 ## 🏷 Tags  
 
-`android` `mobile-app` `android-application`  
-`elderly-people` `medicine-management` `medicine-reminder` `elderly-care` `medicine-tracking` `dosezy`  
+`android` `ios` `swiftui` `jetpack-compose` `kotlin` `open-source` `local-first` `offline-first` `medicine-reminder` `medicine-management` `medication-adherence` `caregiver` `elderly-care` `health-tech` `self-hosted` `dosezy` `nextjs`
+  
