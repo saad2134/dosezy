@@ -1,14 +1,12 @@
-cff-version: 1.2.0
-
+cff-version: "1.2.0"
 message: "If you use Dosezy in your work, research, or project, please cite it using the information below."
 
 title: "Dosezy"
-
 version: "2.2.1"
-
 date-released: "2026-08-08"
 
-abstract: "Dosezy is a free and open-source, local-first Android medicine tracking and medication adherence application designed with accessibility and privacy at its core. It provides medication scheduling and reminders, medication history, configurable late and missed dose tracking, multiple profiles, caregiver-oriented functionality, data export, localization, and adaptive system themes. Dosezy is designed to work offline without requiring an account, with optional cloud services intended to provide backup, synchronization, and connected caregiver features."
+type: "software"
+license: "MIT"
 
 authors:
 
@@ -16,29 +14,21 @@ authors:
   given-names: "Saad"
   website: "https://github.com/saad2134"
 
-type: software
-
-license: "MIT"
-
 repository-code: "https://github.com/saad2134/dosezy"
-
 url: "https://github.com/saad2134/dosezy"
+
+abstract: "Dosezy is a free and open-source, local-first Android medicine tracking and medication adherence application designed with accessibility and privacy at its core."
 
 keywords:
 
-* android
-* medication-adherence
-* medication-management
-* medicine-reminder
-* medicine-tracking
-* medication-scheduling
-* elderly-care
-* caregiver-support
-* accessibility
-* privacy
-* local-first
-* offline-first
-* health-tech
-* open-source
-* kotlin
-* jetpack-compose
+* "android"
+* "medication-adherence"
+* "medication-management"
+* "medicine-reminder"
+* "medicine-tracking"
+* "medication-scheduling"
+* "accessibility"
+* "privacy"
+* "local-first"
+* "offline-first"
+* "open-source"
