@@ -1,12 +1,8 @@
 cff-version: 1.2.0
 message: "If you use Dosezy, please cite it as below."
-
 authors:
-
-* family-names: "Saad"
+- family-names: "Saad"
   given-names: "Saad"
-  website: "https://github.com/saad2134"
-
 title: "Dosezy"
 version: 2.2.1
 date-released: 2026-08-08
