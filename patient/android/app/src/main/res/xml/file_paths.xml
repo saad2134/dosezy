@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-cache-path name="cache_images" path="." />
+    <cache-path name="app_cache_images" path="." />
+    <external-path name="external_images" path="." />
+    <external-cache-path name="external_cache" path="." />
+    <cache-path name="internal_cache" path="." />
+    <external-files-path name="external_files" path="." />
+    <files-path name="internal_files" path="." />
+</paths>

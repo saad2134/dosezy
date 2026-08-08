@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect" />
+    <link as="style"
+        href="https://fonts.googleapis.com/css2?display=swap&amp;family=Lexend%3Awght%40400%3B500%3B700%3B900&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900"
+        onload="this.rel='stylesheet'" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <title>Dozesy App</title>
+    <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style type="text/tailwindcss">
+        :root {
+            --primary-color: #2084e4;
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <div class="relative flex size-full min-h-screen flex-col group/design-root overflow-x-hidden bg-gray-100"
+        style='font-family: Lexend, "Noto Sans", sans-serif;'>
+        <div class="flex flex-col pb-32 ">
+            <header class="bg-white p-4 shadow-sm sticky top-0 z-10">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <button id="pfpBtn">
+                            <img alt="User profile picture" class="h-12 w-12 rounded-2xl object-cover"
+                                src="https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg" />
+                        </button>
+                        <div>
+                            <p class="text-2xl font-bold text-gray-800">Hi, John!</p>
+                            <p class="text-sm text-gray-500">"Health is a priceless wealth."</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button aria-label="Notifications Status: All good" id="notifBtn"
+                            class="relative flex items-center justify-center rounded-xl h-12 w-12 bg-green-500 text-white">
+                        <span class="material-symbols-outlined text-3xl "> notifications </span>
+                        <span
+                            class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-white text-green-500">
+                            <span class="material-symbols-outlined text-sm"> check </span>
+                        </span>
+
+                    </div>
+                </div>
+                <div class="flex justify-center mt-8 mb-2">
+                    <h1 class="text-4xl font-bold text-gray-800">Medicines</h1>
+                </div>
+
+
+            </header>
+            <main class="flex-grow p-4 space-y-4 bg-gray-100">
+                <a
+                    class="bg-white rounded-xl shadow-sm p-4 flex items-center gap-4 cursor-pointer hover:bg-slate-100 transition-colors" href="edit_med.html">
+                    <div
+                        class="bg-blue-100 text-blue-500 rounded-full size-12 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-3xl">pill</span>
+                    </div>
+                    <div class="flex-grow">
+                        <p class="text-lg font-semibold text-slate-800">Metformin</p>
+                        <p class="text-slate-500">1 tablet, 2 times a day</p>
+                    </div>
+                    <span class="material-symbols-outlined text-slate-400">chevron_right</span>
+                </a>
+                <a
+                    class="bg-white rounded-xl shadow-sm p-4 flex items-center gap-4 cursor-pointer hover:bg-slate-100 transition-colors" href="edit_med.html">
+                    <div
+                        class="bg-blue-100 text-blue-500 rounded-full size-12 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-3xl">pill</span>
+                    </div>
+                    <div class="flex-grow">
+                        <p class="text-lg font-semibold text-slate-800">Lisinopril</p>
+                        <p class="text-slate-500">1 tablet, 1 time a day</p>
+                    </div>
+                    <span class="material-symbols-outlined text-slate-400">chevron_right</span>
+                </a>
+                <a
+                    class="bg-white rounded-xl shadow-sm p-4 flex items-center gap-4 cursor-pointer hover:bg-slate-100 transition-colors" href="edit_med.html">
+                    <div
+                        class="bg-blue-100 text-blue-500 rounded-full size-12 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-3xl">pill</span>
+                    </div>
+                    <div class="flex-grow">
+                        <p class="text-lg font-semibold text-slate-800">Atorvastatin</p>
+                        <p class="text-slate-500">1 tablet, 1 time a day</p>
+                    </div>
+                    <span class="material-symbols-outlined text-slate-400">chevron_right</span>
+                </a>
+                <a
+                    class="bg-white rounded-xl shadow-sm p-4 flex items-center gap-4 cursor-pointer hover:bg-slate-100 transition-colors" href="edit_med.html">
+                    <div
+                        class="bg-blue-100 text-blue-500 rounded-full size-12 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-3xl">pill</span>
+                    </div>
+                    <div class="flex-grow">
+                        <p class="text-lg font-semibold text-slate-800">Levothyroxine</p>
+                        <p class="text-slate-500">1 tablet, 1 time a day</p>
+                    </div>
+                    <span class="material-symbols-outlined text-slate-400">chevron_right</span>
+                </a>
+                <a
+                    class="bg-white rounded-xl shadow-sm p-4 flex items-center gap-4 cursor-pointer hover:bg-slate-100 transition-colors" href="edit_med.html">
+                    <div
+                        class="bg-blue-100 text-blue-500 rounded-full size-12 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-3xl">pill</span>
+                    </div>
+                    <div class="flex-grow">
+                        <p class="text-lg font-semibold text-slate-800">Aspirin</p>
+                        <p class="text-slate-500">1 tablet, 1 time a day</p>
+                    </div>
+                    <span class="material-symbols-outlined text-slate-400">chevron_right</span>
+                </a>
+
+                
+
+                <div class="border-t-2 border-dashed border-gray-300 my-4"></div>
+
+                <div class="flex flex-col items-center justify-center text-center py-10 px-6"> 
+                    <div class="flex items-center justify-center h-24 w-24 rounded-full bg-gray-200 mb-6">
+                        <span class="material-symbols-outlined text-6xl text-gray-400">medication</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">No medications yet</h2>
+                    <p class="text-lg text-gray-500 max-w-sm">It looks like you haven't added any medications to your
+                        schedule. Get started by tapping the <span class="font-bold text-blue-500">plus</span> button
+                        below.</p>
+                </div>
+                
+
+            </main>
+        </div>
+        <div class="fixed bottom-0 left-0 right-0 z-20 ">
+            <nav class="flex justify-around items-center border-t border-gray-200 bg-white py-2">
+                <!-- Home -->
+                <a class="flex flex-col items-center gap-1 text-gray-400" href="home.html">
+                    <span class="material-symbols-outlined text-3xl">home</span>
+                    <p class="text-xs font-medium">Home</p>
+                </a>
+
+                <!-- Schedule -->
+                <a class="flex flex-col items-center gap-1 text-gray-400" href="schedule.html">
+                    <span class="material-symbols-outlined text-3xl">calendar_month</span>
+                    <p class="text-xs font-medium">Schedule</p>
+                </a>
+
+                <!-- Center Add Button -->
+                <a href="add_med.html" aria-label="Add New Medicine"
+                    class="flex items-center justify-center w-14 h-14 bg-blue-500 rounded-2xl text-white shadow-lg transform transition-transform hover:scale-105 active:scale-95">
+                    <span class="material-symbols-outlined text-4xl">add</span>
+                </a>
+
+                <!-- Medicines -->
+                <a class="flex flex-col items-center gap-1 text-blue-500" href="medicines.html">
+                    <span class="material-symbols-outlined text-3xl">medication</span>
+                    <p class="text-xs font-medium">Medicines</p>
+                </a>
+
+                <!-- Menu -->
+                <a class="flex flex-col items-center gap-1  text-gray-400" href="menu.html">
+                    <span class="material-symbols-outlined text-3xl">menu</span>
+                    <p class="text-xs font-medium">Menu</p>
+                </a>
+            </nav>
+        </div>
+    </div>
+
+
+<!-- pfpModal (hidden by default) -->
+    <div id="pfpModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm m-4 overflow-hidden">
+            <div class="p-4 text-center">
+
+                <!-- Manage Profile -->
+                <a href="menu/manage_account.html"
+                    class="w-full flex items-center justify-center gap-2 rounded-xl h-14 px-6 bg-blue-500 text-white text-lg font-bold hover:bg-blue-600 transition-colors duration-300">
+                    <span class="material-symbols-outlined text-xl">account_circle</span>
+                    <span>Manage this Profile</span>
+                </a>
+
+                <!-- Switch Profile Button -->
+                <a href="switch.html"
+                    class="mt-4 w-full flex items-center justify-center gap-2 rounded-xl h-14 px-6 bg-blue-500 text-white text-lg font-bold hover:bg-blue-600 transition-colors duration-300">
+                    <span class="material-symbols-outlined text-xl">switch_account</span>
+                    <span>Switch Profile</span>
+                </a>
+
+                <!-- Add New Profile Button -->
+                <a href="new_1.html"
+                    class="mt-4 w-full flex items-center justify-center gap-2 rounded-xl h-14 px-6 bg-blue-500 text-white text-lg font-bold hover:bg-blue-600 transition-colors duration-300">
+                    <span class="material-symbols-outlined text-xl">person_add</span>
+                    <span>New Profile</span>
+                </a>
+
+                <!-- Close button -->
+                <button id="closePfp" 
+                    class="mt-4 w-full flex items-center justify-center  rounded-xl h-14 px-6 border border-gray-300 text-gray-600 hover:bg-gray-100 transition-colors duration-300">
+                    <span class="material-symbols-outlined">
+                        close
+                    </span>
+                    <span>Close</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const pfpBtn = document.getElementById("pfpBtn");
+        const closePfp = document.getElementById("closePfp");
+        const pfpModal = document.getElementById("pfpModal");
+
+        pfpBtn.addEventListener("click", () => {
+            pfpModal.classList.remove("hidden");
+        });
+
+        closePfp.addEventListener("click", () => {
+            pfpModal.classList.add("hidden");
+        });
+
+        // Optional: close when clicking outside the modal
+        pfpModal.addEventListener("click", (e) => {
+            if (e.target === pfpModal) {
+                pfpModal.classList.add("hidden");
+            }
+        });
+    </script>
+
+
+    <!-- Notification Status Modal (hidden by default) -->
+    <div id="notifModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm m-4 overflow-hidden">
+            <div class="p-6 text-center">
+                <div class="flex items-center justify-center gap-2 pb-4">
+                    <h1 class="text-2xl font-bold text-gray-800 leading-tight tracking-tight mb-0">
+                        Notification Check
+                    </h1>
+                    <span class="material-symbols-outlined text-blue-400 text-3xl animate-rotate-sync">
+                        sync
+                    </span>
+                </div>
+
+                <!-- Statuses List -->
+                <div class="space-y-2">
+
+                    <a href="#"
+                        class="flex items-center justify-between p-4 bg-green-200 rounded-xl hover:bg-green-200 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-green-400 text-3xl">notification_settings</span>
+                            <div class="flex flex-col items-start">
+                                <p class="text-lg text-left font-medium text-green-800">Notification Permission</p>
+                                <p class="text-sm text-left text-green-600">Permission to send notifications given.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-green-400 text-3xl">chevron_right</span>
+                    </a>
+
+                    <a href="#"
+                        class="flex items-center justify-between p-4 bg-green-200 rounded-xl hover:bg-green-200 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="material-symbols-outlined text-green-400 text-3xl">battery_android_frame_question</span>
+                            <div class="flex flex-col items-start">
+                                <p class="text-lg text-left font-medium text-green-800">Phone Battery</p>
+                                <p class="text-sm text-left text-green-600">Battery is at 78%</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-green-400 text-3xl">chevron_right</span>
+                    </a>
+
+
+                    <a href="#"
+                        class="flex items-center justify-between p-4 bg-green-200 rounded-xl hover:bg-green-200 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-green-400 text-3xl">select_to_speak</span>
+                            <div class="flex flex-col items-start">
+                                <p class="text-lg text-left font-medium text-green-800">Phone Sound</p>
+                                <p class="text-sm text-left text-green-600">Phone is not silent.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-green-400 text-3xl">chevron_right</span>
+                    </a>
+
+                    <a href="#"
+                        class="flex items-center justify-between p-4 bg-green-200 rounded-xl hover:bg-green-200 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-green-400 text-3xl">tab_inactive</span>
+                            <div class="flex flex-col items-start">
+                                <p class="text-lg text-left font-medium text-green-800">Background Permission</p>
+                                <p class="text-sm text-left text-green-600">Permission to run in background given.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-green-400 text-3xl">chevron_right</span>
+                    </a>
+                </div>
+
+                <!-- Close Button -->
+                <button id="notifClose"
+                    class="mt-6 w-full flex items-center justify-center gap-2 rounded-xl h-14 px-6 bg-blue-500 text-white text-lg font-bold hover:bg-blue-600 transition-colors duration-300">
+                    <span>Ok</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const notifBtn = document.getElementById("notifBtn");
+        const notifModal = document.getElementById("notifModal");
+        const notifClose = document.getElementById("notifClose");
+
+        notifBtn.addEventListener("click", () => {
+            notifModal.classList.remove("hidden");
+        });
+
+        notifClose.addEventListener("click", () => {
+            notifModal.classList.add("hidden");
+        });
+
+        // Optional: close when clicking outside the modal
+        notifModal.addEventListener("click", (e) => {
+            if (e.target === notifModal) {
+                notifModal.classList.add("hidden");
+            }
+        });
+    </script>
+
+</body>
+
+</html>

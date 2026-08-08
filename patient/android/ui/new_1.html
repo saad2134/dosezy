@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Dozesy App</title>
+    <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <style type="text/tailwindcss">
+        :root {
+      --primary-50: #eef7fe;
+      --primary-100: #dbeffd;
+      --primary-200: #c1e3fc;
+      --primary-300: #9ad2fa;
+      --primary-400: #6cbaf7;
+      --primary-500: #2084e4;
+      --primary-600: #2e83d9;
+      --primary-700: #2569b2;
+      --primary-800: #21568e;
+      --primary-900: #204871;
+      --primary-950: #162f4b;
+      --secondary-50: #f0f9ff;
+      --secondary-100: #e0f2fe;
+      --secondary-200: #bae6fd;
+      --secondary-300: #7dd3fc;
+      --secondary-400: #38bdf8;
+      --secondary-500: #0ea5e9;
+      --secondary-600: #0284c7;
+      --secondary-700: #0369a1;
+      --secondary-800: #075985;
+      --secondary-900: #0c4a6e;
+      --secondary-950: #082f49;
+    }
+    body {
+      font-family: 'Lexend', sans-serif;
+    }
+    .material-symbols-outlined {
+        font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
+    }
+  </style>
+    <style>
+        body {
+            min-height: 100dvh;
+            /* Always fills the screen height */
+            height: auto;
+            /* Let content expand naturally */
+            overflow-x: hidden;
+            /* Prevent sideways scrolling */
+        }
+
+        .modal {
+            display: none;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .option-row {
+            cursor: pointer;
+        }
+
+        .option-row input {
+            pointer-events: none;
+        }
+
+        /* prevent tiny click-only */
+    </style>
+
+    <style type="text/tailwindcss">
+        :root {
+        --primary-color: #2084e4;
+        --secondary-color: #e7eff3;
+        --text-primary: #0d171b;
+        --text-secondary: #4c809a;
+        --background-color: #f8fafc;
+      }
+      .form-input {
+        @apply flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d171b] focus:outline-0 focus:ring-2 focus:ring-[#1193d4] border-2 border-slate-200 bg-white h-16 placeholder:text-slate-400 p-4 text-lg font-normal leading-normal;
+      }
+      .form-label {
+        @apply text-[var(--text-primary)] text-lg font-medium leading-normal pb-2;
+      }
+    </style>
+
+</head>
+
+<body class="bg-white" style='font-family: Lexend, "Noto Sans", sans-serif;'>
+    <div class="flex flex-col min-h-screen w-full bg-white overflow-x-hidden">
+
+        <!-- Main content (auto expand & center) -->
+        <main class="flex flex-col flex-grow items-center justify-center p-6 text-center">
+            <div class="flex items-center justify-center w-60 h-60 rounded-2xl mb-8">
+                <img src="loader-icon.svg" alt="Loading..." class="w-60 h-60">
+            </div>
+
+            <h1 class="text-4xl font-bold text-slate-800 mb-2">
+                Welcome to Dosezy
+            </h1>
+            <p class="text-2xl text-slate-600">
+                Your personal medication assistant.
+            </p>
+        </main>
+
+        <!-- Bottom section (always pinned below main content) -->
+        <footer class="w-full p-6">
+            <div class="flex w-full flex-row items-center justify-center gap-3 mb-6">
+                <div class="h-2.5 w-8 rounded-full bg-[var(--primary-500)]"></div>
+                <div class="h-2.5 w-2.5 rounded-full bg-slate-300"></div>
+                <div class="h-2.5 w-2.5 rounded-full bg-slate-300"></div>
+            </div>
+            <a class="flex w-full items-center justify-center rounded-2xl h-14 px-8 bg-[var(--primary-500)] text-white text-lg font-bold leading-normal tracking-wide shadow-lg shadow-sky-200 transition-transform duration-300 hover:scale-105"
+                href="new_2.html">
+                <span class="truncate">Get Started</span>
+            </a>
+
+            <a id="switchacBtn"
+                class="mt-4 flex w-full items-center justify-center rounded-2xl h-14 px-8 bg-gray-700 text-white text-lg font-bold leading-normal tracking-wide shadow-lg shadow-sky-200 transition-transform duration-300 hover:scale-105">
+                <span class="truncate">Existing Profile</span>
+            </a>
+        </footer>
+    </div>
+
+
+
+
+    <!-- Switch Account Modal (hidden by default) -->
+    <div id="switchacModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm m-4 overflow-hidden">
+            <div class="p-6 text-center">
+                <h1 class="text-2xl font-bold text-gray-800 leading-tight tracking-tight mb-6">
+                    Existing Profiles
+                </h1>
+
+                <!-- Profiles List -->
+                <div class="space-y-4">
+                    <!-- Profile 1 -->
+                    <a href="index.html"
+                        class="flex items-center justify-between p-4 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <img alt="User profile picture" class="h-12 w-12 rounded-2xl object-cover"
+                                src="https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg" />
+                            <p class="text-lg font-medium text-gray-800">John Doe</p>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-400 text-2xl">chevron_right</span>
+                    </a>
+
+                    <!-- Profile 2 -->
+                    <a href="#"
+                        class="flex items-center justify-between p-4 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <img alt="User profile picture" class="h-12 w-12 rounded-2xl object-cover"
+                                src="https://avatarfiles.alphacoders.com/360/360040.jpg" />
+                            <p class="text-lg font-medium text-gray-800">Whoever</p>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-400 text-2xl">chevron_right</span>
+                    </a>
+                </div>
+
+                <!-- Add New Profile Button -->
+                <a href="new_1.html"
+                    class="mt-6 w-full flex items-center justify-center gap-2 rounded-xl h-14 px-6 bg-blue-500 text-white text-lg font-bold hover:bg-blue-600 transition-colors duration-300">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                    <span>Close</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const switchacBtn = document.getElementById("switchacBtn");
+        const switchacModal = document.getElementById("switchacModal");
+
+        switchacBtn.addEventListener("click", () => {
+            switchacModal.classList.remove("hidden");
+        });
+
+        // Optional: close when clicking outside the modal
+        switchacModal.addEventListener("click", (e) => {
+            if (e.target === switchacModal) {
+                switchacModal.classList.add("hidden");
+            }
+        });
+    </script>
+
+</body>
+
+</html>
