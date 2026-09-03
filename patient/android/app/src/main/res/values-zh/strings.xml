@@ -295,4 +295,6 @@
     <string name="menu_check_updates">检查更新</string>
     <string name="menu_data_section">数据</string>
     <string name="optional">可选</string>
+
+    <string name="no_browser_found">没有可用于检查更新的网页浏览器或应用商店。</string>
 </resources>

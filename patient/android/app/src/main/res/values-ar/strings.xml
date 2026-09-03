@@ -278,4 +278,6 @@
     <string name="menu_check_updates">التحقق من التحديثات</string>
     <string name="menu_data_section">البيانات</string>
     <string name="optional">اختياري</string>
+
+    <string name="no_browser_found">لا يوجد متصفح ويب أو متجر تطبيقات متوفر للتحقق من التحديثات.</string>
 </resources>

@@ -278,4 +278,6 @@
     <string name="menu_check_updates">Controlla aggiornamenti</string>
     <string name="menu_data_section">Dati</string>
     <string name="optional">Opzionale</string>
+
+    <string name="no_browser_found">Nessun browser web o app store disponibile.</string>
 </resources>

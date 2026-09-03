@@ -278,4 +278,6 @@
     <string name="menu_check_updates">Проверить обновления</string>
     <string name="menu_data_section">Данные</string>
     <string name="optional">Необязательно</string>
+
+    <string name="no_browser_found">Нет доступного браузера или магазина приложений.</string>
 </resources>

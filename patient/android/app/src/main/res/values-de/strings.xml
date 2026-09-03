@@ -278,4 +278,6 @@
     <string name="menu_check_updates">Nach Updates suchen</string>
     <string name="menu_data_section">Daten</string>
     <string name="optional">Optional</string>
+
+    <string name="no_browser_found">Kein Webbrowser oder App-Store verfügbar.</string>
 </resources>

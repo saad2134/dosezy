@@ -278,4 +278,6 @@
     <string name="menu_check_updates">আপডেট পরীক্ষা করুন</string>
     <string name="menu_data_section">ডেটা</string>
     <string name="optional">ঐচ্ছিক</string>
+
+    <string name="no_browser_found">আপডেট চেক করার জন্য কোনো ওয়েব ব্রাউজার বা অ্যাপ স্টোর উপলব্ধ নেই।</string>
 </resources>

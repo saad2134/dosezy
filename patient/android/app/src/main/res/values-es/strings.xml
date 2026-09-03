@@ -294,4 +294,6 @@
     <string name="menu_check_updates">Buscar actualizaciones</string>
     <string name="menu_data_section">Datos</string>
     <string name="optional">Opcional</string>
+
+    <string name="no_browser_found">No hay navegador web ni tienda de aplicaciones disponible.</string>
 </resources>

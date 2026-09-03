@@ -277,4 +277,6 @@
     <string name="menu_check_updates">Verificar atualizações</string>
     <string name="menu_data_section">Dados</string>
     <string name="optional">Opcional</string>
+
+    <string name="no_browser_found">Nenhum navegador ou loja de aplicativos disponível.</string>
 </resources>

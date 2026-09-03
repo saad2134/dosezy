@@ -294,4 +294,6 @@
     <string name="menu_check_updates">अपडेट की जांच करें</string>
     <string name="menu_data_section">डेटा</string>
     <string name="optional">वैकल्पिक</string>
+
+    <string name="no_browser_found">अपडेट जांचने के लिए कोई वेब ब्राउज़र या ऐप स्टोर उपलब्ध नहीं है।</string>
 </resources>

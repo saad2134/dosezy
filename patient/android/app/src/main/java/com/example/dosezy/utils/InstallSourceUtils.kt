@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.widget.Toast
+import com.example.dosezy.R
 
 data class InstallSourceDetails(
     val sourceName: String,
@@ -90,10 +92,24 @@ object InstallSourceUtils {
             }
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(sourceDetails.webFallbackUrl)).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            try {
+                val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(sourceDetails.webFallbackUrl)).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                context.startActivity(webIntent)
+            } catch (e2: Exception) {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.no_browser_found),
+                    Toast.LENGTH_LONG
+                ).show()
             }
-            context.startActivity(webIntent)
+        } catch (e: Exception) {
+            Toast.makeText(
+                context,
+                context.getString(R.string.no_browser_found),
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 }

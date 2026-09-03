@@ -293,4 +293,6 @@
     <string name="menu_check_updates">Check for Updates</string>
     <string name="menu_data_section">Data</string>
     <string name="optional">Optional</string>
+
+    <string name="no_browser_found">No web browser or app store available to check for updates.</string>
 </resources>
