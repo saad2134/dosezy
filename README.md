@@ -9,7 +9,7 @@
 
 <div align="center">
 
-![Phase](https://img.shields.io/badge/🛠️%20Phase-Released%20v2%2E1%2E0-blue?style=for-the-badge)
+![Phase](https://img.shields.io/badge/🛠️%20Phase-Released%20v2%2E2%2E2-blue?style=for-the-badge)
 ![Platforms](https://img.shields.io/badge/🌐%20Platforms-Android-28a745?style=for-the-badge)
 
 </div>
@@ -53,7 +53,7 @@ Once you input the basics: name, dosage, timings, and frequency, the app intelli
 
 - 📅 **Medication Adherence** – Automated reminders ensure timely medication consumption.
 - 🌐 **12 Global Languages** – Full native localization in English, Chinese (中文), Spanish (Español), Hindi (हिन्दी), Portuguese (Português), Arabic (العربية), French (Français), German (Deutsch), Japanese (日本語), Russian (Русский), Italian (Italiano), and Bengali (বাংলা).
-- 🌍 **International Emergency Services** – Interactive country/region emergency dialer supporting India, USA/Canada, UK, EU, China, Japan, Russia, Brazil, Bangladesh, and Australia with automatic country detection based on language.
+- 🌍 **International Emergency Services** – Interactive country/region emergency dialer supporting India, USA/Canada, UK, EU, China, Japan, Russia, Brazil, Bangladesh, and Australia with automatic SIM/network country ISO detection and locale fallback.
 - ⏰ **Configurable Late & Missed Thresholds** – Custom **Consider Late After** (1-3h) and **Consider Missed After** (3-9h) settings with orange high-visibility late status badges (`Xh Xm ago`) and "Mark Late" actions.
 - 🕒 **12-First Grid Time Picker** – Easy 12-hour (12 first layout) and 24-hour interactive grid time selector with quick minute chips.
 - ♿ **Accessibility-First Design** – Large text, high-contrast colors, and simple controls for elderly users.  
@@ -61,7 +61,8 @@ Once you input the basics: name, dosage, timings, and frequency, the app intelli
 - 🎨 **Adaptive System Dark/Light Theme** – Complete theme support respecting the Android system default settings with zero white flash transitions.
 - 📅 **Custom Calendar Scheduling** – Full interactive support for daily, weekly (specific days of the week), and monthly (specific days of the month) frequencies.
 - 👤 **Multi-Profile Management** – Create, edit, and switch between family member profiles.
-- 📄 **Data Security & Export** – Local `Room` database storage with PDF report and JSON data export capabilities.  
+- 📄 **Data Security & Native Exports** – Local `Room` database storage with native PDF medical reports (English format note), JSON backup archives, and CSV export capabilities.  
+- 🛍️ **Multi-Store Update Check & Web Fallback** – Automatically detects installation store source (Google Play, F-Droid, Huawei AppGallery, Samsung Galaxy Store, Xiaomi GetApps, Amazon Appstore, Aurora Store, GitHub Sideload) and launches native store or web browser fallback.  
 - 👨‍👩‍👧 **Caregiver Support** – Logs and adherence history help caregivers track missed and late doses.  
 
 ### 🩺 Caregiver Cloud Platform (Optional, Self-Hostable, Coming Soon)
@@ -128,23 +129,31 @@ Dosezy is architected as an **open-source, local-first monorepo** with an option
 
 > **"Dosezy Cloud enhances Dosezy, never holds Dosezy hostage."**
 
-```
-                         ┌─────────────────────────────────────────────────────────────┐
-                         │                       DOSEZY MONOREPO                       │
-                         └──────────────────────────────┬──────────────────────────────┘
-                                                        │
-           ┌─────────────────────────────┬──────────────┴──────────────┬─────────────────────────────┐
-           │                             │                             │                             │
-┌──────────┴──────────┐       ┌──────────┴──────────┐       ┌──────────┴──────────┐       ┌──────────┴──────────┐
-│   PATIENT CLIENTS   │       │   OPENAPI SCHEMAS   │       │   CAREGIVER & WEB   │       │   SYNC SERVER & API │
-│ (100% Local-First)  │       │  (Shared Contract)  │       │ (Connected Portal)  │       │ (Self-Hostable Core)│
-├─────────────────────┤       ├─────────────────────┤       ├─────────────────────┤       ├─────────────────────┤
-│ patient/android/    │       │ api/openapi.yaml    │       │ caregiver/          │       │ server/             │
-│ patient/ios/        │       │ docs/               │       │ website/            │       │ • Incremental Sync  │
-│ • Offline Room DB   │       │ • Domain Models     │       │ • Web Dashboard     │       │ • Multi-Device Sync │
-│ • 12 Localizations  │       │ • DTO Definitions   │       │ • Adherence Monitor │       │ • PostgreSQL        │
-│ • High-Contrast UI  │       │ • Sync Protocol     │       │ • Next.js Website   │       │ • Zero-Telemetry    │
-└─────────────────────┘       └─────────────────────┘       └─────────────────────┘       └─────────────────────┘
+```mermaid
+flowchart TB
+ subgraph Clients["📱 Patient Client Applications (100% Local-First & Offline)"]
+    direction LR
+        AndroidApp["Android App<br>(patient/android)"]
+        iOSApp["iOS App<br>(patient/ios)"]
+  end
+ subgraph ServerCloud["☁️ Cloud & Sync Platform (Optional & Self-Hostable)"]
+    direction LR
+        SyncServer["Self-Hostable Sync Server<br>(server/)"]
+        ContractNote["📜 Shared OpenAPI 3.0 Contract (api/openapi.yaml)<br><i>Defines REST APIs, data schemas, and sync protocols.</i>"]
+  end
+ subgraph s1["🌐 Website"]
+        MarketingWeb["Web Portal, Guides & Manuals<br>(website/)"]
+  end
+ subgraph s2["❤️ Caregiver Client Applications"]
+        CaregiverWeb["Caregiver Web Dashboard<br>(caregiver/)"]
+  end
+    iOSApp <== "Optional Encrypted Sync" ==> ContractNote
+    AndroidApp <== "Optional Encrypted Sync" ==> ContractNote
+    SyncServer <--> CaregiverWeb
+    ContractNote -- "Validates REST & Sync API" --> SyncServer
+
+    ContractNote@{ shape: hex}
+    style ContractNote stroke-width:2px,stroke-dasharray: 2
 ```
 
 - **Local-First by Default:** All fundamental features—scheduling, persistent notifications, history tracking, data exports, and emergency services—operate completely offline without requiring an account or network connectivity.

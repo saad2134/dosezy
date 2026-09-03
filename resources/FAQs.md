@@ -1,8 +1,8 @@
 # Dosezy: Frequently Asked Questions (FAQ)
 
-> **App Version:** v2.0.0
+> **App Version:** v2.2.2
 
-Welcome to the **Dosezy FAQ**! Here you will find simple, easy-to-understand answers to common questions about using Dosezy v2.0.0.
+Welcome to the **Dosezy FAQ**! Here you will find simple, easy-to-understand answers to common questions about using Dosezy v2.2.2.
 
 ---
 
@@ -82,6 +82,9 @@ Yes! Tap **Menu > Switch Profile** to create separate profiles for parents, chil
 
 ### Is my health information kept private?
 Yes. 100% of your medicine data and personal health information stays stored safely on your own phone in an offline database. Dosezy does not sell or send your private medical data to external servers.
+
+### How do I check for app updates?
+Go to **Menu > Check for Updates** (under the Network section). Dosezy automatically detects where you downloaded the app from (Google Play, F-Droid, Huawei AppGallery, Samsung Galaxy Store, Xiaomi GetApps, Amazon Appstore, or GitHub Releases) and opens your store client or safely opens the web store page in your default browser.
 
 ---
 

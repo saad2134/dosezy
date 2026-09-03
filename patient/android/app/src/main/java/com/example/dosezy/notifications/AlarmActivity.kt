@@ -130,6 +130,12 @@ class AlarmActivity : ComponentActivity() {
                     database = database,
                     isDarkTheme = isDark,
                     onDismiss = {
+                        if (entryId.isNotEmpty()) {
+                            try {
+                                val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                                notificationManager.cancel(entryId.hashCode())
+                            } catch (_: Exception) {}
+                        }
                         stopAlarm()
                         finish()
                     }
@@ -453,6 +459,8 @@ fun AlarmScreenContent(
                                 if (entryId.isNotEmpty()) {
                                     val now = LocalDateTime.now().toString()
                                     database.scheduleDao().updateMedicationStatus(entryId, com.example.dosezy.data.model.MedicationStatus.TAKEN_ON_TIME.name, now)
+                                    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                                    notificationManager.cancel(entryId.hashCode())
                                 }
                             }
                             onDismiss()
@@ -486,6 +494,8 @@ fun AlarmScreenContent(
                                         minutes = snoozeMins,
                                         medicineName = medicineName
                                     )
+                                    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                                    notificationManager.cancel(entryId.hashCode())
                                 }
                             }
                             onDismiss()

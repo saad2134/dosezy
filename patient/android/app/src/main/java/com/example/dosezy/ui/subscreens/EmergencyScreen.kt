@@ -78,6 +78,64 @@ val emergencyCountries = listOf(
     CountryEmergency("AU", "🇦🇺", "Australia", ambulance = "000", fire = "000", police = "000", universal = "000")
 )
 
+fun detectDeviceEmergencyCountry(context: android.content.Context, userLanguage: com.example.dosezy.data.model.Language): CountryEmergency {
+    // 1. Try Telephony Network or SIM Country ISO
+    val tm = context.getSystemService(android.content.Context.TELEPHONY_SERVICE) as? android.telephony.TelephonyManager
+    val telephonyIso = try {
+        val netIso = tm?.networkCountryIso?.uppercase()
+        val simIso = tm?.simCountryIso?.uppercase()
+        if (!netIso.isNullOrBlank()) netIso else if (!simIso.isNullOrBlank()) simIso else null
+    } catch (_: Exception) { null }
+
+    // 2. Try System Locale Country ISO
+    val localeIso = try {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            context.resources.configuration.locales[0]?.country?.uppercase()
+        } else {
+            @Suppress("DEPRECATION")
+            context.resources.configuration.locale?.country?.uppercase()
+        }
+    } catch (_: Exception) { null }
+
+    val detectedIso = telephonyIso ?: localeIso
+
+    if (!detectedIso.isNullOrBlank()) {
+        val matched = matchEmergencyCountryByIso(detectedIso)
+        if (matched != null) return matched
+    }
+
+    // 3. Fallback based on user app language setting if explicitly set
+    return when (userLanguage) {
+        com.example.dosezy.data.model.Language.BENGALI -> emergencyCountries.find { it.code == "BD" }
+        com.example.dosezy.data.model.Language.CHINESE -> emergencyCountries.find { it.code == "CN" }
+        com.example.dosezy.data.model.Language.JAPANESE -> emergencyCountries.find { it.code == "JP" }
+        com.example.dosezy.data.model.Language.RUSSIAN -> emergencyCountries.find { it.code == "RU" }
+        com.example.dosezy.data.model.Language.SPANISH,
+        com.example.dosezy.data.model.Language.FRENCH,
+        com.example.dosezy.data.model.Language.GERMAN,
+        com.example.dosezy.data.model.Language.ITALIAN,
+        com.example.dosezy.data.model.Language.PORTUGUESE -> emergencyCountries.find { it.code == "EU" }
+        com.example.dosezy.data.model.Language.HINDI -> emergencyCountries.find { it.code == "IN" }
+        else -> emergencyCountries.find { it.code == "US" }
+    } ?: emergencyCountries.find { it.code == "GB" } ?: emergencyCountries.first()
+}
+
+private fun matchEmergencyCountryByIso(iso: String): CountryEmergency? {
+    return when (iso) {
+        "GB" -> emergencyCountries.find { it.code == "GB" }
+        "US", "CA" -> emergencyCountries.find { it.code == "US" }
+        "IN" -> emergencyCountries.find { it.code == "IN" }
+        "AU" -> emergencyCountries.find { it.code == "AU" }
+        "BD" -> emergencyCountries.find { it.code == "BD" }
+        "BR" -> emergencyCountries.find { it.code == "BR" }
+        "CN" -> emergencyCountries.find { it.code == "CN" }
+        "JP" -> emergencyCountries.find { it.code == "JP" }
+        "RU" -> emergencyCountries.find { it.code == "RU" }
+        "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "NO", "CH", "IS", "LI" -> emergencyCountries.find { it.code == "EU" }
+        else -> null
+    }
+}
+
 @Composable
 fun EmergencyScreen(navController: NavController) {
     val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
@@ -105,20 +163,8 @@ fun EmergencyContent(userLanguage: com.example.dosezy.data.model.Language) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
-    val defaultCountry = remember(userLanguage) {
-        when (userLanguage) {
-            com.example.dosezy.data.model.Language.BENGALI -> emergencyCountries.find { it.code == "BD" }
-            com.example.dosezy.data.model.Language.CHINESE -> emergencyCountries.find { it.code == "CN" }
-            com.example.dosezy.data.model.Language.JAPANESE -> emergencyCountries.find { it.code == "JP" }
-            com.example.dosezy.data.model.Language.RUSSIAN -> emergencyCountries.find { it.code == "RU" }
-            com.example.dosezy.data.model.Language.SPANISH,
-            com.example.dosezy.data.model.Language.FRENCH,
-            com.example.dosezy.data.model.Language.GERMAN,
-            com.example.dosezy.data.model.Language.ITALIAN,
-            com.example.dosezy.data.model.Language.PORTUGUESE -> emergencyCountries.find { it.code == "EU" }
-            com.example.dosezy.data.model.Language.HINDI -> emergencyCountries.find { it.code == "IN" }
-            else -> emergencyCountries.first() // India default
-        } ?: emergencyCountries.first()
+    val defaultCountry = remember(userLanguage, context) {
+        detectDeviceEmergencyCountry(context, userLanguage)
     }
 
     var selectedCountry by remember { mutableStateOf(defaultCountry) }

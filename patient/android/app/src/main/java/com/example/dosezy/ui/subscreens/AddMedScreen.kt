@@ -128,6 +128,7 @@ fun AddMedScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
+                    .verticalScroll(rememberScrollState())
                     .padding(16.dp)
                     .background(MaterialTheme.colorScheme.background)
             ) {

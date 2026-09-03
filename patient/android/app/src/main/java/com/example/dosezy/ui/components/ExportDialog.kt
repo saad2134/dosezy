@@ -1,5 +1,6 @@
 package com.example.dosezy.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Share
@@ -33,52 +33,47 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.dosezy.R
 import java.io.File
-import androidx.compose.foundation.clickable
 
 enum class ExportFormat(
-    val displayName: String,
-    val fileExtension: String
+    val displayNameRes: Int,
+    val fileExtension: String,
+    val noteRes: Int? = null
 ) {
-    CSV("CSV Format", ".csv"),
-    JSON("JSON Format", ".json"),
-    PDF("PDF Format", ".pdf")
+    CSV(R.string.export_format_csv, ".csv"),
+    JSON(R.string.export_format_json, ".json"),
+    PDF(R.string.export_format_pdf, ".pdf", R.string.export_format_pdf_note)
 }
 
 enum class SaveLocation(
-    val displayName: String,
-    val description: String,
+    val titleRes: Int,
+    val descRes: Int,
     val icon: androidx.compose.ui.graphics.vector.ImageVector
 ) {
     DEVICE_STORAGE(
-        "Device Storage",
-        "Save to your device's Downloads folder",
+        R.string.export_device_storage,
+        R.string.export_device_storage_desc,
         Icons.Default.Folder
     ),
-    CLOUD_STORAGE(
-        "Cloud Storage",
-        "Save to Google Drive or other cloud services",
-        Icons.Default.CloudDownload
-    ),
     SHARE_DIRECTLY(
-        "Share Directly",
-        "Share immediately without saving",
+        R.string.export_share_directly,
+        R.string.export_share_directly_desc,
         Icons.Default.Share
     )
 }
-
 
 @Composable
 fun ExportDialog(
     onDismiss: () -> Unit,
     onExportToDevice: (ExportFormat) -> Unit,
-    onExportToCloud: () -> Unit,
-    onShareDirectly: () -> Unit,
+    onShareDirectly: (ExportFormat) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedFormat by remember { mutableStateOf(ExportFormat.CSV) }
@@ -88,7 +83,8 @@ fun ExportDialog(
         Surface(
             modifier = modifier,
             shape = RoundedCornerShape(24.dp),
-            color = Color.White
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 6.dp
         ) {
             Column(
                 modifier = Modifier.padding(24.dp)
@@ -100,14 +96,14 @@ fun ExportDialog(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Download,
-                        contentDescription = "Export",
+                        contentDescription = stringResource(R.string.menu_export_data),
                         modifier = Modifier
                             .padding(end = 12.dp)
                             .size(28.dp),
-                        tint = Color(0xFF2084E4)
+                        tint = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = "Export Data",
+                        text = stringResource(R.string.menu_export_data),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -116,9 +112,9 @@ fun ExportDialog(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Format Selection
+                // File Format Selection
                 Text(
-                    text = "Export Format",
+                    text = stringResource(R.string.export_file_format),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -139,17 +135,29 @@ fun ExportDialog(
                                 onClick = { selectedFormat = format }
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = format.displayName,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color(0xFF374151)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = format.fileExtension,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            Column {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = stringResource(format.displayNameRes),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = format.fileExtension,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                format.noteRes?.let { resId ->
+                                    Text(
+                                        text = stringResource(resId),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontSize = 11.sp
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -158,7 +166,7 @@ fun ExportDialog(
 
                 // Save Location Selection
                 Text(
-                    text = "Save To",
+                    text = stringResource(R.string.export_save_to),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -175,9 +183,9 @@ fun ExportDialog(
                             shape = RoundedCornerShape(12.dp),
                             colors = CardDefaults.cardColors(
                                 containerColor = if (saveLocation == location) {
-                                    Color(0xFFEFF6FF)
+                                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
                                 } else {
-                                    Color(0xFFF9FAFB)
+                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                                 }
                             ),
                             elevation = CardDefaults.cardElevation(
@@ -192,31 +200,27 @@ fun ExportDialog(
                             ) {
                                 Icon(
                                     imageVector = location.icon,
-                                    contentDescription = location.displayName,
+                                    contentDescription = stringResource(location.titleRes),
                                     modifier = Modifier
                                         .padding(end = 12.dp)
                                         .size(24.dp),
                                     tint = if (saveLocation == location) {
-                                        Color(0xFF2084E4)
+                                        MaterialTheme.colorScheme.primary
                                     } else {
-                                        Color(0xFF6B7280)
+                                        MaterialTheme.colorScheme.onSurfaceVariant
                                     }
                                 )
                                 Column(
                                     modifier = Modifier.weight(1f)
                                 ) {
                                     Text(
-                                        text = location.displayName,
+                                        text = stringResource(location.titleRes),
                                         style = MaterialTheme.typography.bodyMedium,
                                         fontWeight = FontWeight.Medium,
-                                        color = if (saveLocation == location) {
-                                            Color(0xFF1E293B)
-                                        } else {
-                                            Color(0xFF374151)
-                                        }
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                     Text(
-                                        text = location.description,
+                                        text = stringResource(location.descRes),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -239,7 +243,7 @@ fun ExportDialog(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            text = "Cancel",
+                            text = stringResource(R.string.cancel),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium
                         )
@@ -249,18 +253,17 @@ fun ExportDialog(
                         onClick = {
                             when (saveLocation) {
                                 SaveLocation.DEVICE_STORAGE -> onExportToDevice(selectedFormat)
-                                SaveLocation.CLOUD_STORAGE -> onExportToCloud()
-                                SaveLocation.SHARE_DIRECTLY -> onShareDirectly()
+                                SaveLocation.SHARE_DIRECTLY -> onShareDirectly(selectedFormat)
                             }
                         },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF2084E4)
+                            containerColor = MaterialTheme.colorScheme.primary
                         )
                     ) {
                         Text(
-                            text = "Export",
+                            text = stringResource(R.string.export),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -283,7 +286,8 @@ fun ExportSuccessDialog(
         Surface(
             modifier = modifier,
             shape = RoundedCornerShape(24.dp),
-            color = Color.White
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 6.dp
         ) {
             Column(
                 modifier = Modifier.padding(32.dp),
@@ -294,7 +298,7 @@ fun ExportSuccessDialog(
                     modifier = Modifier.size(64.dp),
                     shape = RoundedCornerShape(32.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFDBEAFE)
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
                     )
                 ) {
                     Icon(
@@ -303,7 +307,7 @@ fun ExportSuccessDialog(
                         modifier = Modifier
                             .padding(16.dp)
                             .size(32.dp),
-                        tint = Color(0xFF2084E4)
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -311,7 +315,7 @@ fun ExportSuccessDialog(
 
                 // Title
                 Text(
-                    text = "Export Successful",
+                    text = stringResource(R.string.export_success_title),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -323,8 +327,8 @@ fun ExportSuccessDialog(
                 // Description
                 Text(
                     text = exportedFile?.let {
-                        "Your data has been exported to:\n${it.name}"
-                    } ?: "Your data has been successfully exported.",
+                        "${stringResource(R.string.export_success_desc)}\n${it.name}"
+                    } ?: stringResource(R.string.export_success_title),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
@@ -345,17 +349,17 @@ fun ExportSuccessDialog(
                                 .height(48.dp),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF2084E4)
+                                containerColor = MaterialTheme.colorScheme.primary
                             )
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Share,
-                                contentDescription = "Share",
+                                contentDescription = stringResource(R.string.export_share_file),
                                 modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Share File",
+                                text = stringResource(R.string.export_share_file),
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -366,10 +370,7 @@ fun ExportSuccessDialog(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(48.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = Color(0xFF6B7280)
-                            )
+                            shape = RoundedCornerShape(12.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Folder,
@@ -378,7 +379,7 @@ fun ExportSuccessDialog(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "View in Folder",
+                                text = stringResource(R.string.export_device_storage),
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium
                             )
@@ -393,11 +394,11 @@ fun ExportSuccessDialog(
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Transparent,
-                            contentColor = Color(0xFF6B7280)
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     ) {
                         Text(
-                            text = "Close",
+                            text = stringResource(R.string.cancel),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium
                         )
@@ -407,4 +408,3 @@ fun ExportSuccessDialog(
         }
     }
 }
-

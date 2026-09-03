@@ -1,0 +1,627 @@
+openapi: 3.0.3
+info:
+  title: Dosezy API
+  description: |
+    Official OpenAPI 3.0 specification for **Dosezy** — Open-Source, Offline-First Medicine Tracking & Caregiver Cloud Platform.
+    
+    ### Domain Alignment
+    - **API Base URL:** `https://api.dosezy.app`
+    - **Status Page:** `https://status.dosezy.app`
+    - **Documentation:** `https://docs.dosezy.app`
+    - **Patient Web App:** `https://patient.dosezy.app`
+    - **Caregiver Portal:** `https://caregiver.dosezy.app`
+  version: 1.0.0
+  contact:
+    name: Dosezy Maintainers
+    email: reach.saad@outlook.com
+    url: https://dosezy.app
+  license:
+    name: MIT License
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.dosezy.app
+    description: Official Hosted Cloud Production Server
+  - url: http://localhost:8080
+    description: Self-Hosted Local Server Core
+
+tags:
+  - name: Health & System
+    description: Server health checks, system status, and info
+  - name: User Profiles
+    description: Patient profile management and metadata
+  - name: Medicines
+    description: Medication definitions, dosages, and schedules
+  - name: Schedule Logs
+    description: Historical dose tracking, adherence logs, and status updates
+  - name: Incremental Sync
+    description: Local-first delta synchronization protocol
+  - name: Caregiver Platform
+    description: Caregiver pairing, patient monitoring, and adherence metrics
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health & System
+      summary: Get server health and status
+      operationId: getHealthStatus
+      responses:
+        '200':
+          description: Server is healthy and operational
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  version:
+                    type: string
+                    example: 2.2.2
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: '2026-09-03T18:45:00Z'
+
+  /v1/users:
+    get:
+      tags:
+        - User Profiles
+      summary: List all user profiles
+      operationId: listUsers
+      responses:
+        '200':
+          description: List of user profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      tags:
+        - User Profiles
+      summary: Create a new patient profile
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateInput'
+      responses:
+        '201':
+          description: User profile created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /v1/users/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - User Profiles
+      summary: Get user profile details
+      operationId: getUserById
+      responses:
+        '200':
+          description: User profile details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - User Profiles
+      summary: Update user profile
+      operationId: updateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateInput'
+      responses:
+        '200':
+          description: User profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    delete:
+      tags:
+        - User Profiles
+      summary: Delete user profile
+      operationId: deleteUser
+      responses:
+        '204':
+          description: Profile deleted successfully
+
+  /v1/users/{userId}/medicines:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Medicines
+      summary: List medicines for a user
+      operationId: listMedicines
+      responses:
+        '200':
+          description: List of medications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Medicine'
+    post:
+      tags:
+        - Medicines
+      summary: Add a new medicine
+      operationId: createMedicine
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedicineInput'
+      responses:
+        '201':
+          description: Medicine created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medicine'
+
+  /v1/medicines/{medicineId}:
+    parameters:
+      - name: medicineId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Medicines
+      summary: Get medicine details
+      operationId: getMedicineById
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medicine'
+    put:
+      tags:
+        - Medicines
+      summary: Update medicine
+      operationId: updateMedicine
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedicineInput'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medicine'
+    delete:
+      tags:
+        - Medicines
+      summary: Delete medicine
+      operationId: deleteMedicine
+      responses:
+        '204':
+          description: Medicine deleted successfully
+
+  /v1/users/{userId}/schedules:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Schedule Logs
+      summary: Get dose schedule history
+      operationId: listScheduleEntries
+      parameters:
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/DoseStatus'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScheduleEntry'
+    post:
+      tags:
+        - Schedule Logs
+      summary: Log a dose action (Taken, Snoozed, Missed)
+      operationId: createScheduleEntry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleEntryInput'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleEntry'
+
+  /v1/sync:
+    post:
+      tags:
+        - Incremental Sync
+      summary: Incremental Delta Sync (Offline-First)
+      operationId: performDeltaSync
+      description: Push local database changes and receive remote updates since `lastSyncedAt`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncPushRequest'
+      responses:
+        '200':
+          description: Sync completed successfully with deltas returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncPullResponse'
+
+  /v1/caregiver/pair:
+    post:
+      tags:
+        - Caregiver Platform
+      summary: Generate or redeem a caregiver pairing code
+      operationId: pairCaregiver
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PairingRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PairingResponse'
+
+  /v1/caregiver/patients:
+    get:
+      tags:
+        - Caregiver Platform
+      summary: List monitored patients & adherence metrics for caregiver
+      operationId: listMonitoredPatients
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CaregiverPatientSummary'
+
+components:
+  schemas:
+    Gender:
+      type: string
+      enum: [MALE, FEMALE, OTHER, PREFER_NOT_TO_SAY]
+
+    DosageUnit:
+      type: string
+      enum: [MG, MCG, G, ML, TABLET, CAPSULE, DROP, PUFF, UNIT, SPOON, PATCH]
+
+    FrequencyPattern:
+      type: string
+      enum: [EVERY_DAY, SPECIFIC_DAYS_OF_WEEK, SPECIFIC_DAYS_OF_MONTH]
+
+    DoseStatus:
+      type: string
+      enum: [SCHEDULED, TAKEN_ON_TIME, TAKEN_LATE, MISSED, SKIPPED]
+
+    User:
+      type: object
+      required:
+        - userId
+        - fullName
+        - age
+        - gender
+      properties:
+        userId:
+          type: string
+          example: usr_8f9a2b1c
+        fullName:
+          type: string
+          example: John Doe
+        age:
+          type: integer
+          example: 45
+        gender:
+          $ref: '#/components/schemas/Gender'
+        contactNumber:
+          type: string
+          example: '+1234567890'
+        profilePicPath:
+          type: string
+          nullable: true
+        isCurrentUser:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UserCreateInput:
+      type: object
+      required:
+        - fullName
+        - age
+        - gender
+      properties:
+        fullName:
+          type: string
+          example: Jane Doe
+        age:
+          type: integer
+          example: 38
+        gender:
+          $ref: '#/components/schemas/Gender'
+        contactNumber:
+          type: string
+
+    Medicine:
+      type: object
+      required:
+        - medicineId
+        - userId
+        - medicationName
+        - dosage
+        - dosageUnit
+        - timesPerDay
+        - scheduledTimes
+      properties:
+        medicineId:
+          type: string
+          example: med_1a2b3c
+        userId:
+          type: string
+          example: usr_8f9a2b1c
+        medicationName:
+          type: string
+          example: Amoxicillin
+        dosage:
+          type: number
+          format: double
+          example: 500.0
+        dosageUnit:
+          $ref: '#/components/schemas/DosageUnit'
+        timesPerDay:
+          type: integer
+          example: 2
+        frequencyPattern:
+          $ref: '#/components/schemas/FrequencyPattern'
+        scheduledTimes:
+          type: array
+          items:
+            type: string
+            example: '08:00'
+        imageUri:
+          type: string
+          nullable: true
+
+    MedicineInput:
+      type: object
+      required:
+        - medicationName
+        - dosage
+        - dosageUnit
+        - timesPerDay
+        - scheduledTimes
+      properties:
+        medicationName:
+          type: string
+        dosage:
+          type: number
+        dosageUnit:
+          $ref: '#/components/schemas/DosageUnit'
+        timesPerDay:
+          type: integer
+        scheduledTimes:
+          type: array
+          items:
+            type: string
+
+    ScheduleEntry:
+      type: object
+      required:
+        - entryId
+        - userId
+        - medicineId
+        - scheduledDateTime
+        - status
+      properties:
+        entryId:
+          type: string
+          example: sch_998877
+        userId:
+          type: string
+          example: usr_8f9a2b1c
+        medicineId:
+          type: string
+          example: med_1a2b3c
+        scheduledDateTime:
+          type: string
+          format: date-time
+          example: '2026-09-03T08:00:00Z'
+        status:
+          $ref: '#/components/schemas/DoseStatus'
+        takenAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    ScheduleEntryInput:
+      type: object
+      required:
+        - medicineId
+        - scheduledDateTime
+        - status
+      properties:
+        medicineId:
+          type: string
+        scheduledDateTime:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/DoseStatus'
+        takenAt:
+          type: string
+          format: date-time
+
+    SyncPushRequest:
+      type: object
+      required:
+        - lastSyncedAt
+      properties:
+        lastSyncedAt:
+          type: string
+          format: date-time
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        medicines:
+          type: array
+          items:
+            $ref: '#/components/schemas/Medicine'
+        schedules:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScheduleEntry'
+
+    SyncPullResponse:
+      type: object
+      required:
+        - syncTimestamp
+      properties:
+        syncTimestamp:
+          type: string
+          format: date-time
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        medicines:
+          type: array
+          items:
+            $ref: '#/components/schemas/Medicine'
+        schedules:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScheduleEntry'
+
+    PairingRequest:
+      type: object
+      properties:
+        pairingCode:
+          type: string
+          example: '8F9A2B'
+        role:
+          type: string
+          enum: [PATIENT, CAREGIVER]
+
+    PairingResponse:
+      type: object
+      properties:
+        pairingCode:
+          type: string
+          example: '8F9A2B'
+        expiresAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          example: PENDING
+
+    CaregiverPatientSummary:
+      type: object
+      properties:
+        userId:
+          type: string
+        fullName:
+          type: string
+        adherenceRate:
+          type: number
+          format: double
+          example: 94.5
+        activeMedicinesCount:
+          type: integer
+          example: 4
+        missedDosesCount:
+          type: integer
+          example: 1
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          example: NOT_FOUND
+        message:
+          type: string
+          example: The requested resource was not found.
+
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

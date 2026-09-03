@@ -66,7 +66,7 @@
     <string name="menu_preferences">環境設定</string>
     <string name="menu_emergency">緊急連絡先</string>
     <string name="menu_help_support">ヘルプとサポート</string>
-    <string name="menu_export_data">CSV形式でデータをエクスポート</string>
+    <string name="menu_export_data">データをエクスポート</string>
     <string name="menu_switch_profile">プロフィールを切り替え</string>
     <string name="menu_manage_profiles">プロフィールを管理</string>
     <string name="menu_manage_profile">このプロフィールを管理</string>
@@ -260,4 +260,22 @@
     <string name="menu_backup_restore">バックアップと復元</string>
     <string name="menu_sharing">介護者・家族共有</string>
     <string name="coming_soon">近日公開</string>
+
+    <string name="export_file_format">ファイル形式</string>
+    <string name="export_format_csv">CSV形式</string>
+    <string name="export_format_json">JSON形式</string>
+    <string name="export_format_pdf">PDF形式</string>
+    <string name="export_save_to">保存先</string>
+    <string name="export_device_storage">デバイスストレージ</string>
+    <string name="export_device_storage_desc">端末のダウンロードフォルダに保存</string>
+    <string name="export_share_directly">直接共有</string>
+    <string name="export_share_directly_desc">保存せずにアプリ経由で即座に共有</string>
+
+    <string name="export_format_pdf_note">（英語の医療レポート）</string>
+
+    <string name="menu_network_section">ネットワーク</string>
+    <string name="menu_cloud_config">Dosezy クラウド設定</string>
+    <string name="menu_check_updates">更新を確認</string>
+    <string name="menu_data_section">データ</string>
+    <string name="optional">任意</string>
 </resources>

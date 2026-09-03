@@ -66,7 +66,7 @@
     <string name="menu_preferences">পছন্দসমূহ</string>
     <string name="menu_emergency">জরুরি যোগাযোগ</string>
     <string name="menu_help_support">সাহায্য ও সহায়তা</string>
-    <string name="menu_export_data">CSV হিসেবে ডেটা এক্সপোর্ট</string>
+    <string name="menu_export_data">ডেটা এক্সপোর্ট করুন</string>
     <string name="menu_switch_profile">প্রোফাইল পরিবর্তন করুন</string>
     <string name="menu_manage_profiles">প্রোফাইল পরিচালনা</string>
     <string name="menu_manage_profile">এই প্রোফাইল পরিচালনা করুন</string>
@@ -260,4 +260,22 @@
     <string name="menu_backup_restore">ব্যাকআপ ও রিস্টোর</string>
     <string name="menu_sharing">পরিচর্যাকারী শেয়ারিং</string>
     <string name="coming_soon">শীঘ্রই আসছে</string>
+
+    <string name="export_file_format">ফাইল ফরম্যাট</string>
+    <string name="export_format_csv">CSV ফরম্যাট</string>
+    <string name="export_format_json">JSON ফরম্যাট</string>
+    <string name="export_format_pdf">PDF ফরম্যাট</string>
+    <string name="export_save_to">সংরক্ষণ করুন</string>
+    <string name="export_device_storage">ডিভাইস স্টোরেজ</string>
+    <string name="export_device_storage_desc">আপনার ডিভাইসের ডাউনলোড ফোল্ডারে সংরক্ষণ করুন</string>
+    <string name="export_share_directly">সরাসরি শেয়ার করুন</string>
+    <string name="export_share_directly_desc">সংরক্ষণ না করেই অ্যাপের মাধ্যমে অবিলম্বে শেয়ার করুন</string>
+
+    <string name="export_format_pdf_note">(ইংরেজি ভাষায় চিকিৎসা সংক্রান্ত প্রতিবেদন)</string>
+
+    <string name="menu_network_section">নেটওয়ার্ক</string>
+    <string name="menu_cloud_config">Dosezy ক্লাউড কনফিগারেশন</string>
+    <string name="menu_check_updates">আপডেট পরীক্ষা করুন</string>
+    <string name="menu_data_section">ডেটা</string>
+    <string name="optional">ঐচ্ছিক</string>
 </resources>

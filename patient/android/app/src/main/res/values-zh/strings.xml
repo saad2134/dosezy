@@ -74,7 +74,7 @@
     <string name="menu_emergency">紧急联系人</string>
     <string name="menu_help_support">帮助与支持</string>
     <string name="menu_data">数据</string>
-    <string name="menu_export_data">导出数据为 CSV</string>
+    <string name="menu_export_data">导出数据</string>
     <string name="menu_switch_profile">切换配置文件</string>
     <string name="menu_manage_profiles">管理配置文件</string>
     <string name="menu_manage_profile">管理此配置文件</string>
@@ -277,4 +277,22 @@
     <string name="menu_backup_restore">备份与恢复</string>
     <string name="menu_sharing">照护者共享</string>
     <string name="coming_soon">即将推出</string>
+
+    <string name="export_file_format">文件格式</string>
+    <string name="export_format_csv">CSV 格式</string>
+    <string name="export_format_json">JSON 格式</string>
+    <string name="export_format_pdf">PDF 格式</string>
+    <string name="export_save_to">保存至</string>
+    <string name="export_device_storage">设备存储</string>
+    <string name="export_device_storage_desc">保存到设备的“下载”文件夹</string>
+    <string name="export_share_directly">直接分享</string>
+    <string name="export_share_directly_desc">无需保存，通过应用程序即时分享</string>
+
+    <string name="export_format_pdf_note">（英文医疗报告）</string>
+
+    <string name="menu_network_section">网络</string>
+    <string name="menu_cloud_config">Dosezy 云端配置</string>
+    <string name="menu_check_updates">检查更新</string>
+    <string name="menu_data_section">数据</string>
+    <string name="optional">可选</string>
 </resources>

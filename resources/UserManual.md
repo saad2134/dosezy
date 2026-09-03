@@ -1,8 +1,8 @@
 # Dosezy User Manual
 
-> **App Version:** v2.0.0
+> **App Version:** v2.2.2
 
-Welcome to **Dosezy v2.0.0**! Dosezy is your personal, easy-to-use companion for managing daily medications, setting smart reminders, tracking adherence, and keeping your loved ones healthy.
+Welcome to **Dosezy v2.2.2**! Dosezy is your personal, easy-to-use companion for managing daily medications, setting smart reminders, tracking adherence, and keeping your loved ones healthy.
 
 This guide explains how to use all features of Dosezy in simple step-by-step terms.
 
@@ -124,7 +124,17 @@ You can easily export medicine records to print for doctor visits or keep person
 
 ---
 
-## 8. Troubleshooting & Support
+## 8. Network & App Updates
+
+1. Tap **Menu**.
+2. Under the **Network** section:
+   - **Dosezy Cloud Configuration** *(Optional, Coming Soon)*: Placeholder for future optional multi-device encrypted sync.
+   - **Caregiver Sharing** *(Coming Soon)*: Placeholder for remote caregiver pairing.
+   - **Check for Updates**: Checks for app updates on your store (Google Play, F-Droid, Huawei AppGallery, Samsung Galaxy Store, Xiaomi GetApps, Amazon Appstore, or GitHub Releases). If your app store client is missing or uninstalled, Dosezy smoothly opens the web store page in your system default browser.
+
+---
+
+## 9. Troubleshooting & Support
 
 ### Reminders not sounding?
 - Ensure notification permissions are enabled in your Android phone settings.

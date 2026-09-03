@@ -66,7 +66,7 @@
     <string name="menu_preferences">Настройки</string>
     <string name="menu_emergency">Экстренные контакты</string>
     <string name="menu_help_support">Справка и поддержка</string>
-    <string name="menu_export_data">Экспорт данных в CSV</string>
+    <string name="menu_export_data">Экспорт данных</string>
     <string name="menu_switch_profile">Сменить профиль</string>
     <string name="menu_manage_profiles">Управление профилями</string>
     <string name="menu_manage_profile">Управление этим профилем</string>
@@ -260,4 +260,22 @@
     <string name="menu_backup_restore">Резервное Копирование и Восстановление</string>
     <string name="menu_sharing">Общий Доступ для Опекунов</string>
     <string name="coming_soon">Скоро</string>
+
+    <string name="export_file_format">Формат файла</string>
+    <string name="export_format_csv">Формат CSV</string>
+    <string name="export_format_json">Формат JSON</string>
+    <string name="export_format_pdf">Формат PDF</string>
+    <string name="export_save_to">Сохранить в</string>
+    <string name="export_device_storage">Память устройства</string>
+    <string name="export_device_storage_desc">Сохранить в папку Загрузки вашего устройства</string>
+    <string name="export_share_directly">Поделиться напрямую</string>
+    <string name="export_share_directly_desc">Поделиться сразу через приложения без сохранения</string>
+
+    <string name="export_format_pdf_note">(Медицинский отчет на английском)</string>
+
+    <string name="menu_network_section">Сеть</string>
+    <string name="menu_cloud_config">Настройки облака Dosezy</string>
+    <string name="menu_check_updates">Проверить обновления</string>
+    <string name="menu_data_section">Данные</string>
+    <string name="optional">Необязательно</string>
 </resources>

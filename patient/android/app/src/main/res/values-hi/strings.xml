@@ -73,7 +73,7 @@
     <string name="menu_preferences">प्राथमिकताएं</string>
     <string name="menu_emergency">आपातकालीन संपर्क</string>
     <string name="menu_help_support">सहायता और सहायता</string>
-    <string name="menu_export_data">CSV के रूप में डेटा निर्यात करें</string>
+    <string name="menu_export_data">डेटा निर्यात करें</string>
     <string name="menu_switch_profile">प्रोफ़ाइल बदलें</string>
     <string name="menu_manage_profiles">प्रोफ़ाइल प्रबंधित करें</string>
     <string name="menu_manage_profile">इस प्रोफ़ाइल को प्रबंधित करें</string>
@@ -276,4 +276,22 @@
     <string name="menu_backup_restore">बैकअप और रीस्टोर</string>
     <string name="menu_sharing">देखभालकर्ता साझाकरण</string>
     <string name="coming_soon">जल्द आ रहा है</string>
+
+    <string name="export_file_format">फ़ाइल प्रारूप</string>
+    <string name="export_format_csv">CSV प्रारूप</string>
+    <string name="export_format_json">JSON प्रारूप</string>
+    <string name="export_format_pdf">PDF प्रारूप</string>
+    <string name="export_save_to">सहेजें</string>
+    <string name="export_device_storage">डिवाइस संग्रहण</string>
+    <string name="export_device_storage_desc">अपने डिवाइस के डाउनलोड फ़ोल्डर में सहेजें</string>
+    <string name="export_share_directly">सीधे साझा करें</string>
+    <string name="export_share_directly_desc">बिना सहेजे ऐप्स के माध्यम से तुरंत साझा करें</string>
+
+    <string name="export_format_pdf_note">(अंग्रेजी में चिकित्सा रिपोर्ट)</string>
+
+    <string name="menu_network_section">नेटवर्क</string>
+    <string name="menu_cloud_config">Dosezy क्लाउड कॉन्फ़िगरेशन</string>
+    <string name="menu_check_updates">अपडेट की जांच करें</string>
+    <string name="menu_data_section">डेटा</string>
+    <string name="optional">वैकल्पिक</string>
 </resources>

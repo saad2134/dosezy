@@ -66,7 +66,7 @@
     <string name="menu_preferences">Preferenze</string>
     <string name="menu_emergency">Contatti di Emergenza</string>
     <string name="menu_help_support">Aiuto e Supporto</string>
-    <string name="menu_export_data">Esporta Dati in CSV</string>
+    <string name="menu_export_data">Esporta dati</string>
     <string name="menu_switch_profile">Cambia Profilo</string>
     <string name="menu_manage_profiles">Gestisci Profili</string>
     <string name="menu_manage_profile">Gestisci questo Profilo</string>
@@ -260,4 +260,22 @@
     <string name="menu_backup_restore">Backup e Ripristino</string>
     <string name="menu_sharing">Condivisione con Caregiver</string>
     <string name="coming_soon">Prossimamente</string>
+
+    <string name="export_file_format">Formato file</string>
+    <string name="export_format_csv">Formato CSV</string>
+    <string name="export_format_json">Formato JSON</string>
+    <string name="export_format_pdf">Formato PDF</string>
+    <string name="export_save_to">Salva in</string>
+    <string name="export_device_storage">Memoria dispositivo</string>
+    <string name="export_device_storage_desc">Salva nella cartella Download del dispositivo</string>
+    <string name="export_share_directly">Condividi direttamente</string>
+    <string name="export_share_directly_desc">Condividi immediatamente tramite app</string>
+
+    <string name="export_format_pdf_note">(Report medico in inglese)</string>
+
+    <string name="menu_network_section">Rete</string>
+    <string name="menu_cloud_config">Configurazione Cloud Dosezy</string>
+    <string name="menu_check_updates">Controlla aggiornamenti</string>
+    <string name="menu_data_section">Dati</string>
+    <string name="optional">Opzionale</string>
 </resources>

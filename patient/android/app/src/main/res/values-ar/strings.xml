@@ -66,7 +66,7 @@
     <string name="menu_preferences">التفضيلات</string>
     <string name="menu_emergency">جهات اتصال الطوارئ</string>
     <string name="menu_help_support">المساعدة والدعم</string>
-    <string name="menu_export_data">تصدير البيانات كـ CSV</string>
+    <string name="menu_export_data">تصدير البيانات</string>
     <string name="menu_switch_profile">تبديل الملف الشخصي</string>
     <string name="menu_manage_profiles">إدارة الملفات الشخصية</string>
     <string name="menu_manage_profile">إدارة هذا الملف الشخصي</string>
@@ -260,4 +260,22 @@
     <string name="menu_backup_restore">النسخ الاحتياطي والاستعادة</string>
     <string name="menu_sharing">مشاركة مقدم الرعاية</string>
     <string name="coming_soon">قريباً</string>
+
+    <string name="export_file_format">صيغة الملف</string>
+    <string name="export_format_csv">صيغة CSV</string>
+    <string name="export_format_json">صيغة JSON</string>
+    <string name="export_format_pdf">صيغة PDF</string>
+    <string name="export_save_to">حفظ في</string>
+    <string name="export_device_storage">تخزين الجهاز</string>
+    <string name="export_device_storage_desc">الحفظ في مجلد التنزيلات على جهازك</string>
+    <string name="export_share_directly">مشاركة مباشرة</string>
+    <string name="export_share_directly_desc">مشاركة فورية عبر التطبيقات دون حفظ</string>
+
+    <string name="export_format_pdf_note">(تقرير طبي باللغة الإنجليزية)</string>
+
+    <string name="menu_network_section">الشبكة</string>
+    <string name="menu_cloud_config">إعدادات السحابة Dosezy</string>
+    <string name="menu_check_updates">التحقق من التحديثات</string>
+    <string name="menu_data_section">البيانات</string>
+    <string name="optional">اختياري</string>
 </resources>

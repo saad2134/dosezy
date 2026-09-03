@@ -74,7 +74,7 @@
     <string name="menu_emergency">Emergency Contacts</string>
     <string name="menu_help_support">Help &amp; Support</string>
     <string name="menu_data">Data</string>
-    <string name="menu_export_data">Export Data as CSV</string>
+    <string name="menu_export_data">Export Data</string>
     <string name="menu_switch_profile">Switch Profile</string>
     <string name="menu_manage_profiles">Manage Profiles</string>
     <string name="menu_manage_profile">Manage this Profile</string>
@@ -275,4 +275,22 @@
     <string name="menu_backup_restore">Backup &amp; Restore</string>
     <string name="menu_sharing">Caregiver Sharing</string>
     <string name="coming_soon">Coming Soon</string>
+
+    <string name="export_file_format">File Format</string>
+    <string name="export_format_csv">CSV Format</string>
+    <string name="export_format_json">JSON Format</string>
+    <string name="export_format_pdf">PDF Format</string>
+    <string name="export_save_to">Save To</string>
+    <string name="export_device_storage">Device Storage</string>
+    <string name="export_device_storage_desc">Save to your device\'s Downloads folder</string>
+    <string name="export_share_directly">Share Directly</string>
+    <string name="export_share_directly_desc">Share immediately via apps without saving</string>
+
+    <string name="export_format_pdf_note">(Medical report in English)</string>
+
+    <string name="menu_network_section">Network</string>
+    <string name="menu_cloud_config">Dosezy Cloud Configuration</string>
+    <string name="menu_check_updates">Check for Updates</string>
+    <string name="menu_data_section">Data</string>
+    <string name="optional">Optional</string>
 </resources>

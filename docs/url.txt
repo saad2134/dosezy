@@ -1,0 +1,15 @@
+dosezy.app
+dosezy.app/status
+dosezy.app/docs
+dosezy.app/api
+dosezy.app/patient
+dosezy.app/caregiver
+
+status.dosezy.app
+docs.dosezy.app
+
+patient.dosezy.app
+caregiver.dosezy.app
+api.dosezy.app
+
+

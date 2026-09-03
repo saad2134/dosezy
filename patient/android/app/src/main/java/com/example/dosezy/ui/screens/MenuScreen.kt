@@ -20,14 +20,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Emergency
 import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.SwitchAccount
+import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -40,8 +43,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.ui.res.stringResource
-import com.example.dosezy.R
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -57,6 +58,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -68,11 +70,13 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.dosezy.R
 import com.example.dosezy.data.export.DataExporter
 import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.User
 import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.viewmodels.UserViewModel
+import com.example.dosezy.utils.InstallSourceUtils
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -81,6 +85,9 @@ fun MenuScreen(navController: NavController) {
     val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
     val users by userViewModel.users.collectAsState()
     val currentUser by userViewModel.currentUser.collectAsState()
+    var showExportFormatDialog by remember { mutableStateOf(false) }
+    var selectedExportFormat by remember { mutableStateOf(com.example.dosezy.ui.components.ExportFormat.CSV) }
+    var shouldShareDirectly by remember { mutableStateOf(false) }
     var showExportDialog by remember { mutableStateOf(false) }
     var showExportProgress by remember { mutableStateOf(false) }
     var showExportScopeDialog by remember { mutableStateOf(false) }
@@ -99,20 +106,24 @@ fun MenuScreen(navController: NavController) {
         )
     }
 
-    fun startExport(exportAll: Boolean) {
+    fun startExport(
+        exportAll: Boolean,
+        format: com.example.dosezy.ui.components.ExportFormat,
+        shareDirectly: Boolean = false
+    ) {
         showExportProgress = true
         exportError = null
         coroutineScope.launch {
             try {
-                exportFile = if (exportAll) {
-                    dataExporter.exportAllUsersToCsv()
-                } else {
-                    currentUser?.userId?.let { uid ->
-                        dataExporter.exportUserToCsv(uid)
-                    } ?: dataExporter.exportAllUsersToCsv()
-                }
+                val targetUid = if (exportAll) null else currentUser?.userId
+                val file = dataExporter.exportUserData(targetUid, format)
+                exportFile = file
                 showExportProgress = false
-                showExportDialog = true
+                if (shareDirectly) {
+                    dataExporter.shareFile(file)
+                } else {
+                    showExportDialog = true
+                }
             } catch (e: Exception) {
                 exportError = e.message ?: "Export failed"
                 showExportProgress = false
@@ -188,10 +199,57 @@ fun MenuScreen(navController: NavController) {
                 )
             }
 
+            // Network Section Header
+            item {
+                Text(
+                    text = androidx.compose.ui.res.stringResource(R.string.menu_network_section),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+
+            // Dosezy Cloud Configuration (Disabled, Coming Soon, Optional)
+            item {
+                MenuItem(
+                    icon = Icons.Default.Cloud,
+                    title = androidx.compose.ui.res.stringResource(R.string.menu_cloud_config),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    enabled = false,
+                    badge = "${stringResource(R.string.optional)} • ${stringResource(R.string.coming_soon)}",
+                    onClick = {}
+                )
+            }
+
+            // Caregiver Sharing (Disabled, Coming Soon)
+            item {
+                MenuItem(
+                    icon = Icons.Default.People,
+                    title = androidx.compose.ui.res.stringResource(R.string.menu_sharing),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    enabled = false,
+                    badge = stringResource(R.string.coming_soon),
+                    onClick = {}
+                )
+            }
+
+            // Check for Updates
+            item {
+                MenuItem(
+                    icon = Icons.Default.Refresh,
+                    title = androidx.compose.ui.res.stringResource(R.string.menu_check_updates),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    onClick = {
+                        InstallSourceUtils.checkForUpdates(context)
+                    }
+                )
+            }
+
             // Data Section Header
             item {
                 Text(
-                    text = androidx.compose.ui.res.stringResource(R.string.menu_data),
+                    text = androidx.compose.ui.res.stringResource(R.string.menu_data_section),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -211,18 +269,6 @@ fun MenuScreen(navController: NavController) {
                 )
             }
 
-            // Sharing (Disabled, Coming Soon)
-            item {
-                MenuItem(
-                    icon = Icons.Default.People,
-                    title = androidx.compose.ui.res.stringResource(R.string.menu_sharing),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    enabled = false,
-                    badge = androidx.compose.ui.res.stringResource(R.string.coming_soon),
-                    onClick = {}
-                )
-            }
-
             // Export Data
             item {
                 MenuItem(
@@ -230,15 +276,38 @@ fun MenuScreen(navController: NavController) {
                     title = androidx.compose.ui.res.stringResource(R.string.menu_export_data),
                     color = MaterialTheme.colorScheme.onSurface,
                     onClick = {
-                        if (users.size > 1) {
-                            showExportScopeDialog = true
-                        } else {
-                            startExport(exportAll = false)
-                        }
+                        showExportFormatDialog = true
                     }
                 )
             }
         }
+    }
+
+    // Export Format Dialog (CSV, JSON, PDF)
+    if (showExportFormatDialog) {
+        com.example.dosezy.ui.components.ExportDialog(
+            onDismiss = { showExportFormatDialog = false },
+            onExportToDevice = { format ->
+                showExportFormatDialog = false
+                selectedExportFormat = format
+                shouldShareDirectly = false
+                if (users.size > 1) {
+                    showExportScopeDialog = true
+                } else {
+                    startExport(exportAll = false, format = format, shareDirectly = false)
+                }
+            },
+            onShareDirectly = { format ->
+                showExportFormatDialog = false
+                selectedExportFormat = format
+                shouldShareDirectly = true
+                if (users.size > 1) {
+                    showExportScopeDialog = true
+                } else {
+                    startExport(exportAll = false, format = format, shareDirectly = true)
+                }
+            }
+        )
     }
 
     // Export Scope Selection Dialog (Current Profile vs All Profiles)
@@ -259,7 +328,7 @@ fun MenuScreen(navController: NavController) {
                     Button(
                         onClick = {
                             showExportScopeDialog = false
-                            startExport(exportAll = false)
+                            startExport(exportAll = false, format = selectedExportFormat, shareDirectly = shouldShareDirectly)
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -272,7 +341,7 @@ fun MenuScreen(navController: NavController) {
                     OutlinedButton(
                         onClick = {
                             showExportScopeDialog = false
-                            startExport(exportAll = true)
+                            startExport(exportAll = true, format = selectedExportFormat, shareDirectly = shouldShareDirectly)
                         },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp)
