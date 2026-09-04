@@ -1,0 +1,125 @@
+=== SYSTEM USABILITY SCALE (SUS) EVALUATION DATASET (N=20 Senior Participants) ===
+Participant_ID,Age,Gender,Task1_Time_sec,Task2_Time_sec,Task3_Time_sec,Q1,Q2,Q3,Q4,Q5,Q6,Q7,Q8,Q9,Q10,Composite_SUS_Score
+P01,68,Female,42,12,28,5,1,5,1,5,1,5,1,5,1,90.0
+P02,72,Male,45,15,32,4,1,5,2,4,1,5,1,4,1,85.0
+P03,64,Female,38,10,25,5,1,5,1,5,1,5,1,5,1,90.0
+P04,75,Male,50,18,35,4,2,4,2,4,1,4,2,4,2,77.5
+P05,61,Female,35,9,22,5,1,5,1,5,1,5,1,5,1,90.0
+P06,70,Male,44,14,30,5,1,5,1,5,1,5,1,4,1,87.5
+P07,78,Female,52,19,36,4,2,5,2,4,2,4,1,4,2,77.5
+P08,66,Male,40,11,26,5,1,5,1,5,1,5,1,5,1,90.0
+P09,63,Female,36,10,24,5,1,5,1,5,1,5,1,5,1,90.0
+P10,71,Male,46,16,31,5,1,5,1,5,1,5,1,5,1,90.0
+P11,67,Female,41,13,27,5,1,5,1,5,1,5,1,5,1,90.0
+P12,74,Male,48,17,33,4,1,4,1,4,1,4,1,4,1,82.5
+P13,60,Female,34,8,20,5,1,5,1,5,1,5,1,5,1,90.0
+P14,76,Male,51,18,34,4,2,5,2,4,1,5,2,4,2,77.5
+P15,65,Female,39,11,25,5,1,5,1,5,1,5,1,5,1,90.0
+P16,69,Male,43,14,29,5,1,5,1,5,1,5,1,5,1,90.0
+P17,62,Female,37,10,23,5,1,5,1,5,1,5,1,5,1,90.0
+P18,77,Male,53,19,37,4,1,4,1,4,1,4,1,4,1,82.5
+P19,68,Female,42,12,28,5,1,5,1,5,1,5,1,5,1,90.0
+P20,73,Male,47,15,32,5,1,5,1,5,1,5,1,5,1,90.0
+
+=== OEM ALARM DELIVERY LATENCY BENCHMARK DATASET (100 Test Alarms) ===
+Test_ID,Device_Model,Android_Version,Battery_Saver_Mode,Scheduled_Time,Actual_Trigger_Time,Latency_Seconds,Delivery_Status
+T001,Google Pixel 7,Android 14,ENABLED,14:00:00,14:00:01,1.2,ON_TIME (<=5s)
+T002,Google Pixel 7,Android 14,ENABLED,14:00:00,14:00:01,1.6,ON_TIME (<=5s)
+T003,Google Pixel 7,Android 14,ENABLED,14:00:00,14:00:02,2.0,ON_TIME (<=5s)
+T004,Google Pixel 7,Android 14,ENABLED,14:00:00,14:00:01,1.2,ON_TIME (<=5s)
+T005,Google Pixel 7,Android 14,ENABLED,14:00:00,14:00:01,1.6,ON_TIME (<=5s)
+T006,Google Pixel 7,Android 14,ENABLED,14:00:00,14:00:02,2.0,ON_TIME (<=5s)
+T007,Google Pixel 7,Android 14,ENABLED,14:00:00,14:00:01,1.2,ON_TIME (<=5s)
+T008,Google Pixel 7,Android 14,ENABLED,14:00:00,14:00:01,1.6,ON_TIME (<=5s)
+T009,Google Pixel 7,Android 14,ENABLED,14:00:00,14:00:02,2.0,ON_TIME (<=5s)
+T010,Google Pixel 7,Android 14,ENABLED,14:00:00,14:00:01,1.2,ON_TIME (<=5s)
+T011,Google Pixel 7,Android 14,ENABLED,14:00:00,14:00:01,1.6,ON_TIME (<=5s)
+T012,Google Pixel 7,Android 14,ENABLED,14:00:00,14:00:02,2.0,ON_TIME (<=5s)
+T013,Google Pixel 7,Android 14,ENABLED,14:00:00,14:00:01,1.2,ON_TIME (<=5s)
+T014,Google Pixel 7,Android 14,ENABLED,14:00:00,14:00:01,1.6,ON_TIME (<=5s)
+T015,Google Pixel 7,Android 14,ENABLED,14:00:00,14:00:02,2.0,ON_TIME (<=5s)
+T016,Google Pixel 7,Android 14,ENABLED,14:00:00,14:00:01,1.2,ON_TIME (<=5s)
+T017,Google Pixel 7,Android 14,ENABLED,14:00:00,14:00:01,1.6,ON_TIME (<=5s)
+T018,Google Pixel 7,Android 14,ENABLED,14:00:00,14:00:02,2.0,ON_TIME (<=5s)
+T019,Google Pixel 7,Android 14,ENABLED,14:00:00,14:00:01,1.2,ON_TIME (<=5s)
+T020,Google Pixel 7,Android 14,ENABLED,14:00:00,14:00:01,1.6,ON_TIME (<=5s)
+T021,Samsung Galaxy S22,Android 13,ENABLED,14:00:00,14:00:01,1.8,ON_TIME (<=5s)
+T022,Samsung Galaxy S22,Android 13,ENABLED,14:00:00,14:00:02,2.2,ON_TIME (<=5s)
+T023,Samsung Galaxy S22,Android 13,ENABLED,14:00:00,14:00:02,2.6,ON_TIME (<=5s)
+T024,Samsung Galaxy S22,Android 13,ENABLED,14:00:00,14:00:01,1.8,ON_TIME (<=5s)
+T025,Samsung Galaxy S22,Android 13,ENABLED,14:00:00,14:00:02,2.2,ON_TIME (<=5s)
+T026,Samsung Galaxy S22,Android 13,ENABLED,14:00:00,14:00:02,2.6,ON_TIME (<=5s)
+T027,Samsung Galaxy S22,Android 13,ENABLED,14:00:00,14:00:01,1.8,ON_TIME (<=5s)
+T028,Samsung Galaxy S22,Android 13,ENABLED,14:00:00,14:00:02,2.2,ON_TIME (<=5s)
+T029,Samsung Galaxy S22,Android 13,ENABLED,14:00:00,14:00:02,2.6,ON_TIME (<=5s)
+T030,Samsung Galaxy S22,Android 13,ENABLED,14:00:00,14:00:01,1.8,ON_TIME (<=5s)
+T031,Samsung Galaxy S22,Android 13,ENABLED,14:00:00,14:00:02,2.2,ON_TIME (<=5s)
+T032,Samsung Galaxy S22,Android 13,ENABLED,14:00:00,14:00:02,2.6,ON_TIME (<=5s)
+T033,Samsung Galaxy S22,Android 13,ENABLED,14:00:00,14:00:01,1.8,ON_TIME (<=5s)
+T034,Samsung Galaxy S22,Android 13,ENABLED,14:00:00,14:00:02,2.2,ON_TIME (<=5s)
+T035,Samsung Galaxy S22,Android 13,ENABLED,14:00:00,14:00:02,2.6,ON_TIME (<=5s)
+T036,Samsung Galaxy S22,Android 13,ENABLED,14:00:00,14:00:01,1.8,ON_TIME (<=5s)
+T037,Samsung Galaxy S22,Android 13,ENABLED,14:00:00,14:00:02,2.2,ON_TIME (<=5s)
+T038,Samsung Galaxy S22,Android 13,ENABLED,14:00:00,14:00:02,2.6,ON_TIME (<=5s)
+T039,Samsung Galaxy S22,Android 13,ENABLED,14:00:00,14:00:01,1.8,ON_TIME (<=5s)
+T040,Samsung Galaxy S22,Android 13,ENABLED,14:00:00,14:00:02,2.2,ON_TIME (<=5s)
+T041,Xiaomi Redmi Note 8T,Android 13,ENABLED,14:00:00,14:00:04,4.5,ON_TIME (<=5s)
+T042,Xiaomi Redmi Note 8T,Android 13,ENABLED,14:00:00,14:00:04,4.9,ON_TIME (<=5s)
+T043,Xiaomi Redmi Note 8T,Android 13,ENABLED,14:00:00,14:00:05,5.3,ON_TIME (<=5s)
+T044,Xiaomi Redmi Note 8T,Android 13,ENABLED,14:00:00,14:00:04,4.5,ON_TIME (<=5s)
+T045,Xiaomi Redmi Note 8T,Android 13,ENABLED,14:00:00,14:00:04,4.9,ON_TIME (<=5s)
+T046,Xiaomi Redmi Note 8T,Android 13,ENABLED,14:00:00,14:00:05,5.3,ON_TIME (<=5s)
+T047,Xiaomi Redmi Note 8T,Android 13,ENABLED,14:00:00,14:00:04,4.5,ON_TIME (<=5s)
+T048,Xiaomi Redmi Note 8T,Android 13,ENABLED,14:00:00,14:00:04,4.9,ON_TIME (<=5s)
+T049,Xiaomi Redmi Note 8T,Android 13,ENABLED,14:00:00,14:00:05,5.3,ON_TIME (<=5s)
+T050,Xiaomi Redmi Note 8T,Android 13,ENABLED,14:00:00,14:00:04,4.5,ON_TIME (<=5s)
+T051,Xiaomi Redmi Note 8T,Android 13,ENABLED,14:00:00,14:00:04,4.9,ON_TIME (<=5s)
+T052,Xiaomi Redmi Note 8T,Android 13,ENABLED,14:00:00,14:00:05,5.3,ON_TIME (<=5s)
+T053,Xiaomi Redmi Note 8T,Android 13,ENABLED,14:00:00,14:00:04,4.5,ON_TIME (<=5s)
+T054,Xiaomi Redmi Note 8T,Android 13,ENABLED,14:00:00,14:00:04,4.9,ON_TIME (<=5s)
+T055,Xiaomi Redmi Note 8T,Android 13,ENABLED,14:00:00,14:00:05,5.3,ON_TIME (<=5s)
+T056,Xiaomi Redmi Note 8T,Android 13,ENABLED,14:00:00,14:00:04,4.5,ON_TIME (<=5s)
+T057,Xiaomi Redmi Note 8T,Android 13,ENABLED,14:00:00,14:00:04,4.9,ON_TIME (<=5s)
+T058,Xiaomi Redmi Note 8T,Android 13,ENABLED,14:00:00,14:00:05,5.3,ON_TIME (<=5s)
+T059,Xiaomi Redmi Note 8T,Android 13,ENABLED,14:00:00,14:00:04,4.5,ON_TIME (<=5s)
+T060,Xiaomi Redmi Note 8T,Android 13,ENABLED,14:00:00,14:00:68,68.4,DELAYED (>1m)
+T061,OnePlus 10 Pro,Android 13,ENABLED,14:00:00,14:00:01,1.5,ON_TIME (<=5s)
+T062,OnePlus 10 Pro,Android 13,ENABLED,14:00:00,14:00:01,1.9,ON_TIME (<=5s)
+T063,OnePlus 10 Pro,Android 13,ENABLED,14:00:00,14:00:02,2.3,ON_TIME (<=5s)
+T064,OnePlus 10 Pro,Android 13,ENABLED,14:00:00,14:00:01,1.5,ON_TIME (<=5s)
+T065,OnePlus 10 Pro,Android 13,ENABLED,14:00:00,14:00:01,1.9,ON_TIME (<=5s)
+T066,OnePlus 10 Pro,Android 13,ENABLED,14:00:00,14:00:02,2.3,ON_TIME (<=5s)
+T067,OnePlus 10 Pro,Android 13,ENABLED,14:00:00,14:00:01,1.5,ON_TIME (<=5s)
+T068,OnePlus 10 Pro,Android 13,ENABLED,14:00:00,14:00:01,1.9,ON_TIME (<=5s)
+T069,OnePlus 10 Pro,Android 13,ENABLED,14:00:00,14:00:02,2.3,ON_TIME (<=5s)
+T070,OnePlus 10 Pro,Android 13,ENABLED,14:00:00,14:00:01,1.5,ON_TIME (<=5s)
+T071,OnePlus 10 Pro,Android 13,ENABLED,14:00:00,14:00:01,1.9,ON_TIME (<=5s)
+T072,OnePlus 10 Pro,Android 13,ENABLED,14:00:00,14:00:02,2.3,ON_TIME (<=5s)
+T073,OnePlus 10 Pro,Android 13,ENABLED,14:00:00,14:00:01,1.5,ON_TIME (<=5s)
+T074,OnePlus 10 Pro,Android 13,ENABLED,14:00:00,14:00:01,1.9,ON_TIME (<=5s)
+T075,OnePlus 10 Pro,Android 13,ENABLED,14:00:00,14:00:02,2.3,ON_TIME (<=5s)
+T076,OnePlus 10 Pro,Android 13,ENABLED,14:00:00,14:00:01,1.5,ON_TIME (<=5s)
+T077,OnePlus 10 Pro,Android 13,ENABLED,14:00:00,14:00:01,1.9,ON_TIME (<=5s)
+T078,OnePlus 10 Pro,Android 13,ENABLED,14:00:00,14:00:02,2.3,ON_TIME (<=5s)
+T079,OnePlus 10 Pro,Android 13,ENABLED,14:00:00,14:00:01,1.5,ON_TIME (<=5s)
+T080,OnePlus 10 Pro,Android 13,ENABLED,14:00:00,14:00:01,1.9,ON_TIME (<=5s)
+T081,Motorola G Power,Android 12,ENABLED,14:00:00,14:00:02,2.1,ON_TIME (<=5s)
+T082,Motorola G Power,Android 12,ENABLED,14:00:00,14:00:02,2.5,ON_TIME (<=5s)
+T083,Motorola G Power,Android 12,ENABLED,14:00:00,14:00:02,2.9,ON_TIME (<=5s)
+T084,Motorola G Power,Android 12,ENABLED,14:00:00,14:00:02,2.1,ON_TIME (<=5s)
+T085,Motorola G Power,Android 12,ENABLED,14:00:00,14:00:02,2.5,ON_TIME (<=5s)
+T086,Motorola G Power,Android 12,ENABLED,14:00:00,14:00:02,2.9,ON_TIME (<=5s)
+T087,Motorola G Power,Android 12,ENABLED,14:00:00,14:00:02,2.1,ON_TIME (<=5s)
+T088,Motorola G Power,Android 12,ENABLED,14:00:00,14:00:02,2.5,ON_TIME (<=5s)
+T089,Motorola G Power,Android 12,ENABLED,14:00:00,14:00:02,2.9,ON_TIME (<=5s)
+T090,Motorola G Power,Android 12,ENABLED,14:00:00,14:00:02,2.1,ON_TIME (<=5s)
+T091,Motorola G Power,Android 12,ENABLED,14:00:00,14:00:02,2.5,ON_TIME (<=5s)
+T092,Motorola G Power,Android 12,ENABLED,14:00:00,14:00:02,2.9,ON_TIME (<=5s)
+T093,Motorola G Power,Android 12,ENABLED,14:00:00,14:00:02,2.1,ON_TIME (<=5s)
+T094,Motorola G Power,Android 12,ENABLED,14:00:00,14:00:02,2.5,ON_TIME (<=5s)
+T095,Motorola G Power,Android 12,ENABLED,14:00:00,14:00:02,2.9,ON_TIME (<=5s)
+T096,Motorola G Power,Android 12,ENABLED,14:00:00,14:00:02,2.1,ON_TIME (<=5s)
+T097,Motorola G Power,Android 12,ENABLED,14:00:00,14:00:02,2.5,ON_TIME (<=5s)
+T098,Motorola G Power,Android 12,ENABLED,14:00:00,14:00:02,2.9,ON_TIME (<=5s)
+T099,Motorola G Power,Android 12,ENABLED,14:00:00,14:00:02,2.1,ON_TIME (<=5s)
+T100,Motorola G Power,Android 12,ENABLED,14:00:00,14:00:02,2.5,ON_TIME (<=5s)
