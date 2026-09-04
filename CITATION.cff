@@ -1,9 +1,13 @@
 cff-version: 1.2.0
 message: "If you use Dosezy, please cite it as below."
 authors:
-- family-names: "Saad"
-  given-names: "M"
+- family-names: "Mohammed"
+  given-names: "Saaduddin"
+- family-names: "Khan"
+  given-names: "Md Rahif Uddin"
+- family-names: "Mohammed"
+  given-names: "Khwaja"
 title: "Dosezy"
-version: 2.2.1
+version: 2.2.2
 date-released: 2026-08-08
 url: "https://github.com/saad2134/dosezy"

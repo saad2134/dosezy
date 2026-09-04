@@ -1,0 +1,627 @@
+%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
+%
+% Plik:     csagh.sty    [LaTeX Document style: Computer Science, 2013]
+%
+% U¿ycie:   \documentclass[10pt]{article}
+%           \usepackage{csagh}    % w³¹czenie niniejszego stylu
+%           \usepackage{...}      % ewentualnie inne, konieczne pakiety
+%            ...
+%
+% Za³o¿enia:
+%  * rozmiary kolumny strony: 130x190mm (kolumna strony zawiera
+%    tekst zasadniczy --- bez nag³ówków ¿ywej paginy oraz numeracji
+%    stron)
+%  * zak³adamy, i¿ jêzykiem publikacji jest jêzyk angielski
+%  * u¿ycie makra \author{...}{...} dla z³o¿enia nazwisk autorów 
+%    artyku³u wraz z afiliacjami  
+%  * u¿ycie makr \title{...} --- dla z³o¿enia tytu³u g³ównego 
+%  * u¿ycie rodowisk \begin{abstract}...\begin{abstract} do z³o¿enia
+%    streszczenia 
+%  * u¿ycie makr \keywords{...} dla podania s³ów kluczowych artyku³u 
+%  * formatowanie ródtytu³ów: numerowane lub nienumerowane,
+%    wyrównane do lewego brzegu kolumny, sk³adane pogrubionym krojem
+%    pisma, o wielkoci zale¿nej od poziomu zagnie¿d¿enia
+%  * autor powinie przygotowaæ swój artyku³, na wzór wydawnict typu
+%    ,,camera ready'' --- nale¿y zwróciæ uwagê na zalecenia jakie
+%    nak³ada Wydawnictwo Naukowo-Dydaktyczne AGH (czytelnoæ i nale¿yta
+%    estetyka ilustracji, zgodne z wymogami wydawnictwa opisy 
+%    bibliograficzne, w³aciwy uk³ad typograficzny)
+%
+% Pakiety jakie wykorzystuje niniejszy styl, tj.:
+%   ifthen.sty,
+%   exscale.sty,
+%   array.sty,
+%   tabularx.sty
+% --- s¹ pakietami rozpowszechnianymi w podstawowej dystrybucji LaTeX2e.
+% Pozosta³e (np amsmath.sty, amsthm.sty, amssymb.sty graphicx.sty)
+% mog¹ byæ do³¹czone w zale¿noci od potrzeb do pliku g³ównego.
+% Wszyskie pakiety dostêpne s¹ poprzez Internetowe zasoby serwerów FTP,
+% m.in.:
+%   ftp://ftp.tex.ac.uk/tex-archive/macros/latex/required/
+%  http://ctan.org/tex-archive/macros/latex/required
+%
+% Wspó³czesne instalacje, np. TeXLive posiadaj¹ w³asne instalatory, 
+% pomagaj¹ce doinstalowaæ wszelkie niezbêdne komponenty.
+%
+% W przypadku artyku³ów, zawieraj¹cych fragmenty tekstu pisane
+% w jêzyku polskim, zachodzi uzasadnione przypuszczenie ;-) i¿ wyst¹pi¹
+% tam polskie diakrytyki, np. w nazwiskach. To samo dotyczy nazwisk 
+% autorów zagranicznych wielu narodowoci. Zaleca siê u¿ywanie 
+% pakietu babel.sty, np.:
+%
+% \usepackage[russian,polish]{babel}
+%
+% lub stosowanie pakietów wspieraj¹cych sk³adanie dokumentów 
+% w kodowaniu UTF-8:
+%
+% \usepackage[utf8]{inputenc}
+%
+%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
+%
+% Przyk³ad u¿ycia niniejszego pliku stylu:
+%
+%  \documentclass[10pt]{article}
+%  \usepackage{tabularx}
+%  \usepackage{csagh}
+%
+%  \begin{document}
+%  \begin{opening}
+%
+%  \title{Tytu³ referatu}
+%  \author[Instytucja, adres, e-mail autora/autorów]{Autor}
+%
+%  \begin{abstract}
+%    Jak sama nazwa wskazuje... streszczenie angielskie.
+%  \end{abstract}
+%
+%  \keywords{...}
+%
+%  \end{opening}
+%
+%    ...
+%    Zasadniczy tekst artyku³u (...)
+%    ...
+%  \end{document}
+%
+% Referat mo¿e mieæ równie¿ kilku autorów, bêd¹cych przedstawicielami
+% ró¿nych instytucji, wymagaj¹cych ró¿nych afiliacji:
+%
+%  \documentclass[10pt]{article}
+%  \usepackage{tabularx}
+%  \usepackage{csagh}
+%
+%  \begin{document}
+%  \begin{opening}
+%
+%  \author[Instytucja, adres, e-mail pierwszego autora]{Autor-1}
+%
+%  \author[Instytucja, adres, e-mail drugiego autora]{Autor-2}
+%  \autor{Autor-3} % trzeci autor przypisan¹ bêdzie mia³ ostatni¹
+%                  % affiliacjê, czyli identyczn¹ z drugim autorem
+%
+%  \author[Instytucja1, adres1, e-mail1 czwartego autora,
+%          Instytucja2, adres2, e-mail2 czwartego autora,]{Autor-4}
+%
+%  \title{Tytul referatu}
+%
+%  \begin{abstract}
+%    Jak sama nazwa wskazuje... streszczenie.
+%  \end{abstract}
+%
+%  \keywords{...}
+%
+%  \end{opening}
+%
+%    ...
+%    Zasadniczy tekst artyku³u (...)
+%    ...
+%  \end{document}
+%
+%
+% Autor:   Jacek Kmiecik     (jk@pretext.com.pl)
+% Copyr.:  preTeXt           http://www.pretext.com.pl,
+%                            http://www.kmiecik.com.pl
+%
+% Date: v0.1  15.05 2004
+%       v0.2  30.06.2004
+%       v0.3   3.07.2004
+%       v0.4   5.06.2005
+%       v0.5  20.10.2005
+%       v0.6  30.03.2012 (zmiana uk³adu typograficznego periodyku CS)
+%       v0.7   7.01.2013 (poprawa b³êdów elementów 'abstract', 'affiliations'
+%       v0.71 30.03.2013 (poprawki w TeX-kodzie, czyszczenie bugów)
+%       v0.72 27.04.2013 ('incompatible' arabtex!)
+%       v0.73 18.05.2013 (poprawki w TeX-kodzie -- formatowanie \caption)
+%       v0.74 08.05.2013 (czyszczenie kodu, poprawki w short-draft-isnstruction)
+%       v0.75 29.11.2014 (poprawka; Olek B. thx!)
+%
+%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
+
+\NeedsTeXFormat{LaTeX2e}% LaTeX 2.09 can't be used (nor non-LaTeX)
+\ProvidesPackage {csagh}%
+%   [2012/03/30 v0.6  ]
+%   [2013/01/07 v0.7  ]
+%   [2013/03/30 v0.71 ]
+%   [2013/04/27 v0.72 ]
+%   [2013/05/18 v0.73 ]
+%   [2013/06/08 v0.74 ]
+    [2014/11/29 v0.75 LaTeX style: Computer Science; copyr. d(JK)]
+
+\RequirePackage{ifthen}
+\RequirePackage{exscale}
+\RequirePackage{array}
+
+% \newboolean{pl@language}
+% \DeclareOption{pl}{\setboolean{pl@language}{true}}
+% \DeclareOption{en}{\setboolean{pl@language}{false}}
+% \ExecuteOptions{en}
+% \ProcessOptions
+
+\AtBeginDocument{%
+  \InputIfFileExists{cs_local.cfg}%
+    {\typeout{^^J \space[Lokala konfiguracja... Computer Sciencie]^^J}}%
+    {\typeout{^^J \space[Publiczna konfiguracja... Computer Sciencie]^^J}%
+     \let\@head@fik\@empty}%
+  }
+
+\setlength{\paperwidth}      {210mm}
+\setlength{\paperheight}     {297mm}
+\setlength{\textheight}      {190mm}
+\setlength{\textwidth}       {130mm}
+
+\setlength{\topmargin}       {-21mm}
+\setlength{\headheight}      {8.4mm}
+\setlength{\headsep}        {17.5mm}
+\setlength{\topskip}           {0mm}
+\setlength{\footskip}       {52.5mm} % {27.5mm} % v0.4
+
+\setlength{\oddsidemargin}  {14.9mm}
+\setlength{\evensidemargin} {14.9mm}
+\setlength{\marginparwidth}    {0mm}
+\setlength{\marginparsep}      {0mm}
+\setlength{\leftskip}          {0mm}
+\setlength{\rightskip}         {0mm}
+\setlength{\parskip}          {1.5pt plus1pt minus.75pt}
+\setlength{\parindent}        {20pt}
+\setlength{\leftmargini}      {\parindent}
+
+\setlength{\columnseprule}     {0pt}
+
+\renewcommand{\baselinestretch}{1.05}
+\widowpenalty 10000
+\clubpenalty  10000
+\sloppy
+\flushbottom
+
+%
+% Wzglêdnie lepsze/³atwiejsze po³o¿enie ,,float-ów'' na stronach...
+%
+\setcounter     {topnumber}              {3}   %% {2} --- orginal
+\renewcommand   {\topfraction}           {.95} %% {.7}
+\setcounter     {bottomnumber}           {0}   %% {1}
+\renewcommand   {\bottomfraction}        {.3}  %% {.3}
+\setcounter     {totalnumber}            {3}   %% {3}
+\renewcommand   {\textfraction}          {.1}  %% {.2}
+\renewcommand   {\floatpagefraction}     {.75} %% {.5}
+\setcounter     {dbltopnumber}           {2}   %% {2}
+\renewcommand   {\dbltopfraction}        {.8}  %% {.7}
+\renewcommand   {\dblfloatpagefraction}  {.8}  %% {.5}
+
+\newcommand\paginefont{\normalfont\small\ttfamily}
+\newcommand{\h@rule}{\rule[11pt]{\textwidth}{.3pt}}
+
+\newcommand{\ps@CSdraft}{%
+  \renewcommand{\@oddhead} {\@head@fik}% \@empty}%
+  \renewcommand{\@evenhead}{\@head@fik}% \@empty}%
+  \renewcommand{\@oddfoot} {\rightline{\bottompage}\llap{\h@rule}}%
+  \renewcommand{\@evenfoot}{\rightline{\bottompage}\llap{\h@rule}}%
+  }
+
+\newcommand\bottompage{\paginefont
+    \today\qquad{str.\space\thepage/\pageref{LastPage}}}
+
+\pagestyle{CSdraft}
+        % {empty}
+        % {plain}
+
+% ---
+
+\def\titl@format{\fontsize{14pt}{17pt}\sffamily\bfseries}
+\gdef\title #1{\def\@title{#1}}
+
+\newcounter{@autor}
+\newcounter{@dumpautor}
+\setcounter{@autor}    {0}
+\setcounter{@dumpautor}{0}
+\newcounter{temp@cnt}
+\let\author\@undefined
+\gdef\lastaffil{???}
+
+\newcommand\author[2][]{%
+  \stepcounter{@autor}%
+  \def\reserved@a{#1}%
+  \save@Autor{\the@autor}{#2}%
+  \ifx\reserved@a\@empty
+    \setcounter{temp@cnt}{\value{@autor}}%
+    \addtocounter{temp@cnt}{-1}%   
+    \save@AutorAfi{\the@autor}{\dump@AutorAfi{\thetemp@cnt}}%
+  \else
+    \save@AutorAfi{\the@autor}{#1}%
+  \fi
+} 
+
+\newcommand\dump@author{\relax
+  \setcounter{@dumpautor}{0}% reset
+  \whiledo
+    {\value{@dumpautor}<\value{@autor}}
+    {\stepcounter{@dumpautor}%
+     \mbox{\dump@Autor{\the@dumpautor}}%
+     \ifthenelse{\equal{\value{@dumpautor}}{\value{@autor}}}
+       {\relax}
+       {\unskip\newline}%
+    }
+}
+
+\newcommand\dump@author@affil{\relax
+  \setcounter{@dumpautor}{0}% reset
+  \begin{description}
+    \raggedright
+    \whiledo
+     {\value{@dumpautor}<\value{@autor}}
+     {\stepcounter{@dumpautor}%
+      \item[\dump@Autor{\the@dumpautor}]\mbox{}\hfill\\*%
+        {\samepage
+         \dump@AutorAfi{\the@dumpautor}%
+         \ifthenelse{\equal{\value{@dumpautor}}{\value{@autor}}}%
+        {\relax}%
+        {\unskip}}%
+     }\relax
+  \end{description}
+}
+\let\autor\author
+
+\AtEndDocument{%
+  \section*{Affiliations}
+  \begin{footnotesize}
+    \ifthenelse{\equal{\value{@autor}}{0}}%
+    {No Authors... no affiliations... ???\relax}
+    {\dump@author@affil}%
+  \end{footnotesize}\par
+  \bigskip
+  \noindent
+  \parbox{\linewidth}{\small
+    \dump@received\newline
+    \dump@revised \newline
+    \dump@accepted
+  }
+}
+
+\def\@nameedef#1{\expandafter\xdef\csname #1\endcsname}
+
+\def\save@Autor    #1#2{\global\@namedef{autor::#1}{#2}}
+\def\dump@Autor      #1{\@nameuse{autor::#1}}
+\def\save@AutorAfi #1#2{\global\@nameedef{affil::#1}{#2}}
+\def\dump@AutorAfi   #1{\@nameuse{affil::#1}}
+
+\let\affiliation\dump@author@affil
+\let\dumpAutorAfi\dump@AutorAfi
+
+\gdef\date    #1{\def\date@{#1}}
+\def\received #1{\gdef\@received{#1}}
+\def\revised  #1{\gdef\@revised {#1}}
+\def\accepted #1{\gdef\@accepted{#1}}
+
+\def\dump@received {\textbf{Received}: \@ifundefined{@received} {???}{\@received}}
+\def\dump@revised  {\textbf{Revised}:  \@ifundefined{@revised}  {???}{\@revised}}
+\def\dump@accepted {\textbf{Accepted}: \@ifundefined{@accepted} {???}{\@accepted}}
+
+
+\skip\footins = 16pt plus 4pt minus 2pt
+\def\footnoterule{\kern-3\p@
+    \hrule \@width\textwidth \kern 2.6\p@}
+
+\def\no@xists@abstract    {\textsl  {??? Abstract non exists ???}}
+\def\no@xists@title       {\textsl  {??? Title non exists ???}}
+\def\no@xists@author      {\textsl  {??? Author(s) non exists\dots ???}}
+
+\def\abstractsize{\small\slshape}
+
+\def\keywords      #1{\def\@keywords{#1}}
+\def\@setkeywords{%
+  \@ifstar{\@setkeywords@do[???]}{\@setkeywords@do}}
+\newcommand\@setkeywords@do[1][\dump@keywords\@addpunct]{#1}
+\def\@addpunct#1{\ifnum\spacefactor>\@m \else#1\fi}
+
+\let\@keywords=\@empty
+
+\newsavebox{\@abstractbox}
+\def\abstract{%
+   \global\setbox\@abstractbox=\vtop\bgroup
+   \hsize=.856\linewidth
+   \normalfont\abstractsize\noindent\ignorespaces
+ }
+\def\endabstract{\unskip\par\egroup}
+
+% ----------------------------------------------------------------------
+
+\providecommand{\abstractname}{Abstract}
+\providecommand{\keywordsname}{Keywords}
+
+\def\@@abstract{\mbox{\normalfont\small\bfseries\sffamily Abstract}}
+\def\@@keywords{\mbox{\normalfont\small\bfseries\sffamily\keywordsname}}
+
+\newlength  \@col@skip
+\newlength  \@temp@a \settowidth{\@temp@a}{\@@abstract}
+\newlength  \@temp@b \settowidth{\@temp@b}{\@@keywords}
+\newlength  \@dx@tp
+\setlength  \@dx@tp\textwidth
+\setlength  \@col@skip{8pt}
+\ifthenelse{\lengthtest{\@temp@a > \@temp@b}}
+ {\addtolength\@dx@tp{-\@temp@a}}
+ {\addtolength\@dx@tp{-\@temp@b}}
+\addtolength\@dx@tp{-2\@col@skip}
+\addtolength\@dx@tp{-1pt}
+
+\RequirePackage{tabularx}
+
+\def\opening{\global\@topnum\z@}
+\def\endopening
+   {\vspace*{5mm plus 1fill}%
+      \noindent
+      \begin{minipage}[b][180mm][s]{\linewidth}
+        \setlength\parindent{0pt}%
+        \begin{minipage}[t]{\linewidth}
+          \@tp@element{\relax}     {\CS@dumpAuthor}   \vspace{32pt}
+          \@tp@element{\relax}     {\CS@dumpTitle}    
+        \end{minipage}
+        \par
+        \vspace{\stretch{1}}
+        \begin{minipage}[t]{\linewidth}
+          \@tp@element{\@@abstract}{\CS@dumpAbstract} \vspace{22pt}
+          \@tp@element{\@@keywords}{\CS@dumpKeywords}
+        \end{minipage}
+      \removelastskip
+      \vspace{-1ex}
+      \rlap{\makebox[1.17\@temp@b][r]{\raisebox{0mm}[0pt][0pt]{\rule[-0mm]{1pt}{180mm}}}}
+      \end{minipage}
+      \removelastskip
+      \eject
+  }
+
+\newcommand\@tp@element[2]{\noindent
+  \begin{tabularx}{\linewidth}{@{}r X @{}}
+    \makebox[\@temp@b][r]{#1}& #2
+  \end{tabularx}
+  \par
+}
+
+\newcommand\CS@dumpAuthor{%
+  \ifthenelse{\equal{0}{\value{@autor}}}
+   {\no@xists@author}
+   {\large\scshape\dump@author}
+}
+\newcommand\CS@dumpTitle{%
+  \@ifundefined{title}
+   {\no@xists@title}
+   {\PBS\raggedright
+    \titl@format\MakeUppercase\@title}
+}
+\newcommand\CS@dumpAbstract{%
+   \usebox{\@abstractbox}
+}
+\newcommand\CS@dumpKeywords{%
+  \small
+  \PBS\raggedright
+  \let\dump@keywords\@keywords
+  \ifx\@keywords\@empty\@setkeywords*\relax\else\@setkeywords\fi
+}
+
+% ---
+
+\renewcommand\section{\@startsection
+  {section}{1}%
+           {\z@}%
+           {-2.25ex \@plus -1ex \@minus -.2ex}%
+           {2ex \@plus.2ex}%
+           {\normalfont\sffamily\fontsize{13pt}{15pt}\selectfont
+            \bfseries\raggedright}}
+\renewcommand\subsection{\@startsection
+  {subsection}{2}%
+           {\z@}%
+           {-2.00ex\@plus -1ex \@minus -.2ex}%
+           {1ex \@plus .2ex}%
+           {\normalfont\sffamily\fontsize{11pt}{13pt}\selectfont
+            \bfseries\raggedright}}
+\renewcommand\subsubsection{\@startsection
+  {subsubsection}{3}%
+           {\z@}%
+           {-1.75ex\@plus -1ex \@minus -.2ex}%
+           {.75ex \@plus .2ex}%
+           {\normalfont\sffamily\bfseries\normalsize\raggedright}}
+\renewcommand\paragraph{\@startsection
+  {paragraph}{4}%
+           {\z@}%
+           {-1.25ex\@plus -1ex \@minus -.2ex}%
+           {-.333em \@plus .2ex}%
+           {\normalfont\sffamily\bfseries\normalsize}}
+\renewcommand\subparagraph{\@startsection
+  {subparagraph}{4}%
+           {\z@}%
+           {-1.00ex\@plus -1ex \@minus -.2ex}%
+           {-.333em \@plus .2ex}%
+           {\normalfont\sffamily\itshape\normalsize}}
+
+\setcounter{secnumdepth}{3}
+\def\@seccntformat#1%
+    {\csname the#1\endcsname.\hspace{.5em}}
+
+% ---
+
+\setlength  \labelsep  {.333em}
+\setlength  \labelwidth{\leftmargini}
+\addtolength\labelwidth{-\labelsep}
+\setlength\partopsep{0\p@}
+\@beginparpenalty -\@lowpenalty
+\@endparpenalty   -\@lowpenalty
+\@itempenalty     -\@lowpenalty
+\def\@listi  {\leftmargin\leftmargini
+              \parsep  \z@
+              \topsep  \z@
+                 plus .15\baselineskip
+                 minus \z@
+              \itemsep \p@}
+\@listi
+\let\@listI\@listi
+\def\@listii {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep .20\baselineskip
+                plus  .15\baselineskip
+                minus \z@
+              \parsep  \z@
+              \itemsep \p@}
+\def\@listiii{\leftmargin\leftmarginiii
+              \labelwidth\leftmarginiii
+              \advance\labelwidth-\labelsep
+              \itemsep   \p@}
+
+\def\itemize{%
+ \ifnum \@itemdepth >\thr@@\@toodeep\else
+   \advance\@itemdepth\@ne
+   \edef\@itemitem{labelitem\romannumeral\the\@itemdepth}%
+   \expandafter\list
+     \csname\@itemitem\endcsname
+      {\def\makelabel##1{\hss\llap{\reset@font##1}}}%
+ \fi}
+
+\def\enumerate{%
+ \ifnum \@enumdepth >\thr@@\@toodeep\else
+   \advance\@enumdepth\@ne
+   \edef\@enumctr{enum\romannumeral\the\@enumdepth}%
+   \expandafter\list
+     \csname label\@enumctr\endcsname
+      {\usecounter\@enumctr%
+       \def\makelabel##1{\hss\llap{\reset@font##1}}}%
+ \fi}
+
+% ---
+
+\renewcommand\@makefntext[1]{%
+    \parindent 20pt%
+    \noindent\hb@xt@20pt{\hss\@makefnmark}#1}
+
+% ---
+
+\def\verbatim@font{\normalfont\small\ttfamily}
+
+\@ifundefined{url}
+  {\def\url#1{\hmode@bgroup\let\do\@makeother \dospecials\verbatim@font #1\egroup}}
+  {\relax}
+
+% ---
+
+\newcommand\cap@lab@fnt{\normalfont\small\sffamily\bfseries}
+\newcommand\cap@txt@fnt{\normalfont\small\rmfamily}
+\long\def\fig@makecaption#1#2{%
+    \setbox0\hbox{#2}%
+    \ifdim\wd0=\z@%
+        \let\cap@labeldelim\relax\else
+        \def\cap@labeldelim{.}\fi
+  \vskip\abovecaptionskip
+  \sbox\@tempboxa{%
+    {\cap@lab@fnt#1\cap@labeldelim}\nobreakspace{\cap@txt@fnt#2}}%
+  \ifdim \wd\@tempboxa >\hsize
+    \centerlast
+    \unhbox\@tempboxa\par
+  \else
+    \global \@minipagefalse
+    \hb@xt@\hsize{\hfil\box\@tempboxa\hfil}%
+  \fi
+  \vskip\belowcaptionskip}
+
+\long\def\tab@makecaption#1#2{%
+  \vskip\belowcaptionskip
+  \minipage{\linewidth}
+    \centerlast
+    \centerline{\cap@lab@fnt#1}
+    {\cap@txt@fnt#2}\par
+  \endminipage
+  \vskip\abovecaptionskip}
+
+\renewenvironment{figure}
+   {\let\@makecaption\fig@makecaption%
+    \@float{figure}}
+   {\end@float}
+
+\renewenvironment{table}
+   {\let\@makecaption\tab@makecaption%
+    \@float{table}}
+   {\end@float}
+
+\def\@floatboxreset {%
+    \reset@font
+    \normalsize
+    \@setminipage
+    \small
+  }
+
+\ifx\@undefined\centerlast
+\newcommand*\centerlast{%
+  \addtolength{\leftskip}    {0pt plus  1fil}%
+  \addtolength{\rightskip}   {0pt plus -1fil}%
+  \setlength  {\parfillskip} {0pt plus  2fil}%
+  }
+\fi
+
+% ---
+
+\def\ack@name {Acknowledgements}
+\newenvironment{acknowledgements}{%
+  \subsection*{\ack@name}
+   \begin{itshape}\ignorespaces
+  }
+  {\end{itshape}}
+
+% ---
+
+\let\todayPL\today
+\begingroup
+  \count@\time
+  \divide\count@ 60
+  \count2=-\count@
+  \multiply\count2 60
+  \advance\count2 \time
+  \global\edef\today{%
+    \the\year/\two@digits{\the\month}/\two@digits{\the\day};\space%
+      \two@digits{\the\count@}:\two@digits{\the\count2}}
+\endgroup
+
+\def\lastpage@makelabel{\addtocounter{page}{-1}%
+    \immediate\write\@auxout{\string
+        \newlabel{LastPage}{{}{\thepage}}}%
+    \addtocounter{page}{1}}
+\AtEndDocument{\clearpage\lastpage@makelabel}%
+
+\@ifundefined{eqref}{\let\eqref\EQref}{}
+\newcommand\EQref[1]{\bgroup\rmfamily\upshape(\ref{#1})\egroup}
+
+\@ifundefined{PreserveBackslash}
+ {\newcommand\PreserveBackslash[1]{\let\temp=\\#1\let\\=\temp}
+  \let\PBS=\PreserveBackslash
+ }{}
+
+\def\dywiz{\kern0sp\discretionary{-}{-}{-}\penalty10000\hskip0sp\relax}
+\let\dyw\dywiz
+
+\RequirePackage{url}
+\def\URL{\noexpand\url}
+
+\AtBeginDocument{%
+ \g@addto@macro\@floatboxreset\centering
+}
+
+% ---
+
+\endinput
+
+% -*- TeX:PL -*-
