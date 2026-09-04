@@ -1,0 +1,1 @@
+Simple medicine tracker & reminders. Enter details, we'll handle the rest.

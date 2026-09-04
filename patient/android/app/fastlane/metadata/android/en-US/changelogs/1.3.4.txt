@@ -1,0 +1,7 @@
+* Support for system Dark/Light theme and refined high-contrast colors.
+* Flexible scheduling with support for specific days of week/month.
+* Smarter alarms with auto-rescheduling on timezone changes.
+* Exact alarm capability checks for more reliable alerts.
+* Enhanced profile photo picker & camera permission flows.
+* Fixed new user crash on select devices.
+* UI styling improvements in Edit Medication screen.

@@ -1,0 +1,14 @@
+* International Emergency Services: Country/region picker with 10 countries and quick personal contacts setup.
+* Full-Screen Medicine Alarm: High-contrast responsive layout supporting localized alarm text, user time formatting preferences, and custom snooze.
+* Customizable Snooze Duration: Choose from 5, 10, 15, 20, or 30 minutes in Preferences.
+* Custom Late & Missed Thresholds: Configure "Consider Late After" and "Consider Missed After" settings.
+* High-Visibility Late Indicators: Orange late badge styling with time-ago display on Home screen.
+* 12-First Interactive Grid Time Picker: Easy 12-hour and 24-hour hour & minute selection with quick-tap chips.
+* Skeleton Loading: Smooth loading placeholders instead of empty-screen flicker on Home and Medicines pages.
+* App Footprint Optimization: APK size reduced by ~70% using R8 tree-shaking and resource pruning.
+* Enhanced multi-profile management, data export, calendar full-page scrolling, and accessibility options.
+* Emergency Contacts Deletion Safety: Added a confirmation popup when deleting a personal contact to prevent accidental deletion.
+* Image Management: Added a "Remove Picture" option in both Profile and Medication add/manage screens to allow returning to an imageless state.
+* Tintless UI Popups: Disabled blueish elevation tint globally across all dialogs, bottom sheets, and select image source screens.
+* Calendar Loading Fix: Resolved an infinite skeleton loader hang when navigating daily schedules.
+* Support Improvements: Removed phone support option in Help and Support for simplified communication.

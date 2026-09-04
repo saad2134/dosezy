@@ -1,0 +1,5 @@
+* New Medication Analytics Screen: Track overall adherence percentage, doses taken on time vs late vs missed, past 7-day adherence trend, and active usage duration.
+* Menu Navigation Enhancements: Added Analytics shortcut above Preferences, and placeholder indicators for upcoming Backup & Restore and Caregiver Sharing features.
+* Enhanced Preferences Icons: Updated distinctive icons for Consider Late After, Consider Missed After, and Snooze Duration settings.
+* Complete 12-Language Localization: Handcrafted translations for all new analytics and menu features across English, Spanish, Hindi, Chinese, Portuguese, Arabic, French, German, Japanese, Russian, Italian, and Bengali.
+* Build & Performance Improvements: Version 2.2.1 release optimizations.

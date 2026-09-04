@@ -1,0 +1,6 @@
+* Automatic Emergency Number Detection: Detects country emergency contacts based on device SIM/network country ISO and system locale fallback.
+* Form Scrollability: Added smooth vertical scrolling to Add Medication screen to prevent clipping on all screen aspect ratios and text scaling levels.
+* Notification Management: Instant automatic notification dismissal when alarms are taken or snoozed directly from the full-screen alarm interface.
+* Privacy & Minimal Permissions Footprint: Cleaned up unused permission declarations (READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, READ_MEDIA_IMAGES, ACCESS_NETWORK_STATE) for strict offline-first compliance.
+* Native Exports & Reorganized Menu: Added native PDF health report generation, structured JSON backups, dedicated Network (Dosezy Cloud Configuration optional placeholder, Caregiver Sharing, Check for Updates) and Data menu sections.
+* Multi-Store Update Checks: Automatically detects installation store source (Google Play, F-Droid, Huawei AppGallery, Samsung Galaxy Store, Xiaomi GetApps, Amazon Appstore, GitHub) with native store or web browser fallback.
