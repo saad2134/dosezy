@@ -1,0 +1,243 @@
+---
+---
+
+<!-- Fixed Floating AI Assistant Chat Widget (Bottom Right) -->
+<div id="ai-chat-widget" class="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 font-sans pointer-events-none">
+  
+  <!-- Chat Window Drawer (Anchored Absolutely Above Squircle Trigger) -->
+  <div 
+    id="ai-chat-window" 
+    class="hidden pointer-events-auto absolute bottom-16 right-0 w-[calc(100vw-2.5rem)] max-w-sm sm:w-96 bg-[#0a0c10]/95 backdrop-blur-2xl border border-white/20 rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden transform opacity-0 scale-95 transition-all duration-300 origin-bottom-right"
+  >
+    <!-- Header Bar -->
+    <div class="px-4 py-3.5 bg-[#12151c]/90 border-b border-white/10 flex items-center justify-between">
+      <div class="flex items-center space-x-2.5">
+        <div class="relative w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 p-[1px] shadow-md flex items-center justify-center shrink-0">
+          <div class="w-full h-full bg-[#0a0c10] rounded-[11px] flex items-center justify-center text-sky-400">
+            <svg class="w-4 h-4 text-sky-400" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2C12 7.52285 7.52285 12 2 12C7.52285 12 12 16.4771 12 22C12 16.4771 16.4771 12 22 12C16.4771 12 12 7.52285 12 2Z" fill="url(#hdr-ai-grad)"/>
+              <path d="M19 2C19 4.20914 17.2091 6 15 6C17.2091 6 19 7.79086 19 10C19 7.79086 20.7909 6 23 6C20.7909 6 19 4.20914 19 2Z" fill="#38BDF8"/>
+              <defs>
+                <linearGradient id="hdr-ai-grad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#38BDF8"/>
+                  <stop offset="1" stop-color="#818CF8"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#0a0c10]"></span>
+        </div>
+        <div>
+          <h4 class="font-bold text-white text-xs font-display">
+            Dosezy AI Assistant
+          </h4>
+          <p class="text-[10px] text-neutral-400 font-mono">Local-First Guide & Support</p>
+        </div>
+      </div>
+
+      <!-- Close Button -->
+      <button 
+        id="ai-chat-close-btn"
+        type="button"
+        class="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10 transition-colors focus:outline-none cursor-pointer"
+        aria-label="Close AI Chat Assistant"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Chat Messages Scroll Container -->
+    <div id="ai-chat-messages" class="p-4 h-72 overflow-y-auto space-y-3.5 text-xs leading-relaxed bg-grid-pattern">
+      <!-- Initial AI Greeting -->
+      <div class="flex items-start space-x-2.5">
+        <div class="w-6 h-6 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center shrink-0 mt-0.5">
+          <svg class="w-3.5 h-3.5 text-sky-400" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2C12 7.52285 7.52285 12 2 12C7.52285 12 12 16.4771 12 22C12 16.4771 16.4771 12 22 12C16.4771 12 12 7.52285 12 2Z" fill="#38BDF8"/>
+          </svg>
+        </div>
+        <div class="bg-[#12151c] p-3 rounded-2xl border border-white/10 text-neutral-200 space-y-1.5 max-w-[85%]">
+          <p>Hello! I am <strong>Dosezy AI</strong>. How can I assist your medication management today?</p>
+          <p class="text-[11px] text-neutral-400">Ask me anything about local-first privacy, grid pickers, caregiver cloud sync, or self-hosting!</p>
+        </div>
+      </div>
+
+      <!-- Quick Action Suggestion Chips -->
+      <div id="ai-quick-chips" class="pt-1 flex flex-wrap gap-1.5 pl-8">
+        <button data-query="How does local-first offline privacy work?" class="chip-btn text-[10px] font-mono px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 text-sky-300 border border-white/10 hover:border-sky-500/30 transition-all text-left cursor-pointer">
+          🔒 Offline Privacy
+        </button>
+        <button data-query="What is the 12-Hour Grid Time Picker?" class="chip-btn text-[10px] font-mono px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 text-sky-300 border border-white/10 hover:border-sky-500/30 transition-all text-left cursor-pointer">
+          ⏰ 12-Hour Grid Picker
+        </button>
+        <button data-query="How does Caregiver Cloud Sync work?" class="chip-btn text-[10px] font-mono px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 text-sky-300 border border-white/10 hover:border-sky-500/30 transition-all text-left cursor-pointer">
+          ☁️ Caregiver Cloud
+        </button>
+        <button data-query="How can I self-host Dosezy on Docker?" class="chip-btn text-[10px] font-mono px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 text-sky-300 border border-white/10 hover:border-sky-500/30 transition-all text-left cursor-pointer">
+          🐳 Self-Hosting
+        </button>
+      </div>
+    </div>
+
+    <!-- Input Form Footer -->
+    <form id="ai-chat-form" class="p-2.5 bg-[#12151c]/90 border-t border-white/10 flex items-center space-x-2">
+      <input 
+        type="text"
+        id="ai-chat-input"
+        placeholder="Type a question about Dosezy..."
+        required
+        autocomplete="off"
+        class="flex-1 px-3.5 py-2 rounded-xl bg-[#030407] border border-white/10 text-white text-xs placeholder-neutral-500 focus:outline-none focus:border-sky-500/60 transition-colors"
+      />
+      <button 
+        type="submit"
+        class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white text-xs font-bold transition-all shadow-md flex items-center justify-center shrink-0 cursor-pointer"
+        aria-label="Send Message"
+      >
+        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+        </svg>
+      </button>
+    </form>
+  </div>
+
+  <!-- Squircle Trigger Button (Fixed In Place, Custom High-End AI Sparkle Emblem) -->
+  <button 
+    id="ai-chat-trigger-btn"
+    type="button"
+    class="pointer-events-auto relative w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 via-blue-600 to-indigo-600 hover:from-sky-400 hover:via-blue-500 hover:to-indigo-500 text-white shadow-[0_8px_25px_rgba(2,132,199,0.45)] hover:shadow-[0_0_20px_rgba(56,189,248,0.6)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center border border-white/20 cursor-pointer group"
+    aria-label="Open Dosezy AI Assistant"
+  >
+    <svg class="w-5 h-5 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 drop-shadow-[0_2px_8px_rgba(56,189,248,0.5)]" viewBox="0 0 24 24" fill="none">
+      <path d="M12 2C12 7.52285 7.52285 12 2 12C7.52285 12 12 16.4771 12 22C12 16.4771 16.4771 12 22 12C16.4771 12 12 7.52285 12 2Z" fill="url(#trg-ai-grad)"/>
+      <path d="M19 2C19 4.20914 17.2091 6 15 6C17.2091 6 19 7.79086 19 10C19 7.79086 20.7909 6 23 6C20.7909 6 19 4.20914 19 2Z" fill="#38BDF8"/>
+      <defs>
+        <linearGradient id="trg-ai-grad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#FFFFFF"/>
+          <stop offset="1" stop-color="#38BDF8"/>
+        </linearGradient>
+      </defs>
+    </svg>
+
+    <!-- Online Pulse Status Badge -->
+    <span class="absolute -top-1 -right-1 flex h-3 w-3">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-300 opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-400 border-2 border-[#0a0c10]"></span>
+    </span>
+  </button>
+
+</div>
+
+<!-- Client Interactive Script for AI Assistant Chat Widget -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const triggerBtn = document.getElementById('ai-chat-trigger-btn');
+    const closeBtn = document.getElementById('ai-chat-close-btn');
+    const chatWindow = document.getElementById('ai-chat-window');
+    const chatMessages = document.getElementById('ai-chat-messages');
+    const chatForm = document.getElementById('ai-chat-form') as HTMLFormElement | null;
+    const chatInput = document.getElementById('ai-chat-input') as HTMLInputElement | null;
+    const chipBtns = document.querySelectorAll('.chip-btn');
+
+    const KNOWLEDGE_BASE: Record<string, string> = {
+      privacy: "🔒 **100% Local Privacy**: Dosezy omits `android.permission.INTERNET` from its core Android manifest. Your prescription schedules and medical history stay 100% offline inside an encrypted local SQLite Room database.",
+      grid: "⏰ **12-Hour Grid Time Picker**: Designed specifically for geriatric accessibility and tremor reduction! Replaces rotating radial clock dials with 12 stationary, high-contrast touch targets (48 × 48 dp min).",
+      cloud: "☁️ **Dosezy Cloud**: An optional managed service for families. Provides caregiver web portal monitoring at `app.dosezy.com` with real-time missed dose push alerts and patient-controlled E2EE consent.",
+      selfhost: "🐳 **Self-Hosting**: You can deploy your own private sync node on Docker Compose & PostgreSQL (`server/`). It provides complete hardware sovereignty with zero external API calls.",
+      download: "📱 **Downloading Dosezy**: Patient App (v2.2.2) is free and available via direct APK sideload or F-Droid! Check out `/patient` for download packages."
+    };
+
+    function toggleChat(show?: boolean) {
+      if (!chatWindow) return;
+      const willShow = show !== undefined ? show : chatWindow.classList.contains('hidden');
+      if (willShow) {
+        chatWindow.classList.remove('hidden');
+        requestAnimationFrame(() => {
+          chatWindow.classList.remove('opacity-0', 'scale-95');
+          chatWindow.classList.add('opacity-100', 'scale-100');
+        });
+      } else {
+        chatWindow.classList.remove('opacity-100', 'scale-100');
+        chatWindow.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => {
+          chatWindow.classList.add('hidden');
+        }, 200);
+      }
+    }
+
+    if (triggerBtn) triggerBtn.addEventListener('click', () => toggleChat());
+    if (closeBtn) closeBtn.addEventListener('click', () => toggleChat(false));
+
+    function appendUserMessage(text: string) {
+      if (!chatMessages) return;
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'flex justify-end';
+      msgDiv.innerHTML = `
+        <div class="bg-sky-600 text-white p-3 rounded-2xl max-w-[85%] text-xs shadow-md">
+          ${text}
+        </div>
+      `;
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function appendAiReply(replyText: string) {
+      if (!chatMessages) return;
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'flex items-start space-x-2.5 animate-fade-in';
+      msgDiv.innerHTML = `
+        <div class="w-6 h-6 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center shrink-0 mt-0.5">
+          <svg class="w-3.5 h-3.5 text-sky-400" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2C12 7.52285 7.52285 12 2 12C7.52285 12 12 16.4771 12 22C12 16.4771 16.4771 12 22 12C16.4771 12 12 7.52285 12 2Z" fill="#38BDF8"/>
+          </svg>
+        </div>
+        <div class="bg-[#12151c] p-3 rounded-2xl border border-white/10 text-neutral-200 leading-relaxed max-w-[85%]">
+          ${replyText}
+        </div>
+      `;
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function handleQuery(query: string) {
+      appendUserMessage(query);
+
+      const q = query.toLowerCase();
+      let response = "I'm glad you asked! Dosezy is an open-source, local-first medicine tracker. You can explore our Patient Application, Caregiver Cloud, or Architecture specs anytime from the top navigation bar.";
+
+      if (q.includes('privac') || q.includes('offlin') || q.includes('data')) {
+        response = KNOWLEDGE_BASE.privacy;
+      } else if (q.includes('grid') || q.includes('time') || q.includes('picker') || q.includes('clock')) {
+        response = KNOWLEDGE_BASE.grid;
+      } else if (q.includes('cloud') || q.includes('caregiver') || q.includes('sync') || q.includes('alert')) {
+        response = KNOWLEDGE_BASE.cloud;
+      } else if (q.includes('host') || q.includes('docker') || q.includes('server')) {
+        response = KNOWLEDGE_BASE.selfhost;
+      } else if (q.includes('download') || q.includes('apk') || q.includes('fdroid') || q.includes('app')) {
+        response = KNOWLEDGE_BASE.download;
+      }
+
+      setTimeout(() => {
+        appendAiReply(response);
+      }, 500);
+    }
+
+    chipBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const query = btn.getAttribute('data-query');
+        if (query) handleQuery(query);
+      });
+    });
+
+    if (chatForm && chatInput) {
+      chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = chatInput.value.trim();
+        if (!text) return;
+        chatInput.value = '';
+        handleQuery(text);
+      });
+    }
+  });
+</script>

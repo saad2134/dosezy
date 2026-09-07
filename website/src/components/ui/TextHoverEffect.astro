@@ -1,0 +1,175 @@
+---
+interface Props {
+  text?: string;
+}
+
+const { text = "DOSEZY" } = Astro.props;
+---
+
+<div class="w-full h-full flex items-center justify-center relative">
+  <svg
+    id="text-hover-svg"
+    width="100%"
+    height="100%"
+    viewBox="0 0 300 100"
+    xmlns="http://www.w3.org/2000/svg"
+    class="select-none cursor-pointer overflow-visible"
+  >
+    <defs>
+      <!-- Blue theme hover gradient -->
+      <linearGradient
+        id="dosezyTextGradient"
+        gradientUnits="userSpaceOnUse"
+        cx="50%"
+        cy="50%"
+        r="25%"
+      >
+        <stop offset="0%" stop-color="#38bdf8"></stop>
+        <stop offset="25%" stop-color="#60a5fa"></stop>
+        <stop offset="50%" stop-color="#0284c7"></stop>
+        <stop offset="75%" stop-color="#2563eb"></stop>
+        <stop offset="100%" stop-color="#0ea5e9"></stop>
+      </linearGradient>
+
+      <!-- Dynamic Radial Reveal Mask -->
+      <radialGradient
+        id="dosezyRevealMask"
+        gradientUnits="userSpaceOnUse"
+        r="25%"
+        cx="50%"
+        cy="50%"
+      >
+        <stop offset="0%" stop-color="white" stop-opacity="1"></stop>
+        <stop offset="100%" stop-color="black" stop-opacity="0"></stop>
+      </radialGradient>
+
+      <mask id="dosezyTextMask">
+        <rect x="0" y="0" width="100%" height="100%" fill="url(#dosezyRevealMask)"></rect>
+      </mask>
+    </defs>
+
+    <!-- Base Stroke Layer -->
+    <text
+      x="50%"
+      y="50%"
+      text-anchor="middle"
+      dominant-baseline="middle"
+      stroke-width="0.3"
+      class="fill-transparent stroke-neutral-800 font-extrabold text-7xl tracking-tighter transition-opacity duration-500"
+      id="base-text"
+    >
+      {text}
+    </text>
+
+    <!-- Animated Dashstroke Layer -->
+    <text
+      x="50%"
+      y="50%"
+      text-anchor="middle"
+      dominant-baseline="middle"
+      stroke-width="0.3"
+      class="fill-transparent stroke-neutral-800/60 font-extrabold text-7xl tracking-tighter animate-dashstroke"
+    >
+      {text}
+    </text>
+
+    <!-- Blue Gradient Reveal Text Layer on Mask -->
+    <text
+      x="50%"
+      y="50%"
+      text-anchor="middle"
+      dominant-baseline="middle"
+      stroke="url(#dosezyTextGradient)"
+      stroke-width="0.45"
+      mask="url(#dosezyTextMask)"
+      class="fill-sky-500/10 font-extrabold text-7xl tracking-tighter"
+    >
+      {text}
+    </text>
+  </svg>
+</div>
+
+<script>
+  const svg = document.getElementById('text-hover-svg') as SVGSVGElement | null;
+  const mask = document.getElementById('dosezyRevealMask') as SVGElement | null;
+  const baseText = document.getElementById('base-text');
+
+  if (svg && mask) {
+    let currentCx = 50;
+    let currentCy = 50;
+    let targetCx = 50;
+    let targetCy = 50;
+    let animFrameId: number | null = null;
+    let isHovered = false;
+
+    function updateMaskPosition() {
+      // Smooth interpolation (lerp) towards target position
+      const dx = targetCx - currentCx;
+      const dy = targetCy - currentCy;
+
+      currentCx += dx * 0.1;
+      currentCy += dy * 0.1;
+
+      if (mask) {
+        mask.setAttribute('cx', `${currentCx}%`);
+        mask.setAttribute('cy', `${currentCy}%`);
+      }
+
+      // Continue animating until position has converged
+      if (Math.abs(dx) > 0.05 || Math.abs(dy) > 0.05 || isHovered) {
+        animFrameId = requestAnimationFrame(updateMaskPosition);
+      } else {
+        currentCx = targetCx;
+        currentCy = targetCy;
+        if (mask) {
+          mask.setAttribute('cx', `${currentCx}%`);
+          mask.setAttribute('cy', `${currentCy}%`);
+        }
+        animFrameId = null;
+      }
+    }
+
+    function startAnimation() {
+      if (!animFrameId) {
+        animFrameId = requestAnimationFrame(updateMaskPosition);
+      }
+    }
+
+    svg.addEventListener('mouseenter', (e) => {
+      isHovered = true;
+      if (baseText) baseText.style.opacity = '0.75';
+      const rect = svg.getBoundingClientRect();
+      targetCx = ((e.clientX - rect.left) / rect.width) * 100;
+      targetCy = ((e.clientY - rect.top) / rect.height) * 100;
+      startAnimation();
+    });
+
+    svg.addEventListener('mousemove', (e) => {
+      const rect = svg.getBoundingClientRect();
+      targetCx = ((e.clientX - rect.left) / rect.width) * 100;
+      targetCy = ((e.clientY - rect.top) / rect.height) * 100;
+      startAnimation();
+    });
+
+    svg.addEventListener('mouseleave', () => {
+      isHovered = false;
+      if (baseText) baseText.style.opacity = '0.4';
+      targetCx = 50;
+      targetCy = 50;
+      startAnimation();
+    });
+  }
+</script>
+
+<style>
+  @keyframes dash {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  .animate-dashstroke {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: dash 5s ease-in-out infinite alternate;
+  }
+</style>

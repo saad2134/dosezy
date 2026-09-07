@@ -1,0 +1,261 @@
+---
+---
+
+<section id="demo" class="py-20 relative bg-grid-pattern overflow-hidden border-t border-white/10">
+  
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Section Header -->
+    <div class="text-center max-w-3xl mx-auto mb-14">
+      <span class="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-sky-500/10 text-sky-300 border border-sky-500/20">
+        INTERACTIVE DEMONSTRATION
+      </span>
+      <h2 class="mt-4 text-3xl sm:text-5xl font-extrabold text-white font-display">
+        Experience the 12-Hour Grid Picker
+      </h2>
+      <p class="mt-4 text-base sm:text-lg text-neutral-400 leading-relaxed">
+        Try Dosezy's stationary button layout directly in your browser. Engineered to eliminate fine motor tracking demands and eliminate accidental taps.
+      </p>
+    </div>
+
+    <!-- Interactive Workspace Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- Left Side: Interactive 12-Hour Grid Picker Card -->
+      <div class="lg:col-span-7 vercel-card p-6 sm:p-8 rounded-3xl relative border border-white/10 shadow-2xl bg-[#0a0c10]/90">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
+          <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-sm">
+              ⏰
+            </div>
+            <div>
+              <h3 class="font-bold text-white text-base">Select Medication Schedule</h3>
+              <p class="text-xs text-neutral-400">12-First Discrete Touch Layout</p>
+            </div>
+          </div>
+          <span class="text-xs font-mono px-2.5 py-1 rounded-md bg-sky-500/10 text-sky-300 border border-sky-500/20">
+            Stationary Targets
+          </span>
+        </div>
+
+        <!-- Live Clock Display Box -->
+        <div class="bg-[#12151c] rounded-2xl p-5 border border-white/10 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <span class="text-xs uppercase font-mono text-neutral-400 block mb-1">Selected Alarm Time</span>
+            <div class="flex items-baseline space-x-2">
+              <span id="display-time" class="text-4xl sm:text-5xl font-extrabold text-white font-mono tracking-tight">08:30</span>
+              <span id="display-period" class="text-xl font-bold text-sky-400 font-mono">AM</span>
+            </div>
+          </div>
+          
+          <div class="flex items-center space-x-2 bg-black/40 p-1.5 rounded-xl border border-white/10">
+            <button id="btn-am" class="px-4 py-2 rounded-lg text-xs font-bold transition-all bg-blue-600 text-white shadow-md">
+              AM
+            </button>
+            <button id="btn-pm" class="px-4 py-2 rounded-lg text-xs font-bold transition-all text-neutral-400 hover:text-white">
+              PM
+            </button>
+          </div>
+        </div>
+
+        <!-- 12-Hour Stationary Button Grid -->
+        <div class="mb-6">
+          <label class="block text-xs font-mono font-semibold text-neutral-400 uppercase mb-3">Hour (1 — 12)</label>
+          <div class="grid grid-cols-4 sm:grid-cols-6 gap-2.5" id="hour-grid">
+            <button data-hour="01" class="hour-btn py-3 rounded-xl border border-white/10 text-sm font-bold bg-white/5 hover:bg-white/10 text-neutral-300 transition-all">01</button>
+            <button data-hour="02" class="hour-btn py-3 rounded-xl border border-white/10 text-sm font-bold bg-white/5 hover:bg-white/10 text-neutral-300 transition-all">02</button>
+            <button data-hour="03" class="hour-btn py-3 rounded-xl border border-white/10 text-sm font-bold bg-white/5 hover:bg-white/10 text-neutral-300 transition-all">03</button>
+            <button data-hour="04" class="hour-btn py-3 rounded-xl border border-white/10 text-sm font-bold bg-white/5 hover:bg-white/10 text-neutral-300 transition-all">04</button>
+            <button data-hour="05" class="hour-btn py-3 rounded-xl border border-white/10 text-sm font-bold bg-white/5 hover:bg-white/10 text-neutral-300 transition-all">05</button>
+            <button data-hour="06" class="hour-btn py-3 rounded-xl border border-white/10 text-sm font-bold bg-white/5 hover:bg-white/10 text-neutral-300 transition-all">06</button>
+            <button data-hour="07" class="hour-btn py-3 rounded-xl border border-white/10 text-sm font-bold bg-white/5 hover:bg-white/10 text-neutral-300 transition-all">07</button>
+            <button data-hour="08" class="hour-btn py-3 rounded-xl border-sky-500/60 text-sm font-bold bg-sky-500/20 text-white transition-all shadow-[0_0_15px_rgba(2,132,199,0.3)]">08</button>
+            <button data-hour="09" class="hour-btn py-3 rounded-xl border border-white/10 text-sm font-bold bg-white/5 hover:bg-white/10 text-neutral-300 transition-all">09</button>
+            <button data-hour="10" class="hour-btn py-3 rounded-xl border border-white/10 text-sm font-bold bg-white/5 hover:bg-white/10 text-neutral-300 transition-all">10</button>
+            <button data-hour="11" class="hour-btn py-3 rounded-xl border border-white/10 text-sm font-bold bg-white/5 hover:bg-white/10 text-neutral-300 transition-all">11</button>
+            <button data-hour="12" class="hour-btn py-3 rounded-xl border border-white/10 text-sm font-bold bg-white/5 hover:bg-white/10 text-neutral-300 transition-all">12</button>
+          </div>
+        </div>
+
+        <!-- Quick Minute Chips -->
+        <div class="mb-6">
+          <label class="block text-xs font-mono font-semibold text-neutral-400 uppercase mb-3">Minute Chips</label>
+          <div class="grid grid-cols-4 gap-2.5" id="minute-grid">
+            <button data-minute="00" class="minute-btn py-2.5 rounded-xl border border-white/10 text-xs font-bold bg-white/5 text-neutral-300">00 min</button>
+            <button data-minute="15" class="minute-btn py-2.5 rounded-xl border border-white/10 text-xs font-bold bg-white/5 text-neutral-300">15 min</button>
+            <button data-minute="30" class="minute-btn py-2.5 rounded-xl border-sky-500/60 text-xs font-bold bg-sky-500/20 text-white shadow-[0_0_15px_rgba(2,132,199,0.3)]">30 min</button>
+            <button data-minute="45" class="minute-btn py-2.5 rounded-xl border border-white/10 text-xs font-bold bg-white/5 text-neutral-300">45 min</button>
+          </div>
+        </div>
+
+        <!-- Dose Quick Selector -->
+        <div>
+          <label class="block text-xs font-mono font-semibold text-neutral-400 uppercase mb-3">Prescription Preset</label>
+          <div class="flex flex-wrap gap-2" id="dose-grid">
+            <button data-dose="1 Pill (500mg)" class="dose-btn px-3.5 py-2 rounded-lg border border-sky-500/40 text-xs font-medium bg-sky-500/10 text-sky-300">💊 1 Pill (500mg)</button>
+            <button data-dose="2 Tablets" class="dose-btn px-3.5 py-2 rounded-lg border border-white/10 text-xs font-medium bg-white/5 text-neutral-400 hover:text-white">💊 2 Tablets</button>
+            <button data-dose="5 ml Syrup" class="dose-btn px-3.5 py-2 rounded-lg border border-white/10 text-xs font-medium bg-white/5 text-neutral-400 hover:text-white">🧪 5 ml Syrup</button>
+            <button data-dose="1 Capsule" class="dose-btn px-3.5 py-2 rounded-lg border border-white/10 text-xs font-medium bg-white/5 text-neutral-400 hover:text-white">💊 1 Capsule</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Side: Simulated Alarm Card Feedback & Usability Benefits -->
+      <div class="lg:col-span-5 space-y-6">
+        
+        <!-- Live Alarm Card Simulation -->
+        <div class="vercel-card p-6 rounded-3xl border border-white/10 bg-[#0a0c10]/90">
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xs font-mono font-semibold text-neutral-400 uppercase">Live Notification Preview</span>
+            <span id="preview-status" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-500/10 text-sky-300 border border-sky-500/20">
+              ACTIVE REMINDER
+            </span>
+          </div>
+
+          <!-- Notification Card Box -->
+          <div class="bg-[#12151c] p-4 rounded-2xl border border-white/10 space-y-3">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-lg">
+                  💊
+                </div>
+                <div>
+                  <h4 id="preview-med-name" class="font-bold text-white text-base">Aspirin / Daily Supplement</h4>
+                  <p id="preview-dose-text" class="text-xs text-sky-300 font-mono">1 Pill (500mg) • Scheduled</p>
+                </div>
+              </div>
+              <span id="preview-time-tag" class="text-sm font-bold font-mono text-white bg-white/10 px-2.5 py-1 rounded-lg">
+                08:30 AM
+              </span>
+            </div>
+
+            <!-- Threshold Badges -->
+            <div class="pt-2 border-t border-white/5 flex flex-wrap gap-2 text-[11px] font-mono">
+              <span class="px-2 py-0.5 rounded bg-sky-500/10 text-sky-300 border border-sky-500/20">
+                Consider Late: +2h
+              </span>
+              <span class="px-2 py-0.5 rounded bg-white/10 text-neutral-300 border border-white/10">
+                Consider Missed: +4h
+              </span>
+            </div>
+
+            <!-- Simulated Action Buttons -->
+            <div class="pt-2 grid grid-cols-2 gap-2">
+              <button class="py-2 rounded-lg bg-blue-600 text-white text-xs font-bold hover:bg-blue-500 transition-colors shadow-lg">
+                ✓ Mark Taken
+              </button>
+              <button class="py-2 rounded-lg bg-white/10 text-white text-xs font-semibold hover:bg-white/20 transition-colors">
+                ⏰ Snooze 15m
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Usability Advantage Box -->
+        <div class="vercel-card p-6 rounded-3xl border border-white/10 bg-[#0a0c10]/90">
+          <h4 class="font-bold text-white text-sm flex items-center space-x-2">
+            <span class="text-sky-400">⚡</span>
+            <span>Why the Grid Picker Outperforms Radial Clocks</span>
+          </h4>
+          <ul class="mt-4 space-y-3 text-xs text-neutral-300">
+            <li class="flex items-start space-x-2">
+              <span class="text-sky-400 font-bold">✓</span>
+              <span><strong>Stationary Touch Targets:</strong> Touch zones never move around a circle, resolving motor tremor difficulties.</span>
+            </li>
+            <li class="flex items-start space-x-2">
+              <span class="text-sky-400 font-bold">✓</span>
+              <span><strong>Large Min Touch Surface:</strong> Minimum target dimensions of 48 × 48 dp guarantee high accessibility.</span>
+            </li>
+            <li class="flex items-start space-x-2">
+              <span class="text-sky-400 font-bold">✓</span>
+              <span><strong>High Contrast AAA:</strong> High contrast ratio prevents vision strain and improves legibility.</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<script>
+  let selectedHour = '08';
+  let selectedMinute = '30';
+  let selectedPeriod = 'AM';
+  let selectedDose = '1 Pill (500mg)';
+
+  const displayTime = document.getElementById('display-time');
+  const displayPeriod = document.getElementById('display-period');
+  const btnAM = document.getElementById('btn-am');
+  const btnPM = document.getElementById('btn-pm');
+  const previewTimeTag = document.getElementById('preview-time-tag');
+  const previewDoseText = document.getElementById('preview-dose-text');
+
+  function updateDisplay() {
+    if (displayTime) displayTime.textContent = `${selectedHour}:${selectedMinute}`;
+    if (displayPeriod) displayPeriod.textContent = selectedPeriod;
+    if (previewTimeTag) previewTimeTag.textContent = `${selectedHour}:${selectedMinute} ${selectedPeriod}`;
+    if (previewDoseText) previewDoseText.textContent = `${selectedDose} • Scheduled`;
+  }
+
+  // AM/PM Listeners
+  if (btnAM && btnPM) {
+    btnAM.addEventListener('click', () => {
+      selectedPeriod = 'AM';
+      btnAM.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all bg-blue-600 text-white shadow-md";
+      btnPM.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all text-neutral-400 hover:text-white";
+      updateDisplay();
+    });
+
+    btnPM.addEventListener('click', () => {
+      selectedPeriod = 'PM';
+      btnPM.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all bg-blue-600 text-white shadow-md";
+      btnAM.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all text-neutral-400 hover:text-white";
+      updateDisplay();
+    });
+  }
+
+  // Hour Grid Buttons
+  const hourBtns = document.querySelectorAll('.hour-btn');
+  hourBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      hourBtns.forEach(b => {
+        b.className = "hour-btn py-3 rounded-xl border border-white/10 text-sm font-bold bg-white/5 hover:bg-white/10 text-neutral-300 transition-all";
+      });
+      btn.className = "hour-btn py-3 rounded-xl border-sky-500/60 text-sm font-bold bg-sky-500/20 text-white transition-all shadow-[0_0_15px_rgba(2,132,199,0.3)]";
+      selectedHour = btn.getAttribute('data-hour') || '08';
+      updateDisplay();
+    });
+  });
+
+  // Minute Grid Buttons
+  const minuteBtns = document.querySelectorAll('.minute-btn');
+  minuteBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      minuteBtns.forEach(b => {
+        b.className = "minute-btn py-2.5 rounded-xl border border-white/10 text-xs font-bold bg-white/5 text-neutral-300";
+      });
+      btn.className = "minute-btn py-2.5 rounded-xl border-sky-500/60 text-xs font-bold bg-sky-500/20 text-white shadow-[0_0_15px_rgba(2,132,199,0.3)]";
+      selectedMinute = btn.getAttribute('data-minute') || '00';
+      updateDisplay();
+    });
+  });
+
+  // Dose Grid Buttons
+  const doseBtns = document.querySelectorAll('.dose-btn');
+  doseBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      doseBtns.forEach(b => {
+        b.className = "dose-btn px-3.5 py-2 rounded-lg border border-white/10 text-xs font-medium bg-white/5 text-neutral-400 hover:text-white";
+      });
+      btn.className = "dose-btn px-3.5 py-2 rounded-lg border border-sky-500/40 text-xs font-medium bg-sky-500/10 text-sky-300";
+      selectedDose = btn.getAttribute('data-dose') || '1 Pill (500mg)';
+      updateDisplay();
+    });
+  });
+</script>

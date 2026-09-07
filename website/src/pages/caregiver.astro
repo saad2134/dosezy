@@ -1,0 +1,64 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Caregiver Portal ✦ Dosezy Connected Family Platform">
+	<Header />
+	<main class="flex-grow pt-28 sm:pt-32 pb-16 bg-[#030407] bg-grid-pattern">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			
+			<!-- Hero Header -->
+			<div class="text-center max-w-3xl mx-auto mb-16">
+				<span class="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-sky-500/10 text-sky-300 border border-sky-500/20">
+					CAREGIVER CLOUD PLATFORM (caregiver/)
+				</span>
+				<h1 class="mt-4 text-4xl sm:text-6xl font-extrabold text-white font-display">
+					Caregiver Web Portal
+				</h1>
+				<p class="mt-4 text-neutral-400 text-lg leading-relaxed">
+					Connected family care for peace of mind. Enables relatives and caregivers to remotely monitor medication adherence while honoring patient privacy.
+				</p>
+
+				<div class="mt-8 flex items-center justify-center space-x-4">
+					<button disabled class="px-6 py-3 rounded-xl bg-white/10 text-neutral-400 border border-white/10 text-sm font-bold cursor-not-allowed">
+						Coming Soon
+					</button>
+					<span class="text-xs font-mono text-sky-300 bg-sky-500/10 px-3 py-1.5 rounded-lg border border-sky-500/20">
+						app.dosezy.com
+					</span>
+				</div>
+			</div>
+
+			<!-- Platform Features -->
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+				<div class="vercel-card p-6 rounded-2xl">
+					<div class="text-3xl mb-4">👨‍👩‍👧</div>
+					<h3 class="text-xl font-bold text-white font-display">Multi-Profile Dashboard</h3>
+					<p class="mt-2 text-xs text-neutral-400 leading-relaxed">
+						Track multiple family members (aging parents, children, or spouse) from a single web interface with real-time adherence charts.
+					</p>
+				</div>
+
+				<div class="vercel-card p-6 rounded-2xl">
+					<div class="text-3xl mb-4">🛡️</div>
+					<h3 class="text-xl font-bold text-white font-display">Granular Sharing Consent</h3>
+					<p class="mt-2 text-xs text-neutral-400 leading-relaxed">
+						Patients retain full control over data sharing permissions. Choose to share complete schedules, missed doses only, or emergency triggers.
+					</p>
+				</div>
+
+				<div class="vercel-card p-6 rounded-2xl">
+					<div class="text-3xl mb-4">🔔</div>
+					<h3 class="text-xl font-bold text-white font-display">Real-Time Missed Dose Alerts</h3>
+					<p class="mt-2 text-xs text-neutral-400 leading-relaxed">
+						Receive instant push notifications or SMS alerts when a critical prescription is past due, allowing quick check-ins with your loved ones.
+					</p>
+				</div>
+			</div>
+
+		</div>
+	</main>
+	<Footer />
+</Layout>

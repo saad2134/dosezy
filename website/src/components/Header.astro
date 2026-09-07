@@ -1,0 +1,294 @@
+---
+---
+
+<header class="fixed top-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
+  <div 
+    id="main-navbar" 
+    class="pointer-events-auto w-[94%] sm:w-[92%] max-w-6xl mt-2.5 sm:mt-3 px-4 sm:px-6 py-2 rounded-2xl border border-white/10 bg-[#030407]/40 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.6)] font-sans"
+  >
+    <div class="flex items-center justify-between h-10">
+      
+      <!-- Left Column: Brand Logo (Flex 1) -->
+      <div class="flex-1 flex items-center justify-start">
+        <a href="/" class="flex items-center space-x-2 group">
+          <div class="relative w-7 h-7 rounded-lg overflow-hidden p-[1px] bg-gradient-to-tr from-blue-500 via-sky-400 to-indigo-500 group-hover:scale-105 transition-transform duration-300 shadow-[0_0_12px_rgba(2,132,199,0.3)]">
+            <img src="/icon-squircle-1000px.png" alt="Dosezy Icon" class="w-full h-full object-cover rounded-[7px]" />
+          </div>
+          <span class="font-bold text-sm sm:text-base tracking-tight text-white group-hover:text-sky-300 transition-colors">
+            Dosezy<span class="text-sky-400 font-extrabold">.</span>
+          </span>
+        </a>
+      </div>
+
+      <!-- Center Column: Navigation Links (Transparent Background) -->
+      <div class="flex items-center justify-center">
+        <nav class="hidden md:flex items-center justify-center space-x-1 bg-transparent p-0 text-xs font-semibold text-neutral-300">
+          <a href="/#features" class="px-3.5 py-1.5 rounded-full hover:text-white hover:bg-white/10 transition-all duration-200">Features</a>
+          <a href="/architecture" class="px-3.5 py-1.5 rounded-full hover:text-white hover:bg-white/10 transition-all duration-200">Architecture</a>
+          <a href="/pricing" class="px-3.5 py-1.5 rounded-full text-sky-400 font-bold hover:text-sky-300 hover:bg-sky-500/10 transition-all duration-200">Pricing</a>
+          <a href="/#downloads" class="px-3.5 py-1.5 rounded-full hover:text-white hover:bg-white/10 transition-all duration-200">Downloads</a>
+        </nav>
+      </div>
+
+      <!-- Right Column: Action Buttons (Equal Height h-8 & Perfectly Aligned Vertically) -->
+      <div class="flex-1 flex items-center justify-end space-x-2">
+        <!-- Star on GitHub Button (White Star + 'on' + GitHub Icon) -->
+        <a 
+          href="https://github.com/saad2134/dosezy" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="hidden sm:inline-flex items-center justify-center space-x-1.5 h-8 px-3 rounded-lg bg-white/5 text-white border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-200 shrink-0 group/gh text-xs font-semibold"
+          title="Star Dosezy on GitHub"
+          aria-label="Star Dosezy on GitHub"
+        >
+          <svg class="w-3.5 h-3.5 text-white fill-current group-hover/gh:scale-110 transition-transform" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+          </svg>
+          <span class="text-neutral-300 font-normal">on</span>
+          <svg class="w-3.5 h-3.5 fill-current text-white group-hover/gh:text-sky-300 transition-colors" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+        </a>
+
+        <!-- Get Dosezy Dropdown Menu Button -->
+        <div class="relative group/dropdown flex items-center">
+          <button 
+            id="get-dosezy-btn"
+            type="button"
+            class="relative inline-flex items-center justify-center space-x-1.5 h-8 px-3.5 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 hover:from-sky-400 hover:via-blue-500 hover:to-indigo-500 shadow-md hover:shadow-[0_0_12px_rgba(56,189,248,0.3)] hover:scale-[1.02] active:scale-95 transition-all duration-300 overflow-hidden cursor-pointer shrink-0"
+            aria-expanded="false"
+            aria-haspopup="true"
+          >
+            <!-- Subtle shimmer sweep reflection beam on hover -->
+            <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover/dropdown:translate-x-full transition-transform duration-1000 ease-out pointer-events-none"></span>
+
+            <span>Get Dosezy</span>
+
+            <svg id="dropdown-chevron" class="w-3.5 h-3.5 text-sky-200 group-hover/dropdown:text-white transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <!-- Dropdown Submenu -->
+          <div 
+            id="get-dosezy-menu"
+            class="hidden absolute right-0 top-full mt-2.5 w-[calc(100vw-2.5rem)] max-w-xs sm:w-80 bg-[#0a0c10] backdrop-blur-2xl border border-white/20 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.9)] p-2.5 z-50 space-y-2 transform opacity-0 scale-95 transition-all duration-200 origin-top-right"
+          >
+            <!-- Patient Client Apps Split Container (Left Android / Right iOS) -->
+            <div class="p-1">
+              <div class="px-2 pt-1 pb-1.5 flex items-center justify-between text-[10px] font-mono font-bold text-neutral-400 uppercase tracking-wider">
+                <span>Patient Client Apps</span>
+                <span class="text-emerald-400">100% Offline</span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <!-- Left Side: Android Client (Active) -->
+                <a 
+                  href="/patient?platform=android" 
+                  class="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500/15 via-teal-600/10 to-emerald-600/10 border border-emerald-500/30 hover:border-emerald-400 hover:shadow-[0_0_15px_rgba(16,185,129,0.25)] transition-all group/android flex flex-col justify-between"
+                >
+                  <div class="flex items-center justify-between mb-1.5">
+                    <div class="w-6 h-6 rounded-md bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400 group-hover/android:scale-105 transition-transform shrink-0" title="Android Client">
+                      <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993s-.4482.9997-.9993.9997zm-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993s-.4482.9997-.9993.9997zm11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1523-.5676.416.416 0 00-.5676.1523l-2.0223 3.5029C15.5902 8.3582 13.8535 8.01 12 8.01s-3.5902.3482-5.1366.9404L4.8411 5.4475a.416.416 0 00-.5676-.1523.416.416 0 00-.1523.5676l1.9973 3.4592C2.6889 11.0858.4237 14.3385.01 18.257h23.98c-.4137-3.9185-2.6789-7.1712-6.1085-8.9356z"/>
+                      </svg>
+                    </div>
+                    <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">APK</span>
+                  </div>
+                  <div>
+                    <span class="text-xs font-bold text-white group-hover/android:text-emerald-300 transition-colors block">Android</span>
+                    <span class="text-[10px] text-neutral-400 block leading-tight">Kotlin & Compose</span>
+                  </div>
+                  <div class="mt-2 text-[9px] font-mono text-emerald-300 font-semibold flex items-center justify-between">
+                    <span>Get App</span>
+                    <span class="group-hover/android:translate-x-0.5 transition-transform">→</span>
+                  </div>
+                </a>
+
+                <!-- Right Side: iOS Client (Disabled Coming Soon) -->
+                <div 
+                  class="p-2.5 rounded-xl bg-white/[0.03] border border-white/10 opacity-55 cursor-not-allowed select-none flex flex-col justify-between"
+                  title="iOS App Coming Soon"
+                >
+                  <div class="flex items-center justify-between mb-1.5">
+                    <div class="w-6 h-6 rounded-md bg-white/10 border border-white/20 flex items-center justify-center text-neutral-300 shrink-0" title="iOS">
+                      <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.32c.64-.78 1.08-1.85.96-2.92-.93.04-2.06.62-2.73 1.4-.6.69-1.12 1.79-.98 2.85 1.04.08 2.11-.55 2.75-1.33z"/>
+                      </svg>
+                    </div>
+                    <span class="text-[8px] font-mono px-1.5 py-0.5 rounded bg-white/10 text-white border border-white/20 font-bold uppercase">Soon</span>
+                  </div>
+                  <div>
+                    <span class="text-xs font-bold text-neutral-300 block">iOS</span>
+                    <span class="text-[10px] text-neutral-500 block leading-tight">Swift & SwiftUI</span>
+                  </div>
+                  <div class="mt-2 text-[9px] font-mono text-neutral-500 font-semibold flex items-center justify-between">
+                    <span>Coming Soon</span>
+                    <span>🔒</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Divider Line (75% width centered between Patient App and Dosezy Cloud) -->
+            <div class="w-[75%] mx-auto h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent my-2"></div>
+
+            <!-- Highlighted Option 2: Dosezy Cloud Card -->
+            <a 
+              href="/caregiver" 
+              class="block p-3 rounded-xl bg-gradient-to-br from-sky-500/15 via-blue-600/10 to-indigo-600/15 border border-sky-500/30 hover:border-sky-400 hover:shadow-[0_0_15px_rgba(56,189,248,0.2)] transition-all group/cloud"
+            >
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center space-x-2">
+                  <div class="w-6 h-6 rounded-md bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-300 shrink-0">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z" />
+                    </svg>
+                  </div>
+                  <span class="text-xs font-bold text-white group-hover/cloud:text-sky-300 transition-colors">Dosezy Cloud</span>
+                </div>
+                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30 font-semibold uppercase">MANAGED</span>
+              </div>
+              <p class="text-[11px] text-neutral-300 leading-snug">
+                Managed caregiver synchronization, Web portal & real-time missed dose alerts.
+              </p>
+              <div class="mt-2 flex items-center justify-between text-[10px] font-mono text-sky-300 font-semibold">
+                <span>Caregiver Web Portal</span>
+                <span class="group-hover/cloud:translate-x-0.5 transition-transform">Get Started →</span>
+              </div>
+            </a>
+
+            <!-- Compact Secondary Option: Self-Host -->
+            <a 
+              href="/self-host" 
+              class="flex items-center justify-between px-3 py-2 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 transition-all text-neutral-400 hover:text-white group/selfhost"
+            >
+              <div class="flex items-center space-x-2">
+                <svg class="w-3.5 h-3.5 text-neutral-400 group-hover/selfhost:text-sky-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 002 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2" />
+                </svg>
+                <span class="text-[11px] font-medium">Self-Host</span>
+              </div>
+              <span class="text-[10px] font-mono text-neutral-400 group-hover/selfhost:text-white">Docker (Free) →</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Mobile Menu Toggle Button -->
+        <button id="mobile-menu-btn" type="button" class="md:hidden p-1 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10 focus:outline-none cursor-pointer" aria-label="Toggle Navigation Menu">
+          <svg id="menu-icon-open" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <svg id="menu-icon-close" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Mobile Menu Drawer (Nav Links Only) -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-white/10 bg-[#0a0c10]/95 backdrop-blur-2xl px-4 pt-3 pb-3 space-y-1 mt-2 rounded-b-2xl">
+      <a href="/#features" class="block py-2 px-3 rounded-lg text-sm font-medium text-neutral-200 hover:text-white hover:bg-white/5 transition-colors">Features</a>
+      <a href="/architecture" class="block py-2 px-3 rounded-lg text-sm font-medium text-neutral-200 hover:text-white hover:bg-white/5 transition-colors">Architecture</a>
+      <a href="/pricing" class="block py-2 px-3 rounded-lg text-sm font-medium text-sky-400 font-semibold hover:bg-sky-500/10 transition-colors">Pricing</a>
+      <a href="/#downloads" class="block py-2 px-3 rounded-lg text-sm font-medium text-neutral-200 hover:text-white hover:bg-white/5 transition-colors">Downloads</a>
+    </div>
+  </div>
+</header>
+
+<style>
+  #main-navbar {
+    transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                max-width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                margin-top 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                border-radius 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                padding-left 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                padding-right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  #main-navbar.is-scrolled {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-top: 0 !important;
+    border-radius: 0 !important;
+    background-color: rgba(3, 4, 7, 0.85) !important;
+    border-color: transparent transparent rgba(255, 255, 255, 0.1) transparent !important;
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.8) !important;
+  }
+</style>
+
+<script>
+  const navbar = document.getElementById('main-navbar');
+  const btn = document.getElementById('mobile-menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  const iconOpen = document.getElementById('menu-icon-open');
+  const iconClose = document.getElementById('menu-icon-close');
+
+  const getDosezyBtn = document.getElementById('get-dosezy-btn');
+  const getDosezyMenu = document.getElementById('get-dosezy-menu');
+  const dropdownChevron = document.getElementById('dropdown-chevron');
+
+  if (navbar) {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        navbar.classList.add('is-scrolled');
+      } else {
+        navbar.classList.remove('is-scrolled');
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+  }
+
+  if (getDosezyBtn && getDosezyMenu) {
+    const toggleDropdown = (show?: boolean) => {
+      const willShow = show !== undefined ? show : getDosezyMenu.classList.contains('hidden');
+      if (willShow) {
+        getDosezyMenu.classList.remove('hidden');
+        requestAnimationFrame(() => {
+          getDosezyMenu.classList.remove('opacity-0', 'scale-95');
+          getDosezyMenu.classList.add('opacity-100', 'scale-100');
+        });
+        if (dropdownChevron) dropdownChevron.classList.add('rotate-180');
+        getDosezyBtn.setAttribute('aria-expanded', 'true');
+      } else {
+        getDosezyMenu.classList.remove('opacity-100', 'scale-100');
+        getDosezyMenu.classList.add('opacity-0', 'scale-95');
+        if (dropdownChevron) dropdownChevron.classList.remove('rotate-180');
+        getDosezyBtn.setAttribute('aria-expanded', 'false');
+        setTimeout(() => {
+          if (getDosezyBtn.getAttribute('aria-expanded') === 'false') {
+            getDosezyMenu.classList.add('hidden');
+          }
+        }, 150);
+      }
+    };
+
+    getDosezyBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleDropdown();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!getDosezyBtn.contains(e.target as Node) && !getDosezyMenu.contains(e.target as Node)) {
+        toggleDropdown(false);
+      }
+    });
+  }
+
+  if (btn && menu && iconOpen && iconClose) {
+    btn.addEventListener('click', () => {
+      const isOpen = !menu.classList.contains('hidden');
+      menu.classList.toggle('hidden');
+      iconOpen.classList.toggle('hidden', !isOpen);
+      iconClose.classList.toggle('hidden', isOpen);
+    });
+  }
+</script>

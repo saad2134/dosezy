@@ -1,0 +1,81 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Cookie Policy ✦ Dosezy Zero Tracking Cookies Disclosure">
+	<Header />
+	<main class="flex-grow pt-28 sm:pt-32 pb-16 bg-[#030407] bg-grid-pattern">
+		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+			
+			<!-- Header -->
+			<div class="mb-10">
+				<span class="px-3.5 py-1 rounded-full text-xs font-mono font-bold bg-sky-500/10 text-sky-300 border border-sky-500/20">
+					COOKIE DISCLOSURE & ZERO TRACKING
+				</span>
+				<h1 class="mt-4 text-3xl sm:text-5xl font-extrabold text-white font-display tracking-tight">
+					Cookie Policy
+				</h1>
+				<p class="mt-3 text-xs font-mono text-neutral-400">
+					Effective Date: September 7, 2026 | Document Revision 2.4
+				</p>
+			</div>
+
+			<!-- Main Container Card -->
+			<div class="vercel-card p-6 sm:p-12 rounded-3xl border border-white/10 bg-[#0a0c10]/95 space-y-8">
+				
+				<!-- Highlight Banner -->
+				<div class="p-4 sm:p-5 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-sky-200 text-xs leading-relaxed flex items-start space-x-3">
+					<span class="text-lg shrink-0">🍪</span>
+					<div class="space-y-1">
+						<strong class="font-bold text-white">Zero Cookie Guarantee:</strong>
+						<p>Dosezy operates a strict zero-tracking website. We do not place HTTP tracking cookies, advertising beacons, analytics cookies, or behavioral fingerprinting scripts on your device. You can browse our website without annoying cookie banner popups.</p>
+					</div>
+				</div>
+
+				<!-- Legal Clauses -->
+				<div class="space-y-8 text-xs text-neutral-300 leading-relaxed border-t border-white/10 pt-8">
+					
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-sky-400 font-mono">01.</span>
+							<span>Zero Tracking & Analytics Cookies</span>
+						</h2>
+						<p>Dosezy does not use any persistent HTTP tracking cookies, marketing cookies, third-party analytics pixels (such as Google Tag Manager or Facebook Pixel), or cross-site device fingerprinting scripts. We believe web browsing should remain completely private.</p>
+					</section>
+
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-sky-400 font-mono">02.</span>
+							<span>Essential Local Web Storage (`sessionStorage`)</span>
+						</h2>
+						<p>When you interact with live interactive web demonstrations on our site (such as the interactive 12-Hour Grid Time Picker demo), your browser may temporarily store ephemeral preference variables in local session memory (<code class="text-sky-300 font-mono">window.sessionStorage</code>).</p>
+						<p>This session data is strictly restricted to your local client browser, is never transmitted to any web server, and is automatically destroyed when you close your browser tab.</p>
+					</section>
+
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-sky-400 font-mono">03.</span>
+							<span>External Third-Party Links & Disclaimers</span>
+						</h2>
+						<p>Our website contains external outbound links to third-party platforms including GitHub, F-Droid, Docker Hub, and YouTube. Clicking an external link transfers you to that platform's domain, which operates under its own distinct cookie policies and privacy terms.</p>
+						<p>Dosezy developers have no control over and assume no liability for third-party cookie practices on external websites.</p>
+					</section>
+
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-sky-400 font-mono">04.</span>
+							<span>Managing Your Browser Preferences</span>
+						</h2>
+						<p>You can configure your web browser settings to block or delete local storage and cookies at any time. Because Dosezy does not rely on tracking cookies, disabling cookies in your browser settings will not impact your ability to view our website or download our software.</p>
+					</section>
+
+				</div>
+
+			</div>
+
+		</div>
+	</main>
+	<Footer />
+</Layout>

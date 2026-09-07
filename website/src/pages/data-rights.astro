@@ -1,0 +1,96 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="GDPR & CCPA Data Rights ✦ Dosezy Data Sovereignty Framework">
+	<Header />
+	<main class="flex-grow pt-28 sm:pt-32 pb-16 bg-[#030407] bg-grid-pattern">
+		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+			
+			<!-- Header -->
+			<div class="mb-10">
+				<span class="px-3.5 py-1 rounded-full text-xs font-mono font-bold bg-sky-500/10 text-sky-300 border border-sky-500/20">
+					DATA SOVEREIGNTY & GLOBAL PRIVACY RIGHTS
+				</span>
+				<h1 class="mt-4 text-3xl sm:text-5xl font-extrabold text-white font-display tracking-tight">
+					GDPR & CCPA Data Rights
+				</h1>
+				<p class="mt-3 text-xs font-mono text-neutral-400">
+					Effective Date: September 7, 2026 | Document Revision 2.4
+				</p>
+			</div>
+
+			<!-- Main Container Card -->
+			<div class="vercel-card p-6 sm:p-12 rounded-3xl border border-white/10 bg-[#0a0c10]/95 space-y-8">
+				
+				<!-- Highlight Banner -->
+				<div class="p-4 sm:p-5 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-sky-200 text-xs leading-relaxed flex items-start space-x-3">
+					<span class="text-lg shrink-0">🔒</span>
+					<div class="space-y-1">
+						<strong class="font-bold text-white">Complete Data Sovereignty:</strong>
+						<p>Dosezy is architected to guarantee absolute compliance with the European Union GDPR, California CCPA/CPRA, and global data protection laws. Because Dosezy stores your health records locally on your device hardware, you exercise complete ownership and control over your personal data.</p>
+					</div>
+				</div>
+
+				<!-- Legal Clauses -->
+				<div class="space-y-8 text-xs text-neutral-300 leading-relaxed border-t border-white/10 pt-8">
+					
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-sky-400 font-mono">01.</span>
+							<span>Global Privacy Framework Compliance</span>
+						</h2>
+						<p>Dosezy respects and enforces statutory data protection rights under major international privacy legislation, including the EU General Data Protection Regulation (GDPR), California Consumer Privacy Act (CCPA/CPRA), Virginia Consumer Data Protection Act (VCDPA), Colorado Privacy Act (CPA), and Brazil General Data Protection Law (LGPD).</p>
+					</section>
+
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-sky-400 font-mono">02.</span>
+							<span>Right to Local Data Sovereignty</span>
+						</h2>
+						<p>Under GDPR Article 6 and CCPA regulations, data subjects have the right to restrict unauthorized processing of personal health metrics. Dosezy satisfies this requirement at the architectural level: core client applications function 100% offline without transmitting data to central servers or third-party cloud aggregators.</p>
+					</section>
+
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-sky-400 font-mono">03.</span>
+							<span>Right of Access & Data Portability</span>
+						</h2>
+						<p>Under GDPR Article 20 and CCPA rules, you have the right to export your personal data in a structured, commonly used, and machine-readable format. Dosezy provides built-in tools allowing you to export your full medication schedule, dosage history, and logs as an encrypted JSON file or formatted PDF log directly from local device storage without server intervention.</p>
+					</section>
+
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-sky-400 font-mono">04.</span>
+							<span>Right to Erasure ("Right to be Forgotten")</span>
+						</h2>
+						<p>Under GDPR Article 17 and CCPA deletion rules, you have the right to permanently purge your data. Because Dosezy stores information locally in your device's SQLite Room database, you can exercise immediate erasure by choosing "Clear App Data" in your device OS settings or uninstalling the app.</p>
+						<p>If you use optional Caregiver Cloud sync, clicking "Revoke Caregiver Access" instantly purges encrypted sync buffers from the relay server.</p>
+					</section>
+
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-sky-400 font-mono">05.</span>
+							<span>Zero Commercial Data Sale or Behavioral Profiling</span>
+						</h2>
+						<p>Dosezy explicitly guarantees that we do not "sell", "share", or "rent" user personal information or health metrics as defined by the CCPA/CPRA. We perform zero automated decision-making, credit scoring, or commercial profiling.</p>
+					</section>
+
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-sky-400 font-mono">06.</span>
+							<span>Data Protection Contact & Officer Protocol</span>
+						</h2>
+						<p>For questions regarding your technical data portability rights or privacy framework compliance, contact our open-source maintainers at <a href="mailto:privacy@dosezy.com" class="text-sky-300 hover:underline font-mono">privacy@dosezy.com</a> or open an issue on our GitHub repository.</p>
+					</section>
+
+				</div>
+
+			</div>
+
+		</div>
+	</main>
+	<Footer />
+</Layout>

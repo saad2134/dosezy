@@ -1,0 +1,105 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Medical & Health Disclaimer ✦ Dosezy Non-Clinical Software Utility Notice">
+	<Header />
+	<main class="flex-grow pt-28 sm:pt-32 pb-16 bg-[#030407] bg-grid-pattern">
+		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+			
+			<!-- Header -->
+			<div class="mb-10">
+				<span class="px-3.5 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/20">
+					LEGAL & MEDICAL DISCLAIMER NOTICE
+				</span>
+				<h1 class="mt-4 text-3xl sm:text-5xl font-extrabold text-white font-display tracking-tight">
+					Medical & Health Disclaimer
+				</h1>
+				<p class="mt-3 text-xs font-mono text-neutral-400">
+					Effective Date: September 7, 2026 | Document Revision 2.4
+				</p>
+			</div>
+
+			<!-- Main Container Card -->
+			<div class="vercel-card p-6 sm:p-12 rounded-3xl border border-white/10 bg-[#0a0c10]/95 space-y-8">
+				
+				<!-- Highlight Banner -->
+				<div class="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs leading-relaxed flex items-start space-x-3">
+					<span class="text-lg shrink-0">⚠️</span>
+					<div class="space-y-1">
+						<strong class="font-bold text-white">CRITICAL MEDICAL DISCLAIMER:</strong>
+						<p>Dosezy is an automated digital scheduling utility. Dosezy is NOT a medical device, does not provide clinical diagnosis or treatment advice, and does not replace your prescribing physician, pharmacist, or healthcare provider. Never rely on Dosezy for emergency or life-critical medical situations.</p>
+					</div>
+				</div>
+
+				<!-- Legal Clauses -->
+				<div class="space-y-8 text-xs text-neutral-300 leading-relaxed border-t border-white/10 pt-8">
+					
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-amber-400 font-mono">01.</span>
+							<span>Non-Clinical Software Utility Status</span>
+						</h2>
+						<p>Dosezy (including the Android Patient App, iOS clients, Docker Self-Host Node, Caregiver Cloud portal, and documentation) is provided solely as a self-managed adherence scheduling utility. Dosezy has NOT been evaluated, cleared, or certified as a regulated medical device by the U.S. Food and Drug Administration (FDA), European Medicines Agency (EMA), or any national health regulatory authority.</p>
+						<p>Dosezy does not provide medical diagnosis, dosage calculations, prescription validation, or pharmaceutical advice.</p>
+					</section>
+
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-amber-400 font-mono">02.</span>
+							<span>No Doctor-Patient Relationship</span>
+						</h2>
+						<p>Your use of Dosezy does not create a doctor-patient, pharmacist-patient, or clinical relationship between you and the developers, maintainers (Saad), or contributors of Dosezy. Always consult your qualified physician or licensed healthcare provider regarding prescription changes, health symptoms, or medical advice.</p>
+					</section>
+
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-amber-400 font-mono">03.</span>
+							<span>User Responsibility for Data Entry Accuracy</span>
+						</h2>
+						<p>You are solely responsible for ensuring that all medication titles, dosage amounts, frequency schedules, pill counts, emergency contacts, and reminder times entered into Dosezy match your official physician prescriptions with 100% precision. Dosezy maintains no automated clinical database to detect user typing errors, wrong dosage numbers, or incorrect schedule frequencies.</p>
+					</section>
+
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-amber-400 font-mono">04.</span>
+							<span>Emergency Situations Warning</span>
+						</h2>
+						<p>DO NOT USE DOSEZY FOR LIFE-CRITICAL MEDICATIONS OR EMERGENCY HEALTH CONDITIONS. If you believe you are experiencing a medical emergency, adverse drug reaction, accidental overdose, or acute health symptom, immediately contact your local emergency services (such as 911, 112, 999) or proceed to the nearest hospital emergency room.</p>
+					</section>
+
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-amber-400 font-mono">05.</span>
+							<span>Operating System & Battery Killer Notification Disclaimers</span>
+						</h2>
+						<p>While Dosezy utilizes native Android AlarmManager and local SQLite persistence to schedule offline alarms, notification reliability depends on operating system state. Mobile OS features (such as Android Doze mode, manufacturer battery optimization task killers, device reboots, or iOS Background App Refresh restrictions) can delay, silence, or suppress alarm notifications.</p>
+						<p>Dosezy maintainers are not responsible or liable for missed doses, silenced alarms, or health complications resulting from OS-level notification suppressions. You agree to exclude Dosezy from device battery optimization settings manually.</p>
+					</section>
+
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-amber-400 font-mono">06.</span>
+							<span>No Drug Interaction or Allergy Warnings</span>
+						</h2>
+						<p>Dosezy does NOT check, flag, or warn against harmful drug-drug interactions, food-drug contraindications, double-dosing, or allergic reactions. You must consult your prescribing doctor or pharmacist to verify medication compatibility.</p>
+					</section>
+
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-amber-400 font-mono">07.</span>
+							<span>Complete Release of Developer Liability for Health Outcomes</span>
+						</h2>
+						<p>BY USING DOSEZY, YOU EXPRESSLY RELEASE AND HOLD HARMLESS THE LEAD DEVELOPER (SAAD), MAINTAINERS, AND CONTRIBUTORS FROM ALL CLAIMS, DEMANDS, CAUSES OF ACTION, AND LIABILITIES FOR PERSONAL INJURY, ILLNESS, ADVERSE DRUG REACTIONS, WRONGFUL DEATH, OR HEALTH COMPLICATIONS RELATING TO MISSED DOSES OR SOFTWARE USE.</p>
+					</section>
+
+				</div>
+
+			</div>
+
+		</div>
+	</main>
+	<Footer />
+</Layout>

@@ -1,0 +1,147 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="FAQs ✦ Dosezy Frequently Asked Questions">
+	<Header />
+	<main class="flex-grow pt-28 sm:pt-32 pb-16 bg-[#030407] bg-grid-pattern">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			
+			<!-- Hero Header -->
+			<div class="text-center max-w-3xl mx-auto mb-16">
+				<span class="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-sky-500/10 text-sky-300 border border-sky-500/20">
+					FREQUENTLY ASKED QUESTIONS (v2.2.2)
+				</span>
+				<h1 class="mt-4 text-4xl sm:text-6xl font-extrabold text-white font-display">
+					Frequently Asked Questions
+				</h1>
+				<p class="mt-4 text-neutral-400 text-base sm:text-lg leading-relaxed">
+					Find quick answers about Dosezy features, status colors, emergency calling, offline privacy, and family profile setup.
+				</p>
+			</div>
+
+			<!-- Live Search Input -->
+			<div class="max-w-2xl mx-auto mb-14">
+				<div class="relative">
+					<input 
+						type="text" 
+						id="faq-search" 
+						placeholder="Search questions (e.g. languages, offline privacy, late colors, updates)..." 
+						class="w-full px-5 py-4 rounded-2xl bg-[#0a0c10] border border-white/10 text-white placeholder-neutral-500 focus:outline-none focus:border-sky-500/50 text-sm shadow-xl"
+					/>
+					<svg class="w-5 h-5 text-neutral-500 absolute right-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+					</svg>
+				</div>
+			</div>
+
+			<!-- FAQ Accordion List -->
+			<div class="max-w-3xl mx-auto space-y-4" id="faq-list">
+				
+				<!-- Question 1 -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden" open>
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>What is Dosezy?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4">
+						Dosezy is a simple, friendly, and smart medication reminder app. It helps individuals, family members, and caregivers manage daily medicines, set reminders, and ensure no dose is ever missed.
+					</div>
+				</details>
+
+				<!-- Question 2 -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>Does Dosezy support my native language?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
+						<p>Yes! Dosezy supports 12 major world languages:</p>
+						<p class="font-mono text-[11px] text-sky-300">English, Spanish, Hindi, Chinese, Portuguese, Arabic, French, German, Japanese, Russian, Italian, and Bengali.</p>
+						<p>The app automatically opens in your phone's system language, and you can also switch languages manually anytime in <strong>Menu > Preferences</strong>.</p>
+					</div>
+				</details>
+
+				<!-- Question 3 -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>How do dose status colors work on the Home screen?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
+						<p><strong class="text-white">Normal Color:</strong> Scheduled time passed recently (under your "Consider Late After" threshold).</p>
+						<p><strong class="text-amber-400">Orange Color:</strong> Medicine is Late (3 to 6 hours past due by default). An orange "Mark Late" button will appear.</p>
+						<p><strong class="text-red-400">Red Color:</strong> Medicine is Missed (more than 6 hours past due by default).</p>
+						<p><strong class="text-emerald-400">Green Color:</strong> Dose confirmed as Taken.</p>
+					</div>
+				</details>
+
+				<!-- Question 4 -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>Is my health information kept private?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4">
+						Yes. 100% of your medication records and personal data stay stored locally on your device in an offline SQLite Room database. Dosezy explicitly omits <code class="text-sky-300 font-mono">android.permission.INTERNET</code>, ensuring your private data is never transmitted to cloud servers.
+					</div>
+				</details>
+
+				<!-- Question 5 -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>How do I call emergency services in my country?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4">
+						Go to <strong>Menu > Emergency Contacts</strong>, select your country/region (India, USA/Canada, UK, EU, China, Japan, Russia, Brazil, Bangladesh, or Australia), and tap any emergency card to make a direct 1-tap call to police, fire, ambulance, or universal emergency lines.
+					</div>
+				</details>
+
+				<!-- Question 6 -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>How do I export my data for doctor visits?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4">
+						Go to <strong>Menu > Export Data</strong> and choose <strong>PDF Report</strong> (for a clean, printable summary) or <strong>JSON Backup</strong> (for a digital backup file).
+					</div>
+				</details>
+
+			</div>
+
+		</div>
+	</main>
+	<Footer />
+</Layout>
+
+<script>
+	const faqSearch = document.getElementById('faq-search') as HTMLInputElement;
+	const faqItems = document.querySelectorAll('.faq-item');
+
+	if (faqSearch) {
+		faqSearch.addEventListener('input', (e) => {
+			const query = (e.target as HTMLInputElement).value.toLowerCase();
+			faqItems.forEach(item => {
+				const text = item.textContent?.toLowerCase() || '';
+				const match = text.includes(query);
+				(item as HTMLElement).style.display = match ? 'block' : 'none';
+			});
+		});
+	}
+</script>

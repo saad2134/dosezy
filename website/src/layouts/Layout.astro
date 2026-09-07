@@ -1,0 +1,55 @@
+---
+import '../styles/global.css';
+import AiAssistantChat from '../components/AiAssistantChat.astro';
+
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const {
+	title = "Dosezy — Free, Open Source & Private Medicine Tracker",
+	description = "Dosezy transforms medication management into a simple, accessible, 100% private, offline-first experience. Features an accessible 12-Hour Grid Picker, localized emergency dialer, and zero network telemetry."
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="dark scroll-smooth">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		
+		<!-- Favicon using actual Dosezy Squircle Icon -->
+		<link rel="icon" type="image/png" href="/icon-squircle-1000px.png" />
+		<link rel="shortcut icon" type="image/png" href="/icon-squircle-1000px.png" />
+		<link rel="apple-touch-icon" href="/icon-squircle-1000px.png" />
+		
+		<meta name="generator" content={Astro.generator} />
+
+		<!-- Primary Meta Tags -->
+		<title>{title}</title>
+		<meta name="title" content={title} />
+		<meta name="description" content={description} />
+
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content="/dosezy_banner_rounded.png" />
+
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:title" content={title} />
+		<meta property="twitter:description" content={description} />
+		<meta property="twitter:image" content="/dosezy_banner_rounded.png" />
+
+		<!-- Google Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+	</head>
+	<body class="bg-[#030407] text-[#ededed] min-h-screen flex flex-col font-sans antialiased selection:bg-sky-500/30 selection:text-white">
+		<slot />
+		<AiAssistantChat />
+	</body>
+</html>

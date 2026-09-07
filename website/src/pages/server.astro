@@ -1,0 +1,125 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Server & Cloud Platform ✦ Dosezy Managed Cloud & Self-Hosting">
+	<Header />
+	<main class="flex-grow pt-28 sm:pt-32 pb-16 bg-[#030407] bg-grid-pattern">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			
+			<!-- Hero Header -->
+			<div class="text-center max-w-3xl mx-auto mb-16">
+				<span class="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-sky-500/10 text-sky-300 border border-sky-500/20">
+					SERVER & CLOUD INFRASTRUCTURE
+				</span>
+				<h1 class="mt-4 text-4xl sm:text-6xl font-extrabold text-white font-display">
+					Server & Cloud Platform
+				</h1>
+				<p class="mt-4 text-neutral-400 text-lg leading-relaxed">
+					Whether you prefer a zero-setup Managed Cloud Plan or hosting your own open-source Docker server, Dosezy provides E2EE encrypted synchronization with zero privacy compromises.
+				</p>
+
+				<div class="mt-8 flex items-center justify-center space-x-4">
+					<a href="/pricing" class="px-6 py-3 rounded-xl bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 text-white text-sm font-bold hover:shadow-lg transition-all">
+						View Pricing & Cloud Plans
+					</a>
+				</div>
+			</div>
+
+			<!-- Two Deployment Options Grid -->
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+				
+				<!-- Option A: Managed Cloud Plan -->
+				<div class="vercel-card p-8 rounded-3xl border border-sky-500/30 bg-[#0a0c10]/95 flex flex-col justify-between group">
+					<div>
+						<div class="flex items-center justify-between mb-6">
+							<div class="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 text-2xl">
+								☁️
+							</div>
+							<span class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-sky-500/10 text-sky-300 border border-sky-500/20">
+								MANAGED SERVICE
+							</span>
+						</div>
+
+						<h2 class="text-2xl font-bold text-white font-display">Dosezy Caregiver Cloud</h2>
+						<p class="text-xs font-mono text-sky-400 mt-1">api.dosezy.app • app.dosezy.com</p>
+						
+						<p class="mt-4 text-neutral-400 text-sm leading-relaxed">
+							Fully managed cloud infrastructure for families who want zero-setup multi-device sync, caregiver web monitoring, and real-time missed dose push alerts without maintaining servers.
+						</p>
+
+						<ul class="mt-6 space-y-2.5 text-xs text-neutral-300">
+							<li class="flex items-center space-x-2">
+								<span class="text-sky-400 font-bold">✓</span>
+								<span>Caregiver Web Portal (`app.dosezy.com`)</span>
+							</li>
+							<li class="flex items-center space-x-2">
+								<span class="text-sky-400 font-bold">✓</span>
+								<span>Real-Time Instant Missed Dose Push & SMS Alerts</span>
+							</li>
+							<li class="flex items-center space-x-2">
+								<span class="text-sky-400 font-bold">✓</span>
+								<span>Zero Maintenance • End-to-End Encryption</span>
+							</li>
+						</ul>
+					</div>
+
+					<div class="mt-8 pt-6 border-t border-white/10 flex items-center justify-between">
+						<button disabled class="px-5 py-2.5 rounded-xl bg-white/10 text-neutral-400 border border-white/10 text-xs font-bold cursor-not-allowed">
+							Coming Soon
+						</button>
+						<a href="/pricing" class="text-xs font-mono text-sky-300 hover:underline">See Cloud Pricing →</a>
+					</div>
+				</div>
+
+				<!-- Option B: Self-Hosted Server -->
+				<div class="vercel-card p-8 rounded-3xl border border-indigo-500/30 bg-[#0a0c10]/95 flex flex-col justify-between group">
+					<div>
+						<div class="flex items-center justify-between mb-6">
+							<div class="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-2xl">
+								🐳
+							</div>
+							<span class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
+								SELF-HOSTED (FREE)
+							</span>
+						</div>
+
+						<h2 class="text-2xl font-bold text-white font-display">Self-Hosted Server Node</h2>
+						<p class="text-xs font-mono text-indigo-400 mt-1">server/ • PostgreSQL & Docker</p>
+						
+						<p class="mt-4 text-neutral-400 text-sm leading-relaxed">
+							100% open-source backend stack for home lab enthusiasts who want complete control over their hardware, hosting on Docker Compose, Home Assistant, or Linux VPS.
+						</p>
+
+						<ul class="mt-6 space-y-2.5 text-xs text-neutral-300">
+							<li class="flex items-center space-x-2">
+								<span class="text-indigo-400 font-bold">✓</span>
+								<span>Docker Compose & PostgreSQL Architecture</span>
+							</li>
+							<li class="flex items-center space-x-2">
+								<span class="text-indigo-400 font-bold">✓</span>
+								<span>CRDT Conflict-Free Offline Mutation Queue</span>
+							</li>
+							<li class="flex items-center space-x-2">
+								<span class="text-indigo-400 font-bold">✓</span>
+								<span>Unlimited Devices & 100% Free Forever</span>
+							</li>
+						</ul>
+					</div>
+
+					<div class="mt-8 pt-6 border-t border-white/10 flex items-center justify-between">
+						<button disabled class="px-5 py-2.5 rounded-xl bg-white/10 text-neutral-400 border border-white/10 text-xs font-bold cursor-not-allowed">
+							Coming Soon
+						</button>
+						<span class="text-xs font-mono text-indigo-300">GPL-3.0 License</span>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+	</main>
+	<Footer />
+</Layout>

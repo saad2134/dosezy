@@ -1,0 +1,273 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Pricing ✦ Dosezy Free Offline App & Caregiver Cloud Plans">
+	<Header />
+	<main class="flex-grow pt-28 sm:pt-32 pb-16 bg-[#030407] bg-grid-pattern">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			
+			<!-- Hero Header -->
+			<div class="text-center max-w-3xl mx-auto mb-16">
+				<span class="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-sky-500/10 text-sky-300 border border-sky-500/20">
+					TRANSPARENT & OPEN SOURCE
+				</span>
+				<h1 class="mt-4 text-4xl sm:text-6xl font-extrabold text-white font-display">
+					Simple, Fair Pricing
+				</h1>
+				<p class="mt-4 text-neutral-400 text-lg leading-relaxed">
+					The Dosezy Patient App and Self-Hosted server are 100% free and open-source. For families wanting zero-setup cloud sync and remote caregiver tracking, we offer our Managed Cloud Plan.
+				</p>
+			</div>
+
+			<!-- Pricing Cards Grid -->
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+				
+				<!-- Tier 1: Patient App (Free Forever) -->
+				<div class="vercel-card p-8 rounded-3xl border border-white/10 bg-[#0a0c10]/95 flex flex-col justify-between group">
+					<div>
+						<div class="flex items-center justify-between mb-4">
+							<span class="text-xs font-mono font-bold text-sky-400 uppercase">Patient Client</span>
+							<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-500/10 text-sky-300 border border-sky-500/20">100% FREE</span>
+						</div>
+
+						<h2 class="text-2xl font-bold text-white font-display">Patient App</h2>
+						<div class="mt-4 flex items-baseline space-x-1">
+							<span class="text-4xl font-extrabold text-white font-display">$0</span>
+							<span class="text-xs text-neutral-400 font-mono">/ forever</span>
+						</div>
+						<p class="mt-3 text-xs text-neutral-400 leading-relaxed">
+							Full offline Android application with zero ads, zero accounts required, and zero network telemetry.
+						</p>
+
+						<div class="mt-6 pt-6 border-t border-white/10 space-y-3 text-xs text-neutral-300">
+							<div class="flex items-center space-x-2">
+								<span class="text-sky-400 font-bold">✓</span>
+								<span>12-Hour Grid Time Picker</span>
+							</div>
+							<div class="flex items-center space-x-2">
+								<span class="text-sky-400 font-bold">✓</span>
+								<span>100% Offline SQLite Room DB</span>
+							</div>
+							<div class="flex items-center space-x-2">
+								<span class="text-sky-400 font-bold">✓</span>
+								<span>12 Languages & Emergency ISO Dialer</span>
+							</div>
+							<div class="flex items-center space-x-2">
+								<span class="text-sky-400 font-bold">✓</span>
+								<span>Printable A4 PDF Reports & JSON Backup</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="mt-8">
+						<a href="/patient" class="w-full py-3 block text-center rounded-xl bg-white text-black text-xs font-bold hover:bg-neutral-200 transition-all shadow-md">
+							Download Patient App
+						</a>
+					</div>
+				</div>
+
+				<!-- Tier 2: Self-Hosted Server (Free & Open Source) -->
+				<div class="vercel-card p-8 rounded-3xl border border-white/10 bg-[#0a0c10]/95 flex flex-col justify-between group">
+					<div>
+						<div class="flex items-center justify-between mb-4">
+							<span class="text-xs font-mono font-bold text-indigo-400 uppercase">Self-Hosted</span>
+							<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">OPEN SOURCE</span>
+						</div>
+
+						<h2 class="text-2xl font-bold text-white font-display">Self-Hosted Server</h2>
+						<div class="mt-4 flex items-baseline space-x-1">
+							<span class="text-4xl font-extrabold text-white font-display">$0</span>
+							<span class="text-xs text-neutral-400 font-mono">/ self-managed</span>
+						</div>
+						<p class="mt-3 text-xs text-neutral-400 leading-relaxed">
+							Deploy your private backend sync engine on Docker and PostgreSQL without relying on cloud SaaS.
+						</p>
+
+						<div class="mt-6 pt-6 border-t border-white/10 space-y-3 text-xs text-neutral-300">
+							<div class="flex items-center space-x-2">
+								<span class="text-indigo-400 font-bold">✓</span>
+								<span>Docker Compose & PostgreSQL Node</span>
+							</div>
+							<div class="flex items-center space-x-2">
+								<span class="text-indigo-400 font-bold">✓</span>
+								<span>End-to-End Payload Encryption (E2EE)</span>
+							</div>
+							<div class="flex items-center space-x-2">
+								<span class="text-indigo-400 font-bold">✓</span>
+								<span>CRDT Offline Sync Queue</span>
+							</div>
+							<div class="flex items-center space-x-2">
+								<span class="text-indigo-400 font-bold">✓</span>
+								<span>Unlimited Devices & Community Support</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="mt-8">
+						<a href="/server" class="w-full py-3 block text-center rounded-xl bg-white/10 text-white border border-white/10 text-xs font-bold hover:bg-white/20 transition-all">
+							Explore Server Docs
+						</a>
+					</div>
+				</div>
+
+				<!-- Tier 3: Caregiver Cloud Plan (Managed Service) -->
+				<div class="vercel-card p-8 rounded-3xl border border-sky-500/40 bg-[#0a0c10]/95 flex flex-col justify-between relative group shadow-[0_0_30px_rgba(2,132,199,0.2)]">
+					<div class="absolute -top-3 right-8 bg-gradient-to-r from-sky-500 to-blue-600 text-white text-[10px] font-mono font-extrabold px-3 py-1 rounded-full uppercase shadow-md">
+						MANAGED CLOUD
+					</div>
+
+					<div>
+						<div class="flex items-center justify-between mb-4">
+							<span class="text-xs font-mono font-bold text-sky-400 uppercase">Caregiver Cloud</span>
+							<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-500/10 text-sky-300 border border-sky-500/20">MANAGED</span>
+						</div>
+
+						<h2 class="text-2xl font-bold text-white font-display">Caregiver Cloud Plan</h2>
+						<div class="mt-4 flex items-baseline space-x-1">
+							<span class="text-4xl font-extrabold text-white font-display">$9.99</span>
+							<span class="text-xs text-neutral-400 font-mono">/ mo (Family Group)</span>
+						</div>
+						<p class="mt-3 text-xs text-neutral-400 leading-relaxed">
+							Managed Cloud Server (`api.dosezy.app`) + Caregiver Web Portal (`app.dosezy.com`) for family tracking with zero server maintenance.
+						</p>
+
+						<div class="mt-6 pt-6 border-t border-white/10 space-y-3 text-xs text-neutral-300">
+							<div class="flex items-center space-x-2">
+								<span class="text-sky-400 font-bold">✓</span>
+								<span>Managed Server (`api.dosezy.app`)</span>
+							</div>
+							<div class="flex items-center space-x-2">
+								<span class="text-sky-400 font-bold">✓</span>
+								<span>Caregiver Web Portal (`app.dosezy.com`)</span>
+							</div>
+							<div class="flex items-center space-x-2">
+								<span class="text-sky-400 font-bold">✓</span>
+								<span>Real-Time Push & SMS Missed Dose Alerts</span>
+							</div>
+							<div class="flex items-center space-x-2">
+								<span class="text-sky-400 font-bold">✓</span>
+								<span>Patient-Controlled Sharing Consent</span>
+							</div>
+							<div class="flex items-center space-x-2">
+								<span class="text-sky-400 font-bold">✓</span>
+								<span>Automatic Multi-Device Sync</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="mt-8">
+						<button disabled class="w-full py-3 block text-center rounded-xl bg-white/10 text-neutral-400 border border-white/10 text-xs font-bold cursor-not-allowed">
+							Coming Soon
+						</button>
+					</div>
+				</div>
+
+				<!-- Tier 3: Self-Hosted Server (Free & Open Source - Option B) -->
+				<div class="vercel-card p-8 rounded-3xl border border-white/10 bg-[#0a0c10]/95 flex flex-col justify-between group">
+					<div>
+						<div class="flex items-center justify-between mb-4">
+							<span class="text-xs font-mono font-bold text-indigo-400 uppercase">Self-Hosted</span>
+							<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">OPTION B</span>
+						</div>
+
+						<h2 class="text-2xl font-bold text-white font-display">Self-Hosted Server</h2>
+						<div class="mt-4 flex items-baseline space-x-1">
+							<span class="text-4xl font-extrabold text-white font-display">$0</span>
+							<span class="text-xs text-neutral-400 font-mono">/ self-managed</span>
+						</div>
+						<p class="mt-3 text-xs text-neutral-400 leading-relaxed">
+							Deploy your private backend sync engine on Docker and PostgreSQL without relying on cloud SaaS.
+						</p>
+
+						<div class="mt-6 pt-6 border-t border-white/10 space-y-3 text-xs text-neutral-300">
+							<div class="flex items-center space-x-2">
+								<span class="text-indigo-400 font-bold">✓</span>
+								<span>Docker Compose & PostgreSQL Node</span>
+							</div>
+							<div class="flex items-center space-x-2">
+								<span class="text-indigo-400 font-bold">✓</span>
+								<span>End-to-End Payload Encryption (E2EE)</span>
+							</div>
+							<div class="flex items-center space-x-2">
+								<span class="text-indigo-400 font-bold">✓</span>
+								<span>CRDT Offline Sync Queue</span>
+							</div>
+							<div class="flex items-center space-x-2">
+								<span class="text-indigo-400 font-bold">✓</span>
+								<span>Unlimited Devices & Community Support</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="mt-8">
+						<a href="/server" class="w-full py-3 block text-center rounded-xl bg-white/10 text-white border border-white/10 text-xs font-bold hover:bg-white/20 transition-all">
+							Explore Server Docs
+						</a>
+					</div>
+				</div>
+
+			</div>
+
+			<!-- Comparison Table -->
+			<div class="vercel-card p-8 sm:p-10 rounded-3xl border border-white/10 bg-[#0a0c10]/95 max-w-4xl mx-auto">
+				<h3 class="text-xl font-bold text-white font-display mb-6 text-center">Plan Comparison Matrix</h3>
+				
+				<div class="overflow-x-auto">
+					<table class="w-full text-left text-xs font-mono">
+						<thead>
+							<tr class="border-b border-white/10 text-neutral-400 uppercase">
+								<th class="py-3 px-4">Feature</th>
+								<th class="py-3 px-4 text-center">Patient App</th>
+								<th class="py-3 px-4 text-center">Self-Hosted</th>
+								<th class="py-3 px-4 text-center text-sky-400">Caregiver Cloud</th>
+							</tr>
+						</thead>
+						<tbody class="divide-y divide-white/5 text-neutral-300">
+							<tr>
+								<td class="py-3.5 px-4 font-sans font-medium text-white">Price</td>
+								<td class="py-3.5 px-4 text-center text-sky-400 font-bold">$0</td>
+								<td class="py-3.5 px-4 text-center text-indigo-400 font-bold">$0</td>
+								<td class="py-3.5 px-4 text-center text-white font-bold">$9.99/mo</td>
+							</tr>
+							<tr>
+								<td class="py-3.5 px-4 font-sans font-medium text-white">Offline Patient App</td>
+								<td class="py-3.5 px-4 text-center text-emerald-400 font-bold">✓</td>
+								<td class="py-3.5 px-4 text-center text-emerald-400 font-bold">✓</td>
+								<td class="py-3.5 px-4 text-center text-emerald-400 font-bold">✓</td>
+							</tr>
+							<tr>
+								<td class="py-3.5 px-4 font-sans font-medium text-white">Zero-Telemetry Privacy</td>
+								<td class="py-3.5 px-4 text-center text-emerald-400 font-bold">✓</td>
+								<td class="py-3.5 px-4 text-center text-emerald-400 font-bold">✓</td>
+								<td class="py-3.5 px-4 text-center text-emerald-400 font-bold">✓ (E2EE)</td>
+							</tr>
+							<tr>
+								<td class="py-3.5 px-4 font-sans font-medium text-white">Multi-Device Sync</td>
+								<td class="py-3.5 px-4 text-center text-neutral-500">—</td>
+								<td class="py-3.5 px-4 text-center text-emerald-400 font-bold">✓ (Self-managed)</td>
+								<td class="py-3.5 px-4 text-center text-emerald-400 font-bold">✓ (Managed)</td>
+							</tr>
+							<tr>
+								<td class="py-3.5 px-4 font-sans font-medium text-white">Caregiver Web Portal</td>
+								<td class="py-3.5 px-4 text-center text-neutral-500">—</td>
+								<td class="py-3.5 px-4 text-center text-emerald-400 font-bold">✓ (Self-hosted)</td>
+								<td class="py-3.5 px-4 text-center text-emerald-400 font-bold">✓ (app.dosezy.com)</td>
+							</tr>
+							<tr>
+								<td class="py-3.5 px-4 font-sans font-medium text-white">Real-Time Missed Alerts</td>
+								<td class="py-3.5 px-4 text-center text-neutral-500">—</td>
+								<td class="py-3.5 px-4 text-center text-neutral-500">Self-configured</td>
+								<td class="py-3.5 px-4 text-center text-emerald-400 font-bold">✓ Instant Push & SMS</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+		</div>
+	</main>
+	<Footer />
+</Layout>

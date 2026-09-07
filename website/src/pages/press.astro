@@ -1,0 +1,209 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Press & Media Kit ✦ Dosezy Brand Assets & Press Release">
+	<Header />
+	<main class="flex-grow pt-28 sm:pt-32 pb-16 bg-[#030407] bg-grid-pattern">
+		<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+			
+			<!-- Header -->
+			<div class="mb-12 text-center max-w-3xl mx-auto">
+				<span class="px-3.5 py-1 rounded-full text-xs font-mono font-bold bg-sky-500/10 text-sky-300 border border-sky-500/20">
+					MEDIA ASSETS & BRAND GUIDELINES
+				</span>
+				<h1 class="mt-4 text-4xl sm:text-6xl font-extrabold text-white font-display tracking-tight">
+					Press & Media Kit
+				</h1>
+				<p class="mt-4 text-neutral-400 text-base sm:text-lg leading-relaxed">
+					Official Dosezy logos, squircle app icons, brand color swatches, product screenshots, and boilerplate information for journalists, medical technology media, and publishers.
+				</p>
+			</div>
+
+			<!-- Brand Assets Cards Grid -->
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+				
+				<!-- Logomark Card -->
+				<div class="p-8 rounded-3xl bg-[#0a0c10]/95 border border-white/10 flex flex-col justify-between space-y-6">
+					<div>
+						<div class="w-16 h-16 rounded-2xl overflow-hidden p-1 bg-gradient-to-tr from-blue-500 via-sky-400 to-indigo-500 shadow-lg mb-4">
+							<img src="/icon-squircle-1000px.png" alt="Dosezy Squircle Icon" class="w-full h-full object-cover rounded-xl" />
+						</div>
+						<h3 class="text-xl font-bold text-white font-display">Official Squircle Icon</h3>
+						<p class="mt-2 text-xs text-neutral-400 leading-relaxed">
+							High-resolution 1000 × 1000 px PNG app logomark with 12-Hour Grid pill motif and vibrant gradient border.
+						</p>
+					</div>
+
+					<div class="pt-4 border-t border-white/10 flex items-center justify-between">
+						<span class="text-xs font-mono text-neutral-500">PNG (1000×1000 px)</span>
+						<a 
+							href="/icon-squircle-1000px.png" 
+							download="dosezy-squircle-icon-1000px.png" 
+							class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all"
+						>
+							Download Icon ↓
+						</a>
+					</div>
+				</div>
+
+				<!-- Vector Logo Card -->
+				<div class="p-8 rounded-3xl bg-[#0a0c10]/95 border border-white/10 flex flex-col justify-between space-y-6">
+					<div>
+						<div class="h-16 flex items-center space-x-3 mb-4">
+							<img src="/icon-squircle-1000px.png" alt="Dosezy Logo" class="w-10 h-10 rounded-xl" />
+							<span class="font-bold text-3xl text-white">Dosezy<span class="text-sky-400">.</span></span>
+						</div>
+						<h3 class="text-xl font-bold text-white font-display">Full Wordmark & Brand Logo</h3>
+						<p class="mt-2 text-xs text-neutral-400 leading-relaxed">
+							Primary Dosezy wordmark for dark theme placements and article headers.
+						</p>
+					</div>
+
+					<div class="pt-4 border-t border-white/10 flex items-center justify-between">
+						<span class="text-xs font-mono text-neutral-500">Dark Theme PNG (2000×600 px)</span>
+						<a 
+							href="/dosezy-wordmark-brand-logo.png" 
+							download="dosezy-wordmark-logo.png" 
+							class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all"
+						>
+							Download Logo ↓
+						</a>
+					</div>
+				</div>
+
+			</div>
+
+			<!-- Brand Color Palette Swatches -->
+			<div class="p-8 rounded-3xl bg-[#0a0c10]/95 border border-white/10 space-y-6 mb-16">
+				<h2 class="text-2xl font-bold text-white font-display">Official Brand Color Palette</h2>
+				<p class="text-xs text-neutral-400 leading-relaxed max-w-3xl">
+					Our 80% Blue / 20% Purple-Indigo color system is optimized for high-contrast accessibility (WCAG AAA) and dark mode reduction of eye strain.
+				</p>
+
+				<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
+					<div class="p-4 rounded-2xl bg-[#030407] border border-white/15 space-y-2">
+						<div class="w-full h-10 rounded-xl bg-[#030407] border border-white/20"></div>
+						<p class="text-xs font-bold text-white">Obsidian Black</p>
+						<p class="text-[10px] font-mono text-neutral-400">HEX #030407</p>
+					</div>
+
+					<div class="p-4 rounded-2xl bg-[#030407] border border-white/15 space-y-2">
+						<div class="w-full h-10 rounded-xl bg-sky-400"></div>
+						<p class="text-xs font-bold text-white">Sky Blue</p>
+						<p class="text-[10px] font-mono text-neutral-400">HEX #38BDF8</p>
+					</div>
+
+					<div class="p-4 rounded-2xl bg-[#030407] border border-white/15 space-y-2">
+						<div class="w-full h-10 rounded-xl bg-blue-600"></div>
+						<p class="text-xs font-bold text-white">Royal Blue</p>
+						<p class="text-[10px] font-mono text-neutral-400">HEX #2563EB</p>
+					</div>
+
+					<div class="p-4 rounded-2xl bg-[#030407] border border-white/15 space-y-2">
+						<div class="w-full h-10 rounded-xl bg-[#a855f7]"></div>
+						<p class="text-xs font-bold text-white">Icon Accent Purple</p>
+						<p class="text-[10px] font-mono text-neutral-400">HEX #A855F7</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Brand Usage Guidelines Section -->
+			<div class="p-8 rounded-3xl bg-[#0a0c10]/95 border border-white/10 space-y-6 mb-16">
+				<div>
+					<span class="px-3 py-1 rounded-full text-[10px] font-mono font-bold bg-sky-500/10 text-sky-300 border border-sky-500/20">
+						GUIDELINES & RULES
+					</span>
+					<h2 class="mt-3 text-2xl font-bold text-white font-display">Brand Asset Usage Guidance</h2>
+					<p class="mt-1 text-xs text-neutral-400 leading-relaxed max-w-3xl">
+						Please follow these standards when including Dosezy brand assets in articles, press releases, video reviews, or publisher documentation.
+					</p>
+				</div>
+
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+					<!-- DOs Card -->
+					<div class="p-6 rounded-2xl bg-[#030407] border border-emerald-500/20 space-y-4">
+						<div class="flex items-center space-x-2.5 text-emerald-400">
+							<div class="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+								</svg>
+							</div>
+							<h3 class="text-sm font-bold uppercase font-mono tracking-wider text-white">Recommended Usage (DOs)</h3>
+						</div>
+						<ul class="space-y-2.5 text-xs text-neutral-300">
+							<li class="flex items-start space-x-2">
+								<span class="text-emerald-400 font-bold">✓</span>
+								<span><strong>Maintain Aspect Ratio:</strong> Keep exact proportions when scaling icons or wordmarks; never stretch or skew.</span>
+							</li>
+							<li class="flex items-start space-x-2">
+								<span class="text-emerald-400 font-bold">✓</span>
+								<span><strong>Provide Safe Margin:</strong> Allow a minimum padding area equal to at least 25% of the logo height around all sides.</span>
+							</li>
+							<li class="flex items-start space-x-2">
+								<span class="text-emerald-400 font-bold">✓</span>
+								<span><strong>Use Dark Backdrops:</strong> Place logos against dark obsidian (`#030407`) or dark neutral backgrounds for high visual contrast.</span>
+							</li>
+							<li class="flex items-start space-x-2">
+								<span class="text-emerald-400 font-bold">✓</span>
+								<span><strong>Open-Source Attribution:</strong> Credit Dosezy as an open-source, local-first platform created by Saad under GPL-3.0.</span>
+							</li>
+						</ul>
+					</div>
+
+					<!-- DON'Ts Card -->
+					<div class="p-6 rounded-2xl bg-[#030407] border border-rose-500/20 space-y-4">
+						<div class="flex items-center space-x-2.5 text-rose-400">
+							<div class="w-7 h-7 rounded-lg bg-rose-500/10 border border-rose-500/30 flex items-center justify-center">
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+								</svg>
+							</div>
+							<h3 class="text-sm font-bold uppercase font-mono tracking-wider text-white">Prohibited Modifications (DON'Ts)</h3>
+						</div>
+						<ul class="space-y-2.5 text-xs text-neutral-300">
+							<li class="flex items-start space-x-2">
+								<span class="text-rose-400 font-bold">✕</span>
+								<span><strong>Do Not Recolor Assets:</strong> Do not change squircle gradient colors or alter the signature Sky Blue (`#38BDF8`) period dot.</span>
+							</li>
+							<li class="flex items-start space-x-2">
+								<span class="text-rose-400 font-bold">✕</span>
+								<span><strong>Do Not Rotate or Crop:</strong> Do not rotate, cut off squircle corners, or isolate text elements out of composition.</span>
+							</li>
+							<li class="flex items-start space-x-2">
+								<span class="text-rose-400 font-bold">✕</span>
+								<span><strong>Do Not Imply Endorsement:</strong> Do not use Dosezy assets in a way that suggests official medical endorsement or partnership without consent.</span>
+							</li>
+							<li class="flex items-start space-x-2">
+								<span class="text-rose-400 font-bold">✕</span>
+								<span><strong>Do Not Place on Busy Patterns:</strong> Avoid low-contrast light surfaces or complex backgrounds without a dark card plate.</span>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+
+			<!-- Press Boilerplate & Contact Box -->
+			<div class="p-8 rounded-3xl bg-[#0a0c10]/95 border border-white/10 space-y-6">
+				<h2 class="text-2xl font-bold text-white font-display">Company Boilerplate</h2>
+				<div class="p-5 rounded-2xl bg-[#030407] border border-white/10 text-xs text-neutral-300 leading-relaxed italic">
+					"Dosezy is an open-source, 100% local-first medication management platform designed for patient privacy, geriatric accessibility, and caregiver cloud synchronization. Engineered without internet runtime permissions on Android, Dosezy ensures personal health data remains strictly on local hardware while offering optional end-to-end encrypted cloud sync."
+				</div>
+
+				<div class="pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-neutral-400 border-t border-white/10">
+					<div>
+						<span>For press inquiries & media interviews: </span>
+						<a href="mailto:press@dosezy.com" class="text-sky-300 hover:underline font-mono">press@dosezy.com</a>
+					</div>
+					<a href="/contact" class="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold hover:shadow-md transition-all">
+						Contact Press Team →
+					</a>
+				</div>
+			</div>
+
+		</div>
+	</main>
+	<Footer />
+</Layout>

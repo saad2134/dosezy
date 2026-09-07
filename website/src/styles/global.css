@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-display: 'Outfit', 'Inter', sans-serif;
+  }
+
+  body {
+    background-color: #030407;
+    color: #ededed;
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    selection-background-color: rgba(2, 132, 199, 0.35);
+    selection-color: #ffffff;
+  }
+}
+
+/* Background Grid Pattern with Smooth Diagonal Motion (Top-Left to Bottom-Right) */
+@keyframes diagonalGridMove {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 40px 40px;
+  }
+}
+
+.bg-grid-pattern {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  animation: diagonalGridMove 3.5s linear infinite;
+}
+
+.bg-dot-pattern {
+  background-size: 24px 24px;
+  background-image: radial-gradient(circle, rgba(2, 132, 199, 0.08) 1px, transparent 1px);
+}
+
+/* Radial Glow Effects - Primary Blue & Subtle Indigo Accent */
+.radial-blur-blue {
+  background: radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.25) 0%, rgba(14, 165, 233, 0.12) 45%, transparent 70%);
+}
+
+.radial-blur-purple {
+  background: radial-gradient(circle at 80% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 60%);
+}
+
+/* Glassmorphism Card */
+.vercel-card {
+  background: rgba(10, 12, 16, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.vercel-card:hover {
+  border-color: rgba(2, 132, 199, 0.35);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.8), 0 0 30px -5px rgba(2, 132, 199, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Custom Gradient Text */
+.text-gradient {
+  background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-blue {
+  background: linear-gradient(135deg, #38bdf8 0%, #0284c7 65%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Global Print Media Rules for Pristine PDF Exports */
+@media print {
+  header, 
+  footer, 
+  nav, 
+  #main-navbar, 
+  #mobile-menu, 
+  #ai-chat-widget, 
+  #ai-chat-window, 
+  .print\:hidden {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #030407;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #0f2b48;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0284c7;
+}

@@ -1,0 +1,110 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Privacy Policy ✦ Dosezy Zero-Telemetry & Data Sovereignty Guarantee">
+	<Header />
+	<main class="flex-grow pt-28 sm:pt-32 pb-16 bg-[#030407] bg-grid-pattern">
+		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+			
+			<!-- Header -->
+			<div class="mb-10">
+				<span class="px-3.5 py-1 rounded-full text-xs font-mono font-bold bg-sky-500/10 text-sky-300 border border-sky-500/20">
+					PRIVACY BY DESIGN & ZERO TELEMETRY
+				</span>
+				<h1 class="mt-4 text-3xl sm:text-5xl font-extrabold text-white font-display tracking-tight">
+					Privacy Policy
+				</h1>
+				<p class="mt-3 text-xs font-mono text-neutral-400">
+					Effective Date: September 7, 2026 | Document Revision 2.4
+				</p>
+			</div>
+
+			<!-- Main Container Card -->
+			<div class="vercel-card p-6 sm:p-12 rounded-3xl border border-white/10 bg-[#0a0c10]/95 space-y-8">
+				
+				<!-- Highlight Banner -->
+				<div class="p-4 sm:p-5 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-sky-200 text-xs leading-relaxed flex items-start space-x-3">
+					<span class="text-lg shrink-0">🛡️</span>
+					<div class="space-y-1">
+						<strong class="font-bold text-white">Absolute Privacy Guarantee:</strong>
+						<p>Dosezy is engineered around a strict local-first architecture. The core application contains zero analytics SDKs, zero advertising trackers, zero telemetry, and intentionally omits internet permission from its offline manifest. Your health logs never leave your physical device hardware unless you explicitly configure encrypted cloud sync.</p>
+					</div>
+				</div>
+
+				<!-- Legal Clauses -->
+				<div class="space-y-8 text-xs text-neutral-300 leading-relaxed border-t border-white/10 pt-8">
+					
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-sky-400 font-mono">01.</span>
+							<span>Zero Telemetry & Zero Network Permissions</span>
+						</h2>
+						<p>Dosezy enforces a strict zero-telemetry policy. Unlike standard health apps, Dosezy does not contain any third-party analytics libraries (such as Google Analytics, Firebase, Mixpanel, or Sentry). The core Android application intentionally omits <code class="text-sky-300 font-mono">android.permission.INTERNET</code> from its manifest.</p>
+						<p>We collect 0 bytes of usage metrics, crash reports, IP addresses, device identifiers (IMEI/Android ID), or behavioral interaction data. Your use of Dosezy is completely invisible to us and any third parties.</p>
+					</section>
+
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-sky-400 font-mono">02.</span>
+							<span>Local Hardware Storage & Data Ownership</span>
+						</h2>
+						<p>All data entered into Dosezy—including medication names, schedules, dosage histories, emergency contact details, doctor notes, and adherence rates—remains stored exclusively in an encrypted SQLite Room database on your physical device hardware.</p>
+						<p>You hold 100% legal ownership and physical control over your medical records. Because data is stored locally, the developers and maintainers of Dosezy cannot access, view, restore, or modify your stored information under any circumstances.</p>
+					</section>
+
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-sky-400 font-mono">03.</span>
+							<span>Optional Caregiver Cloud Sync & End-to-End Encryption (E2EE)</span>
+						</h2>
+						<p>If you voluntarily opt into using the managed Dosezy Caregiver Cloud or deploy your own Docker Self-Host Node, synchronization is protected by Zero-Knowledge End-to-End Encryption (E2EE):</p>
+						<ul class="list-disc pl-5 space-y-1.5 text-neutral-400">
+							<li>Data payloads are encrypted on your local device before transmission using AES-256-GCM encryption and Argon2 key derivation.</li>
+							<li>Our cloud sync servers act solely as blind encrypted relay nodes and store zero plain-text data or decryption keys.</li>
+							<li>Only authorized caregiver devices holding your private passphrase can decrypt your sync payloads.</li>
+						</ul>
+					</section>
+
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-sky-400 font-mono">04.</span>
+							<span>Zero Commercial Data Selling or Aggregation</span>
+						</h2>
+						<p>Dosezy does not monetize, license, rent, trade, or sell user personal health information to third-party data brokers, pharmaceutical companies, advertisers, or insurance providers. We explicitly comply with the California Consumer Privacy Act (CCPA) "Do Not Sell My Info" mandates and EU GDPR Article 13/14 requirements.</p>
+					</section>
+
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-sky-400 font-mono">05.</span>
+							<span>Children's Privacy Protection (COPPA & GDPR)</span>
+						</h2>
+						<p>Dosezy is a general audience health scheduling utility. We do not knowingly collect personal information from children under the age of 13 (or 16 in the European Union). Because Dosezy operates offline without central data collection, no child data is ever transmitted to or stored by Dosezy maintainers.</p>
+					</section>
+
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-sky-400 font-mono">06.</span>
+							<span>Disclaimer of Physical Device Hardware Security Liability</span>
+						</h2>
+						<p>While Dosezy implements local SQLite database encryption, you are responsible for securing your physical smartphone (e.g., biometrics, device screen passcode). Dosezy maintainers are not liable for unauthorized access to your health records resulting from stolen hardware, unencrypted device backups, or malware on your local operating system.</p>
+					</section>
+
+					<section class="space-y-3">
+						<h2 class="text-base font-bold text-white font-display flex items-center space-x-2">
+							<span class="text-sky-400 font-mono">07.</span>
+							<span>Policy Updates & Contact Information</span>
+						</h2>
+						<p>We reserve the right to modify this Privacy Policy to reflect technical or legal advancements. Any updates will be posted on this page with a revised effective date. For privacy inquiries or technical questions, contact our maintainers at <a href="mailto:privacy@dosezy.com" class="text-sky-300 hover:underline font-mono">privacy@dosezy.com</a>.</p>
+					</section>
+
+				</div>
+
+			</div>
+
+		</div>
+	</main>
+	<Footer />
+</Layout>
