@@ -1,4 +1,4 @@
-A comprehensive, accessible medicine tracking and notifier app designed for stress-free medication management. Once you input the basics—name, dosage, timing, and frequency—Dosezy intelligently handles your medication schedule with zero privacy compromises.
+A comprehensive, accessible medicine (meds) tracking and notifier app designed for stress-free medication management. Once you input the basics: name, dosage, timing, and frequency, Dosezy intelligently handles your medication schedule keeping your health on track with zero privacy compromises.
 
 ✨ Key Features in Version 2.0.0:
 
