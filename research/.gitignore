@@ -1,2 +1,4 @@
 # Ignore internal submission guide in research directory
 Submission_Guide.md
+/submissions
+/__pycache__ 
