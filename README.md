@@ -9,7 +9,7 @@
 
 <div align="center">
 
-![Phase](https://img.shields.io/badge/🛠️%20Phase-Released%20v2%2E2%2E2-blue?style=for-the-badge)
+![Phase](https://img.shields.io/badge/🛠️%20Phase-Released%20v2%2E3%2E0-blue?style=for-the-badge)
 ![Platforms](https://img.shields.io/badge/🌐%20Platforms-Android-28a745?style=for-the-badge)
 
 </div>
@@ -346,3 +346,10 @@ Developed and published by **Saad (@saad2134)**.
 
 `android` `ios` `swiftui` `jetpack-compose` `kotlin` `open-source` `local-first` `offline-first` `medicine-reminder` `medicine-management` `medication-adherence` `caregiver` `elderly-care` `health-tech` `self-hosted` `dosezy` `nextjs`
   
+
+
+### 🆕 What's New in v2.3.0
+- **🔔 Slot-Based Grouped Alarms:** Takes multiple medicines scheduled at the exact same minute into a single non-clashing alert window with an interactive checklist and one-tap **"Take All"** action.
+- **⚡ Multi-Dose Quick Presets:** Presets for `1x`, `2x`, `3x`, and `4x` daily dosing to quickly schedule multiple dose times.
+- **📦 Home Medicine Inventory & Stock Tracking:** Track tablet counts with automatic stock deduction on dose taken and customizable low-stock refill warning alerts.
+- **📊 Data Exporter & OpenAPI Sync:** PDF, CSV, and JSON exports now include stock inventory levels, synced with OpenAPI 3.0 specification.

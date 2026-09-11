@@ -74,7 +74,7 @@ For a budget of **₹0 – ₹5,000**, we target legitimate, DOAJ-indexed comput
 ## 5. 🚀 Publication Roadmap
 
 ```
-Phase 1: Code Baseline & Architecture Lockdown (Completed v2.2.2)
+Phase 1: Code Baseline & Architecture Lockdown (Completed v2.3.0)
    └── Room DB, PDF Export, 12 Languages, Emergency ISO, Offline Security
 
 Phase 2: Manuscript Draft Preparation (research/Manuscript_Outline.md)

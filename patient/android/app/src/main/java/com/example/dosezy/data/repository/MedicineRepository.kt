@@ -33,6 +33,7 @@ class MedicineRepository @Inject constructor(
         database.medicineDao().getMedicinesByUser(userId).first()
 
     @RequiresApi(Build.VERSION_CODES.O)
+    @Suppress("UNUSED_PARAMETER")
     suspend fun insertMedicine(medicine: Medicine, context: Context? = null) {
         Log.d(TAG, "Inserting medicine: ${medicine.medicationName} for user: ${medicine.userId}")
 
@@ -51,7 +52,7 @@ class MedicineRepository @Inject constructor(
         Log.d(TAG, "All schedule entries inserted")
 
         // SCHEDULE ALARMS IMMEDIATELY
-        scheduleRepository.scheduleAlarmsForMedicine(medicine.medicineId, this.context)
+        scheduleRepository.rescheduleAllAlarms(medicine.userId, this.context)
         Log.d(TAG, "Immediately scheduled alarms for new medicine")
 
         // Debug
@@ -64,23 +65,40 @@ class MedicineRepository @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun updateMedicine(medicine: Medicine) {
-        // Update the medicine
+        val oldMedicine = database.medicineDao().getMedicineByIdDirect(medicine.medicineId)
+
+        // Update the medicine metadata
         database.medicineDao().updateMedicine(medicine)
 
-        // Delete existing schedule entries for this medicine and regenerate
-        val scheduleEntries = medicine.generateScheduleEntries(LocalDate.now(), 30)
+        if (oldMedicine != null) {
+            val scheduleChanged = oldMedicine.scheduledTimes != medicine.scheduledTimes ||
+                    oldMedicine.frequency != medicine.frequency ||
+                    oldMedicine.timesPerDay != medicine.timesPerDay
 
-        // Remove old entries for this medicine
-        database.scheduleDao().deleteScheduleEntriesByMedicine(medicine.medicineId)
+            if (scheduleChanged) {
+                val now = java.time.LocalDateTime.now().withSecond(0).withNano(0)
+                val fromEpochMillis = now.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
 
-        // Insert new entries
-        scheduleEntries.forEach { entry ->
-            database.scheduleDao().insertScheduleEntry(entry)
+                // Delete ONLY future pending entries for this medicine
+                database.scheduleDao().deleteFuturePendingScheduleEntries(medicine.medicineId, fromEpochMillis)
+
+                // Generate new schedule entries starting from today for 30 days
+                val newEntries = medicine.generateScheduleEntries(LocalDate.now(), 30)
+
+                // Filter to keep only entries scheduled for now or future
+                val futureNewEntries = newEntries.filter { it.scheduledDateTime >= now }
+                database.scheduleDao().insertScheduleEntries(futureNewEntries)
+            }
+        } else {
+            // Fallback if old medicine wasn't in DB
+            val scheduleEntries = medicine.generateScheduleEntries(LocalDate.now(), 30)
+            database.scheduleDao().deleteScheduleEntriesByMedicine(medicine.medicineId)
+            database.scheduleDao().insertScheduleEntries(scheduleEntries)
         }
 
         // Reschedule alarms
         scheduleRepository.cancelAlarmsForMedicine(medicine.medicineId, this.context)
-        scheduleRepository.scheduleAlarmsForMedicine(medicine.medicineId, this.context)
+        scheduleRepository.rescheduleAllAlarms(medicine.userId, this.context)
     }
 
 

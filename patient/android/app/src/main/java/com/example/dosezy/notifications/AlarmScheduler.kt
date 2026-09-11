@@ -10,6 +10,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.dosezy.data.model.ScheduleEntry
+import java.time.LocalDateTime
 import java.time.ZoneId
 
 class AlarmScheduler(private val context: Context) {
@@ -32,23 +33,44 @@ class AlarmScheduler(private val context: Context) {
     @SuppressLint("ScheduleExactAlarm")
     @RequiresApi(Build.VERSION_CODES.O)
     fun scheduleMedicineAlarm(entry: ScheduleEntry, medicineName: String) {
+        scheduleGroupedMedicineAlarm(
+            scheduledDateTime = entry.scheduledDateTime,
+            entries = listOf(entry),
+            medicineNames = listOf(medicineName)
+        )
+    }
+
+    @SuppressLint("ScheduleExactAlarm")
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun scheduleGroupedMedicineAlarm(
+        scheduledDateTime: LocalDateTime,
+        entries: List<ScheduleEntry>,
+        medicineNames: List<String>
+    ) {
+        if (entries.isEmpty() || medicineNames.isEmpty()) return
+
+        val entryIds = ArrayList(entries.map { it.entryId })
+        val medNames = ArrayList(medicineNames)
+        val cleanDateTime = scheduledDateTime.withSecond(0).withNano(0)
+        val timeFormatted = cleanDateTime.format(java.time.format.DateTimeFormatter.ofPattern("hh:mm a"))
+        val slotKey = "${entries.first().userId}_${cleanDateTime}"
+
         val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
-            putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, entry.entryId)
-            putExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME, medicineName)
-            putExtra(
-                MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME,
-                entry.scheduledDateTime.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"))
-            )
+            putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, entryIds.first())
+            putStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS, entryIds)
+            putExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME, medNames.joinToString(", "))
+            putStringArrayListExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAMES, medNames)
+            putExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME, timeFormatted)
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            entry.entryId.hashCode(),
+            slotKey.hashCode(),
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val triggerTime = entry.scheduledDateTime.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000
+        val triggerTime = cleanDateTime.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (canScheduleExact()) {
@@ -70,7 +92,7 @@ class AlarmScheduler(private val context: Context) {
             alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
         }
 
-        Log.d(TAG, "Scheduled alarm for medicine: $medicineName at ${entry.scheduledDateTime} (exact=${canScheduleExact()})")
+        Log.d(TAG, "Scheduled grouped alarm for ${medNames.size} medicines at $scheduledDateTime (slotKey=$slotKey)")
     }
 
     @SuppressLint("ScheduleExactAlarm")
@@ -82,7 +104,7 @@ class AlarmScheduler(private val context: Context) {
 
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            entryId.hashCode() + 1000, // Different request code for snooze
+            entryId.hashCode() + 1000,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -107,7 +129,7 @@ class AlarmScheduler(private val context: Context) {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
         }
 
-        Log.d(TAG, "Scheduled snooze for entry: $entryId in $minutes minutes (exact=${canScheduleExact()})")
+        Log.d(TAG, "Scheduled snooze for entry: $entryId in $minutes minutes")
     }
 
     fun cancelAlarm(entryId: String) {
@@ -121,6 +143,20 @@ class AlarmScheduler(private val context: Context) {
 
         alarmManager.cancel(pendingIntent)
         Log.d(TAG, "Cancelled alarm for entry: $entryId")
+    }
+
+    fun cancelSlotAlarm(userId: String, scheduledDateTime: LocalDateTime) {
+        val slotKey = "${userId}_${scheduledDateTime.withSecond(0).withNano(0)}"
+        val intent = Intent(context, MedicineAlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            slotKey.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        alarmManager.cancel(pendingIntent)
+        Log.d(TAG, "Cancelled grouped slot alarm: $slotKey")
     }
 
     fun cancelSnooze(entryId: String) {

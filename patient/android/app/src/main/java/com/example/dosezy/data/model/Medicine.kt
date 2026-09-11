@@ -34,7 +34,10 @@ data class Medicine(
     val timesPerDay: Int,
     val frequency: Frequency,
     val scheduledTimes: List<LocalTime>, // Multiple times per day
-    val imageUri: String? = null
+    val imageUri: String? = null,
+    val currentStock: Int? = null,
+    val refillThreshold: Int? = null,
+    val autoDeductOnTake: Boolean = true
 ) {
 
     /**
@@ -53,9 +56,10 @@ data class Medicine(
             // Check if medicine should be taken on this day based on frequency
             if (shouldTakeOnDate(currentDate)) {
                 scheduledTimes.forEach { time ->
-                    val scheduledDateTime = LocalDateTime.of(currentDate, time)
+                    val cleanTime = time.withSecond(0).withNano(0)
+                    val scheduledDateTime = LocalDateTime.of(currentDate, cleanTime)
 
-                    val entryId = "${medicineId}_${currentDate}_${time}".replace(":", "_").replace("-", "_")
+                    val entryId = "${medicineId}_${currentDate}_${cleanTime}".replace(":", "_").replace("-", "_")
                     val entry = ScheduleEntry(
                         entryId = entryId,
                         userId = userId,

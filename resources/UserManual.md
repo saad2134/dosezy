@@ -1,8 +1,8 @@
 # Dosezy User Manual
 
-> **App Version:** v2.2.2
+> **App Version:** v2.3.0
 
-Welcome to **Dosezy v2.2.2**! Dosezy is your personal, easy-to-use companion for managing daily medications, setting smart reminders, tracking adherence, and keeping your loved ones healthy.
+Welcome to **Dosezy v2.3.0**! Dosezy is your personal, easy-to-use companion for managing daily medications, setting smart reminders, tracking adherence, and keeping your loved ones healthy.
 
 This guide explains how to use all features of Dosezy in simple step-by-step terms.
 
@@ -142,3 +142,12 @@ You can easily export medicine records to print for doctor visits or keep person
 
 ### Need Help?
 Go to **Menu > Help & Support** inside the app or email our support team at **reach.saad@outlook.com**.
+
+### 📦 Medicine Stock & Inventory Tracking (New in v2.3.0)
+Dosezy v2.3.0 introduces native home inventory tracking:
+1. **Setting Current Stock:** When adding or editing a medicine, enter the **Current Stock** (e.g., 60 pills) and **Refill Alert Threshold** (e.g., 10 pills).
+2. **Auto-Deduction:** Tapping **Taken** on alarms or notifications automatically decrements your pill count.
+3. **Refill Warning:** When remaining stock falls below your threshold, Dosezy displays a low-stock warning badge on the dashboard.
+
+### 🔔 Slot-Based Grouped Alarms (New in v2.3.0)
+When multiple medicines are scheduled at the same time (e.g., 5 tablets at 8:00 AM), Dosezy combines them into a single alert window. You can check off individual medicines or tap **Take All** in one tap.

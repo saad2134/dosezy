@@ -121,19 +121,30 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 alarmScheduler.cancelSnooze(entry.entryId)
             }
 
-            // Schedule new alarms for pending future entries within the 7-day window
+            // Schedule grouped alarms for pending future entries within the 7-day window
             var scheduledCount = 0
             val limitTime = LocalDateTime.now().plusDays(7)
-            allEntries.forEach { entry ->
-                if (entry.status == MedicationStatus.PENDING &&
-                    entry.scheduledDateTime.isAfter(LocalDateTime.now()) &&
-                    entry.scheduledDateTime.isBefore(limitTime)) {
+            val nowMinus2 = LocalDateTime.now().minusMinutes(2)
+            val pendingEntries = allEntries.filter { 
+                it.status == MedicationStatus.PENDING &&
+                it.scheduledDateTime.isAfter(nowMinus2) &&
+                it.scheduledDateTime.isBefore(limitTime)
+            }
 
-                    val medicine = database.medicineDao().getMedicineById(entry.medicineId).first()
-                    medicine?.let {
-                        alarmScheduler.scheduleMedicineAlarm(entry, it.medicationName)
-                        scheduledCount++
-                    }
+            // Group entries by exact scheduled time slot
+            val groupedByTime = pendingEntries.groupBy { it.scheduledDateTime.withSecond(0).withNano(0) }
+
+            groupedByTime.forEach { (slotDateTime, entriesInSlot) ->
+                val entriesWithNames = entriesInSlot.mapNotNull { entry ->
+                    val med = database.medicineDao().getMedicineByIdDirect(entry.medicineId)
+                    med?.let { Pair(entry, it.medicationName) }
+                }
+
+                if (entriesWithNames.isNotEmpty()) {
+                    val entriesList = entriesWithNames.map { it.first }
+                    val namesList = entriesWithNames.map { it.second }
+                    alarmScheduler.scheduleGroupedMedicineAlarm(slotDateTime, entriesList, namesList)
+                    scheduledCount += entriesWithNames.size
                 }
             }
 

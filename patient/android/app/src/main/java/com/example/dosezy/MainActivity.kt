@@ -32,6 +32,7 @@ import com.example.dosezy.ui.screens.ScheduleScreen
 import com.example.dosezy.ui.subscreens.AddMedScreen
 import com.example.dosezy.ui.subscreens.EditMedScreen
 import com.example.dosezy.ui.subscreens.AnalyticsScreen
+import com.example.dosezy.ui.subscreens.BackupRestoreScreen
 import com.example.dosezy.ui.subscreens.EmergencyScreen
 import com.example.dosezy.ui.subscreens.HelpSupportScreen
 import com.example.dosezy.ui.subscreens.ManageProfileScreen
@@ -230,6 +231,10 @@ fun DosezyApp() {
             }
             composable("preferences") {
                 PreferencesScreen(navController)
+            }
+
+            composable("backup_restore") {
+                BackupRestoreScreen(navController)
             }
 
             // New User Onboarding Flow

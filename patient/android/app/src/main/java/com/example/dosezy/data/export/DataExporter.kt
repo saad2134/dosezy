@@ -178,6 +178,9 @@ class DataExporter(
             mObj.put("timesPerDay", med.timesPerDay)
             mObj.put("frequencyPattern", med.frequency.pattern.name)
             mObj.put("scheduledTimes", JSONArray(med.scheduledTimes.map { it.toString() }))
+            mObj.put("currentStock", med.currentStock)
+            mObj.put("refillThreshold", med.refillThreshold)
+            mObj.put("autoDeductOnTake", med.autoDeductOnTake)
             medArray.put(mObj)
         }
         root.put("medicines", medArray)
@@ -204,21 +207,21 @@ class DataExporter(
         val page = pdfDocument.startPage(pageInfo)
         val canvas = page.canvas
 
-        val titlePaint = Paint().apply {
+        val titlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.parseColor("#1193D4")
-            textSize = 20f
+            textSize = 18f
             isFakeBoldText = true
         }
-        val subtitlePaint = Paint().apply {
+        val subtitlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.parseColor("#4B5563")
-            textSize = 11f
+            textSize = 10f
         }
-        val headerPaint = Paint().apply {
+        val headerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.parseColor("#1F2937")
-            textSize = 13f
+            textSize = 12f
             isFakeBoldText = true
         }
-        val textPaint = Paint().apply {
+        val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.parseColor("#374151")
             textSize = 10f
         }
@@ -244,7 +247,50 @@ class DataExporter(
         canvas.drawText("Gender: ${user.gender}", 360f, y, textPaint)
         y += 18f
         canvas.drawLine(40f, y, 555f, y, linePaint)
-        y += 25f
+        y += 20f
+
+        // Analytics & Adherence Summary Section (Calculated from past decided doses)
+        val totalCount = schedules.size
+        val takenOnTimeCount = schedules.count { it.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_ON_TIME }
+        val takenLateCount = schedules.count { it.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_LATE }
+        val missedCount = schedules.count { it.status == com.example.dosezy.data.model.MedicationStatus.MISSED }
+        val pendingCount = schedules.count { it.status == com.example.dosezy.data.model.MedicationStatus.PENDING }
+
+        val takenTotal = takenOnTimeCount + takenLateCount
+        val decidedCount = takenTotal + missedCount
+        val adherenceRate = if (decidedCount > 0) (takenTotal.toDouble() / decidedCount * 100.0) else if (totalCount > 0) 100.0 else 0.0
+        val rateFormatted = String.format(java.util.Locale.US, "%.1f%%", adherenceRate)
+
+        canvas.drawText("Adherence & Analytics Summary", 40f, y, headerPaint)
+        y += 16f
+
+        val cardRect = android.graphics.RectF(40f, y, 555f, y + 46f)
+        val cardPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.parseColor("#F3F4F6")
+        }
+        canvas.drawRoundRect(cardRect, 8f, 8f, cardPaint)
+
+        val rateColor = if (adherenceRate >= 90.0) Color.parseColor("#10B981")
+                        else if (adherenceRate >= 70.0) Color.parseColor("#1193D4")
+                        else Color.parseColor("#EF4444")
+
+        val ratePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = rateColor
+            textSize = 15f
+            isFakeBoldText = true
+        }
+        canvas.drawText("Overall Adherence: $rateFormatted", 52f, y + 20f, ratePaint)
+
+        val cardSubPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.parseColor("#4B5563")
+            textSize = 9.5f
+        }
+        val breakdownText = "On-Time: $takenOnTimeCount   |   Late: $takenLateCount   |   Missed: $missedCount   |   Pending: $pendingCount   |   Total Doses: $totalCount"
+        canvas.drawText(breakdownText, 52f, y + 36f, cardSubPaint)
+
+        y += 56f
+        canvas.drawLine(40f, y, 555f, y, linePaint)
+        y += 20f
 
         // Medicines Table
         canvas.drawText("Active Medications (${medicines.size})", 40f, y, headerPaint)
@@ -287,11 +333,23 @@ class DataExporter(
         y += 16f
 
         subtitlePaint.isFakeBoldText = false
-        schedules.take(16).forEach { sch ->
-            val dateStr = sch.scheduledDateTime.toString().take(16).replace("T", " ")
+        schedules.take(18).forEach { sch ->
+            val dateStr = sch.scheduledDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
             canvas.drawText(dateStr, 40f, y, textPaint)
-            canvas.drawText(sch.status.name, 260f, y, textPaint)
-            val takenStr = sch.takenAt?.toString()?.take(16)?.replace("T", " ") ?: "-"
+            val statusLabel = when (sch.status) {
+                com.example.dosezy.data.model.MedicationStatus.TAKEN_ON_TIME -> "Taken On Time"
+                com.example.dosezy.data.model.MedicationStatus.TAKEN_LATE -> "Taken Late"
+                com.example.dosezy.data.model.MedicationStatus.MISSED -> "Missed"
+                com.example.dosezy.data.model.MedicationStatus.PENDING -> "Pending"
+            }
+            canvas.drawText(statusLabel, 260f, y, textPaint)
+            val takenStr = if (sch.takenAt != null && sch.takenAt.year > 1970) {
+                sch.takenAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+            } else if (sch.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_ON_TIME || sch.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_LATE) {
+                sch.scheduledDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+            } else {
+                "-"
+            }
             canvas.drawText(takenStr, 400f, y, textPaint)
             y += 16f
         }

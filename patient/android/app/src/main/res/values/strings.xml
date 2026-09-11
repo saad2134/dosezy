@@ -74,7 +74,7 @@
     <string name="menu_emergency">Emergency Contacts</string>
     <string name="menu_help_support">Help &amp; Support</string>
     <string name="menu_data">Data</string>
-    <string name="menu_export_data">Export Data</string>
+    <string name="menu_export_data">Export Activity Report</string>
     <string name="menu_switch_profile">Switch Profile</string>
     <string name="menu_manage_profiles">Manage Profiles</string>
     <string name="menu_manage_profile">Manage this Profile</string>
@@ -161,7 +161,7 @@
     <string name="help_title">Help &amp; Support</string>
     <string name="help_resources">Resources</string>
     <string name="help_faqs_title">FAQs</string>
-    <string name="help_faqs_desc">Answers to common questions.</string>
+    <string name="help_faqs_desc">Get common answers.</string>
     <string name="help_user_manual_title">User Manual</string>
     <string name="help_user_manual_desc">Browse the user guide.</string>
     <string name="help_contact_support">Contact Support</string>
@@ -215,10 +215,10 @@
     <!-- Dialogs &amp; Buttons -->
     <string name="select_language">Select Language</string>
     <string name="system_default">System Default</string>
-    <string name="export_data">Export Data</string>
+    <string name="export_data">Export Activity Report</string>
     <string name="export_current_profile">Export Current Profile Only</string>
     <string name="export_all_profiles">Export All Profiles (ZIP)</string>
-    <string name="export_choose_title">Export Data Options</string>
+    <string name="export_choose_title">Export Activity Report Options</string>
     <string name="export_choose_desc">Choose which data you would like to export:</string>
     <string name="export_success_title">Export Successful</string>
     <string name="export_success_desc">Data exported to:</string>
@@ -274,7 +274,7 @@
     <string name="analytics_insights_start">Start logging doses to view personalized adherence insights.</string>
     <string name="menu_backup_restore">Backup &amp; Restore</string>
     <string name="menu_sharing">Caregiver Sharing</string>
-    <string name="coming_soon">Coming Soon</string>
+    <string name="coming_soon">Soon</string>
 
     <string name="export_file_format">File Format</string>
     <string name="export_format_csv">CSV Format</string>
@@ -295,4 +295,147 @@
     <string name="optional">Optional</string>
 
     <string name="no_browser_found">No web browser or app store available to check for updates.</string>
+
+    <string name="stock_current">Current Stock</string>
+    <string name="stock_refill_threshold">Refill Alert Below</string>
+    <string name="stock_units_left">%d units left</string>
+    <string name="refill_alert_title">Refill Alert: %s</string>
+    <string name="preset_1x_daily">1x Daily (8 AM)</string>
+    <string name="preset_2x_daily">2x Daily (8 AM, 8 PM)</string>
+    <string name="preset_3x_daily">3x Daily (8 AM, 2 PM, 8 PM)</string>
+    <string name="preset_4x_daily">4x Daily (8 AM, 12 PM, 4 PM, 8 PM)</string>
+    <string name="take_all_medicines">Take All (%d)</string>
+
+    <string name="menu_data_sharing_section">Data &amp; Sharing</string>
+    <string name="menu_cloud_setup">Cloud Setup</string>
+    <string name="open_source">OSS</string>
+    <string name="range_7_days">7 Days</string>
+    <string name="range_30_days">30 Days</string>
+    <string name="range_6_months">6 Months</string>
+    <string name="range_12_months">12 Months</string>
+    <string name="range_total">Total</string>
+    <string name="range_all">All</string>
+    <string name="adherence_by_period">Adherence by Time Period</string>
+
+    <!-- Backup & Restore Feature -->
+    <string name="backup_header_title">Data Backup &amp; Synchronization</string>
+    <string name="backup_header_desc">Manage your patient profiles, dosage schedules, adherence history logs, and custom photos across devices.</string>
+    <string name="backup_section_automatic">AUTOMATIC</string>
+    <string name="backup_section_manual">MANUAL</string>
+    <string name="backup_cloud_title">Dosezy Cloud Server</string>
+    <string name="backup_cloud_sub">Managed Caregiver &amp; Sync Platform</string>
+    <string name="backup_cloud_desc">Optional managed cloud platform for real-time family sharing, caregiver remote monitoring, and automated multi-device synchronization without compromising data privacy.</string>
+    <string name="backup_self_hosted_title">Self-Hosted Backend Server</string>
+    <string name="backup_self_hosted_sub">100% Open Source &amp; Private</string>
+    <string name="backup_self_hosted_desc">Connect directly to your own self-hosted Dosezy server instance for complete data sovereignty, family caregiver dashboard, and private infrastructure control.</string>
+    <string name="backup_export_title">Export Full Backup (.zip)</string>
+    <string name="backup_export_sub">Create portable backup archive</string>
+    <string name="backup_export_desc">Create a portable .zip package containing all registered user profiles, active medications, custom photos, and adherence history logs.</string>
+    <string name="backup_export_btn">Export Full Backup</string>
+    <string name="backup_import_title">Import Backup (.zip)</string>
+    <string name="backup_import_sub">Restore profiles &amp; adherence logs</string>
+    <string name="backup_import_desc">Select a Dosezy backup .zip file to restore profiles, custom photos, schedules, and active alarms seamlessly across versions.</string>
+    <string name="backup_import_btn">Select &amp; Import Backup</string>
+    <string name="backup_privacy_title">Privacy &amp; Version Compatibility</string>
+    <string name="backup_privacy_point1">• 🔒 Privacy First: All exported backup archives remain strictly local on your device. Zero external data tracking or hidden analytics telemetries.</string>
+    <string name="backup_privacy_point2">• 🔄 Version Compatibility: Intelligent JSON parsing guarantees seamless backup export and import across past, present, and future Dosezy app versions.</string>
+    <string name="backup_privacy_point3">• 👥 Multi-Profile Support: Preserves and restores all patient profiles, custom avatar photos, and medication definitions intact.</string>
+    <string name="backup_privacy_point4">• ⚡ Auto Alarm Sync: AlarmManager schedules are immediately re-activated post-import so no dose reminder is missed.</string>
+    <string name="backup_status_packaging">Packaging backup archive…</string>
+    <string name="backup_status_inspecting">Inspecting backup package…</string>
+    <string name="backup_status_restoring">Restoring selected profiles…</string>
+    <string name="backup_status_no_profiles">No profiles found in backup archive.</string>
+    <string name="backup_saved_success">Backup Saved Successfully</string>
+
+    <!-- Profile Import Dialog -->
+    <string name="import_dialog_title">Import Profile Packages</string>
+    <string name="import_dialog_desc">Select which patient profiles to restore into your active Dosezy database.</string>
+    <string name="import_profiles_found">Patient Profiles Found in Archive</string>
+    <string name="import_no_profiles_found">No profiles found in this backup archive.</string>
+    <string name="import_existing_profile_badge">EXISTS LOCALLY</string>
+    <string name="import_strategy_label">Import Strategy</string>
+    <string name="import_strategy_create_new">Create New</string>
+    <string name="import_strategy_create_new_desc">Import alongside existing profiles with a new ID</string>
+    <string name="import_strategy_merge">Merge Data</string>
+    <string name="import_strategy_merge_desc">Add new medications and append history logs</string>
+    <string name="import_strategy_overwrite">Overwrite</string>
+    <string name="import_strategy_overwrite_desc">Replace existing profile, medications, and schedules completely</string>
+    <string name="import_strategy_skip">Skip</string>
+    <string name="import_strategy_skip_desc">Do not import this profile</string>
+    <string name="import_confirm_btn">Confirm &amp; Restore</string>
+
+    <!-- Medicine Form Time &amp; Stock Additions -->
+    <string name="med_add_time">+ Add Time</string>
+    <string name="med_hour_12">Hour (12 is First):</string>
+    <string name="med_hour_24">Hour (24h):</string>
+    <string name="med_minute">Minute:</string>
+    <string name="med_stock_placeholder">e.g. 60</string>
+    <string name="med_threshold_placeholder">e.g. 10</string>
+    <string name="backup_close_btn">Close</string>
+    <string name="backup_export_success_msg">Your backup file has been created and saved successfully:</string>
+    <string name="backup_export_success_title">Export Completed</string>
+    <string name="backup_header_sub">Safeguard your medication schedules, patient profiles, and adherence history.</string>
+    <string name="backup_offline_badge">100% Offline &amp; Private</string>
+    <string name="backup_restore_confirm_btn">Restore</string>
+    <string name="backup_restore_confirm_msg">This will replace the current database with the data from the backup file. This action cannot be undone.
+
+Do you want to continue?</string>
+    <string name="backup_restore_confirm_title">Restore Data?</string>
+    <string name="backup_restore_in_progress">Restoring data...</string>
+    <string name="backup_share_btn">Share</string>
+    <string name="backup_storage_note">Backup files are compressed .zip packages and completely portable.</string>
+    <string name="import_profile_action">Conflict Action: </string>
+    <string name="import_profile_btn">Import Selected</string>
+    <string name="import_profile_duplicate_prefix"> (Copy)</string>
+    <string name="import_profile_items_to_import">Items to import: %1$d medications, %2$d records</string>
+    <string name="import_profile_keep_existing">Keep existing profile (Skip)</string>
+    <string name="import_profile_merge">Merge medications and logs</string>
+    <string name="import_profile_replace">Replace existing profile</string>
+    <string name="import_profile_sub">Found %1$d profile(s) in backup package. Select which profiles to import.</string>
+    <string name="import_profile_title">Select Profiles to Import</string>
+    <string name="import_profile_conflict_warn">Profile name already exists locally</string>
+    <string name="med_dose_amount_label">Amount: %1$s %2$s</string>
+    <string name="med_frequency_day_singular">Every day</string>
+    <string name="med_frequency_days_pattern">Every %1$d days</string>
+    <string name="med_stock_current_placeholder">e.g. 30</string>
+    <string name="med_stock_refill_placeholder">e.g. 5</string>
+    <string name="med_time_add_btn">+ Add Time</string>
+    <string name="med_time_label">Time %1$d</string>
+    <string name="med_time_remove_cd">Remove time</string>
+    <string name="med_time_select_title">Select Dose Time</string>
+    <string name="med_time_title">Dose Time</string>
+    <string name="notif_refill_alert_title">Refill Alert: %1$s</string>
+    <string name="notif_refill_alert_text">Low stock remaining: %1$d units left. Please refill soon.</string>
+    <string name="notif_channel_name">Medicine Reminders</string>
+    <string name="notif_channel_desc">Notifications for medicine reminders</string>
+    <string name="delete">Delete</string>
+    <string name="stock_inventory_title">Medicine Stock &amp; Inventory (Optional)</string>
+    <string name="dialog_delete_med_title">Delete Medication</string>
+    <string name="dialog_delete_med_msg">Are you sure you want to delete this medication? This action cannot be undone.</string>
+    <string name="backup_coming_soon">COMING SOON</string>
+    <string name="backup_restore_title">Restore from Backup (.zip)</string>
+    <string name="backup_restore_desc">Restore patient profiles, custom photos, medication schedules, and active alarms from a previously exported Dosezy .zip archive.</string>
+    <string name="backup_restore_btn">Restore from Backup</string>
+    <string name="import_from_server_or_backup">Import from server/backup</string>
+    <string name="tab_cloud_server">Cloud / Server</string>
+    <string name="tab_local_file">Local File</string>
+    <string name="cloud_sync_locked_desc">Automated caregiver cloud sync and self-hosted server connections are currently in development and will be available in an upcoming update.</string>
+    <string name="local_backup_select_desc">Select a previously exported Dosezy .zip archive from your device or Google Drive to restore your patient profiles, medications, and schedules.</string>
+    <string name="local_backup_select_btn">Select .zip Backup File</string>
+    <string name="import_source_dialog_title">Import Patient Data</string>
+    <string name="import_source_dialog_sub">Choose your backup source to restore patient profiles, medications, and schedules.</string>
+    <string name="scheduled_dosing_times_title">Scheduled Dosing Times</string>
+    <string name="frequency_preset_daily">%1$s Daily</string>
+    <string name="time_picker_hour_12_label">Hour (12 is First):</string>
+    <string name="time_picker_hour_24_label">Hour (24h):</string>
+    <string name="time_picker_minute_label">Minute: %1$02d</string>
+    <string name="err_battery_optimization">Please enable \'Don\'t optimize\' in Battery settings</string>
+    <string name="err_open_notification_settings">Cannot open notification settings</string>
+    <string name="err_open_sound_settings">Cannot open sound settings</string>
+    <string name="err_open_app_settings">Cannot open app settings</string>
+    <string name="err_open_exact_alarm_settings">Cannot open exact alarm settings</string>
+    <string name="err_cannot_make_call">Cannot make call</string>
+    <string name="err_cannot_open_link">Cannot open link</string>
+    <string name="err_no_email_app">No email app available</string>
+    <string name="err_share_failed">Share error: %1$s</string>
 </resources>

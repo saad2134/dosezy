@@ -1,5 +1,29 @@
 package com.example.dosezy.ui.screens
 
+import kotlinx.coroutines.launch
+
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+import androidx.compose.runtime.rememberCoroutineScope
+
+import androidx.compose.ui.graphics.luminance
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.OutlinedButton
+import android.net.Uri
+import android.widget.Toast
+import com.example.dosezy.data.DosezyDatabase
+import com.example.dosezy.data.export.BackupRestoreManager
+import com.example.dosezy.data.export.ZipInspectionResult
+import com.example.dosezy.data.repository.ScheduleRepository
+import com.example.dosezy.ui.components.ProfileImportDialog
+
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -67,6 +91,7 @@ import com.example.dosezy.R
 import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.User
 import com.example.dosezy.data.model.getLocalizedName
+import com.example.dosezy.ui.components.ImportSourceDialog
 import com.example.dosezy.ui.components.ProfilePicturePicker
 import com.example.dosezy.ui.theme.LightBlue40
 import com.example.dosezy.ui.viewmodels.UserViewModel
@@ -81,12 +106,37 @@ fun NewUserScreen(
     isCreatingNewProfile: Boolean = false,
     userViewModel: UserViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val users by userViewModel.users.collectAsState()
     val currentUser by userViewModel.currentUser.collectAsState()
+
+    val database = remember { DosezyDatabase.getInstance(context) }
+    val scheduleRepository = remember { ScheduleRepository(database) }
+    val backupManager = remember { BackupRestoreManager(context, database, scheduleRepository) }
 
     var isProfileSetupValid by remember { mutableStateOf(false) }
     var completeProfileSetup by remember { mutableStateOf({}) }
     var showExistingProfiles by remember { mutableStateOf(false) }
+    var showImportSourceDialog by remember { mutableStateOf(false) }
+
+    var inspectionResult by remember { mutableStateOf<ZipInspectionResult?>(null) }
+    var isImporting by remember { mutableStateOf(false) }
+
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            scope.launch {
+                val inspect = backupManager.inspectBackupZip(uri)
+                if (inspect.success && inspect.profiles.isNotEmpty()) {
+                    inspectionResult = inspect
+                } else {
+                    Toast.makeText(context, inspect.message.ifEmpty { "No profiles found in backup archive." }, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
 
     Scaffold(
         bottomBar = {
@@ -138,7 +188,8 @@ fun NewUserScreen(
                     onSelectUser = { user ->
                         userViewModel.setCurrentUser(user)
                     },
-                    onCreateNewProfile = { onNext(2) }
+                    onCreateNewProfile = { onNext(2) },
+                    onImportBackup = { showImportSourceDialog = true }
                 )
                 2 -> FeaturesPage()
                 3 -> ProfileSetupPage(
@@ -151,6 +202,55 @@ fun NewUserScreen(
                     },
                     setCompleteAction = { action ->
                         completeProfileSetup = action
+                    }
+                )
+            }
+
+            if (showImportSourceDialog) {
+                ImportSourceDialog(
+                    onDismiss = { showImportSourceDialog = false },
+                    onSelectLocalFile = {
+                        importLauncher.launch(
+                            arrayOf(
+                                "application/zip",
+                                "application/x-zip-compressed",
+                                "application/octet-stream",
+                                "*/*"
+                            )
+                        )
+                    }
+                )
+            }
+
+            if (inspectionResult != null) {
+                ProfileImportDialog(
+                    inspectionResult = inspectionResult!!,
+                    onDismiss = {
+                        inspectionResult?.tempDir?.deleteRecursively()
+                        inspectionResult = null
+                    },
+                    onConfirmImport = { decisions ->
+                        val tempDir = inspectionResult!!.tempDir!!
+                        inspectionResult = null
+                        scope.launch {
+                            isImporting = true
+                            val result = backupManager.executeSelectiveRestore(tempDir, decisions)
+                            isImporting = false
+                            Toast.makeText(context, result.message, Toast.LENGTH_LONG).show()
+                            if (result.success) {
+                                withContext(Dispatchers.IO) {
+                                    val updatedUsers = database.userDao().getAllUsersDirect()
+                                    if (updatedUsers.isNotEmpty()) {
+                                        withContext(Dispatchers.Main) {
+                                            userViewModel.setCurrentUser(updatedUsers.first())
+                                            navController.navigate("home") {
+                                                popUpTo("newuser/1") { inclusive = true }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 )
             }
@@ -174,7 +274,8 @@ fun WelcomePage(
     isCreatingNewProfile: Boolean,
     existingUsers: List<User>,
     onSelectUser: (User) -> Unit,
-    onCreateNewProfile: () -> Unit
+    onCreateNewProfile: () -> Unit,
+    onImportBackup: () -> Unit = {}
 ) {
     var showExistingProfiles by remember { mutableStateOf(false) }
 
@@ -211,6 +312,24 @@ fun WelcomePage(
         )
 
         Spacer(modifier = Modifier.height(48.dp))
+
+        // Import from Server / Backup Button on Start Screen
+        OutlinedButton(
+            onClick = onImportBackup,
+            modifier = Modifier
+                .widthIn(max = 280.dp)
+                .height(48.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = MaterialTheme.colorScheme.primary
+            )
+        ) {
+            Icon(imageVector = Icons.Default.Download, contentDescription = null, modifier = Modifier.size(20.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = stringResource(R.string.import_from_server_or_backup), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
 
         // Progress Indicators
         Row(
@@ -581,7 +700,7 @@ fun GenderDropdown(
 
 @Composable
 fun FeatureItem(icon: ImageVector, title: String, description: String) {
-    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
     val iconBg = if (isDark) Color(0xFF1E293B) else Color(0xFFF1F5F9)
     val iconTint = if (isDark) Color(0xFF38BDF8) else Color(0xFF0284C7)
     Row(
@@ -867,7 +986,7 @@ fun ExistingProfilesModal(
                         containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
-                    Text("Close")
+                    Text(stringResource(R.string.close))
                 }
             }
         }

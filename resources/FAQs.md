@@ -1,8 +1,8 @@
 # Dosezy: Frequently Asked Questions (FAQ)
 
-> **App Version:** v2.2.2
+> **App Version:** v2.3.0
 
-Welcome to the **Dosezy FAQ**! Here you will find simple, easy-to-understand answers to common questions about using Dosezy v2.2.2.
+Welcome to the **Dosezy FAQ**! Here you will find simple, easy-to-understand answers to common questions about using Dosezy v2.3.0.
 
 ---
 
@@ -90,3 +90,9 @@ Go to **Menu > Check for Updates** (under the Network section). Dosezy automatic
 
 ### Need further assistance?
 Contact support from **Menu > Help & Support** or email **reach.saad@outlook.com**.
+
+### Q: Can I group multiple medicines scheduled for the same time into one alert?
+**A:** Yes! Starting in v2.3.0, if you take multiple tablets at the exact same minute (e.g., 8:00 AM), Dosezy groups them into a single alert screen with a "Take All" button.
+
+### Q: How does home medicine stock tracking work?
+**A:** Enter your current tablet count and low-stock threshold in the medicine details screen. Whenever you mark a dose as "Taken", Dosezy automatically subtracts the dosage count and notifies you when it's time to refill!

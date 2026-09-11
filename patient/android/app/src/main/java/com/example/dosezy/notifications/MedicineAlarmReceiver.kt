@@ -37,6 +37,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         const val EXTRA_ENTRY_ID = "entry_id"
         const val EXTRA_MEDICINE_NAME = "medicine_name"
         const val EXTRA_SCHEDULED_TIME = "scheduled_time"
+        const val EXTRA_ENTRY_IDS = "entry_ids"
+        const val EXTRA_MEDICINE_NAMES = "medicine_names"
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -55,18 +57,22 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         }
 
         val entryId = intent?.getStringExtra(EXTRA_ENTRY_ID)
+        val entryIds = intent?.getStringArrayListExtra(EXTRA_ENTRY_IDS)
         val medicineName = intent?.getStringExtra(EXTRA_MEDICINE_NAME)
+        val medicineNames = intent?.getStringArrayListExtra(EXTRA_MEDICINE_NAMES)
         val scheduledTime = intent?.getStringExtra(EXTRA_SCHEDULED_TIME)
 
         if (entryId != null && medicineName != null) {
-            showNotification(context, entryId, medicineName, scheduledTime)
+            showNotification(context, entryId, entryIds, medicineName, medicineNames, scheduledTime)
         }
     }
 
     private fun showNotification(
         context: Context,
         entryId: String,
+        entryIds: ArrayList<String>?,
         medicineName: String,
+        medicineNames: ArrayList<String>?,
         scheduledTime: String?
     ) {
         createNotificationChannel(context)
@@ -117,7 +123,13 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         val alarmIntent = Intent(context, AlarmActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             putExtra(EXTRA_ENTRY_ID, entryId)
+            if (entryIds != null) {
+                putStringArrayListExtra(EXTRA_ENTRY_IDS, entryIds)
+            }
             putExtra(EXTRA_MEDICINE_NAME, medicineName)
+            if (medicineNames != null) {
+                putStringArrayListExtra(EXTRA_MEDICINE_NAMES, medicineNames)
+            }
             putExtra(EXTRA_SCHEDULED_TIME, scheduledTime ?: "")
         }
 
@@ -169,10 +181,10 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Medicine Reminders",
+                context.getString(com.example.dosezy.R.string.notif_channel_name),
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Notifications for medicine reminders"
+                description = context.getString(com.example.dosezy.R.string.notif_channel_desc)
                 enableLights(true)
                 enableVibration(true)
                 setShowBadge(true)

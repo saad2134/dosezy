@@ -70,11 +70,16 @@ fun CustomNavigationBar(
 
     val shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(70.dp)
+    androidx.compose.material3.Surface(
+        modifier = modifier.fillMaxWidth(),
+        color = Color.Transparent,
+        tonalElevation = 0.dp
     ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(70.dp)
+        ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
@@ -195,6 +200,7 @@ fun CustomNavigationBar(
             modifier = Modifier.weight(1f)
         )
         }
+    }
     }
 }
 

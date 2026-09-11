@@ -6,6 +6,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +20,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -41,7 +46,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -64,6 +72,24 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 
+enum class AdherenceRange(val stringResId: Int) {
+    ALL(R.string.range_all),
+    LAST_7_DAYS(R.string.range_7_days),
+    LAST_30_DAYS(R.string.range_30_days),
+    SIX_MONTHS(R.string.range_6_months),
+    TWELVE_MONTHS(R.string.range_12_months),
+    TOTAL(R.string.range_total)
+}
+
+data class RangeAdherenceData(
+    val range: AdherenceRange,
+    val label: String,
+    val takenCount: Int,
+    val decidedCount: Int,
+    val totalEntries: Int,
+    val rate: Int
+)
+
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,7 +106,42 @@ fun AnalyticsScreen(navController: NavController) {
         }
     }
 
-    // Adherence computations
+    val today = LocalDate.now()
+    var selectedRange by remember { mutableStateOf(AdherenceRange.TOTAL) }
+
+    fun getRangeEntries(range: AdherenceRange): List<ScheduleEntry> {
+        return when (range) {
+            AdherenceRange.LAST_7_DAYS -> scheduleEntries.filter { it.scheduledDateTime.toLocalDate() >= today.minusDays(7) }
+            AdherenceRange.LAST_30_DAYS -> scheduleEntries.filter { it.scheduledDateTime.toLocalDate() >= today.minusDays(30) }
+            AdherenceRange.SIX_MONTHS -> scheduleEntries.filter { it.scheduledDateTime.toLocalDate() >= today.minusMonths(6) }
+            AdherenceRange.TWELVE_MONTHS -> scheduleEntries.filter { it.scheduledDateTime.toLocalDate() >= today.minusMonths(12) }
+            AdherenceRange.TOTAL -> scheduleEntries
+            AdherenceRange.ALL -> scheduleEntries
+        }
+    }
+
+    fun computeAdherence(range: AdherenceRange, label: String): RangeAdherenceData {
+        val entries = getRangeEntries(range)
+        val total = entries.size
+        val taken = entries.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
+        val missed = entries.count { it.status == MedicationStatus.MISSED }
+        val decided = taken + missed
+        val rate = if (decided > 0) ((taken.toDouble() / decided.toDouble()) * 100).toInt() else if (total > 0) 100 else 0
+        return RangeAdherenceData(range, label, taken, decided, total, rate)
+    }
+
+    val rangeDataList = listOf(
+        computeAdherence(AdherenceRange.ALL, stringResource(R.string.range_all)),
+        computeAdherence(AdherenceRange.LAST_7_DAYS, stringResource(R.string.range_7_days)),
+        computeAdherence(AdherenceRange.LAST_30_DAYS, stringResource(R.string.range_30_days)),
+        computeAdherence(AdherenceRange.SIX_MONTHS, stringResource(R.string.range_6_months)),
+        computeAdherence(AdherenceRange.TWELVE_MONTHS, stringResource(R.string.range_12_months)),
+        computeAdherence(AdherenceRange.TOTAL, stringResource(R.string.range_total))
+    )
+
+    val selectedData = rangeDataList.find { it.range == selectedRange } ?: rangeDataList.last()
+
+    // Global overall stats for breakdown grid
     val totalEntries = scheduleEntries.size
     val takenOnTime = scheduleEntries.count { it.status == MedicationStatus.TAKEN_ON_TIME }
     val takenLate = scheduleEntries.count { it.status == MedicationStatus.TAKEN_LATE }
@@ -88,17 +149,8 @@ fun AnalyticsScreen(navController: NavController) {
     val totalTaken = takenOnTime + takenLate
     val totalDecided = totalTaken + missed
 
-    val adherenceRate = if (totalDecided > 0) {
-        ((totalTaken.toDouble() / totalDecided.toDouble()) * 100).toInt()
-    } else if (totalEntries > 0) {
-        100
-    } else {
-        0
-    }
-
     // Earliest recorded entry date or today
     val earliestDate = scheduleEntries.minByOrNull { it.scheduledDateTime }?.scheduledDateTime?.toLocalDate()
-    val today = LocalDate.now()
     val sinceString = if (earliestDate != null) {
         val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
         stringResource(R.string.analytics_using_since, earliestDate.format(formatter))
@@ -146,17 +198,18 @@ fun AnalyticsScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(4.dp))
             }
 
-            // 1. Primary Adherence Hero Card
+            // 1. Unified Adherence Card combining main progress ring, range selector, and at-a-glance period breakdown
             item {
-                AdherenceHeroCard(
-                    adherenceRate = adherenceRate,
-                    totalTaken = totalTaken,
-                    totalDecided = totalDecided,
-                    sinceText = sinceString
+                UnifiedAdherenceCard(
+                    rangeDataList = rangeDataList,
+                    selectedRange = selectedRange,
+                    selectedData = selectedData,
+                    sinceText = sinceString,
+                    onSelectRange = { range -> selectedRange = range }
                 )
             }
 
-            // 2. 2x2 Metric Breakdown Grid
+            // 3. 2x2 Metric Breakdown Grid
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Row(
@@ -209,15 +262,15 @@ fun AnalyticsScreen(navController: NavController) {
                 }
             }
 
-            // 3. Weekly Adherence Trend Visual
+            // 4. Weekly Adherence Trend Visual
             item {
                 WeeklyTrendCard(past7Days = past7Days)
             }
 
-            // 4. Personalized Insights Banner
+            // 5. Personalized Insights Banner
             item {
                 InsightCard(
-                    adherenceRate = adherenceRate,
+                    adherenceRate = selectedData.rate,
                     totalEntries = totalEntries
                 )
             }
@@ -230,12 +283,19 @@ fun AnalyticsScreen(navController: NavController) {
 }
 
 @Composable
-fun AdherenceHeroCard(
-    adherenceRate: Int,
-    totalTaken: Int,
-    totalDecided: Int,
-    sinceText: String
+fun UnifiedAdherenceCard(
+    rangeDataList: List<RangeAdherenceData>,
+    selectedRange: AdherenceRange,
+    selectedData: RangeAdherenceData,
+    sinceText: String,
+    onSelectRange: (AdherenceRange) -> Unit
 ) {
+    val animatedProgress by animateFloatAsState(
+        targetValue = (selectedData.rate / 100f).coerceIn(0f, 1f),
+        animationSpec = tween(durationMillis = 600),
+        label = "AdherenceProgress"
+    )
+
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
@@ -246,58 +306,190 @@ fun AdherenceHeroCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Circular Progress Ring
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.size(130.dp)
+            // Horizontal Segmented Time Range Selector Pills (All Tab at far right)
+            val sortedTabs = remember(rangeDataList) {
+                rangeDataList.filter { it.range != AdherenceRange.ALL } + rangeDataList.filter { it.range == AdherenceRange.ALL }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally)
             ) {
-                // Background Track
-                CircularProgressIndicator(
-                    progress = 1f,
-                    modifier = Modifier.size(130.dp),
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
-                    strokeWidth = 12.dp
-                )
-                // Active Adherence Ring
-                CircularProgressIndicator(
-                    progress = (adherenceRate / 100f).coerceIn(0f, 1f),
-                    modifier = Modifier.size(130.dp),
-                    color = if (adherenceRate >= 80) Color(0xFF10B981) else if (adherenceRate >= 50) Color(0xFFF59E0B) else Color(0xFF0277BD),
-                    strokeWidth = 12.dp,
-                    strokeCap = StrokeCap.Round
-                )
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "$adherenceRate%",
-                        style = MaterialTheme.typography.headlineLarge,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                sortedTabs.forEach { rData ->
+                    val isSelected = rData.range == selectedRange
+                    Surface(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(20.dp))
+                            .clickable { onSelectRange(rData.range) },
+                        shape = RoundedCornerShape(20.dp),
+                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                    ) {
+                        Text(
+                            text = rData.label,
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                        )
+                    }
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            Text(
-                text = stringResource(R.string.analytics_adherence_rate),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            if (selectedRange == AdherenceRange.ALL) {
+                // ALL Tab: Show ONLY mini rings breakdown row ABOVE the sinceText badge
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(14.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = stringResource(R.string.adherence_by_period),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.padding(bottom = 10.dp)
+                        )
 
-            Text(
-                text = stringResource(R.string.analytics_adherence_sub),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 2.dp)
-            )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .horizontalScroll(rememberScrollState()),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            rangeDataList.filter { it.range != AdherenceRange.ALL }.forEach { rData ->
+                                val ringColor = when {
+                                    rData.rate >= 80 -> Color(0xFF10B981)
+                                    rData.rate >= 50 -> Color(0xFFF59E0B)
+                                    else -> Color(0xFF0277BD)
+                                }
 
-            Spacer(modifier = Modifier.height(12.dp))
+                                Surface(
+                                    modifier = Modifier
+                                        .width(96.dp)
+                                        .clip(RoundedCornerShape(14.dp))
+                                        .clickable { onSelectRange(rData.range) },
+                                    shape = RoundedCornerShape(14.dp),
+                                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(10.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center
+                                    ) {
+                                        Text(
+                                            text = rData.label,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            maxLines = 1
+                                        )
+
+                                        Spacer(modifier = Modifier.height(6.dp))
+
+                                        Box(
+                                            contentAlignment = Alignment.Center,
+                                            modifier = Modifier.size(50.dp)
+                                        ) {
+                                            CircularProgressIndicator(
+                                                progress = 1f,
+                                                modifier = Modifier.size(50.dp),
+                                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
+                                                strokeWidth = 5.dp
+                                            )
+                                            CircularProgressIndicator(
+                                                progress = (rData.rate / 100f).coerceIn(0f, 1f),
+                                                modifier = Modifier.size(50.dp),
+                                                color = ringColor,
+                                                strokeWidth = 5.dp,
+                                                strokeCap = StrokeCap.Round
+                                            )
+                                            Text(
+                                                text = "${rData.rate}%",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                fontWeight = FontWeight.ExtraBold,
+                                                color = MaterialTheme.colorScheme.onSurface,
+                                                fontSize = 11.sp
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+            } else {
+                // Specific Period Tabs: Central Big Progress Ring
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.size(135.dp)
+                ) {
+                    CircularProgressIndicator(
+                        progress = 1f,
+                        modifier = Modifier.size(135.dp),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
+                        strokeWidth = 12.dp
+                    )
+                    val ringColor = when {
+                        selectedData.rate >= 80 -> Color(0xFF10B981)
+                        selectedData.rate >= 50 -> Color(0xFFF59E0B)
+                        else -> Color(0xFF0277BD)
+                    }
+                    CircularProgressIndicator(
+                        progress = animatedProgress,
+                        modifier = Modifier.size(135.dp),
+                        color = ringColor,
+                        strokeWidth = 12.dp,
+                        strokeCap = StrokeCap.Round
+                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "${selectedData.rate}%",
+                            style = MaterialTheme.typography.headlineLarge,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = "${selectedData.takenCount}/${if (selectedData.decidedCount > 0) selectedData.decidedCount else selectedData.totalEntries}",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 11.sp
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = selectedData.label + " " + stringResource(R.string.analytics_adherence_rate),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                Text(
+                    text = stringResource(R.string.analytics_adherence_sub),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 2.dp)
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+            }
 
             // Subtitle: Using Dosezy since...
             Surface(
@@ -306,7 +498,7 @@ fun AdherenceHeroCard(
             ) {
                 Text(
                     text = sinceText,
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)

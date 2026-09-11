@@ -99,12 +99,12 @@ class ScheduleViewModel @Inject constructor(
 
         rawScheduleJob = viewModelScope.launch {
             try {
-                scheduleRepository.getScheduleForDate(userId, date).collect { entries ->
-                    Log.d(TAG, "Successfully loaded ${entries.size} raw schedule entries")
+                scheduleRepository.getScheduleForUser(userId).collect { entries ->
+                    Log.d(TAG, "Successfully loaded ${entries.size} user schedule entries for month-wide indicators")
                     _scheduleEntries.value = entries
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Error loading raw schedule", e)
+                Log.e(TAG, "Error loading user schedule", e)
             }
         }
     }

@@ -72,7 +72,7 @@ fun <T> SelectionDialog(
                 ),
                 modifier = Modifier.padding(8.dp)
             ) {
-                Text("Close")
+                Text(androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.close))
             }
         }
     )

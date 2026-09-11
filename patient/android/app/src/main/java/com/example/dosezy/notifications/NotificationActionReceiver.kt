@@ -22,6 +22,27 @@ import kotlinx.coroutines.flow.first
 @AndroidEntryPoint
 class NotificationActionReceiver : BroadcastReceiver() {
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun checkAndPostRefillNotification(context: Context, database: DosezyDatabase, medicineId: String) {
+        try {
+            val medicine = database.medicineDao().getMedicineByIdDirect(medicineId)
+            if (medicine != null && medicine.currentStock != null && medicine.refillThreshold != null) {
+                if (medicine.currentStock <= medicine.refillThreshold) {
+                    val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                    val builder = androidx.core.app.NotificationCompat.Builder(context, MedicineAlarmReceiver.CHANNEL_ID)
+                        .setSmallIcon(com.example.dosezy.R.drawable.ic_medicine_notification)
+                        .setContentTitle(context.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
+                        .setContentText(context.getString(com.example.dosezy.R.string.notif_refill_alert_text, medicine.currentStock))
+                        .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+                        .setCategory(androidx.core.app.NotificationCompat.CATEGORY_ALARM)
+                        .setAutoCancel(true)
+                    nManager.notify((medicineId + "_refill_topbar").hashCode(), builder.build())
+                }
+            }
+        } catch (_: Exception) {}
+    }
+
+
     @Inject
     lateinit var database: DosezyDatabase
 
@@ -50,6 +71,35 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 Log.d(TAG, "Marking medicine as taken for entry: $entryId")
                 val takenAt = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
                 scheduleRepository.updateMedicationStatus(entryId, "TAKEN_ON_TIME", takenAt)
+
+                // Stock Auto-Decrement Logic
+                try {
+                    val entry = database.scheduleDao().getScheduleEntryById(entryId)
+                    entry?.let { e ->
+                        val medicine = database.medicineDao().getMedicineById(e.medicineId).first()
+                        if (medicine != null && medicine.currentStock != null && medicine.autoDeductOnTake) {
+                            val deductAmount = medicine.dosage.toInt().coerceAtLeast(1)
+                            val newStock = (medicine.currentStock - deductAmount).coerceAtLeast(0)
+                            val updatedMedicine = medicine.copy(currentStock = newStock)
+                            database.medicineDao().updateMedicine(updatedMedicine)
+                            Log.d(TAG, "Decremented stock for ${medicine.medicationName}: ${medicine.currentStock} -> $newStock")
+
+                            // Trigger refill warning if stock is below threshold
+                            if (medicine.refillThreshold != null && newStock <= medicine.refillThreshold) {
+                                val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                                val builder = androidx.core.app.NotificationCompat.Builder(context, MedicineAlarmReceiver.CHANNEL_ID)
+                                    .setSmallIcon(com.example.dosezy.R.drawable.ic_medicine_notification)
+                                    .setContentTitle(context.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
+                                    .setContentText(context.getString(com.example.dosezy.R.string.notif_refill_alert_text, newStock))
+                                    .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+                                    .setAutoCancel(true)
+                                nManager.notify((entryId + "_refill").hashCode(), builder.build())
+                            }
+                        }
+                    }
+                } catch (ex: Exception) {
+                    Log.e(TAG, "Error performing stock auto-decrement", ex)
+                }
 
                 // Cancel the notification
                 val notificationManager =

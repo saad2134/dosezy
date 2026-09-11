@@ -36,4 +36,7 @@ interface MedicineDao {
     // ADD THIS METHOD:
     @Query("DELETE FROM medicines WHERE medicineId = :medicineId")
     suspend fun deleteMedicineById(medicineId: String)
+
+    @Query("SELECT * FROM medicines WHERE userId = :userId")
+    suspend fun getMedicinesByUserDirect(userId: String): List<Medicine>
 }

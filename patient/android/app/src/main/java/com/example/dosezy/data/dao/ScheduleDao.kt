@@ -62,4 +62,8 @@ interface ScheduleDao {
     // ADD THIS FOR DEBUGGING: Get all schedule entries
     @Query("SELECT * FROM schedule_entries WHERE userId = :userId")
     suspend fun getAllScheduleEntries(userId: String): List<ScheduleEntry>
+
+    // Delete only future pending schedule entries for a specific medicine
+    @Query("DELETE FROM schedule_entries WHERE medicineId = :medicineId AND status = 'PENDING' AND scheduledDateTime >= :fromEpochMillis")
+    suspend fun deleteFuturePendingScheduleEntries(medicineId: String, fromEpochMillis: Long)
 }

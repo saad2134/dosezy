@@ -1,10 +1,13 @@
 package com.example.dosezy.ui.screens
 
+import androidx.compose.ui.graphics.luminance
+
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -53,6 +56,7 @@ import com.example.dosezy.data.model.TimeFormat
 import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.theme.DosezyTheme
 import com.example.dosezy.ui.viewmodels.ScheduleViewModel
+import com.example.dosezy.ui.viewmodels.MedicineViewModel
 import com.example.dosezy.ui.viewmodels.UserViewModel
 import com.example.dosezy.utils.DateUtils
 import com.example.dosezy.utils.TimeCalculationUtils
@@ -67,6 +71,9 @@ fun HomeScreen(
 ) {
     val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
     val scheduleViewModel: ScheduleViewModel = com.example.dosezy.utils.sharedScheduleViewModel()
+    val medicineViewModel: MedicineViewModel = com.example.dosezy.utils.sharedMedicineViewModel()
+
+    val userMedicines by medicineViewModel.medicines.collectAsState()
 
     val currentUser by userViewModel.currentUser.collectAsState()
     val scheduleWithMedicine by scheduleViewModel.scheduleWithMedicine.collectAsState()
@@ -368,11 +375,42 @@ private fun MedicationCard(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Text(
-                    text = medicine?.getDosageDisplay() ?: "Unknown dosage",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = medicine?.getDosageDisplay() ?: "Unknown dosage",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    medicine?.currentStock?.let { stock ->
+                        val isLow = medicine.refillThreshold != null && stock <= medicine.refillThreshold
+                        val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+                        val containerBg = if (isLow) {
+                            if (isDark) Color(0xFF3F1313) else Color(0xFFFEE2E2)
+                        } else {
+                            if (isDark) Color(0xFF0F2D14) else Color(0xFFD1FAE5)
+                        }
+                        val contentColor = if (isLow) {
+                            if (isDark) Color(0xFFFCA5A5) else Color(0xFFB91C1C)
+                        } else {
+                            if (isDark) Color(0xFFA7F3D0) else Color(0xFF065F46)
+                        }
+                        androidx.compose.material3.Surface(
+                            color = containerBg,
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = if (isLow) "⚠️ Refill Warning: $stock left" else "📦 Stock: $stock",
+                                color = contentColor,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
+                }
 
                 // Show individual medication status under dosage
                 if (isTaken) {

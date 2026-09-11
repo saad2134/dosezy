@@ -1,6 +1,7 @@
 package com.example.dosezy.ui.subscreens
 
 import androidx.compose.material3.MaterialTheme
+import com.example.dosezy.R
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -253,7 +254,7 @@ private fun openUrl(context: android.content.Context, url: String) {
         val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))
         context.startActivity(intent)
     } catch (e: Exception) {
-        android.widget.Toast.makeText(context, "Cannot open link", android.widget.Toast.LENGTH_SHORT).show()
+        android.widget.Toast.makeText(context, context.getString(R.string.err_cannot_open_link), android.widget.Toast.LENGTH_SHORT).show()
     }
 }
 
@@ -266,7 +267,7 @@ private fun openEmail(context: android.content.Context, email: String, subject: 
         }
         context.startActivity(intent)
     } catch (e: Exception) {
-        android.widget.Toast.makeText(context, "No email app available", android.widget.Toast.LENGTH_SHORT).show()
+        android.widget.Toast.makeText(context, context.getString(R.string.err_no_email_app), android.widget.Toast.LENGTH_SHORT).show()
     }
 }
 
@@ -277,6 +278,6 @@ private fun openPhone(context: android.content.Context, phoneNumber: String) {
         }
         context.startActivity(intent)
     } catch (e: Exception) {
-        android.widget.Toast.makeText(context, "Cannot make call", android.widget.Toast.LENGTH_SHORT).show()
+        android.widget.Toast.makeText(context, context.getString(R.string.err_cannot_make_call), android.widget.Toast.LENGTH_SHORT).show()
     }
 }

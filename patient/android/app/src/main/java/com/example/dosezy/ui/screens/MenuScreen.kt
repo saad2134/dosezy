@@ -3,6 +3,9 @@ package com.example.dosezy.ui.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +25,7 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.CloudSync
+import androidx.compose.material.icons.filled.Loop
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Emergency
 import androidx.compose.material.icons.filled.HelpOutline
@@ -43,6 +47,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import kotlin.OptIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -199,10 +204,10 @@ fun MenuScreen(navController: NavController) {
                 )
             }
 
-            // Network Section Header
+            // Data & Sharing Section Header
             item {
                 Text(
-                    text = androidx.compose.ui.res.stringResource(R.string.menu_network_section),
+                    text = androidx.compose.ui.res.stringResource(R.string.menu_data_sharing_section),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -210,19 +215,23 @@ fun MenuScreen(navController: NavController) {
                 )
             }
 
-            // Dosezy Cloud Configuration (Disabled, Coming Soon, Optional)
+            // 1. Cloud Setup (Disabled, Coming Soon, Optional, Open-Source)
             item {
                 MenuItem(
                     icon = Icons.Default.Cloud,
-                    title = androidx.compose.ui.res.stringResource(R.string.menu_cloud_config),
+                    title = androidx.compose.ui.res.stringResource(R.string.menu_cloud_setup),
                     color = MaterialTheme.colorScheme.onSurface,
                     enabled = false,
-                    badge = "${stringResource(R.string.optional)} • ${stringResource(R.string.coming_soon)}",
+                    badges = listOf(
+                        stringResource(R.string.coming_soon),
+                        stringResource(R.string.optional),
+                        stringResource(R.string.open_source)
+                    ),
                     onClick = {}
                 )
             }
 
-            // Caregiver Sharing (Disabled, Coming Soon)
+            // 2. Caregiver Sharing (Disabled, Coming Soon)
             item {
                 MenuItem(
                     icon = Icons.Default.People,
@@ -234,42 +243,19 @@ fun MenuScreen(navController: NavController) {
                 )
             }
 
-            // Check for Updates
+            // 3. Backup & Restore
             item {
                 MenuItem(
-                    icon = Icons.Default.Refresh,
-                    title = androidx.compose.ui.res.stringResource(R.string.menu_check_updates),
+                    icon = Icons.Default.Loop,
+                    title = androidx.compose.ui.res.stringResource(R.string.menu_backup_restore),
                     color = MaterialTheme.colorScheme.onSurface,
                     onClick = {
-                        InstallSourceUtils.checkForUpdates(context)
+                        navController.navigate("backup_restore")
                     }
                 )
             }
 
-            // Data Section Header
-            item {
-                Text(
-                    text = androidx.compose.ui.res.stringResource(R.string.menu_data_section),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
-
-            // Backup & Restore (Disabled, Coming Soon)
-            item {
-                MenuItem(
-                    icon = Icons.Default.CloudSync,
-                    title = androidx.compose.ui.res.stringResource(R.string.menu_backup_restore),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    enabled = false,
-                    badge = androidx.compose.ui.res.stringResource(R.string.coming_soon),
-                    onClick = {}
-                )
-            }
-
-            // Export Data
+            // 4. Export Data
             item {
                 MenuItem(
                     icon = Icons.Default.Download,
@@ -280,8 +266,22 @@ fun MenuScreen(navController: NavController) {
                     }
                 )
             }
+
+            // 5. Check for Updates
+            item {
+                MenuItem(
+                    icon = Icons.Default.Refresh,
+                    title = androidx.compose.ui.res.stringResource(R.string.menu_check_updates),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    onClick = {
+                        InstallSourceUtils.checkForUpdates(context)
+                    }
+                )
+            }
         }
     }
+
+    
 
     // Export Format Dialog (CSV, JSON, PDF)
     if (showExportFormatDialog) {
@@ -615,6 +615,7 @@ fun ProfileActionButton(
 }
 
 @Composable
+@OptIn(ExperimentalLayoutApi::class)
 fun MenuItem(
     icon: ImageVector,
     title: String,
@@ -622,7 +623,8 @@ fun MenuItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    badge: String? = null
+    badge: String? = null,
+    badges: List<String>? = null
 ) {
     val alpha = if (enabled) 1f else 0.45f
     Surface(
@@ -664,7 +666,29 @@ fun MenuItem(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                if (badge != null) {
+                if (badges != null && badges.isNotEmpty()) {
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier.wrapContentWidth(Alignment.End)
+                    ) {
+                        badges.forEach { b ->
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                            ) {
+                                Text(
+                                    text = b,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                    fontSize = 11.sp
+                                )
+                            }
+                        }
+                    }
+                } else if (badge != null) {
                     Surface(
                         shape = RoundedCornerShape(8.dp),
                         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)

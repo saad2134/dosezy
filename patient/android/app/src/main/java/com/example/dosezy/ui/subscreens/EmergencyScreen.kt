@@ -633,128 +633,7 @@ fun EmergencyServiceCard(
     }
 }
 
-@Composable
-fun EmergencyInfoDialog(
-    onDismiss: () -> Unit,
-    onEdit: () -> Unit
-) {
-    androidx.compose.material3.AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = "Emergency Information",
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        },
-        text = {
-            Column {
-                Text("Name: John Doe", modifier = Modifier.padding(vertical = 4.dp))
-                Text("Emergency Contact: Jane Doe (123-456-7890)", modifier = Modifier.padding(vertical = 4.dp))
-                Text("Blood Type: O+", modifier = Modifier.padding(vertical = 4.dp))
-                Text("Allergies: Penicillin, Peanuts", modifier = Modifier.padding(vertical = 4.dp))
-                Text("Medical Conditions: Asthma", modifier = Modifier.padding(vertical = 4.dp))
-                Text("Current Medications: Albuterol", modifier = Modifier.padding(vertical = 4.dp))
-            }
-        },
-        confirmButton = {
-            androidx.compose.material3.TextButton(onClick = onEdit) {
-                Text("Edit")
-            }
-        },
-        dismissButton = {
-            androidx.compose.material3.TextButton(onClick = onDismiss) {
-                Text("Close")
-            }
-        }
-    )
-}
 
-@Composable
-fun EditEmergencyInfoDialog(
-    onDismiss: () -> Unit,
-    onSave: () -> Unit
-) {
-    var name by remember { mutableStateOf("John Doe") }
-    var emergencyContact by remember { mutableStateOf("Jane Doe (123-456-7890)") }
-    var bloodType by remember { mutableStateOf("O+") }
-    var allergies by remember { mutableStateOf("Penicillin, Peanuts") }
-    var medicalConditions by remember { mutableStateOf("Asthma") }
-    var currentMedications by remember { mutableStateOf("Albuterol") }
-
-    androidx.compose.material3.AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = "Edit Emergency Information",
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        },
-        text = {
-            Column {
-                androidx.compose.material3.OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text("Name") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                )
-                androidx.compose.material3.OutlinedTextField(
-                    value = emergencyContact,
-                    onValueChange = { emergencyContact = it },
-                    label = { Text("Emergency Contact") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                )
-                androidx.compose.material3.OutlinedTextField(
-                    value = bloodType,
-                    onValueChange = { bloodType = it },
-                    label = { Text("Blood Type") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                )
-                androidx.compose.material3.OutlinedTextField(
-                    value = allergies,
-                    onValueChange = { allergies = it },
-                    label = { Text("Allergies") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                )
-                androidx.compose.material3.OutlinedTextField(
-                    value = medicalConditions,
-                    onValueChange = { medicalConditions = it },
-                    label = { Text("Medical Conditions") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                )
-                androidx.compose.material3.OutlinedTextField(
-                    value = currentMedications,
-                    onValueChange = { currentMedications = it },
-                    label = { Text("Current Medications") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                )
-            }
-        },
-        confirmButton = {
-            androidx.compose.material3.TextButton(onClick = onSave) {
-                Text("Save")
-            }
-        },
-        dismissButton = {
-            androidx.compose.material3.TextButton(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        }
-    )
-}
 
 // Utility function for opening phone dialer
 private fun openPhone(context: android.content.Context, phoneNumber: String) {
@@ -764,6 +643,6 @@ private fun openPhone(context: android.content.Context, phoneNumber: String) {
         }
         context.startActivity(intent)
     } catch (e: Exception) {
-        android.widget.Toast.makeText(context, "Cannot make call", android.widget.Toast.LENGTH_SHORT).show()
+        android.widget.Toast.makeText(context, context.getString(R.string.err_cannot_make_call), android.widget.Toast.LENGTH_SHORT).show()
     }
 }

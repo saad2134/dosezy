@@ -183,14 +183,16 @@ fun ExportDialog(
                             shape = RoundedCornerShape(12.dp),
                             colors = CardDefaults.cardColors(
                                 containerColor = if (saveLocation == location) {
-                                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
                                 } else {
-                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                                    Color.Transparent
                                 }
                             ),
-                            elevation = CardDefaults.cardElevation(
-                                defaultElevation = if (saveLocation == location) 1.dp else 0.dp
-                            )
+                            border = androidx.compose.foundation.BorderStroke(
+                                width = 1.dp,
+                                color = if (saveLocation == location) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                            ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                         ) {
                             Row(
                                 modifier = Modifier

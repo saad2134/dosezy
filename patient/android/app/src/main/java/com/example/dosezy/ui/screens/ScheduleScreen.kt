@@ -98,9 +98,11 @@ fun ScheduleScreen(navController: NavController) {
                     tonalElevation = 0.dp,
                     shadowElevation = 2.dp
                 ) {
+                    val rawScheduleEntries by scheduleViewModel.scheduleEntries.collectAsState()
+
                     ScheduleCalendar(
                         selectedDate = selectedDate,
-                        scheduleEntries = scheduleWithMedicine.map { it.scheduleEntry },
+                        scheduleEntries = rawScheduleEntries,
                         onDateSelected = { date ->
                             scheduleViewModel.setSelectedDate(date)
                         },

@@ -1,11 +1,15 @@
 package com.example.dosezy.ui.screens
 
+import androidx.compose.ui.graphics.luminance
+
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -133,45 +138,100 @@ fun MedicineItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+
     Surface(
         modifier = modifier
+            .fillMaxWidth()
             .clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
         color = MaterialTheme.colorScheme.surface,
         tonalElevation = 0.dp,
-        shadowElevation = 2.dp
+        shadowElevation = 4.dp
     ) {
-        androidx.compose.material3.ListItem(
-            headlineContent = {
-                Text(
-                    text = medicine.medicationName,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            },
-            supportingContent = {
-                Text(
-                    text = formatDosageInfo(medicine),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            },
-            leadingContent = {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f)
+            ) {
+                // Medicine Image in Squircle Frame (matching Home Page style)
                 MedicineImage(
                     imageUri = medicine.imageUri,
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(52.dp)
                 )
-            },
-            trailingContent = {
+
+                Spacer(modifier = Modifier.width(14.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = medicine.medicationName,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+
+                    Spacer(modifier = Modifier.height(2.dp))
+
+                    Text(
+                        text = formatDosageInfo(medicine),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    val stock = medicine.currentStock
+                    if (stock != null) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        val isLow = medicine.refillThreshold != null && stock <= medicine.refillThreshold
+                        val containerBg = if (isLow) {
+                            if (isDark) Color(0xFF3F1313) else Color(0xFFFEE2E2)
+                        } else {
+                            if (isDark) Color(0xFF0F2D14) else Color(0xFFD1FAE5)
+                        }
+                        val contentColor = if (isLow) {
+                            if (isDark) Color(0xFFFCA5A5) else Color(0xFFB91C1C)
+                        } else {
+                            if (isDark) Color(0xFFA7F3D0) else Color(0xFF065F46)
+                        }
+                        Surface(
+                            color = containerBg,
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = if (isLow) "⚠️ Refill Warning: $stock left" else "📦 Stock: $stock",
+                                color = contentColor,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // Action Chevron Pill (Matching Home Page item action button style)
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFF1193D4).copy(alpha = 0.12f)),
+                contentAlignment = Alignment.Center
+            ) {
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
                     contentDescription = "Edit medicine",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = Color(0xFF1193D4),
+                    modifier = Modifier.size(22.dp)
                 )
-            },
-            modifier = Modifier.padding(8.dp)
-        )
+            }
+        }
     }
 }
 

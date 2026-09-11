@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
@@ -241,7 +242,7 @@ private fun CalendarDay(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .clip(CircleShape)
+            .clip(RoundedCornerShape(12.dp))
             .background(backgroundColor)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
@@ -252,17 +253,18 @@ private fun CalendarDay(
             Text(
                 text = day.toString(),
                 color = textColor,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Medium
+                fontSize = 21.sp,
+                fontWeight = FontWeight.Bold
             )
 
             if (statusColor != Color.Transparent) {
                 Spacer(modifier = Modifier.height(2.dp))
                 Box(
                     modifier = Modifier
-                        .size(6.dp)
-                        .clip(CircleShape)
-                        .background(statusColor)
+                        .width(22.dp)
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(if (isSelected) Color.White else statusColor)
                 )
             }
         }

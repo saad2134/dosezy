@@ -12,6 +12,7 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import com.example.dosezy.R
 
 object NotificationUtils {
 
@@ -169,7 +170,7 @@ object NotificationUtils {
                 }
                 context.startActivity(intent)
             } catch (e2: Exception) {
-                Toast.makeText(context, "Please enable 'Don't optimize' in Battery settings", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, context.getString(R.string.err_battery_optimization), Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -194,7 +195,7 @@ object NotificationUtils {
                 context.startActivity(intent)
             }
         } catch (e: Exception) {
-            Toast.makeText(context, "Cannot open notification settings", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.err_open_notification_settings), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -208,7 +209,7 @@ object NotificationUtils {
             }
             context.startActivity(intent)
         } catch (e: Exception) {
-            Toast.makeText(context, "Cannot open sound settings", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.err_open_sound_settings), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -223,7 +224,7 @@ object NotificationUtils {
             }
             context.startActivity(intent)
         } catch (e: Exception) {
-            Toast.makeText(context, "Cannot open app settings", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.err_open_app_settings), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -284,7 +285,7 @@ object NotificationUtils {
                 }
                 context.startActivity(intent)
             } catch (e: Exception) {
-                Toast.makeText(context, "Cannot open exact alarm settings", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.err_open_exact_alarm_settings), Toast.LENGTH_SHORT).show()
             }
         }
     }
