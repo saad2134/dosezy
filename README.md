@@ -9,7 +9,7 @@
 
 <div align="center">
 
-![Phase](https://img.shields.io/badge/🛠️%20Phase-Released%20v2%2E3%2E0-blue?style=for-the-badge)
+![Phase](https://img.shields.io/badge/🛠️%20Phase-Released%20v2%2E3%2E1-blue?style=for-the-badge)
 ![Platforms](https://img.shields.io/badge/🌐%20Platforms-Android-28a745?style=for-the-badge)
 
 </div>
@@ -207,7 +207,7 @@ dosezy/
   </thead>
   <tbody>
     <tr>
-      <td><strong>v1.0 – v2.1</strong></td>
+      <td><strong>v1.0 – v2.3</strong></td>
       <td><strong>Local-First Android Client</strong></td>
       <td>Core Medication Adherence</td>
       <td>Jetpack Compose UI, 12 native localizations, Room offline database, customizable late/missed thresholds, full-screen alarms, emergency dialer, zero account barrier.</td>
@@ -221,24 +221,17 @@ dosezy/
       <td align="center">🟡 In Design</td>
     </tr>
     <tr>
-      <td><strong>v3.0</strong></td>
-      <td><strong>Self-Hostable Backend & Sync</strong></td>
-      <td>Incremental Cloud Sync</td>
-      <td>Open-source server (<code>server/</code>), PostgreSQL DB, conflict-free sync engine, offline mutation queues, optional cloud connection.</td>
-      <td align="center">⏳ Planned</td>
-    </tr>
-    <tr>
-      <td><strong>v3.5</strong></td>
-      <td><strong>Native iOS Patient Client</strong></td>
-      <td>Multi-Platform Expansion</td>
-      <td>Native Swift & SwiftUI app (<code>patient/ios/</code>), SwiftData/CoreData local database, Apple UserNotifications, zero-account local operation.</td>
+      <td><strong>v3.0 – v3.9</strong></td>
+      <td><strong>Self-Hostable Backend & Caregiver Platform</strong></td>
+      <td>Incremental Sync & Web Portal</td>
+      <td>Open-source server (<code>server/</code>), PostgreSQL DB, conflict-free sync engine, offline mutation queues, optional cloud connection, dedicated Caregiver web portal (<code>caregiver/</code> at <code>app.dosezy.com</code>), remote adherence monitoring, patient-controlled granular sharing permissions.</td>
       <td align="center">⏳ Planned</td>
     </tr>
     <tr>
       <td><strong>v4.0</strong></td>
-      <td><strong>Caregiver Cloud Platform</strong></td>
-      <td>Connected Family Care</td>
-      <td>Dedicated Caregiver web portal (<code>caregiver/</code> at <code>app.dosezy.com</code>), remote adherence monitoring, patient-controlled granular sharing permissions.</td>
+      <td><strong>Native iOS Patient Client</strong></td>
+      <td>Multi-Platform Expansion</td>
+      <td>Native Swift & SwiftUI app (<code>patient/ios/</code>), SwiftData/CoreData local database, Apple UserNotifications, zero-account local operation.</td>
       <td align="center">⏳ Planned</td>
     </tr>
   </tbody>
@@ -348,8 +341,8 @@ Developed and published by **Saad (@saad2134)**.
   
 
 
-### 🆕 What's New in v2.3.0
-- **🔔 Slot-Based Grouped Alarms:** Takes multiple medicines scheduled at the exact same minute into a single non-clashing alert window with an interactive checklist and one-tap **"Take All"** action.
-- **⚡ Multi-Dose Quick Presets:** Presets for `1x`, `2x`, `3x`, and `4x` daily dosing to quickly schedule multiple dose times.
-- **📦 Home Medicine Inventory & Stock Tracking:** Track tablet counts with automatic stock deduction on dose taken and customizable low-stock refill warning alerts.
-- **📊 Data Exporter & OpenAPI Sync:** PDF, CSV, and JSON exports now include stock inventory levels, synced with OpenAPI 3.0 specification.
+### 🆕 What's New in v2.3.1
+- **⏰ Schedule Duplication on Edit Fix:** Resolved issue where modifying reminder times left behind stale un-taken doses; untaken doses from start of day are cleanly purged before new slots generate.
+- **🔔 Alarm Sound, Vibration & Background Reliability:** Hardened notification channel with `USAGE_ALARM`, wake lock, high-priority vibration, and DND bypass for reliable lock-screen and background alerts.
+- **📱 Responsive Layout Wrapping:** Upgraded frequency preset chips and analytics period breakdowns to dynamic `FlowRow` for compact displays.
+- **🌐 100% 12-Language Localization Parity:** Localized stock/refill badges, time calculation phrases, and all screen strings across 12 languages (389 keys each).
