@@ -47,6 +47,14 @@ object TimeCalculationUtils {
         }
     }
 
+    fun formatTimeDifference(context: android.content.Context, timeDiff: TimeDifference): String {
+        return if (timeDiff.isLate) {
+            context.getString(com.example.dosezy.R.string.time_diff_ago, timeDiff.hours, timeDiff.minutes)
+        } else {
+            context.getString(com.example.dosezy.R.string.to_be_taken_in, timeDiff.hours, timeDiff.minutes)
+        }
+    }
+
     fun formatTimeDifference(timeDiff: TimeDifference): String {
         return if (timeDiff.isLate) {
             "${timeDiff.hours}h ${timeDiff.minutes}m ago"

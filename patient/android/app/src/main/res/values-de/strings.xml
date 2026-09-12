@@ -418,4 +418,12 @@ Möchten Sie fortfahren?</string>
     <string name="err_cannot_open_link">Link kann nicht geöffnet werden</string>
     <string name="err_no_email_app">Keine E-Mail-App verfügbar</string>
     <string name="err_share_failed">Freigabefehler: %1$s</string>
+    <string name="med_stock_refill_warning_badge">⚠️ Nachfüllwarnung: Noch %1$d übrig</string>
+    <string name="med_stock_badge">📦 Vorrat: %1$d</string>
+    <string name="to_be_taken_in">Einzunehmen in %1$d Std. %2$d Min.</string>
+    <string name="time_diff_ago">Vor %1$d Std. %2$d Min.</string>
+    <string name="status_all_medications_taken">Alle Medikamente eingenommen</string>
+    <string name="status_scheduled_for_this_time">Für diese Zeit geplant</string>
+    <string name="daily_frequency_presets_title">Tägliche Häufigkeitsvoreinstellungen</string>
+    <string name="action_edit_medicine_cd">Medikament bearbeiten</string>
 </resources>

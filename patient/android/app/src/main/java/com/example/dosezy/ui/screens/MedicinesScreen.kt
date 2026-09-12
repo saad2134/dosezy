@@ -203,7 +203,11 @@ fun MedicineItem(
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
-                                text = if (isLow) "⚠️ Refill Warning: $stock left" else "📦 Stock: $stock",
+                                text = if (isLow) {
+                                    stringResource(R.string.med_stock_refill_warning_badge, stock)
+                                } else {
+                                    stringResource(R.string.med_stock_badge, stock)
+                                },
                                 color = contentColor,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
@@ -226,7 +230,7 @@ fun MedicineItem(
             ) {
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
-                    contentDescription = "Edit medicine",
+                    contentDescription = stringResource(R.string.action_edit_medicine_cd),
                     tint = Color(0xFF1193D4),
                     modifier = Modifier.size(22.dp)
                 )

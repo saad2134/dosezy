@@ -434,4 +434,12 @@
     <string name="err_cannot_open_link">लिंक नहीं खोला जा सका</string>
     <string name="err_no_email_app">कोई ईमेल ऐप उपलब्ध नहीं है</string>
     <string name="err_share_failed">साझाकरण त्रुटि: %1$s</string>
+    <string name="med_stock_refill_warning_badge">⚠️ रिफिल चेतावनी: %1$d शेष</string>
+    <string name="med_stock_badge">📦 स्टॉक: %1$d</string>
+    <string name="to_be_taken_in">%1$dघंटे %2$dमिनट में लेनी है</string>
+    <string name="time_diff_ago">%1$dघंटे %2$dमिनट पहले</string>
+    <string name="status_all_medications_taken">सभी दवाएं ले ली गईं</string>
+    <string name="status_scheduled_for_this_time">इस समय के लिए निर्धारित</string>
+    <string name="daily_frequency_presets_title">दैनिक आवृत्ति प्रीसेट</string>
+    <string name="action_edit_medicine_cd">दवा संपादित करें</string>
 </resources>

@@ -253,10 +253,16 @@ private fun TimeSection(
         val statusText = when {
             entries.all { it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
                     it.scheduleEntry.status == MedicationStatus.TAKEN_LATE } -> {
-                "All medications taken"
+                androidx.compose.ui.res.stringResource(R.string.status_all_medications_taken)
             }
-            timeDiff != null -> TimeCalculationUtils.formatTimeDifference(timeDiff)
-            else -> "Scheduled for this time"
+            timeDiff != null -> {
+                if (timeDiff.isLate) {
+                    androidx.compose.ui.res.stringResource(R.string.time_diff_ago, timeDiff.hours, timeDiff.minutes)
+                } else {
+                    androidx.compose.ui.res.stringResource(R.string.to_be_taken_in, timeDiff.hours, timeDiff.minutes)
+                }
+            }
+            else -> androidx.compose.ui.res.stringResource(R.string.status_scheduled_for_this_time)
         }
 
         // Always normal color below time header (not transparent, not red, not orange)
@@ -402,7 +408,11 @@ private fun MedicationCard(
                             shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
                         ) {
                             Text(
-                                text = if (isLow) "⚠️ Refill Warning: $stock left" else "📦 Stock: $stock",
+                                text = if (isLow) {
+                                    androidx.compose.ui.res.stringResource(R.string.med_stock_refill_warning_badge, stock)
+                                } else {
+                                    androidx.compose.ui.res.stringResource(R.string.med_stock_badge, stock)
+                                },
                                 color = contentColor,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
@@ -424,7 +434,7 @@ private fun MedicationCard(
                         entry.scheduledDateTime,
                         currentDateTime
                     )
-                    val agoText = "${timeDiff.hours}h ${timeDiff.minutes}m ago"
+                    val agoText = androidx.compose.ui.res.stringResource(R.string.time_diff_ago, timeDiff.hours, timeDiff.minutes)
 
                     if (isMissed) {
                         Text(

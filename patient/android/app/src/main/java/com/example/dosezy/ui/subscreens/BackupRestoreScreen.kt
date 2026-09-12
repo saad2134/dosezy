@@ -267,7 +267,9 @@ fun BackupRestoreScreen(
                                     text = stringResource(R.string.backup_coming_soon),
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.ExtraBold,
-                                    color = if (isDark) Color(0xFFA78BFA) else Color(0xFF7C3AED)
+                                    color = if (isDark) Color(0xFFA78BFA) else Color(0xFF7C3AED),
+                                    maxLines = 1,
+                                    softWrap = false
                                 )
                             }
                         }
@@ -346,7 +348,9 @@ fun BackupRestoreScreen(
                                     text = stringResource(R.string.backup_coming_soon),
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.ExtraBold,
-                                    color = if (isDark) Color(0xFF67E8F9) else Color(0xFF0891B2)
+                                    color = if (isDark) Color(0xFF67E8F9) else Color(0xFF0891B2),
+                                    maxLines = 1,
+                                    softWrap = false
                                 )
                             }
                         }

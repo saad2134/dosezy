@@ -417,4 +417,12 @@ Deseja continuar?</string>
     <string name="err_cannot_open_link">Não é possível abrir o link</string>
     <string name="err_no_email_app">Nenhum aplicativo de e-mail disponível</string>
     <string name="err_share_failed">Erro ao compartilhar: %1$s</string>
+    <string name="med_stock_refill_warning_badge">⚠️ Alerta de recarga: restam %1$d</string>
+    <string name="med_stock_badge">📦 Estoque: %1$d</string>
+    <string name="to_be_taken_in">A tomar em %1$dh %2$dm</string>
+    <string name="time_diff_ago">Há %1$dh %2$dm</string>
+    <string name="status_all_medications_taken">Todos os medicamentos tomados</string>
+    <string name="status_scheduled_for_this_time">Agendado para este horário</string>
+    <string name="daily_frequency_presets_title">Predefinições de frequência diária</string>
+    <string name="action_edit_medicine_cd">Editar medicamento</string>
 </resources>

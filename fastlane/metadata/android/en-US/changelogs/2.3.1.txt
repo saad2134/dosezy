@@ -1,0 +1,4 @@
+1. Schedule Deduplication: Resolved duplicate dose entries when modifying reminder times.
+2. Alarm & Sound Reliability: Enhanced full-screen alarm, wake lock, ringtone, and vibration delivery.
+3. UI Improvements: Responsive wrapping for frequency presets and analytics charts.
+4. Localization Improvements: Complete 12-language translation parity with localized refill and time indicators.

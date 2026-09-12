@@ -418,4 +418,12 @@ Voulez-vous continuer ?</string>
     <string name="err_cannot_open_link">Impossible d\'ouvrir le lien</string>
     <string name="err_no_email_app">Aucune application de messagerie disponible</string>
     <string name="err_share_failed">Erreur de partage : %1$s</string>
+    <string name="med_stock_refill_warning_badge">⚠️ Alerte réapprovisionnement : %1$d restants</string>
+    <string name="med_stock_badge">📦 Stock : %1$d</string>
+    <string name="to_be_taken_in">À prendre dans %1$dh %2$dmin</string>
+    <string name="time_diff_ago">Il y a %1$dh %2$dmin</string>
+    <string name="status_all_medications_taken">Tous les médicaments sont pris</string>
+    <string name="status_scheduled_for_this_time">Programmé pour cette heure</string>
+    <string name="daily_frequency_presets_title">Préréglages de fréquence quotidienne</string>
+    <string name="action_edit_medicine_cd">Modifier le médicament</string>
 </resources>

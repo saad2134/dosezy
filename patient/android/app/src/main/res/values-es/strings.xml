@@ -434,4 +434,12 @@
     <string name="err_cannot_open_link">No se puede abrir el enlace</string>
     <string name="err_no_email_app">No hay aplicaciones de correo electrónico disponibles</string>
     <string name="err_share_failed">Error al compartir: %1$s</string>
+    <string name="med_stock_refill_warning_badge">⚠️ Alerta de reposición: quedan %1$d</string>
+    <string name="med_stock_badge">📦 Stock: %1$d</string>
+    <string name="to_be_taken_in">Por tomar en %1$dh %2$dm</string>
+    <string name="time_diff_ago">Hace %1$dh %2$dm</string>
+    <string name="status_all_medications_taken">Todos los medicamentos tomados</string>
+    <string name="status_scheduled_for_this_time">Programado para esta hora</string>
+    <string name="daily_frequency_presets_title">Ajustes preestablecidos diarios</string>
+    <string name="action_edit_medicine_cd">Editar medicamento</string>
 </resources>

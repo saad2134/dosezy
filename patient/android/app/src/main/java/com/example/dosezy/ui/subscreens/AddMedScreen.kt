@@ -510,14 +510,15 @@ fun AddMedScreen(
 
                         // 2. Dosing Presets (1x, 2x, 3x, 4x)
                         Text(
-                            text = "Daily Frequency Presets",
+                            text = stringResource(R.string.daily_frequency_presets_title),
                             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
                             color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(bottom = 6.dp)
                         )
-                        Row(
+                        FlowRow(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             val presets = listOf(
                                 "1x" to listOf(LocalTime.of(8, 0)),

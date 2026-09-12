@@ -418,4 +418,12 @@
     <string name="err_cannot_open_link">تعذر فتح الرابط</string>
     <string name="err_no_email_app">لا يوجد تطبيق بريد إلكتروني متاح</string>
     <string name="err_share_failed">خطأ في المشاركة: %1$s</string>
+    <string name="med_stock_refill_warning_badge">⚠️ تحذير إعادة التعبئة: متبقي %1$d</string>
+    <string name="med_stock_badge">📦 المخزون: %1$d</string>
+    <string name="to_be_taken_in">يجب تناوله خلال %1$d س و %2$d د</string>
+    <string name="time_diff_ago">منذ %1$d س و %2$d د</string>
+    <string name="status_all_medications_taken">تم تناول جميع الأدوية</string>
+    <string name="status_scheduled_for_this_time">مجدول لهذا الوقت</string>
+    <string name="daily_frequency_presets_title">الإعدادات المسبقة للتكرار اليومي</string>
+    <string name="action_edit_medicine_cd">تعديل الدواء</string>
 </resources>

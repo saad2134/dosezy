@@ -418,4 +418,12 @@
     <string name="err_cannot_open_link">Невозможно открыть ссылку</string>
     <string name="err_no_email_app">Нет доступных почтовых приложений</string>
     <string name="err_share_failed">Ошибка отправки: %1$s</string>
+    <string name="med_stock_refill_warning_badge">⚠️ Пополнение запаса: осталось %1$d</string>
+    <string name="med_stock_badge">📦 Запас: %1$d</string>
+    <string name="to_be_taken_in">Принять через %1$d ч %2$d мин</string>
+    <string name="time_diff_ago">%1$d ч %2$d мин назад</string>
+    <string name="status_all_medications_taken">Все лекарства приняты</string>
+    <string name="status_scheduled_for_this_time">Запланировано на это время</string>
+    <string name="daily_frequency_presets_title">Предустановки частоты приема</string>
+    <string name="action_edit_medicine_cd">Редактировать лекарство</string>
 </resources>

@@ -104,8 +104,8 @@ class BackupRestoreManager(
             // 1. Write Manifest
             val manifestJson = JSONObject().apply {
                 put("manifestVersion", 1)
-                put("appVersion", "2.3.0")
-                put("versionCode", 16)
+                put("appVersion", com.example.dosezy.BuildConfig.VERSION_NAME)
+                put("versionCode", com.example.dosezy.BuildConfig.VERSION_CODE)
                 put("exportedAt", LocalDateTime.now().toString())
                 put("profileCount", users.size)
                 put("profileIds", JSONArray(profileIds))

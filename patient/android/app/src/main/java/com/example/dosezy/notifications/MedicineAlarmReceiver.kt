@@ -75,7 +75,18 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         medicineNames: ArrayList<String>?,
         scheduledTime: String?
     ) {
+        // Acquire wake lock to ensure CPU stays awake while firing alarm
+        val powerManager = context.getSystemService(Context.POWER_SERVICE) as? android.os.PowerManager
+        val wakeLock = powerManager?.newWakeLock(
+            android.os.PowerManager.PARTIAL_WAKE_LOCK,
+            "Dosezy:MedicineAlarmWakeLock"
+        )
+        wakeLock?.acquire(10 * 1000L) // 10 seconds
+
         createNotificationChannel(context)
+
+        val alarmSoundUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_ALARM)
+            ?: android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
 
         val contentText = scheduledTime?.let {
             "Scheduled for $it - Time to take your medicine!"
@@ -140,20 +151,25 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Launch AlarmActivity directly to wake screen up and interrupt user
+        // Launch AlarmActivity directly if permitted (e.g., when screen is active / app foreground)
         try {
             context.startActivity(alarmIntent)
         } catch (e: Exception) {
             Log.e(TAG, "Could not start AlarmActivity directly", e)
         }
 
-        // Create notification with Compose icons and fullScreenIntent
+        val vibrationPattern = longArrayOf(0, 1000, 500, 1000)
+
+        // Create notification with sound, vibration, and fullScreenIntent
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_medicine_notification)
             .setContentTitle("Medicine Reminder: $medicineName")
             .setContentText(contentText)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setSound(alarmSoundUri, android.media.AudioManager.STREAM_ALARM)
+            .setVibrate(vibrationPattern)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setFullScreenIntent(fullScreenPendingIntent, true)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
@@ -179,6 +195,14 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
     private fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val alarmSoundUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_ALARM)
+                ?: android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
+            val audioAttributes = android.media.AudioAttributes.Builder()
+                .setUsage(android.media.AudioAttributes.USAGE_ALARM)
+                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
+            val vibrationPattern = longArrayOf(0, 1000, 500, 1000)
+
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 context.getString(com.example.dosezy.R.string.notif_channel_name),
@@ -187,6 +211,9 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 description = context.getString(com.example.dosezy.R.string.notif_channel_desc)
                 enableLights(true)
                 enableVibration(true)
+                this.vibrationPattern = vibrationPattern
+                setSound(alarmSoundUri, audioAttributes)
+                setBypassDnd(true)
                 setShowBadge(true)
                 lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
             }

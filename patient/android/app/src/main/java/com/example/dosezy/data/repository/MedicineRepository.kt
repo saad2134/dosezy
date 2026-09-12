@@ -76,18 +76,17 @@ class MedicineRepository @Inject constructor(
                     oldMedicine.timesPerDay != medicine.timesPerDay
 
             if (scheduleChanged) {
-                val now = java.time.LocalDateTime.now().withSecond(0).withNano(0)
-                val fromEpochMillis = now.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+                val startOfToday = LocalDate.now().atStartOfDay()
+                val startOfTodayEpochMillis = startOfToday.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
 
-                // Delete ONLY future pending entries for this medicine
-                database.scheduleDao().deleteFuturePendingScheduleEntries(medicine.medicineId, fromEpochMillis)
+                // Delete all untaken schedule entries from start of today onwards for this medicine
+                database.scheduleDao().deleteUntakenScheduleEntriesFrom(medicine.medicineId, startOfTodayEpochMillis)
 
                 // Generate new schedule entries starting from today for 30 days
                 val newEntries = medicine.generateScheduleEntries(LocalDate.now(), 30)
 
-                // Filter to keep only entries scheduled for now or future
-                val futureNewEntries = newEntries.filter { it.scheduledDateTime >= now }
-                database.scheduleDao().insertScheduleEntries(futureNewEntries)
+                // Insert the new entries (already taken entries are preserved by OnConflictStrategy.IGNORE)
+                database.scheduleDao().insertScheduleEntries(newEntries)
             }
         } else {
             // Fallback if old medicine wasn't in DB

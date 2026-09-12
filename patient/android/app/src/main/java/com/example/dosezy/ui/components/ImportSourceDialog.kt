@@ -5,6 +5,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.dosezy.R
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ImportSourceDialog(
     onDismiss: () -> Unit,
@@ -176,14 +179,19 @@ fun ImportSourceDialog(
                                 )
                             }
                             Spacer(modifier = Modifier.height(12.dp))
-                            Row(verticalAlignment = Alignment.CenterVertically) {
+                            FlowRow(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalArrangement = Arrangement.spacedBy(6.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
                                 Text(
                                     text = stringResource(R.string.backup_cloud_title),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = textPrimary
+                                    color = textPrimary,
+                                    textAlign = TextAlign.Center
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(20.dp))
@@ -195,7 +203,10 @@ fun ImportSourceDialog(
                                         text = stringResource(R.string.backup_coming_soon),
                                         fontSize = 9.sp,
                                         fontWeight = FontWeight.ExtraBold,
-                                        color = if (isDark) Color(0xFFA78BFA) else Color(0xFF7C3AED)
+                                        color = if (isDark) Color(0xFFA78BFA) else Color(0xFF7C3AED),
+                                        maxLines = 1,
+                                        softWrap = false,
+                                        lineHeight = 10.sp
                                     )
                                 }
                             }

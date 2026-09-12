@@ -418,4 +418,12 @@
     <string name="err_cannot_open_link">লিঙ্ক খোলা সম্ভব নয়</string>
     <string name="err_no_email_app">কোন ইমেইল অ্যাপ পাওয়া যায়নি</string>
     <string name="err_share_failed">শেয়ার করতে ত্রুটি: %1$s</string>
+    <string name="med_stock_refill_warning_badge">⚠️ রিফিল সতর্কতা: %1$d বাকি</string>
+    <string name="med_stock_badge">📦 স্টক: %1$d</string>
+    <string name="to_be_taken_in">%1$dঘণ্টা %2$dমিনিটের মধ্যে সেব্য</string>
+    <string name="time_diff_ago">%1$dঘণ্টা %2$dমিনিট আগে</string>
+    <string name="status_all_medications_taken">সমস্ত ওষুধ গ্রহণ করা হয়েছে</string>
+    <string name="status_scheduled_for_this_time">এই সময়ের জন্য নির্ধারিত</string>
+    <string name="daily_frequency_presets_title">দৈনিক ফ্রিকোয়েন্সি প্রিসেট</string>
+    <string name="action_edit_medicine_cd">ওষুধ সম্পাদনা করুন</string>
 </resources>

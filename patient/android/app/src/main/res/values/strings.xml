@@ -438,4 +438,12 @@ Do you want to continue?</string>
     <string name="err_cannot_open_link">Cannot open link</string>
     <string name="err_no_email_app">No email app available</string>
     <string name="err_share_failed">Share error: %1$s</string>
+    <string name="med_stock_refill_warning_badge">⚠️ Refill Warning: %1$d left</string>
+    <string name="med_stock_badge">📦 Stock: %1$d</string>
+    <string name="to_be_taken_in">To be taken in %1$dh %2$dm</string>
+    <string name="time_diff_ago">%1$dh %2$dm ago</string>
+    <string name="status_all_medications_taken">All medications taken</string>
+    <string name="status_scheduled_for_this_time">Scheduled for this time</string>
+    <string name="daily_frequency_presets_title">Daily Frequency Presets</string>
+    <string name="action_edit_medicine_cd">Edit medicine</string>
 </resources>

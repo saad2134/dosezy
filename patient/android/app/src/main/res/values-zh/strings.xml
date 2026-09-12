@@ -434,4 +434,12 @@
     <string name="err_cannot_open_link">无法打开链接</string>
     <string name="err_no_email_app">没有可用的电子邮件应用</string>
     <string name="err_share_failed">分享错误: %1$s</string>
+    <string name="med_stock_refill_warning_badge">⚠️ 补充提醒：仅剩 %1$d 份</string>
+    <string name="med_stock_badge">📦 库存：%1$d</string>
+    <string name="to_be_taken_in">%1$d 小时 %2$d 分钟后服用</string>
+    <string name="time_diff_ago">%1$d 小时 %2$d 分钟前</string>
+    <string name="status_all_medications_taken">所有药物均已服用</string>
+    <string name="status_scheduled_for_this_time">已安排在此时间</string>
+    <string name="daily_frequency_presets_title">每日服药频率预设</string>
+    <string name="action_edit_medicine_cd">编辑药物</string>
 </resources>
