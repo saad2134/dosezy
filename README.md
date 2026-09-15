@@ -9,7 +9,7 @@
 
 <div align="center">
 
-![Phase](https://img.shields.io/badge/🛠️%20Phase-Released%20v2%2E3%2E1-blue?style=for-the-badge)
+![Phase](https://img.shields.io/badge/🛠️%20Phase-In%20Development%20v2%2E3%2E2-blue?style=for-the-badge)
 ![Platforms](https://img.shields.io/badge/🌐%20Platforms-Android-28a745?style=for-the-badge)
 
 </div>
@@ -338,8 +338,10 @@ Developed and published by **Saad (@saad2134)**.
 ## 🏷 Tags  
 
 `android` `ios` `swiftui` `jetpack-compose` `kotlin` `open-source` `local-first` `offline-first` `medicine-reminder` `medicine-management` `medication-adherence` `caregiver` `elderly-care` `health-tech` `self-hosted` `dosezy` `nextjs`
-  
 
+---
+
+## 📃 Changelogs
 
 ### 🆕 What's New in v2.3.2
 - **🛡️ Security Hardening (Zip Slip Fix):** Patched archive extraction during backup restores by strictly canonicalizing file paths to prevent arbitrary file access vulnerabilities.

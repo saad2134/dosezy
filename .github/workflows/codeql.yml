@@ -7,6 +7,7 @@ on:
     branches: ["main"]
   schedule:
     - cron: "41 13 * * 3"
+  workflow_dispatch:
 
 permissions:
   security-events: write
@@ -16,15 +17,48 @@ permissions:
 
 jobs:
   # ------------------------------------------------------------
+  # Change Detection
+  # ------------------------------------------------------------
+  detect-changes:
+    name: Detect Changed Components
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      android: ${{ steps.filter.outputs.android }}
+      website: ${{ steps.filter.outputs.website }}
+      server: ${{ steps.filter.outputs.server }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Paths Filter
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            android:
+              - 'patient/android/**'
+              - '.github/workflows/codeql.yml'
+            website:
+              - 'website/**'
+              - '.github/workflows/codeql.yml'
+            server:
+              - 'server/**'
+              - '.github/workflows/codeql.yml'
+
+  # ------------------------------------------------------------
   # Android / Kotlin / Java
   # ------------------------------------------------------------
   analyze-android:
     name: Analyze (java-kotlin)
+    needs: detect-changes
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || needs.detect-changes.outputs.android == 'true'
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -33,7 +67,7 @@ jobs:
           java-version: "17"
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v4
+        uses: github/codeql-action/init@v3
         with:
           languages: java-kotlin
           build-mode: manual
@@ -65,7 +99,7 @@ jobs:
           ./gradlew clean assemble --no-daemon --stacktrace
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v4
+        uses: github/codeql-action/analyze@v3
         with:
           category: "/language:java-kotlin"
 
@@ -75,20 +109,22 @@ jobs:
   # ------------------------------------------------------------
   analyze-website:
     name: Analyze (javascript-typescript)
+    needs: detect-changes
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || needs.detect-changes.outputs.website == 'true'
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v4
+        uses: github/codeql-action/init@v3
         with:
           languages: javascript-typescript
           build-mode: none
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v4
+        uses: github/codeql-action/analyze@v3
         with:
           category: "/language:javascript-typescript"
 
@@ -98,19 +134,21 @@ jobs:
   # ------------------------------------------------------------
   analyze-server:
     name: Analyze (python)
+    needs: detect-changes
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || needs.detect-changes.outputs.server == 'true'
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v4
+        uses: github/codeql-action/init@v3
         with:
           languages: python
           build-mode: none
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v4
+        uses: github/codeql-action/analyze@v3
         with:
           category: "/language:python"
