@@ -418,7 +418,7 @@
     <string name="err_cannot_open_link">リンクを開けません</string>
     <string name="err_no_email_app">利用可能なメールアプリがありません</string>
     <string name="err_share_failed">共有エラー: %1$s</string>
-    <string name="med_stock_refill_warning_badge">⚠️ 残量警告: 残り %1$d 個</string>
+    <string name="med_stock_refill_warning_badge">⚠️ 補充: 残り %1$d 個</string>
     <string name="med_stock_badge">📦 在庫: %1$d</string>
     <string name="to_be_taken_in">%1$d時間%2$d分後に服用</string>
     <string name="time_diff_ago">%1$d時間%2$d分前</string>
@@ -426,4 +426,117 @@
     <string name="status_scheduled_for_this_time">この時間に予定されています</string>
     <string name="daily_frequency_presets_title">1日の服用頻度プリセット</string>
     <string name="action_edit_medicine_cd">薬を編集</string>
+
+    <!-- v2.4.0 新機能 (Japanese) -->
+    <string name="profile_allergies">アレルギー</string>
+    <string name="profile_allergies_placeholder">例：ペニシリン、サルファ剤、ピーナッツ</string>
+    <string name="profile_medical_conditions">既往症 / 慢性疾患</string>
+    <string name="profile_medical_conditions_placeholder">例：高血圧、2型糖尿病</string>
+    <string name="emergency_medical_profile">患者の医療情報</string>
+    <string name="emergency_no_allergies">登録されたアレルギーはありません</string>
+    <string name="emergency_no_conditions">登録された既往症はありません</string>
+
+    <string name="med_shape_label">薬の形状・剤形</string>
+    <string name="med_color_label">視覚カラー</string>
+    <string name="pill_shape_round">丸型 (Round)</string>
+    <string name="pill_shape_capsule">カプセル (Capsule)</string>
+    <string name="pill_shape_oval">楕円型 (Oval)</string>
+    <string name="pill_shape_liquid">シロップ・液体 (Liquid)</string>
+    <string name="pill_shape_inhaler">吸入器 (Inhaler)</string>
+    <string name="pill_shape_injection">注射 (Injection)</string>
+    <string name="pill_shape_drops">点眼・点滴 (Drops)</string>
+    <string name="pill_shape_patch">貼付剤・湿布 (Patch)</string>
+
+    <string name="med_notes_label">医師・薬剤師の指示・注意事項</string>
+    <string name="med_notes_placeholder">例：食後服用、グレープフルーツ禁止、処方箋 #12345</string>
+
+    <string name="course_duration_title">服薬期間</string>
+    <string name="course_ongoing">継続服用</string>
+    <string name="course_finite">期間限定コース</string>
+    <string name="course_duration_days_label">期間 (日数)</string>
+    <string name="course_duration_days_placeholder">例：7, 10, 14, 30</string>
+    <string name="course_start_date_label">開始日</string>
+    <string name="course_end_date_label">終了日：%1$s</string>
+    <string name="course_completed_badge">コース完了</string>
+
+    <string name="freq_as_needed">必要時 (頓服 / PRN)</string>
+    <string name="freq_as_needed_desc">定時アラームなし。服用時にその都度記録します。</string>
+    <string name="freq_every_x_hours">X 時間ごと</string>
+    <string name="freq_every_x_days">X 日ごと</string>
+    <string name="freq_every_hours_format">%1$d 時間ごと</string>
+    <string name="freq_every_days_format">%1$d 日ごと</string>
+    <string name="interval_hours_label">服用間隔 (時間)</string>
+    <string name="interval_days_label">服用間隔 (日数)</string>
+    <string name="btn_log_prn_dose">服用を記録</string>
+    <string name="prn_doses_taken_today">本日記録された服用数: %1$d</string>
+    <string name="prn_section_title">頓服薬 (PRN)</string>
+
+    <string name="btn_quick_refill_action">+ 補充</string>
+    <string name="quick_refill_dialog_title">在庫補充: %1$s</string>
+    <string name="quick_refill_amount_label">追加数量</string>
+    <string name="quick_refill_preset_30">+30</string>
+    <string name="quick_refill_preset_60">+60</string>
+    <string name="quick_refill_preset_90">+90</string>
+    <string name="quick_refill_success">%1$s の在庫を補充しました。現在の在庫: %2$d</string>
+
+    <string name="no_scheduled_doses_today">本日の服用予定はありません</string>
+    <string name="prn_confirm_log_title">服用を記録</string>
+    <string name="prn_confirm_log_msg">%1$s (%2$s) の服用（1回分）を記録しますか？</string>
+    <string name="hours_limit_hint">24時間以上の間隔には「X日ごと」をご利用ください。</string>
+
+    <string name="pref_nagging_title">リマインド再通知 (Nagging)</string>
+    <string name="pref_nagging_desc">予定された薬が服用完了されない場合、繰り返し通知します</string>
+    <string name="pref_nagging_interval">再通知間隔</string>
+    <string name="pref_nagging_max_repeats">最大再通知回数</string>
+    <string name="pref_nagging_repeats_format">%1$d 回</string>
+    <string name="notif_nagging_title">服薬リマインド: %1$s</string>
+    <string name="notif_nagging_text">再通知 %1$d/%2$d: %3$s の予定薬がまだ服用されていません。</string>
+
+    <string name="widget_title">Dosezy 今日の服薬</string>
+    <string name="widget_no_meds">予定されている薬はありません</string>
+    <string name="widget_all_taken">今日のすべての薬を服用しました！🎉</string>
+    <string name="widget_tap_to_open">タップしてアプリを開く</string>
+    <string name="widget_no_profile">プロフィールが作成されていません</string>
+    <string name="widget_open_app">Dosezy を開いて設定してください</string>
+    <string name="widget_taken_summary">%1$d / %2$d 服用済み</string>
+    <string name="widget_all_completed">すべての服薬が完了しました！🎉</string>
+    <string name="widget_no_doses_today">本日の予定はありません</string>
+    <string name="widget_next_dose_format">次回: %1$s • %2$s</string>
+
+    <!-- Custom Alarm Sounds -->
+    <string name="pref_alarm_sound">アラーム音</string>
+    <string name="pref_alarm_sound_desc">服薬アラームの着信音を選択</string>
+    <string name="alarm_sound_system_default">システムのデフォルト</string>
+    <string name="alarm_sound_gentle_chime">やさしいチャイム</string>
+    <string name="alarm_sound_medical_marimba">メディカルマリンバ</string>
+    <string name="alarm_sound_brisk_pulse">軽快なパルス</string>
+    <string name="alarm_sound_calm_bell">穏やかなベル</string>
+    <string name="alarm_sound_preview">試聴</string>
+    <!-- Discontinue & Soft-Delete (#51) -->
+    <string name="dialog_med_action_title">服用終了または削除？</string>
+    <string name="dialog_med_action_desc">このお薬の処理を選択してください：</string>
+    <string name="btn_discontinue_keep_history">服用終了（履歴を保持）</string>
+    <string name="discontinue_med_explanation">今後の通知を停止し、アクティブ一覧から除外します。過去の服薬履歴やレポートは保持されます。</string>
+    <string name="btn_delete_permanently">完全に削除</string>
+    <string name="delete_permanently_explanation">このお薬とすべての過去の服薬記録を完全に消去します。</string>
+    <string name="discontinued_medications_section">服用終了したお薬</string>
+    <string name="btn_reactivate_med">再開する</string>
+    <string name="dialog_delete_permanent_title">完全に削除しますか？</string>
+    <string name="dialog_delete_permanent_msg">%1$s を完全に削除してもよろしいですか？過去の服薬履歴もすべて削除されます。</string>
+    <string name="help_github_issues_title">問題を報告</string>
+    <string name="help_github_issues_desc">GitHub で不具合の報告や新機能の提案を行う</string>
+    <string name="menu_about_dosezy">Dosezy について</string>
+    <string name="about_title">Dosezy について</string>
+    <string name="about_tagline">患者様とご家族のための、完全オフライン＆プライバシー重視の服薬管理アプリ。</string>
+    <string name="about_star_github">GitHub でスターをつける</string>
+    <string name="about_star_github_desc">GitHub でスターをつけてオープンソースプロジェクトを応援する</string>
+    <string name="about_support_dev_title">開発を支援する</string>
+    <string name="about_support_dev_desc">Dosezy は完全無料、広告なし、プライバシー重視です。皆様のご支援が開発の原動力です！</string>
+    <string name="about_buymeacoffee">開発者にコーヒーをおごる</string>
+    <string name="about_buymeacoffee_desc">クレジットカードや PayPal で手軽にご支援いただけます</string>
+    <string name="about_crypto_donations">暗号資産（仮想通貨）でのご支援</string>
+    <string name="about_copied_to_clipboard">%1$s アドレスをクリップボードにコピーしました</string>
+    <string name="about_tap_to_copy">タップしてアドレスをコピー</string>
+    <string name="about_github_sponsors">GitHub Sponsors</string>
+    <string name="about_github_sponsors_desc">GitHub Sponsors で毎月または単発の支援をする</string>
 </resources>

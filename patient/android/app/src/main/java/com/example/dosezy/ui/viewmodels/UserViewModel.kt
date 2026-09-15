@@ -135,12 +135,45 @@ class UserViewModel @Inject constructor(
         }
     }
 
-    fun deleteUser(user: User) {
+    fun deleteUser(user: User, onNextUserSelected: ((User?) -> Unit)? = null) {
         viewModelScope.launch {
-            userRepository.deleteUser(user)
-            // If deleted the current user, select a new one
-            if (user.isCurrentUser && _users.value.isNotEmpty()) {
-                setCurrentUser(_users.value.first())
+            _isLoading.value = true
+            try {
+                withContext(Dispatchers.IO) {
+                    // Cancel alarms for the deleted user
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        medicineNotificationManager.cancelAllAlarmsForUser(user.userId)
+                    }
+
+                    // Delete the user from DB
+                    userRepository.deleteUser(user)
+
+                    // Fetch remaining users directly from DB
+                    val remainingUsers = userRepository.getAllUsersList().filter { it.userId != user.userId }
+                    if (user.isCurrentUser && remainingUsers.isNotEmpty()) {
+                        // Pick next available user and set as current
+                        val nextUser = remainingUsers.first().copy(isCurrentUser = true)
+                        userRepository.updateUser(nextUser)
+
+                        withContext(Dispatchers.Main) {
+                            _currentUser.value = nextUser
+                            onNextUserSelected?.invoke(nextUser)
+                        }
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            medicineNotificationManager.scheduleAlarmsForUser(nextUser.userId)
+                        }
+                    } else if (remainingUsers.isEmpty()) {
+                        withContext(Dispatchers.Main) {
+                            _currentUser.value = null
+                            onNextUserSelected?.invoke(null)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("UserViewModel", "Error deleting user", e)
+            } finally {
+                _isLoading.value = false
             }
         }
     }

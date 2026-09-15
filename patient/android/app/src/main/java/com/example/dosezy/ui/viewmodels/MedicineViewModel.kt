@@ -23,11 +23,15 @@ class MedicineViewModel @Inject constructor(
     private val _medicines = MutableStateFlow<List<Medicine>>(emptyList())
     val medicines: StateFlow<List<Medicine>> = _medicines.asStateFlow()
 
+    private val _archivedMedicines = MutableStateFlow<List<Medicine>>(emptyList())
+    val archivedMedicines: StateFlow<List<Medicine>> = _archivedMedicines.asStateFlow()
+
     private val _currentUserId = MutableStateFlow<String?>(null)
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private var medicinesJob: kotlinx.coroutines.Job? = null
+    private var archivedMedicinesJob: kotlinx.coroutines.Job? = null
 
     init {
         loadCurrentUserAndMedicines()
@@ -57,11 +61,17 @@ class MedicineViewModel @Inject constructor(
 
     private fun loadUserMedicines(userId: String) {
         medicinesJob?.cancel()
+        archivedMedicinesJob?.cancel()
         _isLoading.value = true
         medicinesJob = viewModelScope.launch {
             medicineRepository.getMedicinesByUser(userId).collect { medicines ->
                 _medicines.value = medicines
                 _isLoading.value = false
+            }
+        }
+        archivedMedicinesJob = viewModelScope.launch {
+            medicineRepository.getArchivedMedicinesByUser(userId).collect { archived ->
+                _archivedMedicines.value = archived
             }
         }
     }
@@ -85,6 +95,28 @@ class MedicineViewModel @Inject constructor(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun archiveMedicine(medicine: Medicine) {
+        viewModelScope.launch {
+            medicineRepository.archiveMedicine(medicine)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun unarchiveMedicine(medicine: Medicine) {
+        viewModelScope.launch {
+            medicineRepository.unarchiveMedicine(medicine)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun deleteMedicinePermanently(medicine: Medicine) {
+        viewModelScope.launch {
+            medicineRepository.deleteMedicinePermanently(medicine)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     fun deleteMedicine(medicine: Medicine) {
         viewModelScope.launch {
             medicineRepository.deleteMedicine(medicine)

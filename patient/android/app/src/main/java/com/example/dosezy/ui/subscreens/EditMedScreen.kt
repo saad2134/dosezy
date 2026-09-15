@@ -37,6 +37,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
@@ -64,16 +65,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.dosezy.ui.components.MedicinePhotoVisualPicker
+import com.example.dosezy.ui.components.ProfilePicturePicker
 import androidx.navigation.compose.rememberNavController
 import com.example.dosezy.data.model.DosageUnit
 import com.example.dosezy.data.model.FrequencyPattern
 import com.example.dosezy.data.model.Medicine
+import com.example.dosezy.data.model.PillShape
 import com.example.dosezy.data.model.TimeFormat
 import com.example.dosezy.data.model.getLocalizedName
+import com.example.dosezy.ui.components.PillColorSelector
+import com.example.dosezy.ui.components.PillShapeSelector
 import com.example.dosezy.ui.components.ProfilePicturePicker
 import com.example.dosezy.ui.theme.DosezyTheme
 import com.example.dosezy.ui.viewmodels.MedicineViewModel
 import com.example.dosezy.ui.viewmodels.UserViewModel
+import java.time.LocalDate
 import java.time.LocalTime
 import java.util.UUID
 
@@ -110,6 +117,15 @@ fun EditMedScreen(
     var currentStockText by remember { mutableStateOf("") }
     var refillThresholdText by remember { mutableStateOf("") }
 
+    // v2.4.0 New States: Pill Visual, Notes, Course Duration & Interval
+    var selectedPillShape by remember { mutableStateOf(PillShape.ROUND) }
+    var selectedPillColor by remember { mutableStateOf("#1193D4") }
+    var doctorNotes by remember { mutableStateOf("") }
+    var isFiniteCourse by remember { mutableStateOf(false) }
+    var durationDaysText by remember { mutableStateOf("") }
+    var intervalHoursText by remember { mutableStateOf("4") }
+    var intervalDaysText by remember { mutableStateOf("2") }
+
     // Dropdown states
     var dosageUnitExpanded by remember { mutableStateOf(false) }
     var frequencyExpanded by remember { mutableStateOf(false) }
@@ -128,6 +144,13 @@ fun EditMedScreen(
             selectedDaysOfMonth = medicineToEdit.frequency.selectedDaysOfMonth ?: listOf()
             currentStockText = medicineToEdit.currentStock?.toString() ?: ""
             refillThresholdText = medicineToEdit.refillThreshold?.toString() ?: ""
+            selectedPillShape = medicineToEdit.pillShape
+            selectedPillColor = medicineToEdit.pillColor
+            doctorNotes = medicineToEdit.notes ?: ""
+            isFiniteCourse = (medicineToEdit.endDate != null || medicineToEdit.durationDays != null)
+            durationDaysText = medicineToEdit.durationDays?.toString() ?: ""
+            intervalHoursText = medicineToEdit.frequency.intervalHours?.toString() ?: "4"
+            intervalDaysText = medicineToEdit.frequency.intervalDays?.toString() ?: "2"
             selectedDosePreset = when (scheduledTimesList.size) {
                 1 -> "1x"
                 2 -> "2x"
@@ -196,24 +219,21 @@ fun EditMedScreen(
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
-                    // ProfilePicturePicker for medicine image selection
+                    // Medicine Image Selection with Pill Visual
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(128.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                        ) {
-                            ProfilePicturePicker(
-                                profilePicPath = medicineImagePath,
-                                onProfilePictureSelected = { path ->
-                                    medicineImagePath = path
-                                },
-                                modifier = Modifier.size(128.dp)
-                            )
-                        }
+                        MedicinePhotoVisualPicker(
+                            imagePath = medicineImagePath,
+                            pillShape = selectedPillShape,
+                            pillColor = selectedPillColor,
+                            onImageSelected = { path -> medicineImagePath = path },
+                            onVisualSelected = { shape, color ->
+                                selectedPillShape = shape
+                                selectedPillColor = color
+                            }
+                        )
 
                         Spacer(modifier = Modifier.height(8.dp))
 
@@ -357,6 +377,8 @@ fun EditMedScreen(
 
                     Spacer(modifier = Modifier.height(20.dp))
 
+
+
                     // --- Unified Schedule & Dosing Times Card ---
                     androidx.compose.material3.Surface(
                         modifier = Modifier.fillMaxWidth(),
@@ -431,6 +453,65 @@ fun EditMedScreen(
                                         )
                                     }
                                 }
+                            }
+
+                            // Specific frequency configurations
+                            if (selectedFrequency == FrequencyPattern.AS_NEEDED) {
+                                Spacer(modifier = Modifier.height(12.dp))
+                                androidx.compose.material3.Surface(
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.freq_as_needed_desc),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        modifier = Modifier.padding(12.dp)
+                                    )
+                                }
+                            }
+
+                            if (selectedFrequency == FrequencyPattern.EVERY_X_HOURS) {
+                                Spacer(modifier = Modifier.height(14.dp))
+                                OutlinedTextField(
+                                    value = intervalHoursText,
+                                    onValueChange = { if (it.all { c -> c.isDigit() }) intervalHoursText = it },
+                                    label = { Text(stringResource(R.string.interval_hours_label)) },
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    shape = RoundedCornerShape(16.dp),
+                                    modifier = Modifier.fillMaxWidth().height(64.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = Color(0xFF1193D4),
+                                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                                    )
+                                )
+                                val hrs = intervalHoursText.toIntOrNull()
+                                if (hrs != null && hrs > 24) {
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    Text(
+                                        text = stringResource(R.string.hours_limit_hint),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color(0xFFF59E0B),
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
+                            }
+
+                            if (selectedFrequency == FrequencyPattern.EVERY_X_DAYS) {
+                                Spacer(modifier = Modifier.height(14.dp))
+                                OutlinedTextField(
+                                    value = intervalDaysText,
+                                    onValueChange = { if (it.all { c -> c.isDigit() }) intervalDaysText = it },
+                                    label = { Text(stringResource(R.string.interval_days_label)) },
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    shape = RoundedCornerShape(16.dp),
+                                    modifier = Modifier.fillMaxWidth().height(64.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = Color(0xFF1193D4),
+                                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                                    )
+                                )
                             }
 
                             if (selectedFrequency == FrequencyPattern.WEEKLY) {
@@ -544,94 +625,190 @@ fun EditMedScreen(
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(18.dp))
+                            // Presets and custom times (only for scheduled frequencies, not AS_NEEDED)
+                            if (selectedFrequency != FrequencyPattern.AS_NEEDED) {
+                                Spacer(modifier = Modifier.height(18.dp))
 
-                            // 2. Dosing Presets (1x, 2x, 3x, 4x)
-                            Text(
-                                text = stringResource(R.string.daily_frequency_presets_title),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                                color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(bottom = 6.dp)
-                            )
-                            FlowRow(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                val presets = listOf(
-                                    "1x" to listOf(LocalTime.of(8, 0)),
-                                    "2x" to listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
-                                    "3x" to listOf(LocalTime.of(8, 0), LocalTime.of(14, 0), LocalTime.of(20, 0)),
-                                    "4x" to listOf(LocalTime.of(8, 0), LocalTime.of(12, 0), LocalTime.of(16, 0), LocalTime.of(20, 0))
-                                )
-                                presets.forEach { (label, times) ->
-                                    val isSelected = selectedDosePreset == label
-                                    androidx.compose.material3.FilterChip(
-                                        selected = isSelected,
-                                        onClick = {
-                                            selectedDosePreset = label
-                                            scheduledTimesList = times
-                                            selectedTime = times.first()
-                                        },
-                                        label = { Text(text = stringResource(R.string.frequency_preset_daily, label)) },
-                                        colors = androidx.compose.material3.FilterChipDefaults.filterChipColors(
-                                            selectedContainerColor = Color(0xFF1193D4),
-                                            selectedLabelColor = Color.White
+                                // 2. Dosing Presets (1x, 2x, 3x, 4x) - only for DAILY
+                                if (selectedFrequency == FrequencyPattern.DAILY) {
+                                    Text(
+                                        text = stringResource(R.string.daily_frequency_presets_title),
+                                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        modifier = Modifier.padding(bottom = 6.dp)
+                                    )
+                                    FlowRow(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        val presets = listOf(
+                                            "1x" to listOf(LocalTime.of(8, 0)),
+                                            "2x" to listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
+                                            "3x" to listOf(LocalTime.of(8, 0), LocalTime.of(14, 0), LocalTime.of(20, 0)),
+                                            "4x" to listOf(LocalTime.of(8, 0), LocalTime.of(12, 0), LocalTime.of(16, 0), LocalTime.of(20, 0))
                                         )
+                                        presets.forEach { (label, times) ->
+                                            val isSelected = selectedDosePreset == label
+                                            androidx.compose.material3.FilterChip(
+                                                selected = isSelected,
+                                                onClick = {
+                                                    selectedDosePreset = label
+                                                    scheduledTimesList = times
+                                                    selectedTime = times.first()
+                                                },
+                                                label = { Text(text = stringResource(R.string.frequency_preset_daily, label)) },
+                                                colors = androidx.compose.material3.FilterChipDefaults.filterChipColors(
+                                                    selectedContainerColor = Color(0xFF1193D4),
+                                                    selectedLabelColor = Color.White
+                                                )
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(14.dp))
+                                }
+
+                                // 3. Custom Dosing Times Chips
+                                Text(
+                                    text = stringResource(R.string.scheduled_dosing_times_title),
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.padding(bottom = 6.dp)
+                                )
+                                FlowRow(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    scheduledTimesList.forEachIndexed { idx, time ->
+                                        val formatted = com.example.dosezy.utils.TimeFormatUtils.formatLocalTime(time, currentUser?.timeFormat ?: TimeFormat.HOUR_12, activeLocale)
+                                        androidx.compose.material3.InputChip(
+                                            selected = selectedTime == time,
+                                            onClick = {
+                                                selectedTime = time
+                                                editingTimeIndex = idx
+                                                showTimePicker = true
+                                            },
+                                            label = { Text("⏰ $formatted") },
+                                            trailingIcon = {
+                                                if (scheduledTimesList.size > 1) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.Close,
+                                                        contentDescription = stringResource(R.string.med_time_remove_cd),
+                                                        modifier = Modifier
+                                                            .size(16.dp)
+                                                            .clickable {
+                                                                scheduledTimesList = scheduledTimesList - time
+                                                                if (selectedTime == time && scheduledTimesList.isNotEmpty()) {
+                                                                    selectedTime = scheduledTimesList.first()
+                                                                }
+                                                                selectedDosePreset = "Custom"
+                                                            }
+                                                    )
+                                                }
+                                            }
+                                        )
+                                    }
+                                    androidx.compose.material3.AssistChip(
+                                        onClick = {
+                                            editingTimeIndex = null
+                                            showTimePicker = true
+                                        },
+                                        label = { Text(stringResource(R.string.med_time_add_btn)) }
                                     )
                                 }
                             }
+                        }
+                    }
 
-                            Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                            // 3. Custom Dosing Times Chips
+                    // --- v2.4.0 Prescription Duration & End Date Card ---
+                    androidx.compose.material3.Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(20.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                    ) {
+                        Column(modifier = Modifier.padding(18.dp)) {
                             Text(
-                                text = stringResource(R.string.scheduled_dosing_times_title),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                                color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(bottom = 6.dp)
+                                text = stringResource(R.string.course_duration_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
-                                                        FlowRow(
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp),
-                                modifier = Modifier.fillMaxWidth()
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
                             ) {
-                                scheduledTimesList.forEachIndexed { idx, time ->
-                                    val formatted = com.example.dosezy.utils.TimeFormatUtils.formatLocalTime(time, currentUser?.timeFormat ?: TimeFormat.HOUR_12, activeLocale)
-                                    androidx.compose.material3.InputChip(
-                                        selected = selectedTime == time,
-                                        onClick = {
-                                            selectedTime = time
-                                            editingTimeIndex = idx
-                                            showTimePicker = true
-                                        },
-                                        label = { Text("⏰ $formatted") },
-                                        trailingIcon = {
-                                            if (scheduledTimesList.size > 1) {
-                                                Icon(
-                                                    imageVector = Icons.Default.Close,
-                                                    contentDescription = stringResource(R.string.med_time_remove_cd),
-                                                    modifier = Modifier
-                                                        .size(16.dp)
-                                                        .clickable {
-                                                            scheduledTimesList = scheduledTimesList - time
-                                                            if (selectedTime == time && scheduledTimesList.isNotEmpty()) {
-                                                                selectedTime = scheduledTimesList.first()
-                                                            }
-                                                            selectedDosePreset = "Custom"
-                                                        }
-                                                )
-                                            }
-                                        }
+                                Surface(
+                                    shape = RoundedCornerShape(14.dp),
+                                    color = if (!isFiniteCourse) Color(0xFF1193D4) else MaterialTheme.colorScheme.surfaceVariant,
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(44.dp)
+                                        .clickable { isFiniteCourse = false }
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Text(
+                                            text = stringResource(R.string.course_ongoing),
+                                            color = if (!isFiniteCourse) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 14.sp
+                                        )
+                                    }
+                                }
+
+                                Surface(
+                                    shape = RoundedCornerShape(14.dp),
+                                    color = if (isFiniteCourse) Color(0xFF1193D4) else MaterialTheme.colorScheme.surfaceVariant,
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(44.dp)
+                                        .clickable { isFiniteCourse = true }
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Text(
+                                            text = stringResource(R.string.course_finite),
+                                            color = if (isFiniteCourse) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 14.sp
+                                        )
+                                    }
+                                }
+                            }
+
+                            if (isFiniteCourse) {
+                                Spacer(modifier = Modifier.height(12.dp))
+                                OutlinedTextField(
+                                    value = durationDaysText,
+                                    onValueChange = { if (it.all { c -> c.isDigit() }) durationDaysText = it },
+                                    label = { Text(stringResource(R.string.course_duration_days_label)) },
+                                    placeholder = { Text(stringResource(R.string.course_duration_days_placeholder)) },
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    shape = RoundedCornerShape(16.dp),
+                                    modifier = Modifier.fillMaxWidth().height(64.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = Color(0xFF1193D4),
+                                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                                    )
+                                )
+
+                                val days = durationDaysText.toIntOrNull()
+                                if (days != null && days > 0) {
+                                    val start = medicineToEdit?.startDate ?: LocalDate.now()
+                                    val endDate = start.plusDays(days.toLong())
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    Text(
+                                        text = stringResource(R.string.course_end_date_label, endDate.toString()),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.SemiBold
                                     )
                                 }
-                                androidx.compose.material3.AssistChip(
-                                    onClick = {
-                                        editingTimeIndex = null
-                                        showTimePicker = true
-                                    },
-                                    label = { Text(stringResource(R.string.med_time_add_btn)) }
-                                )
                             }
                         }
                     }
@@ -680,9 +857,39 @@ fun EditMedScreen(
                         )
                     }
 
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // --- v2.4.0 Doctor & Pharmacy Notes ---
+                    Text(
+                        text = stringResource(R.string.med_notes_label),
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 18.sp
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    OutlinedTextField(
+                        value = doctorNotes,
+                        onValueChange = { doctorNotes = it },
+                        placeholder = { Text(stringResource(R.string.med_notes_placeholder)) },
+                        shape = RoundedCornerShape(16.dp),
+                        minLines = 2,
+                        maxLines = 4,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFF1193D4),
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                        )
+                    )
+
                     Spacer(modifier = Modifier.height(24.dp))
 
                     // Save Changes Button
+                    val durationDaysInt = durationDaysText.toIntOrNull()
+                    val calcStartDate = if (isFiniteCourse) (medicineToEdit?.startDate ?: LocalDate.now()) else null
+                    val calcEndDate = if (isFiniteCourse && durationDaysInt != null) (calcStartDate ?: LocalDate.now()).plusDays(durationDaysInt.toLong()) else null
+
                     Button(
                         onClick = {
                             if (medicationName.isNotBlank() && dosage.isNotBlank()) {
@@ -692,19 +899,27 @@ fun EditMedScreen(
                                     medicationName = medicationName,
                                     dosage = dosage.toDoubleOrNull() ?: 0.0,
                                     dosageUnit = selectedDosageUnit,
-                                    timesPerDay = scheduledTimesList.size,
+                                    timesPerDay = if (selectedFrequency == FrequencyPattern.AS_NEEDED) 0 else scheduledTimesList.size,
                                     frequency = com.example.dosezy.data.model.Frequency(
                                         pattern = selectedFrequency,
                                         daysPerWeek = if (selectedFrequency == FrequencyPattern.WEEKLY) selectedDaysOfWeek.size else null,
                                         daysPerMonth = if (selectedFrequency == FrequencyPattern.MONTHLY) selectedDaysOfMonth.size else null,
                                         selectedDaysOfWeek = if (selectedFrequency == FrequencyPattern.WEEKLY) selectedDaysOfWeek else null,
-                                        selectedDaysOfMonth = if (selectedFrequency == FrequencyPattern.MONTHLY) selectedDaysOfMonth else null
+                                        selectedDaysOfMonth = if (selectedFrequency == FrequencyPattern.MONTHLY) selectedDaysOfMonth else null,
+                                        intervalHours = if (selectedFrequency == FrequencyPattern.EVERY_X_HOURS) intervalHoursText.toIntOrNull() else null,
+                                        intervalDays = if (selectedFrequency == FrequencyPattern.EVERY_X_DAYS) intervalDaysText.toIntOrNull() else null
                                     ),
-                                    scheduledTimes = scheduledTimesList,
+                                    scheduledTimes = if (selectedFrequency == FrequencyPattern.AS_NEEDED) emptyList() else scheduledTimesList,
                                     imageUri = medicineImagePath,
                                     currentStock = currentStockText.toIntOrNull(),
                                     refillThreshold = refillThresholdText.toIntOrNull(),
-                                    autoDeductOnTake = true
+                                    autoDeductOnTake = true,
+                                    notes = doctorNotes.trim().ifBlank { null },
+                                    pillShape = selectedPillShape,
+                                    pillColor = selectedPillColor,
+                                    startDate = calcStartDate,
+                                    endDate = calcEndDate,
+                                    durationDays = if (isFiniteCourse) durationDaysInt else null
                                 )
 
                                 if (medicineToEdit != null) {
@@ -725,6 +940,9 @@ fun EditMedScreen(
                         ),
                         enabled = medicationName.isNotBlank() && dosage.isNotBlank() && (
                             selectedFrequency == FrequencyPattern.DAILY ||
+                            selectedFrequency == FrequencyPattern.AS_NEEDED ||
+                            selectedFrequency == FrequencyPattern.EVERY_X_HOURS ||
+                            selectedFrequency == FrequencyPattern.EVERY_X_DAYS ||
                             (selectedFrequency == FrequencyPattern.WEEKLY && selectedDaysOfWeek.isNotEmpty()) ||
                             (selectedFrequency == FrequencyPattern.MONTHLY && selectedDaysOfMonth.isNotEmpty()) ||
                             selectedFrequency == FrequencyPattern.CUSTOM
@@ -795,33 +1013,87 @@ fun EditMedScreen(
         )
     }
 
-    // Delete Confirmation Dialog
+    // Discontinue / Delete Choice Dialog
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text(stringResource(R.string.dialog_delete_med_title)) },
-            text = { Text(stringResource(R.string.dialog_delete_med_msg)) },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        medicineViewModel.deleteMedicine(medicineToEdit!!)
-                        showDeleteDialog = false
-                        navController.popBackStack()
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFDC2626)
+            title = {
+                Text(
+                    text = stringResource(R.string.dialog_med_action_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                    Text(
+                        text = stringResource(R.string.dialog_med_action_desc),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                ) {
-                    Text(stringResource(R.string.delete))
+
+                    // Option 1: Discontinue / Archive (Recommended)
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                medicineViewModel.archiveMedicine(medicineToEdit!!)
+                                showDeleteDialog = false
+                                navController.popBackStack()
+                            }
+                    ) {
+                        Column(modifier = Modifier.padding(14.dp)) {
+                            Text(
+                                text = stringResource(R.string.btn_discontinue_keep_history),
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = stringResource(R.string.discontinue_med_explanation),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+
+                    // Option 2: Delete Permanently
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color(0xFFDC2626).copy(alpha = 0.08f),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFDC2626).copy(alpha = 0.3f)),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                medicineViewModel.deleteMedicinePermanently(medicineToEdit!!)
+                                showDeleteDialog = false
+                                navController.popBackStack()
+                            }
+                    ) {
+                        Column(modifier = Modifier.padding(14.dp)) {
+                            Text(
+                                text = stringResource(R.string.btn_delete_permanently),
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFFDC2626)
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = stringResource(R.string.delete_permanently_explanation),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 }
             },
+            confirmButton = {},
             dismissButton = {
-                Button(
-                    onClick = { showDeleteDialog = false },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF6B7280)
-                    )
-                ) {
+                TextButton(onClick = { showDeleteDialog = false }) {
                     Text(stringResource(R.string.cancel))
                 }
             }

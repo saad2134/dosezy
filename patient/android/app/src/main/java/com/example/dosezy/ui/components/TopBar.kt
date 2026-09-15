@@ -73,12 +73,15 @@ fun TopBar(
     ) {
         // First Row: Profile info and Notification button
         Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             // Left: Profile picture and user info
             Row(
+                modifier = Modifier.weight(1f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Profile Picture
@@ -101,25 +104,32 @@ fun TopBar(
                 val greetingText = androidx.compose.ui.res.stringResource(greetingRes)
                 val userName = currentUser?.fullName?.split(" ")?.get(0) ?: "User"
 
-                Column {
+                Column(
+                    modifier = Modifier.weight(1f, fill = false)
+                ) {
                     Text(
                         text = "$greetingText $userName!",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                     )
                     Text(
                         text = androidx.compose.ui.res.stringResource(R.string.health_quote),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                     )
                 }
             }
 
+            Spacer(modifier = Modifier.width(12.dp))
+
             // Right: Notification Status Button
             if (showNotificationStatus) {
                 NotificationStatusButton(
-
                     onClick = { showNotificationDialog = true }
                 )
             }

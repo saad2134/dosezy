@@ -35,6 +35,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,15 +61,25 @@ import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.theme.DosezyTheme
 import com.example.dosezy.ui.viewmodels.MedicineViewModel
 import com.example.dosezy.ui.viewmodels.UserViewModel
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TextButton
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.draw.alpha
 
 @Composable
 fun MedicinesScreen(
     navController: NavController,
-    medicineViewModel: MedicineViewModel = com.example.dosezy.utils.sharedMedicineViewModel(),
-    userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
+    userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel(),
+    medicineViewModel: MedicineViewModel = com.example.dosezy.utils.sharedMedicineViewModel()
 ) {
     val currentUser by userViewModel.currentUser.collectAsState()
     val medicines by medicineViewModel.medicines.collectAsState()
+    val archivedMedicines by medicineViewModel.archivedMedicines.collectAsState()
     val isLoading by medicineViewModel.isLoading.collectAsState()
 
     LaunchedEffect(currentUser) {
@@ -74,6 +87,9 @@ fun MedicinesScreen(
             medicineViewModel.setCurrentUser(user.userId)
         }
     }
+
+    var medicineToRefill by remember { mutableStateOf<Medicine?>(null) }
+    var medicineToPermanentlyDelete by remember { mutableStateOf<Medicine?>(null) }
 
     // light theme
     Surface(
@@ -89,13 +105,23 @@ fun MedicinesScreen(
                 actions = {}
             )
 
-            if (isLoading && medicines.isEmpty()) {
+            if (isLoading && medicines.isEmpty() && archivedMedicines.isEmpty()) {
                 com.example.dosezy.ui.components.MedicineListSkeleton(count = 4)
             } else {
                 MedicinesContent(
                     medicines = medicines,
+                    archivedMedicines = archivedMedicines,
                     onMedicineClick = { medicine ->
                         navController.navigate("edit_med/${medicine.medicineId}")
+                    },
+                    onRefillClick = { medicine ->
+                        medicineToRefill = medicine
+                    },
+                    onReactivateClick = { medicine ->
+                        medicineViewModel.unarchiveMedicine(medicine)
+                    },
+                    onPermanentDeleteClick = { medicine ->
+                        medicineToPermanentlyDelete = medicine
                     },
                     modifier = Modifier
                         .fillMaxSize()
@@ -104,15 +130,68 @@ fun MedicinesScreen(
             }
         }
     }
+
+    // Quick Refill Dialog
+    val medToRefill = medicineToRefill
+    if (medToRefill != null) {
+        com.example.dosezy.ui.components.QuickRefillDialog(
+            medicine = medToRefill,
+            onConfirmRefill = { added ->
+                val newStock = (medToRefill.currentStock ?: 0) + added
+                medicineViewModel.updateMedicine(medToRefill.copy(currentStock = newStock))
+                medicineToRefill = null
+            },
+            onDismiss = { medicineToRefill = null }
+        )
+    }
+
+    // Permanent Delete Confirmation Dialog
+    val medToDelete = medicineToPermanentlyDelete
+    if (medToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { medicineToPermanentlyDelete = null },
+            title = {
+                Text(
+                    text = stringResource(com.example.dosezy.R.string.dialog_delete_permanent_title),
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(stringResource(com.example.dosezy.R.string.dialog_delete_permanent_msg, medToDelete.medicationName))
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        medicineViewModel.deleteMedicinePermanently(medToDelete)
+                        medicineToPermanentlyDelete = null
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFDC2626)
+                    )
+                ) {
+                    Text(stringResource(com.example.dosezy.R.string.btn_delete_permanently))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { medicineToPermanentlyDelete = null }) {
+                    Text(stringResource(com.example.dosezy.R.string.cancel))
+                }
+            }
+        )
+    }
 }
 
 @Composable
 fun MedicinesContent(
     medicines: List<Medicine>,
+    archivedMedicines: List<Medicine> = emptyList(),
     onMedicineClick: (Medicine) -> Unit,
+    onRefillClick: (Medicine) -> Unit,
+    onReactivateClick: (Medicine) -> Unit = {},
+    onPermanentDeleteClick: (Medicine) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    if (medicines.isEmpty()) {
+    if (medicines.isEmpty() && archivedMedicines.isEmpty()) {
         EmptyMedicinesState()
     } else {
         LazyColumn(
@@ -122,9 +201,120 @@ fun MedicinesContent(
                 MedicineItem(
                     medicine = medicine,
                     onClick = { onMedicineClick(medicine) },
+                    onRefillClick = onRefillClick,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 4.dp)
+                )
+            }
+
+            if (archivedMedicines.isNotEmpty()) {
+                item {
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Text(
+                        text = stringResource(com.example.dosezy.R.string.discontinued_medications_section),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 6.dp)
+                    )
+                }
+
+                items(archivedMedicines, key = { "archived_${it.medicineId}" }) { medicine ->
+                    ArchivedMedicineItem(
+                        medicine = medicine,
+                        onReactivate = { onReactivateClick(medicine) },
+                        onDeletePermanently = { onPermanentDeleteClick(medicine) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ArchivedMedicineItem(
+    medicine: Medicine,
+    onReactivate: () -> Unit,
+    onDeletePermanently: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            MedicineImage(
+                imageUri = medicine.imageUri,
+                pillShape = medicine.pillShape,
+                pillColor = medicine.pillColor,
+                modifier = Modifier
+                    .size(50.dp)
+                    .alpha(0.7f)
+            )
+
+            Spacer(modifier = Modifier.width(14.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = medicine.medicationName,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
+                )
+                Text(
+                    text = medicine.getDosageDisplay(),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                if (!medicine.notes.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "📝 ${medicine.notes}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color(0xFFF59E0B).copy(alpha = 0.8f),
+                        maxLines = 1
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // Reactivate Button
+            FilledTonalButton(
+                onClick = onReactivate,
+                shape = RoundedCornerShape(10.dp),
+                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                modifier = Modifier.height(34.dp)
+            ) {
+                Text(
+                    text = stringResource(com.example.dosezy.R.string.btn_reactivate_med),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.width(4.dp))
+
+            // Permanent Delete Button
+            IconButton(
+                onClick = onDeletePermanently,
+                modifier = Modifier.size(34.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = stringResource(com.example.dosezy.R.string.btn_delete_permanently),
+                    tint = Color(0xFFDC2626).copy(alpha = 0.7f),
+                    modifier = Modifier.size(18.dp)
                 )
             }
         }
@@ -136,6 +326,7 @@ fun MedicinesContent(
 fun MedicineItem(
     medicine: Medicine,
     onClick: () -> Unit,
+    onRefillClick: ((Medicine) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
@@ -144,10 +335,10 @@ fun MedicineItem(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(14.dp),
         color = MaterialTheme.colorScheme.surface,
         tonalElevation = 0.dp,
-        shadowElevation = 4.dp
+        shadowElevation = 3.dp
     ) {
         Row(
             modifier = Modifier
@@ -160,10 +351,12 @@ fun MedicineItem(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.weight(1f)
             ) {
-                // Medicine Image in Squircle Frame (matching Home Page style)
+                // Medicine Image in Squircle Frame with Pill Visual fallback
                 MedicineImage(
                     imageUri = medicine.imageUri,
-                    modifier = Modifier.size(52.dp)
+                    pillShape = medicine.pillShape,
+                    pillColor = medicine.pillColor,
+                    modifier = Modifier.size(54.dp)
                 )
 
                 Spacer(modifier = Modifier.width(14.dp))
@@ -184,35 +377,80 @@ fun MedicineItem(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
+                    // Notes / Warnings preview
+                    if (!medicine.notes.isNullOrBlank()) {
+                        Spacer(modifier = Modifier.height(3.dp))
+                        Text(
+                            text = "📝 ${medicine.notes}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color(0xFFF59E0B),
+                            maxLines = 1,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
+                    // Finite course end date indicator
+                    if (medicine.endDate != null) {
+                        val isFinished = java.time.LocalDate.now().isAfter(medicine.endDate)
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = if (isFinished) "🏁 ${stringResource(R.string.course_completed_badge)}" else "📅 ${stringResource(R.string.course_end_date_label, medicine.endDate.toString())}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = if (isFinished) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+
                     val stock = medicine.currentStock
                     if (stock != null) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        val isLow = medicine.refillThreshold != null && stock <= medicine.refillThreshold
-                        val containerBg = if (isLow) {
-                            if (isDark) Color(0xFF3F1313) else Color(0xFFFEE2E2)
-                        } else {
-                            if (isDark) Color(0xFF0F2D14) else Color(0xFFD1FAE5)
-                        }
-                        val contentColor = if (isLow) {
-                            if (isDark) Color(0xFFFCA5A5) else Color(0xFFB91C1C)
-                        } else {
-                            if (isDark) Color(0xFFA7F3D0) else Color(0xFF065F46)
-                        }
-                        Surface(
-                            color = containerBg,
-                            shape = RoundedCornerShape(8.dp)
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
-                            Text(
-                                text = if (isLow) {
-                                    stringResource(R.string.med_stock_refill_warning_badge, stock)
-                                } else {
-                                    stringResource(R.string.med_stock_badge, stock)
-                                },
-                                color = contentColor,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                            )
+                            val isLow = medicine.refillThreshold != null && stock <= medicine.refillThreshold
+                            val containerBg = if (isLow) {
+                                if (isDark) Color(0xFF3F1313) else Color(0xFFFEE2E2)
+                            } else {
+                                if (isDark) Color(0xFF0F2D14) else Color(0xFFD1FAE5)
+                            }
+                            val contentColor = if (isLow) {
+                                if (isDark) Color(0xFFFCA5A5) else Color(0xFFB91C1C)
+                            } else {
+                                if (isDark) Color(0xFFA7F3D0) else Color(0xFF065F46)
+                            }
+                            Surface(
+                                color = containerBg,
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text(
+                                    text = if (isLow) {
+                                        stringResource(R.string.med_stock_refill_warning_badge, stock)
+                                    } else {
+                                        stringResource(R.string.med_stock_badge, stock)
+                                    },
+                                    color = contentColor,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                                )
+                            }
+
+                            if (onRefillClick != null) {
+                                Surface(
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    shape = RoundedCornerShape(8.dp),
+                                    modifier = Modifier.clickable { onRefillClick(medicine) }
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.btn_quick_refill_action),
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -220,7 +458,7 @@ fun MedicineItem(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // Action Chevron Pill (Matching Home Page item action button style)
+            // Action Chevron Pill
             Box(
                 modifier = Modifier
                     .size(36.dp)
@@ -242,6 +480,8 @@ fun MedicineItem(
 @Composable
 fun MedicineImage(
     imageUri: String?,
+    pillShape: com.example.dosezy.data.model.PillShape? = null,
+    pillColor: String? = null,
     modifier: Modifier = Modifier,
     iconSize: androidx.compose.ui.unit.Dp = 36.dp
 ) {
@@ -270,6 +510,12 @@ fun MedicineImage(
                         shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                     ),
                 contentScale = ContentScale.Crop
+            )
+        } else if (pillShape != null) {
+            com.example.dosezy.ui.components.PillShapeVisual(
+                shape = pillShape,
+                colorHex = pillColor ?: "#1193D4",
+                size = iconSize
             )
         } else {
             Icon(

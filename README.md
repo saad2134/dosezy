@@ -9,7 +9,7 @@
 
 <div align="center">
 
-![Phase](https://img.shields.io/badge/🛠️%20Phase-In%20Development%20v2%2E3%2E2-blue?style=for-the-badge)
+![Phase](https://img.shields.io/badge/🛠️%20Phase-Released%20v2%2E4%2E0-blue?style=for-the-badge)
 ![Platforms](https://img.shields.io/badge/🌐%20Platforms-Android-28a745?style=for-the-badge)
 
 </div>
@@ -343,17 +343,4 @@ Developed and published by **Saad (@saad2134)**.
 
 ## 📃 Changelogs
 
-### 🆕 What's New in v2.3.2
-- **🛡️ Security Hardening (Zip Slip Fix):** Patched archive extraction during backup restores by strictly canonicalizing file paths to prevent arbitrary file access vulnerabilities.
-- **📦 Unified Stock Deduction & Refill Alerts:** Standardized stock auto-decrement and low-stock push notifications across all intake actions (Notification Shade, Full-Screen Alarm, and In-App Schedule).
-
-### 📜 Previous Releases
-<details>
-<summary><b>v2.3.1</b></summary>
-
-- **⏰ Schedule Duplication on Edit Fix:** Resolved issue where modifying reminder times left behind stale un-taken doses; untaken doses from start of day are cleanly purged before new slots generate.
-- **🔔 Alarm Sound, Vibration & Background Reliability:** Hardened notification channel with `USAGE_ALARM`, wake lock, high-priority vibration, and DND bypass for reliable lock-screen and background alerts.
-- **📱 Responsive Layout Wrapping:** Upgraded frequency preset chips and analytics period breakdowns to dynamic `FlowRow` for compact displays.
-- **🌐 100% 12-Language Localization Parity:** Localized stock/refill badges, time calculation phrases, and all screen strings across 12 languages (389 keys each).
-
-</details>
+For full release notes, version history, and detailed changes, please see the [Documentation Changelogs](docs/changelogs/) or [GitHub Releases](https://github.com/saad2134/dosezy/releases).

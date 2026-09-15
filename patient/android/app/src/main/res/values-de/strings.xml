@@ -418,7 +418,7 @@ Möchten Sie fortfahren?</string>
     <string name="err_cannot_open_link">Link kann nicht geöffnet werden</string>
     <string name="err_no_email_app">Keine E-Mail-App verfügbar</string>
     <string name="err_share_failed">Freigabefehler: %1$s</string>
-    <string name="med_stock_refill_warning_badge">⚠️ Nachfüllwarnung: Noch %1$d übrig</string>
+    <string name="med_stock_refill_warning_badge">⚠️ Nachfüllen: Noch %1$d übrig</string>
     <string name="med_stock_badge">📦 Vorrat: %1$d</string>
     <string name="to_be_taken_in">Einzunehmen in %1$d Std. %2$d Min.</string>
     <string name="time_diff_ago">Vor %1$d Std. %2$d Min.</string>
@@ -426,4 +426,117 @@ Möchten Sie fortfahren?</string>
     <string name="status_scheduled_for_this_time">Für diese Zeit geplant</string>
     <string name="daily_frequency_presets_title">Tägliche Häufigkeitsvoreinstellungen</string>
     <string name="action_edit_medicine_cd">Medikament bearbeiten</string>
+
+    <!-- v2.4.0 Neue Funktionen (German) -->
+    <string name="profile_allergies">Allergien</string>
+    <string name="profile_allergies_placeholder">z. B. Penicillin, Sulfonamide, Erdnüsse</string>
+    <string name="profile_medical_conditions">Vorerkrankungen / Chronische Leiden</string>
+    <string name="profile_medical_conditions_placeholder">z. B. Bluthochdruck, Typ-2-Diabetes</string>
+    <string name="emergency_medical_profile">Medizinisches Patientenprofil</string>
+    <string name="emergency_no_allergies">Keine Allergien eingetragen</string>
+    <string name="emergency_no_conditions">Keine Vorerkrankungen eingetragen</string>
+
+    <string name="med_shape_label">Tablettenform &amp; Darreichung</string>
+    <string name="med_color_label">Visuelle Farbe</string>
+    <string name="pill_shape_round">Rund</string>
+    <string name="pill_shape_capsule">Kapsel</string>
+    <string name="pill_shape_oval">Oval</string>
+    <string name="pill_shape_liquid">Flüssig / Saft</string>
+    <string name="pill_shape_inhaler">Inhalator</string>
+    <string name="pill_shape_injection">Injektion</string>
+    <string name="pill_shape_drops">Tropfen</string>
+    <string name="pill_shape_patch">Pflaster</string>
+
+    <string name="med_notes_label">Arzt- / Apothekenhinweise &amp; Warnungen</string>
+    <string name="med_notes_placeholder">z. B. Zu den Mahlzeiten, Keine Grapefruit, Rezept #12345</string>
+
+    <string name="course_duration_title">Behandlungsdauer</string>
+    <string name="course_ongoing">Dauerhaft</string>
+    <string name="course_finite">Befristete Kur</string>
+    <string name="course_duration_days_label">Dauer (Tage)</string>
+    <string name="course_duration_days_placeholder">z. B. 7, 10, 14, 30</string>
+    <string name="course_start_date_label">Startdatum</string>
+    <string name="course_end_date_label">Enddatum: %1$s</string>
+    <string name="course_completed_badge">Kur abgeschlossen</string>
+
+    <string name="freq_as_needed">Bei Bedarf (PRN)</string>
+    <string name="freq_as_needed_desc">Keine festen Erinnerungen. Bei Einnahme einfach manuell protokollieren.</string>
+    <string name="freq_every_x_hours">Alle X Stunden</string>
+    <string name="freq_every_x_days">Alle X Tage</string>
+    <string name="freq_every_hours_format">Alle %1$d Stunden</string>
+    <string name="freq_every_days_format">Alle %1$d Tage</string>
+    <string name="interval_hours_label">Stunden zwischen Dosen</string>
+    <string name="interval_days_label">Tage zwischen Dosen</string>
+    <string name="btn_log_prn_dose">Dosis erfassen</string>
+    <string name="prn_doses_taken_today">Heute erfasste Dosen: %1$d</string>
+    <string name="prn_section_title">Bedarfsmedikation (PRN)</string>
+
+    <string name="btn_quick_refill_action">+ Auffüllen</string>
+    <string name="quick_refill_dialog_title">Vorrat auffüllen: %1$s</string>
+    <string name="quick_refill_amount_label">Menge hinzufügen</string>
+    <string name="quick_refill_preset_30">+30</string>
+    <string name="quick_refill_preset_60">+60</string>
+    <string name="quick_refill_preset_90">+90</string>
+    <string name="quick_refill_success">Vorrat für %1$s aufgefüllt. Neuer Bestand: %2$d</string>
+
+    <string name="no_scheduled_doses_today">Keine Dosen für heute geplant</string>
+    <string name="prn_confirm_log_title">Dosis protokollieren</string>
+    <string name="prn_confirm_log_msg">1 Dosis von %1$s (%2$s) jetzt als genommen erfassen?</string>
+    <string name="hours_limit_hint">Für Intervalle über 24 Stunden nutzen Sie \'Alle X Tage\'.</string>
+
+    <string name="pref_nagging_title">Hartnäckige Nachfass-Erinnerungen</string>
+    <string name="pref_nagging_desc">Wiederholt erinnern, falls geplante Dosis nicht als eingenommen markiert ist</string>
+    <string name="pref_nagging_interval">Erinnerungsintervall</string>
+    <string name="pref_nagging_max_repeats">Max. Wiederholungen</string>
+    <string name="pref_nagging_repeats_format">%1$d-mal</string>
+    <string name="notif_nagging_title">Nachfass-Erinnerung: %1$s</string>
+    <string name="notif_nagging_text">Erinnerung %1$d/%2$d: Die Dosis für %3$s steht noch aus.</string>
+
+    <string name="widget_title">Dosezy Heute</string>
+    <string name="widget_no_meds">Keine anstehenden Dosen</string>
+    <string name="widget_all_taken">Alle heutigen Dosen eingenommen! 🎉</string>
+    <string name="widget_tap_to_open">Tippen zum Öffnen</string>
+    <string name="widget_no_profile">Kein Profil erstellt</string>
+    <string name="widget_open_app">Dosezy zur Einrichtung öffnen</string>
+    <string name="widget_taken_summary">%1$d / %2$d eingenommen</string>
+    <string name="widget_all_completed">Alle Dosen abgeschlossen! 🎉</string>
+    <string name="widget_no_doses_today">Heute keine Dosen geplant</string>
+    <string name="widget_next_dose_format">Nächste: %1$s • %2$s</string>
+
+    <!-- Custom Alarm Sounds -->
+    <string name="pref_alarm_sound">Alarmton</string>
+    <string name="pref_alarm_sound_desc">Melodie für Medikamenten-Alarme auswählen</string>
+    <string name="alarm_sound_system_default">Systemstandard</string>
+    <string name="alarm_sound_gentle_chime">Sanftes Glockenspiel</string>
+    <string name="alarm_sound_medical_marimba">Medizinisches Marimba</string>
+    <string name="alarm_sound_brisk_pulse">Munterer Impuls</string>
+    <string name="alarm_sound_calm_bell">Beruhigende Glocke</string>
+    <string name="alarm_sound_preview">Vorschau</string>
+    <!-- Discontinue & Soft-Delete (#51) -->
+    <string name="dialog_med_action_title">Absetzen oder löschen?</string>
+    <string name="dialog_med_action_desc">Wählen Sie eine Aktion für dieses Medikament:</string>
+    <string name="btn_discontinue_keep_history">Absetzen (Verlauf behalten)</string>
+    <string name="discontinue_med_explanation">Stoppt zukünftige Erinnerungen und entfernt es aus der aktiven Liste. Der bisherige Verlauf bleibt erhalten.</string>
+    <string name="btn_delete_permanently">Dauerhaft löschen</string>
+    <string name="delete_permanently_explanation">Löscht dieses Medikament und den gesamten bisherigen Verlauf unwiderruflich.</string>
+    <string name="discontinued_medications_section">Abgesetzte Medikamente</string>
+    <string name="btn_reactivate_med">Reaktivieren</string>
+    <string name="dialog_delete_permanent_title">Dauerhaft löschen?</string>
+    <string name="dialog_delete_permanent_msg">Möchten Sie %1$s wirklich dauerhaft löschen? Der gesamte bisherige Verlauf wird gelöscht.</string>
+    <string name="help_github_issues_title">Problem melden</string>
+    <string name="help_github_issues_desc">Fehler melden oder neue Funktionen auf GitHub vorschlagen</string>
+    <string name="menu_about_dosezy">Über Dosezy</string>
+    <string name="about_title">Über Dosezy</string>
+    <string name="about_tagline">Privater, offline-fähiger Medikamenten-Begleiter für Patienten und Pflegende.</string>
+    <string name="about_star_github">Auf GitHub mit Stern bewerten</string>
+    <string name="about_star_github_desc">Unterstützen Sie unser Open-Source-Projekt mit einem Stern auf GitHub</string>
+    <string name="about_support_dev_title">Entwicklung unterstützen</string>
+    <string name="about_support_dev_desc">Dosezy ist 100% kostenlos, werbefrei und privat. Ihre Spenden halten das Projekt am Leben!</string>
+    <string name="about_buymeacoffee">Kauf mir einen Kaffee</string>
+    <string name="about_buymeacoffee_desc">Unterstützen per Karte oder PayPal auf BuyMeACoffee</string>
+    <string name="about_crypto_donations">Krypto-Spenden</string>
+    <string name="about_copied_to_clipboard">%1$s-Adresse in die Zwischenablage kopiert</string>
+    <string name="about_tap_to_copy">Tippen zum Kopieren der Adresse</string>
+    <string name="about_github_sponsors">GitHub Sponsors</string>
+    <string name="about_github_sponsors_desc">Monatlich oder einmalig über GitHub Sponsors unterstützen</string>
 </resources>

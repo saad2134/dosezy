@@ -24,13 +24,21 @@ class MedicineRepository @Inject constructor(
         private const val TAG = "MedicineRepository"
     }
 
-    // Method (returns Flow)
+    // Active medicines only (returns Flow)
     fun getMedicinesByUser(userId: String): Flow<List<Medicine>> =
+        database.medicineDao().getActiveMedicinesByUser(userId)
+
+    // All medicines including archived (returns Flow)
+    fun getAllMedicinesByUser(userId: String): Flow<List<Medicine>> =
         database.medicineDao().getMedicinesByUser(userId)
 
-    // Get medicines as list (not Flow)
+    // Archived / discontinued medicines (returns Flow)
+    fun getArchivedMedicinesByUser(userId: String): Flow<List<Medicine>> =
+        database.medicineDao().getArchivedMedicinesByUser(userId)
+
+    // Get active medicines as list (not Flow)
     suspend fun getMedicinesByUserSync(userId: String): List<Medicine> =
-        database.medicineDao().getMedicinesByUser(userId).first()
+        database.medicineDao().getActiveMedicinesByUser(userId).first()
 
     @RequiresApi(Build.VERSION_CODES.O)
     @Suppress("UNUSED_PARAMETER")
@@ -54,6 +62,11 @@ class MedicineRepository @Inject constructor(
         // SCHEDULE ALARMS IMMEDIATELY
         scheduleRepository.rescheduleAllAlarms(medicine.userId, this.context)
         Log.d(TAG, "Immediately scheduled alarms for new medicine")
+
+        // Update home screen widget
+        try {
+            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(this.context)
+        } catch (_: Exception) {}
 
         // Debug
         val allEntries = database.scheduleDao().getAllScheduleEntries(medicine.userId)
@@ -98,19 +111,63 @@ class MedicineRepository @Inject constructor(
         // Reschedule alarms
         scheduleRepository.cancelAlarmsForMedicine(medicine.medicineId, this.context)
         scheduleRepository.rescheduleAllAlarms(medicine.userId, this.context)
+
+        // Update home screen widget
+        try {
+            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(this.context)
+        } catch (_: Exception) {}
     }
 
 
     @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun deleteMedicine(medicine: Medicine) {
+    suspend fun archiveMedicine(medicine: Medicine) {
+        // 1. Cancel future alarms for this medicine
+        scheduleRepository.cancelAlarmsForMedicine(medicine.medicineId, this.context)
+        // 2. Delete only future pending schedule entries (preserves all past taken/missed records!)
+        val nowMillis = System.currentTimeMillis()
+        database.scheduleDao().deleteFuturePendingScheduleEntries(medicine.medicineId, nowMillis)
+        // 3. Mark medicine as archived
+        database.medicineDao().setArchivedStatus(medicine.medicineId, true)
+        // 4. Update home widget
+        try {
+            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(this.context)
+        } catch (_: Exception) {}
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun unarchiveMedicine(medicine: Medicine) {
+        // 1. Mark medicine as active (unarchived)
+        database.medicineDao().setArchivedStatus(medicine.medicineId, false)
+        // 2. Generate new schedule entries starting from today for 30 days
+        val newEntries = medicine.copy(isArchived = false).generateScheduleEntries(LocalDate.now(), 30)
+        database.scheduleDao().insertScheduleEntries(newEntries)
+        // 3. Schedule alarms
+        scheduleRepository.scheduleAlarmsForMedicine(medicine.medicineId, this.context)
+        // 4. Update home widget
+        try {
+            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(this.context)
+        } catch (_: Exception) {}
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun deleteMedicinePermanently(medicine: Medicine) {
         // Cancel alarms first
         scheduleRepository.cancelAlarmsForMedicine(medicine.medicineId, this.context)
-        // Delete schedule entries first
+        // Delete all schedule entries
         database.scheduleDao().deleteScheduleEntriesByMedicine(medicine.medicineId)
         // Then delete the medicine
         database.medicineDao().deleteMedicine(medicine)
+
+        // Update home screen widget
+        try {
+            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(this.context)
+        } catch (_: Exception) {}
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun deleteMedicine(medicine: Medicine) {
+        deleteMedicinePermanently(medicine)
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun deleteMedicine(medicineId: String) {
@@ -120,8 +177,12 @@ class MedicineRepository @Inject constructor(
         database.scheduleDao().deleteScheduleEntriesByMedicine(medicineId)
         // Then delete the medicine using the new method
         database.medicineDao().deleteMedicineById(medicineId)
-    }
 
+        // Update home screen widget
+        try {
+            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(this.context)
+        } catch (_: Exception) {}
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun addMedicineWithAlarms(medicine: Medicine, context: Context) {

@@ -418,7 +418,7 @@
     <string name="err_cannot_open_link">تعذر فتح الرابط</string>
     <string name="err_no_email_app">لا يوجد تطبيق بريد إلكتروني متاح</string>
     <string name="err_share_failed">خطأ في المشاركة: %1$s</string>
-    <string name="med_stock_refill_warning_badge">⚠️ تحذير إعادة التعبئة: متبقي %1$d</string>
+    <string name="med_stock_refill_warning_badge">⚠️ إعادة التعبئة: متبقي %1$d</string>
     <string name="med_stock_badge">📦 المخزون: %1$d</string>
     <string name="to_be_taken_in">يجب تناوله خلال %1$d س و %2$d د</string>
     <string name="time_diff_ago">منذ %1$d س و %2$d د</string>
@@ -426,4 +426,117 @@
     <string name="status_scheduled_for_this_time">مجدول لهذا الوقت</string>
     <string name="daily_frequency_presets_title">الإعدادات المسبقة للتكرار اليومي</string>
     <string name="action_edit_medicine_cd">تعديل الدواء</string>
+
+    <!-- v2.4.0 New Features (Arabic) -->
+    <string name="profile_allergies">الحساسية</string>
+    <string name="profile_allergies_placeholder">مثال: البنسلين، السلفا، الفول السوداني</string>
+    <string name="profile_medical_conditions">الحالات الطبية / الأمراض المزمنة</string>
+    <string name="profile_medical_conditions_placeholder">مثال: ارتفاع ضغط الدم، السكري من النوع 2</string>
+    <string name="emergency_medical_profile">الملف الطبي للمريض</string>
+    <string name="emergency_no_allergies">لا توجد حساسية مسجلة</string>
+    <string name="emergency_no_conditions">لا توجد حالات طبية مسجلة</string>
+
+    <string name="med_shape_label">شكل ونوع الدواء</string>
+    <string name="med_color_label">اللون البصري</string>
+    <string name="pill_shape_round">قرص دائري</string>
+    <string name="pill_shape_capsule">كبسولة</string>
+    <string name="pill_shape_oval">بيضاوي</string>
+    <string name="pill_shape_liquid">شراب / سائل</string>
+    <string name="pill_shape_inhaler">بخاخ</string>
+    <string name="pill_shape_injection">حقنة</string>
+    <string name="pill_shape_drops">قطرات</string>
+    <string name="pill_shape_patch">لاصقة</string>
+
+    <string name="med_notes_label">ملاحظات الطبيب / الصيدلية والتحذيرات</string>
+    <string name="med_notes_placeholder">مثال: يؤخذ مع الطعام، تجنب الجريب فروت، وصفة رقم 12345</string>
+
+    <string name="course_duration_title">مدة العلاج</string>
+    <string name="course_ongoing">مستمر</string>
+    <string name="course_finite">فترة محددة</string>
+    <string name="course_duration_days_label">مدة العلاج (بالأيام)</string>
+    <string name="course_duration_days_placeholder">مثال: 7، 10، 14، 30</string>
+    <string name="course_start_date_label">تاريخ البدء</string>
+    <string name="course_end_date_label">تاريخ الانتهاء: %1$s</string>
+    <string name="course_completed_badge">اكتمل العلاج</string>
+
+    <string name="freq_as_needed">عند الحاجة (PRN)</string>
+    <string name="freq_as_needed_desc">بدون تنبيهات مجدولة. سجل الجرعات الفورية عند تناولها.</string>
+    <string name="freq_every_x_hours">كل X ساعات</string>
+    <string name="freq_every_x_days">كل X أيام</string>
+    <string name="freq_every_hours_format">كل %1$d ساعات</string>
+    <string name="freq_every_days_format">كل %1$d أيام</string>
+    <string name="interval_hours_label">عدد الساعات بين الجرعات</string>
+    <string name="interval_days_label">عدد الأيام بين الجرعات</string>
+    <string name="btn_log_prn_dose">تسجيل جرعة</string>
+    <string name="prn_doses_taken_today">الجرعات المسجلة اليوم: %1$d</string>
+    <string name="prn_section_title">أدوية تؤخذ عند الحاجة (PRN)</string>
+
+    <string name="btn_quick_refill_action">+ تعبئة</string>
+    <string name="quick_refill_dialog_title">إعادة تعبئة: %1$s</string>
+    <string name="quick_refill_amount_label">الكمية المضافة</string>
+    <string name="quick_refill_preset_30">+30</string>
+    <string name="quick_refill_preset_60">+60</string>
+    <string name="quick_refill_preset_90">+90</string>
+    <string name="quick_refill_success">تمت إعادة تعبئة المخزون لـ %1$s. الرصيد الجديد: %2$d</string>
+
+    <string name="no_scheduled_doses_today">لا توجد جرعات مجدولة لهذا اليوم</string>
+    <string name="prn_confirm_log_title">تسجيل الجرعة</string>
+    <string name="prn_confirm_log_msg">تسجيل جرعة واحدة من %1$s (%2$s) تم تناولها الآن؟</string>
+    <string name="hours_limit_hint">للفترات التي تزيد عن 24 ساعة، يُفضل استخدام \"كل X أيام\".</string>
+
+    <string name="pref_nagging_title">تنبيهات المتابعة المتكررة (Nagging)</string>
+    <string name="pref_nagging_desc">التذكير المتكرر في حال عدم تأكيد تناول الجرعة المجدولة</string>
+    <string name="pref_nagging_interval">فترة تكرار التنبيه</string>
+    <string name="pref_nagging_max_repeats">الحد الأقصى للتكرار</string>
+    <string name="pref_nagging_repeats_format">%1$d مرات</string>
+    <string name="notif_nagging_title">متابعة الجرعة: %1$s</string>
+    <string name="notif_nagging_text">تذكير %1$d/%2$d: جرعة %3$s ما زالت معلقة ولم تؤخذ بعد.</string>
+
+    <string name="widget_title">Dosezy اليوم</string>
+    <string name="widget_no_meds">لا توجد جرعات قادمة</string>
+    <string name="widget_all_taken">تم تناول جميع الجرعات اليوم! 🎉</string>
+    <string name="widget_tap_to_open">انقر لفتح التطبيق</string>
+    <string name="widget_no_profile">لم يتم إنشاء ملف شخصي</string>
+    <string name="widget_open_app">افتح Dosezy للإعداد</string>
+    <string name="widget_taken_summary">تم تناول %1$d من %2$d</string>
+    <string name="widget_all_completed">اكتملت جميع جرعات اليوم! 🎉</string>
+    <string name="widget_no_doses_today">لا توجد جرعات مجدولة اليوم</string>
+    <string name="widget_next_dose_format">التالي: %1$s • %2$s</string>
+
+    <!-- Custom Alarm Sounds -->
+    <string name="pref_alarm_sound">نغمة المنبه</string>
+    <string name="pref_alarm_sound_desc">اختر نغمة التنبيه الخاصة بجرعات الدواء</string>
+    <string name="alarm_sound_system_default">الافتراضي للنظام</string>
+    <string name="alarm_sound_gentle_chime">رنين هادئ</string>
+    <string name="alarm_sound_medical_marimba">ماريمبا طبية</string>
+    <string name="alarm_sound_brisk_pulse">نبض سريع</string>
+    <string name="alarm_sound_calm_bell">جرس مهدئ</string>
+    <string name="alarm_sound_preview">معاينة</string>
+    <!-- Discontinue & Soft-Delete (#51) -->
+    <string name="dialog_med_action_title">إيقاف أم حذف الدواء؟</string>
+    <string name="dialog_med_action_desc">اختر الإجراء المطلوب لهذا الدواء:</string>
+    <string name="btn_discontinue_keep_history">إيقاف الدواء (الاحتفاظ بالسجل)</string>
+    <string name="discontinue_med_explanation">يوقف التنبيهات القادمة ويزيله من القائمة النشطة. سيتم الاحتفاظ بجميع السجلات السابقة.</string>
+    <string name="btn_delete_permanently">حذف نهائي</string>
+    <string name="delete_permanently_explanation">يحذف هذا الدواء وجميع سجلاته السابقة بشكل دائم.</string>
+    <string name="discontinued_medications_section">الأدوية المتوقفة</string>
+    <string name="btn_reactivate_med">إعادة التفعيل</string>
+    <string name="dialog_delete_permanent_title">حذف نهائي؟</string>
+    <string name="dialog_delete_permanent_msg">هل أنت متأكد من حذف %1$s نهائياً؟ سيتم حذف جميع السجلات والتقارير الخاصة به.</string>
+    <string name="help_github_issues_title">الإبلاغ عن مشكلة</string>
+    <string name="help_github_issues_desc">أبلغ عن الأخطاء أو اقترح ميزات جديدة على GitHub</string>
+    <string name="menu_about_dosezy">حول Dosezy</string>
+    <string name="about_title">حول Dosezy</string>
+    <string name="about_tagline">رفيق دوائي آمن وخاص يعمل بدون إنترنت للمرضى ومقدمي الرعاية.</string>
+    <string name="about_star_github">نجمة على GitHub</string>
+    <string name="about_star_github_desc">ادعم مشروعنا مفتوح المصدر عبر وضع نجمة على GitHub</string>
+    <string name="about_support_dev_title">دعم التطوير</string>
+    <string name="about_support_dev_desc">تطبيق Dosezy مجاني 100% وخالٍ من الإعلانات تماماً. تبرعاتكم تساهم في استمرار التطوير!</string>
+    <string name="about_buymeacoffee">اشترِ لي قهوة (Buy Me a Coffee)</string>
+    <string name="about_buymeacoffee_desc">ادعمنا بواسطة البطاقة المصرفية أو PayPal</string>
+    <string name="about_crypto_donations">التبرع بالعملات المشفرة</string>
+    <string name="about_copied_to_clipboard">تم نسخ عنوان %1$s إلى الحافظة</string>
+    <string name="about_tap_to_copy">اضغط لنسخ العنوان</string>
+    <string name="about_github_sponsors">GitHub Sponsors</string>
+    <string name="about_github_sponsors_desc">ادعم المشروع شهرياً أو لمرة واحدة عبر GitHub Sponsors</string>
 </resources>

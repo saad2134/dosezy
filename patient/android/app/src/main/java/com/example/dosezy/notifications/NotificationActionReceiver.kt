@@ -30,7 +30,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 if (medicine.currentStock <= medicine.refillThreshold) {
                     val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
                     val builder = androidx.core.app.NotificationCompat.Builder(context, MedicineAlarmReceiver.CHANNEL_ID)
-                        .setSmallIcon(com.example.dosezy.R.drawable.ic_medicine_notification)
+                        .setSmallIcon(com.example.dosezy.R.drawable.loader_icon)
                         .setContentTitle(context.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
                         .setContentText(context.getString(com.example.dosezy.R.string.notif_refill_alert_text, medicine.currentStock))
                         .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
@@ -66,6 +66,9 @@ class NotificationActionReceiver : BroadcastReceiver() {
     private suspend fun handleAction(context: Context, action: String?, entryId: String) {
         val scheduleRepository = ScheduleRepository(database)
 
+        val alarmScheduler = AlarmScheduler(context)
+        alarmScheduler.cancelNagging(entryId)
+
         when (action) {
             "TAKEN_ACTION" -> {
                 Log.d(TAG, "Marking medicine as taken for entry: $entryId")
@@ -81,7 +84,6 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 val medicine = entry?.let { database.medicineDao().getMedicineById(it.medicineId).first() }
                 val medicineName = medicine?.medicationName ?: "Medicine"
 
-                val alarmScheduler = AlarmScheduler(context)
                 alarmScheduler.scheduleSnooze(entryId, 10, medicineName) // 10 minutes snooze
 
                 // Cancel the current notification

@@ -79,6 +79,8 @@ fun ManageProfileScreen(navController: NavController) {
     var age by remember { mutableStateOf("") }
     var gender by remember { mutableStateOf<Gender?>(null) }
     var contactNumber by remember { mutableStateOf("") }
+    var allergies by remember { mutableStateOf("") }
+    var medicalConditions by remember { mutableStateOf("") }
     var profilePicPath by remember { mutableStateOf<String?>(null) }
     var showGenderDropdown by remember { mutableStateOf(false) }
 
@@ -94,6 +96,8 @@ fun ManageProfileScreen(navController: NavController) {
             age = user.age.toString()
             gender = user.gender
             contactNumber = user.contactNumber
+            allergies = user.allergies ?: ""
+            medicalConditions = user.medicalConditions ?: ""
             profilePicPath = user.profilePicPath
         }
     }
@@ -279,6 +283,42 @@ fun ManageProfileScreen(navController: NavController) {
                         )
                     }
 
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Allergies Field
+                    Column {
+                        OutlinedTextField(
+                            value = allergies,
+                            onValueChange = { allergies = it },
+                            label = { Text(stringResource(R.string.profile_allergies)) },
+                            placeholder = { Text(stringResource(R.string.profile_allergies_placeholder)) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                            )
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Medical Conditions Field
+                    Column {
+                        OutlinedTextField(
+                            value = medicalConditions,
+                            onValueChange = { medicalConditions = it },
+                            label = { Text(stringResource(R.string.profile_medical_conditions)) },
+                            placeholder = { Text(stringResource(R.string.profile_medical_conditions_placeholder)) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                            )
+                        )
+                    }
+
                     Spacer(modifier = Modifier.height(32.dp))
 
                     val updatedSuccessStr = stringResource(R.string.profile_updated_success)
@@ -299,7 +339,9 @@ fun ManageProfileScreen(navController: NavController) {
                                         fullName = fullName.trim(),
                                         age = age.toIntOrNull() ?: 0,
                                         gender = gender!!,
-                                        contactNumber = contactNumber.trim()
+                                        contactNumber = contactNumber.trim(),
+                                        allergies = allergies.trim().ifBlank { null },
+                                        medicalConditions = medicalConditions.trim().ifBlank { null }
                                     )
                                     userViewModel.updateUser(updatedUser)
                                     scope.launch {

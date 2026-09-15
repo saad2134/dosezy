@@ -44,6 +44,9 @@ import androidx.navigation.NavController
 import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.viewmodels.UserViewModel
 
+import androidx.compose.material.icons.outlined.BugReport
+import androidx.compose.material.icons.outlined.Info
+
 @Composable
 fun HelpSupportScreen(navController: NavController) {
     val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
@@ -82,13 +85,11 @@ fun HelpSupportContent(navController: NavController) {
         // Resources Section
         Text(
             text = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_resources),
-            fontSize = 24.sp,
+            fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 8.dp)
         )
-
-        Spacer(modifier = Modifier.height(8.dp))
 
         // FAQ Card
         SupportCard(
@@ -100,7 +101,7 @@ fun HelpSupportContent(navController: NavController) {
             }
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         // User Manual Card
         SupportCard(
@@ -112,18 +113,16 @@ fun HelpSupportContent(navController: NavController) {
             }
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         // Contact Support Section
         Text(
             text = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_contact_support),
-            fontSize = 24.sp,
+            fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 8.dp)
         )
-
-        Spacer(modifier = Modifier.height(8.dp))
 
         // Email Support Card
         SupportCard(
@@ -132,6 +131,30 @@ fun HelpSupportContent(navController: NavController) {
             description = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_email_support_desc),
             onClick = {
                 openEmail(context, "reach.saad@outlook.com", "Help & Support Request")
+            }
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Create New Issue / GitHub Card
+        SupportCard(
+            icon = Icons.Outlined.BugReport,
+            title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_github_issues_title),
+            description = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_github_issues_desc),
+            onClick = {
+                openUrl(context, "https://github.com/saad2134/dosezy/issues/new/choose")
+            }
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // About & Support Project Card
+        SupportCard(
+            icon = Icons.Outlined.Info,
+            title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.about_title),
+            description = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.about_tagline),
+            onClick = {
+                navController.navigate("about")
             }
         )
 

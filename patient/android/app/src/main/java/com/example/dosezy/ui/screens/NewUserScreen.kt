@@ -420,6 +420,8 @@ fun ProfileSetupPage(
     var age by remember { mutableStateOf("") }
     var gender by remember { mutableStateOf<Gender?>(null) }
     var contactNumber by remember { mutableStateOf("") }
+    var allergies by remember { mutableStateOf("") }
+    var medicalConditions by remember { mutableStateOf("") }
     var profilePicPath by remember { mutableStateOf<String?>(null) }
     var showGenderDropdown by remember { mutableStateOf(false) }
 
@@ -606,6 +608,42 @@ fun ProfileSetupPage(
                 )
             )
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Allergies Field (Optional)
+        Column {
+            OutlinedTextField(
+                value = allergies,
+                onValueChange = { allergies = it },
+                label = { Text(stringResource(R.string.profile_allergies)) },
+                placeholder = { Text(stringResource(R.string.profile_allergies_placeholder)) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                )
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Medical Conditions Field (Optional)
+        Column {
+            OutlinedTextField(
+                value = medicalConditions,
+                onValueChange = { medicalConditions = it },
+                label = { Text(stringResource(R.string.profile_medical_conditions)) },
+                placeholder = { Text(stringResource(R.string.profile_medical_conditions_placeholder)) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                )
+            )
+        }
     }
 
     // Validation and completion logic
@@ -634,6 +672,8 @@ fun ProfileSetupPage(
                 age = age.toIntOrNull() ?: 0,
                 gender = gender!!,
                 contactNumber = contactNumber.trim(),
+                allergies = allergies.trim().ifBlank { null },
+                medicalConditions = medicalConditions.trim().ifBlank { null },
                 isCurrentUser = true
             )
             onComplete(user)

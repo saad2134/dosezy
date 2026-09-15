@@ -434,7 +434,7 @@
     <string name="err_cannot_open_link">लिंक नहीं खोला जा सका</string>
     <string name="err_no_email_app">कोई ईमेल ऐप उपलब्ध नहीं है</string>
     <string name="err_share_failed">साझाकरण त्रुटि: %1$s</string>
-    <string name="med_stock_refill_warning_badge">⚠️ रिफिल चेतावनी: %1$d शेष</string>
+    <string name="med_stock_refill_warning_badge">⚠️ रिफिल: %1$d शेष</string>
     <string name="med_stock_badge">📦 स्टॉक: %1$d</string>
     <string name="to_be_taken_in">%1$dघंटे %2$dमिनट में लेनी है</string>
     <string name="time_diff_ago">%1$dघंटे %2$dमिनट पहले</string>
@@ -442,4 +442,117 @@
     <string name="status_scheduled_for_this_time">इस समय के लिए निर्धारित</string>
     <string name="daily_frequency_presets_title">दैनिक आवृत्ति प्रीसेट</string>
     <string name="action_edit_medicine_cd">दवा संपादित करें</string>
+
+    <!-- v2.4.0 New Features (Hindi) -->
+    <string name="profile_allergies">एलर्जी</string>
+    <string name="profile_allergies_placeholder">उदा. पेनिसिलिन, सल्फा, मूंगफली</string>
+    <string name="profile_medical_conditions">चिकित्सा स्थितियां / पुरानी बीमारियां</string>
+    <string name="profile_medical_conditions_placeholder">उदा. उच्च रक्तचाप, टाइप 2 मधुमेह</string>
+    <string name="emergency_medical_profile">मरीज की मेडिकल प्रोफाइल</string>
+    <string name="emergency_no_allergies">कोई एलर्जी दर्ज नहीं है</string>
+    <string name="emergency_no_conditions">कोई स्थिति दर्ज नहीं है</string>
+
+    <string name="med_shape_label">गोली का आकार और प्रकार</string>
+    <string name="med_color_label">दृश्य रंग</string>
+    <string name="pill_shape_round">गोल (Round)</string>
+    <string name="pill_shape_capsule">कैप्सूल (Capsule)</string>
+    <string name="pill_shape_oval">अंडाकार (Oval)</string>
+    <string name="pill_shape_liquid">सिरप / तरल (Liquid)</string>
+    <string name="pill_shape_inhaler">इनहेलर (Inhaler)</string>
+    <string name="pill_shape_injection">इंजेक्शन (Injection)</string>
+    <string name="pill_shape_drops">ड्रॉप्स (Drops)</string>
+    <string name="pill_shape_patch">पैच (Patch)</string>
+
+    <string name="med_notes_label">डॉक्टर / फार्मेसी नोट्स और विशेष चेतावनी</string>
+    <string name="med_notes_placeholder">उदा. भोजन के साथ लें, चकोतरा से बचें, प्रिस्क्रिप्शन #12345</string>
+
+    <string name="course_duration_title">उपचार की अवधि</string>
+    <string name="course_ongoing">निरंतर</string>
+    <string name="course_finite">सीमित कोर्स (Finite Course)</string>
+    <string name="course_duration_days_label">कोर्स की अवधि (दिन)</string>
+    <string name="course_duration_days_placeholder">उदा. 7, 10, 14, 30</string>
+    <string name="course_start_date_label">प्रारंभ तिथि</string>
+    <string name="course_end_date_label">समाप्ति तिथि: %1$s</string>
+    <string name="course_completed_badge">कोर्स समाप्त</string>
+
+    <string name="freq_as_needed">ज़रूरत पड़ने पर (PRN)</string>
+    <string name="freq_as_needed_desc">कोई निर्धारित अलार्म नहीं। जब भी लें, उसी समय लॉग करें।</string>
+    <string name="freq_every_x_hours">हर X घंटे में</string>
+    <string name="freq_every_x_days">हर X दिनों में</string>
+    <string name="freq_every_hours_format">प्रत्येक %1$d घंटे में</string>
+    <string name="freq_every_days_format">प्रत्येक %1$d दिनों में</string>
+    <string name="interval_hours_label">खुराक के बीच के घंटे</string>
+    <string name="interval_days_label">खुराक के बीच के दिन</string>
+    <string name="btn_log_prn_dose">खुराक दर्ज करें</string>
+    <string name="prn_doses_taken_today">आज दर्ज खुराकें: %1$d</string>
+    <string name="prn_section_title">ज़रूरत पड़ने पर दवाएं (PRN)</string>
+
+    <string name="btn_quick_refill_action">+ रिफिल</string>
+    <string name="quick_refill_dialog_title">स्टॉक रिफिल: %1$s</string>
+    <string name="quick_refill_amount_label">संख्या जोड़ें</string>
+    <string name="quick_refill_preset_30">+30</string>
+    <string name="quick_refill_preset_60">+60</string>
+    <string name="quick_refill_preset_90">+90</string>
+    <string name="quick_refill_success">%1$s के लिए स्टॉक रिफिल किया गया। नया बैलेंस: %2$d</string>
+
+    <string name="no_scheduled_doses_today">आज के लिए कोई निर्धारित खुराक नहीं है</string>
+    <string name="prn_confirm_log_title">खुराक दर्ज करें</string>
+    <string name="prn_confirm_log_msg">क्या %1$s (%2$s) की 1 खुराक अभी ली गई दर्ज करें?</string>
+    <string name="hours_limit_hint">24 घंटे से अधिक के अंतराल के लिए \'हर X दिन\' चुनें।</string>
+
+    <string name="pref_nagging_title">अनुवर्ती (नैगिंग) रिमाइंडर</string>
+    <string name="pref_nagging_desc">यदि खुराक नहीं ली गई है तो बार-बार याद दिलाएं</string>
+    <string name="pref_nagging_interval">रिमाइंडर अंतराल</string>
+    <string name="pref_nagging_max_repeats">अधिकतम दोहराव</string>
+    <string name="pref_nagging_repeats_format">%1$d बार</string>
+    <string name="notif_nagging_title">अनुवर्ती सूचना: %1$s</string>
+    <string name="notif_nagging_text">रिमाइंडर %1$d/%2$d: %3$s के लिए खुराक अभी भी लंबित है।</string>
+
+    <string name="widget_title">Dosezy आज</string>
+    <string name="widget_no_meds">कोई आगामी खुराक नहीं</string>
+    <string name="widget_all_taken">आज की सभी खुराकें ले ली गईं! 🎉</string>
+    <string name="widget_tap_to_open">ऐप खोलने के लिए टैप करें</string>
+    <string name="widget_no_profile">कोई प्रोफ़ाइल नहीं बनाई गई</string>
+    <string name="widget_open_app">सेटअप के लिए Dosezy खोलें</string>
+    <string name="widget_taken_summary">%1$d / %2$d ली गईं</string>
+    <string name="widget_all_completed">सभी खुराकें पूरी हुईं! 🎉</string>
+    <string name="widget_no_doses_today">आज कोई खुराक निर्धारित नहीं है</string>
+    <string name="widget_next_dose_format">अगली: %1$s • %2$s</string>
+
+    <!-- Custom Alarm Sounds -->
+    <string name="pref_alarm_sound">अलार्म टोन</string>
+    <string name="pref_alarm_sound_desc">दवा अलार्म के लिए रिंगटोन चुनें</string>
+    <string name="alarm_sound_system_default">सिस्टम डिफ़ॉल्ट</string>
+    <string name="alarm_sound_gentle_chime">सौम्य चाइम्स</string>
+    <string name="alarm_sound_medical_marimba">मेडिकल मरिम्बा</string>
+    <string name="alarm_sound_brisk_pulse">तेज़ पल्स</string>
+    <string name="alarm_sound_calm_bell">शांत घंटी</string>
+    <string name="alarm_sound_preview">सुनें</string>
+    <!-- Discontinue & Soft-Delete (#51) -->
+    <string name="dialog_med_action_title">दवा बंद करें या हटाएं?</string>
+    <string name="dialog_med_action_desc">इस दवा के लिए कार्रवाई चुनें:</string>
+    <string name="btn_discontinue_keep_history">बंद करें (इतिहास सुरक्षित रखें)</string>
+    <string name="discontinue_med_explanation">आगामी रिमाइंडर बंद हो जाएंगे और सक्रिय सूची से हट जाएंगे। पिछला सारा इतिहास सुरक्षित रहेगा।</string>
+    <string name="btn_delete_permanently">हमेशा के लिए हटाएं</string>
+    <string name="delete_permanently_explanation">इस दवा और इसके पिछले सारे रिकॉर्ड्स को स्थायी रूप से मिटा दिया जाएगा।</string>
+    <string name="discontinued_medications_section">बंद की गई दवाइयां</string>
+    <string name="btn_reactivate_med">फिर से शुरू करें</string>
+    <string name="dialog_delete_permanent_title">हमेशा के लिए हटाएं?</string>
+    <string name="dialog_delete_permanent_msg">क्या आप वाकई %1$s को हमेशा के लिए हटाना चाहते हैं? इसका सारा इतिहास मिटा दिया जाएगा।</string>
+    <string name="help_github_issues_title">समस्या की रिपोर्ट करें</string>
+    <string name="help_github_issues_desc">GitHub पर बग रिपोर्ट करें या नए सुझाव दें</string>
+    <string name="menu_about_dosezy">Dosezy के बारे में</string>
+    <string name="about_title">Dosezy के बारे में</string>
+    <string name="about_tagline">मरीजों और देखभाल करने वालों के लिए एक सुरक्षित, ऑफ़लाइन दवा साथी।</string>
+    <string name="about_star_github">GitHub पर स्टार दें</string>
+    <string name="about_star_github_desc">GitHub पर स्टार देकर हमारे ओपन-सोर्स प्रोजेक्ट का समर्थन करें</string>
+    <string name="about_support_dev_title">विकास का समर्थन करें</string>
+    <string name="about_support_dev_desc">Dosezy पूरी तरह से मुफ़्त, सुरक्षित और विज्ञापन-मुक्त है। आपका दान प्रोजेक्ट को आगे बढ़ाने में मदद करता है!</string>
+    <string name="about_buymeacoffee">Buy Me a Coffee पर सहयोग करें</string>
+    <string name="about_buymeacoffee_desc">कार्ड या PayPal के ज़रिए BuyMeACoffee पर दान करें</string>
+    <string name="about_crypto_donations">क्रिप्टोकरेंसी दान</string>
+    <string name="about_copied_to_clipboard">%1$s पता क्लिपबोर्ड पर कॉपी किया गया</string>
+    <string name="about_tap_to_copy">पता कॉपी करने के लिए टैप करें</string>
+    <string name="about_github_sponsors">GitHub Sponsors</string>
+    <string name="about_github_sponsors_desc">GitHub Sponsors के माध्यम से मासिक या एकमुश्त दान करें</string>
 </resources>

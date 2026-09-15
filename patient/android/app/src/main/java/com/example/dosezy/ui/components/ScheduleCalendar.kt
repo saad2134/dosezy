@@ -318,9 +318,9 @@ fun ScheduleList(
 fun ScheduleListItem(
     scheduleWithMedicine: ScheduleWithMedicine,
     timeFormat: TimeFormat, // time format parameter
-    onMarkAsTaken: (String, String) -> Unit,
-    onMarkAsLate: (String, String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onMarkAsTaken: ((String, String) -> Unit)? = null,
+    onMarkAsLate: ((String, String) -> Unit)? = null
 ) {
     val entry = scheduleWithMedicine.scheduleEntry
     val medicine = scheduleWithMedicine.medicine
@@ -333,9 +333,11 @@ fun ScheduleListItem(
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Medication Icon with image support
+        // Medication Icon with image & pill visual support
         MedicineImage(
             imageUri = medicine?.imageUri,
+            pillShape = medicine?.pillShape,
+            pillColor = medicine?.pillColor,
             modifier = Modifier.size(56.dp)
         )
 
@@ -351,6 +353,14 @@ fun ScheduleListItem(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
+            if (!medicine?.notes.isNullOrBlank()) {
+                Text(
+                    text = "📝 ${medicine?.notes}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color(0xFFF59E0B),
+                    maxLines = 1
+                )
+            }
             Text(
                 text = medicine?.getDosageDisplay() ?: "Unknown dosage",
                 style = MaterialTheme.typography.bodyMedium,
@@ -369,7 +379,7 @@ fun ScheduleListItem(
 
         Spacer(modifier = Modifier.width(16.dp))
 
-        // Status Button
+        // Status Indicator (Read-only status overview on Schedule page)
         val now = java.time.LocalDateTime.now()
         val missedAfter = currentUser?.considerMissedAfter ?: 6
         val isPassed = now.isAfter(entry.scheduledDateTime)
@@ -381,30 +391,22 @@ fun ScheduleListItem(
             else -> MedicationStatus.PENDING
         }
 
-        val (icon, color, onClick) = when (resolvedStatus) {
+        val (icon, color) = when (resolvedStatus) {
             MedicationStatus.TAKEN_ON_TIME ->
-                Triple(Icons.Default.Done, MaterialTheme.colorScheme.primary, null as (() -> Unit)?)
+                Pair(Icons.Default.Done, MaterialTheme.colorScheme.primary)
             MedicationStatus.TAKEN_LATE ->
-                Triple(Icons.Default.Done, MaterialTheme.colorScheme.tertiary, null)
+                Pair(Icons.Default.Done, MaterialTheme.colorScheme.tertiary)
             MedicationStatus.MISSED ->
-                Triple(Icons.Default.Close, MaterialTheme.colorScheme.error, null)
+                Pair(Icons.Default.Close, MaterialTheme.colorScheme.error)
             MedicationStatus.PENDING ->
-                Triple(Icons.Default.HorizontalRule, MaterialTheme.colorScheme.onSurfaceVariant) {
-                    val takenAt = now.format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-                    if (now.isAfter(entry.scheduledDateTime)) {
-                        onMarkAsLate(entry.entryId, takenAt)
-                    } else {
-                        onMarkAsTaken(entry.entryId, takenAt)
-                    }
-                }
+                Pair(Icons.Default.HorizontalRule, MaterialTheme.colorScheme.onSurfaceVariant)
         }
 
         Box(
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
-                .background(color.copy(alpha = 0.2f))
-                .clickable(enabled = onClick != null) { onClick?.invoke() },
+                .background(color.copy(alpha = 0.2f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(

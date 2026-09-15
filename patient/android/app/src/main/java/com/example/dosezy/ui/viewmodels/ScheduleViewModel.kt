@@ -180,6 +180,15 @@ class ScheduleViewModel @Inject constructor(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun logAsNeededDose(medicine: com.example.dosezy.data.model.Medicine) {
+        viewModelScope.launch {
+            _currentUserId.value?.let { userId ->
+                scheduleRepository.logAsNeededDose(medicine, userId, LocalDateTime.now(), context)
+                loadScheduleForDate(userId, _selectedDate.value)
+            }
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun getFormattedDate(): String {

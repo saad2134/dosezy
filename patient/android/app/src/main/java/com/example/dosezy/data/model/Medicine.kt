@@ -37,27 +37,48 @@ data class Medicine(
     val imageUri: String? = null,
     val currentStock: Int? = null,
     val refillThreshold: Int? = null,
-    val autoDeductOnTake: Boolean = true
+    val autoDeductOnTake: Boolean = true,
+    val notes: String? = null,
+    val pillShape: PillShape = PillShape.ROUND,
+    val pillColor: String = "#1193D4",
+    val startDate: LocalDate? = null,
+    val endDate: LocalDate? = null,
+    val durationDays: Int? = null,
+    val isArchived: Boolean = false
 ) {
 
     /**
      * Generates schedule entries for this medicine for a given date range
-     * @param startDate The start date for generating schedule entries
+     * @param startDateRange The start date for generating schedule entries
      * @param days Number of days to generate entries for (default: 30 days)
      * @return List of ScheduleEntry objects
      */
     @RequiresApi(Build.VERSION_CODES.O)
-    fun generateScheduleEntries(startDate: LocalDate, days: Int = 30): List<ScheduleEntry> {
-        val entries = mutableListOf<ScheduleEntry>()
-        val endDate = startDate.plusDays(days.toLong())
+    fun generateScheduleEntries(startDateRange: LocalDate, days: Int = 30): List<ScheduleEntry> {
+        // As-needed (PRN) medications do not generate automated scheduled reminder slots
+        if (frequency.pattern == FrequencyPattern.AS_NEEDED) {
+            return emptyList()
+        }
 
-        var currentDate = startDate
-        while (currentDate.isBefore(endDate) || currentDate.isEqual(endDate)) {
+        val entries = mutableListOf<ScheduleEntry>()
+        val effectiveStart = if (startDate != null && startDate.isAfter(startDateRange)) startDate else startDateRange
+        val effectiveEnd = if (endDate != null && endDate.isBefore(startDateRange.plusDays(days.toLong()))) endDate else startDateRange.plusDays(days.toLong())
+
+        if (effectiveStart.isAfter(effectiveEnd)) return emptyList()
+
+        var currentDate = effectiveStart
+        while (currentDate.isBefore(effectiveEnd) || currentDate.isEqual(effectiveEnd)) {
             // Check if medicine should be taken on this day based on frequency
             if (shouldTakeOnDate(currentDate)) {
+                val now = LocalDateTime.now()
                 scheduledTimes.forEach { time ->
                     val cleanTime = time.withSecond(0).withNano(0)
                     val scheduledDateTime = LocalDateTime.of(currentDate, cleanTime)
+
+                    // Skip past reminder times on the current day to avoid immediate missed status
+                    if (currentDate.isEqual(now.toLocalDate()) && scheduledDateTime.isBefore(now.minusMinutes(15))) {
+                        return@forEach
+                    }
 
                     val entryId = "${medicineId}_${currentDate}_${cleanTime}".replace(":", "_").replace("-", "_")
                     val entry = ScheduleEntry(
@@ -81,8 +102,20 @@ data class Medicine(
      */
     @RequiresApi(Build.VERSION_CODES.O)
     private fun shouldTakeOnDate(date: LocalDate): Boolean {
+        // Verify within finite course bounds
+        if (startDate != null && date.isBefore(startDate)) return false
+        if (endDate != null && date.isAfter(endDate)) return false
+
         return when (frequency.pattern) {
             FrequencyPattern.DAILY -> true
+            FrequencyPattern.AS_NEEDED -> false
+            FrequencyPattern.EVERY_X_HOURS -> true
+            FrequencyPattern.EVERY_X_DAYS -> {
+                val interval = (frequency.intervalDays ?: 2).coerceAtLeast(1)
+                val baseDate = startDate ?: LocalDate.of(2024, 1, 1)
+                val daysDiff = java.time.temporal.ChronoUnit.DAYS.between(baseDate, date)
+                daysDiff % interval == 0L
+            }
             FrequencyPattern.WEEKLY -> {
                 val selectedDays = frequency.selectedDaysOfWeek
                 if (!selectedDays.isNullOrEmpty()) {
@@ -109,10 +142,7 @@ data class Medicine(
                     date.dayOfMonth <= daysPerMonth
                 }
             }
-            FrequencyPattern.CUSTOM -> {
-                // For custom frequency, default to daily
-                true
-            }
+            FrequencyPattern.CUSTOM -> true
         }
     }
 
@@ -138,25 +168,14 @@ data class Medicine(
     }
 
     /**
-     * Gets the abbreviation for the dosage unit
-     */
-    private fun getDosageUnitAbbreviation(): String {
-        return when (dosageUnit) {
-            DosageUnit.MG -> "mg"
-            DosageUnit.MCG -> "mcg"
-            DosageUnit.ML -> "mL"
-            DosageUnit.DROP -> "drop"
-            DosageUnit.TABLET -> "tablet"
-            DosageUnit.CAPSULE -> "capsule"
-        }
-    }
-
-    /**
      * Gets a display string for the frequency (e.g., "Daily", "3 times per week")
      */
     fun getFrequencyDisplay(): String {
         return when (frequency.pattern) {
             FrequencyPattern.DAILY -> "Daily"
+            FrequencyPattern.AS_NEEDED -> "As Needed (PRN)"
+            FrequencyPattern.EVERY_X_HOURS -> "Every ${frequency.intervalHours ?: 4} Hours"
+            FrequencyPattern.EVERY_X_DAYS -> "Every ${frequency.intervalDays ?: 2} Days"
             FrequencyPattern.WEEKLY -> {
                 val days = frequency.daysPerWeek ?: 7
                 "$days times per week"
@@ -200,16 +219,36 @@ fun DosageUnit.getLocalizedName(): String {
     }
 }
 
+enum class PillShape {
+    ROUND, CAPSULE, OVAL, LIQUID, INHALER, INJECTION, DROPS, PATCH
+}
+
+@androidx.compose.runtime.Composable
+fun PillShape.getLocalizedName(): String {
+    return when (this) {
+        PillShape.ROUND -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.pill_shape_round)
+        PillShape.CAPSULE -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.pill_shape_capsule)
+        PillShape.OVAL -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.pill_shape_oval)
+        PillShape.LIQUID -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.pill_shape_liquid)
+        PillShape.INHALER -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.pill_shape_inhaler)
+        PillShape.INJECTION -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.pill_shape_injection)
+        PillShape.DROPS -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.pill_shape_drops)
+        PillShape.PATCH -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.pill_shape_patch)
+    }
+}
+
 data class Frequency(
     val pattern: FrequencyPattern,
     val daysPerWeek: Int? = null,
     val daysPerMonth: Int? = null,
     val selectedDaysOfWeek: List<Int>? = null,  // 1=Mon, 2=Tue, ..., 7=Sun (ISO)
-    val selectedDaysOfMonth: List<Int>? = null   // 1-31
+    val selectedDaysOfMonth: List<Int>? = null,  // 1-31
+    val intervalHours: Int? = null,              // for EVERY_X_HOURS (e.g. 4, 6, 8, 12)
+    val intervalDays: Int? = null                // for EVERY_X_DAYS (e.g. 2, 3, 5)
 )
 
 enum class FrequencyPattern {
-    DAILY, WEEKLY, MONTHLY, CUSTOM
+    DAILY, WEEKLY, MONTHLY, CUSTOM, AS_NEEDED, EVERY_X_HOURS, EVERY_X_DAYS
 }
 
 @androidx.compose.runtime.Composable
@@ -219,6 +258,9 @@ fun FrequencyPattern.getLocalizedName(): String {
         FrequencyPattern.WEEKLY -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_weekly)
         FrequencyPattern.MONTHLY -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_monthly)
         FrequencyPattern.CUSTOM -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_custom)
+        FrequencyPattern.AS_NEEDED -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_as_needed)
+        FrequencyPattern.EVERY_X_HOURS -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_every_x_hours)
+        FrequencyPattern.EVERY_X_DAYS -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_every_x_days)
     }
 }
 
@@ -232,6 +274,15 @@ fun Medicine.getLocalizedDosageDisplay(): String {
 fun Medicine.getLocalizedFrequencyDisplay(): String {
     return when (frequency.pattern) {
         FrequencyPattern.DAILY -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_daily)
+        FrequencyPattern.AS_NEEDED -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_as_needed)
+        FrequencyPattern.EVERY_X_HOURS -> {
+            val hours = frequency.intervalHours ?: 4
+            androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_every_hours_format, hours)
+        }
+        FrequencyPattern.EVERY_X_DAYS -> {
+            val days = frequency.intervalDays ?: 2
+            androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_every_days_format, days)
+        }
         FrequencyPattern.WEEKLY -> {
             val days = frequency.daysPerWeek ?: 7
             androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.times_per_week_format, days)

@@ -11,16 +11,21 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Medication
 import androidx.compose.ui.res.stringResource
+import com.example.dosezy.data.model.PillShape
+
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -407,3 +412,233 @@ private fun deleteOldImage(path: String) {
         Log.e("ProfilePicturePicker", "Failed to delete old image: ${e.message}")
     }
 }
+
+@Composable
+fun MedicinePhotoVisualPicker(
+    imagePath: String?,
+    pillShape: PillShape,
+    pillColor: String,
+    onImageSelected: (String?) -> Unit,
+    onVisualSelected: (PillShape, String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    var showImageSourceDialog by remember { mutableStateOf(false) }
+    var showPillVisualDialog by remember { mutableStateOf(false) }
+    var tempUri by remember { mutableStateOf<Uri?>(null) }
+    var showError by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            if (uri != null) {
+                try {
+                    val savedPath = saveImageToInternalStorage(context, uri, imagePath)
+                    onImageSelected(savedPath)
+                } catch (e: Exception) {
+                    Log.e("ProfilePicturePicker", "Gallery error: ${e.message}", e)
+                    errorMessage = "Failed to load image from gallery"
+                    showError = true
+                }
+            }
+        }
+    )
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture(),
+        onResult = { success ->
+            if (success) {
+                tempUri?.let { uri ->
+                    try {
+                        val savedPath = saveImageToInternalStorage(context, uri, imagePath)
+                        onImageSelected(savedPath)
+                    } catch (e: Exception) {
+                        Log.e("ProfilePicturePicker", "Camera save error: ${e.message}", e)
+                        errorMessage = "Failed to save captured image"
+                        showError = true
+                    }
+                }
+            }
+            tempUri = null
+        }
+    )
+
+    val openCamera = {
+        try {
+            val uri = createImageFileUri(context)
+            if (uri != null) {
+                tempUri = uri
+                cameraLauncher.launch(uri)
+            } else {
+                errorMessage = "Cannot create temporary file for camera"
+                showError = true
+            }
+        } catch (e: Exception) {
+            errorMessage = "Cannot open camera: ${e.message}"
+            showError = true
+        }
+    }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted) openCamera()
+            else {
+                errorMessage = "Camera permission is required to take photos"
+                showError = true
+            }
+        }
+    )
+
+    fun openCameraWithPermissionCheck() {
+        val permission = android.Manifest.permission.CAMERA
+        if (ContextCompat.checkSelfPermission(context, permission) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            openCamera()
+        } else {
+            cameraPermissionLauncher.launch(permission)
+        }
+    }
+
+    Box(
+        modifier = modifier.size(128.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        // Main Container (Squircle)
+        Surface(
+            shape = RoundedCornerShape(24.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
+            modifier = Modifier
+                .size(128.dp)
+                .clickable { showImageSourceDialog = true }
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                if (!imagePath.isNullOrEmpty()) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(context)
+                            .data(File(imagePath))
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "Medicine Image",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(24.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    // Display Selected Pill Shape & Color in the frame!
+                    PillShapeVisual(
+                        shape = pillShape,
+                        colorHex = pillColor,
+                        size = 64.dp
+                    )
+                }
+            }
+        }
+
+        // Top-Right: Remove photo button (if photo exists)
+        if (!imagePath.isNullOrEmpty()) {
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .size(32.dp)
+                    .clickable {
+                        deleteOldImage(imagePath)
+                        onImageSelected(null)
+                    }
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = stringResource(R.string.image_picker_remove),
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+        }
+
+        // Bottom-Right: Camera/Photo Picker Button
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.primary,
+            shadowElevation = 4.dp,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .size(38.dp)
+                .clickable { showImageSourceDialog = true }
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = Icons.Default.CameraAlt,
+                    contentDescription = stringResource(R.string.form_medicine_image),
+                    tint = Color.White,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+        }
+
+        // Bottom-Left: Pill Shape & Visual Dialog Button (Around photo frame)
+        Surface(
+            shape = CircleShape,
+            color = parseHexColor(pillColor),
+            shadowElevation = 4.dp,
+            border = BorderStroke(2.dp, Color.White),
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .size(38.dp)
+                .clickable { showPillVisualDialog = true }
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                PillShapeVisual(
+                    shape = pillShape,
+                    colorHex = "#FFFFFF",
+                    size = 20.dp
+                )
+            }
+        }
+    }
+
+    if (showPillVisualDialog) {
+        PillVisualDialog(
+            selectedShape = pillShape,
+            selectedColorHex = pillColor,
+            onShapeSelected = { shape -> onVisualSelected(shape, pillColor) },
+            onColorSelected = { color -> onVisualSelected(pillShape, color) },
+            onDismiss = { showPillVisualDialog = false }
+        )
+    }
+
+    if (showImageSourceDialog) {
+        ImageSourceDialog(
+            onDismiss = { showImageSourceDialog = false },
+            onCameraSelected = {
+                showImageSourceDialog = false
+                openCameraWithPermissionCheck()
+            },
+            onGallerySelected = {
+                showImageSourceDialog = false
+                galleryLauncher.launch("image/*")
+            }
+        )
+    }
+
+    if (showError) {
+        AlertDialog(
+            onDismissRequest = { showError = false },
+            title = { Text(stringResource(R.string.image_picker_error_title)) },
+            text = { Text(errorMessage) },
+            confirmButton = {
+                TextButton(onClick = { showError = false }) {
+                    Text(stringResource(android.R.string.ok))
+                }
+            }
+        )
+    }
+}

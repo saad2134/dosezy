@@ -57,31 +57,79 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import android.media.MediaPlayer
+import androidx.lifecycle.lifecycleScope
+import com.example.dosezy.data.model.AlarmSound
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class AlarmActivity : ComponentActivity() {
 
+    companion object {
+        private var activeInstance: java.lang.ref.WeakReference<AlarmActivity>? = null
+
+        fun stopActiveAlarm() {
+            try {
+                activeInstance?.get()?.let { activity ->
+                    activity.runOnUiThread {
+                        activity.stopAlarm()
+                        activity.finish()
+                    }
+                }
+            } catch (_: Exception) {}
+            activeInstance = null
+        }
+    }
+
     @Inject
     lateinit var database: DosezyDatabase
 
+    private var mediaPlayer: MediaPlayer? = null
     private var ringtone: Ringtone? = null
     private var vibrator: Vibrator? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        activeInstance = java.lang.ref.WeakReference(this)
 
         // Turn screen on and unlock keyguard
         setupWindowFlags()
 
-        // Play alarm sound and vibration
-        startAlarmSoundAndVibration()
+        // Start vibration immediately
+        startAlarmVibration()
 
         val entryId = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID) ?: ""
         val entryIds = intent.getStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS) ?: arrayListOf(entryId)
         val initialMedicineName = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME) ?: "Medication"
         val initialScheduledTime = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME) ?: ""
+
+        // Fetch user alarm sound preference and start audio playback
+        lifecycleScope.launch(Dispatchers.IO) {
+            var targetSound: AlarmSound = AlarmSound.SYSTEM_DEFAULT
+            try {
+                if (entryId.isNotEmpty()) {
+                    val entry = database.scheduleDao().getScheduleEntryById(entryId)
+                    if (entry != null) {
+                        val u = database.userDao().getUserByIdDirect(entry.userId)
+                        if (u != null) {
+                            targetSound = u.alarmSound
+                        }
+                    }
+                }
+                if (targetSound == AlarmSound.SYSTEM_DEFAULT) {
+                    val users = database.userDao().getAllUsersDirect()
+                    val currentUser = users.find { it.isCurrentUser } ?: users.firstOrNull()
+                    if (currentUser != null) {
+                        targetSound = currentUser.alarmSound
+                    }
+                }
+            } catch (_: Exception) {}
+
+            withContext(Dispatchers.Main) {
+                playAlarmSound(targetSound)
+            }
+        }
 
         setContent {
             var user by remember { mutableStateOf<User?>(null) }
@@ -136,31 +184,18 @@ class AlarmActivity : ComponentActivity() {
             setTurnScreenOn(true)
             val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
             keyguardManager.requestDismissKeyguard(this, null)
-        } else {
-            @Suppress("DEPRECATION")
-            window.addFlags(
-                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                        WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
-                        WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
-                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-            )
         }
+        @Suppress("DEPRECATION")
+        window.addFlags(
+            WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
+                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
+                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
+                    WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
+        )
     }
 
-    private fun startAlarmSoundAndVibration() {
-        try {
-            val alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-                ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-            ringtone = RingtoneManager.getRingtone(applicationContext, alarmUri)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                ringtone?.audioAttributes = AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_ALARM)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .build()
-            }
-            ringtone?.play()
-        } catch (_: Exception) {}
-
+    private fun startAlarmVibration() {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 val vibratorManager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
@@ -179,9 +214,43 @@ class AlarmActivity : ComponentActivity() {
         } catch (_: Exception) {}
     }
 
+    private fun playAlarmSound(sound: AlarmSound) {
+        try {
+            if (sound.rawResId != null) {
+                mediaPlayer = MediaPlayer.create(applicationContext, sound.rawResId).apply {
+                    setAudioAttributes(
+                        AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_ALARM)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build()
+                    )
+                    isLooping = true
+                    start()
+                }
+            } else {
+                val alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+                    ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+                ringtone = RingtoneManager.getRingtone(applicationContext, alarmUri)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    ringtone?.audioAttributes = AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_ALARM)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                        .build()
+                }
+                ringtone?.play()
+            }
+        } catch (_: Exception) {}
+    }
+
     private fun stopAlarm() {
         try {
+            mediaPlayer?.stop()
+            mediaPlayer?.release()
+            mediaPlayer = null
+        } catch (_: Exception) {}
+        try {
             ringtone?.stop()
+            ringtone = null
         } catch (_: Exception) {}
         try {
             vibrator?.cancel()
@@ -191,6 +260,9 @@ class AlarmActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         stopAlarm()
+        if (activeInstance?.get() == this) {
+            activeInstance = null
+        }
     }
 }
 
@@ -460,16 +532,15 @@ fun GroupedAlarmScreenContent(
                                                 contentScale = androidx.compose.ui.layout.ContentScale.Crop
                                             )
                                         } else {
-                                            Icon(
-                                                imageVector = Icons.Default.Medication,
-                                                contentDescription = null,
-                                                tint = Color(0xFF1193D4),
-                                                modifier = Modifier.size(28.dp)
+                                            com.example.dosezy.ui.components.PillShapeVisual(
+                                                shape = med.pillShape,
+                                                colorHex = med.pillColor,
+                                                modifier = Modifier.size(32.dp)
                                             )
                                         }
                                     }
                                     Spacer(modifier = Modifier.width(14.dp))
-                                    Column {
+                                    Column(modifier = Modifier.weight(1f)) {
                                         Text(
                                             text = med.medicationName,
                                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
@@ -487,6 +558,29 @@ fun GroupedAlarmScreenContent(
                                                 color = Color(0xFF2E7D32),
                                                 fontWeight = FontWeight.SemiBold
                                             )
+                                        }
+                                        if (!med.notes.isNullOrBlank()) {
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            val noteBg = if (isDarkTheme) Color(0xFF381A05) else Color(0xFFFEF3C7)
+                                            val noteTextColor = if (isDarkTheme) Color(0xFFFDBA74) else Color(0xFF92400E)
+                                            val noteBorderColor = if (isDarkTheme) Color(0xFFF59E0B).copy(alpha = 0.35f) else Color(0xFFF59E0B).copy(alpha = 0.5f)
+                                            Surface(
+                                                shape = RoundedCornerShape(8.dp),
+                                                color = noteBg,
+                                                border = androidx.compose.foundation.BorderStroke(1.dp, noteBorderColor)
+                                            ) {
+                                                Row(
+                                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                ) {
+                                                    Text(
+                                                        text = "📝 ${med.notes}",
+                                                        style = MaterialTheme.typography.bodySmall,
+                                                        color = noteTextColor,
+                                                        fontWeight = FontWeight.Medium
+                                                    )
+                                                }
+                                            }
                                         }
                                     }
                                 }

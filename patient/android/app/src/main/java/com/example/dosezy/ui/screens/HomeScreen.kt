@@ -17,12 +17,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Medication
+import com.example.dosezy.data.model.Medicine
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -85,6 +89,8 @@ fun HomeScreen(
 
     // State for real-time updates
     var currentTime by remember { mutableStateOf(java.time.LocalDateTime.now()) }
+    var isPrnExpanded by remember { mutableStateOf(false) }
+    var medToLogConfirm by remember { mutableStateOf<Medicine?>(null) }
 
     // Auto-refresh every minute for real-time updates and run immediately on load
     LaunchedEffect(currentUser) {
@@ -207,12 +213,200 @@ fun HomeScreen(
                                 Spacer(modifier = Modifier.height(16.dp))
                             }
                         }
-                    } else {
+                    } else if (userMedicines.isEmpty()) {
                         NoMedicationsState()
+                    } else {
+                        // User has medications, but none scheduled for today (e.g. PRN or non-today)
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 16.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(24.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(40.dp)
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = androidx.compose.ui.res.stringResource(R.string.no_scheduled_doses_today),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                    }
+
+                    // --- v2.4.0 As-Needed (PRN) Medications Section ---
+                    val prnMedicines = userMedicines.filter { it.frequency.pattern == com.example.dosezy.data.model.FrequencyPattern.AS_NEEDED }
+                    if (prnMedicines.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { isPrnExpanded = !isPrnExpanded },
+                            shape = RoundedCornerShape(16.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Medication,
+                                        contentDescription = null,
+                                        tint = Color(0xFF1193D4),
+                                        modifier = Modifier.size(22.dp)
+                                    )
+                                    Text(
+                                        text = "${androidx.compose.ui.res.stringResource(R.string.prn_section_title)} (${prnMedicines.size})",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
+                                Icon(
+                                    imageVector = if (isPrnExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+
+                        if (isPrnExpanded) {
+                            Spacer(modifier = Modifier.height(10.dp))
+                            prnMedicines.forEach { prnMed ->
+                                Surface(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = MaterialTheme.colorScheme.surface,
+                                    shadowElevation = 3.dp
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(14.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.weight(1f)
+                                        ) {
+                                            MedicineImage(
+                                                imageUri = prnMed.imageUri,
+                                                pillShape = prnMed.pillShape,
+                                                pillColor = prnMed.pillColor,
+                                                modifier = Modifier.size(48.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(12.dp))
+                                            Column {
+                                                Text(
+                                                    text = prnMed.medicationName,
+                                                    style = MaterialTheme.typography.titleMedium,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = MaterialTheme.colorScheme.onSurface
+                                                )
+                                                Text(
+                                                    text = prnMed.getDosageDisplay(),
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                                if (!prnMed.notes.isNullOrBlank()) {
+                                                    Text(
+                                                        text = "📝 ${prnMed.notes}",
+                                                        style = MaterialTheme.typography.labelSmall,
+                                                        color = Color(0xFFF59E0B),
+                                                        maxLines = 1
+                                                    )
+                                                }
+                                            }
+                                        }
+
+                                        Button(
+                                            onClick = {
+                                                medToLogConfirm = prnMed
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color(0xFF1193D4),
+                                                contentColor = Color.White
+                                            ),
+                                            shape = RoundedCornerShape(10.dp)
+                                        ) {
+                                            Text(
+                                                text = androidx.compose.ui.res.stringResource(R.string.btn_log_prn_dose),
+                                                style = MaterialTheme.typography.bodySmall,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+                        }
                     }
                 }
             }
         }
+    }
+
+    if (medToLogConfirm != null) {
+        val med = medToLogConfirm!!
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { medToLogConfirm = null },
+            title = {
+                Text(
+                    text = androidx.compose.ui.res.stringResource(R.string.prn_confirm_log_title),
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    text = androidx.compose.ui.res.stringResource(
+                        R.string.prn_confirm_log_msg,
+                        med.medicationName,
+                        med.getDosageDisplay()
+                    )
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        scheduleViewModel.logAsNeededDose(med)
+                        medToLogConfirm = null
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1193D4))
+                ) {
+                    Text(androidx.compose.ui.res.stringResource(R.string.btn_log_prn_dose))
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = { medToLogConfirm = null }
+                ) {
+                    Text(androidx.compose.ui.res.stringResource(android.R.string.cancel))
+                }
+            }
+        )
     }
 }
 
@@ -363,9 +557,11 @@ private fun MedicationCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Medicine icon
+            // Medicine icon with pill visual support
             MedicineImage(
                 imageUri = medicine?.imageUri,
+                pillShape = medicine?.pillShape,
+                pillColor = medicine?.pillColor,
                 modifier = Modifier.size(64.dp)
             )
 
@@ -373,88 +569,63 @@ private fun MedicationCard(
 
             // Medication info
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
+                // 1. Name
                 Text(
                     text = medicine?.medicationName ?: "Unknown Medicine",
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
+
+                // 2. Qty / Dosage
+                Text(
+                    text = medicine?.getDosageDisplay() ?: "Unknown dosage",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                // 3. Note
+                if (!medicine?.notes.isNullOrBlank()) {
                     Text(
-                        text = medicine?.getDosageDisplay() ?: "Unknown dosage",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        text = "📝 ${medicine?.notes}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color(0xFFF59E0B),
+                        maxLines = 2
                     )
-                    medicine?.currentStock?.let { stock ->
-                        val isLow = medicine.refillThreshold != null && stock <= medicine.refillThreshold
-                        val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
-                        val containerBg = if (isLow) {
-                            if (isDark) Color(0xFF3F1313) else Color(0xFFFEE2E2)
-                        } else {
-                            if (isDark) Color(0xFF0F2D14) else Color(0xFFD1FAE5)
-                        }
-                        val contentColor = if (isLow) {
-                            if (isDark) Color(0xFFFCA5A5) else Color(0xFFB91C1C)
-                        } else {
-                            if (isDark) Color(0xFFA7F3D0) else Color(0xFF065F46)
-                        }
-                        androidx.compose.material3.Surface(
-                            color = containerBg,
-                            shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
-                        ) {
-                            Text(
-                                text = if (isLow) {
-                                    androidx.compose.ui.res.stringResource(R.string.med_stock_refill_warning_badge, stock)
-                                } else {
-                                    androidx.compose.ui.res.stringResource(R.string.med_stock_badge, stock)
-                                },
-                                color = contentColor,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
-                        }
-                    }
                 }
 
-                // Show individual medication status under dosage
-                if (isTaken) {
-                    Text(
-                        text = androidx.compose.ui.res.stringResource(R.string.status_taken),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                } else {
-                    val timeDiff = TimeCalculationUtils.calculateTimeDifference(
-                        entry.scheduledDateTime,
-                        currentDateTime
-                    )
-                    val agoText = androidx.compose.ui.res.stringResource(R.string.time_diff_ago, timeDiff.hours, timeDiff.minutes)
-
-                    if (isMissed) {
+                // 4. Refill warning / stock badge
+                medicine?.currentStock?.let { stock ->
+                    val isLow = medicine.refillThreshold != null && stock <= medicine.refillThreshold
+                    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+                    val containerBg = if (isLow) {
+                        if (isDark) Color(0xFF3F1313) else Color(0xFFFEE2E2)
+                    } else {
+                        if (isDark) Color(0xFF0F2D14) else Color(0xFFD1FAE5)
+                    }
+                    val contentColor = if (isLow) {
+                        if (isDark) Color(0xFFFCA5A5) else Color(0xFFB91C1C)
+                    } else {
+                        if (isDark) Color(0xFFA7F3D0) else Color(0xFF065F46)
+                    }
+                    androidx.compose.material3.Surface(
+                        color = containerBg,
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+                        modifier = Modifier.padding(top = 2.dp)
+                    ) {
                         Text(
-                            text = agoText,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.error // Red if missed
-                        )
-                    } else if (isLate) {
-                        Text(
-                            text = agoText,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = orangeColor // Orange if late
-                        )
-                    } else if (isPassed) {
-                        Text(
-                            text = agoText,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant // Normal color if under late time
+                            text = if (isLow) {
+                                androidx.compose.ui.res.stringResource(R.string.med_stock_refill_warning_badge, stock)
+                            } else {
+                                androidx.compose.ui.res.stringResource(R.string.med_stock_badge, stock)
+                            },
+                            color = contentColor,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                         )
                     }
                 }

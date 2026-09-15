@@ -101,6 +101,17 @@ class Converters {
         }
     }
 
+    // PillShape converters
+    @TypeConverter
+    fun fromPillShape(shape: com.example.dosezy.data.model.PillShape?): String = (shape ?: com.example.dosezy.data.model.PillShape.ROUND).name
+
+    @TypeConverter
+    fun toPillShape(value: String?): com.example.dosezy.data.model.PillShape = try {
+        if (value != null) com.example.dosezy.data.model.PillShape.valueOf(value) else com.example.dosezy.data.model.PillShape.ROUND
+    } catch (_: Exception) {
+        com.example.dosezy.data.model.PillShape.ROUND
+    }
+
     // Frequency converters
     @TypeConverter
     fun fromFrequency(frequency: Frequency?): String? {
@@ -109,6 +120,8 @@ class Converters {
             jsonObject.put("pattern", freq.pattern.name)
             freq.daysPerWeek?.let { jsonObject.put("daysPerWeek", it) }
             freq.daysPerMonth?.let { jsonObject.put("daysPerMonth", it) }
+            freq.intervalHours?.let { jsonObject.put("intervalHours", it) }
+            freq.intervalDays?.let { jsonObject.put("intervalDays", it) }
             freq.selectedDaysOfWeek?.let { days ->
                 val arr = JSONArray()
                 days.forEach { arr.put(it) }
@@ -128,19 +141,29 @@ class Converters {
         return if (value == null) {
             null
         } else {
-            val jsonObject = JSONObject(value)
-            val pattern = FrequencyPattern.valueOf(jsonObject.getString("pattern"))
-            val daysPerWeek = if (jsonObject.has("daysPerWeek")) jsonObject.getInt("daysPerWeek") else null
-            val daysPerMonth = if (jsonObject.has("daysPerMonth")) jsonObject.getInt("daysPerMonth") else null
-            val selectedDaysOfWeek = if (jsonObject.has("selectedDaysOfWeek")) {
-                val arr = jsonObject.getJSONArray("selectedDaysOfWeek")
-                (0 until arr.length()).map { arr.getInt(it) }
-            } else null
-            val selectedDaysOfMonth = if (jsonObject.has("selectedDaysOfMonth")) {
-                val arr = jsonObject.getJSONArray("selectedDaysOfMonth")
-                (0 until arr.length()).map { arr.getInt(it) }
-            } else null
-            Frequency(pattern, daysPerWeek, daysPerMonth, selectedDaysOfWeek, selectedDaysOfMonth)
+            try {
+                val jsonObject = JSONObject(value)
+                val pattern = try {
+                    FrequencyPattern.valueOf(jsonObject.getString("pattern"))
+                } catch (_: Exception) {
+                    FrequencyPattern.DAILY
+                }
+                val daysPerWeek = if (jsonObject.has("daysPerWeek") && !jsonObject.isNull("daysPerWeek")) jsonObject.getInt("daysPerWeek") else null
+                val daysPerMonth = if (jsonObject.has("daysPerMonth") && !jsonObject.isNull("daysPerMonth")) jsonObject.getInt("daysPerMonth") else null
+                val intervalHours = if (jsonObject.has("intervalHours") && !jsonObject.isNull("intervalHours")) jsonObject.getInt("intervalHours") else null
+                val intervalDays = if (jsonObject.has("intervalDays") && !jsonObject.isNull("intervalDays")) jsonObject.getInt("intervalDays") else null
+                val selectedDaysOfWeek = if (jsonObject.has("selectedDaysOfWeek") && !jsonObject.isNull("selectedDaysOfWeek")) {
+                    val arr = jsonObject.getJSONArray("selectedDaysOfWeek")
+                    (0 until arr.length()).map { arr.getInt(it) }
+                } else null
+                val selectedDaysOfMonth = if (jsonObject.has("selectedDaysOfMonth") && !jsonObject.isNull("selectedDaysOfMonth")) {
+                    val arr = jsonObject.getJSONArray("selectedDaysOfMonth")
+                    (0 until arr.length()).map { arr.getInt(it) }
+                } else null
+                Frequency(pattern, daysPerWeek, daysPerMonth, selectedDaysOfWeek, selectedDaysOfMonth, intervalHours, intervalDays)
+            } catch (_: Exception) {
+                Frequency(FrequencyPattern.DAILY)
+            }
         }
     }
 
@@ -165,5 +188,15 @@ class Converters {
         Language.valueOf(languageString)
     } catch (e: Exception) {
         Language.SYSTEM
+    }
+
+    @TypeConverter
+    fun fromAlarmSound(alarmSound: com.example.dosezy.data.model.AlarmSound): String = alarmSound.name
+
+    @TypeConverter
+    fun toAlarmSound(alarmSoundString: String): com.example.dosezy.data.model.AlarmSound = try {
+        com.example.dosezy.data.model.AlarmSound.valueOf(alarmSoundString)
+    } catch (_: Exception) {
+        com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT
     }
 }

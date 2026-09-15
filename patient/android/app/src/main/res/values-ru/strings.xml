@@ -418,7 +418,7 @@
     <string name="err_cannot_open_link">Невозможно открыть ссылку</string>
     <string name="err_no_email_app">Нет доступных почтовых приложений</string>
     <string name="err_share_failed">Ошибка отправки: %1$s</string>
-    <string name="med_stock_refill_warning_badge">⚠️ Пополнение запаса: осталось %1$d</string>
+    <string name="med_stock_refill_warning_badge">⚠️ Пополнение: осталось %1$d</string>
     <string name="med_stock_badge">📦 Запас: %1$d</string>
     <string name="to_be_taken_in">Принять через %1$d ч %2$d мин</string>
     <string name="time_diff_ago">%1$d ч %2$d мин назад</string>
@@ -426,4 +426,117 @@
     <string name="status_scheduled_for_this_time">Запланировано на это время</string>
     <string name="daily_frequency_presets_title">Предустановки частоты приема</string>
     <string name="action_edit_medicine_cd">Редактировать лекарство</string>
+
+    <!-- v2.4.0 Новые функции (Russian) -->
+    <string name="profile_allergies">Аллергии</string>
+    <string name="profile_allergies_placeholder">напр. Пенициллин, Сульфаниламиды, Арахис</string>
+    <string name="profile_medical_conditions">Медицинские состояния / Хронические заболевания</string>
+    <string name="profile_medical_conditions_placeholder">напр. Гипертония, Сахарный диабет 2 типа</string>
+    <string name="emergency_medical_profile">Медицинский профиль пациента</string>
+    <string name="emergency_no_allergies">Аллергии не указаны</string>
+    <string name="emergency_no_conditions">Заболевания не указаны</string>
+
+    <string name="med_shape_label">Форма и тип таблетки</string>
+    <string name="med_color_label">Визуальный цвет</string>
+    <string name="pill_shape_round">Круглая</string>
+    <string name="pill_shape_capsule">Капсула</string>
+    <string name="pill_shape_oval">Овальная</string>
+    <string name="pill_shape_liquid">Сироп / Раствор</string>
+    <string name="pill_shape_inhaler">Ингалятор</string>
+    <string name="pill_shape_injection">Инъекция</string>
+    <string name="pill_shape_drops">Капли</string>
+    <string name="pill_shape_patch">Пластырь</string>
+
+    <string name="med_notes_label">Указания врача / аптеки и предостережения</string>
+    <string name="med_notes_placeholder">напр. Принимать во время еды, Избегать грейпфрута, Рецепт #12345</string>
+
+    <string name="course_duration_title">Длительность курса</string>
+    <string name="course_ongoing">Постоянный прием</string>
+    <string name="course_finite">Ограниченный курс</string>
+    <string name="course_duration_days_label">Длительность курса (Дней)</string>
+    <string name="course_duration_days_placeholder">напр. 7, 10, 14, 30</string>
+    <string name="course_start_date_label">Дата начала</string>
+    <string name="course_end_date_label">Дата окончания: %1$s</string>
+    <string name="course_completed_badge">Курс завершен</string>
+
+    <string name="freq_as_needed">По необходимости (PRN)</string>
+    <string name="freq_as_needed_desc">Без запланированных будильников. Фиксируйте приемы по мере необходимости.</string>
+    <string name="freq_every_x_hours">Каждые X часов</string>
+    <string name="freq_every_x_days">Каждые X дней</string>
+    <string name="freq_every_hours_format">Каждые %1$d ч</string>
+    <string name="freq_every_days_format">Каждые %1$d дн</string>
+    <string name="interval_hours_label">Интервал между приемами (часы)</string>
+    <string name="interval_days_label">Интервал между приемами (дни)</string>
+    <string name="btn_log_prn_dose">Записать прием</string>
+    <string name="prn_doses_taken_today">Приемов записано сегодня: %1$d</string>
+    <string name="prn_section_title">Препараты по необходимости (PRN)</string>
+
+    <string name="btn_quick_refill_action">+ Пополнить</string>
+    <string name="quick_refill_dialog_title">Пополнение запаса: %1$s</string>
+    <string name="quick_refill_amount_label">Добавить количество</string>
+    <string name="quick_refill_preset_30">+30</string>
+    <string name="quick_refill_preset_60">+60</string>
+    <string name="quick_refill_preset_90">+90</string>
+    <string name="quick_refill_success">Запас пополнен для %1$s. Новый остаток: %2$d</string>
+
+    <string name="no_scheduled_doses_today">На сегодня приёмов не запланировано</string>
+    <string name="prn_confirm_log_title">Записать приём</string>
+    <string name="prn_confirm_log_msg">Записать 1 приём %1$s (%2$s) прямо сейчас?</string>
+    <string name="hours_limit_hint">Для интервалов более 24 часов выберите «Каждые X дней».</string>
+
+    <string name="pref_nagging_title">Настойчивые повторные напоминания</string>
+    <string name="pref_nagging_desc">Повторять напоминания, если прием не был подтвержден</string>
+    <string name="pref_nagging_interval">Интервал напоминаний</string>
+    <string name="pref_nagging_max_repeats">Максимум повторений</string>
+    <string name="pref_nagging_repeats_format">%1$d раз</string>
+    <string name="notif_nagging_title">Повторное напоминание: %1$s</string>
+    <string name="notif_nagging_text">Напоминание %1$d/%2$d: Прием %3$s все еще ожидает подтверждения.</string>
+
+    <string name="widget_title">Dosezy Сегодня</string>
+    <string name="widget_no_meds">Нет предстоящих приемов</string>
+    <string name="widget_all_taken">Все лекарства на сегодня приняты! 🎉</string>
+    <string name="widget_tap_to_open">Нажмите, чтобы открыть приложение</string>
+    <string name="widget_no_profile">Профиль не создан</string>
+    <string name="widget_open_app">Откройте Dosezy для настройки</string>
+    <string name="widget_taken_summary">%1$d из %2$d принято</string>
+    <string name="widget_all_completed">Все приемы выполнены! 🎉</string>
+    <string name="widget_no_doses_today">На сегодня ничего не запланировано</string>
+    <string name="widget_next_dose_format">Следующий: %1$s • %2$s</string>
+
+    <!-- Custom Alarm Sounds -->
+    <string name="pref_alarm_sound">Звук будильника</string>
+    <string name="pref_alarm_sound_desc">Выберите мелодию для напоминаний о лекарствах</string>
+    <string name="alarm_sound_system_default">По умолчанию системы</string>
+    <string name="alarm_sound_gentle_chime">Мягкий перезвон</string>
+    <string name="alarm_sound_medical_marimba">Медицинская маримба</string>
+    <string name="alarm_sound_brisk_pulse">Бодрый импульс</string>
+    <string name="alarm_sound_calm_bell">Спокойный колокол</string>
+    <string name="alarm_sound_preview">Прослушать</string>
+    <!-- Discontinue & Soft-Delete (#51) -->
+    <string name="dialog_med_action_title">Прекратить или удалить?</string>
+    <string name="dialog_med_action_desc">Выберите действие для этого лекарства:</string>
+    <string name="btn_discontinue_keep_history">Прекратить (Сохранить историю)</string>
+    <string name="discontinue_med_explanation">Отменяет будущие напоминания и убирает из активного списка. Вся история приемов сохраняется.</string>
+    <string name="btn_delete_permanently">Удалить навсегда</string>
+    <string name="delete_permanently_explanation">Безвозвратно удаляет лекарство и всю историю приемов.</string>
+    <string name="discontinued_medications_section">Прекращенные лекарства</string>
+    <string name="btn_reactivate_med">Возобновить</string>
+    <string name="dialog_delete_permanent_title">Удалить навсегда?</string>
+    <string name="dialog_delete_permanent_msg">Вы уверены, что хотите навсегда удалить %1$s? Вся история приемов будет удалена.</string>
+    <string name="help_github_issues_title">Сообщить о проблеме</string>
+    <string name="help_github_issues_desc">Сообщить об ошибке или предложить функцию на GitHub</string>
+    <string name="menu_about_dosezy">О Dosezy</string>
+    <string name="about_title">О Dosezy</string>
+    <string name="about_tagline">Конфиденциальный оффлайн-помощник по приему лекарств для пациентов и близких.</string>
+    <string name="about_star_github">Поставить звезду на GitHub</string>
+    <string name="about_star_github_desc">Поддержите наш проект с открытым исходным кодом звездой на GitHub</string>
+    <string name="about_support_dev_title">Поддержать разработку</string>
+    <string name="about_support_dev_desc">Dosezy на 100% бесплатен, конфиденциален и без рекламы. Ваша поддержка помогает проекту развиваться!</string>
+    <string name="about_buymeacoffee">Купить кофе автору</string>
+    <string name="about_buymeacoffee_desc">Поддержать картой или через PayPal на BuyMeACoffee</string>
+    <string name="about_crypto_donations">Пожертвования в криптовалюте</string>
+    <string name="about_copied_to_clipboard">Адрес %1$s скопирован в буфер обмена</string>
+    <string name="about_tap_to_copy">Нажмите, чтобы скопировать адрес</string>
+    <string name="about_github_sponsors">GitHub Sponsors</string>
+    <string name="about_github_sponsors_desc">Ежемесячная или разовая поддержка через GitHub Sponsors</string>
 </resources>

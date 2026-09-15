@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Loop
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Emergency
 import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Refresh
@@ -152,8 +153,9 @@ fun MenuScreen(navController: NavController) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp)
+                .padding(horizontal = 16.dp),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 10.dp, bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             // Profile Card
             item {
@@ -204,6 +206,16 @@ fun MenuScreen(navController: NavController) {
                 )
             }
 
+            // About Dosezy & Support
+            item {
+                MenuItem(
+                    icon = Icons.Default.Info,
+                    title = androidx.compose.ui.res.stringResource(R.string.menu_about_dosezy),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    onClick = { navController.navigate("about") }
+                )
+            }
+
             // Data & Sharing Section Header
             item {
                 Text(
@@ -215,7 +227,7 @@ fun MenuScreen(navController: NavController) {
                 )
             }
 
-            // 1. Cloud Setup (Disabled, Coming Soon, Optional, Open-Source)
+            // 1. Cloud Setup (Disabled, Optional, Soon)
             item {
                 MenuItem(
                     icon = Icons.Default.Cloud,
@@ -223,9 +235,8 @@ fun MenuScreen(navController: NavController) {
                     color = MaterialTheme.colorScheme.onSurface,
                     enabled = false,
                     badges = listOf(
-                        stringResource(R.string.coming_soon),
                         stringResource(R.string.optional),
-                        stringResource(R.string.open_source)
+                        stringResource(R.string.coming_soon)
                     ),
                     onClick = {}
                 )

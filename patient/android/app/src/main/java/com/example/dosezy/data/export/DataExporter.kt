@@ -158,6 +158,7 @@ class DataExporter(
     private fun buildJsonContent(user: User, medicines: List<Medicine>, schedules: List<ScheduleEntry>): String {
         val root = JSONObject()
         root.put("appName", "Dosezy")
+        root.put("appVersion", "2.4.0")
         root.put("exportedAt", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
 
         val userObj = JSONObject()
@@ -166,6 +167,9 @@ class DataExporter(
         userObj.put("age", user.age)
         userObj.put("gender", user.gender.name)
         userObj.put("contactNumber", user.contactNumber)
+        userObj.put("allergies", user.allergies ?: "")
+        userObj.put("medicalConditions", user.medicalConditions ?: "")
+        userObj.put("alarmSound", user.alarmSound.name)
         root.put("user", userObj)
 
         val medArray = JSONArray()
@@ -177,10 +181,19 @@ class DataExporter(
             mObj.put("dosageUnit", med.dosageUnit.name)
             mObj.put("timesPerDay", med.timesPerDay)
             mObj.put("frequencyPattern", med.frequency.pattern.name)
+            mObj.put("intervalHours", med.frequency.intervalHours)
+            mObj.put("intervalDays", med.frequency.intervalDays)
             mObj.put("scheduledTimes", JSONArray(med.scheduledTimes.map { it.toString() }))
             mObj.put("currentStock", med.currentStock)
             mObj.put("refillThreshold", med.refillThreshold)
             mObj.put("autoDeductOnTake", med.autoDeductOnTake)
+            mObj.put("pillShape", med.pillShape.name)
+            mObj.put("pillColor", med.pillColor)
+            mObj.put("notes", med.notes ?: "")
+            mObj.put("startDate", med.startDate?.toString() ?: "")
+            mObj.put("endDate", med.endDate?.toString() ?: "")
+            mObj.put("durationDays", med.durationDays)
+            mObj.put("isArchived", med.isArchived)
             medArray.put(mObj)
         }
         root.put("medicines", medArray)
@@ -190,9 +203,9 @@ class DataExporter(
             val sObj = JSONObject()
             sObj.put("entryId", sch.entryId)
             sObj.put("medicineId", sch.medicineId)
-            sObj.put("scheduledDateTime", sch.scheduledDateTime)
+            sObj.put("scheduledDateTime", sch.scheduledDateTime.toString())
             sObj.put("status", sch.status.name)
-            sObj.put("takenAt", sch.takenAt ?: "")
+            sObj.put("takenAt", sch.takenAt?.toString() ?: "")
             schedArray.put(sObj)
         }
         root.put("schedules", schedArray)
@@ -221,6 +234,11 @@ class DataExporter(
             textSize = 12f
             isFakeBoldText = true
         }
+        val alertHeaderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.parseColor("#DC2626")
+            textSize = 10f
+            isFakeBoldText = true
+        }
         val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.parseColor("#374151")
             textSize = 10f
@@ -230,21 +248,41 @@ class DataExporter(
             strokeWidth = 1f
         }
 
-        var y = 40f
-        canvas.drawText("DOSEZY - Patient Health & Medication Report", 40f, y, titlePaint)
-        y += 18f
+        // Top-left App Brand Icon (matching New User & Alarm popup brand icon)
+        val brandIcon = androidx.core.content.ContextCompat.getDrawable(context, com.example.dosezy.R.drawable.loader_icon)
+        if (brandIcon != null) {
+            brandIcon.setBounds(40, 24, 68, 52) // 28x28 pt at top-left
+            brandIcon.draw(canvas)
+        }
+
+        var y = 38f
+        canvas.drawText("DOSEZY - Patient Health & Medication Report", 76f, y, titlePaint)
+        y += 16f
         val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
-        canvas.drawText("Generated: $timestamp | Private & Offline Export", 40f, y, subtitlePaint)
+        canvas.drawText("Generated: $timestamp | Private & Offline Export", 76f, y, subtitlePaint)
         y += 15f
         canvas.drawLine(40f, y, 555f, y, linePaint)
-        y += 25f
+        y += 22f
 
         // Patient Info
         canvas.drawText("Patient Profile", 40f, y, headerPaint)
-        y += 16f
+        y += 15f
         canvas.drawText("Name: ${user.fullName}", 40f, y, textPaint)
         canvas.drawText("Age: ${user.age}", 240f, y, textPaint)
         canvas.drawText("Gender: ${user.gender}", 360f, y, textPaint)
+        y += 15f
+
+        // Allergies & Medical Conditions in PDF
+        val allergiesText = if (!user.allergies.isNullOrBlank()) user.allergies else "None recorded"
+        val conditionsText = if (!user.medicalConditions.isNullOrBlank()) user.medicalConditions else "None recorded"
+        
+        if (!user.allergies.isNullOrBlank()) {
+            canvas.drawText("Allergies: $allergiesText", 40f, y, alertHeaderPaint)
+        } else {
+            canvas.drawText("Allergies: $allergiesText", 40f, y, textPaint)
+        }
+        y += 15f
+        canvas.drawText("Chronic Conditions: $conditionsText", 40f, y, textPaint)
         y += 18f
         canvas.drawLine(40f, y, 555f, y, linePaint)
         y += 20f
@@ -371,12 +409,12 @@ class DataExporter(
 
         // User Information Section
         csvBuilder.append("USER INFORMATION\n")
-        csvBuilder.append("User ID,Full Name,Age,Gender,Contact Number,Profile Picture Path,Is Current User\n")
-        csvBuilder.append("\"${user.userId}\",\"${user.fullName}\",${user.age},${user.gender},\"${user.contactNumber}\",\"${user.profilePicPath ?: ""}\",${user.isCurrentUser}\n\n")
+        csvBuilder.append("User ID,Full Name,Age,Gender,Contact Number,Allergies,Medical Conditions,Profile Picture Path,Is Current User\n")
+        csvBuilder.append("\"${user.userId}\",\"${user.fullName}\",${user.age},${user.gender},\"${user.contactNumber}\",\"${user.allergies ?: ""}\",\"${user.medicalConditions ?: ""}\",\"${user.profilePicPath ?: ""}\",${user.isCurrentUser}\n\n")
 
         // Medicines Section
         csvBuilder.append("MEDICINES\n")
-        csvBuilder.append("Medicine ID,User ID,Medication Name,Dosage,Dosage Unit,Times Per Day,Frequency Pattern,Days Per Week,Days Per Month,Scheduled Times,Image URI\n")
+        csvBuilder.append("Medicine ID,User ID,Medication Name,Dosage,Dosage Unit,Times Per Day,Frequency Pattern,Interval Hours,Interval Days,Scheduled Times,Pill Shape,Pill Color,Doctor Notes,Start Date,End Date,Duration Days,Stock,Image URI\n")
         medicines.forEach { medicine ->
             val scheduledTimesStr = medicine.scheduledTimes.joinToString(";") { it.toString() }
             csvBuilder.append(
@@ -387,9 +425,16 @@ class DataExporter(
                         "${medicine.dosageUnit}," +
                         "${medicine.timesPerDay}," +
                         "${medicine.frequency.pattern}," +
-                        "${medicine.frequency.daysPerWeek ?: ""}," +
-                        "${medicine.frequency.daysPerMonth ?: ""}," +
+                        "${medicine.frequency.intervalHours ?: ""}," +
+                        "${medicine.frequency.intervalDays ?: ""}," +
                         "\"$scheduledTimesStr\"," +
+                        "\"${medicine.pillShape.name}\"," +
+                        "\"${medicine.pillColor}\"," +
+                        "\"${(medicine.notes ?: "").replace("\"", "\"\"")}\"," +
+                        "\"${medicine.startDate ?: ""}\"," +
+                        "\"${medicine.endDate ?: ""}\"," +
+                        "${medicine.durationDays ?: ""}," +
+                        "${medicine.currentStock ?: ""}," +
                         "\"${medicine.imageUri ?: ""}\"\n"
             )
         }

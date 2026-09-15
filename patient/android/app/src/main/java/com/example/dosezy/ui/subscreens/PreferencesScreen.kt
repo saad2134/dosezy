@@ -1,5 +1,10 @@
 package com.example.dosezy.ui.subscreens
 
+import android.media.MediaPlayer
+import android.media.Ringtone
+import android.media.RingtoneManager
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
@@ -18,9 +23,51 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.dosezy.R
+import com.example.dosezy.data.model.AlarmSound
 import com.example.dosezy.data.model.Language
 import com.example.dosezy.data.model.Theme
 import com.example.dosezy.data.model.TimeFormat
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Repeat
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Snooze
+import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.VolumeUp
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import com.example.dosezy.ui.components.PreferenceItem
 import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.viewmodels.UserViewModel
@@ -37,7 +84,10 @@ fun PreferencesScreen(navController: NavController) {
     var showLateAfterDialog by remember { mutableStateOf(false) }
     var showMissedAfterDialog by remember { mutableStateOf(false) }
     var showSnoozeDialog by remember { mutableStateOf(false) }
+    var showAlarmSoundDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
+    var showNaggingIntervalDialog by remember { mutableStateOf(false) }
+    var showNaggingRepeatsDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -123,6 +173,150 @@ fun PreferencesScreen(navController: NavController) {
                 )
             }
 
+            // Follow-up / Nagging Reminders Switch & Settings
+            item {
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(
+                                modifier = Modifier.weight(1f).padding(end = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Repeat,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Column {
+                                    Text(
+                                        text = stringResource(R.string.pref_nagging_title),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.pref_nagging_desc),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                            Switch(
+                                checked = currentUser?.naggingRemindersEnabled == true,
+                                onCheckedChange = { isChecked ->
+                                    currentUser?.let { user ->
+                                        userViewModel.updateUser(user.copy(naggingRemindersEnabled = isChecked))
+                                    }
+                                }
+                            )
+                        }
+
+                        AnimatedVisibility(
+                            visible = currentUser?.naggingRemindersEnabled == true,
+                            enter = expandVertically() + fadeIn(),
+                            exit = shrinkVertically() + fadeOut()
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 12.dp)
+                            ) {
+                                Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                // Sub-option 1: Interval (Indented)
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 12.dp)
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .clickable { showNaggingIntervalDialog = true }
+                                        .padding(vertical = 10.dp, horizontal = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Default.Schedule,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(10.dp))
+                                        Text(
+                                            text = stringResource(R.string.pref_nagging_interval),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                    Text(
+                                        text = stringResource(R.string.minutes_format, currentUser?.naggingIntervalMinutes ?: 10),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+
+                                // Sub-option 2: Repeats (Indented)
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 12.dp)
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .clickable { showNaggingRepeatsDialog = true }
+                                        .padding(vertical = 10.dp, horizontal = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Default.Snooze,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(10.dp))
+                                        Text(
+                                            text = stringResource(R.string.pref_nagging_max_repeats),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                    Text(
+                                        text = stringResource(R.string.pref_nagging_repeats_format, currentUser?.naggingMaxRepeats ?: 3),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            item {
+                // Alarm Sound Preference
+                val currentSound = currentUser?.alarmSound ?: AlarmSound.SYSTEM_DEFAULT
+                PreferenceItem(
+                    title = androidx.compose.ui.res.stringResource(R.string.pref_alarm_sound),
+                    currentValue = androidx.compose.ui.res.stringResource(currentSound.getTitleRes()),
+                    iconName = "alarm_sound",
+                    onClick = { showAlarmSoundDialog = true }
+                )
+            }
+
             item {
                 // Language Preference
                 val sysLangName = com.example.dosezy.utils.LocaleHelper.getSystemLanguageDisplayName()
@@ -149,6 +343,44 @@ fun PreferencesScreen(navController: NavController) {
                     onClick = { showLanguageDialog = true }
                 )
             }
+        }
+
+        // Nagging Interval Dialog
+        if (showNaggingIntervalDialog) {
+            val options = listOf(5, 10, 15, 20, 30).map { mins ->
+                androidx.compose.ui.res.stringResource(R.string.minutes_format, mins) to mins
+            }
+            com.example.dosezy.ui.components.SelectionDialog(
+                title = androidx.compose.ui.res.stringResource(R.string.pref_nagging_interval),
+                options = options,
+                currentSelection = currentUser?.naggingIntervalMinutes ?: 10,
+                onOptionSelected = { mins ->
+                    currentUser?.let { user ->
+                        userViewModel.updateUser(user.copy(naggingIntervalMinutes = mins))
+                    }
+                    showNaggingIntervalDialog = false
+                },
+                onDismiss = { showNaggingIntervalDialog = false }
+            )
+        }
+
+        // Nagging Repeats Dialog
+        if (showNaggingRepeatsDialog) {
+            val options = listOf(1, 2, 3, 5).map { repeats ->
+                androidx.compose.ui.res.stringResource(R.string.pref_nagging_repeats_format, repeats) to repeats
+            }
+            com.example.dosezy.ui.components.SelectionDialog(
+                title = androidx.compose.ui.res.stringResource(R.string.pref_nagging_max_repeats),
+                options = options,
+                currentSelection = currentUser?.naggingMaxRepeats ?: 3,
+                onOptionSelected = { count ->
+                    currentUser?.let { user ->
+                        userViewModel.updateUser(user.copy(naggingMaxRepeats = count))
+                    }
+                    showNaggingRepeatsDialog = false
+                },
+                onDismiss = { showNaggingRepeatsDialog = false }
+            )
         }
 
         // Theme Selection Dialog
@@ -236,7 +468,169 @@ fun PreferencesScreen(navController: NavController) {
                 onDismiss = { showSnoozeDialog = false }
             )
         }
+
+        // Alarm Sound Selection Dialog
+        if (showAlarmSoundDialog) {
+            AlarmSoundSelectionDialog(
+                currentSound = currentUser?.alarmSound ?: AlarmSound.SYSTEM_DEFAULT,
+                onSoundSelected = { newSound ->
+                    currentUser?.let { user ->
+                        userViewModel.updateUser(user.copy(alarmSound = newSound))
+                    }
+                    showAlarmSoundDialog = false
+                },
+                onDismiss = { showAlarmSoundDialog = false }
+            )
+        }
     }
+}
+
+// Dialog Composable for Alarm Sound Selection
+@Composable
+fun AlarmSoundSelectionDialog(
+    currentSound: AlarmSound,
+    onSoundSelected: (AlarmSound) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+    var previewingSound by remember { mutableStateOf<AlarmSound?>(null) }
+    var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
+    var ringtone by remember { mutableStateOf<Ringtone?>(null) }
+
+    fun stopAudio() {
+        try {
+            mediaPlayer?.stop()
+            mediaPlayer?.release()
+        } catch (_: Exception) {}
+        mediaPlayer = null
+
+        try {
+            ringtone?.stop()
+        } catch (_: Exception) {}
+        ringtone = null
+        previewingSound = null
+    }
+
+    fun playPreview(sound: AlarmSound) {
+        stopAudio()
+        previewingSound = sound
+        try {
+            if (sound.rawResId != null) {
+                val mp = MediaPlayer.create(context, sound.rawResId).apply {
+                    setOnCompletionListener {
+                        previewingSound = null
+                    }
+                    start()
+                }
+                mediaPlayer = mp
+            } else {
+                val alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+                    ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+                val r = RingtoneManager.getRingtone(context, alarmUri)
+                ringtone = r
+                r?.play()
+            }
+        } catch (_: Exception) {
+            previewingSound = null
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            stopAudio()
+        }
+    }
+
+    val sounds = listOf(
+        AlarmSound.SYSTEM_DEFAULT,
+        AlarmSound.GENTLE_CHIME,
+        AlarmSound.MEDICAL_MARIMBA,
+        AlarmSound.BRISK_PULSE,
+        AlarmSound.CALM_BELL
+    )
+
+    AlertDialog(
+        onDismissRequest = {
+            stopAudio()
+            onDismiss()
+        },
+        tonalElevation = 0.dp,
+        containerColor = MaterialTheme.colorScheme.surface,
+        title = {
+            Text(
+                text = stringResource(R.string.pref_alarm_sound),
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState())
+            ) {
+                sounds.forEach { sound ->
+                    val isPlaying = previewingSound == sound
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                text = stringResource(sound.getTitleRes()),
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = if (currentSound == sound) FontWeight.Bold else FontWeight.Normal
+                            )
+                        },
+                        leadingContent = {
+                            RadioButton(
+                                selected = currentSound == sound,
+                                onClick = {
+                                    playPreview(sound)
+                                    onSoundSelected(sound)
+                                }
+                            )
+                        },
+                        trailingContent = {
+                            IconButton(
+                                onClick = {
+                                    if (isPlaying) {
+                                        stopAudio()
+                                    } else {
+                                        playPreview(sound)
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = if (isPlaying) Icons.Default.Stop else Icons.Default.VolumeUp,
+                                    contentDescription = stringResource(R.string.alarm_sound_preview),
+                                    tint = if (isPlaying) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        },
+                        colors = ListItemDefaults.colors(
+                            containerColor = Color.Transparent
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable {
+                                playPreview(sound)
+                                onSoundSelected(sound)
+                            }
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    stopAudio()
+                    onDismiss()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                ),
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Text(stringResource(R.string.close))
+            }
+        }
+    )
 }
 
 // Dialog Composable for Theme Selection

@@ -9,6 +9,7 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.example.dosezy.MainActivity
 import com.example.dosezy.data.model.ScheduleEntry
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -72,7 +73,18 @@ class AlarmScheduler(private val context: Context) {
 
         val triggerTime = cleanDateTime.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
+            val showIntent = PendingIntent.getActivity(
+                context,
+                slotKey.hashCode() + 500,
+                Intent(context, MainActivity::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            alarmManager.setAlarmClock(
+                AlarmManager.AlarmClockInfo(triggerTime, showIntent),
+                pendingIntent
+            )
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (canScheduleExact()) {
                 alarmManager.setExactAndAllowWhileIdle(
                     AlarmManager.RTC_WAKEUP,
@@ -111,7 +123,18 @@ class AlarmScheduler(private val context: Context) {
 
         val triggerTime = System.currentTimeMillis() + (minutes * 60 * 1000)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
+            val showIntent = PendingIntent.getActivity(
+                context,
+                entryId.hashCode() + 1500,
+                Intent(context, MainActivity::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            alarmManager.setAlarmClock(
+                AlarmManager.AlarmClockInfo(triggerTime, showIntent),
+                pendingIntent
+            )
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (canScheduleExact()) {
                 alarmManager.setExactAndAllowWhileIdle(
                     AlarmManager.RTC_WAKEUP,
@@ -170,5 +193,54 @@ class AlarmScheduler(private val context: Context) {
 
         alarmManager.cancel(pendingIntent)
         Log.d(TAG, "Cancelled snooze for entry: $entryId")
+    }
+
+    @SuppressLint("ScheduleExactAlarm")
+    fun scheduleNaggingReminder(entryId: String, minutes: Int, medicineName: String, naggingCount: Int) {
+        val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
+            putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, entryId)
+            putExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME, medicineName)
+            putExtra(MedicineAlarmReceiver.EXTRA_NAGGING_COUNT, naggingCount)
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            entryId.hashCode() + 2000,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val triggerTime = System.currentTimeMillis() + (minutes * 60 * 1000)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
+            val showIntent = PendingIntent.getActivity(
+                context,
+                entryId.hashCode() + 2500,
+                Intent(context, MainActivity::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            alarmManager.setAlarmClock(
+                AlarmManager.AlarmClockInfo(triggerTime, showIntent),
+                pendingIntent
+            )
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (canScheduleExact()) {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+            } else {
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+            }
+        } else {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+        }
+        Log.d(TAG, "Scheduled nagging reminder #$naggingCount for entry: $entryId in $minutes minutes")
+    }
+
+    fun cancelNagging(entryId: String) {
+        val intent = Intent(context, MedicineAlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            entryId.hashCode() + 2000,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        alarmManager.cancel(pendingIntent)
+        Log.d(TAG, "Cancelled nagging reminder for entry: $entryId")
     }
 }

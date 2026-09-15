@@ -174,8 +174,8 @@ object InstallSourceUtils {
             else -> InstallSourceDetails(
                 sourceName = "GitHub Release / Direct Sideload",
                 installerPackage = installerPackage,
-                storeUri = "https://github.com/saad2134/dosezy/releases/latest",
-                webFallbackUrl = "https://github.com/saad2134/dosezy/releases/latest"
+                storeUri = "https://github.com/saad2134/dosezy/releases",
+                webFallbackUrl = "https://github.com/saad2134/dosezy/releases"
             )
         }
     }

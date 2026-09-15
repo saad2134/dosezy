@@ -95,7 +95,7 @@ class BackupRestoreManager(
     suspend fun createFullBackupZip(): File = withContext(Dispatchers.IO) {
         val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
         val exportDir = context.getExternalFilesDir(null) ?: context.filesDir
-        val zipFile = File(exportDir, "dosezy_backup_v2.3.0_$timestamp.zip")
+        val zipFile = File(exportDir, "dosezy_backup_v2.4.0_$timestamp.zip")
 
         val users = database.userDao().getAllUsersDirect()
         val profileIds = users.map { it.userId }
@@ -509,7 +509,12 @@ class BackupRestoreManager(
             language = try { Language.valueOf(json.get("language").asString) } catch (_: Exception) { Language.SYSTEM },
             considerLateAfter = json.get("considerLateAfter")?.asInt ?: 3,
             considerMissedAfter = json.get("considerMissedAfter")?.asInt ?: 6,
-            snoozeDuration = json.get("snoozeDuration")?.asInt ?: 10
+            snoozeDuration = json.get("snoozeDuration")?.asInt ?: 10,
+            allergies = json.get("allergies")?.let { if (it.isJsonNull) null else it.asString },
+            medicalConditions = json.get("medicalConditions")?.let { if (it.isJsonNull) null else it.asString },
+            naggingRemindersEnabled = json.get("naggingRemindersEnabled")?.asBoolean ?: false,
+            naggingIntervalMinutes = json.get("naggingIntervalMinutes")?.asInt ?: 5,
+            naggingMaxRepeats = json.get("naggingMaxRepeats")?.asInt ?: 3
         )
     }
 
@@ -538,8 +543,15 @@ class BackupRestoreManager(
                 daysPerWeek = freqObj.get("daysPerWeek")?.let { if (it.isJsonNull) null else it.asInt },
                 daysPerMonth = freqObj.get("daysPerMonth")?.let { if (it.isJsonNull) null else it.asInt },
                 selectedDaysOfWeek = selectedDaysOfWeek,
-                selectedDaysOfMonth = selectedDaysOfMonth
+                selectedDaysOfMonth = selectedDaysOfMonth,
+                intervalHours = freqObj.get("intervalHours")?.let { if (it.isJsonNull) null else it.asInt },
+                intervalDays = freqObj.get("intervalDays")?.let { if (it.isJsonNull) null else it.asInt }
             )
+
+            val pillShape = obj.get("pillShape")?.let { if (it.isJsonNull) null else try { PillShape.valueOf(it.asString) } catch (_: Exception) { null } } ?: PillShape.ROUND
+            val pillColor = obj.get("pillColor")?.let { if (it.isJsonNull) null else it.asString } ?: "#1193D4"
+            val startDate = obj.get("startDate")?.let { if (it.isJsonNull) null else try { LocalDate.parse(it.asString) } catch (_: Exception) { null } }
+            val endDate = obj.get("endDate")?.let { if (it.isJsonNull) null else try { LocalDate.parse(it.asString) } catch (_: Exception) { null } }
 
             val med = Medicine(
                 medicineId = obj.get("medicineId").asString,
@@ -553,7 +565,14 @@ class BackupRestoreManager(
                 imageUri = obj.get("imageUri")?.let { if (it.isJsonNull) null else it.asString },
                 currentStock = obj.get("currentStock")?.let { if (it.isJsonNull) null else it.asInt },
                 refillThreshold = obj.get("refillThreshold")?.let { if (it.isJsonNull) null else it.asInt },
-                autoDeductOnTake = obj.get("autoDeductOnTake")?.asBoolean ?: true
+                autoDeductOnTake = obj.get("autoDeductOnTake")?.asBoolean ?: true,
+                pillShape = pillShape,
+                pillColor = pillColor,
+                notes = obj.get("notes")?.let { if (it.isJsonNull) null else it.asString },
+                startDate = startDate,
+                endDate = endDate,
+                durationDays = obj.get("durationDays")?.let { if (it.isJsonNull) null else it.asInt },
+                isArchived = obj.get("isArchived")?.asBoolean ?: false
             )
             list.add(med)
         }

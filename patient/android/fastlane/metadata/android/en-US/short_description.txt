@@ -1,1 +1,1 @@
-Simple medicine (meds) tracker & reminder app. Enter the details, we'll remind you on time.
+Track your medications, get timely reminders, and manage your health with ease.

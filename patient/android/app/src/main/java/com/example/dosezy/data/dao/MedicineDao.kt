@@ -37,6 +37,15 @@ interface MedicineDao {
     @Query("DELETE FROM medicines WHERE medicineId = :medicineId")
     suspend fun deleteMedicineById(medicineId: String)
 
+    @Query("SELECT * FROM medicines WHERE userId = :userId AND isArchived = 0")
+    fun getActiveMedicinesByUser(userId: String): Flow<List<Medicine>>
+
+    @Query("SELECT * FROM medicines WHERE userId = :userId AND isArchived = 1")
+    fun getArchivedMedicinesByUser(userId: String): Flow<List<Medicine>>
+
+    @Query("UPDATE medicines SET isArchived = :isArchived WHERE medicineId = :medicineId")
+    suspend fun setArchivedStatus(medicineId: String, isArchived: Boolean)
+
     @Query("SELECT * FROM medicines WHERE userId = :userId")
     suspend fun getMedicinesByUserDirect(userId: String): List<Medicine>
 }

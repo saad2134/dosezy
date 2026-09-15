@@ -434,7 +434,7 @@
     <string name="err_cannot_open_link">无法打开链接</string>
     <string name="err_no_email_app">没有可用的电子邮件应用</string>
     <string name="err_share_failed">分享错误: %1$s</string>
-    <string name="med_stock_refill_warning_badge">⚠️ 补充提醒：仅剩 %1$d 份</string>
+    <string name="med_stock_refill_warning_badge">⚠️ 补充：仅剩 %1$d 份</string>
     <string name="med_stock_badge">📦 库存：%1$d</string>
     <string name="to_be_taken_in">%1$d 小时 %2$d 分钟后服用</string>
     <string name="time_diff_ago">%1$d 小时 %2$d 分钟前</string>
@@ -442,4 +442,117 @@
     <string name="status_scheduled_for_this_time">已安排在此时间</string>
     <string name="daily_frequency_presets_title">每日服药频率预设</string>
     <string name="action_edit_medicine_cd">编辑药物</string>
+
+    <!-- v2.4.0 新功能 (Chinese) -->
+    <string name="profile_allergies">过敏史</string>
+    <string name="profile_allergies_placeholder">例如：青霉素、磺胺类、花生</string>
+    <string name="profile_medical_conditions">慢性疾病 / 病史</string>
+    <string name="profile_medical_conditions_placeholder">例如：高血压、2型糖尿病</string>
+    <string name="emergency_medical_profile">患者医疗档案</string>
+    <string name="emergency_no_allergies">未记录过敏史</string>
+    <string name="emergency_no_conditions">未记录病史</string>
+
+    <string name="med_shape_label">药丸形状与剂型</string>
+    <string name="med_color_label">外观颜色</string>
+    <string name="pill_shape_round">圆形 (Round)</string>
+    <string name="pill_shape_capsule">胶囊 (Capsule)</string>
+    <string name="pill_shape_oval">椭圆形 (Oval)</string>
+    <string name="pill_shape_liquid">口服液 (Liquid)</string>
+    <string name="pill_shape_inhaler">吸入剂 (Inhaler)</string>
+    <string name="pill_shape_injection">注射剂 (Injection)</string>
+    <string name="pill_shape_drops">滴剂 (Drops)</string>
+    <string name="pill_shape_patch">贴剂 (Patch)</string>
+
+    <string name="med_notes_label">医生 / 药剂师嘱咐及特别警告</string>
+    <string name="med_notes_placeholder">例如：饭后服用、忌食西柚、处方号 #12345</string>
+
+    <string name="course_duration_title">用药疗程周期</string>
+    <string name="course_ongoing">长期服用</string>
+    <string name="course_finite">有限疗程</string>
+    <string name="course_duration_days_label">疗程天数 (天)</string>
+    <string name="course_duration_days_placeholder">例如：7, 10, 14, 30</string>
+    <string name="course_start_date_label">开始日期</string>
+    <string name="course_end_date_label">结束日期：%1$s</string>
+    <string name="course_completed_badge">疗程已结束</string>
+
+    <string name="freq_as_needed">按需服用 (PRN)</string>
+    <string name="freq_as_needed_desc">无定时闹钟提醒。每次服用时即时记录即可。</string>
+    <string name="freq_every_x_hours">每 X 小时</string>
+    <string name="freq_every_x_days">每 X 天</string>
+    <string name="freq_every_hours_format">每 %1$d 小时</string>
+    <string name="freq_every_days_format">每 %1$d 天</string>
+    <string name="interval_hours_label">两次服药间隔小时</string>
+    <string name="interval_days_label">两次服药间隔天数</string>
+    <string name="btn_log_prn_dose">记录服药</string>
+    <string name="prn_doses_taken_today">今日已记录：%1$d 次</string>
+    <string name="prn_section_title">按需服用药品 (PRN)</string>
+
+    <string name="btn_quick_refill_action">+ 补充</string>
+    <string name="quick_refill_dialog_title">补充库存：%1$s</string>
+    <string name="quick_refill_amount_label">添加数量</string>
+    <string name="quick_refill_preset_30">+30</string>
+    <string name="quick_refill_preset_60">+60</string>
+    <string name="quick_refill_preset_90">+90</string>
+    <string name="quick_refill_success">已为 %1$s 补充库存。当前库存：%2$d</string>
+
+    <string name="no_scheduled_doses_today">今天没有安排的服药计划</string>
+    <string name="prn_confirm_log_title">记录服药</string>
+    <string name="prn_confirm_log_msg">确认记录现在服用 1 剂 %1$s（%2$s）？</string>
+    <string name="hours_limit_hint">若间隔超过 24 小时，请使用“每 X 天”。</string>
+
+    <string name="pref_nagging_title">持续跟进提醒 (Nagging)</string>
+    <string name="pref_nagging_desc">若计划剂量未确认服用，将重复发送提醒</string>
+    <string name="pref_nagging_interval">提醒间隔时间</string>
+    <string name="pref_nagging_max_repeats">最大重复次数</string>
+    <string name="pref_nagging_repeats_format">%1$d 次</string>
+    <string name="notif_nagging_title">用药跟进提醒：%1$s</string>
+    <string name="notif_nagging_text">提醒 %1$d/%2$d：原定于 %3$s 的药物尚未服用。</string>
+
+    <string name="widget_title">Dosezy 今日服药</string>
+    <string name="widget_no_meds">暂无待服药物</string>
+    <string name="widget_all_taken">今日所有药物均已服用！🎉</string>
+    <string name="widget_tap_to_open">点击打开应用</string>
+    <string name="widget_no_profile">未创建用户档案</string>
+    <string name="widget_open_app">打开 Dosezy 进行设置</string>
+    <string name="widget_taken_summary">%1$d / %2$d 已服用</string>
+    <string name="widget_all_completed">今日药物已全部完成！🎉</string>
+    <string name="widget_no_doses_today">今日未安排任何药物</string>
+    <string name="widget_next_dose_format">下一剂：%1$s • %2$s</string>
+
+    <!-- Custom Alarm Sounds -->
+    <string name="pref_alarm_sound">闹钟铃声</string>
+    <string name="pref_alarm_sound_desc">选择服药提醒闹钟的专属铃声</string>
+    <string name="alarm_sound_system_default">系统默认铃声</string>
+    <string name="alarm_sound_gentle_chime">温和风铃</string>
+    <string name="alarm_sound_medical_marimba">清脆马林巴</string>
+    <string name="alarm_sound_brisk_pulse">欢快节拍</string>
+    <string name="alarm_sound_calm_bell">宁静磬音</string>
+    <string name="alarm_sound_preview">试听铃声</string>
+    <!-- Discontinue & Soft-Delete (#51) -->
+    <string name="dialog_med_action_title">停用还是删除？</string>
+    <string name="dialog_med_action_desc">请选择如何处理该药物：</string>
+    <string name="btn_discontinue_keep_history">停用（保留历史记录）</string>
+    <string name="discontinue_med_explanation">停止未来的用药提醒并从当前用药列表中移除。所有过往服药记录与报表将完整保留。</string>
+    <string name="btn_delete_permanently">永久删除</string>
+    <string name="delete_permanently_explanation">永久清除该药物及其所有历史服药记录。</string>
+    <string name="discontinued_medications_section">已停用药物</string>
+    <string name="btn_reactivate_med">重新启用</string>
+    <string name="dialog_delete_permanent_title">永久删除？</string>
+    <string name="dialog_delete_permanent_msg">确定要永久删除 %1$s 吗？该药物的所有历史记录都将被清除。</string>
+    <string name="help_github_issues_title">提交问题或建议</string>
+    <string name="help_github_issues_desc">在 GitHub 上反馈错误或提出新功能建议</string>
+    <string name="menu_about_dosezy">关于 Dosezy</string>
+    <string name="about_title">关于 Dosezy</string>
+    <string name="about_tagline">专为患者与看护者打造的离线隐私用药助手。</string>
+    <string name="about_star_github">在 GitHub 上点亮 Star</string>
+    <string name="about_star_github_desc">在 GitHub 上为我们的开源项目点亮 Star 予以支持</string>
+    <string name="about_support_dev_title">支持独立开发</string>
+    <string name="about_support_dev_desc">Dosezy 完全免费、无广告、纯本地离线。您的赞助是支持持续维护的最大动力！</string>
+    <string name="about_buymeacoffee">请开发者喝杯咖啡</string>
+    <string name="about_buymeacoffee_desc">通过 BuyMeACoffee 使用银行卡或 PayPal 赞助</string>
+    <string name="about_crypto_donations">加密货币捐赠</string>
+    <string name="about_copied_to_clipboard">已复制 %1$s 地址到剪贴板</string>
+    <string name="about_tap_to_copy">点击复制地址</string>
+    <string name="about_github_sponsors">GitHub Sponsors</string>
+    <string name="about_github_sponsors_desc">通过 GitHub Sponsors 进行每月或单次赞助</string>
 </resources>

@@ -129,12 +129,6 @@ fun ScheduleScreen(navController: NavController) {
                         com.example.dosezy.ui.components.ScheduleListItem(
                             scheduleWithMedicine = swm,
                             timeFormat = timeFormat,
-                            onMarkAsTaken = { entryId, takenAt ->
-                                scheduleViewModel.markAsTaken(entryId, takenAt)
-                            },
-                            onMarkAsLate = { entryId, takenAt ->
-                                scheduleViewModel.markAsLate(entryId, takenAt)
-                            },
                             modifier = Modifier.fillMaxWidth()
                         )
                         Spacer(modifier = Modifier.height(8.dp))

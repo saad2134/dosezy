@@ -1,0 +1,9 @@
+• Custom alarm sounds (4 distinct tones + system default)
+• Allergies & conditions in profiles, emergency SOS & exports
+• Follow-up nagging reminders for pending doses
+• Home screen widget for live dose tracking
+• Quick one-tap stock refill (+30, +60, +90)
+• Doctor notes & special Rx warnings
+• 8 visual pill shapes & vibrant colors
+• Interval (every X hrs/days) & PRN medications
+• Finite course duration & completion tracking

@@ -33,12 +33,13 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
     companion object {
         const val TAG = "MedicineAlarmReceiver"
-        const val CHANNEL_ID = "medicine_reminders"
+        const val CHANNEL_ID = "dosezy_medicine_reminders_v2"
         const val EXTRA_ENTRY_ID = "entry_id"
         const val EXTRA_MEDICINE_NAME = "medicine_name"
         const val EXTRA_SCHEDULED_TIME = "scheduled_time"
         const val EXTRA_ENTRY_IDS = "entry_ids"
         const val EXTRA_MEDICINE_NAMES = "medicine_names"
+        const val EXTRA_NAGGING_COUNT = "nagging_count"
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -61,9 +62,33 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         val medicineName = intent?.getStringExtra(EXTRA_MEDICINE_NAME)
         val medicineNames = intent?.getStringArrayListExtra(EXTRA_MEDICINE_NAMES)
         val scheduledTime = intent?.getStringExtra(EXTRA_SCHEDULED_TIME)
+        val naggingCount = intent?.getIntExtra(EXTRA_NAGGING_COUNT, 0) ?: 0
 
         if (entryId != null && medicineName != null) {
-            showNotification(context, entryId, entryIds, medicineName, medicineNames, scheduledTime)
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val entry = database.scheduleDao().getScheduleEntryById(entryId)
+                    if (entry != null && entry.status == com.example.dosezy.data.model.MedicationStatus.PENDING) {
+                        val user = database.userDao().getUserByIdDirect(entry.userId)
+                        val isNagging = naggingCount > 0
+                        showNotification(context, entryId, entryIds, medicineName, medicineNames, scheduledTime, isNagging, naggingCount, user?.naggingMaxRepeats ?: 3)
+
+                        // Schedule next follow-up nagging reminder if enabled and below limit
+                        if (user != null && user.naggingRemindersEnabled && naggingCount < user.naggingMaxRepeats) {
+                            val alarmScheduler = AlarmScheduler(context)
+                            alarmScheduler.scheduleNaggingReminder(
+                                entryId = entryId,
+                                minutes = user.naggingIntervalMinutes,
+                                medicineName = medicineName,
+                                naggingCount = naggingCount + 1
+                            )
+                        }
+                    }
+                } catch (ex: Exception) {
+                    Log.e(TAG, "Error processing alarm in background", ex)
+                    showNotification(context, entryId, entryIds, medicineName, medicineNames, scheduledTime, false, 0, 3)
+                }
+            }
         }
     }
 
@@ -73,15 +98,21 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         entryIds: ArrayList<String>?,
         medicineName: String,
         medicineNames: ArrayList<String>?,
-        scheduledTime: String?
+        scheduledTime: String?,
+        isNagging: Boolean = false,
+        naggingCount: Int = 0,
+        maxNagging: Int = 3
     ) {
-        // Acquire wake lock to ensure CPU stays awake while firing alarm
+        // Acquire wake lock to wake up screen and keep CPU active
         val powerManager = context.getSystemService(Context.POWER_SERVICE) as? android.os.PowerManager
+        @Suppress("DEPRECATION")
         val wakeLock = powerManager?.newWakeLock(
-            android.os.PowerManager.PARTIAL_WAKE_LOCK,
+            android.os.PowerManager.SCREEN_BRIGHT_WAKE_LOCK or
+                    android.os.PowerManager.ACQUIRE_CAUSES_WAKEUP or
+                    android.os.PowerManager.ON_AFTER_RELEASE,
             "Dosezy:MedicineAlarmWakeLock"
         )
-        wakeLock?.acquire(10 * 1000L) // 10 seconds
+        wakeLock?.acquire(15 * 1000L) // 15 seconds
 
         createNotificationChannel(context)
 
@@ -132,7 +163,12 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
         // Full screen alarm intent
         val alarmIntent = Intent(context, AlarmActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK or
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP or
+                        Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+            )
             putExtra(EXTRA_ENTRY_ID, entryId)
             if (entryIds != null) {
                 putStringArrayListExtra(EXTRA_ENTRY_IDS, entryIds)
@@ -160,14 +196,25 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
         val vibrationPattern = longArrayOf(0, 1000, 500, 1000)
 
-        // Create notification with sound, vibration, and fullScreenIntent
+        val notificationTitle = if (isNagging) {
+            context.getString(R.string.notif_nagging_title, medicineName)
+        } else {
+            "Medicine Reminder: $medicineName"
+        }
+
+        val notificationText = if (isNagging) {
+            context.getString(R.string.notif_nagging_text, naggingCount, maxNagging, scheduledTime ?: "")
+        } else {
+            contentText
+        }
+
+        // Create notification with vibration, loader_icon, and fullScreenIntent
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_medicine_notification)
-            .setContentTitle("Medicine Reminder: $medicineName")
-            .setContentText(contentText)
+            .setSmallIcon(R.drawable.loader_icon)
+            .setContentTitle(notificationTitle)
+            .setContentText(notificationText)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
-            .setSound(alarmSoundUri, android.media.AudioManager.STREAM_ALARM)
             .setVibrate(vibrationPattern)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setFullScreenIntent(fullScreenPendingIntent, true)
@@ -183,7 +230,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 "Snooze (10 min)",
                 snoozePendingIntent
             )
-            .setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
+            .setStyle(NotificationCompat.BigTextStyle().bigText(notificationText))
             .build()
 
         val notificationManager =
@@ -195,12 +242,6 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
     private fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val alarmSoundUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_ALARM)
-                ?: android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
-            val audioAttributes = android.media.AudioAttributes.Builder()
-                .setUsage(android.media.AudioAttributes.USAGE_ALARM)
-                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .build()
             val vibrationPattern = longArrayOf(0, 1000, 500, 1000)
 
             val channel = NotificationChannel(
@@ -212,7 +253,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 enableLights(true)
                 enableVibration(true)
                 this.vibrationPattern = vibrationPattern
-                setSound(alarmSoundUri, audioAttributes)
+                setSound(null, null)
                 setBypassDnd(true)
                 setShowBadge(true)
                 lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC

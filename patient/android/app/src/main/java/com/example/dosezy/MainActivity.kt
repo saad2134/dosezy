@@ -29,6 +29,7 @@ import com.example.dosezy.ui.screens.MedicinesScreen
 import com.example.dosezy.ui.screens.MenuScreen
 import com.example.dosezy.ui.screens.NewUserScreen
 import com.example.dosezy.ui.screens.ScheduleScreen
+import com.example.dosezy.ui.subscreens.AboutScreen
 import com.example.dosezy.ui.subscreens.AddMedScreen
 import com.example.dosezy.ui.subscreens.EditMedScreen
 import com.example.dosezy.ui.subscreens.AnalyticsScreen
@@ -228,6 +229,9 @@ fun DosezyApp() {
             }
             composable("help_support") {
                 HelpSupportScreen(navController)
+            }
+            composable("about") {
+                AboutScreen(navController)
             }
             composable("preferences") {
                 PreferencesScreen(navController)

@@ -26,8 +26,32 @@ data class User(
     val language: Language = Language.SYSTEM,
     val considerLateAfter: Int = 3, // hours, default 3 (options 1-3)
     val considerMissedAfter: Int = 6, // hours, default 6 (options 3-9)
-    val snoozeDuration: Int = 10 // minutes, default 10 (options 5, 10, 15, 20, 30)
+    val snoozeDuration: Int = 10, // minutes, default 10 (options 5, 10, 15, 20, 30)
+    val allergies: String? = null,
+    val medicalConditions: String? = null,
+    val naggingRemindersEnabled: Boolean = false,
+    val naggingIntervalMinutes: Int = 5, // 5, 10, 15 min
+    val naggingMaxRepeats: Int = 3, // 1, 2, 3 repeats
+    val alarmSound: AlarmSound = AlarmSound.SYSTEM_DEFAULT
 )
+
+enum class AlarmSound(val rawResId: Int?) {
+    SYSTEM_DEFAULT(null),
+    GENTLE_CHIME(com.example.dosezy.R.raw.alarm_gentle_chime),
+    MEDICAL_MARIMBA(com.example.dosezy.R.raw.alarm_medical_marimba),
+    BRISK_PULSE(com.example.dosezy.R.raw.alarm_brisk_pulse),
+    CALM_BELL(com.example.dosezy.R.raw.alarm_calm_bell);
+
+    fun getTitleRes(): Int {
+        return when (this) {
+            SYSTEM_DEFAULT -> com.example.dosezy.R.string.alarm_sound_system_default
+            GENTLE_CHIME -> com.example.dosezy.R.string.alarm_sound_gentle_chime
+            MEDICAL_MARIMBA -> com.example.dosezy.R.string.alarm_sound_medical_marimba
+            BRISK_PULSE -> com.example.dosezy.R.string.alarm_sound_brisk_pulse
+            CALM_BELL -> com.example.dosezy.R.string.alarm_sound_calm_bell
+        }
+    }
+}
 
 enum class Gender(val displayName: String) {
     MALE("Male"),
