@@ -1,6 +1,6 @@
 # Dosezy: Frequently Asked Questions (FAQ)
 
-> **App Version:** v2.3.1
+> **App Version:** v2.3.2
 
 Welcome to the **Dosezy FAQ**! Here you will find clear, easy-to-understand answers to common questions about using Dosezy.
 

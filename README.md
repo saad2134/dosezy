@@ -341,8 +341,16 @@ Developed and published by **Saad (@saad2134)**.
   
 
 
-### 🆕 What's New in v2.3.1
+### 🆕 What's New in v2.3.2
+- **🛡️ Security Hardening (Zip Slip Fix):** Patched archive extraction during backup restores by strictly canonicalizing file paths to prevent arbitrary file access vulnerabilities.
+
+### 📜 Previous Releases
+<details>
+<summary><b>v2.3.1</b></summary>
+
 - **⏰ Schedule Duplication on Edit Fix:** Resolved issue where modifying reminder times left behind stale un-taken doses; untaken doses from start of day are cleanly purged before new slots generate.
 - **🔔 Alarm Sound, Vibration & Background Reliability:** Hardened notification channel with `USAGE_ALARM`, wake lock, high-priority vibration, and DND bypass for reliable lock-screen and background alerts.
 - **📱 Responsive Layout Wrapping:** Upgraded frequency preset chips and analytics period breakdowns to dynamic `FlowRow` for compact displays.
 - **🌐 100% 12-Language Localization Parity:** Localized stock/refill badges, time calculation phrases, and all screen strings across 12 languages (389 keys each).
+
+</details>

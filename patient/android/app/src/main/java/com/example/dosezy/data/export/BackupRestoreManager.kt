@@ -173,10 +173,15 @@ class BackupRestoreManager(
             val tempDir = File(context.cacheDir, "dosezy_inspect_${System.currentTimeMillis()}")
             tempDir.mkdirs()
 
+            val canonicalTempPath = tempDir.canonicalPath
             ZipInputStream(BufferedInputStream(inputStream)).use { zis ->
                 var entry = zis.nextEntry
                 while (entry != null) {
                     val destFile = File(tempDir, entry.name)
+                    val canonicalDestPath = destFile.canonicalPath
+                    if (!canonicalDestPath.startsWith(canonicalTempPath + File.separator) && canonicalDestPath != canonicalTempPath) {
+                        throw SecurityException("Invalid backup archive: path traversal detected for entry '${entry.name}'.")
+                    }
                     if (entry.isDirectory) {
                         destFile.mkdirs()
                     } else {

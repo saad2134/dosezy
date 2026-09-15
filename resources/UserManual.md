@@ -1,6 +1,6 @@
 # Dosezy User Manual
 
-> **App Version:** v2.3.1
+> **App Version:** v2.3.2
 
 Welcome to **Dosezy**! Dosezy is your personal, friendly, and private companion for managing daily medications, setting smart reminders, tracking pill inventory, monitoring adherence, and keeping your loved ones healthy.
 
