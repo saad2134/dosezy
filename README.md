@@ -343,6 +343,7 @@ Developed and published by **Saad (@saad2134)**.
 
 ### 🆕 What's New in v2.3.2
 - **🛡️ Security Hardening (Zip Slip Fix):** Patched archive extraction during backup restores by strictly canonicalizing file paths to prevent arbitrary file access vulnerabilities.
+- **📦 Unified Stock Deduction & Refill Alerts:** Standardized stock auto-decrement and low-stock push notifications across all intake actions (Notification Shade, Full-Screen Alarm, and In-App Schedule).
 
 ### 📜 Previous Releases
 <details>

@@ -204,4 +204,52 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
     suspend fun updateMedicationStatus(entryId: String, status: String, takenAt: String?) =
         database.scheduleDao().updateMedicationStatus(entryId, status, takenAt)
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun recordDoseTaken(
+        entryId: String,
+        status: String = "TAKEN_ON_TIME",
+        takenAt: String = LocalDateTime.now().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+        context: Context? = null
+    ) {
+        // 1. Update schedule entry status in database
+        database.scheduleDao().updateMedicationStatus(entryId, status, takenAt)
+
+        // 2. Stock Auto-Decrement Logic
+        try {
+            val entry = database.scheduleDao().getScheduleEntryById(entryId)
+            if (entry != null) {
+                val medicine = database.medicineDao().getMedicineByIdDirect(entry.medicineId)
+                if (medicine != null && medicine.currentStock != null && medicine.autoDeductOnTake) {
+                    val deductAmount = medicine.dosage.toInt().coerceAtLeast(1)
+                    val newStock = (medicine.currentStock - deductAmount).coerceAtLeast(0)
+                    val updatedMedicine = medicine.copy(currentStock = newStock)
+                    database.medicineDao().updateMedicine(updatedMedicine)
+                    Log.d(TAG, "Decremented stock for ${medicine.medicationName}: ${medicine.currentStock} -> $newStock")
+
+                    // 3. Trigger refill warning notification if stock is below threshold
+                    if (context != null && medicine.refillThreshold != null && newStock <= medicine.refillThreshold) {
+                        val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                        val builder = androidx.core.app.NotificationCompat.Builder(context, com.example.dosezy.notifications.MedicineAlarmReceiver.CHANNEL_ID)
+                            .setSmallIcon(com.example.dosezy.R.drawable.ic_medicine_notification)
+                            .setContentTitle(context.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
+                            .setContentText(context.getString(com.example.dosezy.R.string.notif_refill_alert_text, newStock))
+                            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+                            .setAutoCancel(true)
+                        nManager.notify((entry.medicineId + "_refill").hashCode(), builder.build())
+                    }
+                }
+            }
+        } catch (ex: Exception) {
+            Log.e(TAG, "Error performing stock auto-decrement in recordDoseTaken", ex)
+        }
+
+        // 4. Cancel active notification for this entry
+        if (context != null) {
+            try {
+                val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                nManager.cancel(entryId.hashCode())
+            } catch (_: Exception) {}
+        }
+    }
 }

@@ -11,6 +11,8 @@ import com.example.dosezy.data.model.ScheduleWithMedicine
 import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.data.repository.UserRepository
 import com.example.dosezy.utils.TimeCalculationUtils
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +26,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ScheduleViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     companion object {
@@ -117,7 +120,7 @@ class ScheduleViewModel @Inject constructor(
 
     fun markAsTaken(entryId: String, takenAt: String) {
         viewModelScope.launch {
-            scheduleRepository.updateMedicationStatus(entryId, "TAKEN_ON_TIME", takenAt)
+            scheduleRepository.recordDoseTaken(entryId, "TAKEN_ON_TIME", takenAt, context)
             // Refresh the schedule after updating status
             _currentUserId.value?.let { userId ->
                 loadScheduleForDate(userId, _selectedDate.value)
@@ -127,7 +130,7 @@ class ScheduleViewModel @Inject constructor(
 
     fun markAsLate(entryId: String, takenAt: String) {
         viewModelScope.launch {
-            scheduleRepository.updateMedicationStatus(entryId, "TAKEN_LATE", takenAt)
+            scheduleRepository.recordDoseTaken(entryId, "TAKEN_LATE", takenAt, context)
             // Refresh the schedule after updating status
             _currentUserId.value?.let { userId ->
                 loadScheduleForDate(userId, _selectedDate.value)

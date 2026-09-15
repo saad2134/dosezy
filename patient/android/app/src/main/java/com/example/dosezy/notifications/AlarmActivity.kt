@@ -508,17 +508,12 @@ fun GroupedAlarmScreenContent(
                             withContext(Dispatchers.IO) {
                                 val nowStr = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
                                 if (medicinesList.isNotEmpty()) {
-                                    medicinesList.forEach { (entry, med) ->
-                                        scheduleRepository.updateMedicationStatus(entry.entryId, "TAKEN_ON_TIME", nowStr)
-                                        if (med.currentStock != null && med.autoDeductOnTake) {
-                                            val deduct = med.dosage.toInt().coerceAtLeast(1)
-                                            val newStock = (med.currentStock - deduct).coerceAtLeast(0)
-                                            database.medicineDao().updateMedicine(med.copy(currentStock = newStock))
-                                        }
+                                    medicinesList.forEach { (entry, _) ->
+                                        scheduleRepository.recordDoseTaken(entry.entryId, "TAKEN_ON_TIME", nowStr, context)
                                     }
                                 } else if (entryIds.isNotEmpty()) {
                                     entryIds.forEach { id ->
-                                        scheduleRepository.updateMedicationStatus(id, "TAKEN_ON_TIME", nowStr)
+                                        scheduleRepository.recordDoseTaken(id, "TAKEN_ON_TIME", nowStr, context)
                                     }
                                 }
                             }
