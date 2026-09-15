@@ -40,11 +40,13 @@ jobs:
           paths: |
             patient/android
 
-      - name: Build Android app
+      - name: Build Android
+        if: matrix.language == 'java-kotlin'
         working-directory: patient/android
         shell: bash
         run: |
-          chmod +x ./gradlew
+          sed -i 's/\r$//' gradlew
+          chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
 
       - name: Perform CodeQL Analysis
