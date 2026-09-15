@@ -37,30 +37,26 @@ jobs:
         with:
           languages: java-kotlin
           build-mode: manual
-          paths: |
-            patient/android
 
       - name: Inspect Android project
-        if: matrix.language == 'java-kotlin'
         working-directory: patient/android
         shell: bash
         run: |
           sed -i 's/\r$//' gradlew
           chmod +x gradlew
-      
+       
           echo "=== Gradle projects ==="
           ./gradlew projects --no-daemon
-      
+       
           echo "=== Available assemble tasks ==="
           ./gradlew tasks --all --no-daemon | grep -i assemble || true
-      
+       
           echo "=== Android directory ==="
           find . -maxdepth 3 -type f \
             \( -name "*.kt" -o -name "*.java" -o -name "build.gradle" -o -name "build.gradle.kts" \) \
             | sort
 
       - name: Build Android
-        if: matrix.language == 'java-kotlin'
         working-directory: patient/android
         shell: bash
         run: |
@@ -90,8 +86,6 @@ jobs:
         with:
           languages: javascript-typescript
           build-mode: none
-          paths: |
-            website
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
@@ -115,8 +109,6 @@ jobs:
         with:
           languages: python
           build-mode: none
-          paths: |
-            server
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
