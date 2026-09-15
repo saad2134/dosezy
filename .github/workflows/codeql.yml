@@ -1,0 +1,103 @@
+name: "CodeQL Advanced"
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  schedule:
+    - cron: "41 13 * * 3"
+
+permissions:
+  security-events: write
+  packages: read
+  actions: read
+  contents: read
+
+jobs:
+  # ------------------------------------------------------------
+  # Android / Kotlin / Java
+  # ------------------------------------------------------------
+  analyze-android:
+    name: Analyze (java-kotlin)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: java-kotlin
+          build-mode: manual
+          paths: |
+            patient/android
+
+      - name: Build Android app
+        working-directory: patient/android
+        shell: bash
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:java-kotlin"
+
+
+  # ------------------------------------------------------------
+  # Website / JavaScript / TypeScript
+  # ------------------------------------------------------------
+  analyze-website:
+    name: Analyze (javascript-typescript)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+          build-mode: none
+          paths: |
+            website
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:javascript-typescript"
+
+
+  # ------------------------------------------------------------
+  # Server / Python
+  # ------------------------------------------------------------
+  analyze-server:
+    name: Analyze (python)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: python
+          build-mode: none
+          paths: |
+            server
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:python"
