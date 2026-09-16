@@ -1,1 +1,2 @@
 • Configurable alarm ring duration / auto-silence (30s, 1m, 2m, 5m, continuous)
+• Enhanced alarm screen wakeup & background reliability

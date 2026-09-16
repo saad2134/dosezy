@@ -46,13 +46,20 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
         val action = intent?.action
         if (action == Intent.ACTION_BOOT_COMPLETED ||
+            action == "android.intent.action.QUICKBOOT_POWERON" ||
+            action == "android.intent.action.LOCKED_BOOT_COMPLETED" ||
+            action == Intent.ACTION_REBOOT ||
             action == Intent.ACTION_TIMEZONE_CHANGED ||
             action == Intent.ACTION_TIME_CHANGED) {
             
             Log.d(TAG, "Received system broadcast action: $action - rescheduling all alarms")
-            // Reschedule all alarms after system time/zone change or boot
+            val pendingResult = goAsync()
             CoroutineScope(Dispatchers.IO).launch {
-                rescheduleAllAlarms(context)
+                try {
+                    rescheduleAllAlarms(context)
+                } finally {
+                    pendingResult.finish()
+                }
             }
             return
         }
@@ -65,6 +72,17 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         val naggingCount = intent?.getIntExtra(EXTRA_NAGGING_COUNT, 0) ?: 0
 
         if (entryId != null && medicineName != null) {
+            val pendingResult = goAsync()
+            val powerManager = context.getSystemService(Context.POWER_SERVICE) as? android.os.PowerManager
+            @Suppress("DEPRECATION")
+            val wakeLock = powerManager?.newWakeLock(
+                android.os.PowerManager.SCREEN_BRIGHT_WAKE_LOCK or
+                        android.os.PowerManager.ACQUIRE_CAUSES_WAKEUP or
+                        android.os.PowerManager.ON_AFTER_RELEASE,
+                "Dosezy:MedicineAlarmWakeLock"
+            )
+            wakeLock?.acquire(15 * 1000L) // 15 seconds
+
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val entry = database.scheduleDao().getScheduleEntryById(entryId)
@@ -87,6 +105,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 } catch (ex: Exception) {
                     Log.e(TAG, "Error processing alarm in background", ex)
                     showNotification(context, entryId, entryIds, medicineName, medicineNames, scheduledTime, false, 0, 3)
+                } finally {
+                    pendingResult.finish()
                 }
             }
         }
@@ -103,17 +123,6 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         naggingCount: Int = 0,
         maxNagging: Int = 3
     ) {
-        // Acquire wake lock to wake up screen and keep CPU active
-        val powerManager = context.getSystemService(Context.POWER_SERVICE) as? android.os.PowerManager
-        @Suppress("DEPRECATION")
-        val wakeLock = powerManager?.newWakeLock(
-            android.os.PowerManager.SCREEN_BRIGHT_WAKE_LOCK or
-                    android.os.PowerManager.ACQUIRE_CAUSES_WAKEUP or
-                    android.os.PowerManager.ON_AFTER_RELEASE,
-            "Dosezy:MedicineAlarmWakeLock"
-        )
-        wakeLock?.acquire(15 * 1000L) // 15 seconds
-
         createNotificationChannel(context)
 
         val alarmSoundUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_ALARM)
