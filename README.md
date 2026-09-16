@@ -22,9 +22,18 @@
   <a href="https://f-droid.org/en/packages/com.saad2134.dosezy">
     <img width="197" height="59" alt="F-Droid" src="https://github.com/user-attachments/assets/9a463d23-368b-4974-9686-e28649e00b04" />
   </a>
-  <a href="https://github.com/saad2134/dosezy/releases">
-    <img width="197" height="59" alt="get-github-1189403918" src="https://github.com/user-attachments/assets/e9ae5d41-fb6c-468b-b1cc-cc4fb534aa10" />
+  <a href="https://github.com/saad2134/dosezy/releases"> 
+    <img width="197" height="59" alt="GitHub" src="https://github.com/user-attachments/assets/e9ae5d41-fb6c-468b-b1cc-cc4fb534aa10" /> 
   </a>
+  
+  <a> </a>
+  <details>
+    <summary>Others</summary>
+    <br>
+    <a href="https://appteka.store/apps/c40r321202">
+      <img width="197" height="59" alt="AppTeka" src="https://github.com/user-attachments/assets/1089a456-25cd-4dc5-af88-a7966153f250" />
+    </a>
+  </details>
 </div>
 
 #### Coming Soon On
