@@ -22,6 +22,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -191,6 +193,8 @@ fun MedicinesContent(
     onPermanentDeleteClick: (Medicine) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    var isArchivedExpanded by remember { mutableStateOf(false) }
+
     if (medicines.isEmpty() && archivedMedicines.isEmpty()) {
         EmptyMedicinesState()
     } else {
@@ -210,25 +214,62 @@ fun MedicinesContent(
 
             if (archivedMedicines.isNotEmpty()) {
                 item {
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Text(
-                        text = stringResource(com.example.dosezy.R.string.discontinued_medications_section),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 6.dp)
-                    )
-                }
-
-                items(archivedMedicines, key = { "archived_${it.medicineId}" }) { medicine ->
-                    ArchivedMedicineItem(
-                        medicine = medicine,
-                        onReactivate = { onReactivateClick(medicine) },
-                        onDeletePermanently = { onPermanentDeleteClick(medicine) },
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Surface(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                    )
+                            .clickable { isArchivedExpanded = !isArchivedExpanded },
+                        shape = RoundedCornerShape(16.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Medication,
+                                    contentDescription = null,
+                                    tint = Color(0xFF9CA3AF),
+                                    modifier = Modifier.size(22.dp)
+                                )
+                                Text(
+                                    text = "${stringResource(com.example.dosezy.R.string.discontinued_medications_section)} (${archivedMedicines.size})",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                            Icon(
+                                imageVector = if (isArchivedExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+
+                if (isArchivedExpanded) {
+                    item {
+                        Spacer(modifier = Modifier.height(6.dp))
+                    }
+                    items(archivedMedicines, key = { "archived_${it.medicineId}" }) { medicine ->
+                        ArchivedMedicineItem(
+                            medicine = medicine,
+                            onReactivate = { onReactivateClick(medicine) },
+                            onDeletePermanently = { onPermanentDeleteClick(medicine) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                        )
+                    }
                 }
             }
         }
