@@ -250,15 +250,26 @@ class AlarmActivity : ComponentActivity() {
     private fun playAlarmSound(sound: AlarmSound) {
         try {
             if (sound.rawResId != null) {
-                mediaPlayer = MediaPlayer.create(applicationContext, sound.rawResId).apply {
-                    setAudioAttributes(
-                        AudioAttributes.Builder()
-                            .setUsage(AudioAttributes.USAGE_ALARM)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                            .build()
-                    )
-                    isLooping = true
-                    start()
+                val afd = applicationContext.resources.openRawResourceFd(sound.rawResId)
+                if (afd != null) {
+                    mediaPlayer = MediaPlayer().apply {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            setAudioAttributes(
+                                AudioAttributes.Builder()
+                                    .setUsage(AudioAttributes.USAGE_ALARM)
+                                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                                    .build()
+                            )
+                        } else {
+                            @Suppress("DEPRECATION")
+                            setAudioStreamType(android.media.AudioManager.STREAM_ALARM)
+                        }
+                        setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                        afd.close()
+                        isLooping = true
+                        prepare()
+                        start()
+                    }
                 }
             } else {
                 val alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
@@ -269,6 +280,9 @@ class AlarmActivity : ComponentActivity() {
                         .setUsage(AudioAttributes.USAGE_ALARM)
                         .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                         .build()
+                } else {
+                    @Suppress("DEPRECATION")
+                    ringtone?.streamType = android.media.AudioManager.STREAM_ALARM
                 }
                 ringtone?.play()
             }

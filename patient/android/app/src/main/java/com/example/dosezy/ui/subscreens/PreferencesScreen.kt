@@ -1,8 +1,10 @@
 package com.example.dosezy.ui.subscreens
 
+import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.media.Ringtone
 import android.media.RingtoneManager
+import android.os.Build
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.fillMaxSize
@@ -573,17 +575,43 @@ fun AlarmSoundSelectionDialog(
         previewingSound = sound
         try {
             if (sound.rawResId != null) {
-                val mp = MediaPlayer.create(context, sound.rawResId).apply {
-                    setOnCompletionListener {
-                        previewingSound = null
+                val afd = context.resources.openRawResourceFd(sound.rawResId)
+                if (afd != null) {
+                    val mp = MediaPlayer().apply {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            setAudioAttributes(
+                                AudioAttributes.Builder()
+                                    .setUsage(AudioAttributes.USAGE_ALARM)
+                                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                                    .build()
+                            )
+                        } else {
+                            @Suppress("DEPRECATION")
+                            setAudioStreamType(android.media.AudioManager.STREAM_ALARM)
+                        }
+                        setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                        afd.close()
+                        setOnCompletionListener {
+                            previewingSound = null
+                        }
+                        prepare()
+                        start()
                     }
-                    start()
+                    mediaPlayer = mp
                 }
-                mediaPlayer = mp
             } else {
                 val alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
                     ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
                 val r = RingtoneManager.getRingtone(context, alarmUri)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    r?.audioAttributes = AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_ALARM)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                        .build()
+                } else {
+                    @Suppress("DEPRECATION")
+                    r?.streamType = android.media.AudioManager.STREAM_ALARM
+                }
                 ringtone = r
                 r?.play()
             }

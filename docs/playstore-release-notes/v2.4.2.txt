@@ -1,0 +1,60 @@
+<en-IN>
+• Target API 36 (Android 16) support with full NDK debug symbols
+• Configured official production release signing
+• Backup archive security hardening (Zip Slip / CWE-22 protection)
+</en-IN>
+<ar>
+• دعم المستوى 36 من واجهة برمجة التطبيقات (Android 16) مع رموز تصحيح NDK الكاملة
+• تكوين توقيع إصدار الإنتاج الرسمي
+• تعزيز أمان الأرشيف الاحتياطي (الحماية من Zip Slip / CWE-22)
+</ar>
+<de-DE>
+• Unterstützung für Ziel-API 36 (Android 16) mit vollständigen NDK-Debug-Symbolen
+• Offizielle Produktionsfreigabesignierung konfiguriert
+• Sicherheitsoptimierung für Sicherungsarchive (Schutz vor Zip Slip / CWE-22)
+</de-DE>
+<en-US>
+• Target API 36 (Android 16) support with full NDK debug symbols
+• Configured official production release signing
+• Backup archive security hardening (Zip Slip / CWE-22 protection)
+</en-US>
+<es-419>
+• Compatibilidad con API 36 (Android 16) y símbolos de depuración NDK completos
+• Configuración oficial de firma de versión de producción
+• Refuerzo de seguridad en copias de seguridad (protección contra Zip Slip / CWE-22)
+</es-419>
+<fr-FR>
+• Prise en charge de l'API cible 36 (Android 16) avec symboles de débogage NDK complets
+• Configuration de la signature officielle de version de production
+• Renforcement de la sécurité des archives de sauvegarde (protection Zip Slip / CWE-22)
+</fr-FR>
+<hi-IN>
+• पूर्ण NDK डिबग प्रतीकों के साथ टारगेट API 36 (Android 16) समर्थन
+• आधिकारिक उत्पादन रिलीज हस्ताक्षर (Release Signing) कॉन्फ़िगर किया गया
+• बैकअप संग्रह सुरक्षा सुदृढ़ीकरण (Zip Slip / CWE-22 सुरक्षा)
+</hi-IN>
+<it-IT>
+• Supporto per API target 36 (Android 16) con simboli di debug NDK completi
+• Firma di rilascio di produzione ufficiale configurata
+• Rafforzamento della sicurezza degli archivi di backup (protezione da Zip Slip / CWE-22)
+</it-IT>
+<ja-JP>
+• 完全なNDKデバッグシンボルを含むTarget API 36（Android 16）のサポート
+• 公式プロダクションリリース署名を設定
+• バックアップアーカイブのセキュリティ強化（Zip Slip / CWE-22対策）
+</ja-JP>
+<pt-BR>
+• Suporte à API de destino 36 (Android 16) com símbolos de depuração NDK completos
+• Configuração de assinatura de versão de produção oficial
+• Proteção de segurança aprimorada para backups (proteção contra Zip Slip / CWE-22)
+</pt-BR>
+<ru-RU>
+• Поддержка Target API 36 (Android 16) с полными отладочными символами NDK
+• Настроена официальная подпись продакшн-релиза
+• Повышение безопасности архивов резервных копий (защита от Zip Slip / CWE-22)
+</ru-RU>
+<zh-CN>
+• 支持目标 API 36 (Android 16) 并附带完整的 NDK 调试符号
+• 配置官方正式版发布签名
+• 备份归档安全加固（防范 Zip Slip / CWE-22）
+</zh-CN>

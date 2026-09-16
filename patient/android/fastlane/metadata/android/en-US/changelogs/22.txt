@@ -1,0 +1,3 @@
+• Fixed custom alarm sound volume to use Alarm volume instead of Media volume
+• Ensures alarms ring audibly even when media volume is muted
+• Improved screen wakeup and full-screen alarm popup reliability

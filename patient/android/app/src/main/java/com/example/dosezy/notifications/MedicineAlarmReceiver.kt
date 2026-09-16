@@ -74,14 +74,13 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         if (entryId != null && medicineName != null) {
             val pendingResult = goAsync()
             val powerManager = context.getSystemService(Context.POWER_SERVICE) as? android.os.PowerManager
-            @Suppress("DEPRECATION")
             val wakeLock = powerManager?.newWakeLock(
-                android.os.PowerManager.SCREEN_BRIGHT_WAKE_LOCK or
+                android.os.PowerManager.PARTIAL_WAKE_LOCK or
                         android.os.PowerManager.ACQUIRE_CAUSES_WAKEUP or
                         android.os.PowerManager.ON_AFTER_RELEASE,
                 "Dosezy:MedicineAlarmWakeLock"
             )
-            wakeLock?.acquire(15 * 1000L) // 15 seconds
+            wakeLock?.acquire(30 * 1000L) // 30 seconds
 
             CoroutineScope(Dispatchers.IO).launch {
                 try {

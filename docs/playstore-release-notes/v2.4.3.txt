@@ -1,0 +1,60 @@
+<en-IN>
+• Fixed custom alarm sounds to use Alarm volume instead of Media volume
+• Ensures alarms ring audibly even when media volume is muted
+• Improved screen wakeup and full-screen alarm popup reliability
+</en-IN>
+<ar>
+• إصلاح أصوات التنبيه المخصصة لاستخدام مستوى صوت المنبه بدلاً من مستوى صوت الوسائط
+• يضمن رنين التنبيهات بصوت مسموع حتى عند كتم صوت الوسائط
+• تحسين إيقاظ الشاشة وموثوقية النافذة المنبثقة للتنبيه بملء الشاشة
+</ar>
+<de-DE>
+• Benutzerdefinierte Wecktöne verwenden jetzt die Wecker- statt der Medienlautstärke
+• Stellt sicher, dass Alarme auch bei stummgeschalteten Medien laut klingeln
+• Verbesserte Bildschirmaktivierung und Zuverlässigkeit des Vollbild-Alarm-Popups
+</de-DE>
+<en-US>
+• Fixed custom alarm sounds to use Alarm volume instead of Media volume
+• Ensures alarms ring audibly even when media volume is muted
+• Improved screen wakeup and full-screen alarm popup reliability
+</en-US>
+<es-419>
+• Corrección de sonidos de alarma personalizados para usar el volumen de alarma en lugar de multimedia
+• Garantiza que las alarmas suenen incluso si el volumen multimedia está silenciado
+• Activación de pantalla mejorada y mayor confiabilidad de la ventana emergente de alarma
+</es-419>
+<fr-FR>
+• Les alarmes personnalisées utilisent désormais le volume de l'alarme au lieu du volume multimédia
+• Garantit que les alarmes sonnent même lorsque les médias sont coupés
+• Amélioration du réveil de l'écran et de la fiabilité de la notification plein écran
+</fr-FR>
+<hi-IN>
+• कस्टम अलार्म ध्वनियों को मीडिया वॉल्यूम के बजाय अलार्म वॉल्यूम पर ठीक किया गया
+• मीडिया म्यूट होने पर भी अलार्म का स्पष्ट सुनाई देना सुनिश्चित करता है
+• स्क्रीन वेकअप और फुल-स्क्रीन अलार्म पॉपअप की विश्वसनीयता में सुधार
+</hi-IN>
+<it-IT>
+• I suoni di allarme personalizzati ora usano il volume della sveglia anziché quello multimediale
+• Garantisce che gli allarmi squillino anche con i contenuti multimediali disattivati
+• Migliorata la riattivazione dello schermo e l'affidabilità del popup di allarme a schermo intero
+</it-IT>
+<ja-JP>
+• カスタムアラーム音をメディア音量ではなくアラーム音量を使用するように修正
+• メディア音量がミュートされている場合でもアラームが確実に鳴るように改善
+• 画面復帰と全画面アラームポップアップの信頼性を向上
+</ja-JP>
+<pt-BR>
+• Sons de alarme personalizados agora usam o volume do alarme em vez do volume de mídia
+• Garante que os alarmes toquem mesmo com a mídia silenciada
+• Maior confiabilidade para despertar a tela e exibir o pop-up em tela cheia
+</pt-BR>
+<ru-RU>
+• Пользовательские звуки будильника теперь используют громкость будильника вместо медиа
+• Гарантирует звонок будильника, даже если громкость мультимедиа отключена
+• Улучшено пробуждение экрана и надежность полноэкранного всплывающего окна
+</ru-RU>
+<zh-CN>
+• 修复自定义闹钟提示音，改用闹钟音量而非媒体音量
+• 确保即使媒体静音时闹钟也能正常响铃
+• 提升屏幕唤醒和全屏闹钟弹窗的稳定性
+</zh-CN>
