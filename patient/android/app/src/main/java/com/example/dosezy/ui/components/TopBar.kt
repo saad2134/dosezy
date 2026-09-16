@@ -31,7 +31,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -62,14 +67,27 @@ fun TopBar(
     var showProfileDialog by remember { mutableStateOf(false) }
     var showNotificationDialog by remember { mutableStateOf(false) }
 
-    // Calculate notification status (red if any checks fail)
-    val allNotificationsPassed = false
+    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+    val borderColor = if (isDark) Color(0xFF303235) else Color(0xFFD1D5DB)
+    val shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-
+            .clip(shape)
             .background(MaterialTheme.colorScheme.surface)
+            .drawBehind {
+                val strokeWidth = 1.dp.toPx()
+                val r = 16.dp.toPx()
+                val path = Path().apply {
+                    moveTo(0f, size.height - r)
+                    arcTo(Rect(0f, size.height - r * 2, r * 2, size.height), startAngleDegrees = 180f, sweepAngleDegrees = -90f, forceMoveTo = false)
+                    lineTo(size.width - r, size.height)
+                    arcTo(Rect(size.width - r * 2, size.height - r * 2, size.width, size.height), startAngleDegrees = 90f, sweepAngleDegrees = -90f, forceMoveTo = false)
+                    lineTo(size.width, size.height - r)
+                }
+                drawPath(path = path, color = borderColor, style = Stroke(width = strokeWidth))
+            }
     ) {
         // First Row: Profile info and Notification button
         Row(

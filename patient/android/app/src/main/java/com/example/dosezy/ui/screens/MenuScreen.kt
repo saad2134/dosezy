@@ -29,7 +29,7 @@ import androidx.compose.material.icons.filled.Loop
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Emergency
 import androidx.compose.material.icons.filled.HelpOutline
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Refresh
@@ -206,10 +206,10 @@ fun MenuScreen(navController: NavController) {
                 )
             }
 
-            // About Dosezy & Support
+            // About Dosezy
             item {
                 MenuItem(
-                    icon = Icons.Default.Info,
+                    icon = Icons.Outlined.Info,
                     title = androidx.compose.ui.res.stringResource(R.string.menu_about_dosezy),
                     color = MaterialTheme.colorScheme.onSurface,
                     onClick = { navController.navigate("about") }
