@@ -39,7 +39,7 @@
 #### Coming Soon On
 
 <div align="center">
-  <a href="">
+  <a href="https://play.google.com/store/apps/details?id=com.saad2134.dosezy">
     <img width="197" height="59" alt="Google Play" src="https://github.com/user-attachments/assets/7c8720ee-4c1e-4c9a-86c0-8086acd12c71" />
   </a>
   <!-- 
