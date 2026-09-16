@@ -539,4 +539,12 @@
     <string name="about_tap_to_copy">Нажмите, чтобы скопировать адрес</string>
     <string name="about_github_sponsors">GitHub Sponsors</string>
     <string name="about_github_sponsors_desc">Ежемесячная или разовая поддержка через GitHub Sponsors</string>
+    <string name="pref_alarm_duration_title">Длительность звонка будильника</string>
+    <string name="pref_alarm_duration_desc">Автоматически выключать звук и вибрацию через заданное время</string>
+    <string name="alarm_duration_continuous">Непрерывно (до закрытия)</string>
+    <string name="alarm_duration_30s">30 секунд</string>
+    <string name="alarm_duration_1m">1 минута</string>
+    <string name="alarm_duration_2m">2 минуты</string>
+    <string name="alarm_duration_5m">5 минут</string>
+    <string name="alarm_silenced_auto_banner">Будильник автоматически выключен — отметьте прием лекарств, когда будете готовы</string>
 </resources>

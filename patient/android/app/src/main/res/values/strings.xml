@@ -567,4 +567,12 @@ Do you want to continue?</string>
     <string name="about_tap_to_copy">Tap to copy address</string>
     <string name="about_github_sponsors">GitHub Sponsors</string>
     <string name="about_github_sponsors_desc">Support monthly or one-time via GitHub Sponsors</string>
+    <string name="pref_alarm_duration_title">Alarm Ring Duration</string>
+    <string name="pref_alarm_duration_desc">Auto-silence audio &amp; vibration after a set duration</string>
+    <string name="alarm_duration_continuous">Continuous (Until Dismissed)</string>
+    <string name="alarm_duration_30s">30 seconds</string>
+    <string name="alarm_duration_1m">1 minute</string>
+    <string name="alarm_duration_2m">2 minutes</string>
+    <string name="alarm_duration_5m">5 minutes</string>
+    <string name="alarm_silenced_auto_banner">Alarm auto-silenced — record your doses when ready</string>
 </resources>

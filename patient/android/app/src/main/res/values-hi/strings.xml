@@ -555,4 +555,12 @@
     <string name="about_tap_to_copy">पता कॉपी करने के लिए टैप करें</string>
     <string name="about_github_sponsors">GitHub Sponsors</string>
     <string name="about_github_sponsors_desc">GitHub Sponsors के माध्यम से मासिक या एकमुश्त दान करें</string>
+    <string name="pref_alarm_duration_title">अलार्म बजने की अवधि</string>
+    <string name="pref_alarm_duration_desc">निर्धारित समय के बाद ध्वनि और कंपन को स्वचालित रूप से म्यूट करें</string>
+    <string name="alarm_duration_continuous">लगातार (जब तक बंद न किया जाए)</string>
+    <string name="alarm_duration_30s">30 सेकंड</string>
+    <string name="alarm_duration_1m">1 मिनट</string>
+    <string name="alarm_duration_2m">2 मिनट</string>
+    <string name="alarm_duration_5m">5 मिनट</string>
+    <string name="alarm_silenced_auto_banner">अलार्म स्वतः म्यूट हो गया — तैयार होने पर अपनी दवाएं दर्ज करें</string>
 </resources>

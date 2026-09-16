@@ -539,4 +539,12 @@
     <string name="about_tap_to_copy">اضغط لنسخ العنوان</string>
     <string name="about_github_sponsors">GitHub Sponsors</string>
     <string name="about_github_sponsors_desc">ادعم المشروع شهرياً أو لمرة واحدة عبر GitHub Sponsors</string>
+    <string name="pref_alarm_duration_title">مدة رنين المنبه</string>
+    <string name="pref_alarm_duration_desc">إيقاف الصوت والاهتزاز تلقائياً بعد انقضاء المدة المحددة</string>
+    <string name="alarm_duration_continuous">مستمر (حتى الإلغاء)</string>
+    <string name="alarm_duration_30s">30 ثانية</string>
+    <string name="alarm_duration_1m">دقيقة واحدة</string>
+    <string name="alarm_duration_2m">دقيقتان</string>
+    <string name="alarm_duration_5m">5 دقائق</string>
+    <string name="alarm_silenced_auto_banner">تم إيقاف المنبه تلقائياً — سجّل جرعاتك عندما تكون جاهزاً</string>
 </resources>

@@ -9,7 +9,7 @@
 
 <div align="center">
 
-![Phase](https://img.shields.io/badge/🛠️%20Phase-Released%20v2%2E4%2E0-blue?style=for-the-badge)
+![Phase](https://img.shields.io/badge/🛠️%20Phase-Released%20v2%2E4%2E1-blue?style=for-the-badge)
 ![Platforms](https://img.shields.io/badge/🌐%20Platforms-Android-28a745?style=for-the-badge)
 
 </div>
@@ -53,6 +53,11 @@
 Once you input the basics: name, dosage, timings, and frequency, the app intelligently handles your medication schedule.
 
 - 📅 **Medication Adherence** – Automated reminders ensure timely medication consumption.
+- 🔊 **Custom Alarm Sounds & Auto-Silence** – 4 high-clarity synthesized alarm tones (`Gentle Chime`, `Medical Marimba`, `Brisk Pulse`, `Calm Bell`) + system default, with configurable auto-silence timeout options (30s, 1m, 2m, 5m, continuous).
+- 📦 **Soft-Delete Medication Archival** – Discontinue medications when treatment finishes while keeping 100% of past dose logs, adherence stats, and PDF reports intact.
+- 📱 **Home Screen Widget** – Interactive Android Home Screen widget for real-time dose tracking and daily progress.
+- 📝 **Doctor Notes & Rx Warnings** – Notes field with visual warning badges on medication cards.
+- 💊 **8 Visual Pill Shapes & Colors** – Custom vector shapes (`Round`, `Capsule`, `Oval`, `Liquid`, `Inhaler`, `Injection`, `Drops`, `Patch`) and 10 palette colors.
 - 🌐 **12 Global Languages** – Full native localization in English, Chinese (中文), Spanish (Español), Hindi (हिन्दी), Portuguese (Português), Arabic (العربية), French (Français), German (Deutsch), Japanese (日本語), Russian (Русский), Italian (Italiano), and Bengali (বাংলা).
 - 🌍 **International Emergency Services** – Interactive country/region emergency dialer supporting India, USA/Canada, UK, EU, China, Japan, Russia, Brazil, Bangladesh, and Australia with automatic SIM/network country ISO detection and locale fallback.
 - ⏰ **Configurable Late & Missed Thresholds** – Custom **Consider Late After** (1-3h) and **Consider Missed After** (3-9h) settings with orange high-visibility late status badges (`Xh Xm ago`) and "Mark Late" actions.
@@ -60,11 +65,12 @@ Once you input the basics: name, dosage, timings, and frequency, the app intelli
 - ♿ **Accessibility-First Design** – Large text, high-contrast colors, and simple controls for elderly users.  
 - 🔔 **Reliable Notification System** – Persistent alerts with precise battery & sound indicators and snooze/taken/late action triggers.  
 - 🎨 **Adaptive System Dark/Light Theme** – Complete theme support respecting the Android system default settings with zero white flash transitions.
-- 📅 **Custom Calendar Scheduling** – Full interactive support for daily, weekly (specific days of the week), and monthly (specific days of the month) frequencies.
+- 📅 **Custom Calendar Scheduling** – Full interactive support for daily, weekly (specific days of the week), monthly, and interval-based (every X hours/days) frequencies.
 - 👤 **Multi-Profile Management** – Create, edit, and switch between family member profiles.
 - 📄 **Data Security & Native Exports** – Local `Room` database storage with native PDF medical reports (English format note), JSON backup archives, and CSV export capabilities.  
 - 🛍️ **Multi-Store Update Check & Web Fallback** – Automatically detects installation store source (Google Play, F-Droid, Huawei AppGallery, Samsung Galaxy Store, Xiaomi GetApps, Amazon Appstore, Aurora Store, GitHub Sideload) and launches native store or web browser fallback.  
 - 👨‍👩‍👧 **Caregiver Support** – Logs and adherence history help caregivers track missed and late doses.  
+- ☕ **About Dosezy & Open-Source Support** – In-app donation channels via GitHub Sponsors, Buy Me a Coffee, and 1-tap copy cryptocurrency wallets (BTC, ETH, SOL, LTC, ZEC).  
 
 ### 🩺 Caregiver Cloud Platform (Optional, Self-Hostable, Coming Soon)
 

@@ -158,7 +158,7 @@ class DataExporter(
     private fun buildJsonContent(user: User, medicines: List<Medicine>, schedules: List<ScheduleEntry>): String {
         val root = JSONObject()
         root.put("appName", "Dosezy")
-        root.put("appVersion", "2.4.0")
+        root.put("appVersion", "2.4.1")
         root.put("exportedAt", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
 
         val userObj = JSONObject()
@@ -170,6 +170,7 @@ class DataExporter(
         userObj.put("allergies", user.allergies ?: "")
         userObj.put("medicalConditions", user.medicalConditions ?: "")
         userObj.put("alarmSound", user.alarmSound.name)
+        userObj.put("alarmDurationSeconds", user.alarmDurationSeconds)
         root.put("user", userObj)
 
         val medArray = JSONArray()

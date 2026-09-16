@@ -85,6 +85,7 @@ fun PreferencesScreen(navController: NavController) {
     var showMissedAfterDialog by remember { mutableStateOf(false) }
     var showSnoozeDialog by remember { mutableStateOf(false) }
     var showAlarmSoundDialog by remember { mutableStateOf(false) }
+    var showAlarmDurationDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showNaggingIntervalDialog by remember { mutableStateOf(false) }
     var showNaggingRepeatsDialog by remember { mutableStateOf(false) }
@@ -318,6 +319,24 @@ fun PreferencesScreen(navController: NavController) {
             }
 
             item {
+                // Alarm Ring Duration Preference
+                val currentDuration = currentUser?.alarmDurationSeconds ?: 0
+                val durationText = when (currentDuration) {
+                    30 -> stringResource(R.string.alarm_duration_30s)
+                    60 -> stringResource(R.string.alarm_duration_1m)
+                    120 -> stringResource(R.string.alarm_duration_2m)
+                    300 -> stringResource(R.string.alarm_duration_5m)
+                    else -> stringResource(R.string.alarm_duration_continuous)
+                }
+                PreferenceItem(
+                    title = androidx.compose.ui.res.stringResource(R.string.pref_alarm_duration_title),
+                    currentValue = durationText,
+                    iconName = "alarm_duration",
+                    onClick = { showAlarmDurationDialog = true }
+                )
+            }
+
+            item {
                 // Language Preference
                 val sysLangName = com.example.dosezy.utils.LocaleHelper.getSystemLanguageDisplayName()
                 PreferenceItem(
@@ -482,7 +501,45 @@ fun PreferencesScreen(navController: NavController) {
                 onDismiss = { showAlarmSoundDialog = false }
             )
         }
+
+        // Alarm Duration Selection Dialog
+        if (showAlarmDurationDialog) {
+            AlarmDurationSelectionDialog(
+                currentDuration = currentUser?.alarmDurationSeconds ?: 0,
+                onDurationSelected = { newDuration ->
+                    currentUser?.let { user ->
+                        userViewModel.updateUser(user.copy(alarmDurationSeconds = newDuration))
+                    }
+                    showAlarmDurationDialog = false
+                },
+                onDismiss = { showAlarmDurationDialog = false }
+            )
+        }
     }
+}
+
+// Dialog Composable for Alarm Duration Selection
+@Composable
+fun AlarmDurationSelectionDialog(
+    currentDuration: Int,
+    onDurationSelected: (Int) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val options = listOf(
+        0 to androidx.compose.ui.res.stringResource(R.string.alarm_duration_continuous),
+        30 to androidx.compose.ui.res.stringResource(R.string.alarm_duration_30s),
+        60 to androidx.compose.ui.res.stringResource(R.string.alarm_duration_1m),
+        120 to androidx.compose.ui.res.stringResource(R.string.alarm_duration_2m),
+        300 to androidx.compose.ui.res.stringResource(R.string.alarm_duration_5m)
+    )
+
+    com.example.dosezy.ui.components.SelectionDialog(
+        title = androidx.compose.ui.res.stringResource(R.string.pref_alarm_duration_title),
+        options = options.map { it.second to it.first },
+        currentSelection = currentDuration,
+        onOptionSelected = onDurationSelected,
+        onDismiss = onDismiss
+    )
 }
 
 // Dialog Composable for Alarm Sound Selection

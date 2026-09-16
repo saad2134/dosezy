@@ -104,9 +104,10 @@ class AlarmActivity : ComponentActivity() {
         val initialMedicineName = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME) ?: "Medication"
         val initialScheduledTime = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME) ?: ""
 
-        // Fetch user alarm sound preference and start audio playback
+        // Fetch user alarm sound & duration preference and start audio playback + auto-silence
         lifecycleScope.launch(Dispatchers.IO) {
             var targetSound: AlarmSound = AlarmSound.SYSTEM_DEFAULT
+            var autoSilenceSeconds = 0
             try {
                 if (entryId.isNotEmpty()) {
                     val entry = database.scheduleDao().getScheduleEntryById(entryId)
@@ -114,20 +115,33 @@ class AlarmActivity : ComponentActivity() {
                         val u = database.userDao().getUserByIdDirect(entry.userId)
                         if (u != null) {
                             targetSound = u.alarmSound
+                            autoSilenceSeconds = u.alarmDurationSeconds
                         }
                     }
                 }
-                if (targetSound == AlarmSound.SYSTEM_DEFAULT) {
+                if (targetSound == AlarmSound.SYSTEM_DEFAULT || autoSilenceSeconds == 0) {
                     val users = database.userDao().getAllUsersDirect()
                     val currentUser = users.find { it.isCurrentUser } ?: users.firstOrNull()
                     if (currentUser != null) {
-                        targetSound = currentUser.alarmSound
+                        if (targetSound == AlarmSound.SYSTEM_DEFAULT) {
+                            targetSound = currentUser.alarmSound
+                        }
+                        if (autoSilenceSeconds == 0) {
+                            autoSilenceSeconds = currentUser.alarmDurationSeconds
+                        }
                     }
                 }
             } catch (_: Exception) {}
 
             withContext(Dispatchers.Main) {
                 playAlarmSound(targetSound)
+            }
+
+            if (autoSilenceSeconds > 0) {
+                kotlinx.coroutines.delay(autoSilenceSeconds * 1000L)
+                withContext(Dispatchers.Main) {
+                    stopAlarm()
+                }
             }
         }
 

@@ -13,8 +13,8 @@ android {
         applicationId = "com.saad2134.dosezy"
         minSdk = 24
         targetSdk = 34
-        versionCode = 19
-        versionName = "2.4.0"
+        versionCode = 20
+        versionName = "2.4.1"
         buildConfigField("String", "VERSION_NAME", "\"$versionName\"")
         buildConfigField("int", "VERSION_CODE", "$versionCode")
 

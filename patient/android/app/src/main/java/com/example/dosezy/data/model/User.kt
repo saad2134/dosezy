@@ -32,7 +32,8 @@ data class User(
     val naggingRemindersEnabled: Boolean = false,
     val naggingIntervalMinutes: Int = 5, // 5, 10, 15 min
     val naggingMaxRepeats: Int = 3, // 1, 2, 3 repeats
-    val alarmSound: AlarmSound = AlarmSound.SYSTEM_DEFAULT
+    val alarmSound: AlarmSound = AlarmSound.SYSTEM_DEFAULT,
+    val alarmDurationSeconds: Int = 0 // 0 = Continuous, 30 = 30s, 60 = 1m, 120 = 2m, 300 = 5m
 )
 
 enum class AlarmSound(val rawResId: Int?) {

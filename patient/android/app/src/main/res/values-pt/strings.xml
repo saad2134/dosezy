@@ -538,4 +538,12 @@ Deseja continuar?</string>
     <string name="about_tap_to_copy">Toque para copiar o endereço</string>
     <string name="about_github_sponsors">GitHub Sponsors</string>
     <string name="about_github_sponsors_desc">Apoie mensalmente ou pontualmente via GitHub Sponsors</string>
+    <string name="pref_alarm_duration_title">Duração do toque do alarme</string>
+    <string name="pref_alarm_duration_desc">Silenciar áudio e vibração automaticamente após um tempo definido</string>
+    <string name="alarm_duration_continuous">Contínuo (até dispensar)</string>
+    <string name="alarm_duration_30s">30 segundos</string>
+    <string name="alarm_duration_1m">1 minuto</string>
+    <string name="alarm_duration_2m">2 minutos</string>
+    <string name="alarm_duration_5m">5 minutos</string>
+    <string name="alarm_silenced_auto_banner">Alarme silenciado automaticamente — registre suas doses quando estiver pronto</string>
 </resources>

@@ -93,6 +93,7 @@ private fun getIconVector(iconName: String) = when (iconName) {
     "missed_after", "timer_off", "alarm_off" -> Icons.Default.AlarmOff
     "snooze" -> Icons.Default.Snooze
     "alarm", "alarm_sound", "sound", "volume" -> Icons.Default.Schedule
+    "alarm_duration", "duration" -> Icons.Default.Timer
     "language" -> Icons.Default.Language
     else -> Icons.Default.Settings
 }

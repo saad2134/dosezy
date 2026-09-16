@@ -539,4 +539,12 @@
     <string name="about_tap_to_copy">ঠিকানা কপি করতে ট্যাপ করুন</string>
     <string name="about_github_sponsors">GitHub Sponsors</string>
     <string name="about_github_sponsors_desc">GitHub Sponsors-এর মাধ্যমে মাসিক বা এককালীন অনুদান দিন</string>
+    <string name="pref_alarm_duration_title">অ্যালার্ম বাজার সময়সীমা</string>
+    <string name="pref_alarm_duration_desc">নির্দিষ্ট সময় পর স্বয়ংক্রিয়ভাবে শব্দ ও কম্পন বন্ধ করুন</string>
+    <string name="alarm_duration_continuous">একটানা (বন্ধ না করা পর্যন্ত)</string>
+    <string name="alarm_duration_30s">৩০ সেকেন্ড</string>
+    <string name="alarm_duration_1m">১ মিনিট</string>
+    <string name="alarm_duration_2m">২ মিনিট</string>
+    <string name="alarm_duration_5m">৫ মিনিট</string>
+    <string name="alarm_silenced_auto_banner">অ্যালার্ম স্বয়ংক্রিয়ভাবে বন্ধ হয়েছে — সুবিধামতো ওষুধের হিসাব লিপিবদ্ধ করুন</string>
 </resources>

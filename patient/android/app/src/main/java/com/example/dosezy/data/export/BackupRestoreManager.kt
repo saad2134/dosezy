@@ -514,7 +514,9 @@ class BackupRestoreManager(
             medicalConditions = json.get("medicalConditions")?.let { if (it.isJsonNull) null else it.asString },
             naggingRemindersEnabled = json.get("naggingRemindersEnabled")?.asBoolean ?: false,
             naggingIntervalMinutes = json.get("naggingIntervalMinutes")?.asInt ?: 5,
-            naggingMaxRepeats = json.get("naggingMaxRepeats")?.asInt ?: 3
+            naggingMaxRepeats = json.get("naggingMaxRepeats")?.asInt ?: 3,
+            alarmSound = try { AlarmSound.valueOf(json.get("alarmSound").asString) } catch (_: Exception) { AlarmSound.SYSTEM_DEFAULT },
+            alarmDurationSeconds = json.get("alarmDurationSeconds")?.asInt ?: 0
         )
     }
 

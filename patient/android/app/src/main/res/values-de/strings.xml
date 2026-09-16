@@ -539,4 +539,12 @@ Möchten Sie fortfahren?</string>
     <string name="about_tap_to_copy">Tippen zum Kopieren der Adresse</string>
     <string name="about_github_sponsors">GitHub Sponsors</string>
     <string name="about_github_sponsors_desc">Monatlich oder einmalig über GitHub Sponsors unterstützen</string>
+    <string name="pref_alarm_duration_title">Alarm-Klingeldauer</string>
+    <string name="pref_alarm_duration_desc">Ton und Vibration nach einer festgelegten Zeit automatisch stummschalten</string>
+    <string name="alarm_duration_continuous">Durchgehend (bis zum Schließen)</string>
+    <string name="alarm_duration_30s">30 Sekunden</string>
+    <string name="alarm_duration_1m">1 Minute</string>
+    <string name="alarm_duration_2m">2 Minuten</string>
+    <string name="alarm_duration_5m">5 Minuten</string>
+    <string name="alarm_silenced_auto_banner">Alarm automatisch stummgeschaltet — erfassen Sie Ihre Dosen, wenn Sie bereit sind</string>
 </resources>
