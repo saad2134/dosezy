@@ -146,26 +146,45 @@ class AlarmActivity : ComponentActivity() {
         }
 
         setContent {
+            val context = LocalContext.current
+            val prefs = remember { context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE) }
+            var spTheme by remember { mutableStateOf(prefs.getString("theme", "system")) }
             var user by remember { mutableStateOf<User?>(null) }
             
             LaunchedEffect(entryId) {
-                if (entryId.isNotEmpty()) {
-                    withContext(Dispatchers.IO) {
-                        try {
+                withContext(Dispatchers.IO) {
+                    try {
+                        var targetUser: User? = null
+                        if (entryId.isNotEmpty()) {
                             val entry = database.scheduleDao().getScheduleEntryById(entryId)
-                            entry?.let { e ->
-                                user = database.userDao().getUserByIdDirect(e.userId)
+                            if (entry != null) {
+                                targetUser = database.userDao().getUserByIdDirect(entry.userId)
                             }
-                        } catch (_: Exception) {}
-                    }
+                        }
+                        if (targetUser == null) {
+                            val users = database.userDao().getAllUsersDirect()
+                            targetUser = users.find { it.isCurrentUser } ?: users.firstOrNull()
+                        }
+                        user = targetUser
+                        targetUser?.theme?.let { theme ->
+                            val themeStr = theme.name.lowercase()
+                            if (spTheme == "system" || spTheme != themeStr) {
+                                spTheme = themeStr
+                            }
+                        }
+                    } catch (_: Exception) {}
                 }
             }
 
             val systemIsDark = isSystemInDarkTheme()
-            val isDark = when (user?.theme) {
-                com.example.dosezy.data.model.Theme.DARK -> true
-                com.example.dosezy.data.model.Theme.LIGHT -> false
-                else -> systemIsDark
+            val isDark = when (spTheme) {
+                "dark" -> true
+                "light" -> false
+                else -> when (user?.theme) {
+                    com.example.dosezy.data.model.Theme.DARK -> true
+                    com.example.dosezy.data.model.Theme.LIGHT -> false
+                    else -> systemIsDark
+                }
             }
 
             DosezyTheme(darkTheme = isDark) {
@@ -314,17 +333,6 @@ fun GroupedAlarmScreenContent(
             }
             medicinesList = list
             isLoaded = true
-        }
-    }
-
-    val view = androidx.compose.ui.platform.LocalView.current
-    val bgColor = MaterialTheme.colorScheme.background
-    val isDark = !isDarkTheme
-    SideEffect {
-        val window = (view.context as? android.app.Activity)?.window
-        window?.statusBarColor = bgColor.toArgb()
-        window?.let {
-            androidx.core.view.WindowCompat.getInsetsController(it, view).isAppearanceLightStatusBars = isDark
         }
     }
 
