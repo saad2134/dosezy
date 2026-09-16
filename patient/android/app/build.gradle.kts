@@ -5,18 +5,31 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
+import java.util.Properties
+import java.io.FileInputStream
+
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.example.dosezy"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.saad2134.dosezy"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 20
-        versionName = "2.4.1"
+        targetSdk = 36
+        versionCode = 21
+        versionName = "2.4.2"
         buildConfigField("String", "VERSION_NAME", "\"$versionName\"")
         buildConfigField("int", "VERSION_CODE", "$versionCode")
+
+        ndk {
+            debugSymbolLevel = "FULL"
+        }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -24,11 +37,27 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            if (keystorePropertiesFile.exists()) {
+                val storeFilePath = keystoreProperties.getProperty("storeFile") ?: "dosezy-release-key.jks"
+                storeFile = if (rootProject.file(storeFilePath).exists()) {
+                    rootProject.file(storeFilePath)
+                } else {
+                    file(storeFilePath)
+                }
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
             isShrinkResources = false
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (keystorePropertiesFile.exists()) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

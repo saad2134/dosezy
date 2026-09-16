@@ -1,0 +1,3 @@
+• Upgraded to Target API 36 (Android 16) with full NDK debug symbols
+• Production release signing for Google Play & GitHub
+• Backup archive security hardening (Zip Slip / CWE-22)

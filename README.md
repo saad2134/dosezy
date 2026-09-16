@@ -9,7 +9,7 @@
 
 <div align="center">
 
-![Phase](https://img.shields.io/badge/🛠️%20Phase-Released%20v2%2E4%2E1-blue?style=for-the-badge)
+![Phase](https://img.shields.io/badge/🛠️%20Phase-Released%20v2%2E4%2E2-blue?style=for-the-badge)
 ![Platforms](https://img.shields.io/badge/🌐%20Platforms-Android-28a745?style=for-the-badge)
 
 </div>
