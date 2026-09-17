@@ -1,0 +1,2 @@
+• Medicines on the daily schedule and calendar views are now strictly ordered chronologically
+• Improved build compatibility and open-source packaging for F-Droid

@@ -17,14 +17,14 @@ interface ScheduleDao {
     @Query("SELECT * FROM schedule_entries WHERE userId = :userId")
     fun getScheduleForUser(userId: String): Flow<List<ScheduleEntry>>
 
-    @Query("SELECT * FROM schedule_entries WHERE userId = :userId AND scheduledDateTime BETWEEN :startDate AND :endDate")
+    @Query("SELECT * FROM schedule_entries WHERE userId = :userId AND scheduledDateTime BETWEEN :startDate AND :endDate ORDER BY scheduledDateTime ASC")
     fun getScheduleForDateRange(userId: String, startDate: Long, endDate: Long): Flow<List<ScheduleEntry>>
 
-    @Query("SELECT * FROM schedule_entries WHERE userId = :userId AND scheduledDateTime BETWEEN :startDate AND :endDate")
+    @Query("SELECT * FROM schedule_entries WHERE userId = :userId AND scheduledDateTime BETWEEN :startDate AND :endDate ORDER BY scheduledDateTime ASC")
     suspend fun getScheduleForDateRangeDirect(userId: String, startDate: Long, endDate: Long): List<ScheduleEntry>
 
     @Transaction
-    @Query("SELECT * FROM schedule_entries WHERE userId = :userId AND scheduledDateTime BETWEEN :startDate AND :endDate")
+    @Query("SELECT * FROM schedule_entries WHERE userId = :userId AND scheduledDateTime BETWEEN :startDate AND :endDate ORDER BY scheduledDateTime ASC")
     fun getScheduleWithMedicineForDateRange(userId: String, startDate: Long, endDate: Long): Flow<List<ScheduleWithMedicine>>
 
     @Query("SELECT * FROM schedule_entries WHERE entryId = :entryId")
