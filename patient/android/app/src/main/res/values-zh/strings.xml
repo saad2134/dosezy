@@ -575,7 +575,7 @@
     <string name="notif_exact_alarm_title">精确闹钟</string>
     <string name="notif_exact_alarm_granted">闹钟将在精确时间准时响起。</string>
     <string name="notif_exact_alarm_desc">确保闹钟按时触发所需的权限。</string>
-    <string name="notif_overlay_title">悬浮窗/在其他应用上层显示</string>
+    <string name="notif_overlay_title">在其他应用上层显示</string>
     <string name="notif_overlay_granted">闹钟弹窗可以在任何应用之上显示。</string>
     <string name="notif_overlay_desc">确保在使用其他应用时也能可靠弹出全屏提醒。</string>
     <string name="notif_fullscreen_title">全屏闹钟弹窗</string>

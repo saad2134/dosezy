@@ -199,7 +199,7 @@ private fun createNotificationStatuses(
             }
         ),
 
-        // Display Over Other Apps (Pop-ups)
+        // Display Over Apps
         NotificationStatus(
             title = context.getString(com.example.dosezy.R.string.notif_overlay_title),
             description = if (overlayStatus) {
