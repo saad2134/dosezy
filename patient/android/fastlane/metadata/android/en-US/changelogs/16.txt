@@ -1,0 +1,5 @@
+• Grouped Alarms: Combines multiple doses at the same time into a single alert with interactive checklist and 'Take All'.
+• Stock & Refill Tracking: Live medication inventory tracking with auto-deduction and low-stock alerts.
+• Multi-Dose Presets: Quick dosing chips (1x, 2x, 3x, 4x daily) and custom time editing.
+• Backup & Restore: Selective ZIP profile import/export and new import dialog.
+• UI & Localization: Elevated card styling, unified analytics card, and full 12-language translation support.

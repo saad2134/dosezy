@@ -1,0 +1,4 @@
+• Configurable alarm ring duration / auto-silence (30s, 1m, 2m, 5m, continuous)
+• Enhanced alarm screen wakeup & background reliability
+• Responsive UI scaling & adaptive display density across all screen sizes
+• Collapsible discontinued medications section & visual polish

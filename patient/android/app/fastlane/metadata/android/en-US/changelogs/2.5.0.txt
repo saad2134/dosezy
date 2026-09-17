@@ -1,0 +1,4 @@
+• Major UX overhaul: Added intake undo action, dynamic snooze durations, and multi-profile emergency backups
+• Medicine roster search, empty-state guidance, and celebratory daily review keeping today's schedule visible
+• Reorganized Preferences & Menu with structured sections; compact subpage topbars with reliability shield
+• Chronological schedule sorting, archived medicine fix, and calendar date-tap performance optimization

@@ -1,0 +1,4 @@
+• Added custom device audio file selection for alarms with live preview and secure offline storage
+• Enhanced notification & full-screen alarm popup reliability with OEM autostart/popup guides (Xiaomi, Samsung, Oppo, Vivo)
+• Fixed schedule recalculation when changing medication from ongoing to finite duration
+• F-Droid open-source compliance: removed proprietary dependency signing blocks (#56)
