@@ -624,4 +624,22 @@ Do you want to continue?</string>
     <string name="search_no_results">No medications found matching \"%1$s\"</string>
     <string name="search_clear">Clear search</string>
     <string name="backup_export_failed">Export failed: %1$s</string>
+
+    <string name="pref_allow_skip_title">Allow Dose Skipping</string>
+    <string name="pref_allow_skip_desc">Enable an option to skip a scheduled dose with a clinical reason</string>
+    <string name="home_action_skip">Skip</string>
+    <string name="home_action_skipped">Skipped</string>
+    <string name="home_dose_skipped">Dose skipped for %s</string>
+    <string name="alarm_skip_medicine">SKIP DOSE</string>
+    <string name="alarm_skip_all">SKIP ALL (%d)</string>
+    <string name="skip_dialog_title">Skip Medication Dose</string>
+    <string name="skip_dialog_subtitle">Select a clinical reason for skipping this dose:</string>
+    <string name="skip_reason_fasting">Medical fasting / lab test</string>
+    <string name="skip_reason_doctor">Doctor-advised pause</string>
+    <string name="skip_reason_side_effects">Side effects / adverse reaction</string>
+    <string name="skip_reason_already_taken">Already taken earlier</string>
+    <string name="skip_reason_out_of_stock">Medication unavailable / out of stock</string>
+    <string name="skip_reason_other">Other clinical / personal reason</string>
+    <string name="skip_dialog_confirm">Confirm Skip</string>
+    <string name="skip_dialog_cancel">Cancel</string>
 </resources>

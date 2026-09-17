@@ -37,9 +37,10 @@ data class ScheduleEntry(
     val medicineId: String,
     val scheduledDateTime: LocalDateTime,
     val status: MedicationStatus,
-    val takenAt: LocalDateTime? = null
+    val takenAt: LocalDateTime? = null,
+    val skipReason: String? = null
 )
 
 enum class MedicationStatus {
-    PENDING, TAKEN_ON_TIME, TAKEN_LATE, MISSED
+    PENDING, TAKEN_ON_TIME, TAKEN_LATE, MISSED, SKIPPED
 }

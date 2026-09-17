@@ -596,4 +596,22 @@
     <string name="search_no_results">「%1$s」に一致する薬は見つかりませんでした</string>
     <string name="search_clear">検索をクリア</string>
     <string name="backup_export_failed">エクスポートに失敗しました: %1$s</string>
+
+    <string name="pref_allow_skip_title">服薬のスキップを許可</string>
+    <string name="pref_allow_skip_desc">理由を選択して服薬をスキップできるオプションを有効化</string>
+    <string name="home_action_skip">スキップ</string>
+    <string name="home_action_skipped">スキップ済み</string>
+    <string name="home_dose_skipped">%sの服薬をスキップしました</string>
+    <string name="alarm_skip_medicine">スキップ</string>
+    <string name="alarm_skip_all">すべてスキップ (%d)</string>
+    <string name="skip_dialog_title">服薬をスキップ</string>
+    <string name="skip_dialog_subtitle">スキップする理由を選択してください：</string>
+    <string name="skip_reason_fasting">検査前の絶食・検査</string>
+    <string name="skip_reason_doctor">医師の指示による休薬</string>
+    <string name="skip_reason_side_effects">副作用・体調不良</string>
+    <string name="skip_reason_already_taken">すでに服用済み</string>
+    <string name="skip_reason_out_of_stock">薬の在庫切れ・手元にない</string>
+    <string name="skip_reason_other">その他の理由</string>
+    <string name="skip_dialog_confirm">スキップを確定</string>
+    <string name="skip_dialog_cancel">キャンセル</string>
 </resources>

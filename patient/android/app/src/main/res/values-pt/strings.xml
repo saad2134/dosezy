@@ -595,4 +595,22 @@ Deseja continuar?</string>
     <string name="search_no_results">Nenhum medicamento encontrado para \"%1$s\"</string>
     <string name="search_clear">Limpar busca</string>
     <string name="backup_export_failed">Falha na exportação: %1$s</string>
+
+    <string name="pref_allow_skip_title">Permitir pular dose</string>
+    <string name="pref_allow_skip_desc">Ativar opção para pular uma dose agendada com motivo clínico</string>
+    <string name="home_action_skip">Pular</string>
+    <string name="home_action_skipped">Pulada</string>
+    <string name="home_dose_skipped">Dose pulada para %s</string>
+    <string name="alarm_skip_medicine">PULAR DOSE</string>
+    <string name="alarm_skip_all">PULAR TODAS (%d)</string>
+    <string name="skip_dialog_title">Pular dose do medicamento</string>
+    <string name="skip_dialog_subtitle">Selecione um motivo clínico para pular esta dose:</string>
+    <string name="skip_reason_fasting">Jejum médico / exame laboratorial</string>
+    <string name="skip_reason_doctor">Pausa orientada pelo médico</string>
+    <string name="skip_reason_side_effects">Efeitos colaterais / reação adversa</string>
+    <string name="skip_reason_already_taken">Já tomado anteriormente</string>
+    <string name="skip_reason_out_of_stock">Medicamento indisponível / sem estoque</string>
+    <string name="skip_reason_other">Outro motivo clínico ou pessoal</string>
+    <string name="skip_dialog_confirm">Confirmar</string>
+    <string name="skip_dialog_cancel">Cancelar</string>
 </resources>

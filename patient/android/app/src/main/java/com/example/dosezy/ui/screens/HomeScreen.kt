@@ -9,12 +9,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import com.example.dosezy.ui.components.SkipReasonDialog
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.clickable
@@ -94,6 +96,7 @@ fun HomeScreen(
     var currentTime by remember { mutableStateOf(java.time.LocalDateTime.now()) }
     var isPrnExpanded by remember { mutableStateOf(false) }
     var medToLogConfirm by remember { mutableStateOf<Medicine?>(null) }
+    var skippingEntryId by remember { mutableStateOf<String?>(null) }
     val snackbarHostState = remember { androidx.compose.material3.SnackbarHostState() }
     val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -150,10 +153,11 @@ fun HomeScreen(
         }
     }
 
-    // Check if all medications are taken
+    // Check if all medications are taken or skipped
     val allTaken = todayEntries.all {
         it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
-                it.scheduleEntry.status == MedicationStatus.TAKEN_LATE
+                it.scheduleEntry.status == MedicationStatus.TAKEN_LATE ||
+                it.scheduleEntry.status == MedicationStatus.SKIPPED
     }
 
     // Check if there are any medications
@@ -266,6 +270,9 @@ fun HomeScreen(
                                             duration = androidx.compose.material3.SnackbarDuration.Short
                                         )
                                     }
+                                },
+                                onSkip = { entryId ->
+                                    skippingEntryId = entryId
                                 }
                             )
                             Spacer(modifier = Modifier.height(16.dp))
@@ -465,6 +472,35 @@ fun HomeScreen(
             }
         )
     }
+
+    if (skippingEntryId != null) {
+        SkipReasonDialog(
+            onConfirm = { reason ->
+                val targetId = skippingEntryId ?: return@SkipReasonDialog
+                val medName = todayEntries.find { it.scheduleEntry.entryId == targetId }?.medicine?.medicationName ?: ""
+                scheduleViewModel.markAsSkipped(targetId, reason)
+                skippingEntryId = null
+                coroutineScope.launch {
+                    val message = if (medName.isNotBlank()) {
+                        context.getString(R.string.home_dose_skipped, medName)
+                    } else {
+                        context.getString(R.string.home_action_skipped)
+                    }
+                    val result = snackbarHostState.showSnackbar(
+                        message = message,
+                        actionLabel = context.getString(R.string.btn_undo),
+                        duration = androidx.compose.material3.SnackbarDuration.Short
+                    )
+                    if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+                        scheduleViewModel.undoDoseTaken(targetId)
+                    }
+                }
+            },
+            onDismiss = {
+                skippingEntryId = null
+            }
+        )
+    }
 }
 
 @Composable
@@ -475,7 +511,8 @@ private fun TimeSection(
     currentUser: com.example.dosezy.data.model.User?,
     onMarkAsTaken: (String) -> Unit,
     onMarkAsLate: (String) -> Unit,
-    onUndo: (String) -> Unit = {}
+    onUndo: (String) -> Unit = {},
+    onSkip: (String) -> Unit = {}
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -507,7 +544,8 @@ private fun TimeSection(
 
         val allTaken = entries.all {
             it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
-                    it.scheduleEntry.status == MedicationStatus.TAKEN_LATE
+                    it.scheduleEntry.status == MedicationStatus.TAKEN_LATE ||
+                    it.scheduleEntry.status == MedicationStatus.SKIPPED
         }
 
         val statusText = when {
@@ -544,7 +582,8 @@ private fun TimeSection(
                 currentUser = currentUser,
                 onMarkAsTaken = onMarkAsTaken,
                 onMarkAsLate = onMarkAsLate,
-                onUndo = onUndo
+                onUndo = onUndo,
+                onSkip = onSkip
             )
             Spacer(modifier = Modifier.height(8.dp))
         }
@@ -558,12 +597,14 @@ private fun MedicationCard(
     currentUser: com.example.dosezy.data.model.User?,
     onMarkAsTaken: (String) -> Unit,
     onMarkAsLate: (String) -> Unit,
-    onUndo: (String) -> Unit = {}
+    onUndo: (String) -> Unit = {},
+    onSkip: (String) -> Unit = {}
 ) {
     val entry = scheduleWithMedicine.scheduleEntry
     val medicine = scheduleWithMedicine.medicine
     val isTaken = entry.status == MedicationStatus.TAKEN_ON_TIME ||
             entry.status == MedicationStatus.TAKEN_LATE
+    val isSkipped = entry.status == MedicationStatus.SKIPPED
 
     val lateAfter = currentUser?.considerLateAfter ?: 3
     val missedAfter = currentUser?.considerMissedAfter ?: 6
@@ -571,14 +612,14 @@ private fun MedicationCard(
     val isPassed = currentDateTime.isAfter(entry.scheduledDateTime)
 
     // Calculate isMissed dynamically if it passed the threshold, in addition to DB status
-    val isMissed = entry.status == MedicationStatus.MISSED || (!isTaken && isPassed && TimeCalculationUtils.isMissed(
+    val isMissed = entry.status == MedicationStatus.MISSED || (!isTaken && !isSkipped && isPassed && TimeCalculationUtils.isMissed(
         entry.scheduledDateTime,
         currentDateTime,
         missedAfter
     ))
 
     // Calculate if it's currently late (only for pending medications)
-    val isLate = !isTaken && !isMissed && isPassed && TimeCalculationUtils.isLate(
+    val isLate = !isTaken && !isSkipped && !isMissed && isPassed && TimeCalculationUtils.isLate(
         entry.scheduledDateTime,
         currentDateTime,
         lateAfter,
@@ -590,20 +631,21 @@ private fun MedicationCard(
     // Determine button properties
     val buttonText = when {
         isTaken -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.home_action_taken)
+        isSkipped -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.home_action_skipped)
         isMissed -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.home_action_missed)
         isLate -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.home_action_mark_late)
         else -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.home_action_take)
     }
 
     val buttonColor = when {
-        isTaken -> MaterialTheme.colorScheme.surfaceVariant
+        isTaken || isSkipped -> MaterialTheme.colorScheme.surfaceVariant
         isMissed -> MaterialTheme.colorScheme.error
         isLate -> orangeColor
         else -> MaterialTheme.colorScheme.primary
     }
 
     val textColor = when {
-        isTaken -> MaterialTheme.colorScheme.onSurfaceVariant
+        isTaken || isSkipped -> MaterialTheme.colorScheme.onSurfaceVariant
         isMissed -> MaterialTheme.colorScheme.onError
         isLate -> Color.White
         else -> MaterialTheme.colorScheme.onPrimary
@@ -664,6 +706,16 @@ private fun MedicationCard(
                     )
                 }
 
+                // 3b. Skip reason if skipped
+                if (isSkipped && !entry.skipReason.isNullOrBlank()) {
+                    Text(
+                        text = "⏭️ ${androidx.compose.ui.res.stringResource(R.string.home_action_skipped)}: ${entry.skipReason}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2
+                    )
+                }
+
                 // 4. Refill warning / stock badge
                 medicine?.currentStock?.let { stock ->
                     val isLow = medicine.refillThreshold != null && stock <= medicine.refillThreshold
@@ -700,29 +752,48 @@ private fun MedicationCard(
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            // Action button
-            Button(
-                onClick = {
-                    when {
-                        isTaken -> onUndo(entry.entryId)
-                        isLate -> onMarkAsLate(entry.entryId)
-                        !isMissed -> onMarkAsTaken(entry.entryId)
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = buttonColor,
-                    contentColor = textColor
-                ),
-                enabled = enabled,
-                modifier = Modifier
-                    .height(48.dp)
-                    .width(120.dp)
+            // Action button area
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Text(
-                    text = buttonText,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp
-                )
+                Button(
+                    onClick = {
+                        when {
+                            isTaken || isSkipped -> onUndo(entry.entryId)
+                            isLate -> onMarkAsLate(entry.entryId)
+                            !isMissed -> onMarkAsTaken(entry.entryId)
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = buttonColor,
+                        contentColor = textColor
+                    ),
+                    enabled = enabled,
+                    modifier = Modifier
+                        .height(44.dp)
+                        .width(120.dp)
+                ) {
+                    Text(
+                        text = buttonText,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    )
+                }
+
+                if (currentUser?.allowDoseSkipping == true && !isTaken && !isSkipped && !isMissed) {
+                    androidx.compose.material3.TextButton(
+                        onClick = { onSkip(entry.entryId) },
+                        modifier = Modifier.height(28.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
+                    ) {
+                        Text(
+                            text = androidx.compose.ui.res.stringResource(R.string.home_action_skip),
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                    }
+                }
             }
         }
     }

@@ -102,7 +102,7 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                     val displayEntries: List<com.example.dosezy.data.model.ScheduleEntry>
                     if (todayPending.isNotEmpty()) {
                         displayEntries = todayPending
-                    } else if (todayEntries.isNotEmpty() && todayEntries.any { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }) {
+                    } else if (todayEntries.isNotEmpty() && todayEntries.any { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE || it.status == MedicationStatus.SKIPPED }) {
                         // All scheduled doses for today are completed
                         displayEntries = emptyList()
                     } else {
@@ -119,7 +119,7 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                         views.setViewVisibility(R.id.widget_item_3, View.GONE)
                         views.setViewVisibility(R.id.widget_status_message, View.VISIBLE)
 
-                        if (todayEntries.isNotEmpty() && todayEntries.any { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }) {
+                        if (todayEntries.isNotEmpty() && todayEntries.any { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE || it.status == MedicationStatus.SKIPPED }) {
                             views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_all_taken))
                         } else {
                             views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_no_meds))

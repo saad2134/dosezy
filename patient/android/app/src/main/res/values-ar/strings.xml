@@ -596,4 +596,22 @@
     <string name="search_no_results">لم يتم العثور على أدوية مطابقة لـ \"%1$s\"</string>
     <string name="search_clear">مسح البحث</string>
     <string name="backup_export_failed">فشل التصدير: %1$s</string>
+
+    <string name="pref_allow_skip_title">السماح بتخطي الجرعة</string>
+    <string name="pref_allow_skip_desc">تفعيل خيار لتخطي الجرعة المقررة مع تحديد سبب طبي</string>
+    <string name="home_action_skip">تخطي</string>
+    <string name="home_action_skipped">تم التخطي</string>
+    <string name="home_dose_skipped">تم تخطي جرعة %s</string>
+    <string name="alarm_skip_medicine">تخطي الجرعة</string>
+    <string name="alarm_skip_all">تخطي الكل (%d)</string>
+    <string name="skip_dialog_title">تخطي جرعة الدواء</string>
+    <string name="skip_dialog_subtitle">يرجى تحديد سبب طبي لتخطي هذه الجرعة:</string>
+    <string name="skip_reason_fasting">صيام طبي / فحص مخبري</string>
+    <string name="skip_reason_doctor">إيقاف مؤقت بتوجيه من الطبيب</string>
+    <string name="skip_reason_side_effects">آثار جانبية / تفاعل سلبي</string>
+    <string name="skip_reason_already_taken">تم تناولها مسبقاً</string>
+    <string name="skip_reason_out_of_stock">الدواء غير متوفر / نفاد المخزون</string>
+    <string name="skip_reason_other">سبب طبي أو شخصي آخر</string>
+    <string name="skip_dialog_confirm">تأكيد التخطي</string>
+    <string name="skip_dialog_cancel">إلغاء</string>
 </resources>

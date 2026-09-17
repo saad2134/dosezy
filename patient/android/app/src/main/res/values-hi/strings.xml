@@ -612,4 +612,22 @@
     <string name="search_no_results">\"%1$s\" से मेल खाने वाली कोई दवा नहीं मिली</string>
     <string name="search_clear">खोज साफ़ करें</string>
     <string name="backup_export_failed">निर्यात विफल: %1$s</string>
+
+    <string name="pref_allow_skip_title">खुराक छोड़ने की अनुमति दें</string>
+    <string name="pref_allow_skip_desc">चिकित्सीय कारण के साथ खुराक छोड़ने का विकल्प सक्षम करें</string>
+    <string name="home_action_skip">छोड़ें</string>
+    <string name="home_action_skipped">छोड़ दिया</string>
+    <string name="home_dose_skipped">%s के लिए खुराक छोड़ दी गई</string>
+    <string name="alarm_skip_medicine">खुराक छोड़ें</string>
+    <string name="alarm_skip_all">सभी छोड़ें (%d)</string>
+    <string name="skip_dialog_title">दवा की खुराक छोड़ें</string>
+    <string name="skip_dialog_subtitle">इस खुराक को छोड़ने का चिकित्सीय कारण चुनें:</string>
+    <string name="skip_reason_fasting">चिकित्सीय उपवास / लैब टेस्ट</string>
+    <string name="skip_reason_doctor">डॉक्टर द्वारा सलाह दी गई रोक</string>
+    <string name="skip_reason_side_effects">दुष्प्रभाव / प्रतिकूल प्रतिक्रिया</string>
+    <string name="skip_reason_already_taken">पहले ही ले ली गई है</string>
+    <string name="skip_reason_out_of_stock">दवा उपलब्ध नहीं / स्टॉक खत्म</string>
+    <string name="skip_reason_other">अन्य चिकित्सीय / व्यक्तिगत कारण</string>
+    <string name="skip_dialog_confirm">पुष्टि करें</string>
+    <string name="skip_dialog_cancel">रद्द करें</string>
 </resources>

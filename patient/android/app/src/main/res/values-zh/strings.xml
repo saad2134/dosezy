@@ -612,4 +612,22 @@
     <string name="search_no_results">未找到与 \"%1$s\" 匹配的药物</string>
     <string name="search_clear">清除搜索</string>
     <string name="backup_export_failed">导出失败：%1$s</string>
+
+    <string name="pref_allow_skip_title">允许跳过服药</string>
+    <string name="pref_allow_skip_desc">开启因临床原因跳过服药的选项</string>
+    <string name="home_action_skip">跳过</string>
+    <string name="home_action_skipped">已跳过</string>
+    <string name="home_dose_skipped">已跳过 %s 的服药</string>
+    <string name="alarm_skip_medicine">跳过服药</string>
+    <string name="alarm_skip_all">全部跳过 (%d)</string>
+    <string name="skip_dialog_title">跳过本次服药</string>
+    <string name="skip_dialog_subtitle">请选择跳过本次服药的临床原因：</string>
+    <string name="skip_reason_fasting">医疗空腹 / 化验检查</string>
+    <string name="skip_reason_doctor">遵医嘱暂停</string>
+    <string name="skip_reason_side_effects">副作用 / 不良反应</string>
+    <string name="skip_reason_already_taken">此前已服用</string>
+    <string name="skip_reason_out_of_stock">药物用尽 / 缺药</string>
+    <string name="skip_reason_other">其他原因</string>
+    <string name="skip_dialog_confirm">确认跳过</string>
+    <string name="skip_dialog_cancel">取消</string>
 </resources>

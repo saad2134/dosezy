@@ -381,6 +381,7 @@ class DataExporter(
                 com.example.dosezy.data.model.MedicationStatus.TAKEN_ON_TIME -> "Taken On Time"
                 com.example.dosezy.data.model.MedicationStatus.TAKEN_LATE -> "Taken Late"
                 com.example.dosezy.data.model.MedicationStatus.MISSED -> "Missed"
+                com.example.dosezy.data.model.MedicationStatus.SKIPPED -> "Skipped"
                 com.example.dosezy.data.model.MedicationStatus.PENDING -> "Pending"
             }
             canvas.drawText(statusLabel, 260f, y, textPaint)

@@ -262,9 +262,33 @@ class ScheduleRepository(private val database: DosezyDatabase) {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun recordDoseSkipped(
+        entryId: String,
+        skipReason: String,
+        context: Context? = null
+    ) {
+        // 1. Update schedule entry status in database
+        database.scheduleDao().updateMedicationStatusWithReason(entryId, "SKIPPED", null, skipReason)
+
+        // 2. Stop any active alarm sound / popup
+        com.example.dosezy.notifications.AlarmActivity.stopActiveAlarm()
+
+        // 3. Cancel active notification for this entry and update widgets
+        if (context != null) {
+            try {
+                val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                nManager.cancel(entryId.hashCode())
+            } catch (_: Exception) {}
+            try {
+                com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+            } catch (_: Exception) {}
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun undoDoseTaken(entryId: String, context: Context? = null) {
-        // 1. Revert status to PENDING and clear takenAt
-        database.scheduleDao().updateMedicationStatus(entryId, "PENDING", null)
+        // 1. Revert status to PENDING and clear takenAt and skipReason
+        database.scheduleDao().updateMedicationStatusWithReason(entryId, "PENDING", null, null)
 
         // 2. Revert stock auto-decrement if applicable
         try {

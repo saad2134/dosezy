@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.FastForward
 import androidx.compose.material.icons.filled.HorizontalRule
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -298,7 +299,7 @@ private fun getDateStatusColor(entries: List<ScheduleEntry>): Color {
     val hasMissed = entries.any { it.status == MedicationStatus.MISSED }
     val hasLate = entries.any { it.status == MedicationStatus.TAKEN_LATE }
     val allTaken = entries.all {
-        it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE
+        it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE || it.status == MedicationStatus.SKIPPED
     }
 
     return when {
@@ -407,6 +408,7 @@ fun ScheduleListItem(
         
         val resolvedStatus = when {
             entry.status == MedicationStatus.TAKEN_ON_TIME || entry.status == MedicationStatus.TAKEN_LATE -> entry.status
+            entry.status == MedicationStatus.SKIPPED -> MedicationStatus.SKIPPED
             entry.status == MedicationStatus.MISSED -> MedicationStatus.MISSED
             isPassed && TimeCalculationUtils.isMissed(entry.scheduledDateTime, now, missedAfter) -> MedicationStatus.MISSED
             else -> MedicationStatus.PENDING
@@ -417,6 +419,8 @@ fun ScheduleListItem(
                 Pair(Icons.Default.Done, MaterialTheme.colorScheme.primary)
             MedicationStatus.TAKEN_LATE ->
                 Pair(Icons.Default.Done, MaterialTheme.colorScheme.tertiary)
+            MedicationStatus.SKIPPED ->
+                Pair(Icons.Default.FastForward, MaterialTheme.colorScheme.outline)
             MedicationStatus.MISSED ->
                 Pair(Icons.Default.Close, MaterialTheme.colorScheme.error)
             MedicationStatus.PENDING ->

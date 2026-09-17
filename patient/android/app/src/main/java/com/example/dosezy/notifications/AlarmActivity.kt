@@ -9,10 +9,13 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Vibrator
 import android.os.VibratorManager
+import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -22,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.FastForward
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Snooze
@@ -253,6 +257,20 @@ class AlarmActivity : ComponentActivity() {
         AlarmAudioPlayer.stop()
     }
 
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.action == KeyEvent.ACTION_DOWN) {
+            when (event.keyCode) {
+                KeyEvent.KEYCODE_VOLUME_DOWN,
+                KeyEvent.KEYCODE_VOLUME_UP -> {
+                    // Silence alarm audio immediately when physical volume keys are pressed
+                    stopAlarm()
+                    return true
+                }
+            }
+        }
+        return super.dispatchKeyEvent(event)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         stopAlarm()
@@ -278,6 +296,32 @@ fun GroupedAlarmScreenContent(
     var medicinesList by remember { mutableStateOf<List<Pair<ScheduleEntry, Medicine>>>(emptyList()) }
     var user by remember { mutableStateOf<User?>(null) }
     var isLoaded by remember { mutableStateOf(false) }
+    var showSkipReasonDialog by remember { mutableStateOf(false) }
+
+    val snoozeMinutes = user?.snoozeDuration ?: 10
+
+    val snoozeAction = {
+        coroutineScope.launch {
+            withContext(Dispatchers.IO) {
+                val alarmScheduler = AlarmScheduler(context)
+                if (medicinesList.isNotEmpty()) {
+                    medicinesList.forEach { (entry, med) ->
+                        alarmScheduler.scheduleSnooze(entry.entryId, snoozeMinutes, med.medicationName)
+                    }
+                } else if (entryIds.isNotEmpty()) {
+                    entryIds.forEach { id ->
+                        alarmScheduler.scheduleSnooze(id, snoozeMinutes, initialMedicineName)
+                    }
+                }
+            }
+            onDismiss()
+        }
+    }
+
+    // Intercept hardware/system back gesture to safely trigger personalized snooze
+    BackHandler {
+        snoozeAction()
+    }
 
     LaunchedEffect(entryIds) {
         withContext(Dispatchers.IO) {
@@ -580,8 +624,6 @@ fun GroupedAlarmScreenContent(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                val snoozeMinutes = user?.snoozeDuration ?: 10
-
                 // "Take / Take All" Green Primary Button
                 Button(
                     onClick = {
@@ -622,23 +664,7 @@ fun GroupedAlarmScreenContent(
 
                 // Dynamic Snooze Orange Secondary Button (Identical Size 56dp)
                 Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            withContext(Dispatchers.IO) {
-                                val alarmScheduler = AlarmScheduler(context)
-                                if (medicinesList.isNotEmpty()) {
-                                    medicinesList.forEach { (entry, med) ->
-                                        alarmScheduler.scheduleSnooze(entry.entryId, snoozeMinutes, med.medicationName)
-                                    }
-                                } else if (entryIds.isNotEmpty()) {
-                                    entryIds.forEach { id ->
-                                        alarmScheduler.scheduleSnooze(id, snoozeMinutes, initialMedicineName)
-                                    }
-                                }
-                            }
-                            onDismiss()
-                        }
-                    },
+                    onClick = { snoozeAction() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
@@ -657,7 +683,53 @@ fun GroupedAlarmScreenContent(
                         fontSize = 17.sp
                     )
                 }
+
+                // Opt-in Skip Dose Button (Outlined)
+                if (user?.allowDoseSkipping == true) {
+                    OutlinedButton(
+                        onClick = { showSkipReasonDialog = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = RoundedCornerShape(18.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = if (isDarkTheme) Color.White.copy(alpha = 0.85f) else MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
+                    ) {
+                        Icon(imageVector = Icons.Default.FastForward, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = if (medicinesList.size > 1) stringResource(R.string.alarm_skip_all, medicinesList.size) else stringResource(R.string.alarm_skip_medicine),
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                            fontSize = 17.sp
+                        )
+                    }
+                }
             }
         }
+    }
+
+    if (showSkipReasonDialog) {
+        com.example.dosezy.ui.components.SkipReasonDialog(
+            onConfirm = { reason ->
+                showSkipReasonDialog = false
+                coroutineScope.launch {
+                    withContext(Dispatchers.IO) {
+                        if (medicinesList.isNotEmpty()) {
+                            medicinesList.forEach { (entry, _) ->
+                                scheduleRepository.recordDoseSkipped(entry.entryId, reason, context)
+                            }
+                        } else if (entryIds.isNotEmpty()) {
+                            entryIds.forEach { id ->
+                                scheduleRepository.recordDoseSkipped(id, reason, context)
+                            }
+                        }
+                    }
+                    onDismiss()
+                }
+            },
+            onDismiss = { showSkipReasonDialog = false }
+        )
     }
 }

@@ -17,7 +17,7 @@ import com.example.dosezy.data.model.User
 
 @Database(
     entities = [User::class, Medicine::class, ScheduleEntry::class],
-    version = 10,
+    version = 11,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -82,6 +82,13 @@ abstract class DosezyDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_10_11 = object : Migration(10, 11) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE users ADD COLUMN allowDoseSkipping INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE schedule_entries ADD COLUMN skipReason TEXT DEFAULT NULL")
+            }
+        }
+
         fun getInstance(context: Context): DosezyDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -89,7 +96,7 @@ abstract class DosezyDatabase : RoomDatabase() {
                     DosezyDatabase::class.java,
                     "dosezy_database"
                 )
-                    .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
+                    .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11)
                     .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance

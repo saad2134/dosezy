@@ -160,10 +160,21 @@ class ScheduleViewModel @Inject constructor(
         }
     }
 
-    // Add this method to ScheduleViewModel.kt
     fun markAsMissed(entryId: String) {
         viewModelScope.launch {
             scheduleRepository.updateMedicationStatus(entryId, "MISSED", null)
+            currentCalendarUserId = null
+            // Refresh the schedule after updating status
+            _currentUserId.value?.let { userId ->
+                loadScheduleForDate(userId, _selectedDate.value)
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun markAsSkipped(entryId: String, reason: String) {
+        viewModelScope.launch {
+            scheduleRepository.recordDoseSkipped(entryId, reason, context)
             currentCalendarUserId = null
             // Refresh the schedule after updating status
             _currentUserId.value?.let { userId ->

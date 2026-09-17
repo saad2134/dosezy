@@ -612,4 +612,22 @@
     <string name="search_no_results">No se encontraron medicamentos que coincidan con \"%1$s\"</string>
     <string name="search_clear">Borrar búsqueda</string>
     <string name="backup_export_failed">Error al exportar: %1$s</string>
+
+    <string name="pref_allow_skip_title">Permitir omitir dosis</string>
+    <string name="pref_allow_skip_desc">Habilita la opción de omitir una dosis con un motivo clínico</string>
+    <string name="home_action_skip">Omitir</string>
+    <string name="home_action_skipped">Omitida</string>
+    <string name="home_dose_skipped">Dosis omitida para %s</string>
+    <string name="alarm_skip_medicine">OMITIR DOSIS</string>
+    <string name="alarm_skip_all">OMITIR TODAS (%d)</string>
+    <string name="skip_dialog_title">Omitir dosis del medicamento</string>
+    <string name="skip_dialog_subtitle">Seleccione un motivo clínico para omitir esta dosis:</string>
+    <string name="skip_reason_fasting">Ayuno médico / prueba de laboratorio</string>
+    <string name="skip_reason_doctor">Pausa indicada por el médico</string>
+    <string name="skip_reason_side_effects">Efectos secundarios / reacción adversa</string>
+    <string name="skip_reason_already_taken">Ya se tomó anteriormente</string>
+    <string name="skip_reason_out_of_stock">Medicamento no disponible / sin existencias</string>
+    <string name="skip_reason_other">Otro motivo clínico o personal</string>
+    <string name="skip_dialog_confirm">Confirmar omisión</string>
+    <string name="skip_dialog_cancel">Cancelar</string>
 </resources>

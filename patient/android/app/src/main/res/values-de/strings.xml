@@ -596,4 +596,22 @@ Möchten Sie fortfahren?</string>
     <string name="search_no_results">Keine Medikamente für \"%1$s\" gefunden</string>
     <string name="search_clear">Suche löschen</string>
     <string name="backup_export_failed">Export fehlgeschlagen: %1$s</string>
+
+    <string name="pref_allow_skip_title">Dosis-Überspringen erlauben</string>
+    <string name="pref_allow_skip_desc">Option aktivieren, um eine Dosis mit klinischem Grund zu überspringen</string>
+    <string name="home_action_skip">Überspringen</string>
+    <string name="home_action_skipped">Übersprungen</string>
+    <string name="home_dose_skipped">Dosis übersprungen für %s</string>
+    <string name="alarm_skip_medicine">DOSIS ÜBERSPRINGEN</string>
+    <string name="alarm_skip_all">ALLE ÜBERSPRINGEN (%d)</string>
+    <string name="skip_dialog_title">Medikamentendosis überspringen</string>
+    <string name="skip_dialog_subtitle">Wählen Sie einen klinischen Grund für das Überspringen:</string>
+    <string name="skip_reason_fasting">Medizinisches Fasten / Labortest</string>
+    <string name="skip_reason_doctor">Ärztlich verordnete Pause</string>
+    <string name="skip_reason_side_effects">Nebenwirkungen / Unverträglichkeit</string>
+    <string name="skip_reason_already_taken">Bereits früher eingenommen</string>
+    <string name="skip_reason_out_of_stock">Medikament nicht vorrätig</string>
+    <string name="skip_reason_other">Anderer klinischer / persönlicher Grund</string>
+    <string name="skip_dialog_confirm">Bestätigen</string>
+    <string name="skip_dialog_cancel">Abbrechen</string>
 </resources>

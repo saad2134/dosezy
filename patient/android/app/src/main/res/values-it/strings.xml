@@ -596,4 +596,22 @@ Vuoi continuare?</string>
     <string name="search_no_results">Nessun farmaco trovato per \"%1$s\"</string>
     <string name="search_clear">Cancella ricerca</string>
     <string name="backup_export_failed">Esportazione non riuscita: %1$s</string>
+
+    <string name="pref_allow_skip_title">Consenti di saltare la dose</string>
+    <string name="pref_allow_skip_desc">Abilita l\'opzione per saltare una dose con una motivazione clinica</string>
+    <string name="home_action_skip">Salta</string>
+    <string name="home_action_skipped">Saltata</string>
+    <string name="home_dose_skipped">Dose saltata per %s</string>
+    <string name="alarm_skip_medicine">SALTA DOSE</string>
+    <string name="alarm_skip_all">SALTA TUTTE (%d)</string>
+    <string name="skip_dialog_title">Salta dose del farmaco</string>
+    <string name="skip_dialog_subtitle">Seleziona un motivo clinico per saltare questa dose:</string>
+    <string name="skip_reason_fasting">Digiuno medico / esame di laboratorio</string>
+    <string name="skip_reason_doctor">Pausa prescritta dal medico</string>
+    <string name="skip_reason_side_effects">Effetti collaterali / reazione avversa</string>
+    <string name="skip_reason_already_taken">Già assunto in precedenza</string>
+    <string name="skip_reason_out_of_stock">Farmaco non disponibile / esaurito</string>
+    <string name="skip_reason_other">Altro motivo clinico o personale</string>
+    <string name="skip_dialog_confirm">Conferma</string>
+    <string name="skip_dialog_cancel">Annulla</string>
 </resources>
