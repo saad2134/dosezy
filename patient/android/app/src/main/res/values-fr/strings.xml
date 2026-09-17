@@ -630,7 +630,7 @@ Voulez-vous continuer ?</string>
     <string name="pharmacy_order_scope_low_stock">Stock faible uniquement</string>
     <string name="pharmacy_order_scope_all">Tous les médicaments actifs</string>
     <string name="pharmacy_order_days_format">%1$d jours</string>
-    <string name="pharmacy_order_share">Partager via WhatsApp / Applis</string>
+    <string name="pharmacy_order_share">Partager par message</string>
     <string name="pharmacy_order_copy">Copier le texte</string>
     <string name="pharmacy_order_copied">Commande copiée dans le presse-papiers</string>
     <string name="pharmacy_order_empty">Aucun médicament disponible pour commande</string>

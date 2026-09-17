@@ -7,8 +7,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -239,14 +241,14 @@ fun ProfileImportDialog(
                                             modifier = Modifier.weight(1f)
                                         )
                                         StrategyPill(
-                                            label = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.import_profile_merge),
+                                            label = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.import_strategy_merge),
                                             isSelected = strategy == ConflictStrategy.MERGE,
                                             onClick = { strategies[profile.originalUserId] = ConflictStrategy.MERGE },
                                             activeColor = Color(0xFF3B82F6),
                                             modifier = Modifier.weight(1f)
                                         )
                                         StrategyPill(
-                                            label = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.import_profile_replace),
+                                            label = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.import_strategy_overwrite),
                                             isSelected = strategy == ConflictStrategy.OVERWRITE,
                                             onClick = { strategies[profile.originalUserId] = ConflictStrategy.OVERWRITE },
                                             activeColor = Color(0xFFEF4444),
@@ -264,20 +266,22 @@ fun ProfileImportDialog(
                 // Footer Actions
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     OutlinedButton(
                         onClick = onDismiss,
                         modifier = Modifier
-                            .weight(1f)
+                            .weight(0.35f)
                             .height(48.dp),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        contentPadding = PaddingValues(horizontal = 4.dp)
                     ) {
                         Text(
                             text = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.cancel),
                             maxLines = 1,
                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 13.sp
                         )
                     }
 
@@ -295,9 +299,10 @@ fun ProfileImportDialog(
                         },
                         enabled = selectedCount > 0,
                         modifier = Modifier
-                            .weight(1f)
+                            .weight(0.65f)
                             .height(48.dp),
                         shape = RoundedCornerShape(12.dp),
+                        contentPadding = PaddingValues(horizontal = 6.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF1193D4)
                         )
@@ -306,7 +311,8 @@ fun ProfileImportDialog(
                             text = "${androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.import_profile_btn)} ($selectedCount)",
                             maxLines = 1,
                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.sp
                         )
                     }
                 }
@@ -329,18 +335,19 @@ private fun StrategyPill(
 
     Box(
         modifier = modifier
-            .height(36.dp)
+            .defaultMinSize(minHeight = 36.dp)
             .clip(RoundedCornerShape(8.dp))
             .background(bg)
             .border(1.dp, if (isSelected) activeColor else Color.Transparent, RoundedCornerShape(8.dp))
             .clickable { onClick() }
-            .padding(horizontal = 4.dp),
+            .padding(horizontal = 4.dp, vertical = 4.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = label,
             fontSize = 11.sp,
-            maxLines = 1,
+            maxLines = 2,
+            lineHeight = 13.sp,
             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
             color = textCol,

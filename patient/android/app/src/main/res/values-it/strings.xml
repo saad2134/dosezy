@@ -630,7 +630,7 @@ Vuoi continuare?</string>
     <string name="pharmacy_order_scope_low_stock">Solo scorte in esaurimento</string>
     <string name="pharmacy_order_scope_all">Tutti i farmaci attivi</string>
     <string name="pharmacy_order_days_format">%1$d giorni</string>
-    <string name="pharmacy_order_share">Condividi su WhatsApp / App</string>
+    <string name="pharmacy_order_share">Condividi via chat</string>
     <string name="pharmacy_order_copy">Copia testo</string>
     <string name="pharmacy_order_copied">Ordine copiato negli appunti</string>
     <string name="pharmacy_order_empty">Nessun farmaco disponibile da ordinare</string>

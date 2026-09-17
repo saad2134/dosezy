@@ -562,11 +562,11 @@ fun PreferencesScreen(navController: NavController) {
             LanguageSelectionDialog(
                 currentLanguage = currentUser?.language ?: Language.SYSTEM,
                 onLanguageSelected = { newLanguage ->
+                    showLanguageDialog = false
                     currentUser?.let { user ->
                         userViewModel.updateUser(user.copy(language = newLanguage))
                         com.example.dosezy.utils.LocaleHelper.applyLanguage(context, newLanguage, forceRecreate = true)
                     }
-                    showLanguageDialog = false
                 },
                 onDismiss = { showLanguageDialog = false }
             )

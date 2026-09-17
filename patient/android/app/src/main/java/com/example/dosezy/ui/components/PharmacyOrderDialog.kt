@@ -77,9 +77,9 @@ fun PharmacyOrderDialog(
 
     val lowStockMedicines = remember(activeMedicines) {
         activeMedicines.filter { med ->
-            val stock = med.currentStock ?: 0
+            val stock = med.currentStock ?: return@filter false
             val threshold = med.refillThreshold ?: 0
-            stock <= threshold
+            stock <= threshold || stock <= 5
         }
     }
 

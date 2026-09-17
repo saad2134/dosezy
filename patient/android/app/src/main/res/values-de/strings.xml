@@ -630,7 +630,7 @@ Möchten Sie fortfahren?</string>
     <string name="pharmacy_order_scope_low_stock">Nur geringer Bestand</string>
     <string name="pharmacy_order_scope_all">Alle aktiven Medikamente</string>
     <string name="pharmacy_order_days_format">%1$d Tage</string>
-    <string name="pharmacy_order_share">Über WhatsApp / Apps teilen</string>
+    <string name="pharmacy_order_share">Per Chat teilen</string>
     <string name="pharmacy_order_copy">Text kopieren</string>
     <string name="pharmacy_order_copied">Nachbestellung in die Zwischenablage kopiert</string>
     <string name="pharmacy_order_empty">Keine Medikamente zur Bestellung verfügbar</string>

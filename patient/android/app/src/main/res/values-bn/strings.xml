@@ -626,7 +626,7 @@
     <string name="pharmacy_order_scope_low_stock">কেবল স্বল্প মজুত</string>
     <string name="pharmacy_order_scope_all">সকল সক্রিয় ওষুধ</string>
     <string name="pharmacy_order_days_format">%1$d দিন</string>
-    <string name="pharmacy_order_share">হোয়াটসঅ্যাপ / অ্যাপে শেয়ার করুন</string>
+    <string name="pharmacy_order_share">চ্যাটে শেয়ার করুন</string>
     <string name="pharmacy_order_copy">টেক্সট কপি করুন</string>
     <string name="pharmacy_order_copied">রিফিল অর্ডার ক্লিপবোর্ডে কপি করা হয়েছে</string>
     <string name="pharmacy_order_empty">অর্ডার করার মতো কোনো ওষুধ নেই</string>

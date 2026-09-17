@@ -396,29 +396,29 @@ import Footer from '../components/Footer.astro';
 						</div>
 					</article>
 
-					<!-- Card 5: Stock Tracking -->
+					<!-- Card 5: Stock Tracking & Pharmacy Refill Orders -->
 					<article 
 						data-section="patient"
 						data-step="5"
 						data-filter="config"
 						data-difficulty="1"
-						data-readtime="1"
-						data-keywords="stock tracking refill warning inventory tablet count deduction"
+						data-readtime="2"
+						data-keywords="stock tracking refill warning inventory tablet count deduction pharmacy refill order share chat whatsapp"
 						class="manual-card vercel-card p-6 sm:p-8 rounded-3xl border border-white/10 bg-[#0a0c10]/95 space-y-4"
 					>
 						<div class="flex items-center justify-between border-b border-white/10 pb-4">
 							<div class="flex items-center space-x-3">
 								<span class="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-xs">5</span>
-								<h2 class="text-xl font-bold text-white font-display">Pill Inventory & Automatic Refill Warnings</h2>
+								<h2 class="text-xl font-bold text-white font-display">Pill Inventory & Pharmacy Refill Orders</h2>
 							</div>
 							<div class="flex items-center space-x-2">
 								<span class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Inventory</span>
-								<span class="px-2.5 py-0.5 rounded text-[10px] font-mono text-neutral-400 bg-white/5">1 min read</span>
+								<span class="px-2.5 py-0.5 rounded text-[10px] font-mono text-neutral-400 bg-white/5">2 min read</span>
 							</div>
 						</div>
 
 						<p class="text-xs text-neutral-300 leading-relaxed">
-							Keep track of your medicine stock so you never run out of critical prescriptions:
+							Keep track of your medicine stock so you never run out of critical prescriptions, and generate formatted refill orders for your pharmacist:
 						</p>
 
 						<ol class="list-decimal list-inside space-y-1.5 text-xs text-neutral-300">
@@ -426,6 +426,18 @@ import Footer from '../components/Footer.astro';
 							<li>Dosezy automatically subtracts pills whenever you mark a dose as <strong class="text-white">Taken</strong>.</li>
 							<li>An orange <strong class="text-amber-400 font-bold">⚠️ Refill Warning</strong> badge appears on your Home screen and Medicines list when stock drops low.</li>
 						</ol>
+
+						<div class="bg-[#030407] p-3.5 rounded-2xl border border-white/10 space-y-2 mt-2">
+							<strong class="text-sky-300 block text-xs">Pharmacy Refill Order Generator:</strong>
+							<p class="text-[11px] text-neutral-300 leading-relaxed">
+								Under <strong class="text-white">Menu &gt; Data Management &gt; Pharmacy Refill Order</strong>, compile clean prescription refill orders:
+							</p>
+							<ul class="list-disc list-inside space-y-1 text-neutral-300 text-[11px]">
+								<li><strong class="text-white">Filter Modes:</strong> Select <strong class="text-white">Low Stock Only</strong> (items needing replenishment) or <strong class="text-white">All Active</strong> medications.</li>
+								<li><strong class="text-white">Supply Durations:</strong> Choose 15, 30, 60, or 90 days. Dosezy automatically calculates estimated quantities from daily dosing rules and remaining stock.</li>
+								<li><strong class="text-white">Share via Chat &amp; Copy:</strong> Preview the formatted WhatsApp markdown text, then tap <strong class="text-white">Share via Chat</strong> or copy to clipboard in 1 tap.</li>
+							</ul>
+						</div>
 					</article>
 
 					<!-- Card 6: Schedule Calendar -->

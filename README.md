@@ -77,6 +77,7 @@ Once you input the basics: name, dosage, timings, and frequency, the app intelli
 - 📅 **Custom Calendar Scheduling** – Full interactive support for daily, weekly (specific days of the week), monthly, and interval-based (every X hours/days) frequencies.
 - 👤 **Multi-Profile Management** – Create, edit, and switch between family member profiles.
 - 📄 **Data Security & Native Exports** – Local `Room` database storage with native PDF medical reports (English format note), JSON backup archives, and CSV export capabilities.  
+- 🛒 **Dosezy Pharmacy Refill Order** – Generate formatted prescription refill orders for 15, 30, 60, or 90 days from inventory or low-stock filters, with live formatted previews and 1-tap Share via Chat (WhatsApp, Telegram, SMS) or clipboard copy.  
 - 🛍️ **Multi-Store Update Check & Web Fallback** – Automatically detects installation store source (Google Play, F-Droid, Huawei AppGallery, Samsung Galaxy Store, Xiaomi GetApps, Amazon Appstore, Aurora Store, GitHub Sideload) and launches native store or web browser fallback.  
 - 👨‍👩‍👧 **Caregiver Support** – Logs and adherence history help caregivers track missed and late doses.  
 - ☕ **About Dosezy & Open-Source Support** – In-app donation channels via GitHub Sponsors, Buy Me a Coffee, and 1-tap copy cryptocurrency wallets (BTC, ETH, SOL, LTC, ZEC).  

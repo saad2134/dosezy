@@ -62,7 +62,7 @@ fun TopBar(
     showNotificationStatus: Boolean = true,
     titleColor: Color = Color.Unspecified,
     onBackClick: (() -> Unit)? = null,
-    actions: @Composable () -> Unit
+    actions: @Composable () -> Unit = {}
 ) {
     val resolvedTitleColor = if (titleColor == Color.Unspecified) MaterialTheme.colorScheme.onSurface else titleColor
     var showProfileDialog by remember { mutableStateOf(false) }

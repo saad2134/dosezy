@@ -630,7 +630,7 @@
     <string name="pharmacy_order_scope_low_stock">残量少のみ</string>
     <string name="pharmacy_order_scope_all">すべての服用中の薬</string>
     <string name="pharmacy_order_days_format">%1$d 日分</string>
-    <string name="pharmacy_order_share">WhatsApp / アプリで共有</string>
+    <string name="pharmacy_order_share">チャットで共有</string>
     <string name="pharmacy_order_copy">テキストをコピー</string>
     <string name="pharmacy_order_copied">注文リストをクリップボードにコピーしました</string>
     <string name="pharmacy_order_empty">注文可能な医薬品がありません</string>

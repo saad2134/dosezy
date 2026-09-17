@@ -2,6 +2,7 @@ package com.example.dosezy.utils
 
 import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.res.Configuration
 import android.os.Build
 import android.os.LocaleList
@@ -111,11 +112,16 @@ object LocaleHelper {
                 AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(languageTag))
             }
 
-            // ONLY recreate if explicitly requested by user action (never on cold start / LaunchedEffect)
-            if (forceRecreate) {
-                val activity = context as? Activity
+            // On Android 13+ (API 33+), AppCompatDelegate / LocaleManager natively handles activity recreation.
+            // Calling activity.recreate() on top of setApplicationLocales causes a double-destroy race condition that kicks the user out of the app.
+            if (forceRecreate && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                val activity = context.findActivity()
                 if (activity != null && !activity.isFinishing && !activity.isDestroyed) {
-                    activity.recreate()
+                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                        if (!activity.isFinishing && !activity.isDestroyed) {
+                            activity.recreate()
+                        }
+                    }
                 }
             }
         } catch (e: Throwable) {
@@ -145,5 +151,16 @@ object LocaleHelper {
             android.util.Log.e("LocaleHelper", "Failed to updateContextLocale for $language", e)
             context
         }
+    }
+
+    private fun Context.findActivity(): Activity? {
+        var currentContext = this
+        while (currentContext is ContextWrapper) {
+            if (currentContext is Activity) {
+                return currentContext
+            }
+            currentContext = currentContext.baseContext
+        }
+        return null
     }
 }

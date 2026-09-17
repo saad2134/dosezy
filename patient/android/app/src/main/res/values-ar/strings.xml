@@ -630,7 +630,7 @@
     <string name="pharmacy_order_scope_low_stock">المخزون المنخفض فقط</string>
     <string name="pharmacy_order_scope_all">جميع الأدوية النشطة</string>
     <string name="pharmacy_order_days_format">%1$d يومًا</string>
-    <string name="pharmacy_order_share">مشاركة عبر واتساب / التطبيقات</string>
+    <string name="pharmacy_order_share">مشاركة عبر المحادثة</string>
     <string name="pharmacy_order_copy">نسخ النص</string>
     <string name="pharmacy_order_copied">تم نسخ طلب الأدوية إلى الحافظة</string>
     <string name="pharmacy_order_empty">لا توجد أدوية متاحة للطلب</string>

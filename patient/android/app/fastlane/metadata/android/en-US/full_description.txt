@@ -8,6 +8,7 @@ Dosezy is an accessible, offline-first medication tracking and reminder app desi
 • 📝 Clinical Dose Skipping – Opt-in dose skipping with mandatory clinical reasons (doctor advised, adverse reactions, fasting, illness). Skipped doses do not penalize your adherence streak and can be undone at any time.
 • ↩️ Instant Intake Undo – Accidental taps can be reversed immediately with a 5-second undo snackbar or directly from the dose card, restoring deducted stock automatically.
 • 📦 Pill Stock Inventory & Refill Warnings – Real-time stock tracking with automatic deduction on intake. Configurable low-stock alerts notify you when it is time to refill prescriptions.
+• 🛒 Pharmacy Refill Order Generator – Instantly compile prescription refill orders from your active inventory and low-stock medicines. Calculate required supplies for 15, 30, 60, or 90 days, preview the formatted order, and share directly via chat or copy to clipboard.
 • 📅 Interactive Schedule Calendar – Week and month calendar views with color-coded compliance dots and complete TalkBack screen reader accessibility announcing dose statuses.
 • 📊 Adherence Analytics – Comprehensive compliance tracking across Today, 7 Days, 30 Days, 90 Days, and All-Time. Multi-ring breakdowns and individual medication adherence rates.
 • 🔍 Real-Time Medicine Search – Quickly filter large medication rosters by name or instruction with instant empty-state feedback.

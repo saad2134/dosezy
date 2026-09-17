@@ -28,7 +28,7 @@ This guide provides a complete, step-by-step walkthrough of all features in Dose
    - [Custom Ringtone Selection](#custom-ringtone-selection)
    - [Dynamic Snooze Presets](#dynamic-snooze-presets)
 7. [Notification Reliability Shield & Diagnostics](#7-notification-reliability-shield--diagnostics)
-8. [Pill Inventory & Automatic Refill Warnings](#8-pill-inventory--automatic-refill-warnings)
+8. [Pill Inventory, Automatic Refill Warnings & Pharmacy Refill Orders](#8-pill-inventory-automatic-refill-warnings--pharmacy-refill-orders)
 9. [Interactive Schedule Calendar & TalkBack Accessibility](#9-interactive-schedule-calendar--talkback-accessibility)
 10. [Adherence Analytics & Multi-Ring Scores](#10-adherence-analytics--multi-ring-scores)
 11. [Structured Preferences & Dose Tracking Settings](#11-structured-preferences--dose-tracking-settings)
@@ -226,15 +226,29 @@ To guarantee alarms ring reliably even during Android deep sleep (Doze mode):
 
 ---
 
-## 8. Pill Inventory & Automatic Refill Warnings
+## 8. Pill Inventory, Automatic Refill Warnings & Pharmacy Refill Orders
 
-Dosezy includes automatic inventory management so you never run out of vital medications:
+Dosezy includes automatic inventory management and prescription refill order generation so you never run out of vital medications:
 
+### Tracking Inventory & Refill Warnings:
 1. In the Add/Edit Medicine screen, turn on **Track Stock Inventory**.
 2. Enter your **Current Stock** count (e.g., `60` tablets).
 3. Enter your **Refill Warning Threshold** (e.g., `10` tablets).
 4. **Auto-Deduction**: Whenever you tap **Taken** (from alarms or the Home screen), Dosezy automatically subtracts your dosage amount from your stock.
 5. **Low Stock Alerts**: When remaining stock reaches or drops below your threshold, an orange **`⚠️ Refill Warning: X left`** badge is displayed on your Home screen and Medicines list.
+
+### Dosezy Pharmacy Refill Order:
+When you need to reorder medicines from your local pharmacy or doctor:
+1. Tap the **Menu** tab at the bottom right.
+2. Under the **Data Management** section, tap **Pharmacy Refill Order**.
+3. Choose your filter:
+   - **Low Stock Only**: Quickly displays only medications currently at or below their refill warning threshold.
+   - **All Active**: Displays all currently active prescriptions in your profile.
+4. Select your **Supply Duration**:
+   - Choose `15 Days`, `30 Days`, `60 Days`, or `90 Days`. Dosezy automatically calculates the required quantity based on daily intake frequencies and current stock.
+5. Review individual medications using checkboxes, or tap **Select All / Deselect All**.
+6. **Live Preview**: Check the formatted prescription order in the preview box (includes patient name, date, required supplies, current stock, and dosage instructions).
+7. Tap **Share via Chat** to instantly send the order via WhatsApp, Telegram, SMS, or any installed messaging app, or tap **Copy to Clipboard** to paste it anywhere.
 
 ---
 

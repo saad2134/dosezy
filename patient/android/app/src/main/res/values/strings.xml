@@ -658,7 +658,7 @@ Do you want to continue?</string>
     <string name="pharmacy_order_scope_low_stock">Low Stock Only</string>
     <string name="pharmacy_order_scope_all">All Active Medicines</string>
     <string name="pharmacy_order_days_format">%1$d Days</string>
-    <string name="pharmacy_order_share">Share via WhatsApp / Apps</string>
+    <string name="pharmacy_order_share">Share via Chat</string>
     <string name="pharmacy_order_copy">Copy Text</string>
     <string name="pharmacy_order_copied">Refill order copied to clipboard</string>
     <string name="pharmacy_order_empty">No medications available to order</string>

@@ -646,7 +646,7 @@
     <string name="pharmacy_order_scope_low_stock">仅余量不足药品</string>
     <string name="pharmacy_order_scope_all">全部在服药品</string>
     <string name="pharmacy_order_days_format">%1$d 天</string>
-    <string name="pharmacy_order_share">通过微信/WhatsApp/应用分享</string>
+    <string name="pharmacy_order_share">通过聊天分享</string>
     <string name="pharmacy_order_copy">复制文本</string>
     <string name="pharmacy_order_copied">补药清单已复制到剪贴板</string>
     <string name="pharmacy_order_empty">暂无需要订购的药品</string>

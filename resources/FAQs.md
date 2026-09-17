@@ -113,6 +113,14 @@ When adding or editing a medicine:
 3. Every time you mark a dose as **Taken**, Dosezy automatically deducts your dosage count from your stock.
 4. When stock reaches or falls below your threshold, an orange **⚠️ Refill Warning: X left** badge appears on your Home screen and Medicines list so you remember to refill your prescription.
 
+### Can I compile and send prescription refill orders to my pharmacy?
+Yes! Dosezy includes a built-in **Pharmacy Refill Order Generator**:
+1. Open the **Menu** tab and select **Pharmacy Refill Order** under Data Management.
+2. Filter by **Low Stock Only** (prescriptions at or under warning threshold) or **All Active** medications.
+3. Select your desired supply duration (**15 Days**, **30 Days**, **60 Days**, or **90 Days**). Dosezy automatically calculates required quantities based on daily dose frequencies and current inventory.
+4. Review the formatted checklist in the live preview box.
+5. Tap **Share via Chat** to instantly send the formatted order to your pharmacist via WhatsApp, Telegram, or SMS, or tap **Copy to Clipboard** to paste it anywhere.
+
 ---
 
 ## 📊 Calendar & Adherence Analytics

@@ -646,7 +646,7 @@
     <string name="pharmacy_order_scope_low_stock">केवल कम स्टॉक वाली दवाएं</string>
     <string name="pharmacy_order_scope_all">सभी सक्रिय दवाएं</string>
     <string name="pharmacy_order_days_format">%1$d दिन</string>
-    <string name="pharmacy_order_share">व्हाट्सएप / ऐप्स पर शेयर करें</string>
+    <string name="pharmacy_order_share">चैट पर शेयर करें</string>
     <string name="pharmacy_order_copy">टेक्स्ट कॉपी करें</string>
     <string name="pharmacy_order_copied">रीफ़िल ऑर्डर क्लिपबोर्ड पर कॉपी हो गया</string>
     <string name="pharmacy_order_empty">ऑर्डर करने के लिए कोई दवा उपलब्ध नहीं है</string>

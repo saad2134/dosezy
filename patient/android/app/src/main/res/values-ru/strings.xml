@@ -630,7 +630,7 @@
     <string name="pharmacy_order_scope_low_stock">Только заканчивающиеся</string>
     <string name="pharmacy_order_scope_all">Все активные лекарства</string>
     <string name="pharmacy_order_days_format">%1$d дн.</string>
-    <string name="pharmacy_order_share">Поделиться в WhatsApp / приложениях</string>
+    <string name="pharmacy_order_share">Поделиться в чате</string>
     <string name="pharmacy_order_copy">Скопировать текст</string>
     <string name="pharmacy_order_copied">Заказ скопирован в буфер обмена</string>
     <string name="pharmacy_order_empty">Нет доступных лекарств для заказа</string>
