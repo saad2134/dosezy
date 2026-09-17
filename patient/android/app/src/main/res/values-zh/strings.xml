@@ -102,7 +102,7 @@
     <string name="hours_format">%1$d 小时</string>
 
     <!-- Notification Check Dialog -->
-    <string name="notif_check_title">通知状态检查</string>
+        <string name="notif_check_title">通知与弹窗可靠性检查</string>
     <string name="notif_perm_title">通知权限</string>
     <string name="notif_perm_granted">已授予发送通知的权限。</string>
     <string name="notif_battery_title">手机电量</string>
@@ -112,9 +112,9 @@
     <string name="notif_sound_vibrate">手机处于振动模式。</string>
     <string name="notif_sound_silent">手机已静音。</string>
     <string name="notif_sound_unknown">未知声音模式。</string>
-    <string name="notif_bg_title">后台运行权限</string>
-    <string name="notif_bg_desc">后台限制可能会影响通知推送。</string>
-    <string name="notif_bg_granted">应用可在后台运行。</string>
+        <string name="notif_bg_title">电池优化与后台限制</string>
+        <string name="notif_bg_desc">关闭电池优化，防止系统在后台终止闹钟。</string>
+        <string name="notif_bg_granted">应用已被授予无限制后台运行。</string>
     <string name="ok">确定</string>
     <string name="close">关闭</string>
 
@@ -563,4 +563,18 @@
     <string name="alarm_duration_2m">2 分钟</string>
     <string name="alarm_duration_5m">5 分钟</string>
     <string name="alarm_silenced_auto_banner">已自动停止响铃 — 方便时请确认用药</string>
+
+    <string name="alarm_sound_custom">自定义音频文件</string>
+    <string name="alarm_sound_select_file">选择音频文件</string>
+    <string name="alarm_sound_no_file_selected">未选择音频文件</string>
+    <string name="notif_exact_alarm_title">精确闹钟</string>
+    <string name="notif_exact_alarm_granted">闹钟将在精确时间准时响起。</string>
+    <string name="notif_exact_alarm_desc">确保闹钟按时触发所需的权限。</string>
+    <string name="notif_overlay_title">悬浮窗/在其他应用上层显示</string>
+    <string name="notif_overlay_granted">闹钟弹窗可以在任何应用之上显示。</string>
+    <string name="notif_overlay_desc">确保在使用其他应用时也能可靠弹出全屏提醒。</string>
+    <string name="notif_fullscreen_title">全屏闹钟弹窗</string>
+    <string name="notif_fullscreen_granted">已允许全屏闹钟弹窗。</string>
+    <string name="notif_fullscreen_desc">锁屏时显示全屏闹钟界面所需的权限。</string>
+    <string name="notif_oem_setup_btn">配置 %1$s 自启动与后台弹窗设置</string>
 </resources>

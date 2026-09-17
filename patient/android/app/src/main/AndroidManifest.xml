@@ -16,6 +16,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
         android:name=".DosezyApplication"
@@ -52,8 +53,10 @@
             android:exported="false"
             android:showWhenLocked="true"
             android:turnScreenOn="true"
+            android:showForAllUsers="true"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
             android:theme="@style/Theme.Dosezy" />
 
 

@@ -8,6 +8,8 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.BatteryStd
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Notifications
@@ -82,12 +85,16 @@ fun NotificationStatusDialog(
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
-            modifier = modifier,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
             shape = RoundedCornerShape(24.dp),
             color = MaterialTheme.colorScheme.surface
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier
+                    .padding(20.dp)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Header with rotating sync icon
@@ -97,7 +104,7 @@ fun NotificationStatusDialog(
                 ) {
                     Text(
                         text = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.notif_check_title),
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -105,7 +112,7 @@ fun NotificationStatusDialog(
                     RotatingSyncIcon()
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 // Status List
                 Column(
@@ -121,6 +128,30 @@ fun NotificationStatusDialog(
                     }
                 }
 
+                // OEM Setup Button (if aggressive OEM detected)
+                if (NotificationUtils.isKnownAggressiveOem()) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Button(
+                        onClick = { NotificationUtils.openOemBackgroundSettings(context) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF6366F1)
+                        )
+                    ) {
+                        Text(
+                            text = context.getString(
+                                com.example.dosezy.R.string.notif_oem_setup_btn,
+                                NotificationUtils.getOemName()
+                            ),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // OK Button
@@ -128,7 +159,7 @@ fun NotificationStatusDialog(
                     onClick = onDismiss,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp),
+                        .height(52.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF2084E4)
@@ -136,7 +167,7 @@ fun NotificationStatusDialog(
                 ) {
                     Text(
                         text = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.ok),
-                        fontSize = 18.sp,
+                        fontSize = 17.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -151,10 +182,12 @@ private fun createNotificationStatuses(
     refreshCounter: Int
 ): List<NotificationStatus> {
     // Force recomputation by using refreshCounter
-    val backgroundPermStatus = NotificationUtils.isIgnoringBatteryOptimizations(context)
     val notificationPermStatus = NotificationUtils.hasNotificationPermission(context)
-    val batteryStatus = NotificationUtils.isBatterySufficient(context)
+    val exactAlarmsStatus = NotificationUtils.canScheduleExactAlarms(context)
+    val overlayStatus = NotificationUtils.canDrawOverlays(context)
+    val backgroundPermStatus = NotificationUtils.isIgnoringBatteryOptimizations(context)
     val soundStatus = NotificationUtils.isPhoneNotSilent(context)
+    val batteryStatus = NotificationUtils.isBatterySufficient(context)
 
     return listOf(
         NotificationStatus(
@@ -169,7 +202,7 @@ private fun createNotificationStatuses(
                 Icon(
                     imageVector = Icons.Default.Notifications,
                     contentDescription = "Notification Permission",
-                    modifier = Modifier.size(32.dp),
+                    modifier = Modifier.size(30.dp),
                     tint = if (notificationPermStatus) Color(0xFF10B981) else Color(0xFFEF4444)
                 )
             },
@@ -181,38 +214,47 @@ private fun createNotificationStatuses(
         ),
 
         NotificationStatus(
-            title = context.getString(com.example.dosezy.R.string.notif_battery_title),
-            description = NotificationUtils.getBatteryStatus(context),
-            isPassed = batteryStatus,
+            title = context.getString(com.example.dosezy.R.string.notif_exact_alarm_title),
+            description = if (exactAlarmsStatus) {
+                context.getString(com.example.dosezy.R.string.notif_exact_alarm_granted)
+            } else {
+                context.getString(com.example.dosezy.R.string.notif_exact_alarm_desc)
+            },
+            isPassed = exactAlarmsStatus,
             icon = {
                 Icon(
-                    imageVector = Icons.Default.BatteryStd,
-                    contentDescription = "Phone Battery",
-                    modifier = Modifier.size(32.dp),
-                    tint = if (batteryStatus) Color(0xFF10B981) else Color(0xFFEF4444)
+                    imageVector = Icons.Default.Alarm,
+                    contentDescription = "Exact Alarms",
+                    modifier = Modifier.size(30.dp),
+                    tint = if (exactAlarmsStatus) Color(0xFF10B981) else Color(0xFFEF4444)
                 )
             },
             onFixClick = {
-                // Battery level can't be fixed via settings, show battery optimization
-                NotificationUtils.openBatteryOptimizationSettings(context)
+                if (!exactAlarmsStatus) {
+                    NotificationUtils.requestExactAlarmPermission(context)
+                }
             }
         ),
 
         NotificationStatus(
-            title = context.getString(com.example.dosezy.R.string.notif_sound_title),
-            description = NotificationUtils.getSoundStatus(context),
-            isPassed = soundStatus,
+            title = context.getString(com.example.dosezy.R.string.notif_overlay_title),
+            description = if (overlayStatus) {
+                context.getString(com.example.dosezy.R.string.notif_overlay_granted)
+            } else {
+                context.getString(com.example.dosezy.R.string.notif_overlay_desc)
+            },
+            isPassed = overlayStatus,
             icon = {
                 Icon(
-                    imageVector = Icons.Default.VolumeUp,
-                    contentDescription = "Phone Sound",
-                    modifier = Modifier.size(32.dp),
-                    tint = if (soundStatus) Color(0xFF10B981) else Color(0xFFEF4444)
+                    imageVector = Icons.Default.WorkOutline,
+                    contentDescription = "Display Over Apps",
+                    modifier = Modifier.size(30.dp),
+                    tint = if (overlayStatus) Color(0xFF10B981) else Color(0xFFEF4444)
                 )
             },
             onFixClick = {
-                if (!soundStatus) {
-                    NotificationUtils.openSoundSettings(context)
+                if (!overlayStatus) {
+                    NotificationUtils.requestOverlayPermission(context)
                 }
             }
         ),
@@ -227,9 +269,9 @@ private fun createNotificationStatuses(
             isPassed = backgroundPermStatus,
             icon = {
                 Icon(
-                    imageVector = Icons.Default.WorkOutline,
-                    contentDescription = "Background Permission",
-                    modifier = Modifier.size(32.dp),
+                    imageVector = Icons.Default.BatteryStd,
+                    contentDescription = "Battery Optimization",
+                    modifier = Modifier.size(30.dp),
                     tint = if (backgroundPermStatus) Color(0xFF10B981) else Color(0xFFEF4444)
                 )
             },
@@ -237,6 +279,42 @@ private fun createNotificationStatuses(
                 if (!backgroundPermStatus) {
                     NotificationUtils.openBatteryOptimizationSettings(context)
                 }
+            }
+        ),
+
+        NotificationStatus(
+            title = context.getString(com.example.dosezy.R.string.notif_sound_title),
+            description = NotificationUtils.getSoundStatus(context),
+            isPassed = soundStatus,
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.VolumeUp,
+                    contentDescription = "Phone Sound",
+                    modifier = Modifier.size(30.dp),
+                    tint = if (soundStatus) Color(0xFF10B981) else Color(0xFFEF4444)
+                )
+            },
+            onFixClick = {
+                if (!soundStatus) {
+                    NotificationUtils.openSoundSettings(context)
+                }
+            }
+        ),
+
+        NotificationStatus(
+            title = context.getString(com.example.dosezy.R.string.notif_battery_title),
+            description = NotificationUtils.getBatteryStatus(context),
+            isPassed = batteryStatus,
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.BatteryStd,
+                    contentDescription = "Phone Battery",
+                    modifier = Modifier.size(30.dp),
+                    tint = if (batteryStatus) Color(0xFF10B981) else Color(0xFFEF4444)
+                )
+            },
+            onFixClick = {
+                NotificationUtils.openBatteryOptimizationSettings(context)
             }
         )
     )

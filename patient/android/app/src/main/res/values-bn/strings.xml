@@ -91,7 +91,7 @@
     <string name="pref_mark_missed_after">মিস বিবেচনা করার সময়</string>
     <string name="hours_format">%1$d ঘণ্টা পর</string>
 
-    <string name="notif_check_title">নোটিফিকেশন চেক</string>
+        <string name="notif_check_title">নোটিফিকেশন এবং পপআপ নির্ভরযোগ্যতা</string>
     <string name="notif_perm_title">নোটিফিকেশন অনুমতি</string>
     <string name="notif_perm_granted">নোটিফিকেশন পাঠানোর অনুমতি দেওয়া হয়েছে।</string>
     <string name="notif_battery_title">ফোনের ব্যাটারি</string>
@@ -101,9 +101,9 @@
     <string name="notif_sound_vibrate">ফোন ভাইব্রেশন মুডে আছে।</string>
     <string name="notif_sound_silent">ফোন সাইলেন্ট মুডে আছে।</string>
     <string name="notif_sound_unknown">অজানা সাউন্ড মুড।</string>
-    <string name="notif_bg_title">ব্যাকগ্রাউন্ড অনুমতি</string>
-    <string name="notif_bg_desc">ব্যাকগ্রাউন্ড সীমা নোটিফিকেশনে বাধা দিতে পারে।</string>
-    <string name="notif_bg_granted">অ্যাপ ব্যাকগ্রাউন্ডে চলতে পারবে।</string>
+        <string name="notif_bg_title">ব্যাটারি অপ্টিমাইজেশান</string>
+        <string name="notif_bg_desc">ব্যাটারি সীমাবদ্ধতা নিষ্ক্রিয় করুন যাতে ব্যাকগ্রাউন্ডে অ্যালার্ম বন্ধ না হয়।</string>
+        <string name="notif_bg_granted">অ্যাপটি ব্যাকগ্রাউন্ড ব্যাটারি সীমাবদ্ধতা থেকে মুক্ত।</string>
     <string name="ok">ঠিক আছে</string>
     <string name="close">বন্ধ করুন</string>
 
@@ -547,4 +547,14 @@
     <string name="alarm_duration_2m">২ মিনিট</string>
     <string name="alarm_duration_5m">৫ মিনিট</string>
     <string name="alarm_silenced_auto_banner">অ্যালার্ম স্বয়ংক্রিয়ভাবে বন্ধ হয়েছে — সুবিধামতো ওষুধের হিসাব লিপিবদ্ধ করুন</string>
+    <string name="notif_exact_alarm_title">সঠিক সময়ের অ্যালার্ম</string>
+    <string name="notif_exact_alarm_granted">অ্যালার্ম যথাসময়ে বাজবে।</string>
+    <string name="notif_exact_alarm_desc">অ্যালার্ম সঠিক সময়ে বাজার জন্য প্রয়োজনীয়।</string>
+    <string name="notif_overlay_title">অন্যান্য অ্যাপের উপর প্রদর্শন</string>
+    <string name="notif_overlay_granted">অ্যালার্ম পপআপ যেকোনো অ্যাপের উপর প্রদর্শিত হবে।</string>
+    <string name="notif_overlay_desc">অন্যান্য অ্যাপ ব্যবহার করার সময়ও অ্যালার্ম পপআপ স্ক্রীন নিশ্চিত করে।</string>
+    <string name="notif_fullscreen_title">ফুল-স্ক্রিন অ্যালার্ম পপআপ</string>
+    <string name="notif_fullscreen_granted">ফুল-স্ক্রিন অ্যালার্ম উইন্ডো অনুমোদিত।</string>
+    <string name="notif_fullscreen_desc">ডিভাইস লক থাকা অবস্থায় অ্যালার্ম স্ক্রিন দেখানোর জন্য প্রয়োজন।</string>
+    <string name="notif_oem_setup_btn">%1$s অটোস্টার্ট ও পপআপ সেটিংস ঠিক করুন</string>
 </resources>

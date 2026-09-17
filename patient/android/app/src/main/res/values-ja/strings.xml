@@ -91,7 +91,7 @@
     <string name="pref_mark_missed_after">飲み忘れ判定時間</string>
     <string name="hours_format">%1$d 時間後</string>
 
-    <string name="notif_check_title">通知設定の確認</string>
+        <string name="notif_check_title">通知とポップアップの信頼性</string>
     <string name="notif_perm_title">通知権限</string>
     <string name="notif_perm_granted">通知送信権限が許可されています。</string>
     <string name="notif_battery_title">バッテリー残量</string>
@@ -101,9 +101,9 @@
     <string name="notif_sound_vibrate">バイブレーションモードです。</string>
     <string name="notif_sound_silent">サイレントモードです。</string>
     <string name="notif_sound_unknown">不明なサウンドモードです。</string>
-    <string name="notif_bg_title">バックグラウンド実行権限</string>
-    <string name="notif_bg_desc">バックグラウンド制限により通知が届かない場合があります。</string>
-    <string name="notif_bg_granted">アプリはバックグラウンドで実行可能です。</string>
+        <string name="notif_bg_title">バッテリー最適化</string>
+        <string name="notif_bg_desc">バックグラウンドでアラームが停止しないよう最適化を解除してください。</string>
+        <string name="notif_bg_granted">アプリはバックグラウンドのバッテリー制限から除外されています。</string>
     <string name="ok">OK</string>
     <string name="close">閉じる</string>
 
@@ -547,4 +547,18 @@
     <string name="alarm_duration_2m">2 分</string>
     <string name="alarm_duration_5m">5 分</string>
     <string name="alarm_silenced_auto_banner">アラームは自動停止しました — 準備ができたら服薬を記録してください</string>
+
+    <string name="alarm_sound_custom">カスタム音声ファイル</string>
+    <string name="alarm_sound_select_file">音声ファイルを選択</string>
+    <string name="alarm_sound_no_file_selected">音声ファイルが未選択です</string>
+    <string name="notif_exact_alarm_title">正確なアラーム</string>
+    <string name="notif_exact_alarm_granted">アラームが正確な時間に鳴動します。</string>
+    <string name="notif_exact_alarm_desc">アラームを正確なスケジュールで鳴らすために必要です。</string>
+    <string name="notif_overlay_title">他のアプリの上に重ねて表示</string>
+    <string name="notif_overlay_granted">アラーム画面がどのアプリの上にも表示されます。</string>
+    <string name="notif_overlay_desc">他のアプリの使用中でも確実にアラームポップアップを表示します。</string>
+    <string name="notif_fullscreen_title">全画面アラームポップアップ</string>
+    <string name="notif_fullscreen_granted">全画面アラームウィンドウの表示が許可されています。</string>
+    <string name="notif_fullscreen_desc">画面ロック時にアラーム画面を表示するために必要です。</string>
+    <string name="notif_oem_setup_btn">%1$s の自動起動とポップアップ設定を調整</string>
 </resources>

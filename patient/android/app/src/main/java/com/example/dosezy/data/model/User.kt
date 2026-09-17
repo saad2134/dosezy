@@ -33,6 +33,8 @@ data class User(
     val naggingIntervalMinutes: Int = 5, // 5, 10, 15 min
     val naggingMaxRepeats: Int = 3, // 1, 2, 3 repeats
     val alarmSound: AlarmSound = AlarmSound.SYSTEM_DEFAULT,
+    val customAlarmSoundPath: String? = null,
+    val customAlarmSoundTitle: String? = null,
     val alarmDurationSeconds: Int = 0 // 0 = Continuous, 30 = 30s, 60 = 1m, 120 = 2m, 300 = 5m
 )
 
@@ -41,7 +43,8 @@ enum class AlarmSound(val rawResId: Int?) {
     GENTLE_CHIME(com.example.dosezy.R.raw.alarm_gentle_chime),
     MEDICAL_MARIMBA(com.example.dosezy.R.raw.alarm_medical_marimba),
     BRISK_PULSE(com.example.dosezy.R.raw.alarm_brisk_pulse),
-    CALM_BELL(com.example.dosezy.R.raw.alarm_calm_bell);
+    CALM_BELL(com.example.dosezy.R.raw.alarm_calm_bell),
+    CUSTOM(null);
 
     fun getTitleRes(): Int {
         return when (this) {
@@ -50,6 +53,7 @@ enum class AlarmSound(val rawResId: Int?) {
             MEDICAL_MARIMBA -> com.example.dosezy.R.string.alarm_sound_medical_marimba
             BRISK_PULSE -> com.example.dosezy.R.string.alarm_sound_brisk_pulse
             CALM_BELL -> com.example.dosezy.R.string.alarm_sound_calm_bell
+            CUSTOM -> com.example.dosezy.R.string.alarm_sound_custom
         }
     }
 }

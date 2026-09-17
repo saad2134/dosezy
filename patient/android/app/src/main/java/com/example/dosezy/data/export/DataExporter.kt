@@ -170,6 +170,8 @@ class DataExporter(
         userObj.put("allergies", user.allergies ?: "")
         userObj.put("medicalConditions", user.medicalConditions ?: "")
         userObj.put("alarmSound", user.alarmSound.name)
+        userObj.put("customAlarmSoundPath", user.customAlarmSoundPath ?: "")
+        userObj.put("customAlarmSoundTitle", user.customAlarmSoundTitle ?: "")
         userObj.put("alarmDurationSeconds", user.alarmDurationSeconds)
         root.put("user", userObj)
 

@@ -91,7 +91,7 @@
     <string name="pref_mark_missed_after">Considera mancato dopo</string>
     <string name="hours_format">%1$d ora/e</string>
 
-    <string name="notif_check_title">Verifica Notifiche</string>
+        <string name="notif_check_title">Affidabilità notifiche e popup</string>
     <string name="notif_perm_title">Autorizzazione Notifiche</string>
     <string name="notif_perm_granted">Autorizzazione all\'invio di notifiche concessa.</string>
     <string name="notif_battery_title">Batteria del Telefono</string>
@@ -101,9 +101,9 @@
     <string name="notif_sound_vibrate">Il telefono è in modalità vibrazione.</string>
     <string name="notif_sound_silent">Il telefono è in modalità silenziosa.</string>
     <string name="notif_sound_unknown">Modalità audio sconosciuta.</string>
-    <string name="notif_bg_title">Autorizzazione in Background</string>
-    <string name="notif_bg_desc">Le restrizioni in background potrebbero impedire le notifiche.</string>
-    <string name="notif_bg_granted">L\'app può essere eseguita in background.</string>
+        <string name="notif_bg_title">Ottimizzazione batteria</string>
+        <string name="notif_bg_desc">Disattiva l\'ottimizzazione della batteria per non interrompere gli allarmi.</string>
+        <string name="notif_bg_granted">L\'app è esente da restrizioni della batteria in background.</string>
     <string name="ok">OK</string>
     <string name="close">Chiudi</string>
 
@@ -547,4 +547,18 @@ Vuoi continuare?</string>
     <string name="alarm_duration_2m">2 minuti</string>
     <string name="alarm_duration_5m">5 minuti</string>
     <string name="alarm_silenced_auto_banner">Allarme silenziato automaticamente — registra le dosi quando sei pronto</string>
+
+    <string name="alarm_sound_custom">File audio personalizzato</string>
+    <string name="alarm_sound_select_file">Scegli file audio</string>
+    <string name="alarm_sound_no_file_selected">Nessun file audio selezionato</string>
+    <string name="notif_exact_alarm_title">Allarmi precisi</string>
+    <string name="notif_exact_alarm_granted">Gli allarmi scatteranno con precisione esatta.</string>
+    <string name="notif_exact_alarm_desc">Richiesto per far suonare gli allarmi esattamente all\'orario stabilito.</string>
+    <string name="notif_overlay_title">Mostra sopra altre applicazioni</string>
+    <string name="notif_overlay_granted">La schermata dell\'allarme può apparire sopra qualsiasi applicazione.</string>
+    <string name="notif_overlay_desc">Garantisce la comparsa del popup di allarme anche usando altre app.</string>
+    <string name="notif_fullscreen_title">Allarmi a schermo intero</string>
+    <string name="notif_fullscreen_granted">Finestra di allarme a schermo intero consentita.</string>
+    <string name="notif_fullscreen_desc">Richiesto per mostrare la schermata di allarme con il dispositivo bloccato.</string>
+    <string name="notif_oem_setup_btn">Configura avvio automatico e popup per %1$s</string>
 </resources>

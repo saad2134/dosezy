@@ -38,3 +38,5 @@ google-services.json
 # Kotlin compiler cache
 .kotlin/
 /scratch
+
+AGENTS.md

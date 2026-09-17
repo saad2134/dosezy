@@ -106,9 +106,18 @@
     <string name="hours_format">%1$d hour(s)</string>
 
     <!-- Notification Check Dialog -->
-    <string name="notif_check_title">Notification Check</string>
+    <string name="notif_check_title">Notification &amp; Popup Reliability</string>
     <string name="notif_perm_title">Notification Permission</string>
     <string name="notif_perm_granted">Permission granted to send notifications.</string>
+    <string name="notif_exact_alarm_title">Exact Alarms</string>
+    <string name="notif_exact_alarm_granted">Alarms will trigger precisely on time.</string>
+    <string name="notif_exact_alarm_desc">Required for alarms to trigger on exact schedule.</string>
+    <string name="notif_overlay_title">Display Over Apps &amp; Pop-ups</string>
+    <string name="notif_overlay_granted">Alarm popup can show over any app.</string>
+    <string name="notif_overlay_desc">Ensures full-screen alarm popup appears reliably.</string>
+    <string name="notif_fullscreen_title">Full-Screen Alarm Popups</string>
+    <string name="notif_fullscreen_granted">Full-screen alarm window is permitted.</string>
+    <string name="notif_fullscreen_desc">Required to show alarm screen on lock screen.</string>
     <string name="notif_battery_title">Phone Battery</string>
     <string name="notif_battery_status">Battery is at %1$d%%</string>
     <string name="notif_sound_title">Phone Sound</string>
@@ -116,9 +125,10 @@
     <string name="notif_sound_vibrate">Phone is in vibrate mode.</string>
     <string name="notif_sound_silent">Phone is silent.</string>
     <string name="notif_sound_unknown">Unknown sound mode.</string>
-    <string name="notif_bg_title">Background Permission</string>
-    <string name="notif_bg_desc">Background restrictions may prevent notifications.</string>
-    <string name="notif_bg_granted">App can run in background.</string>
+    <string name="notif_bg_title">Battery Optimization</string>
+    <string name="notif_bg_desc">Disable battery optimization so alarms aren\'t killed.</string>
+    <string name="notif_bg_granted">App is exempted from battery restrictions.</string>
+    <string name="notif_oem_setup_btn">Fix %1$s Background &amp; Pop-up Settings</string>
     <string name="ok">OK</string>
     <string name="close">Close</string>
 
@@ -575,4 +585,8 @@ Do you want to continue?</string>
     <string name="alarm_duration_2m">2 minutes</string>
     <string name="alarm_duration_5m">5 minutes</string>
     <string name="alarm_silenced_auto_banner">Alarm auto-silenced — record your doses when ready</string>
+
+    <string name="alarm_sound_custom">Custom Audio File</string>
+    <string name="alarm_sound_select_file">Choose Audio File</string>
+    <string name="alarm_sound_no_file_selected">No audio file chosen</string>
 </resources>

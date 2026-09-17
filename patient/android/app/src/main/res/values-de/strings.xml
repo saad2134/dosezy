@@ -91,7 +91,7 @@
     <string name="pref_mark_missed_after">Als versäumt gelten nach</string>
     <string name="hours_format">%1$d Stunde(n)</string>
 
-    <string name="notif_check_title">Benachrichtigungsprüfung</string>
+        <string name="notif_check_title">Benachrichtigungs- &amp; Popup-Zuverlässigkeit</string>
     <string name="notif_perm_title">Benachrichtigungsberechtigung</string>
     <string name="notif_perm_granted">Berechtigung zum Senden von Benachrichtigungen erteilt.</string>
     <string name="notif_battery_title">Telefonakku</string>
@@ -101,9 +101,9 @@
     <string name="notif_sound_vibrate">Telefon ist im Vibrationsmodus.</string>
     <string name="notif_sound_silent">Telefon ist stumm geschaltet.</string>
     <string name="notif_sound_unknown">Unbekannter Tonmodus.</string>
-    <string name="notif_bg_title">Hintergrundberechtigung</string>
-    <string name="notif_bg_desc">Hintergrundbeschränkungen können Benachrichtigungen verhindern.</string>
-    <string name="notif_bg_granted">App kann im Hintergrund ausgeführt werden.</string>
+        <string name="notif_bg_title">Akku-Optimierung</string>
+        <string name="notif_bg_desc">Akku-Optimierung deaktivieren, damit Alarme im Hintergrund nicht beendet werden.</string>
+        <string name="notif_bg_granted">App ist von Hintergrund-Akkubeschränkungen ausgenommen.</string>
     <string name="ok">OK</string>
     <string name="close">Schließen</string>
 
@@ -547,4 +547,18 @@ Möchten Sie fortfahren?</string>
     <string name="alarm_duration_2m">2 Minuten</string>
     <string name="alarm_duration_5m">5 Minuten</string>
     <string name="alarm_silenced_auto_banner">Alarm automatisch stummgeschaltet — erfassen Sie Ihre Dosen, wenn Sie bereit sind</string>
+
+    <string name="alarm_sound_custom">Eigene Audiodatei</string>
+    <string name="alarm_sound_select_file">Audiodatei auswählen</string>
+    <string name="alarm_sound_no_file_selected">Keine Audiodatei ausgewählt</string>
+    <string name="notif_exact_alarm_title">Genaue Alarme</string>
+    <string name="notif_exact_alarm_granted">Alarme werden sekundengenau ausgelöst.</string>
+    <string name="notif_exact_alarm_desc">Erforderlich, damit Alarme pünktlich starten.</string>
+    <string name="notif_overlay_title">Über anderen Apps anzeigen</string>
+    <string name="notif_overlay_granted">Alarm-Popup kann über jeder App angezeigt werden.</string>
+    <string name="notif_overlay_desc">Garantiert das Erscheinen des Alarm-Popups während der Nutzung anderer Apps.</string>
+    <string name="notif_fullscreen_title">Vollbild-Alarmfenster</string>
+    <string name="notif_fullscreen_granted">Vollbild-Alarmfenster ist zugelassen.</string>
+    <string name="notif_fullscreen_desc">Erforderlich, um den Alarm auf dem Sperrbildschirm anzuzeigen.</string>
+    <string name="notif_oem_setup_btn">%1$s Autostart- &amp; Popup-Einstellungen anpassen</string>
 </resources>

@@ -86,7 +86,10 @@ class MedicineRepository @Inject constructor(
         if (oldMedicine != null) {
             val scheduleChanged = oldMedicine.scheduledTimes != medicine.scheduledTimes ||
                     oldMedicine.frequency != medicine.frequency ||
-                    oldMedicine.timesPerDay != medicine.timesPerDay
+                    oldMedicine.timesPerDay != medicine.timesPerDay ||
+                    oldMedicine.startDate != medicine.startDate ||
+                    oldMedicine.endDate != medicine.endDate ||
+                    oldMedicine.durationDays != medicine.durationDays
 
             if (scheduleChanged) {
                 val startOfToday = LocalDate.now().atStartOfDay()

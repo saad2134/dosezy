@@ -1,0 +1,72 @@
+<en-IN>
+• Added custom device audio file selection for alarms with live preview and secure offline storage
+• Enhanced notification and full-screen alarm popup reliability across OEM devices
+• Fixed schedule recalculation when changing medication from ongoing to finite duration
+• F-Droid open-source compliance improvements
+</en-IN>
+<ar>
+• تمت إضافة خيار اختيار ملفات صوتية مخصصة من الجهاز للمنبهات مع معاينة مباشرة وتخزين آمن
+• تحسين موثوقية الإشعارات وشاشة المنبه المنبثقة عبر مختلف الأجهزة
+• تصحيح إعادة حساب الجداول عند تغيير مدة الدواء من مستمر إلى محدد
+• تحسينات التوافق مفتوح المصدر مع F-Droid
+</ar>
+<de-DE>
+• Auswahl eigener Audiodateien für Alarme mit Live-Vorschau und sicherem Offline-Speicher hinzugefügt
+• Verbesserte Zuverlässigkeit von Benachrichtigungen und Vollbild-Alarm-Popups auf allen Geräten
+• Automatische Zeitplan-Neuberechnung bei Umstellung von dauerhafter auf befristete Medikation
+• Optimierungen für F-Droid Open-Source-Konformität
+</de-DE>
+<en-US>
+• Added custom device audio file selection for alarms with live preview and secure offline storage
+• Enhanced notification and full-screen alarm popup reliability across OEM devices
+• Fixed schedule recalculation when changing medication from ongoing to finite duration
+• F-Droid open-source compliance improvements
+</en-US>
+<es-419>
+• Opción de elegir archivos de audio personalizados para alarmas con vista previa y guardado seguro
+• Mayor fiabilidad en notificaciones y pantallas emergentes de alarma en todos los dispositivos
+• Recálculo automático del horario al cambiar la duración del medicamento de continuo a finito
+• Mejoras de cumplimiento de código abierto para F-Droid
+</es-419>
+<fr-FR>
+• Choix de fichiers audio personnalisés pour les alarmes avec aperçu et stockage sécurisé
+• Fiabilité renforcée des notifications et des pop-ups d'alarme plein écran sur tous les appareils
+• Recalcul automatique du calendrier lors du passage d'un traitement continu à une durée définie
+• Améliorations de la conformité open source pour F-Droid
+</fr-FR>
+<hi-IN>
+• लाइव पूर्वावलोकन और सुरक्षित स्टोरेज के साथ अलार्म के लिए कस्टम ऑडियो फ़ाइल चुनने का विकल्प जोड़ा गया
+• सभी उपकरणों पर नोटिफिकेशन और पूर्ण-स्क्रीन अलार्म पॉपअप की विश्वसनीयता बढ़ाई गई
+• दवा की अवधि निरंतर से निश्चित में बदलने पर शेड्यूल को फिर से निर्धारित करने का सुधार
+• F-Droid ओपन-सोर्स अनुपालन में सुधार
+</hi-IN>
+<it-IT>
+• Selezione di file audio personalizzati per gli allarmi con anteprima dal vivo e salvataggio sicuro
+• Migliorata l'affidabilità delle notifiche e dei popup di allarme a schermo intero
+• Ricalcolo automatico della pianificazione al passaggio da farmaco continuativo a durata definita
+• Miglioramenti della conformità open source per F-Droid
+</it-IT>
+<ja-JP>
+• プレビューと安全な内部保存を備えたカスタムアラーム音声選択機能を追加
+• 全端末での通知および全画面アラームポップアップの信頼性を大幅に向上
+• 薬の服用期間を継続から有限期間に変更した際のスケジュール再計算を修正
+• F-Droidオープンソース準拠の改善
+</ja-JP>
+<pt-BR>
+• Seleção de arquivos de áudio personalizados para alarmes com prévia e armazenamento seguro
+• Confiabilidade aprimorada de notificações e pop-ups de alarme em tela cheia em todos os aparelhos
+• Recálculo automático de horários ao alterar medicamentos de contínuo para duração finita
+• Melhorias de conformidade com código aberto para o F-Droid
+</pt-BR>
+<ru-RU>
+• Выбор пользовательских аудиофайлов для будильников с предпрослушиванием и надежным сохранением
+• Повышена надежность уведомлений и полноэкранных всплывающих окон будильника
+• Исправлен перерасчет расписания при изменении длительности приема с постоянного на конечный
+• Улучшения соответствия стандартам F-Droid
+</ru-RU>
+<zh-CN>
+• 新增自定义闹钟音频文件选择功能，支持实时试听与安全离线存储
+• 全面增强各品牌设备上的通知与全屏闹钟弹窗可靠性
+• 修复用药从持续调整为固定期限时的日程自动重新计算问题
+• F-Droid 开源合规性优化
+</zh-CN>

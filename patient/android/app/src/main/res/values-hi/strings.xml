@@ -101,7 +101,7 @@
     <string name="hours_format">%1$d घंटे</string>
 
     <!-- Notification Check Dialog -->
-    <string name="notif_check_title">सूचना जांच</string>
+        <string name="notif_check_title">सूचना एवं पॉपअप विश्वसनीयता</string>
     <string name="notif_perm_title">सूचना अनुमति</string>
     <string name="notif_perm_granted">सूचनाएं भेजने की अनुमति दी गई।</string>
     <string name="notif_battery_title">फ़ोन की बैटरी</string>
@@ -111,9 +111,9 @@
     <string name="notif_sound_vibrate">फ़ोन वाइब्रेट मोड में है।</string>
     <string name="notif_sound_silent">फ़ोन साइलेंट है।</string>
     <string name="notif_sound_unknown">अज्ञात ध्वनि मोड।</string>
-    <string name="notif_bg_title">बैकग्राउंड अनुमति</string>
-    <string name="notif_bg_desc">बैकग्राउंड सीमाएं सूचनाओं को रोक सकती हैं।</string>
-    <string name="notif_bg_granted">ऐप बैकग्राउंड में चल सकता है।</string>
+        <string name="notif_bg_title">बैटरी अनुकूलन</string>
+        <string name="notif_bg_desc">बैटरी प्रतिबंध अक्षम करें ताकि बैकग्राउंड में अलार्म बंद न हों।</string>
+        <string name="notif_bg_granted">ऐप बैकग्राउंड बैटरी प्रतिबंधों से मुक्त है।</string>
     <string name="ok">ठीक है</string>
     <string name="close">बंद करें</string>
 
@@ -563,4 +563,18 @@
     <string name="alarm_duration_2m">2 मिनट</string>
     <string name="alarm_duration_5m">5 मिनट</string>
     <string name="alarm_silenced_auto_banner">अलार्म स्वतः म्यूट हो गया — तैयार होने पर अपनी दवाएं दर्ज करें</string>
+
+    <string name="alarm_sound_custom">कस्टम ऑडियो फ़ाइल</string>
+    <string name="alarm_sound_select_file">ऑडियो फ़ाइल चुनें</string>
+    <string name="alarm_sound_no_file_selected">कोई ऑडियो फ़ाइल नहीं चुनी गई</string>
+    <string name="notif_exact_alarm_title">सटीक अलार्म</string>
+    <string name="notif_exact_alarm_granted">अलार्म सटीक समय पर बजेंगे।</string>
+    <string name="notif_exact_alarm_desc">अलार्म को समय पर बजने के लिए आवश्यक है।</string>
+    <string name="notif_overlay_title">अन्य ऐप्स के ऊपर दिखाएं</string>
+    <string name="notif_overlay_granted">अलार्म पॉपअप स्क्रीन किसी भी ऐप के ऊपर दिखाई दे सकती है।</string>
+    <string name="notif_overlay_desc">अन्य ऐप का उपयोग करते समय भी अलार्म पॉपअप स्क्रीन सुनिश्चित करता है।</string>
+    <string name="notif_fullscreen_title">पूर्ण-स्क्रीन अलार्म पॉपअप</string>
+    <string name="notif_fullscreen_granted">फुल-स्क्रीन अलार्म विंडो की अनुमति है।</string>
+    <string name="notif_fullscreen_desc">डिवाइस लॉक होने पर अलार्म स्क्रीन दिखाने के लिए आवश्यक है।</string>
+    <string name="notif_oem_setup_btn">%1$s ऑटोस्टार्ट और पॉपअप सेटिंग्स ठीक करें</string>
 </resources>

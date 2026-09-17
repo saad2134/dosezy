@@ -91,7 +91,7 @@
     <string name="pref_mark_missed_after">Считать пропущенным через</string>
     <string name="hours_format">%1$d час(ов)</string>
 
-    <string name="notif_check_title">Проверка уведомлений</string>
+        <string name="notif_check_title">Надежность уведомлений и всплывающих окон</string>
     <string name="notif_perm_title">Разрешение на уведомления</string>
     <string name="notif_perm_granted">Разрешение на отправку уведомлений получено.</string>
     <string name="notif_battery_title">Батарея телефона</string>
@@ -101,9 +101,9 @@
     <string name="notif_sound_vibrate">Телефон в режиме вибрации.</string>
     <string name="notif_sound_silent">Телефон в беззвучном режиме.</string>
     <string name="notif_sound_unknown">Неизвестный звуковой режим.</string>
-    <string name="notif_bg_title">Фоновые разрешения</string>
-    <string name="notif_bg_desc">Фоновые ограничения могут препятствовать доставке уведомлений.</string>
-    <string name="notif_bg_granted">Приложение может работать в фоновом режиме.</string>
+        <string name="notif_bg_title">Оптимизация батареи</string>
+        <string name="notif_bg_desc">Отключите оптимизацию батареи, чтобы будильники не глушились в фоне.</string>
+        <string name="notif_bg_granted">Приложение исключено из ограничений расхода батареи в фоне.</string>
     <string name="ok">ОК</string>
     <string name="close">Закрыть</string>
 
@@ -547,4 +547,18 @@
     <string name="alarm_duration_2m">2 минуты</string>
     <string name="alarm_duration_5m">5 минут</string>
     <string name="alarm_silenced_auto_banner">Будильник автоматически выключен — отметьте прием лекарств, когда будете готовы</string>
+
+    <string name="alarm_sound_custom">Свой звуковой файл</string>
+    <string name="alarm_sound_select_file">Выбрать аудиофайл</string>
+    <string name="alarm_sound_no_file_selected">Аудиофайл не выбран</string>
+    <string name="notif_exact_alarm_title">Точные будильники</string>
+    <string name="notif_exact_alarm_granted">Будильники сработают с абсолютной точностью.</string>
+    <string name="notif_exact_alarm_desc">Требуется для точного срабатывания будильников по расписанию.</string>
+    <string name="notif_overlay_title">Поверх других приложений</string>
+    <string name="notif_overlay_granted">Окно будильника может отображаться поверх любых приложений.</string>
+    <string name="notif_overlay_desc">Гарантирует появление окна будильника даже во время работы в других приложениях.</string>
+    <string name="notif_fullscreen_title">Полноэкранные будильники</string>
+    <string name="notif_fullscreen_granted">Полноэкранные окна будильников разрешены.</string>
+    <string name="notif_fullscreen_desc">Требуется для отображения экрана будильника на экране блокировки.</string>
+    <string name="notif_oem_setup_btn">Настроить автозапуск и всплывающие окна для %1$s</string>
 </resources>

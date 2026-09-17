@@ -171,12 +171,11 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
         // Full screen alarm intent
         val alarmIntent = Intent(context, AlarmActivity::class.java).apply {
-            addFlags(
-                Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                        Intent.FLAG_ACTIVITY_SINGLE_TOP or
-                        Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-            )
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP or
+                    Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or
+                    Intent.FLAG_ACTIVITY_NO_USER_ACTION
             putExtra(EXTRA_ENTRY_ID, entryId)
             if (entryIds != null) {
                 putStringArrayListExtra(EXTRA_ENTRY_IDS, entryIds)
@@ -195,7 +194,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Launch AlarmActivity directly if permitted (e.g., when screen is active / app foreground)
+        // Launch AlarmActivity directly if permitted (e.g., when overlay is granted or app in foreground)
         try {
             context.startActivity(alarmIntent)
         } catch (e: Exception) {
@@ -224,6 +223,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setVibrate(vibrationPattern)
+            .setSound(alarmSoundUri, android.media.AudioManager.STREAM_ALARM)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setFullScreenIntent(fullScreenPendingIntent, true)
             .setAutoCancel(true)
@@ -251,6 +251,12 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
     private fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val vibrationPattern = longArrayOf(0, 1000, 500, 1000)
+            val alarmSoundUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_ALARM)
+                ?: android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
+            val audioAttributes = android.media.AudioAttributes.Builder()
+                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setUsage(android.media.AudioAttributes.USAGE_ALARM)
+                .build()
 
             val channel = NotificationChannel(
                 CHANNEL_ID,
@@ -261,7 +267,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 enableLights(true)
                 enableVibration(true)
                 this.vibrationPattern = vibrationPattern
-                setSound(null, null)
+                setSound(alarmSoundUri, audioAttributes)
                 setBypassDnd(true)
                 setShowBadge(true)
                 lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC

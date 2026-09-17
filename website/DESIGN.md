@@ -47,4 +47,4 @@ Dosezy is a high-assurance, open-source, local-first medicine tracking platform.
 - **Corner Glow Accent**: Top-right / bottom-left radial background spotlights featuring `#7c3aed` and `#a855f7`.
 - **Badges**: Purple/Violet subtle pills (`bg-purple-500/10 text-purple-300 border-purple-500/20`).
 - **Store Badges**: Official local `get-it-on-github.png` and `get-it-on-fdroid.png` graphics.
-- **Licensing Badge**: Single `GPL-3.0` badge in footer.
+- **Licensing Badge**: Single `MIT` badge in footer.

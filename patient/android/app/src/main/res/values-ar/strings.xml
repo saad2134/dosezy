@@ -91,7 +91,7 @@
     <string name="pref_mark_missed_after">اعتبار الجرعة فائتة بعد</string>
     <string name="hours_format">%1$d ساعة</string>
 
-    <string name="notif_check_title">فحص الإشعارات</string>
+        <string name="notif_check_title">فحص الإشعارات والنوافذ المنبثقة</string>
     <string name="notif_perm_title">إذن الإشعارات</string>
     <string name="notif_perm_granted">تم منح الإذن لإرسال الإشعارات.</string>
     <string name="notif_battery_title">بطارية الهاتف</string>
@@ -101,9 +101,9 @@
     <string name="notif_sound_vibrate">الهاتف في وضع الاهتزاز.</string>
     <string name="notif_sound_silent">الهاتف في الوضع الصامت.</string>
     <string name="notif_sound_unknown">وضع الصوت غير معروف.</string>
-    <string name="notif_bg_title">إذن العمل في الخلفية</string>
-    <string name="notif_bg_desc">قد تمنع قيود الخلفية وصول الإشعارات.</string>
-    <string name="notif_bg_granted">يمكن للتطبيق العمل في الخلفية.</string>
+        <string name="notif_bg_title">تحسين البطارية</string>
+        <string name="notif_bg_desc">عطّل تحسين البطارية حتى لا يتم إيقاف المنبهات في الخلفية.</string>
+        <string name="notif_bg_granted">التطبيق مستثنى من قيود البطارية في الخلفية.</string>
     <string name="ok">موافق</string>
     <string name="close">إغلاق</string>
 
@@ -547,4 +547,18 @@
     <string name="alarm_duration_2m">دقيقتان</string>
     <string name="alarm_duration_5m">5 دقائق</string>
     <string name="alarm_silenced_auto_banner">تم إيقاف المنبه تلقائياً — سجّل جرعاتك عندما تكون جاهزاً</string>
+
+    <string name="alarm_sound_custom">ملف صوتي مخصص</string>
+    <string name="alarm_sound_select_file">اختيار ملف صوتي</string>
+    <string name="alarm_sound_no_file_selected">لم يتم اختيار ملف صوتي</string>
+    <string name="notif_exact_alarm_title">منبهات دقيقة</string>
+    <string name="notif_exact_alarm_granted">ستنطلق المنبهات بدقة في الوقت المحدد.</string>
+    <string name="notif_exact_alarm_desc">مطلوب لإطلاق المنبهات بدقة في موعدها.</string>
+    <string name="notif_overlay_title">العرض فوق التطبيقات الأخرى</string>
+    <string name="notif_overlay_granted">يمكن لشاشة المنبه المنبثقة الظهور فوق أي تطبيق.</string>
+    <string name="notif_overlay_desc">يضمن ظهور شاشة المنبه المنبثقة حتى أثناء استخدام تطبيقات أخرى.</string>
+    <string name="notif_fullscreen_title">شاشة المنبه في وضع ملء الشاشة</string>
+    <string name="notif_fullscreen_granted">تم السماح بنوافذ المنبه في وضع ملء الشاشة.</string>
+    <string name="notif_fullscreen_desc">مطلوب لعرض شاشة المنبه عند قفل الجهاز.</string>
+    <string name="notif_oem_setup_btn">ضبط إعدادات التشغيل التلقائي والنوافذ المنبثقة لـ %1$s</string>
 </resources>

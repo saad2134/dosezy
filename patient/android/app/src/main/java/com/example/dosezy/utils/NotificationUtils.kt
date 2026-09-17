@@ -229,12 +229,11 @@ object NotificationUtils {
     }
 
     /**
-     * Check if all notification requirements are met
+     * Check if core notification & alarm requirements are met
      */
     fun areAllNotificationRequirementsMet(context: Context): Boolean {
         return hasNotificationPermission(context) &&
-                isBatterySufficient(context) &&
-                isPhoneNotSilent(context) &&
+                canScheduleExactAlarms(context) &&
                 isIgnoringBatteryOptimizations(context)
     }
 
@@ -291,33 +290,197 @@ object NotificationUtils {
     }
 
     /**
+     * Check if app has permission to draw overlays / display over other apps (SYSTEM_ALERT_WINDOW)
+     */
+    fun canDrawOverlays(context: Context): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Settings.canDrawOverlays(context)
+        } else {
+            true
+        }
+    }
+
+    /**
+     * Request overlay / display over other apps permission
+     */
+    fun requestOverlayPermission(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            try {
+                val intent = Intent(
+                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:${context.packageName}")
+                ).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                context.startActivity(intent)
+            } catch (e: Exception) {
+                try {
+                    val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                    context.startActivity(intent)
+                } catch (e2: Exception) {
+                    Toast.makeText(context, context.getString(R.string.err_open_app_settings), Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    /**
+     * Check if app can use full screen intents (Android 14+)
+     */
+    fun canUseFullScreenIntent(context: Context): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+            notificationManager?.canUseFullScreenIntent() ?: true
+        } else {
+            true
+        }
+    }
+
+    /**
+     * Request full screen intent permission (Android 14+)
+     */
+    fun requestFullScreenIntentPermission(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            try {
+                val intent = Intent(
+                    Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT,
+                    Uri.parse("package:${context.packageName}")
+                ).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                context.startActivity(intent)
+            } catch (e: Exception) {
+                openAppNotificationSettings(context)
+            }
+        }
+    }
+
+    /**
+     * Detect known aggressive OEM manufacturers
+     */
+    fun getOemName(): String {
+        val manufacturer = Build.MANUFACTURER?.lowercase() ?: ""
+        return when {
+            manufacturer.contains("xiaomi") || manufacturer.contains("redmi") || manufacturer.contains("poco") -> "Xiaomi / HyperOS"
+            manufacturer.contains("samsung") -> "Samsung"
+            manufacturer.contains("huawei") || manufacturer.contains("honor") -> "Huawei / Honor"
+            manufacturer.contains("oppo") || manufacturer.contains("realme") || manufacturer.contains("oneplus") -> "OPPO / Realme / OnePlus"
+            manufacturer.contains("vivo") || manufacturer.contains("iqoo") -> "Vivo / iQOO"
+            manufacturer.contains("transsion") || manufacturer.contains("infinix") || manufacturer.contains("tecno") || manufacturer.contains("itel") -> "Transsion / Infinix / Tecno"
+            else -> Build.MANUFACTURER?.replaceFirstChar { it.uppercase() } ?: "Device"
+        }
+    }
+
+    fun isKnownAggressiveOem(): Boolean {
+        val m = Build.MANUFACTURER?.lowercase() ?: ""
+        return m.contains("xiaomi") || m.contains("redmi") || m.contains("poco") ||
+                m.contains("samsung") || m.contains("huawei") || m.contains("honor") ||
+                m.contains("oppo") || m.contains("realme") || m.contains("oneplus") ||
+                m.contains("vivo") || m.contains("iqoo") || m.contains("transsion") ||
+                m.contains("infinix") || m.contains("tecno")
+    }
+
+    /**
+     * Open OEM-specific background autostart & popup settings
+     */
+    fun openOemBackgroundSettings(context: Context): Boolean {
+        val pkg = context.packageName
+        val intentList = mutableListOf<Intent>()
+
+        val m = Build.MANUFACTURER?.lowercase() ?: ""
+        when {
+            m.contains("xiaomi") || m.contains("redmi") || m.contains("poco") -> {
+                intentList.add(Intent().setComponent(android.content.ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity")).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
+                intentList.add(Intent("miui.intent.action.APP_PERM_EDITOR").apply {
+                    setClassName("com.miui.securitycenter", "com.miui.permcenter.permissions.PermissionsEditorActivity")
+                    putExtra("extra_pkgname", pkg)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                })
+                intentList.add(Intent().setComponent(android.content.ComponentName("com.miui.securitycenter", "com.miui.permcenter.permissions.AppPermissionsEditorActivity")).apply {
+                    putExtra("extra_pkgname", pkg)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                })
+            }
+            m.contains("huawei") || m.contains("honor") -> {
+                intentList.add(Intent().setComponent(android.content.ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity")).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
+                intentList.add(Intent().setComponent(android.content.ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity")).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
+                intentList.add(Intent().setComponent(android.content.ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.appcontrol.activity.StartupAppControlActivity")).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
+            }
+            m.contains("oppo") || m.contains("realme") || m.contains("oneplus") -> {
+                intentList.add(Intent().setComponent(android.content.ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.StartupAppListActivity")).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
+                intentList.add(Intent().setComponent(android.content.ComponentName("com.oppo.safe", "com.oppo.safe.permission.startup.StartupAppListActivity")).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
+                intentList.add(Intent().setComponent(android.content.ComponentName("com.coloros.safecenter", "com.coloros.safecenter.startupapp.StartupAppListActivity")).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
+                intentList.add(Intent().setComponent(android.content.ComponentName("com.oplus.safecenter", "com.oplus.safecenter.startupapp.StartupAppListActivity")).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
+            }
+            m.contains("vivo") || m.contains("iqoo") -> {
+                intentList.add(Intent().setComponent(android.content.ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity")).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
+                intentList.add(Intent().setComponent(android.content.ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.BgStartUpManagerActivity")).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
+                intentList.add(Intent().setComponent(android.content.ComponentName("com.iqoo.secure", "com.iqoo.secure.MainGuideActivity")).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
+            }
+            m.contains("samsung") -> {
+                intentList.add(Intent().setComponent(android.content.ComponentName("com.samsung.android.lool", "com.samsung.android.sm.battery.ui.BatteryActivity")).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
+                intentList.add(Intent().setComponent(android.content.ComponentName("com.samsung.android.sm", "com.samsung.android.sm.battery.ui.BatteryActivity")).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
+            }
+        }
+
+        // Generic fallback intents
+        intentList.add(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
+        intentList.add(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.parse("package:$pkg")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        })
+
+        for (intent in intentList) {
+            try {
+                if (intent.resolveActivity(context.packageManager) != null) {
+                    context.startActivity(intent)
+                    return true
+                }
+            } catch (_: Exception) {}
+        }
+        return false
+    }
+
+    /**
      * Get comprehensive notification status summary
      */
     fun getNotificationStatusSummary(context: Context): Map<String, Pair<Boolean, String>> {
+        val overlayPassed = canDrawOverlays(context)
+        val fullScreenPassed = canUseFullScreenIntent(context)
+        val exactAlarmsPassed = canScheduleExactAlarms(context)
+        val notifPassed = hasNotificationPermission(context)
+        val batteryOptPassed = isIgnoringBatteryOptimizations(context)
+
         return mapOf(
             "notification_permission" to Pair(
-                hasNotificationPermission(context),
-                if (hasNotificationPermission(context)) "Notification permission granted" else "Notification permission required"
+                notifPassed,
+                if (notifPassed) "Notification permission granted" else "Notification permission required"
             ),
-            "battery_level" to Pair(
-                isBatterySufficient(context),
-                getBatteryStatus(context)
+            "exact_alarms" to Pair(
+                exactAlarmsPassed,
+                if (exactAlarmsPassed) "Exact alarms permitted" else "Exact alarms permission required"
+            ),
+            "battery_optimization" to Pair(
+                batteryOptPassed,
+                if (batteryOptPassed) "Unrestricted background running permitted" else "Battery optimization whitelist required"
+            ),
+            "overlay_permission" to Pair(
+                overlayPassed,
+                if (overlayPassed) "Display over other apps permitted" else "Display over other apps / Pop-up recommended"
+            ),
+            "fullscreen_intent" to Pair(
+                fullScreenPassed,
+                if (fullScreenPassed) "Full-screen alarm popups permitted" else "Full-screen alarm popup permission required"
             ),
             "sound_mode" to Pair(
                 isPhoneNotSilent(context),
                 getSoundStatus(context)
             ),
-            "battery_optimization" to Pair(
-                isIgnoringBatteryOptimizations(context),
-                getBackgroundPermissionStatus(context)
-            ),
-            "exact_alarms" to Pair(
-                canScheduleExactAlarms(context),
-                if (canScheduleExactAlarms(context)) "Can schedule exact alarms" else "Cannot schedule exact alarms"
-            ),
-            "do_not_disturb" to Pair(
-                !isDoNotDisturbEnabled(context),
-                getDoNotDisturbStatus(context)
+            "battery_level" to Pair(
+                isBatterySufficient(context),
+                getBatteryStatus(context)
             )
         )
     }

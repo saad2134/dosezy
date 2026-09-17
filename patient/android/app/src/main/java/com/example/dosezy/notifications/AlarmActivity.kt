@@ -107,6 +107,7 @@ class AlarmActivity : ComponentActivity() {
         // Fetch user alarm sound & duration preference and start audio playback + auto-silence
         lifecycleScope.launch(Dispatchers.IO) {
             var targetSound: AlarmSound = AlarmSound.SYSTEM_DEFAULT
+            var customSoundPath: String? = null
             var autoSilenceSeconds = 0
             try {
                 if (entryId.isNotEmpty()) {
@@ -115,17 +116,17 @@ class AlarmActivity : ComponentActivity() {
                         val u = database.userDao().getUserByIdDirect(entry.userId)
                         if (u != null) {
                             targetSound = u.alarmSound
+                            customSoundPath = u.customAlarmSoundPath
                             autoSilenceSeconds = u.alarmDurationSeconds
                         }
                     }
                 }
-                if (targetSound == AlarmSound.SYSTEM_DEFAULT || autoSilenceSeconds == 0) {
+                if (targetSound == AlarmSound.SYSTEM_DEFAULT && customSoundPath == null) {
                     val users = database.userDao().getAllUsersDirect()
                     val currentUser = users.find { it.isCurrentUser } ?: users.firstOrNull()
                     if (currentUser != null) {
-                        if (targetSound == AlarmSound.SYSTEM_DEFAULT) {
-                            targetSound = currentUser.alarmSound
-                        }
+                        targetSound = currentUser.alarmSound
+                        customSoundPath = currentUser.customAlarmSoundPath
                         if (autoSilenceSeconds == 0) {
                             autoSilenceSeconds = currentUser.alarmDurationSeconds
                         }
@@ -134,7 +135,7 @@ class AlarmActivity : ComponentActivity() {
             } catch (_: Exception) {}
 
             withContext(Dispatchers.Main) {
-                playAlarmSound(targetSound)
+                playAlarmSound(targetSound, customSoundPath)
             }
 
             if (autoSilenceSeconds > 0) {
@@ -247,9 +248,27 @@ class AlarmActivity : ComponentActivity() {
         } catch (_: Exception) {}
     }
 
-    private fun playAlarmSound(sound: AlarmSound) {
+    private fun playAlarmSound(sound: AlarmSound, customPath: String? = null) {
         try {
-            if (sound.rawResId != null) {
+            if (sound == AlarmSound.CUSTOM && !customPath.isNullOrEmpty() && File(customPath).exists()) {
+                mediaPlayer = MediaPlayer().apply {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        setAudioAttributes(
+                            AudioAttributes.Builder()
+                                .setUsage(AudioAttributes.USAGE_ALARM)
+                                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                                .build()
+                        )
+                    } else {
+                        @Suppress("DEPRECATION")
+                        setAudioStreamType(android.media.AudioManager.STREAM_ALARM)
+                    }
+                    setDataSource(customPath)
+                    isLooping = true
+                    prepare()
+                    start()
+                }
+            } else if (sound.rawResId != null) {
                 val afd = applicationContext.resources.openRawResourceFd(sound.rawResId)
                 if (afd != null) {
                     mediaPlayer = MediaPlayer().apply {

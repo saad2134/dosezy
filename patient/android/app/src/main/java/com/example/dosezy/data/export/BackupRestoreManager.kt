@@ -520,6 +520,8 @@ class BackupRestoreManager(
             naggingIntervalMinutes = json.get("naggingIntervalMinutes")?.asInt ?: 5,
             naggingMaxRepeats = json.get("naggingMaxRepeats")?.asInt ?: 3,
             alarmSound = try { AlarmSound.valueOf(json.get("alarmSound").asString) } catch (_: Exception) { AlarmSound.SYSTEM_DEFAULT },
+            customAlarmSoundPath = json.get("customAlarmSoundPath")?.let { if (it.isJsonNull || it.asString.isBlank()) null else it.asString },
+            customAlarmSoundTitle = json.get("customAlarmSoundTitle")?.let { if (it.isJsonNull || it.asString.isBlank()) null else it.asString },
             alarmDurationSeconds = json.get("alarmDurationSeconds")?.asInt ?: 0
         )
     }

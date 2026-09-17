@@ -22,8 +22,8 @@ android {
         applicationId = "com.saad2134.dosezy"
         minSdk = 24
         targetSdk = 36
-        versionCode = 22
-        versionName = "2.4.3"
+        versionCode = 23
+        versionName = "2.4.4"
         buildConfigField("String", "VERSION_NAME", "\"$versionName\"")
         buildConfigField("int", "VERSION_CODE", "$versionCode")
 
@@ -35,6 +35,13 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+    }
+
+    dependenciesInfo {
+        // Disables dependency metadata when building APKs
+        includeInApk = false
+        // Disables dependency metadata when building Android App Bundles
+        includeInBundle = false
     }
 
     signingConfigs {

@@ -5,6 +5,8 @@ import android.media.MediaPlayer
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,12 +45,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Snooze
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.VolumeUp
+import com.example.dosezy.utils.SoundUtils
+import java.io.File
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -312,9 +317,15 @@ fun PreferencesScreen(navController: NavController) {
             item {
                 // Alarm Sound Preference
                 val currentSound = currentUser?.alarmSound ?: AlarmSound.SYSTEM_DEFAULT
+                val customTitle = currentUser?.customAlarmSoundTitle
+                val soundDisplayValue = if (currentSound == AlarmSound.CUSTOM && !customTitle.isNullOrBlank()) {
+                    customTitle
+                } else {
+                    androidx.compose.ui.res.stringResource(currentSound.getTitleRes())
+                }
                 PreferenceItem(
                     title = androidx.compose.ui.res.stringResource(R.string.pref_alarm_sound),
-                    currentValue = androidx.compose.ui.res.stringResource(currentSound.getTitleRes()),
+                    currentValue = soundDisplayValue,
                     iconName = "alarm_sound",
                     onClick = { showAlarmSoundDialog = true }
                 )
@@ -494,11 +505,18 @@ fun PreferencesScreen(navController: NavController) {
         if (showAlarmSoundDialog) {
             AlarmSoundSelectionDialog(
                 currentSound = currentUser?.alarmSound ?: AlarmSound.SYSTEM_DEFAULT,
-                onSoundSelected = { newSound ->
+                customSoundTitle = currentUser?.customAlarmSoundTitle,
+                customSoundPath = currentUser?.customAlarmSoundPath,
+                onSoundSelected = { newSound, customPath, customTitle ->
                     currentUser?.let { user ->
-                        userViewModel.updateUser(user.copy(alarmSound = newSound))
+                        userViewModel.updateUser(
+                            user.copy(
+                                alarmSound = newSound,
+                                customAlarmSoundPath = customPath ?: user.customAlarmSoundPath,
+                                customAlarmSoundTitle = customTitle ?: user.customAlarmSoundTitle
+                            )
+                        )
                     }
-                    showAlarmSoundDialog = false
                 },
                 onDismiss = { showAlarmSoundDialog = false }
             )
@@ -548,10 +566,16 @@ fun AlarmDurationSelectionDialog(
 @Composable
 fun AlarmSoundSelectionDialog(
     currentSound: AlarmSound,
-    onSoundSelected: (AlarmSound) -> Unit,
+    customSoundTitle: String?,
+    customSoundPath: String?,
+    onSoundSelected: (AlarmSound, String?, String?) -> Unit,
     onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
+    var selectedSound by remember { mutableStateOf(currentSound) }
+    var currentCustomPath by remember { mutableStateOf(customSoundPath) }
+    var currentCustomTitle by remember { mutableStateOf(customSoundTitle) }
+
     var previewingSound by remember { mutableStateOf<AlarmSound?>(null) }
     var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
     var ringtone by remember { mutableStateOf<Ringtone?>(null) }
@@ -570,11 +594,37 @@ fun AlarmSoundSelectionDialog(
         previewingSound = null
     }
 
-    fun playPreview(sound: AlarmSound) {
+    fun playPreview(sound: AlarmSound, customPathToPlay: String? = null) {
         stopAudio()
         previewingSound = sound
         try {
-            if (sound.rawResId != null) {
+            if (sound == AlarmSound.CUSTOM) {
+                val path = customPathToPlay ?: currentCustomPath
+                if (!path.isNullOrEmpty() && File(path).exists()) {
+                    val mp = MediaPlayer().apply {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            setAudioAttributes(
+                                AudioAttributes.Builder()
+                                    .setUsage(AudioAttributes.USAGE_ALARM)
+                                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                                    .build()
+                            )
+                        } else {
+                            @Suppress("DEPRECATION")
+                            setAudioStreamType(android.media.AudioManager.STREAM_ALARM)
+                        }
+                        setDataSource(path)
+                        setOnCompletionListener {
+                            previewingSound = null
+                        }
+                        prepare()
+                        start()
+                    }
+                    mediaPlayer = mp
+                } else {
+                    previewingSound = null
+                }
+            } else if (sound.rawResId != null) {
                 val afd = context.resources.openRawResourceFd(sound.rawResId)
                 if (afd != null) {
                     val mp = MediaPlayer().apply {
@@ -620,6 +670,21 @@ fun AlarmSoundSelectionDialog(
         }
     }
 
+    val audioPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            val (savedFile, fileName) = SoundUtils.saveCustomAudio(context, uri)
+            if (savedFile != null) {
+                selectedSound = AlarmSound.CUSTOM
+                currentCustomPath = savedFile.absolutePath
+                currentCustomTitle = fileName
+                onSoundSelected(AlarmSound.CUSTOM, savedFile.absolutePath, fileName)
+                playPreview(AlarmSound.CUSTOM, savedFile.absolutePath)
+            }
+        }
+    }
+
     DisposableEffect(Unit) {
         onDispose {
             stopAudio()
@@ -631,7 +696,8 @@ fun AlarmSoundSelectionDialog(
         AlarmSound.GENTLE_CHIME,
         AlarmSound.MEDICAL_MARIMBA,
         AlarmSound.BRISK_PULSE,
-        AlarmSound.CALM_BELL
+        AlarmSound.CALM_BELL,
+        AlarmSound.CUSTOM
     )
 
     AlertDialog(
@@ -653,38 +719,82 @@ fun AlarmSoundSelectionDialog(
             ) {
                 sounds.forEach { sound ->
                     val isPlaying = previewingSound == sound
+                    val isSelected = selectedSound == sound
+                    val isCustom = sound == AlarmSound.CUSTOM
+
                     ListItem(
                         headlineContent = {
-                            Text(
-                                text = stringResource(sound.getTitleRes()),
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = if (currentSound == sound) FontWeight.Bold else FontWeight.Normal
-                            )
+                            if (isCustom) {
+                                Text(
+                                    text = if (!currentCustomTitle.isNullOrBlank()) currentCustomTitle!! else stringResource(R.string.alarm_sound_custom),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                    maxLines = 1,
+                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                )
+                            } else {
+                                Text(
+                                    text = stringResource(sound.getTitleRes()),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                )
+                            }
                         },
+                        supportingContent = if (isCustom) {
+                            {
+                                Text(
+                                    text = if (currentCustomPath != null) stringResource(R.string.alarm_sound_select_file) else stringResource(R.string.alarm_sound_no_file_selected),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        } else null,
                         leadingContent = {
                             RadioButton(
-                                selected = currentSound == sound,
+                                selected = isSelected,
                                 onClick = {
-                                    playPreview(sound)
-                                    onSoundSelected(sound)
+                                    if (isCustom && currentCustomPath == null) {
+                                        audioPickerLauncher.launch("audio/*")
+                                    } else {
+                                        selectedSound = sound
+                                        playPreview(sound)
+                                        onSoundSelected(sound, currentCustomPath, currentCustomTitle)
+                                    }
                                 }
                             )
                         },
                         trailingContent = {
-                            IconButton(
-                                onClick = {
-                                    if (isPlaying) {
-                                        stopAudio()
-                                    } else {
-                                        playPreview(sound)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                if (isCustom) {
+                                    IconButton(
+                                        onClick = {
+                                            audioPickerLauncher.launch("audio/*")
+                                        }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.FolderOpen,
+                                            contentDescription = stringResource(R.string.alarm_sound_select_file),
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
                                     }
                                 }
-                            ) {
-                                Icon(
-                                    imageVector = if (isPlaying) Icons.Default.Stop else Icons.Default.VolumeUp,
-                                    contentDescription = stringResource(R.string.alarm_sound_preview),
-                                    tint = if (isPlaying) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
-                                )
+                                if (!isCustom || (isCustom && currentCustomPath != null)) {
+                                    IconButton(
+                                        onClick = {
+                                            if (isPlaying) {
+                                                stopAudio()
+                                            } else {
+                                                playPreview(sound)
+                                            }
+                                        }
+                                    ) {
+                                        Icon(
+                                            imageVector = if (isPlaying) Icons.Default.Stop else Icons.Default.VolumeUp,
+                                            contentDescription = stringResource(R.string.alarm_sound_preview),
+                                            tint = if (isPlaying) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
                             }
                         },
                         colors = ListItemDefaults.colors(
@@ -694,8 +804,13 @@ fun AlarmSoundSelectionDialog(
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(8.dp))
                             .clickable {
-                                playPreview(sound)
-                                onSoundSelected(sound)
+                                if (isCustom && currentCustomPath == null) {
+                                    audioPickerLauncher.launch("audio/*")
+                                } else {
+                                    selectedSound = sound
+                                    playPreview(sound)
+                                    onSoundSelected(sound, currentCustomPath, currentCustomTitle)
+                                }
                             }
                     )
                 }
@@ -708,9 +823,9 @@ fun AlarmSoundSelectionDialog(
                     onDismiss()
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                ),
-                modifier = Modifier.padding(8.dp)
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
             ) {
                 Text(stringResource(R.string.close))
             }
