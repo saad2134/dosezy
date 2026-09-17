@@ -90,10 +90,11 @@ fun AddMedScreen(
     val currentUser by userViewModel.currentUser.collectAsState()
 
     // Form state
+    val defaultInitialTime = remember { LocalTime.now().plusMinutes(30).withSecond(0).withNano(0) }
     var medicationName by remember { mutableStateOf("") }
     var dosage by remember { mutableStateOf("") }
     var selectedDosageUnit by remember { mutableStateOf(DosageUnit.MG) }
-    var selectedTime by remember { mutableStateOf(LocalTime.of(8, 0)) }
+    var selectedTime by remember { mutableStateOf(defaultInitialTime) }
     var selectedFrequency by remember { mutableStateOf(FrequencyPattern.DAILY) }
     var medicineImagePath by remember { mutableStateOf<String?>(null) }
     var showTimePicker by remember { mutableStateOf(false) }
@@ -103,7 +104,7 @@ fun AddMedScreen(
 
     // Multi-Dose Presets & Stock Inventory State
     var selectedDosePreset by remember { mutableStateOf("1x") }
-    var scheduledTimesList by remember { mutableStateOf(listOf(LocalTime.of(8, 0))) }
+    var scheduledTimesList by remember { mutableStateOf(listOf(defaultInitialTime)) }
     var currentStockText by remember { mutableStateOf("") }
     var refillThresholdText by remember { mutableStateOf("") }
 
@@ -598,10 +599,10 @@ fun AddMedScreen(
                                     verticalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
                                     val presets = listOf(
-                                        "1x" to listOf(LocalTime.of(8, 0)),
-                                        "2x" to listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
-                                        "3x" to listOf(LocalTime.of(8, 0), LocalTime.of(14, 0), LocalTime.of(20, 0)),
-                                        "4x" to listOf(LocalTime.of(8, 0), LocalTime.of(12, 0), LocalTime.of(16, 0), LocalTime.of(20, 0))
+                                        "1x" to listOf(defaultInitialTime),
+                                        "2x" to listOf(defaultInitialTime, defaultInitialTime.plusHours(12)).sorted(),
+                                        "3x" to listOf(defaultInitialTime, defaultInitialTime.plusHours(6), defaultInitialTime.plusHours(12)).sorted(),
+                                        "4x" to listOf(defaultInitialTime, defaultInitialTime.plusHours(4), defaultInitialTime.plusHours(8), defaultInitialTime.plusHours(12)).sorted()
                                     )
                                     presets.forEach { (label, times) ->
                                         val isSelected = selectedDosePreset == label

@@ -66,8 +66,17 @@ class NotificationActionReceiver : BroadcastReceiver() {
     private suspend fun handleAction(context: Context, action: String?, entryId: String) {
         val scheduleRepository = ScheduleRepository(database)
 
+        // Immediately stop active alarm sound and dismiss full-screen activity
+        AlarmAudioPlayer.stop()
+        AlarmActivity.stopActiveAlarm()
+
         val alarmScheduler = AlarmScheduler(context)
         alarmScheduler.cancelNagging(entryId)
+
+        // Cancel notification for both Taken and Snooze actions
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+        notificationManager.cancel(entryId.hashCode())
 
         when (action) {
             "TAKEN_ACTION" -> {
@@ -85,11 +94,6 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 val medicineName = medicine?.medicationName ?: "Medicine"
 
                 alarmScheduler.scheduleSnooze(entryId, 10, medicineName) // 10 minutes snooze
-
-                // Cancel the current notification
-                val notificationManager =
-                    context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-                notificationManager.cancel(entryId.hashCode())
 
                 Log.d(TAG, "Medicine reminder snoozed for 10 minutes for entry: $entryId ($medicineName)")
             }

@@ -33,7 +33,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
     companion object {
         const val TAG = "MedicineAlarmReceiver"
-        const val CHANNEL_ID = "dosezy_medicine_reminders_v2"
+        const val CHANNEL_ID = "dosezy_medicine_reminders_v3"
         const val EXTRA_ENTRY_ID = "entry_id"
         const val EXTRA_MEDICINE_NAME = "medicine_name"
         const val EXTRA_SCHEDULED_TIME = "scheduled_time"
@@ -88,6 +88,19 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                     if (entry != null && entry.status == com.example.dosezy.data.model.MedicationStatus.PENDING) {
                         val user = database.userDao().getUserByIdDirect(entry.userId)
                         val isNagging = naggingCount > 0
+
+                        // Immediately trigger centralized alarm audio & vibration
+                        val sound = user?.alarmSound ?: com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT
+                        val customPath = user?.customAlarmSoundPath
+                        val duration = user?.alarmDurationSeconds ?: 0
+
+                        AlarmAudioPlayer.play(
+                            context = context,
+                            sound = sound,
+                            customPath = customPath,
+                            autoSilenceSeconds = duration
+                        )
+
                         showNotification(context, entryId, entryIds, medicineName, medicineNames, scheduledTime, isNagging, naggingCount, user?.naggingMaxRepeats ?: 3)
 
                         // Schedule next follow-up nagging reminder if enabled and below limit
@@ -103,6 +116,12 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                     }
                 } catch (ex: Exception) {
                     Log.e(TAG, "Error processing alarm in background", ex)
+                    AlarmAudioPlayer.play(
+                        context = context,
+                        sound = com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT,
+                        customPath = null,
+                        autoSilenceSeconds = 0
+                    )
                     showNotification(context, entryId, entryIds, medicineName, medicineNames, scheduledTime, false, 0, 3)
                 } finally {
                     pendingResult.finish()
@@ -123,9 +142,6 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         maxNagging: Int = 3
     ) {
         createNotificationChannel(context)
-
-        val alarmSoundUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_ALARM)
-            ?: android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
 
         val contentText = scheduledTime?.let {
             "Scheduled for $it - Time to take your medicine!"
@@ -187,21 +203,35 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             putExtra(EXTRA_SCHEDULED_TIME, scheduledTime ?: "")
         }
 
+        // Android 14+ background activity start options
+        val optionsBundle = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            android.app.ActivityOptions.makeBasic().apply {
+                setPendingIntentBackgroundActivityStartMode(
+                    android.app.ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED
+                )
+            }.toBundle()
+        } else {
+            null
+        }
+
         val fullScreenPendingIntent = PendingIntent.getActivity(
             context,
             entryId.hashCode() + 10,
             alarmIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            optionsBundle
         )
 
-        // Launch AlarmActivity directly if permitted (e.g., when overlay is granted or app in foreground)
+        // Launch AlarmActivity directly if permitted (e.g., overlay granted or app in foreground)
         try {
-            context.startActivity(alarmIntent)
+            if (optionsBundle != null) {
+                context.startActivity(alarmIntent, optionsBundle)
+            } else {
+                context.startActivity(alarmIntent)
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Could not start AlarmActivity directly", e)
         }
-
-        val vibrationPattern = longArrayOf(0, 1000, 500, 1000)
 
         val notificationTitle = if (isNagging) {
             context.getString(R.string.notif_nagging_title, medicineName)
@@ -215,19 +245,18 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             contentText
         }
 
-        // Create notification with vibration, loader_icon, and fullScreenIntent
+        // Create silent notification: AlarmAudioPlayer is the single source of sound & vibration
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.loader_icon)
             .setContentTitle(notificationTitle)
             .setContentText(notificationText)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
-            .setVibrate(vibrationPattern)
-            .setSound(alarmSoundUri, android.media.AudioManager.STREAM_ALARM)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setFullScreenIntent(fullScreenPendingIntent, true)
             .setAutoCancel(true)
-            .setContentIntent(pendingIntent)
+            .setSilent(true)
+            .setContentIntent(fullScreenPendingIntent)
             .addAction(
                 getNotificationIcon(context, Icons.Filled.Check),
                 "Taken",
@@ -250,13 +279,14 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
     private fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val vibrationPattern = longArrayOf(0, 1000, 500, 1000)
-            val alarmSoundUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_ALARM)
-                ?: android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
-            val audioAttributes = android.media.AudioAttributes.Builder()
-                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .setUsage(android.media.AudioAttributes.USAGE_ALARM)
-                .build()
+            val notificationManager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+            // Remove legacy channels to avoid system audio caching conflicts
+            try {
+                notificationManager.deleteNotificationChannel("dosezy_medicine_reminders_v2")
+                notificationManager.deleteNotificationChannel("dosezy_medicine_reminders")
+            } catch (_: Exception) {}
 
             val channel = NotificationChannel(
                 CHANNEL_ID,
@@ -265,16 +295,13 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             ).apply {
                 description = context.getString(com.example.dosezy.R.string.notif_channel_desc)
                 enableLights(true)
-                enableVibration(true)
-                this.vibrationPattern = vibrationPattern
-                setSound(alarmSoundUri, audioAttributes)
+                enableVibration(false) // Managed directly by AlarmAudioPlayer
+                setSound(null, null)  // Silent channel: eliminates duplicate system ringtone
                 setBypassDnd(true)
                 setShowBadge(true)
                 lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
             }
 
-            val notificationManager =
-                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
     }

@@ -40,6 +40,13 @@ import com.example.dosezy.ui.subscreens.ManageProfileScreen
 import com.example.dosezy.ui.subscreens.PreferencesScreen
 import com.example.dosezy.ui.subscreens.SwitchProfileScreen
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.example.dosezy.ui.theme.DosezyTheme
 import com.example.dosezy.ui.viewmodels.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -106,6 +113,8 @@ fun DosezyApp() {
         onResult = {}
     )
 
+    var showOverlayPrompt by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
@@ -115,6 +124,62 @@ fun DosezyApp() {
         if (!com.example.dosezy.utils.NotificationUtils.isIgnoringBatteryOptimizations(context)) {
             com.example.dosezy.utils.NotificationUtils.requestBatteryOptimizationExemption(context)
         }
+        kotlinx.coroutines.delay(1000)
+        if (!com.example.dosezy.utils.NotificationUtils.canDrawOverlays(context)) {
+            val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+            val dismissed = prefs.getBoolean("overlay_prompt_dismissed", false)
+            if (!dismissed) {
+                showOverlayPrompt = true
+            }
+        }
+    }
+
+    if (showOverlayPrompt) {
+        AlertDialog(
+            onDismissRequest = { showOverlayPrompt = false },
+            title = {
+                Text(
+                    text = "Allow Alarm Pop-ups",
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            },
+            text = {
+                Text(
+                    text = "To ensure medication reminders pop up immediately over apps like WhatsApp, please enable 'Display over other apps'.",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                        prefs.edit().putBoolean("overlay_prompt_dismissed", true).apply()
+                        showOverlayPrompt = false
+                        com.example.dosezy.utils.NotificationUtils.requestOverlayPermission(context)
+                    }
+                ) {
+                    Text(
+                        text = "Enable",
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1193D4)
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                        prefs.edit().putBoolean("overlay_prompt_dismissed", true).apply()
+                        showOverlayPrompt = false
+                    }
+                ) {
+                    Text("Later")
+                }
+            },
+            shape = RoundedCornerShape(20.dp),
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     }
 
     val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()

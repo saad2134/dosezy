@@ -1,0 +1,2 @@
+• Default medication time now starts at +30 minutes from current time
+• Unified alarm audio engine: fixed double ringtones, reliable pop-ups & custom sounds over active apps (WhatsApp), and direct banner dismissal

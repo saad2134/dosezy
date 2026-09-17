@@ -70,6 +70,7 @@ class AlarmActivity : ComponentActivity() {
 
         fun stopActiveAlarm() {
             try {
+                AlarmAudioPlayer.stop()
                 activeInstance?.get()?.let { activity ->
                     activity.runOnUiThread {
                         activity.stopAlarm()
@@ -84,9 +85,25 @@ class AlarmActivity : ComponentActivity() {
     @Inject
     lateinit var database: DosezyDatabase
 
-    private var mediaPlayer: MediaPlayer? = null
-    private var ringtone: Ringtone? = null
-    private var vibrator: Vibrator? = null
+    private val activeEntryIdsState = mutableStateOf<List<String>>(emptyList())
+    private val activeMedicineNameState = mutableStateOf("Medication")
+    private val activeScheduledTimeState = mutableStateOf("")
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        setupWindowFlags()
+
+        val newId = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID) ?: ""
+        val newIds = intent.getStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS) ?: if (newId.isNotEmpty()) arrayListOf(newId) else arrayListOf()
+        val newMedName = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME) ?: "Medication"
+        val newSchedTime = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME) ?: ""
+
+        val merged = (activeEntryIdsState.value + newIds + listOf(newId)).filter { it.isNotEmpty() }.distinct()
+        activeEntryIdsState.value = merged
+        activeMedicineNameState.value = newMedName
+        activeScheduledTimeState.value = newSchedTime
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -96,53 +113,52 @@ class AlarmActivity : ComponentActivity() {
         // Turn screen on and unlock keyguard
         setupWindowFlags()
 
-        // Start vibration immediately
-        startAlarmVibration()
-
         val entryId = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID) ?: ""
-        val entryIds = intent.getStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS) ?: arrayListOf(entryId)
+        val entryIds = intent.getStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS) ?: if (entryId.isNotEmpty()) arrayListOf(entryId) else arrayListOf()
         val initialMedicineName = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME) ?: "Medication"
         val initialScheduledTime = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME) ?: ""
 
-        // Fetch user alarm sound & duration preference and start audio playback + auto-silence
-        lifecycleScope.launch(Dispatchers.IO) {
-            var targetSound: AlarmSound = AlarmSound.SYSTEM_DEFAULT
-            var customSoundPath: String? = null
-            var autoSilenceSeconds = 0
-            try {
-                if (entryId.isNotEmpty()) {
-                    val entry = database.scheduleDao().getScheduleEntryById(entryId)
-                    if (entry != null) {
-                        val u = database.userDao().getUserByIdDirect(entry.userId)
-                        if (u != null) {
-                            targetSound = u.alarmSound
-                            customSoundPath = u.customAlarmSoundPath
-                            autoSilenceSeconds = u.alarmDurationSeconds
+        activeEntryIdsState.value = entryIds.filter { it.isNotEmpty() }.distinct()
+        activeMedicineNameState.value = initialMedicineName
+        activeScheduledTimeState.value = initialScheduledTime
+
+        // Fallback: If AlarmAudioPlayer is not yet playing, start playback
+        if (!AlarmAudioPlayer.isPlaying()) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                var targetSound: AlarmSound = AlarmSound.SYSTEM_DEFAULT
+                var customSoundPath: String? = null
+                var autoSilenceSeconds = 0
+                try {
+                    if (entryId.isNotEmpty()) {
+                        val entry = database.scheduleDao().getScheduleEntryById(entryId)
+                        if (entry != null) {
+                            val u = database.userDao().getUserByIdDirect(entry.userId)
+                            if (u != null) {
+                                targetSound = u.alarmSound
+                                customSoundPath = u.customAlarmSoundPath
+                                autoSilenceSeconds = u.alarmDurationSeconds
+                            }
                         }
                     }
-                }
-                if (targetSound == AlarmSound.SYSTEM_DEFAULT && customSoundPath == null) {
-                    val users = database.userDao().getAllUsersDirect()
-                    val currentUser = users.find { it.isCurrentUser } ?: users.firstOrNull()
-                    if (currentUser != null) {
-                        targetSound = currentUser.alarmSound
-                        customSoundPath = currentUser.customAlarmSoundPath
-                        if (autoSilenceSeconds == 0) {
-                            autoSilenceSeconds = currentUser.alarmDurationSeconds
+                    if (targetSound == AlarmSound.SYSTEM_DEFAULT && customSoundPath == null) {
+                        val users = database.userDao().getAllUsersDirect()
+                        val currentUser = users.find { it.isCurrentUser } ?: users.firstOrNull()
+                        if (currentUser != null) {
+                            targetSound = currentUser.alarmSound
+                            customSoundPath = currentUser.customAlarmSoundPath
+                            if (autoSilenceSeconds == 0) {
+                                autoSilenceSeconds = currentUser.alarmDurationSeconds
+                            }
                         }
                     }
-                }
-            } catch (_: Exception) {}
+                } catch (_: Exception) {}
 
-            withContext(Dispatchers.Main) {
-                playAlarmSound(targetSound, customSoundPath)
-            }
-
-            if (autoSilenceSeconds > 0) {
-                kotlinx.coroutines.delay(autoSilenceSeconds * 1000L)
-                withContext(Dispatchers.Main) {
-                    stopAlarm()
-                }
+                AlarmAudioPlayer.play(
+                    context = applicationContext,
+                    sound = targetSound,
+                    customPath = customSoundPath,
+                    autoSilenceSeconds = autoSilenceSeconds
+                )
             }
         }
 
@@ -188,15 +204,19 @@ class AlarmActivity : ComponentActivity() {
                 }
             }
 
+            val currentEntryIds by activeEntryIdsState
+            val currentMedName by activeMedicineNameState
+            val currentSchedTime by activeScheduledTimeState
+
             DosezyTheme(darkTheme = isDark) {
                 GroupedAlarmScreenContent(
-                    entryIds = entryIds.filter { it.isNotEmpty() },
-                    initialMedicineName = initialMedicineName,
-                    initialScheduledTime = initialScheduledTime,
+                    entryIds = currentEntryIds.filter { it.isNotEmpty() },
+                    initialMedicineName = currentMedName,
+                    initialScheduledTime = currentSchedTime,
                     database = database,
                     isDarkTheme = isDark,
                     onDismiss = {
-                        entryIds.forEach { id ->
+                        currentEntryIds.forEach { id ->
                             if (id.isNotEmpty()) {
                                 try {
                                     val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
@@ -229,98 +249,8 @@ class AlarmActivity : ComponentActivity() {
         )
     }
 
-    private fun startAlarmVibration() {
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                val vibratorManager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-                vibrator = vibratorManager.defaultVibrator
-            } else {
-                @Suppress("DEPRECATION")
-                vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-            }
-            val pattern = longArrayOf(0, 1000, 1000)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                vibrator?.vibrate(android.os.VibrationEffect.createWaveform(pattern, 0))
-            } else {
-                @Suppress("DEPRECATION")
-                vibrator?.vibrate(pattern, 0)
-            }
-        } catch (_: Exception) {}
-    }
-
-    private fun playAlarmSound(sound: AlarmSound, customPath: String? = null) {
-        try {
-            if (sound == AlarmSound.CUSTOM && !customPath.isNullOrEmpty() && File(customPath).exists()) {
-                mediaPlayer = MediaPlayer().apply {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        setAudioAttributes(
-                            AudioAttributes.Builder()
-                                .setUsage(AudioAttributes.USAGE_ALARM)
-                                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                                .build()
-                        )
-                    } else {
-                        @Suppress("DEPRECATION")
-                        setAudioStreamType(android.media.AudioManager.STREAM_ALARM)
-                    }
-                    setDataSource(customPath)
-                    isLooping = true
-                    prepare()
-                    start()
-                }
-            } else if (sound.rawResId != null) {
-                val afd = applicationContext.resources.openRawResourceFd(sound.rawResId)
-                if (afd != null) {
-                    mediaPlayer = MediaPlayer().apply {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            setAudioAttributes(
-                                AudioAttributes.Builder()
-                                    .setUsage(AudioAttributes.USAGE_ALARM)
-                                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                                    .build()
-                            )
-                        } else {
-                            @Suppress("DEPRECATION")
-                            setAudioStreamType(android.media.AudioManager.STREAM_ALARM)
-                        }
-                        setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
-                        afd.close()
-                        isLooping = true
-                        prepare()
-                        start()
-                    }
-                }
-            } else {
-                val alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-                    ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-                ringtone = RingtoneManager.getRingtone(applicationContext, alarmUri)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    ringtone?.audioAttributes = AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_ALARM)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                        .build()
-                } else {
-                    @Suppress("DEPRECATION")
-                    ringtone?.streamType = android.media.AudioManager.STREAM_ALARM
-                }
-                ringtone?.play()
-            }
-        } catch (_: Exception) {}
-    }
-
-    private fun stopAlarm() {
-        try {
-            mediaPlayer?.stop()
-            mediaPlayer?.release()
-            mediaPlayer = null
-        } catch (_: Exception) {}
-        try {
-            ringtone?.stop()
-            ringtone = null
-        } catch (_: Exception) {}
-        try {
-            vibrator?.cancel()
-        } catch (_: Exception) {}
+    fun stopAlarm() {
+        AlarmAudioPlayer.stop()
     }
 
     override fun onDestroy() {
