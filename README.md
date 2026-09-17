@@ -20,10 +20,10 @@
 
 <div align="center">
   <a href="https://f-droid.org/en/packages/com.saad2134.dosezy">
-    <img width="197" height="59" alt="F-Droid" src="https://github.com/user-attachments/assets/9a463d23-368b-4974-9686-e28649e00b04" />
+    <img width="197" height="59" alt="F-Droid" src="assets/badges/fdroid.png" />
   </a>
   <a href="https://github.com/saad2134/dosezy/releases"> 
-    <img width="197" height="59" alt="GitHub" src="https://github.com/user-attachments/assets/e9ae5d41-fb6c-468b-b1cc-cc4fb534aa10" /> 
+    <img width="197" height="59" alt="GitHub" src="assets/badges/github.png" /> 
   </a>
   
   <a> </a>
@@ -31,7 +31,7 @@
     <summary>Others</summary>
     <br>
     <a href="https://appteka.store/apps/c40r321202">
-      <img width="197" height="59" alt="AppTeka" src="https://github.com/user-attachments/assets/1089a456-25cd-4dc5-af88-a7966153f250" />
+      <img width="197" height="59" alt="AppTeka" src="assets/badges/appteka.png" />
     </a>
   </details>
 </div>
@@ -39,15 +39,15 @@
 #### Coming Soon On
 
 <div align="center">
-  <a href="">
-    <img width="197" height="59" alt="Google Play" src="https://github.com/user-attachments/assets/7c8720ee-4c1e-4c9a-86c0-8086acd12c71" />
+  <a href="https://play.google.com/store/apps/details?id=com.saad2134.dosezy">
+    <img width="197" height="59" alt="Google Play" src="assets/badges/google-play.png" />
   </a>
   <!-- 
   <a href="">
-    <img width="197" height="59" alt="Galaxy Store" src="https://github.com/user-attachments/assets/52b16b2f-1517-45b2-93b4-d3b6011b7608" />
+    <img width="197" height="59" alt="Galaxy Store" src="assets/badges/galaxy-store.png" />
   </a>
   <a href="">
-    <img width="197" height="59" alt="Huawei AppGallery" src="https://github.com/user-attachments/assets/3cbafa74-a2eb-4f33-9b87-202db77e5280" />
+    <img width="197" height="59" alt="Huawei AppGallery" src="assets/badges/huawei-appgallery.png" />
   </a> -->
 </div>
 
