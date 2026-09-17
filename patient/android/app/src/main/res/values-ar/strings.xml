@@ -91,8 +91,13 @@
     <string name="pref_mark_missed_after">اعتبار الجرعة فائتة بعد</string>
     <string name="hours_format">%1$d ساعة</string>
 
-        <string name="notif_check_title">فحص الإشعارات والنوافذ المنبثقة</string>
+        <string name="notif_check_title">فحص موثوقية الإشعارات</string>
     <string name="notif_perm_title">إذن الإشعارات</string>
+    <string name="notif_perm_desc">مطلوب لإرسال تذكيرات الجرعات والمنبهات.</string>
+    <string name="notif_perm_exact_warning">الإشعارات مفعلة • يلزم إذن المنبهات الدقيقة لتنبيهك في الوقت المحدد (انقر للسماح)</string>
+    <string name="notif_perm_all_granted">تم تفعيل الإشعارات والمنبهات الدقيقة بالكامل.</string>
+    <string name="notif_oem_bg_item_desc">اضبط إعدادات الخلفية لـ %1$s لضمان تشغيل المنبهات في الوقت المحدد.</string>
+
     <string name="notif_perm_granted">تم منح الإذن لإرسال الإشعارات.</string>
     <string name="notif_battery_title">بطارية الهاتف</string>
     <string name="notif_battery_status">البطارية عند %1$d%%</string>

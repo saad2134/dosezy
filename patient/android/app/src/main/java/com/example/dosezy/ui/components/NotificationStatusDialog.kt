@@ -57,6 +57,7 @@ data class NotificationStatus(
     val title: String,
     val description: String,
     val isPassed: Boolean,
+    val isWarning: Boolean = false,
     val icon: @Composable () -> Unit,
     val onFixClick: (() -> Unit)? = null
 )
@@ -128,30 +129,6 @@ fun NotificationStatusDialog(
                     }
                 }
 
-                // OEM Setup Button (if aggressive OEM detected)
-                if (NotificationUtils.isKnownAggressiveOem()) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Button(
-                        onClick = { NotificationUtils.openOemBackgroundSettings(context) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF6366F1)
-                        )
-                    ) {
-                        Text(
-                            text = context.getString(
-                                com.example.dosezy.R.string.notif_oem_setup_btn,
-                                NotificationUtils.getOemName()
-                            ),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // OK Button
@@ -190,52 +167,39 @@ private fun createNotificationStatuses(
     val batteryStatus = NotificationUtils.isBatterySufficient(context)
 
     return listOf(
+        // Notification & Exact Alarms Item (Combines notification permission and exact alarm explanation with warning support)
         NotificationStatus(
             title = context.getString(com.example.dosezy.R.string.notif_perm_title),
-            description = if (notificationPermStatus) {
-                context.getString(com.example.dosezy.R.string.notif_perm_granted)
-            } else {
-                context.getString(com.example.dosezy.R.string.notif_perm_title)
+            description = when {
+                !notificationPermStatus -> context.getString(com.example.dosezy.R.string.notif_perm_desc)
+                !exactAlarmsStatus -> context.getString(com.example.dosezy.R.string.notif_perm_exact_warning)
+                else -> context.getString(com.example.dosezy.R.string.notif_perm_all_granted)
             },
-            isPassed = notificationPermStatus,
+            isPassed = notificationPermStatus && exactAlarmsStatus,
+            isWarning = notificationPermStatus && !exactAlarmsStatus,
             icon = {
+                val iconTint = when {
+                    notificationPermStatus && !exactAlarmsStatus -> Color(0xFFF59E0B) // Orange warning for exact alarms
+                    notificationPermStatus && exactAlarmsStatus -> Color(0xFF10B981) // Green
+                    else -> Color(0xFFEF4444) // Red
+                }
                 Icon(
-                    imageVector = Icons.Default.Notifications,
-                    contentDescription = "Notification Permission",
+                    imageVector = if (notificationPermStatus && !exactAlarmsStatus) Icons.Default.Alarm else Icons.Default.Notifications,
+                    contentDescription = "Notification & Alarm Permission",
                     modifier = Modifier.size(30.dp),
-                    tint = if (notificationPermStatus) Color(0xFF10B981) else Color(0xFFEF4444)
+                    tint = iconTint
                 )
             },
             onFixClick = {
                 if (!notificationPermStatus) {
                     NotificationUtils.requestNotificationPermission(context)
-                }
-            }
-        ),
-
-        NotificationStatus(
-            title = context.getString(com.example.dosezy.R.string.notif_exact_alarm_title),
-            description = if (exactAlarmsStatus) {
-                context.getString(com.example.dosezy.R.string.notif_exact_alarm_granted)
-            } else {
-                context.getString(com.example.dosezy.R.string.notif_exact_alarm_desc)
-            },
-            isPassed = exactAlarmsStatus,
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Alarm,
-                    contentDescription = "Exact Alarms",
-                    modifier = Modifier.size(30.dp),
-                    tint = if (exactAlarmsStatus) Color(0xFF10B981) else Color(0xFFEF4444)
-                )
-            },
-            onFixClick = {
-                if (!exactAlarmsStatus) {
+                } else if (!exactAlarmsStatus) {
                     NotificationUtils.requestExactAlarmPermission(context)
                 }
             }
         ),
 
+        // Display Over Other Apps (Pop-ups)
         NotificationStatus(
             title = context.getString(com.example.dosezy.R.string.notif_overlay_title),
             description = if (overlayStatus) {
@@ -244,6 +208,7 @@ private fun createNotificationStatuses(
                 context.getString(com.example.dosezy.R.string.notif_overlay_desc)
             },
             isPassed = overlayStatus,
+            isWarning = false,
             icon = {
                 Icon(
                     imageVector = Icons.Default.WorkOutline,
@@ -259,14 +224,23 @@ private fun createNotificationStatuses(
             }
         ),
 
+        // Battery Optimization / Background Settings (Takes user directly to OEM background settings if Samsung, etc.)
         NotificationStatus(
             title = context.getString(com.example.dosezy.R.string.notif_bg_title),
             description = if (backgroundPermStatus) {
                 context.getString(com.example.dosezy.R.string.notif_bg_granted)
             } else {
-                context.getString(com.example.dosezy.R.string.notif_bg_desc)
+                if (NotificationUtils.isKnownAggressiveOem()) {
+                    context.getString(
+                        com.example.dosezy.R.string.notif_oem_bg_item_desc,
+                        NotificationUtils.getOemName()
+                    )
+                } else {
+                    context.getString(com.example.dosezy.R.string.notif_bg_desc)
+                }
             },
             isPassed = backgroundPermStatus,
+            isWarning = false,
             icon = {
                 Icon(
                     imageVector = Icons.Default.BatteryStd,
@@ -277,15 +251,24 @@ private fun createNotificationStatuses(
             },
             onFixClick = {
                 if (!backgroundPermStatus) {
-                    NotificationUtils.openBatteryOptimizationSettings(context)
+                    if (NotificationUtils.isKnownAggressiveOem()) {
+                        val opened = NotificationUtils.openOemBackgroundSettings(context)
+                        if (!opened) {
+                            NotificationUtils.openBatteryOptimizationSettings(context)
+                        }
+                    } else {
+                        NotificationUtils.openBatteryOptimizationSettings(context)
+                    }
                 }
             }
         ),
 
+        // Phone Sound Mode
         NotificationStatus(
             title = context.getString(com.example.dosezy.R.string.notif_sound_title),
             description = NotificationUtils.getSoundStatus(context),
             isPassed = soundStatus,
+            isWarning = false,
             icon = {
                 Icon(
                     imageVector = Icons.Default.VolumeUp,
@@ -301,10 +284,12 @@ private fun createNotificationStatuses(
             }
         ),
 
+        // Phone Battery
         NotificationStatus(
             title = context.getString(com.example.dosezy.R.string.notif_battery_title),
             description = NotificationUtils.getBatteryStatus(context),
             isPassed = batteryStatus,
+            isWarning = false,
             icon = {
                 Icon(
                     imageVector = Icons.Default.BatteryStd,
@@ -327,15 +312,15 @@ fun NotificationStatusItem(
     modifier: Modifier = Modifier
 ) {
     val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
-    val backgroundColor = if (status.isPassed) {
-        if (isDark) Color(0xFF064E3B) else Color(0xFFD1FAE5)
-    } else {
-        if (isDark) Color(0xFF7F1D1D) else Color(0xFFFEE2E2)
+    val backgroundColor = when {
+        status.isWarning -> if (isDark) Color(0xFF451A03) else Color(0xFFFEF3C7) // Warm Orange / Amber
+        status.isPassed -> if (isDark) Color(0xFF064E3B) else Color(0xFFD1FAE5) // Emerald Green
+        else -> if (isDark) Color(0xFF7F1D1D) else Color(0xFFFEE2E2) // Rose Red
     }
-    val textColor = if (status.isPassed) {
-        if (isDark) Color(0xFF34D399) else Color(0xFF065F46)
-    } else {
-        if (isDark) Color(0xFFF87171) else Color(0xFF991B1B)
+    val textColor = when {
+        status.isWarning -> if (isDark) Color(0xFFFBBF24) else Color(0xFFB45309) // Orange Amber
+        status.isPassed -> if (isDark) Color(0xFF34D399) else Color(0xFF065F46) // Emerald Green
+        else -> if (isDark) Color(0xFFF87171) else Color(0xFF991B1B) // Rose Red
     }
 
     Surface(
@@ -343,7 +328,7 @@ fun NotificationStatusItem(
             .fillMaxWidth()
             .clickable(
                 onClick = onClick,
-                enabled = status.onFixClick != null && !status.isPassed
+                enabled = status.onFixClick != null && (!status.isPassed || status.isWarning)
             ),
         shape = RoundedCornerShape(16.dp),
         color = backgroundColor
@@ -356,11 +341,12 @@ fun NotificationStatusItem(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
+                modifier = Modifier.weight(1f),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 status.icon()
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = status.title,
                         style = MaterialTheme.typography.bodyLarge,
@@ -370,11 +356,11 @@ fun NotificationStatusItem(
                     Text(
                         text = status.description,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = textColor.copy(alpha = 0.8f)
+                        color = textColor.copy(alpha = 0.85f)
                     )
                 }
             }
-            if (status.onFixClick != null && !status.isPassed) {
+            if (status.onFixClick != null && (!status.isPassed || status.isWarning)) {
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
                     contentDescription = "Fix issue",

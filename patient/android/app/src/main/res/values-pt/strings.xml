@@ -91,8 +91,13 @@
     <string name="pref_mark_missed_after">Considerar atrasado após</string>
     <string name="hours_format">%1$d hora(s)</string>
 
-        <string name="notif_check_title">Confiabilidade de Notificações e Pop-ups</string>
+        <string name="notif_check_title">Confiabilidade de Notificações</string>
     <string name="notif_perm_title">Permissão de Notificação</string>
+    <string name="notif_perm_desc">Necessário para enviar lembretes de dose e alarmes.</string>
+    <string name="notif_perm_exact_warning">Notificações ativadas • Alarmes exatos necessários para tocar no horário (toque para permitir)</string>
+    <string name="notif_perm_all_granted">Notificações e alarmes exatos totalmente ativados.</string>
+    <string name="notif_oem_bg_item_desc">Ajuste as configurações de segundo plano do %1$s para os alarmes tocarem no horário.</string>
+
     <string name="notif_perm_granted">Permissão concedida para enviar notificações.</string>
     <string name="notif_battery_title">Bateria do Telefone</string>
     <string name="notif_battery_status">Bateria em %1$d%%</string>

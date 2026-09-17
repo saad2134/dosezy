@@ -91,8 +91,13 @@
     <string name="pref_mark_missed_after">飲み忘れ判定時間</string>
     <string name="hours_format">%1$d 時間後</string>
 
-        <string name="notif_check_title">通知とポップアップの信頼性</string>
+        <string name="notif_check_title">通知の信頼性</string>
     <string name="notif_perm_title">通知権限</string>
+    <string name="notif_perm_desc">服薬リマインダーとアラームを送信するために必要です。</string>
+    <string name="notif_perm_exact_warning">通知は有効です • 定刻に鳴らすには正確なアラーム権限が必要です（タップして許可）</string>
+    <string name="notif_perm_all_granted">通知と正確なアラームは完全に有効です。</string>
+    <string name="notif_oem_bg_item_desc">%1$s のバックグラウンド設定を調整してアラームを定刻に鳴らします。</string>
+
     <string name="notif_perm_granted">通知送信権限が許可されています。</string>
     <string name="notif_battery_title">バッテリー残量</string>
     <string name="notif_battery_status">バッテリー残量: %1$d%%</string>

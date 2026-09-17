@@ -101,8 +101,13 @@
     <string name="hours_format">%1$d घंटे</string>
 
     <!-- Notification Check Dialog -->
-        <string name="notif_check_title">सूचना एवं पॉपअप विश्वसनीयता</string>
+        <string name="notif_check_title">सूचना विश्वसनीयता</string>
     <string name="notif_perm_title">सूचना अनुमति</string>
+    <string name="notif_perm_desc">दवा रिमाइंडर और अलार्म भेजने के लिए आवश्यक।</string>
+    <string name="notif_perm_exact_warning">सूचनाएं चालू हैं • समय पर अलार्म बजने के लिए सटीक अलार्म की अनुमति दें (अनुमति देने के लिए टैप करें)</string>
+    <string name="notif_perm_all_granted">सूचनाएं और सटीक अलार्म पूरी तरह सक्षम हैं।</string>
+    <string name="notif_oem_bg_item_desc">समय पर अलार्म बजने के लिए %1$s बैकग्राउंड सेटिंग्स ठीक करें।</string>
+
     <string name="notif_perm_granted">सूचनाएं भेजने की अनुमति दी गई।</string>
     <string name="notif_battery_title">फ़ोन की बैटरी</string>
     <string name="notif_battery_status">बैटरी %1$d%% पर है</string>

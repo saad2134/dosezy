@@ -91,8 +91,13 @@
     <string name="pref_mark_missed_after">Considera mancato dopo</string>
     <string name="hours_format">%1$d ora/e</string>
 
-        <string name="notif_check_title">Affidabilità notifiche e popup</string>
+        <string name="notif_check_title">Affidabilità notifiche</string>
     <string name="notif_perm_title">Autorizzazione Notifiche</string>
+    <string name="notif_perm_desc">Richiesto per inviare promemoria e allarmi per i farmaci.</string>
+    <string name="notif_perm_exact_warning">Notifiche attivate • Allarmi precisi necessari per suonare in orario (tocca per consentire)</string>
+    <string name="notif_perm_all_granted">Notifiche e allarmi precisi completamente abilitati.</string>
+    <string name="notif_oem_bg_item_desc">Regola le impostazioni in background di %1$s per far suonare gli allarmi in orario.</string>
+
     <string name="notif_perm_granted">Autorizzazione all\'invio di notifiche concessa.</string>
     <string name="notif_battery_title">Batteria del Telefono</string>
     <string name="notif_battery_status">Batteria al %1$d%%</string>

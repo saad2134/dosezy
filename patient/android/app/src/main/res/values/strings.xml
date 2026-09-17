@@ -106,8 +106,13 @@
     <string name="hours_format">%1$d hour(s)</string>
 
     <!-- Notification Check Dialog -->
-    <string name="notif_check_title">Notification &amp; Popup Reliability</string>
+    <string name="notif_check_title">Notification Reliability</string>
     <string name="notif_perm_title">Notification Permission</string>
+    <string name="notif_perm_desc">Required to send dose reminders and alarms.</string>
+    <string name="notif_perm_exact_warning">Notifications enabled • Exact alarms needed to ring on time (tap to allow)</string>
+    <string name="notif_perm_all_granted">Notifications and exact alarms are fully enabled.</string>
+    <string name="notif_oem_bg_item_desc">Adjust %1$s background settings so alarms ring on time.</string>
+
     <string name="notif_perm_granted">Permission granted to send notifications.</string>
     <string name="notif_exact_alarm_title">Exact Alarms</string>
     <string name="notif_exact_alarm_granted">Alarms will trigger precisely on time.</string>

@@ -220,7 +220,7 @@ No application running on Android (including system apps like Google Clock or Al
 
 1. **Aggressive OEM Battery Task Killers (Xiaomi HyperOS/MIUI, Samsung OneUI, Huawei)**:
    - *The Risk:* Certain phone manufacturers enforce proprietary battery managers that freeze or kill background applications if the user has not marked the app as **Unrestricted**.
-   - *Dosezy's Defense:* Dosezy includes a built-in diagnostic engine (**Notification & Alarm Status Dialog**) that prompts for `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` and alerts users if battery restrictions threaten alarm delivery.
+   - *Dosezy's Defense:* Dosezy includes a built-in diagnostic engine (**Notification Reliability Dialog**) that prompts for `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` and alerts users if battery restrictions threaten alarm delivery.
 2. **Revoked Exact Alarm Permission (`SCHEDULE_EXACT_ALARM`)**:
    - *The Risk:* On Android 12+, if a user manually opens Android Settings $\to$ Apps $\to$ Special App Access $\to$ Alarms & Reminders and toggles off Dosezy, the OS delays alarms by 15–30 minutes to batch them with other system tasks.
    - *Dosezy's Defense:* Dosezy actively checks `alarmManager.canScheduleExactAlarms()` and displays an interactive prompt redirecting the user to system settings if revoked.

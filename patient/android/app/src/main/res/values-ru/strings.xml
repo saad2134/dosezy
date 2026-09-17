@@ -91,8 +91,13 @@
     <string name="pref_mark_missed_after">Считать пропущенным через</string>
     <string name="hours_format">%1$d час(ов)</string>
 
-        <string name="notif_check_title">Надежность уведомлений и всплывающих окон</string>
+        <string name="notif_check_title">Надежность уведомлений</string>
     <string name="notif_perm_title">Разрешение на уведомления</string>
+    <string name="notif_perm_desc">Требуется для отправки напоминаний о приеме лекарств и сигналов.</string>
+    <string name="notif_perm_exact_warning">Уведомления включены • Точные будильники нужны для звонка вовремя (нажмите, чтобы разрешить)</string>
+    <string name="notif_perm_all_granted">Уведомления и точные будильники полностью включены.</string>
+    <string name="notif_oem_bg_item_desc">Настройте работу в фоновом режиме для %1$s, чтобы будильники звонили вовремя.</string>
+
     <string name="notif_perm_granted">Разрешение на отправку уведомлений получено.</string>
     <string name="notif_battery_title">Батарея телефона</string>
     <string name="notif_battery_status">Заряд батареи %1$d%%</string>

@@ -91,8 +91,13 @@
     <string name="pref_mark_missed_after">মিস বিবেচনা করার সময়</string>
     <string name="hours_format">%1$d ঘণ্টা পর</string>
 
-        <string name="notif_check_title">নোটিফিকেশন এবং পপআপ নির্ভরযোগ্যতা</string>
+        <string name="notif_check_title">নোটিফিকেশন নির্ভরযোগ্যতা</string>
     <string name="notif_perm_title">নোটিফিকেশন অনুমতি</string>
+    <string name="notif_perm_desc">ওষুধের রিমাইন্ডার ও অ্যালার্ম পাঠানোর জন্য প্রয়োজনীয়।</string>
+    <string name="notif_perm_exact_warning">নোটিফিকেশন চালু আছে • সময়মতো বাজার জন্য সঠিক অ্যালার্মের অনুমতি প্রয়োজন (অনুমতি দিতে চাপুন)</string>
+    <string name="notif_perm_all_granted">নোটিফিকেশন এবং সঠিক অ্যালার্ম সম্পূর্ণ সক্রিয়।</string>
+    <string name="notif_oem_bg_item_desc">সময়মতো অ্যালার্ম বাজার জন্য %1$s ব্যাকগ্রাউন্ড সেটিংস ঠিক করুন।</string>
+
     <string name="notif_perm_granted">নোটিফিকেশন পাঠানোর অনুমতি দেওয়া হয়েছে।</string>
     <string name="notif_battery_title">ফোনের ব্যাটারি</string>
     <string name="notif_battery_status">ব্যাটারি %1$d%% এ আছে</string>

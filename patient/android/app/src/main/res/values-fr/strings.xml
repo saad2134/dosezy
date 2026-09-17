@@ -91,8 +91,13 @@
     <string name="pref_mark_missed_after">Considérer comme manqué après</string>
     <string name="hours_format">%1$d heure(s)</string>
 
-        <string name="notif_check_title">Fiabilité des notifications et pop-ups</string>
+        <string name="notif_check_title">Fiabilité des notifications</string>
     <string name="notif_perm_title">Autorisation de notification</string>
+    <string name="notif_perm_desc">Requis pour envoyer des rappels de prise et des alarmes.</string>
+    <string name="notif_perm_exact_warning">Notifications activées • Alarmes précises nécessaires pour sonner à l\'heure (appuyez pour autoriser)</string>
+    <string name="notif_perm_all_granted">Notifications et alarmes précises entièrement activées.</string>
+    <string name="notif_oem_bg_item_desc">Réglez les paramètres d\'arrière-plan de %1$s pour que les alarmes sonnent à l\'heure.</string>
+
     <string name="notif_perm_granted">Autorisation accordée pour envoyer des notifications.</string>
     <string name="notif_battery_title">Batterie du téléphone</string>
     <string name="notif_battery_status">Batterie à %1$d%%</string>

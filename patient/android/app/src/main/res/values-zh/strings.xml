@@ -102,8 +102,13 @@
     <string name="hours_format">%1$d 小时</string>
 
     <!-- Notification Check Dialog -->
-        <string name="notif_check_title">通知与弹窗可靠性检查</string>
+        <string name="notif_check_title">通知可靠性检查</string>
     <string name="notif_perm_title">通知权限</string>
+    <string name="notif_perm_desc">用于发送服药提醒和闹钟。</string>
+    <string name="notif_perm_exact_warning">通知已开启 • 需要精准闹钟权限以准时提醒（点击允许）</string>
+    <string name="notif_perm_all_granted">通知与精准闹钟已全部开启。</string>
+    <string name="notif_oem_bg_item_desc">配置 %1$s 后台设置以确保闹钟准时响起。</string>
+
     <string name="notif_perm_granted">已授予发送通知的权限。</string>
     <string name="notif_battery_title">手机电量</string>
     <string name="notif_battery_status">电池电量为 %1$d%%</string>

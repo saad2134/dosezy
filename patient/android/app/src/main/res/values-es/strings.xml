@@ -101,8 +101,13 @@
     <string name="hours_format">%1$d hora(s)</string>
 
     <!-- Notification Check Dialog -->
-        <string name="notif_check_title">Fiabilidad de Notificaciones y Ventanas Emergentes</string>
+        <string name="notif_check_title">Fiabilidad de Notificaciones</string>
     <string name="notif_perm_title">Permiso de notificación</string>
+    <string name="notif_perm_desc">Requerido para enviar recordatorios de dosis y alarmas.</string>
+    <string name="notif_perm_exact_warning">Notificaciones activadas • Alarmas exactas necesarias para sonar a tiempo (toca para permitir)</string>
+    <string name="notif_perm_all_granted">Notificaciones y alarmas exactas totalmente habilitadas.</string>
+    <string name="notif_oem_bg_item_desc">Ajusta la configuración en segundo plano de %1$s para que las alarmas suenen a tiempo.</string>
+
     <string name="notif_perm_granted">Permiso concedido para enviar notificaciones.</string>
     <string name="notif_battery_title">Batería del teléfono</string>
     <string name="notif_battery_status">La batería está al %1$d%%</string>

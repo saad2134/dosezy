@@ -91,8 +91,13 @@
     <string name="pref_mark_missed_after">Als versäumt gelten nach</string>
     <string name="hours_format">%1$d Stunde(n)</string>
 
-        <string name="notif_check_title">Benachrichtigungs- &amp; Popup-Zuverlässigkeit</string>
+        <string name="notif_check_title">Benachrichtigungs-Zuverlässigkeit</string>
     <string name="notif_perm_title">Benachrichtigungsberechtigung</string>
+    <string name="notif_perm_desc">Erforderlich, um Medikamentenerinnerungen und Alarme zu senden.</string>
+    <string name="notif_perm_exact_warning">Benachrichtigungen aktiv • Genaue Alarme für pünktliche Erinnerungen erforderlich (tippen zum Erlauben)</string>
+    <string name="notif_perm_all_granted">Benachrichtigungen und genaue Alarme sind vollständig aktiviert.</string>
+    <string name="notif_oem_bg_item_desc">Passen Sie die %1$s-Hintergrundeinstellungen an, damit Alarme pünktlich klingeln.</string>
+
     <string name="notif_perm_granted">Berechtigung zum Senden von Benachrichtigungen erteilt.</string>
     <string name="notif_battery_title">Telefonakku</string>
     <string name="notif_battery_status">Akku bei %1$d%%</string>
