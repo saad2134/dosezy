@@ -589,4 +589,7 @@
     <string name="home_dose_reverted">%1$s ডোজ মুলতুবি অবস্থায় ফিরিয়ে আনা হয়েছে</string>
     <string name="search_medicines_hint">ওষুধ অনুসন্ধান করুন...</string>
     <string name="btn_add_first_medicine">আপনার প্রথম ওষুধ যোগ করুন</string>
+    <string name="search_no_results">\"%1$s\" এর সাথে মিলে যাওয়া কোনো ওষুধ পাওয়া যায়নি</string>
+    <string name="search_clear">অনুসন্ধান মুছুন</string>
+    <string name="backup_export_failed">রপ্তানি ব্যর্থ হয়েছে: %1$s</string>
 </resources>

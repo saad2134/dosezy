@@ -593,4 +593,7 @@
     <string name="home_dose_reverted">Прием дозы %1$s отменен</string>
     <string name="search_medicines_hint">Поиск лекарств...</string>
     <string name="btn_add_first_medicine">Добавить первое лекарство</string>
+    <string name="search_no_results">Лекарства по запросу \"%1$s\" не найдены</string>
+    <string name="search_clear">Очистить поиск</string>
+    <string name="backup_export_failed">Ошибка экспорта: %1$s</string>
 </resources>

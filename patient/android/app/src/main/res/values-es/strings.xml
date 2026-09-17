@@ -609,4 +609,7 @@
     <string name="home_dose_reverted">Dosis de %1$s revertida a pendiente</string>
     <string name="search_medicines_hint">Buscar medicamentos...</string>
     <string name="btn_add_first_medicine">Añadir tu primer medicamento</string>
+    <string name="search_no_results">No se encontraron medicamentos que coincidan con \"%1$s\"</string>
+    <string name="search_clear">Borrar búsqueda</string>
+    <string name="backup_export_failed">Error al exportar: %1$s</string>
 </resources>

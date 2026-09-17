@@ -609,4 +609,7 @@
     <string name="home_dose_reverted">%1$s 用药记录已撤回</string>
     <string name="search_medicines_hint">搜索药物...</string>
     <string name="btn_add_first_medicine">添加您的第一种药物</string>
+    <string name="search_no_results">未找到与 \"%1$s\" 匹配的药物</string>
+    <string name="search_clear">清除搜索</string>
+    <string name="backup_export_failed">导出失败：%1$s</string>
 </resources>

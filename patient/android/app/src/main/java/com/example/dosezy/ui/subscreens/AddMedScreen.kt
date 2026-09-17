@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -216,7 +217,7 @@ fun AddMedScreen(
                     onValueChange = { medicationName = it },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(64.dp),
+                        .defaultMinSize(minHeight = 56.dp),
                     placeholder = {
                         Text(
                             stringResource(R.string.form_med_name_placeholder),
@@ -260,7 +261,7 @@ fun AddMedScreen(
                         },
                         modifier = Modifier
                             .weight(1f)
-                            .height(64.dp),
+                            .defaultMinSize(minHeight = 56.dp),
                         placeholder = {
                             Text(
                                 "0",
@@ -298,7 +299,7 @@ fun AddMedScreen(
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(64.dp)
+                                    .defaultMinSize(minHeight = 56.dp)
                                     .menuAnchor(),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(0xFF1193D4),
@@ -383,7 +384,7 @@ fun AddMedScreen(
                                 readOnly = true,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(60.dp)
+                                    .defaultMinSize(minHeight = 56.dp)
                                     .menuAnchor(),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(0xFF1193D4),
@@ -437,7 +438,7 @@ fun AddMedScreen(
                                 label = { Text(stringResource(R.string.interval_hours_label)) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier.fillMaxWidth().height(64.dp),
+                                modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 56.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(0xFF1193D4),
                                     unfocusedBorderColor = MaterialTheme.colorScheme.outline
@@ -463,7 +464,7 @@ fun AddMedScreen(
                                 label = { Text(stringResource(R.string.interval_days_label)) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier.fillMaxWidth().height(64.dp),
+                                modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 56.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(0xFF1193D4),
                                     unfocusedBorderColor = MaterialTheme.colorScheme.outline
@@ -747,7 +748,7 @@ fun AddMedScreen(
                                 placeholder = { Text(stringResource(R.string.course_duration_days_placeholder)) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier.fillMaxWidth().height(64.dp),
+                                modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 56.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(0xFF1193D4),
                                     unfocusedBorderColor = MaterialTheme.colorScheme.outline
@@ -792,7 +793,7 @@ fun AddMedScreen(
                         placeholder = { Text(stringResource(R.string.med_stock_current_placeholder)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier.weight(1f).height(64.dp),
+                        modifier = Modifier.weight(1f).defaultMinSize(minHeight = 56.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color(0xFF1193D4),
                             unfocusedBorderColor = MaterialTheme.colorScheme.outline
@@ -805,7 +806,7 @@ fun AddMedScreen(
                         placeholder = { Text(stringResource(R.string.med_stock_refill_placeholder)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier.weight(1f).height(64.dp),
+                        modifier = Modifier.weight(1f).defaultMinSize(minHeight = 56.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color(0xFF1193D4),
                             unfocusedBorderColor = MaterialTheme.colorScheme.outline

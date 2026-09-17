@@ -593,4 +593,7 @@
     <string name="home_dose_reverted">%1$s の服薬記録を取り消しました</string>
     <string name="search_medicines_hint">薬を検索...</string>
     <string name="btn_add_first_medicine">最初の薬を追加</string>
+    <string name="search_no_results">「%1$s」に一致する薬は見つかりませんでした</string>
+    <string name="search_clear">検索をクリア</string>
+    <string name="backup_export_failed">エクスポートに失敗しました: %1$s</string>
 </resources>

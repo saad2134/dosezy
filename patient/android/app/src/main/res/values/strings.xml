@@ -621,4 +621,7 @@ Do you want to continue?</string>
     <string name="home_dose_reverted">%1$s dose reverted to pending</string>
     <string name="search_medicines_hint">Search medications...</string>
     <string name="btn_add_first_medicine">Add Your First Medication</string>
+    <string name="search_no_results">No medications found matching \"%1$s\"</string>
+    <string name="search_clear">Clear search</string>
+    <string name="backup_export_failed">Export failed: %1$s</string>
 </resources>

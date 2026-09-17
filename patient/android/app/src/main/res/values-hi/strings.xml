@@ -609,4 +609,7 @@
     <string name="home_dose_reverted">%1$s खुराक को लंबित में वापस बदला गया</string>
     <string name="search_medicines_hint">दवाइयाँ खोजें...</string>
     <string name="btn_add_first_medicine">अपनी पहली दवा जोड़ें</string>
+    <string name="search_no_results">\"%1$s\" से मेल खाने वाली कोई दवा नहीं मिली</string>
+    <string name="search_clear">खोज साफ़ करें</string>
+    <string name="backup_export_failed">निर्यात विफल: %1$s</string>
 </resources>

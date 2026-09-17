@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
@@ -270,7 +271,7 @@ fun HomeScreen(
                             Spacer(modifier = Modifier.height(16.dp))
                         }
                     } else if (userMedicines.isEmpty()) {
-                        NoMedicationsState()
+                        NoMedicationsState(onAddMedicineClick = { navController.navigate("add_med") })
                     } else {
                         // User has medications, but none scheduled for today (e.g. PRN or non-today)
                         Surface(
@@ -728,7 +729,7 @@ private fun MedicationCard(
 }
 
 @Composable
-private fun NoMedicationsState() {
+private fun NoMedicationsState(onAddMedicineClick: () -> Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -770,6 +771,28 @@ private fun NoMedicationsState() {
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Button(
+            onClick = onAddMedicineClick,
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF1193D4),
+                contentColor = Color.White
+            )
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = androidx.compose.ui.res.stringResource(R.string.form_add_medicine),
+                fontWeight = FontWeight.SemiBold
+            )
+        }
     }
 }
 

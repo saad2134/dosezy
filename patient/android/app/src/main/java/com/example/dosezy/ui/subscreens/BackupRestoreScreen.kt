@@ -105,13 +105,13 @@ fun BackupRestoreScreen(
         if (uri != null) {
             scope.launch {
                 isLoading = true
-                statusMessage = "Inspecting backup package..."
+                statusMessage = context.getString(R.string.backup_status_inspecting)
                 val inspect = backupManager.inspectBackupZip(uri)
                 isLoading = false
                 if (inspect.success && inspect.profiles.isNotEmpty()) {
                     inspectionResult = inspect
                 } else {
-                    statusMessage = inspect.message.ifEmpty { "No profiles found in backup archive." }
+                    statusMessage = inspect.message.ifEmpty { context.getString(R.string.backup_status_no_profiles) }
                 }
             }
         }
@@ -460,7 +460,7 @@ fun BackupRestoreScreen(
                                 onClick = {
                                     scope.launch {
                                         isLoading = true
-                                        statusMessage = "Packaging backup archive..."
+                                        statusMessage = context.getString(R.string.backup_status_packaging)
                                         try {
                                             val zipFile = backupManager.createFullBackupZip()
                                             isLoading = false
@@ -468,7 +468,7 @@ fun BackupRestoreScreen(
                                             showBackupSuccessDialog = true
                                         } catch (e: Exception) {
                                             isLoading = false
-                                            statusMessage = "Export failed: ${e.localizedMessage}"
+                                            statusMessage = context.getString(R.string.backup_export_failed, e.localizedMessage ?: "")
                                         }
                                     }
                                 },
@@ -641,7 +641,7 @@ fun BackupRestoreScreen(
                         inspectionResult = null
                         scope.launch {
                             isLoading = true
-                            statusMessage = "Restoring selected profiles..."
+                            statusMessage = context.getString(R.string.backup_status_restoring)
                             val result = backupManager.executeSelectiveRestore(tempDir, decisions)
                             isLoading = false
                             statusMessage = result.message

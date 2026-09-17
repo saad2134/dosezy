@@ -523,6 +523,8 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
     if (showAddContactDialog) {
         var contactName by remember { mutableStateOf("") }
         var contactPhone by remember { mutableStateOf("") }
+        var isNameTouched by remember { mutableStateOf(false) }
+        var isPhoneTouched by remember { mutableStateOf(false) }
 
         androidx.compose.material3.AlertDialog(
             onDismissRequest = { showAddContactDialog = false },
@@ -533,17 +535,27 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
                 Column {
                     OutlinedTextField(
                         value = contactName,
-                        onValueChange = { contactName = it },
+                        onValueChange = {
+                            contactName = it
+                            isNameTouched = true
+                        },
+                        isError = isNameTouched && contactName.isBlank(),
                         label = { Text(stringResource(R.string.personal_contacts_name_label)) },
                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        singleLine = true
                     )
                     OutlinedTextField(
                         value = contactPhone,
-                        onValueChange = { contactPhone = it },
+                        onValueChange = {
+                            contactPhone = it
+                            isPhoneTouched = true
+                        },
+                        isError = isPhoneTouched && contactPhone.isBlank(),
                         label = { Text(stringResource(R.string.personal_contacts_phone_label)) },
                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                         shape = RoundedCornerShape(12.dp),
+                        singleLine = true,
                         keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                             keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone
                         )
@@ -554,11 +566,12 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
                 androidx.compose.material3.TextButton(
                     onClick = {
                         if (contactName.isNotBlank() && contactPhone.isNotBlank()) {
-                            customContacts.add(Pair(contactName, contactPhone))
+                            customContacts.add(Pair(contactName.trim(), contactPhone.trim()))
                             saveContacts()
                             showAddContactDialog = false
                         }
-                    }
+                    },
+                    enabled = contactName.isNotBlank() && contactPhone.isNotBlank()
                 ) { Text(stringResource(R.string.personal_contacts_save)) }
             },
             dismissButton = {

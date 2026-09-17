@@ -593,4 +593,7 @@
     <string name="home_dose_reverted">تم التراجع عن جرعة %1$s وإعادتها لقيد الانتظار</string>
     <string name="search_medicines_hint">البحث في الأدوية...</string>
     <string name="btn_add_first_medicine">أضف دواءك الأول</string>
+    <string name="search_no_results">لم يتم العثور على أدوية مطابقة لـ \"%1$s\"</string>
+    <string name="search_clear">مسح البحث</string>
+    <string name="backup_export_failed">فشل التصدير: %1$s</string>
 </resources>

@@ -132,7 +132,7 @@ fun NewUserScreen(
                 if (inspect.success && inspect.profiles.isNotEmpty()) {
                     inspectionResult = inspect
                 } else {
-                    Toast.makeText(context, inspect.message.ifEmpty { "No profiles found in backup archive." }, Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, inspect.message.ifEmpty { context.getString(R.string.backup_status_no_profiles) }, Toast.LENGTH_LONG).show()
                 }
             }
         }

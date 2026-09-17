@@ -593,4 +593,7 @@ Voulez-vous continuer ?</string>
     <string name="home_dose_reverted">Dose de %1$s rétablie à en attente</string>
     <string name="search_medicines_hint">Rechercher des médicaments...</string>
     <string name="btn_add_first_medicine">Ajouter votre premier médicament</string>
+    <string name="search_no_results">Aucun médicament trouvé pour \"%1$s\"</string>
+    <string name="search_clear">Effacer la recherche</string>
+    <string name="backup_export_failed">Échec de l\'exportation : %1$s</string>
 </resources>
