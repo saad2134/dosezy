@@ -614,4 +614,33 @@
     <string name="skip_reason_other">その他の理由</string>
     <string name="skip_dialog_confirm">スキップを確定</string>
     <string name="skip_dialog_cancel">キャンセル</string>
+
+    <string name="existing_profiles_title">既存のプロフィール</string>
+    <string name="profile_picture_desc">プロフィール写真</string>
+    <string name="select_profile_desc">プロフィールを選択</string>
+    <string name="profile_age_gender_format">%1$d歳 • %2$s</string>
+    <string name="notif_content_scheduled_format">%1$s に予定 - お薬を飲む時間です！</string>
+    <string name="notif_content_generic_reminder">お薬を飲む時間です！</string>
+    <string name="validation_enter_name">お名前を入力してください</string>
+    <string name="validation_enter_valid_age">有効な年齢（1〜120）を入力してください</string>
+    <string name="medication_added_success">お薬が正常に追加されました</string>
+    <string name="status_pending">保留中</string>
+    <string name="pharmacy_order_title">薬局への注文リスト</string>
+    <string name="pharmacy_order_desc">WhatsAppや薬局向けの医薬品注文リストを作成</string>
+    <string name="pharmacy_order_scope_low_stock">残量少のみ</string>
+    <string name="pharmacy_order_scope_all">すべての服用中の薬</string>
+    <string name="pharmacy_order_days_format">%1$d 日分</string>
+    <string name="pharmacy_order_share">WhatsApp / アプリで共有</string>
+    <string name="pharmacy_order_copy">テキストをコピー</string>
+    <string name="pharmacy_order_copied">注文リストをクリップボードにコピーしました</string>
+    <string name="pharmacy_order_empty">注文可能な医薬品がありません</string>
+    <string name="pharmacy_order_current_stock">現在の残量: 残り %1$d %2$s</string>
+    <string name="pharmacy_order_qty_needed">注文数量: %1$d %2$s</string>
+    <string name="pharmacy_order_patient_header">患者名: %1$s</string>
+    <string name="pharmacy_order_date_header">日付: %1$s</string>
+    <string name="pharmacy_order_supply_header">%1$d 日分の処方注文:</string>
+    <string name="pharmacy_order_footer_confirm">在庫の確認および配送の確認をお願い申し上げます。ありがとうございます。</string>
+    <string name="pharmacy_order_footer_brand">Dosezy で生成</string>
+    <string name="menu_pharmacy_order">薬局への注文リスト</string>
+    <string name="menu_pharmacy_order_desc">医薬品の注文リストを作成してWhatsAppで共有</string>
 </resources>

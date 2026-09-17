@@ -94,7 +94,9 @@ fun BackupRestoreScreen(
     val backupManager = remember { BackupRestoreManager(context, database, scheduleRepository) }
 
     var isLoading by remember { mutableStateOf(false) }
+    var loadingMessage by remember { mutableStateOf<String?>(null) }
     var statusMessage by remember { mutableStateOf<String?>(null) }
+    var isStatusSuccess by remember { mutableStateOf(false) }
     var inspectionResult by remember { mutableStateOf<ZipInspectionResult?>(null) }
     var exportedBackupFile by remember { mutableStateOf<java.io.File?>(null) }
     var showBackupSuccessDialog by remember { mutableStateOf(false) }
@@ -105,12 +107,15 @@ fun BackupRestoreScreen(
         if (uri != null) {
             scope.launch {
                 isLoading = true
-                statusMessage = context.getString(R.string.backup_status_inspecting)
+                loadingMessage = context.getString(R.string.backup_status_inspecting)
                 val inspect = backupManager.inspectBackupZip(uri)
                 isLoading = false
+                loadingMessage = null
                 if (inspect.success && inspect.profiles.isNotEmpty()) {
+                    statusMessage = null
                     inspectionResult = inspect
                 } else {
+                    isStatusSuccess = false
                     statusMessage = inspect.message.ifEmpty { context.getString(R.string.backup_status_no_profiles) }
                 }
             }
@@ -460,14 +465,18 @@ fun BackupRestoreScreen(
                                 onClick = {
                                     scope.launch {
                                         isLoading = true
-                                        statusMessage = context.getString(R.string.backup_status_packaging)
+                                        loadingMessage = context.getString(R.string.backup_status_packaging)
                                         try {
                                             val zipFile = backupManager.createFullBackupZip()
                                             isLoading = false
+                                            loadingMessage = null
+                                            statusMessage = null
                                             exportedBackupFile = zipFile
                                             showBackupSuccessDialog = true
                                         } catch (e: Exception) {
                                             isLoading = false
+                                            loadingMessage = null
+                                            isStatusSuccess = false
                                             statusMessage = context.getString(R.string.backup_export_failed, e.localizedMessage ?: "")
                                         }
                                     }
@@ -572,7 +581,7 @@ fun BackupRestoreScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = if (msg.startsWith("Successfully")) Color(0xFF10B981).copy(alpha = 0.15f) else Color(0xFFEF4444).copy(alpha = 0.15f)
+                            containerColor = if (isStatusSuccess) Color(0xFF10B981).copy(alpha = 0.15f) else Color(0xFFEF4444).copy(alpha = 0.15f)
                         )
                     ) {
                         Row(
@@ -580,9 +589,9 @@ fun BackupRestoreScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                imageVector = if (msg.startsWith("Successfully")) Icons.Default.CheckCircle else Icons.Default.Info,
+                                imageVector = if (isStatusSuccess) Icons.Default.CheckCircle else Icons.Default.Info,
                                 contentDescription = null,
-                                tint = if (msg.startsWith("Successfully")) Color(0xFF10B981) else Color(0xFFEF4444)
+                                tint = if (isStatusSuccess) Color(0xFF10B981) else Color(0xFFEF4444)
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
@@ -635,15 +644,19 @@ fun BackupRestoreScreen(
                     onDismiss = {
                         inspectionResult?.tempDir?.deleteRecursively()
                         inspectionResult = null
+                        statusMessage = null
                     },
                     onConfirmImport = { decisions ->
                         val tempDir = inspectionResult!!.tempDir!!
                         inspectionResult = null
+                        statusMessage = null
                         scope.launch {
                             isLoading = true
-                            statusMessage = context.getString(R.string.backup_status_restoring)
+                            loadingMessage = context.getString(R.string.backup_status_restoring)
                             val result = backupManager.executeSelectiveRestore(tempDir, decisions)
                             isLoading = false
+                            loadingMessage = null
+                            isStatusSuccess = result.success
                             statusMessage = result.message
                             if (result.success) {
                                 Toast.makeText(context, result.message, Toast.LENGTH_LONG).show()
@@ -651,6 +664,41 @@ fun BackupRestoreScreen(
                         }
                     }
                 )
+            }
+        }
+    }
+
+    // In-Front Modal Loading Dialog to eliminate awkward freeze
+    if (isLoading) {
+        androidx.compose.ui.window.Dialog(
+            onDismissRequest = {},
+            properties = androidx.compose.ui.window.DialogProperties(
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false
+            )
+        ) {
+            Surface(
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surface,
+                tonalElevation = 8.dp
+            ) {
+                Row(
+                    modifier = Modifier.padding(24.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    CircularProgressIndicator(
+                        color = Color(0xFF1193D4),
+                        modifier = Modifier.size(36.dp),
+                        strokeWidth = 3.dp
+                    )
+                    Text(
+                        text = loadingMessage ?: stringResource(R.string.backup_status_inspecting),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
         }
     }
@@ -698,7 +746,7 @@ fun BackupRestoreScreen(
 
                     // Description
                     Text(
-                        text = "${stringResource(R.string.export_success_desc)} 'Android/data/${context.packageName}/files'",
+                        text = stringResource(R.string.export_success_desc),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center

@@ -122,13 +122,18 @@ fun NewUserScreen(
 
     var inspectionResult by remember { mutableStateOf<ZipInspectionResult?>(null) }
     var isImporting by remember { mutableStateOf(false) }
+    var loadingMessage by remember { mutableStateOf<String?>(null) }
 
     val importLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
         if (uri != null) {
             scope.launch {
+                isImporting = true
+                loadingMessage = context.getString(R.string.backup_status_inspecting)
                 val inspect = backupManager.inspectBackupZip(uri)
+                isImporting = false
+                loadingMessage = null
                 if (inspect.success && inspect.profiles.isNotEmpty()) {
                     inspectionResult = inspect
                 } else {
@@ -163,13 +168,17 @@ fun NewUserScreen(
                 isProfileSetupValid = isProfileSetupValid,
                 onCompleteProfileSetup = {
                     completeProfileSetup()
-                    // Handle navigation immediately after completion
-                    if (isCreatingNewProfile) {
-                        navController.popBackStack("switch_profile", false)
-                    } else {
-                        navController.navigate("home") {
-                            popUpTo("newuser/1") { inclusive = true }
+                    if (isProfileSetupValid) {
+                        // Handle navigation immediately after completion
+                        if (isCreatingNewProfile) {
+                            navController.popBackStack("switch_profile", false)
+                        } else {
+                            navController.navigate("home") {
+                                popUpTo("newuser/1") { inclusive = true }
+                            }
                         }
+                    } else {
+                        Toast.makeText(context, context.getString(R.string.validation_enter_name), Toast.LENGTH_SHORT).show()
                     }
                 }
             )
@@ -234,8 +243,10 @@ fun NewUserScreen(
                         inspectionResult = null
                         scope.launch {
                             isImporting = true
+                            loadingMessage = context.getString(R.string.backup_status_restoring)
                             val result = backupManager.executeSelectiveRestore(tempDir, decisions)
                             isImporting = false
+                            loadingMessage = null
                             Toast.makeText(context, result.message, Toast.LENGTH_LONG).show()
                             if (result.success) {
                                 withContext(Dispatchers.IO) {
@@ -264,6 +275,41 @@ fun NewUserScreen(
                     onClose = { showExistingProfiles = false },
                     navController = navController
                 )
+            }
+
+            // In-Front Modal Loading Dialog to eliminate awkward pause / freeze perception
+            if (isImporting) {
+                androidx.compose.ui.window.Dialog(
+                    onDismissRequest = {},
+                    properties = androidx.compose.ui.window.DialogProperties(
+                        dismissOnBackPress = false,
+                        dismissOnClickOutside = false
+                    )
+                ) {
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        color = MaterialTheme.colorScheme.surface,
+                        tonalElevation = 8.dp
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(24.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            CircularProgressIndicator(
+                                color = Color(0xFF1193D4),
+                                modifier = Modifier.size(36.dp),
+                                strokeWidth = 3.dp
+                            )
+                            Text(
+                                text = loadingMessage ?: stringResource(R.string.backup_status_inspecting),
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -932,11 +978,7 @@ fun NewUserBottomBar(
                         }
 
                         Button(
-                            onClick = {
-                                if (isProfileSetupValid) {
-                                    onCompleteProfileSetup()
-                                }
-                            },
+                            onClick = onCompleteProfileSetup,
                             modifier = Modifier
                                 .weight(1f)
                                 .height(56.dp),
@@ -945,10 +987,9 @@ fun NewUserBottomBar(
                                 containerColor = if (isProfileSetupValid) {
                                     MaterialTheme.colorScheme.primary
                                 } else {
-                                    Color(0xFF9CA3AF)
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                                 }
-                            ),
-                            enabled = isProfileSetupValid
+                            )
                         ) {
                             Text(
                                 text = stringResource(R.string.save),
@@ -988,7 +1029,7 @@ fun ExistingProfilesModal(
                 modifier = Modifier.padding(24.dp)
             ) {
                 Text(
-                    text = "Existing Profiles",
+                    text = stringResource(R.string.existing_profiles_title),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
@@ -1041,7 +1082,7 @@ fun ProfileItem(user: User, onClick: () -> Unit, modifier: Modifier = Modifier) 
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
             .clickable(onClick = onClick),
-        color = Color(0xFFF8FAFC)
+        color = MaterialTheme.colorScheme.surfaceVariant
     ) {
         Row(
             modifier = Modifier
@@ -1060,7 +1101,7 @@ fun ProfileItem(user: User, onClick: () -> Unit, modifier: Modifier = Modifier) 
                             .data(File(user.profilePicPath))
                             .crossfade(true)
                             .build(),
-                        contentDescription = "Profile Picture",
+                        contentDescription = stringResource(R.string.profile_picture_desc),
                         modifier = Modifier
                             .size(48.dp)
                             .clip(RoundedCornerShape(12.dp)),
@@ -1071,7 +1112,7 @@ fun ProfileItem(user: User, onClick: () -> Unit, modifier: Modifier = Modifier) 
                 } else {
                     Image(
                         painter = painterResource(id = R.drawable.default_profile),
-                        contentDescription = "Profile Picture",
+                        contentDescription = stringResource(R.string.profile_picture_desc),
                         modifier = Modifier
                             .size(48.dp)
                             .clip(RoundedCornerShape(12.dp)),
@@ -1088,7 +1129,7 @@ fun ProfileItem(user: User, onClick: () -> Unit, modifier: Modifier = Modifier) 
                         fontWeight = FontWeight.Medium
                     )
                     Text(
-                        text = "${user.age} years • ${user.gender.displayName}",
+                        text = stringResource(R.string.profile_age_gender_format, user.age, user.gender.displayName),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -1097,7 +1138,7 @@ fun ProfileItem(user: User, onClick: () -> Unit, modifier: Modifier = Modifier) 
 
             Icon(
                 imageVector = Icons.Default.Person,
-                contentDescription = "Select Profile",
+                contentDescription = stringResource(R.string.select_profile_desc),
                 tint = Color(0xFF9CA3AF)
             )
         }

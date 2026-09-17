@@ -903,6 +903,7 @@ fun AddMedScreen(
                             durationDays = if (isFiniteCourse) durationDaysInt else null
                         )
                         medicineViewModel.addMedicine(newMedicine)
+                        android.widget.Toast.makeText(context, context.getString(R.string.medication_added_success), android.widget.Toast.LENGTH_SHORT).show()
                         navController.popBackStack()
                     },
                     modifier = Modifier

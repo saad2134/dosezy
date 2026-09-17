@@ -614,4 +614,33 @@
     <string name="skip_reason_other">Другая клиническая / личная причина</string>
     <string name="skip_dialog_confirm">Подтвердить</string>
     <string name="skip_dialog_cancel">Отмена</string>
+
+    <string name="existing_profiles_title">Существующие профили</string>
+    <string name="profile_picture_desc">Фотография профиля</string>
+    <string name="select_profile_desc">Выбрать профиль</string>
+    <string name="profile_age_gender_format">%1$d лет • %2$s</string>
+    <string name="notif_content_scheduled_format">Запланировано на %1$s - Пора принять лекарство!</string>
+    <string name="notif_content_generic_reminder">Пора принять лекарство!</string>
+    <string name="validation_enter_name">Пожалуйста, введите ваше имя</string>
+    <string name="validation_enter_valid_age">Пожалуйста, введите корректный возраст (1-120)</string>
+    <string name="medication_added_success">Лекарство успешно добавлено</string>
+    <string name="status_pending">В ожидании</string>
+    <string name="pharmacy_order_title">Заказ в аптеку</string>
+    <string name="pharmacy_order_desc">Создать список лекарств для WhatsApp или аптеки</string>
+    <string name="pharmacy_order_scope_low_stock">Только заканчивающиеся</string>
+    <string name="pharmacy_order_scope_all">Все активные лекарства</string>
+    <string name="pharmacy_order_days_format">%1$d дн.</string>
+    <string name="pharmacy_order_share">Поделиться в WhatsApp / приложениях</string>
+    <string name="pharmacy_order_copy">Скопировать текст</string>
+    <string name="pharmacy_order_copied">Заказ скопирован в буфер обмена</string>
+    <string name="pharmacy_order_empty">Нет доступных лекарств для заказа</string>
+    <string name="pharmacy_order_current_stock">Текущий остаток: осталось %1$d %2$s</string>
+    <string name="pharmacy_order_qty_needed">Количество для заказа: %1$d %2$s</string>
+    <string name="pharmacy_order_patient_header">Пациент: %1$s</string>
+    <string name="pharmacy_order_date_header">Дата: %1$s</string>
+    <string name="pharmacy_order_supply_header">Заказ на %1$d дн. запаса:</string>
+    <string name="pharmacy_order_footer_confirm">Пожалуйста, подтвердите наличие и доставку. Спасибо!</string>
+    <string name="pharmacy_order_footer_brand">Сформировано в Dosezy</string>
+    <string name="menu_pharmacy_order">Заказ в аптеку</string>
+    <string name="menu_pharmacy_order_desc">Создать и отправить заказ лекарств через WhatsApp</string>
 </resources>

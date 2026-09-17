@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Loop
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Emergency
 import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.People
@@ -89,8 +90,11 @@ import java.io.File
 @Composable
 fun MenuScreen(navController: NavController) {
     val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
+    val medicineViewModel: com.example.dosezy.ui.viewmodels.MedicineViewModel = com.example.dosezy.utils.sharedMedicineViewModel()
+    val medicines by medicineViewModel.medicines.collectAsState()
     val users by userViewModel.users.collectAsState()
     val currentUser by userViewModel.currentUser.collectAsState()
+    var showPharmacyOrderDialog by remember { mutableStateOf(false) }
     var showExportFormatDialog by remember { mutableStateOf(false) }
     var selectedExportFormat by remember { mutableStateOf(com.example.dosezy.ui.components.ExportFormat.CSV) }
     var shouldShareDirectly by remember { mutableStateOf(false) }
@@ -258,6 +262,18 @@ fun MenuScreen(navController: NavController) {
                 )
             }
 
+            // 5. Pharmacy Refill Order
+            item {
+                MenuItem(
+                    icon = Icons.Default.ReceiptLong,
+                    title = androidx.compose.ui.res.stringResource(R.string.menu_pharmacy_order),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    onClick = {
+                        showPharmacyOrderDialog = true
+                    }
+                )
+            }
+
             // More Section Header
             item {
                 Text(
@@ -380,6 +396,15 @@ fun MenuScreen(navController: NavController) {
                     Text(stringResource(R.string.cancel))
                 }
             }
+        )
+    }
+
+    if (showPharmacyOrderDialog && currentUser != null) {
+        com.example.dosezy.ui.components.PharmacyOrderDialog(
+            user = currentUser!!,
+            medicines = medicines,
+            dataExporter = dataExporter,
+            onDismiss = { showPharmacyOrderDialog = false }
         )
     }
 
@@ -786,7 +811,7 @@ fun ExportDataDialog(
 
                 // Description
                 Text(
-                    text = "${stringResource(R.string.export_success_desc)} 'Android/data/${context.packageName}/files'",
+                    text = stringResource(R.string.export_success_desc),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center

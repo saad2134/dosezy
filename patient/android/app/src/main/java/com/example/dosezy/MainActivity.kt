@@ -53,9 +53,38 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    override fun attachBaseContext(newBase: android.content.Context) {
+        val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(newBase)
+        val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(newBase, savedLanguage)
+        super.attachBaseContext(localizedContext)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         window.decorView.setBackgroundColor(android.graphics.Color.parseColor("#0F172A"))
         super.onCreate(savedInstanceState)
+
+        // Safety fallback: if an uncaught locale/formatting error occurs, reset language to SYSTEM so app opens cleanly on next launch
+        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            val isLocaleOrFormatError = throwable is java.util.MissingFormatArgumentException ||
+                    throwable is java.util.UnknownFormatConversionException ||
+                    throwable is android.content.res.Resources.NotFoundException ||
+                    throwable.cause is java.util.MissingFormatArgumentException ||
+                    throwable.cause is java.util.UnknownFormatConversionException
+
+            if (isLocaleOrFormatError) {
+                try {
+                    getSharedPreferences("app_prefs", MODE_PRIVATE)
+                        .edit()
+                        .putString("selected_language", com.example.dosezy.data.model.Language.SYSTEM.name)
+                        .apply()
+                    androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(androidx.core.os.LocaleListCompat.getEmptyLocaleList())
+                } catch (_: Throwable) {}
+            }
+            defaultHandler?.uncaughtException(thread, throwable)
+        }
+
         if (resources.configuration.smallestScreenWidthDp < 600) {
             requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         }
@@ -80,7 +109,10 @@ class MainActivity : ComponentActivity() {
 
             LaunchedEffect(currentUser?.language) {
                 currentUser?.language?.let { lang ->
-                    com.example.dosezy.utils.LocaleHelper.applyLanguage(context, lang)
+                    val currentSaved = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+                    if (currentSaved != lang) {
+                        com.example.dosezy.utils.LocaleHelper.applyLanguage(context, lang, forceRecreate = false)
+                    }
                 }
             }
 

@@ -610,4 +610,33 @@
     <string name="skip_reason_other">অন্যান্য কারণ</string>
     <string name="skip_dialog_confirm">নিশ্চিত করুন</string>
     <string name="skip_dialog_cancel">বাতিল</string>
+
+    <string name="existing_profiles_title">বিদ্যমান প্রোফাইল</string>
+    <string name="profile_picture_desc">প্রোফাইল ছবি</string>
+    <string name="select_profile_desc">প্রোফাইল নির্বাচন করুন</string>
+    <string name="profile_age_gender_format">%1$d বছর • %2$s</string>
+    <string name="notif_content_scheduled_format">%1$s এর জন্য নির্ধারিত - ওষুধ খাওয়ার সময় হয়েছে!</string>
+    <string name="notif_content_generic_reminder">ওষুধ খাওয়ার সময় হয়েছে!</string>
+    <string name="validation_enter_name">অনুগ্রহ করে আপনার নাম লিখুন</string>
+    <string name="validation_enter_valid_age">অনুগ্রহ করে একটি বৈধ বয়স লিখুন (১-১২০)</string>
+    <string name="medication_added_success">ওষুধ সফলভাবে যোগ করা হয়েছে</string>
+    <string name="status_pending">বিচারাধীন</string>
+    <string name="pharmacy_order_title">ফার্মেসি রিফিল অর্ডার</string>
+    <string name="pharmacy_order_desc">হোয়াটসঅ্যাপ বা ফার্মেসির জন্য ওষুধের অর্ডারের তালিকা তৈরি করুন</string>
+    <string name="pharmacy_order_scope_low_stock">কেবল স্বল্প মজুত</string>
+    <string name="pharmacy_order_scope_all">সকল সক্রিয় ওষুধ</string>
+    <string name="pharmacy_order_days_format">%1$d দিন</string>
+    <string name="pharmacy_order_share">হোয়াটসঅ্যাপ / অ্যাপে শেয়ার করুন</string>
+    <string name="pharmacy_order_copy">টেক্সট কপি করুন</string>
+    <string name="pharmacy_order_copied">রিফিল অর্ডার ক্লিপবোর্ডে কপি করা হয়েছে</string>
+    <string name="pharmacy_order_empty">অর্ডার করার মতো কোনো ওষুধ নেই</string>
+    <string name="pharmacy_order_current_stock">বর্তমান মজুত: %1$d %2$s বাকি</string>
+    <string name="pharmacy_order_qty_needed">অর্ডারের পরিমাণ: %1$d %2$s</string>
+    <string name="pharmacy_order_patient_header">রোগী: %1$s</string>
+    <string name="pharmacy_order_date_header">তারিখ: %1$s</string>
+    <string name="pharmacy_order_supply_header">%1$d দিনের জন্য অর্ডারের তালিকা:</string>
+    <string name="pharmacy_order_footer_confirm">দয়া করে প্রাপ্যতা এবং ডেলিভারি নিশ্চিত করুন। ধন্যবাদ!</string>
+    <string name="pharmacy_order_footer_brand">Dosezy দ্বারা তৈরি</string>
+    <string name="menu_pharmacy_order">ফার্মেসি রিফিল অর্ডার</string>
+    <string name="menu_pharmacy_order_desc">হোয়াটসঅ্যাপের মাধ্যমে ওষুধের অর্ডার তৈরি ও শেয়ার করুন</string>
 </resources>

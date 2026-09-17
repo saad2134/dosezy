@@ -427,6 +427,14 @@ fun ScheduleListItem(
                 Pair(Icons.Default.HorizontalRule, MaterialTheme.colorScheme.onSurfaceVariant)
         }
 
+        val statusDescription = when (resolvedStatus) {
+            MedicationStatus.TAKEN_ON_TIME -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.status_taken)
+            MedicationStatus.TAKEN_LATE -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.analytics_taken_late)
+            MedicationStatus.SKIPPED -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.home_action_skipped)
+            MedicationStatus.MISSED -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.home_action_missed)
+            MedicationStatus.PENDING -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.status_pending)
+        }
+
         Box(
             modifier = Modifier
                 .size(40.dp)
@@ -436,7 +444,7 @@ fun ScheduleListItem(
         ) {
             Icon(
                 imageVector = icon,
-                contentDescription = "Status",
+                contentDescription = statusDescription,
                 tint = color,
                 modifier = Modifier.size(20.dp)
             )

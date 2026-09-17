@@ -53,58 +53,97 @@ object LocaleHelper {
         }
     }
 
+    fun getSavedLanguage(context: Context): Language {
+        return try {
+            val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+            val langName = prefs.getString("selected_language", Language.SYSTEM.name) ?: Language.SYSTEM.name
+            Language.valueOf(langName)
+        } catch (e: Exception) {
+            Language.SYSTEM
+        }
+    }
+
     fun applyLanguage(context: Context, language: Language, forceRecreate: Boolean = false) {
-        val targetLocale = getLocale(language)
-        val currentLocale = context.resources.configuration.locales.get(0)
+        try {
+            // Persist selection so attachBaseContext uses it on subsequent launches
+            try {
+                context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                    .edit()
+                    .putString("selected_language", language.name)
+                    .apply()
+            } catch (_: Throwable) {}
 
-        Locale.setDefault(targetLocale)
+            val targetLocale = getLocale(language)
+            Locale.setDefault(targetLocale)
 
-        val resources = context.resources
-        val config = Configuration(resources.configuration)
-        config.setLocale(targetLocale)
+            val resources = context.resources
+            val config = Configuration(resources.configuration)
+            config.setLocale(targetLocale)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val localeList = LocaleList(targetLocale)
-            LocaleList.setDefault(localeList)
-            config.setLocales(localeList)
-        }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val localeList = LocaleList(targetLocale)
+                LocaleList.setDefault(localeList)
+                config.setLocales(localeList)
+            }
 
-        @Suppress("DEPRECATION")
-        resources.updateConfiguration(config, resources.displayMetrics)
+            @Suppress("DEPRECATION")
+            resources.updateConfiguration(config, resources.displayMetrics)
 
-        val languageTag = when (language) {
-            Language.SYSTEM -> ""
-            Language.ENGLISH -> "en"
-            Language.SPANISH -> "es"
-            Language.HINDI -> "hi"
-            Language.CHINESE -> "zh"
-            Language.PORTUGUESE -> "pt"
-            Language.ARABIC -> "ar"
-            Language.FRENCH -> "fr"
-            Language.GERMAN -> "de"
-            Language.JAPANESE -> "ja"
-            Language.RUSSIAN -> "ru"
-            Language.ITALIAN -> "it"
-            Language.BENGALI -> "bn"
-        }
+            val languageTag = when (language) {
+                Language.SYSTEM -> ""
+                Language.ENGLISH -> "en"
+                Language.SPANISH -> "es"
+                Language.HINDI -> "hi"
+                Language.CHINESE -> "zh"
+                Language.PORTUGUESE -> "pt"
+                Language.ARABIC -> "ar"
+                Language.FRENCH -> "fr"
+                Language.GERMAN -> "de"
+                Language.JAPANESE -> "ja"
+                Language.RUSSIAN -> "ru"
+                Language.ITALIAN -> "it"
+                Language.BENGALI -> "bn"
+            }
 
-        if (languageTag.isEmpty()) {
-            AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList())
-        } else {
-            AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(languageTag))
-        }
+            if (languageTag.isEmpty()) {
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList())
+            } else {
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(languageTag))
+            }
 
-        if (forceRecreate || (currentLocale.language != targetLocale.language)) {
-            (context as? Activity)?.recreate()
+            // ONLY recreate if explicitly requested by user action (never on cold start / LaunchedEffect)
+            if (forceRecreate) {
+                val activity = context as? Activity
+                if (activity != null && !activity.isFinishing && !activity.isDestroyed) {
+                    activity.recreate()
+                }
+            }
+        } catch (e: Throwable) {
+            android.util.Log.e("LocaleHelper", "Error applying language $language, falling back to System default", e)
+            try {
+                context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                    .edit()
+                    .putString("selected_language", Language.SYSTEM.name)
+                    .apply()
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList())
+            } catch (_: Throwable) {}
         }
     }
 
     fun updateContextLocale(context: Context, language: Language): Context {
-        val locale = getLocale(language)
-        Locale.setDefault(locale)
+        return try {
+            val locale = getLocale(language)
+            Locale.setDefault(locale)
 
-        val config = Configuration(context.resources.configuration)
-        config.setLocale(locale)
-        return context.createConfigurationContext(config)
+            val config = Configuration(context.resources.configuration)
+            config.setLocale(locale)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                config.setLocales(LocaleList(locale))
+            }
+            context.createConfigurationContext(config)
+        } catch (e: Throwable) {
+            android.util.Log.e("LocaleHelper", "Failed to updateContextLocale for $language", e)
+            context
+        }
     }
 }

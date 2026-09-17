@@ -28,7 +28,10 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Medication
+import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Search
+import com.example.dosezy.data.export.DataExporter
+import com.example.dosezy.ui.components.PharmacyOrderDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -98,6 +101,16 @@ fun MedicinesScreen(
         }
     }
 
+    val context = LocalContext.current
+    val dataExporter = remember {
+        DataExporter(
+            context = context,
+            userRepository = userViewModel.userRepository,
+            medicineRepository = userViewModel.medicineRepository,
+            scheduleRepository = userViewModel.scheduleRepository
+        )
+    }
+    var showPharmacyOrderDialog by remember { mutableStateOf(false) }
     var medicineToRefill by remember { mutableStateOf<Medicine?>(null) }
     var medicineToPermanentlyDelete by remember { mutableStateOf<Medicine?>(null) }
 
@@ -112,7 +125,17 @@ fun MedicinesScreen(
                 navController = navController,
                 currentUser = currentUser,
                 title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.medicines_title),
-                actions = {}
+                actions = {
+                    if (medicines.isNotEmpty()) {
+                        IconButton(onClick = { showPharmacyOrderDialog = true }) {
+                            Icon(
+                                imageVector = Icons.Default.ReceiptLong,
+                                contentDescription = stringResource(R.string.pharmacy_order_title),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
             )
 
             if (isLoading && medicines.isEmpty() && archivedMedicines.isEmpty()) {
@@ -190,6 +213,15 @@ fun MedicinesScreen(
                     Text(stringResource(com.example.dosezy.R.string.cancel))
                 }
             }
+        )
+    }
+
+    if (showPharmacyOrderDialog && currentUser != null) {
+        PharmacyOrderDialog(
+            user = currentUser!!,
+            medicines = medicines,
+            dataExporter = dataExporter,
+            onDismiss = { showPharmacyOrderDialog = false }
         )
     }
 }

@@ -75,8 +75,38 @@ import Footer from '../components/Footer.astro';
 						</svg>
 					</summary>
 					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
-						<p>Dosezy automatically combines all medicines scheduled for the exact same minute (e.g. 8:00 AM) into a single grouped alarm screen.</p>
-						<p>You get an interactive checklist of your medicines with photos, meal instructions, a prominent green <strong>"Take All"</strong> button, and an orange <strong>"Snooze"</strong> button configured to your preferred snooze duration (5, 10, 15, 20, or 30 minutes in Preferences).</p>
+						<p>Dosezy automatically combines all medicines scheduled for the exact same minute into a single high-priority grouped alarm screen.</p>
+						<p>You get an interactive checklist with photos, meal instructions, a prominent green <strong>"Take All"</strong> button (which logs every dose and decrements stock in 1 tap), and a customizable <strong>"Snooze"</strong> button (5, 10, 15, 20, or 30 minutes).</p>
+					</div>
+				</details>
+
+				<!-- Question: Physical Controls & Custom Alarms -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>Can I silence alarms with volume buttons or pick custom ringtones?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
+						<p><strong class="text-white">Hardware Volume Silence:</strong> Press Volume Up or Down while an alarm rings to immediately silence the audio tone and stop vibration without dismissing the alert or unlocking your device.</p>
+						<p><strong class="text-white">Back-Gesture Snooze:</strong> Pressing your device's physical or gesture Back button automatically triggers a safe snooze for your configured duration.</p>
+						<p><strong class="text-white">Custom Tones &amp; Duration:</strong> In <em>Menu &gt; Preferences &gt; Notifications &amp; Alarms</em>, choose from built-in alert chimes, system alarms, or custom device ringtones with in-app audio preview playback. You can also configure alarm duration (30s, 1m, 2m, 3m, 5m, or continuous loop) and dedicated alarm volume.</p>
+					</div>
+				</details>
+
+				<!-- Question: Clinical Dose Skipping -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>Can I skip a dose if I am unwell, fasting, or advised by my doctor?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
+						<p>Yes! Under <em>Menu &gt; Preferences &gt; Dose Tracking</em>, turn on <strong>Allow Dose Skipping</strong>. An outlined "Skip" button will appear on dose cards and full-screen alarm screens.</p>
+						<p>Skipping requires selecting from 6 standardized clinical reasons: <em>Doctor advised pause</em>, <em>Side effects / adverse reaction</em>, <em>Fasting / medical procedure</em>, <em>Nausea / illness</em>, <em>Ran out of medicine</em>, or <em>Other reason</em>.</p>
+						<p>Skipped doses display a clear clinical badge (e.g. 📝 Skipped: Doctor advised pause), do <strong>not</strong> penalize your adherence score in Analytics, and can be undone at any time with the on-card Undo button.</p>
 					</div>
 				</details>
 
@@ -189,7 +219,22 @@ import Footer from '../components/Footer.astro';
 						<p><strong class="text-emerald-400">Green:</strong> Dose confirmed as Taken (shows exact recorded time).</p>
 						<p><strong class="text-white">Normal Text:</strong> Dose is upcoming or due recently (within your customizable Late Window).</p>
 						<p><strong class="text-amber-400">Orange:</strong> Dose is Late (within your customizable late-to-missed window). An orange "Mark Late" action appears.</p>
-						<p><strong class="text-red-400">Red:</strong> Dose is Missed (past your "Consider Missed After" window).</p>
+						<p><strong class="text-rose-400">Red:</strong> Dose is Missed (past your "Consider Missed After" window).</p>
+						<p><strong class="text-sky-400">Blue:</strong> Dose is Clinically Skipped (shows reason badge with active Undo button).</p>
+					</div>
+				</details>
+
+				<!-- Question: Schedule Calendar & TalkBack -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>Is the schedule calendar accessible with TalkBack screen readers?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
+						<p>Yes! Dosezy provides complete TalkBack screen reader accessibility on the Schedule calendar.</p>
+						<p>Instead of generic status labels, TalkBack audibly announces the exact clinical status of each dose (*"Taken"*, *"Late"*, *"Skipped"*, *"Missed"*, or *"Pending"*), allowing visually impaired users to navigate their full medication history with ease.</p>
 					</div>
 				</details>
 
@@ -202,8 +247,27 @@ import Footer from '../components/Footer.astro';
 						</svg>
 					</summary>
 					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
-						<p>In <strong>Menu > Emergency Contacts</strong>, Dosezy offers 1-tap dialing for national public emergency lines (ambulance, police, fire) across 10 regions, plus custom personal contacts for your family doctor, daughter/son, or caregiver.</p>
+						<p>In <strong>Menu > Emergency Contacts</strong>, Dosezy offers 1-tap dialing for national public emergency lines across 10 regions, plus personal contacts for your doctor or caregiver.</p>
 						<p>Emergency contacts are scoped per user profile to keep personal contacts isolated between family members, and are automatically included in encrypted backups in <strong>Menu > Backup & Restore</strong>.</p>
+					</div>
+				</details>
+
+				<!-- Question: Selective Profile Restore & Conflict Resolution -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>How does backup restore handle profiles that already exist on my phone?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
+						<p>When you restore a backup ZIP, Dosezy displays an in-front inspection loader and presents the <strong>Select Profiles to Import</strong> dialog.</p>
+						<p>For any profile with a matching name, you can pick a specific conflict resolution strategy:</p>
+						<ul class="list-disc list-inside space-y-1 text-[11px] text-neutral-300 pl-1">
+							<li><strong class="text-white">Create New Profile:</strong> Imports the profile as a separate new user with a distinct name.</li>
+							<li><strong class="text-white">Merge Records:</strong> Intelligently merges incoming medicines and compliance history into the existing profile.</li>
+							<li><strong class="text-white">Replace Profile:</strong> Completely overwrites the existing profile with the backup data.</li>
+						</ul>
 					</div>
 				</details>
 

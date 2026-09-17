@@ -613,4 +613,33 @@ Deseja continuar?</string>
     <string name="skip_reason_other">Outro motivo clínico ou pessoal</string>
     <string name="skip_dialog_confirm">Confirmar</string>
     <string name="skip_dialog_cancel">Cancelar</string>
+
+    <string name="existing_profiles_title">Perfis existentes</string>
+    <string name="profile_picture_desc">Foto do perfil</string>
+    <string name="select_profile_desc">Selecionar perfil</string>
+    <string name="profile_age_gender_format">%1$d anos • %2$s</string>
+    <string name="notif_content_scheduled_format">Agendado para %1$s - Hora de tomar seu remédio!</string>
+    <string name="notif_content_generic_reminder">Hora de tomar seu remédio!</string>
+    <string name="validation_enter_name">Por favor, digite seu nome</string>
+    <string name="validation_enter_valid_age">Por favor, insira uma idade válida (1-120)</string>
+    <string name="medication_added_success">Medicamento adicionado com sucesso</string>
+    <string name="status_pending">Pendente</string>
+    <string name="pharmacy_order_title">Pedido para farmácia</string>
+    <string name="pharmacy_order_desc">Gerar lista de medicamentos para WhatsApp ou sua farmácia</string>
+    <string name="pharmacy_order_scope_low_stock">Apenas estoque baixo</string>
+    <string name="pharmacy_order_scope_all">Todos os medicamentos ativos</string>
+    <string name="pharmacy_order_days_format">%1$d dias</string>
+    <string name="pharmacy_order_share">Compartilhar via WhatsApp / Apps</string>
+    <string name="pharmacy_order_copy">Copiar texto</string>
+    <string name="pharmacy_order_copied">Pedido copiado para a área de transferência</string>
+    <string name="pharmacy_order_empty">Nenhum medicamento disponível para pedir</string>
+    <string name="pharmacy_order_current_stock">Estoque atual: restam %1$d %2$s</string>
+    <string name="pharmacy_order_qty_needed">Quantidade a pedir: %1$d %2$s</string>
+    <string name="pharmacy_order_patient_header">Paciente: %1$s</string>
+    <string name="pharmacy_order_date_header">Data: %1$s</string>
+    <string name="pharmacy_order_supply_header">Pedido para suprimento de %1$d dias:</string>
+    <string name="pharmacy_order_footer_confirm">Por favor, confirme a disponibilidade e a entrega. Obrigado!</string>
+    <string name="pharmacy_order_footer_brand">Gerado via Dosezy</string>
+    <string name="menu_pharmacy_order">Pedido para farmácia</string>
+    <string name="menu_pharmacy_order_desc">Gerar e compartilhar pedidos de medicamentos pelo WhatsApp</string>
 </resources>

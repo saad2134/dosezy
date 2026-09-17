@@ -630,4 +630,33 @@
     <string name="skip_reason_other">其他原因</string>
     <string name="skip_dialog_confirm">确认跳过</string>
     <string name="skip_dialog_cancel">取消</string>
+
+    <string name="existing_profiles_title">现有档案</string>
+    <string name="profile_picture_desc">个人头像</string>
+    <string name="select_profile_desc">选择档案</string>
+    <string name="profile_age_gender_format">%1$d 岁 • %2$s</string>
+    <string name="notif_content_scheduled_format">定于 %1$s - 该吃药了！</string>
+    <string name="notif_content_generic_reminder">该吃药了！</string>
+    <string name="validation_enter_name">请输入您的姓名</string>
+    <string name="validation_enter_valid_age">请输入有效年龄（1-120）</string>
+    <string name="medication_added_success">药物添加成功</string>
+    <string name="status_pending">待处理</string>
+    <string name="pharmacy_order_title">药店补药清单</string>
+    <string name="pharmacy_order_desc">生成适用于微信、WhatsApp 或药房的药品补购清单</string>
+    <string name="pharmacy_order_scope_low_stock">仅余量不足药品</string>
+    <string name="pharmacy_order_scope_all">全部在服药品</string>
+    <string name="pharmacy_order_days_format">%1$d 天</string>
+    <string name="pharmacy_order_share">通过微信/WhatsApp/应用分享</string>
+    <string name="pharmacy_order_copy">复制文本</string>
+    <string name="pharmacy_order_copied">补药清单已复制到剪贴板</string>
+    <string name="pharmacy_order_empty">暂无需要订购的药品</string>
+    <string name="pharmacy_order_current_stock">当前余量：剩余 %1$d %2$s</string>
+    <string name="pharmacy_order_qty_needed">建议补订数量：%1$d %2$s</string>
+    <string name="pharmacy_order_patient_header">患者：%1$s</string>
+    <string name="pharmacy_order_date_header">日期：%1$s</string>
+    <string name="pharmacy_order_supply_header">%1$d 天用量补购订单：</string>
+    <string name="pharmacy_order_footer_confirm">请确认药品库存及配送安排，十分感谢！</string>
+    <string name="pharmacy_order_footer_brand">由 Dosezy 生成</string>
+    <string name="menu_pharmacy_order">药店补药清单</string>
+    <string name="menu_pharmacy_order_desc">生成药品订单并通过微信或WhatsApp分享</string>
 </resources>

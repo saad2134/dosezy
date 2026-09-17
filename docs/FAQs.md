@@ -1,6 +1,6 @@
 # Dosezy: Frequently Asked Questions (FAQ)
 
-Welcome to the **Dosezy FAQ**! Here you will find clear, easy-to-understand answers to common questions about using Dosezy, managing prescriptions, setting reliable alarms, tracking pill inventory, and protecting your health data.
+Welcome to the **Dosezy FAQ**! Here you will find clear, easy-to-understand answers to common questions about using Dosezy, managing prescriptions, setting reliable alarms, tracking pill inventory, handling dose skipping, and protecting your health data.
 
 ---
 
@@ -24,47 +24,66 @@ The app automatically opens in your phone's system language, and you can change 
 
 ### How do I add a new medicine?
 1. Open the app and tap **Medicines** in the bottom navigation bar.
-2. Tap **"+ Add Medicine"** (or **"Add Your First Medication"** if your list is currently empty).
+2. Tap **"+ Add Medicine"** (or **"Add Your First Medication"** if your list is empty).
 3. Enter your medicine name and select your dose unit (`tablet`, `capsule`, `mg`, `mcg`, `g`, `mL`, `drops`, `puffs`, `units`).
-4. (Optional) Tap the camera icon to take a photo of your pill box or choose an image from your gallery.
+4. (Optional) Tap the camera icon to photograph your pill box or choose an image from your gallery.
 5. Select a meal instruction (🍽️ *Before Food*, 🍲 *With Food*, 🥗 *After Food*, or ⏱️ *No Food Instructions*).
-6. Choose your frequency: **Daily**, **Weekly** (select specific days of the week), or **Monthly** (select dates).
+6. Choose your frequency: **Daily**, **Weekly** (select specific days), or **Monthly** (select dates).
 7. Tap on **1x, 2x, 3x, or 4x Daily** quick preset chips to automatically populate multiple dose times.
 8. Tap any time chip to adjust it with the **12-First Grid Time Picker** (where 12 is placed at the top for natural morning/night selection).
 9. (Optional) Enter your current tablet count and low-stock refill threshold under **Track Stock Inventory**.
 10. Tap **Save Medicine**.
 
 ### How do I search or find a medicine if I take many prescriptions?
-On the **Medicines** screen, use the search bar at the top. Simply type the name of your medication or your notes/instructions to instantly filter your list in real-time.
+On the **Medicines** screen, use the search bar at the top. Simply type the name of your medication or instructions to instantly filter your roster in real-time. If no items match, tap "Clear search" to reset the list.
 
 ### What should I do when a doctor stops or changes my prescription?
 Rather than deleting the medicine and losing past compliance history, open the medication from the Medicines screen, tap **Edit**, and select **Discontinue / Archive**. This moves the medicine to your **Archived Medications** section. Past calendar logs and adherence analytics remain completely intact, and you can reactivate the medication at any time if prescribed again.
 
 ---
 
-## ⏰ Alarms, Grouped Doses & Status Colors
+## ⏰ Critical Full-Screen Alarms & Physical Controls
 
 ### What happens if I take multiple medicines at the same time?
 Dosezy automatically groups medicines scheduled for the exact same minute (e.g., 8:00 AM) into a single grouped alarm screen. You will see an interactive checklist of every medicine in that time slot with photos and meal instructions, along with a green **"Take All"** button and an orange **"Snooze"** button, preventing overlapping or conflicting alarms.
 
+### Can I silence an active alarm using physical buttons?
+Yes! Simply press the **Volume Up** or **Volume Down** button on your device. Dosezy intercepts the physical volume key to immediately silence audio and stop vibration without dismissing the alarm or requiring you to unlock your phone.
+
+### What happens if I press the Back button or use the Back gesture during an alarm?
+Dosezy automatically triggers a safe snooze for your configured duration. This ensures that accidental back gestures or device handling do not dismiss alarms into an unmonitored pending or missed state.
+
+### Can I customize alarm sounds, duration, and volume?
+Yes! Go to **Menu > Preferences > Notifications & Alarms**:
+- **Alarm Sound**: Choose between Dosezy's built-in alert tones (*Gentle Chime*, *Crystal Pulse*, etc.), system alarms, or your own custom device ringtones with in-app audio preview playback.
+- **Alarm Sound Duration**: Set how long the alarm rings before stopping (`30s`, `1m`, `2m`, `3m`, `5m`, or continuous loop).
+- **Alarm Sound Volume**: Adjust the dedicated audio volume slider.
+
 ### Can I change how long the Snooze button pauses alarms?
-Yes! Dosezy supports customizable snooze durations. Go to **Menu > Preferences > Notifications & Alarms > Default Snooze Duration** and choose between **5, 10, 15, 20, or 30 minutes**. Your chosen duration will automatically apply to full-screen alarm popups and notification action buttons.
+Yes! In **Menu > Preferences > Notifications & Alarms > Default Snooze Duration**, choose between **5, 10, 15, 20, or 30 minutes**. Your chosen duration dynamically applies to full-screen alarm popups and notification action buttons.
 
-### How do dose status indicators work on the Home screen?
-Under each medication on the Home screen, live status badges indicate progress:
-- **Green ("Taken")**: You confirmed taking your dose, displaying the exact recorded timestamp (e.g. `Taken at 08:05 AM`).
-- **Standard Text (`To be taken in...` / `Xh Xm ago`)**: Dose is upcoming or due recently (within your "Consider Late After" window).
-- **Orange (`Xh Xm ago`)**: Dose is **Late** (within your customizable late-to-missed window). An orange **"Mark Late"** button appears.
-- **Red (`Xh Xm ago`)**: Dose is **Missed** (past your "Consider Missed After" window).
+---
 
-### What if I accidentally tap "Take" on a medicine by mistake?
+## 📝 Clinical Dose Skipping & Intake Undo
+
+### Can I skip a dose if I am unwell, fasting, or advised by my doctor?
+Yes! Dosezy provides an opt-in **Clinical Dose Skipping** feature:
+1. Go to **Menu > Preferences > Dose Tracking** and enable **Allow Dose Skipping**.
+2. A secondary **"Skip"** button will appear on your Home dose cards and full-screen alarm screens.
+3. Tapping Skip requires selecting a standardized clinical reason:
+   - *Doctor advised pause*
+   - *Side effects / adverse reaction*
+   - *Fasting / medical procedure*
+   - *Nausea / vomiting / illness*
+   - *Ran out of medicine*
+   - *Other reason*
+4. Skipped doses display an informative `📝 Skipped: <Reason>` badge and do **not** penalize your compliance streak in Analytics adherence calculations.
+
+### What if I accidentally tap "Take" or "Skip" by mistake?
 Dosezy provides an instant **Intake Undo** feature:
-1. Whenever you mark a dose as taken, a 5-second notification bar appears with an **"Undo"** button.
-2. Even after the bar dismisses, the medication card on your Home screen remains interactive with an enabled **"Undo"** option.
-3. Tapping Undo instantly reverts the dose status back to Pending and safely restores your deducted pill count back into your stock inventory.
-
-### What happens when all my medicines for today are taken?
-A celebratory completion banner appears at the top of the Home screen confirming all daily doses are complete. Crucially, today's full medication roster remains visible underneath in a clean checked state so you can always review what was taken, dosages, notes, and exact completion times.
+1. Whenever you mark a dose as taken, late, or skipped, a 5-second snackbar appears with an **"Undo"** button.
+2. Even after the bar dismisses, the medication card on your Home screen remains interactive with an active **"Undo"** option.
+3. Tapping Undo instantly reverts the dose status back to Pending and safely restores any deducted pill count back into your stock inventory.
 
 ### Can I customize when a dose is considered "Late" or "Missed"?
 Yes! Go to **Menu > Preferences > Dose Tracking**:
@@ -99,10 +118,13 @@ When adding or editing a medicine:
 ## 📊 Calendar & Adherence Analytics
 
 ### How do I check past days or upcoming schedules?
-Tap the **Schedule** tab at the bottom to view the interactive day and month calendar. Colored adherence dots on each calendar day indicate whether past doses were completed on time or missed. Tapping any day instantly displays the chronological schedule for that date.
+Tap the **Schedule** tab at the bottom to view the interactive day and month calendar. Colored adherence dots on each calendar day indicate whether past doses were taken on time (green), late (orange), missed (red), or skipped (blue). Tapping any day instantly displays the chronological schedule for that date.
+
+### Is the schedule calendar accessible with TalkBack screen readers?
+Yes! Dosezy provides full accessibility support on the calendar. TalkBack announces the exact status of each dose (*"Taken"*, *"Late"*, *"Skipped"*, *"Missed"*, *"Pending"*) rather than generic status indicators.
 
 ### Where can I see my adherence percentage score?
-Go to **Menu > Analytics**. You will see your overall adherence percentage ring (e.g. `92% Adherence`), totals of on-time vs late vs missed doses, and compliance breakdowns across **Week**, **Month**, **Year**, and **All Time**. If you are starting fresh, a helpful onboarding card explains how your adherence streak develops over time.
+Go to **Menu > Analytics**. You will see your overall adherence percentage ring (e.g., `94% Adherence`), multi-ring comparisons, and total breakdowns of on-time, late, skipped, and missed doses across **Today**, **7 Days**, **30 Days**, **90 Days**, and **All Time**.
 
 ---
 
@@ -119,35 +141,25 @@ Go to **Menu > Analytics**. You will see your overall adherence percentage ring 
 ## 👨‍👩‍👧 Family Profiles, Backups & Doctor Reports
 
 ### Can I manage medicines for multiple family members?
-Yes! Tap **Menu > Switch Profile** to create separate profiles for parents, children, or partners. Each profile tracks its own medicines, dosages, stock counts, personal emergency contacts, and compliance logs completely independently.
+Yes! Tap **Menu > Switch Profile** to create separate profiles for parents, children, or partners. Each profile tracks its own medicines, dosages, stock counts, personal emergency contacts, and compliance logs completely independently. Single-profile accounts are protected against accidental deletion.
 
 ### How do I back up my data or transfer it to a new phone?
 1. Go to **Menu > Backup & Restore**.
-2. Tap **Export Backup** to generate an encrypted backup archive containing all your profiles, medications, logs, and emergency contacts.
-3. Save the file to Google Drive, a USB drive, or send it to your email.
-4. On your new phone, install Dosezy, open **Menu > Backup & Restore**, tap **Restore Backup**, and select your file. You can choose to create new profiles, merge records, or replace existing data.
+2. Tap **Export Backup** to generate a complete encrypted backup ZIP archive containing all your profiles, medications, logs, and emergency contacts.
+3. Save the file or share it directly to Google Drive, internal storage, or email.
+4. On your new phone, install Dosezy, open **Menu > Backup & Restore**, tap **Restore Backup**, and select your ZIP file.
+
+### What happens if the backup contains profiles that already exist on my phone?
+Dosezy includes an intelligent **Profile Import Dialog** with granular conflict resolution:
+- **Create New Profile**: Imports the profile under a new name without overwriting existing data.
+- **Merge Records**: Merges incoming medicines and history into your existing profile.
+- **Replace Profile**: Overwrites the existing profile with the backup data.
 
 ### How do I share my medicine logs with my doctor?
 1. Go to **Menu > Export Data**.
-2. Choose **PDF Report** to generate a clean, printable medical report with current prescriptions, dosages, food instructions, and adherence logs.
+2. Choose **PDF Report** to generate a clean, printable medical report with current prescriptions, dosages, food instructions, skipped dose summaries, and adherence rates.
 3. Tap **Export** and share it via WhatsApp, email, or print it directly for your appointment.
-4. You can also export a **CSV** file or **JSON Backup** for spreadsheet analysis.
-
----
-
-## ⚙️ Preferences & Menu Structure
-
-### How are preferences organized?
-The **Preferences** screen is organized into clear, focused sections:
-- **General**: App Language, Visual Theme (System Default, Light Mode, Dark Mode), and Time Format (12-Hour AM/PM or 24-Hour).
-- **Notifications & Alarms**: Default Snooze Duration, Custom Alarm Sound, and Sound Volume.
-- **Dose Tracking**: Late and Missed time window thresholds.
-
-### Where can I find Help, Support, and Updates?
-In the **Menu**, scroll to the **More** section at the bottom:
-- **Help & Support**: Step-by-step guides, FAQs, and developer contact.
-- **About Dosezy**: App version details, open-source licenses, and acknowledgments.
-- **Check for Updates**: 1-tap check across Google Play, F-Droid, or GitHub.
+4. You can also export a **CSV** spreadsheet or **JSON Backup** for digital record-keeping.
 
 ---
 

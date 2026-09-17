@@ -614,4 +614,33 @@
     <string name="skip_reason_other">سبب طبي أو شخصي آخر</string>
     <string name="skip_dialog_confirm">تأكيد التخطي</string>
     <string name="skip_dialog_cancel">إلغاء</string>
+
+    <string name="existing_profiles_title">الملفات الشخصية الحالية</string>
+    <string name="profile_picture_desc">صورة الملف الشخصي</string>
+    <string name="select_profile_desc">تحديد الملف الشخصي</string>
+    <string name="profile_age_gender_format">%1$d سنة • %2$s</string>
+    <string name="notif_content_scheduled_format">مجدول في %1$s - حان وقت تناول دوائك!</string>
+    <string name="notif_content_generic_reminder">حان وقت تناول دوائك!</string>
+    <string name="validation_enter_name">يرجى إدخال اسمك</string>
+    <string name="validation_enter_valid_age">يرجى إدخال عمر صحيح (1-120)</string>
+    <string name="medication_added_success">تمت إضافة الدواء بنجاح</string>
+    <string name="status_pending">قيد الانتظار</string>
+    <string name="pharmacy_order_title">طلب إعادة تعبئة الصيدلية</string>
+    <string name="pharmacy_order_desc">إنشاء قائمة طلب الأدوية لواتساب أو الصيدلي</string>
+    <string name="pharmacy_order_scope_low_stock">المخزون المنخفض فقط</string>
+    <string name="pharmacy_order_scope_all">جميع الأدوية النشطة</string>
+    <string name="pharmacy_order_days_format">%1$d يومًا</string>
+    <string name="pharmacy_order_share">مشاركة عبر واتساب / التطبيقات</string>
+    <string name="pharmacy_order_copy">نسخ النص</string>
+    <string name="pharmacy_order_copied">تم نسخ طلب الأدوية إلى الحافظة</string>
+    <string name="pharmacy_order_empty">لا توجد أدوية متاحة للطلب</string>
+    <string name="pharmacy_order_current_stock">المخزون الحالي: متبقي %1$d %2$s</string>
+    <string name="pharmacy_order_qty_needed">الكمية المطلوبة: %1$d %2$s</string>
+    <string name="pharmacy_order_patient_header">المريض: %1$s</string>
+    <string name="pharmacy_order_date_header">التاريخ: %1$s</string>
+    <string name="pharmacy_order_supply_header">طلب لإمداد %1$d يومًا:</string>
+    <string name="pharmacy_order_footer_confirm">يرجى تأكيد التوفر وإمكانية التوصيل. شكراً لك!</string>
+    <string name="pharmacy_order_footer_brand">تم الإنشاء عبر دوزيزي</string>
+    <string name="menu_pharmacy_order">طلب إعادة تعبئة الصيدلية</string>
+    <string name="menu_pharmacy_order_desc">إنشاء ومشاركة طلبات الأدوية عبر واتساب</string>
 </resources>

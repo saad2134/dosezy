@@ -630,4 +630,33 @@
     <string name="skip_reason_other">अन्य चिकित्सीय / व्यक्तिगत कारण</string>
     <string name="skip_dialog_confirm">पुष्टि करें</string>
     <string name="skip_dialog_cancel">रद्द करें</string>
+
+    <string name="existing_profiles_title">मौजूदा प्रोफ़ाइल</string>
+    <string name="profile_picture_desc">प्रोफ़ाइल फ़ोटो</string>
+    <string name="select_profile_desc">प्रोफ़ाइल चुनें</string>
+    <string name="profile_age_gender_format">%1$d वर्ष • %2$s</string>
+    <string name="notif_content_scheduled_format">%1$s के लिए निर्धारित - दवा लेने का समय हो गया है!</string>
+    <string name="notif_content_generic_reminder">दवा लेने का समय हो गया है!</string>
+    <string name="validation_enter_name">कृपया अपना नाम दर्ज करें</string>
+    <string name="validation_enter_valid_age">कृपया एक मान्य आयु दर्ज करें (1-120)</string>
+    <string name="medication_added_success">दवा सफलतापूर्वक जोड़ी गई</string>
+    <string name="status_pending">लंबित</string>
+    <string name="pharmacy_order_title">फार्मेसी रीफ़िल ऑर्डर</string>
+    <string name="pharmacy_order_desc">व्हाट्सएप या मेडिकल स्टोर के लिए दवाओं के ऑर्डर की सूची बनाएं</string>
+    <string name="pharmacy_order_scope_low_stock">केवल कम स्टॉक वाली दवाएं</string>
+    <string name="pharmacy_order_scope_all">सभी सक्रिय दवाएं</string>
+    <string name="pharmacy_order_days_format">%1$d दिन</string>
+    <string name="pharmacy_order_share">व्हाट्सएप / ऐप्स पर शेयर करें</string>
+    <string name="pharmacy_order_copy">टेक्स्ट कॉपी करें</string>
+    <string name="pharmacy_order_copied">रीफ़िल ऑर्डर क्लिपबोर्ड पर कॉपी हो गया</string>
+    <string name="pharmacy_order_empty">ऑर्डर करने के लिए कोई दवा उपलब्ध नहीं है</string>
+    <string name="pharmacy_order_current_stock">वर्तमान स्टॉक: %1$d %2$s शेष</string>
+    <string name="pharmacy_order_qty_needed">ऑर्डर की मात्रा: %1$d %2$s</string>
+    <string name="pharmacy_order_patient_header">रोगी: %1$s</string>
+    <string name="pharmacy_order_date_header">दिनांक: %1$s</string>
+    <string name="pharmacy_order_supply_header">%1$d दिनों की आपूर्ति हेतु ऑर्डर सूची:</string>
+    <string name="pharmacy_order_footer_confirm">कृपया दवाओं की उपलब्धता और डिलीवरी की पुष्टि करें। धन्यवाद!</string>
+    <string name="pharmacy_order_footer_brand">Dosezy द्वारा तैयार</string>
+    <string name="menu_pharmacy_order">फार्मेसी रीफ़िल ऑर्डर</string>
+    <string name="menu_pharmacy_order_desc">व्हाट्सएप के ज़रिये दवा ऑर्डर बनाएं और शेयर करें</string>
 </resources>

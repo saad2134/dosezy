@@ -156,8 +156,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         createNotificationChannel(context)
 
         val contentText = scheduledTime?.let {
-            "Scheduled for $it - Time to take your medicine!"
-        } ?: "Time to take your medicine!"
+            context.getString(R.string.notif_content_scheduled_format, it)
+        } ?: context.getString(R.string.notif_content_generic_reminder)
 
         // Create intent for opening the app
         val mainIntent = Intent(context, MainActivity::class.java).apply {

@@ -642,4 +642,33 @@ Do you want to continue?</string>
     <string name="skip_reason_other">Other clinical / personal reason</string>
     <string name="skip_dialog_confirm">Confirm Skip</string>
     <string name="skip_dialog_cancel">Cancel</string>
+
+    <string name="existing_profiles_title">Existing Profiles</string>
+    <string name="profile_picture_desc">Profile Picture</string>
+    <string name="select_profile_desc">Select Profile</string>
+    <string name="profile_age_gender_format">%1$d years • %2$s</string>
+    <string name="notif_content_scheduled_format">Scheduled for %1$s - Time to take your medicine!</string>
+    <string name="notif_content_generic_reminder">Time to take your medicine!</string>
+    <string name="validation_enter_name">Please enter your name</string>
+    <string name="validation_enter_valid_age">Please enter a valid age (1-120)</string>
+    <string name="medication_added_success">Medication added successfully</string>
+    <string name="status_pending">Pending</string>
+    <string name="pharmacy_order_title">Pharmacy Refill Order</string>
+    <string name="pharmacy_order_desc">Generate a medicine order list for WhatsApp or your chemist</string>
+    <string name="pharmacy_order_scope_low_stock">Low Stock Only</string>
+    <string name="pharmacy_order_scope_all">All Active Medicines</string>
+    <string name="pharmacy_order_days_format">%1$d Days</string>
+    <string name="pharmacy_order_share">Share via WhatsApp / Apps</string>
+    <string name="pharmacy_order_copy">Copy Text</string>
+    <string name="pharmacy_order_copied">Refill order copied to clipboard</string>
+    <string name="pharmacy_order_empty">No medications available to order</string>
+    <string name="pharmacy_order_current_stock">Current stock: %1$d %2$s left</string>
+    <string name="pharmacy_order_qty_needed">Order Quantity: %1$d %2$s</string>
+    <string name="pharmacy_order_patient_header">Patient: %1$s</string>
+    <string name="pharmacy_order_date_header">Date: %1$s</string>
+    <string name="pharmacy_order_supply_header">Order for %1$d Days Supply:</string>
+    <string name="pharmacy_order_footer_confirm">Please confirm availability and delivery. Thank you!</string>
+    <string name="pharmacy_order_footer_brand">Generated via Dosezy</string>
+    <string name="menu_pharmacy_order">Pharmacy Refill Order</string>
+    <string name="menu_pharmacy_order_desc">Generate and share medication orders via WhatsApp</string>
 </resources>

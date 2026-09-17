@@ -158,7 +158,7 @@ class DataExporter(
     private fun buildJsonContent(user: User, medicines: List<Medicine>, schedules: List<ScheduleEntry>): String {
         val root = JSONObject()
         root.put("appName", "Dosezy")
-        root.put("appVersion", "2.4.1")
+        root.put("appVersion", com.example.dosezy.BuildConfig.VERSION_NAME)
         root.put("exportedAt", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
 
         val userObj = JSONObject()
@@ -208,6 +208,7 @@ class DataExporter(
             sObj.put("medicineId", sch.medicineId)
             sObj.put("scheduledDateTime", sch.scheduledDateTime.toString())
             sObj.put("status", sch.status.name)
+            sObj.put("skipReason", sch.skipReason ?: "")
             sObj.put("takenAt", sch.takenAt?.toString() ?: "")
             schedArray.put(sObj)
         }
@@ -294,6 +295,7 @@ class DataExporter(
         val totalCount = schedules.size
         val takenOnTimeCount = schedules.count { it.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_ON_TIME }
         val takenLateCount = schedules.count { it.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_LATE }
+        val skippedCount = schedules.count { it.status == com.example.dosezy.data.model.MedicationStatus.SKIPPED }
         val missedCount = schedules.count { it.status == com.example.dosezy.data.model.MedicationStatus.MISSED }
         val pendingCount = schedules.count { it.status == com.example.dosezy.data.model.MedicationStatus.PENDING }
 
@@ -326,7 +328,7 @@ class DataExporter(
             color = Color.parseColor("#4B5563")
             textSize = 9.5f
         }
-        val breakdownText = "On-Time: $takenOnTimeCount   |   Late: $takenLateCount   |   Missed: $missedCount   |   Pending: $pendingCount   |   Total Doses: $totalCount"
+        val breakdownText = "On-Time: $takenOnTimeCount   |   Late: $takenLateCount   |   Skipped: $skippedCount   |   Missed: $missedCount   |   Pending: $pendingCount   |   Total: $totalCount"
         canvas.drawText(breakdownText, 52f, y + 36f, cardSubPaint)
 
         y += 56f
@@ -446,7 +448,7 @@ class DataExporter(
 
         // Schedules Section
         csvBuilder.append("SCHEDULES\n")
-        csvBuilder.append("Entry ID,User ID,Medicine ID,Scheduled DateTime,Status,Taken At\n")
+        csvBuilder.append("Entry ID,User ID,Medicine ID,Scheduled DateTime,Status,Skip Reason,Taken At\n")
         schedules.forEach { schedule ->
             csvBuilder.append(
                 "\"${schedule.entryId}\"," +
@@ -454,6 +456,7 @@ class DataExporter(
                         "\"${schedule.medicineId}\"," +
                         "\"${schedule.scheduledDateTime}\"," +
                         "${schedule.status}," +
+                        "\"${(schedule.skipReason ?: "").replace("\"", "\"\"")}\"," +
                         "\"${schedule.takenAt ?: ""}\"\n"
             )
         }
@@ -499,5 +502,73 @@ class DataExporter(
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(chooserIntent)
+    }
+
+    fun generatePharmacyOrderText(
+        user: User,
+        medicines: List<Medicine>,
+        supplyDays: Int = 30
+    ): String {
+        val dateFormatter = java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy")
+        val dateStr = java.time.LocalDate.now().format(dateFormatter)
+
+        val sb = StringBuilder()
+        sb.append("📋 *Dosezy Pharmacy Refill Order*\n")
+        sb.append(context.getString(com.example.dosezy.R.string.pharmacy_order_patient_header, user.fullName)).append("\n")
+        sb.append(context.getString(com.example.dosezy.R.string.pharmacy_order_date_header, dateStr)).append("\n\n")
+        sb.append("*").append(context.getString(com.example.dosezy.R.string.pharmacy_order_supply_header, supplyDays)).append("*\n\n")
+
+        medicines.forEachIndexed { index, med ->
+            val dailyDose = if (med.dosage > 0) med.dosage else 1.0
+            val dailyRequirement = (med.timesPerDay.coerceAtLeast(1)) * dailyDose
+            val totalNeeded = (dailyRequirement * supplyDays).toInt().coerceAtLeast(1)
+            val dosageDisplay = if (med.dosage > 0) {
+                if (med.dosage % 1.0 == 0.0) "${med.dosage.toInt()}" else "${med.dosage}"
+            } else ""
+            val unitStr = med.dosageUnit.name.lowercase()
+
+            sb.append("${index + 1}. *${med.medicationName}*")
+            if (dosageDisplay.isNotBlank()) {
+                sb.append(" ($dosageDisplay $unitStr)")
+            }
+            sb.append("\n")
+            sb.append("   • ").append(context.getString(com.example.dosezy.R.string.pharmacy_order_qty_needed, totalNeeded, unitStr)).append("\n")
+            if (med.currentStock != null) {
+                sb.append("   • ").append(context.getString(com.example.dosezy.R.string.pharmacy_order_current_stock, med.currentStock, unitStr)).append("\n")
+            }
+            sb.append("   • Frequency: ${med.timesPerDay}x daily\n")
+            if (!med.notes.isNullOrBlank()) {
+                sb.append("   • Notes: ${med.notes}\n")
+            }
+            sb.append("\n")
+        }
+
+        sb.append("_").append(context.getString(com.example.dosezy.R.string.pharmacy_order_footer_confirm)).append("_\n")
+        sb.append("_").append(context.getString(com.example.dosezy.R.string.pharmacy_order_footer_brand)).append("_")
+
+        return sb.toString()
+    }
+
+    fun shareText(text: String, title: String = "Share Pharmacy Refill Order") {
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, text)
+            type = "text/plain"
+        }
+        val chooserIntent = Intent.createChooser(shareIntent, title).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(chooserIntent)
+    }
+
+    fun copyToClipboard(text: String) {
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+        val clip = android.content.ClipData.newPlainText("Pharmacy Order", text)
+        clipboard.setPrimaryClip(clip)
+        android.widget.Toast.makeText(
+            context,
+            context.getString(com.example.dosezy.R.string.pharmacy_order_copied),
+            android.widget.Toast.LENGTH_SHORT
+        ).show()
     }
 }

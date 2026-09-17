@@ -74,6 +74,7 @@ fun ManageProfileScreen(navController: NavController) {
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showSuccessMessage by remember { mutableStateOf(false) }
@@ -348,9 +349,7 @@ fun ManageProfileScreen(navController: NavController) {
                                         medicalConditions = medicalConditions.trim().ifBlank { null }
                                     )
                                     userViewModel.updateUser(updatedUser)
-                                    scope.launch {
-                                        snackbarHostState.showSnackbar(updatedSuccessStr)
-                                    }
+                                    android.widget.Toast.makeText(context, updatedSuccessStr, android.widget.Toast.LENGTH_SHORT).show()
                                     navController.popBackStack()
                                 }
                             }
