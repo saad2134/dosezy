@@ -177,10 +177,18 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
     var selectedCountry by remember { mutableStateOf(defaultCountry) }
     var countryDropdownExpanded by remember { mutableStateOf(false) }
 
-    // Persist personal contacts via SharedPreferences
+    // Persist personal contacts via SharedPreferences, namespaced per user profile
     val prefs = context.getSharedPreferences("emergency_contacts", android.content.Context.MODE_PRIVATE)
-    val customContacts = remember {
-        val saved = prefs.getString("contacts_json", null)
+    val customContacts = remember(currentUser?.userId) {
+        val userKey = "contacts_json_${currentUser?.userId ?: "default"}"
+        var saved = prefs.getString(userKey, null)
+        // Fallback to legacy un-namespaced key if userKey is not set yet
+        if (saved == null && prefs.contains("contacts_json")) {
+            saved = prefs.getString("contacts_json", null)
+            if (saved != null) {
+                prefs.edit().putString(userKey, saved).apply()
+            }
+        }
         val list = androidx.compose.runtime.mutableStateListOf<Pair<String, String>>()
         if (!saved.isNullOrEmpty()) {
             try {
@@ -203,7 +211,8 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
             obj.put("phone", phone)
             arr.put(obj)
         }
-        prefs.edit().putString("contacts_json", arr.toString()).apply()
+        val userKey = "contacts_json_${currentUser?.userId ?: "default"}"
+        prefs.edit().putString(userKey, arr.toString()).apply()
     }
 
     var showAddContactDialog by remember { mutableStateOf(false) }

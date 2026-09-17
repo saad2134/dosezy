@@ -562,4 +562,31 @@
     <string name="notif_fullscreen_granted">ফুল-স্ক্রিন অ্যালার্ম উইন্ডো অনুমোদিত।</string>
     <string name="notif_fullscreen_desc">ডিভাইস লক থাকা অবস্থায় অ্যালার্ম স্ক্রিন দেখানোর জন্য প্রয়োজন।</string>
     <string name="notif_oem_setup_btn">%1$s অটোস্টার্ট ও পপআপ সেটিংস ঠিক করুন</string>
+
+    <string name="btn_back">ফিরে যান</string>
+    <string name="alarm_medication_reminder_multi">ঔষধ অনুস্মারক (%d)</string>
+    <string name="alarm_take_all">সবগুলি নিন (%d)</string>
+    <string name="alarm_take_medicine">ঔষধ গ্রহণ করুন</string>
+    <string name="alarm_snooze_format">স্নুজ (%d মিনিট)</string>
+    <string name="notif_action_snooze_format">স্নুজ (%d মিনিট)</string>
+    <string name="alarm_stock_remaining">মজুদ: %d ইউনিট বাকি</string>
+    <string name="home_action_take">নিন</string>
+    <string name="home_action_taken">নেওয়া হয়েছে</string>
+    <string name="home_action_missed">বাদ পড়েছে</string>
+    <string name="home_action_mark_late">দেরিতে গ্রহণ</string>
+    <string name="home_dose_recorded">%s-এর ডোজ রেকর্ড করা হয়েছে</string>
+    <string name="btn_undo">পূর্বাবস্থায় ফেরান</string>
+    <string name="analytics_empty_title">এখনও কোনো ঔষধের রেকর্ড নেই</string>
+    <string name="analytics_empty_desc">দৈনন্দিন ঔষধ গ্রহণ রেকর্ড করলে আপনার আনুগত্য স্কোর ও পরিসংখ্যান এখানে দেখতে পাবেন।</string>
+    <string name="validation_enter_med_name">অনুগ্রহ করে ঔষধের নাম লিখুন</string>
+    <string name="validation_enter_dosage">অনুগ্রহ করে ডোজের পরিমাণ লিখুন</string>
+    <string name="validation_select_days_week">সপ্তাহের অন্তত একটি দিন নির্বাচন করুন</string>
+    <string name="validation_select_days_month">মাসের অন্তত একটি দিন নির্বাচন করুন</string>
+    <string name="menu_more_section">আরও</string>
+    <string name="pref_section_general">সাধারণ</string>
+    <string name="pref_section_notifications">বিজ্ঞপ্তি এবং অ্যালার্ম</string>
+    <string name="pref_section_dose_tracking">ডোজ ট্র্যাকিং</string>
+    <string name="home_dose_reverted">%1$s ডোজ মুলতুবি অবস্থায় ফিরিয়ে আনা হয়েছে</string>
+    <string name="search_medicines_hint">ওষুধ অনুসন্ধান করুন...</string>
+    <string name="btn_add_first_medicine">আপনার প্রথম ওষুধ যোগ করুন</string>
 </resources>

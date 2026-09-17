@@ -113,8 +113,18 @@ fun PreferencesScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            // ── General Section ──
             item {
-                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = stringResource(R.string.pref_section_general),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 4.dp)
+                )
+            }
+
+            item {
                 // Theme Preference
                 PreferenceItem(
                     title = androidx.compose.ui.res.stringResource(R.string.pref_theme),
@@ -131,41 +141,75 @@ fun PreferencesScreen(navController: NavController) {
             }
 
             item {
-                // Time Format Preference
+                // Language Preference
+                val sysLangName = com.example.dosezy.utils.LocaleHelper.getSystemLanguageDisplayName()
                 PreferenceItem(
-                    title = androidx.compose.ui.res.stringResource(R.string.pref_time_format),
-                    currentValue = currentUser?.timeFormat?.let {
+                    title = androidx.compose.ui.res.stringResource(R.string.pref_language),
+                    currentValue = currentUser?.language?.let {
                         when (it) {
-                            TimeFormat.HOUR_12 -> androidx.compose.ui.res.stringResource(R.string.time_format_12)
-                            TimeFormat.HOUR_24 -> androidx.compose.ui.res.stringResource(R.string.time_format_24)
+                            Language.SYSTEM -> "${androidx.compose.ui.res.stringResource(R.string.system_default)} ($sysLangName)"
+                            Language.ENGLISH -> "English"
+                            Language.SPANISH -> "Español"
+                            Language.HINDI -> "हिन्दी"
+                            Language.CHINESE -> "中文"
+                            Language.PORTUGUESE -> "Português"
+                            Language.ARABIC -> "العربية"
+                            Language.FRENCH -> "Français"
+                            Language.GERMAN -> "Deutsch"
+                            Language.JAPANESE -> "日本語"
+                            Language.RUSSIAN -> "Русский"
+                            Language.ITALIAN -> "Italiano"
+                            Language.BENGALI -> "বাংলা"
                         }
-                    } ?: androidx.compose.ui.res.stringResource(R.string.time_format_12),
-                    iconName = "schedule",
-                    onClick = { showTimeFormatDialog = true }
+                    } ?: "${androidx.compose.ui.res.stringResource(R.string.system_default)} ($sysLangName)",
+                    iconName = "language",
+                    onClick = { showLanguageDialog = true }
+                )
+            }
+
+            // ── Notifications & Alarms Section ──
+            item {
+                Text(
+                    text = stringResource(R.string.pref_section_notifications),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(start = 16.dp, top = 20.dp, bottom = 4.dp)
                 )
             }
 
             item {
-                // Consider Late After Preference
+                // Alarm Sound Preference
+                val currentSound = currentUser?.alarmSound ?: AlarmSound.SYSTEM_DEFAULT
+                val customTitle = currentUser?.customAlarmSoundTitle
+                val soundDisplayValue = if (currentSound == AlarmSound.CUSTOM && !customTitle.isNullOrBlank()) {
+                    customTitle
+                } else {
+                    androidx.compose.ui.res.stringResource(currentSound.getTitleRes())
+                }
                 PreferenceItem(
-                    title = androidx.compose.ui.res.stringResource(R.string.pref_late_after),
-                    currentValue = currentUser?.considerLateAfter?.let {
-                        androidx.compose.ui.res.stringResource(R.string.hours_format, it)
-                    } ?: androidx.compose.ui.res.stringResource(R.string.hours_format, 3),
-                    iconName = "late_after",
-                    onClick = { showLateAfterDialog = true }
+                    title = androidx.compose.ui.res.stringResource(R.string.pref_alarm_sound),
+                    currentValue = soundDisplayValue,
+                    iconName = "alarm_sound",
+                    onClick = { showAlarmSoundDialog = true }
                 )
             }
 
             item {
-                // Consider Missed After Preference
+                // Alarm Ring Duration Preference
+                val currentDuration = currentUser?.alarmDurationSeconds ?: 0
+                val durationText = when (currentDuration) {
+                    30 -> stringResource(R.string.alarm_duration_30s)
+                    60 -> stringResource(R.string.alarm_duration_1m)
+                    120 -> stringResource(R.string.alarm_duration_2m)
+                    300 -> stringResource(R.string.alarm_duration_5m)
+                    else -> stringResource(R.string.alarm_duration_continuous)
+                }
                 PreferenceItem(
-                    title = androidx.compose.ui.res.stringResource(R.string.pref_missed_after),
-                    currentValue = currentUser?.considerMissedAfter?.let {
-                        androidx.compose.ui.res.stringResource(R.string.hours_format, it)
-                    } ?: androidx.compose.ui.res.stringResource(R.string.hours_format, 6),
-                    iconName = "missed_after",
-                    onClick = { showMissedAfterDialog = true }
+                    title = androidx.compose.ui.res.stringResource(R.string.pref_alarm_duration_title),
+                    currentValue = durationText,
+                    iconName = "alarm_duration",
+                    onClick = { showAlarmDurationDialog = true }
                 )
             }
 
@@ -314,65 +358,53 @@ fun PreferencesScreen(navController: NavController) {
                 }
             }
 
+            // ── Dose Tracking Section ──
             item {
-                // Alarm Sound Preference
-                val currentSound = currentUser?.alarmSound ?: AlarmSound.SYSTEM_DEFAULT
-                val customTitle = currentUser?.customAlarmSoundTitle
-                val soundDisplayValue = if (currentSound == AlarmSound.CUSTOM && !customTitle.isNullOrBlank()) {
-                    customTitle
-                } else {
-                    androidx.compose.ui.res.stringResource(currentSound.getTitleRes())
-                }
-                PreferenceItem(
-                    title = androidx.compose.ui.res.stringResource(R.string.pref_alarm_sound),
-                    currentValue = soundDisplayValue,
-                    iconName = "alarm_sound",
-                    onClick = { showAlarmSoundDialog = true }
+                Text(
+                    text = stringResource(R.string.pref_section_dose_tracking),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(start = 16.dp, top = 20.dp, bottom = 4.dp)
                 )
             }
 
             item {
-                // Alarm Ring Duration Preference
-                val currentDuration = currentUser?.alarmDurationSeconds ?: 0
-                val durationText = when (currentDuration) {
-                    30 -> stringResource(R.string.alarm_duration_30s)
-                    60 -> stringResource(R.string.alarm_duration_1m)
-                    120 -> stringResource(R.string.alarm_duration_2m)
-                    300 -> stringResource(R.string.alarm_duration_5m)
-                    else -> stringResource(R.string.alarm_duration_continuous)
-                }
+                // Consider Late After Preference
                 PreferenceItem(
-                    title = androidx.compose.ui.res.stringResource(R.string.pref_alarm_duration_title),
-                    currentValue = durationText,
-                    iconName = "alarm_duration",
-                    onClick = { showAlarmDurationDialog = true }
+                    title = androidx.compose.ui.res.stringResource(R.string.pref_late_after),
+                    currentValue = currentUser?.considerLateAfter?.let {
+                        androidx.compose.ui.res.stringResource(R.string.hours_format, it)
+                    } ?: androidx.compose.ui.res.stringResource(R.string.hours_format, 3),
+                    iconName = "late_after",
+                    onClick = { showLateAfterDialog = true }
                 )
             }
 
             item {
-                // Language Preference
-                val sysLangName = com.example.dosezy.utils.LocaleHelper.getSystemLanguageDisplayName()
+                // Consider Missed After Preference
                 PreferenceItem(
-                    title = androidx.compose.ui.res.stringResource(R.string.pref_language),
-                    currentValue = currentUser?.language?.let {
+                    title = androidx.compose.ui.res.stringResource(R.string.pref_missed_after),
+                    currentValue = currentUser?.considerMissedAfter?.let {
+                        androidx.compose.ui.res.stringResource(R.string.hours_format, it)
+                    } ?: androidx.compose.ui.res.stringResource(R.string.hours_format, 6),
+                    iconName = "missed_after",
+                    onClick = { showMissedAfterDialog = true }
+                )
+            }
+
+            item {
+                // Time Format Preference
+                PreferenceItem(
+                    title = androidx.compose.ui.res.stringResource(R.string.pref_time_format),
+                    currentValue = currentUser?.timeFormat?.let {
                         when (it) {
-                            Language.SYSTEM -> "${androidx.compose.ui.res.stringResource(R.string.system_default)} ($sysLangName)"
-                            Language.ENGLISH -> "English"
-                            Language.SPANISH -> "Español"
-                            Language.HINDI -> "हिन्दी"
-                            Language.CHINESE -> "中文"
-                            Language.PORTUGUESE -> "Português"
-                            Language.ARABIC -> "العربية"
-                            Language.FRENCH -> "Français"
-                            Language.GERMAN -> "Deutsch"
-                            Language.JAPANESE -> "日本語"
-                            Language.RUSSIAN -> "Русский"
-                            Language.ITALIAN -> "Italiano"
-                            Language.BENGALI -> "বাংলা"
+                            TimeFormat.HOUR_12 -> androidx.compose.ui.res.stringResource(R.string.time_format_12)
+                            TimeFormat.HOUR_24 -> androidx.compose.ui.res.stringResource(R.string.time_format_24)
                         }
-                    } ?: "${androidx.compose.ui.res.stringResource(R.string.system_default)} ($sysLangName)",
-                    iconName = "language",
-                    onClick = { showLanguageDialog = true }
+                    } ?: androidx.compose.ui.res.stringResource(R.string.time_format_12),
+                    iconName = "schedule",
+                    onClick = { showTimeFormatDialog = true }
                 )
             }
         }

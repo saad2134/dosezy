@@ -566,4 +566,31 @@ Vuoi continuare?</string>
     <string name="notif_fullscreen_granted">Finestra di allarme a schermo intero consentita.</string>
     <string name="notif_fullscreen_desc">Richiesto per mostrare la schermata di allarme con il dispositivo bloccato.</string>
     <string name="notif_oem_setup_btn">Configura avvio automatico e popup per %1$s</string>
+
+    <string name="btn_back">Indietro</string>
+    <string name="alarm_medication_reminder_multi">Promemoria Farmaci (%d)</string>
+    <string name="alarm_take_all">PRENDI TUTTI (%d)</string>
+    <string name="alarm_take_medicine">PRENDI FARMACO</string>
+    <string name="alarm_snooze_format">POSTICIPA (%d MIN)</string>
+    <string name="notif_action_snooze_format">Posticipa (%d min)</string>
+    <string name="alarm_stock_remaining">Scorta: %d unità rimanenti</string>
+    <string name="home_action_take">Prendi</string>
+    <string name="home_action_taken">Preso</string>
+    <string name="home_action_missed">Saltato</string>
+    <string name="home_action_mark_late">Preso in ritardo</string>
+    <string name="home_dose_recorded">Dose registrata per %s</string>
+    <string name="btn_undo">Annulla</string>
+    <string name="analytics_empty_title">Nessun dato di assunzione</string>
+    <string name="analytics_empty_desc">Registrando i tuoi farmaci giornalieri, qui appariranno la tua percentuale di aderenza, i grafici settimanali e le statistiche.</string>
+    <string name="validation_enter_med_name">Inserisci il nome del farmaco</string>
+    <string name="validation_enter_dosage">Inserisci il dosaggio</string>
+    <string name="validation_select_days_week">Seleziona almeno un giorno della settimana</string>
+    <string name="validation_select_days_month">Seleziona almeno un giorno del mese</string>
+    <string name="menu_more_section">Altro</string>
+    <string name="pref_section_general">Generale</string>
+    <string name="pref_section_notifications">Notifiche e Sveglie</string>
+    <string name="pref_section_dose_tracking">Monitoraggio Dosi</string>
+    <string name="home_dose_reverted">Dose di %1$s ripristinata a in sospeso</string>
+    <string name="search_medicines_hint">Cerca farmaci...</string>
+    <string name="btn_add_first_medicine">Aggiungi il tuo primo farmaco</string>
 </resources>

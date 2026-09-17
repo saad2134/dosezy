@@ -130,8 +130,8 @@ fun SwitchProfileScreen(navController: NavController) {
                                     onClick = {
                                         if (user.userId != currentUser?.userId) {
                                             userViewModel.setCurrentUser(user)
-                                            navController.popBackStack()
                                         }
+                                        navController.popBackStack()
                                     }
                                 )
                             }

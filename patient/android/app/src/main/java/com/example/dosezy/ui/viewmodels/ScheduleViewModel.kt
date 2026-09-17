@@ -73,18 +73,37 @@ class ScheduleViewModel @Inject constructor(
         }
     }
 
+    private var currentCalendarUserId: String? = null
+
     fun setSelectedDate(date: LocalDate) {
-        _selectedDate.value = date
-        _currentUserId.value?.let { userId ->
-            loadScheduleForDate(userId, date)
+        if (_selectedDate.value != date) {
+            _selectedDate.value = date
         }
     }
 
     fun loadScheduleForDate(userId: String, date: LocalDate) {
         scheduleJob?.cancel()
-        rawScheduleJob?.cancel()
 
-        _isRefreshing.value = true
+        // Only show skeleton on initial load when data is empty
+        if (_scheduleWithMedicine.value.isEmpty()) {
+            _isRefreshing.value = true
+        }
+
+        // Load month-wide indicators once per user or on updates, not on every date click
+        if (currentCalendarUserId != userId || _scheduleEntries.value.isEmpty()) {
+            currentCalendarUserId = userId
+            rawScheduleJob?.cancel()
+            rawScheduleJob = viewModelScope.launch {
+                try {
+                    scheduleRepository.getScheduleForUser(userId).collect { entries ->
+                        Log.d(TAG, "Successfully loaded ${entries.size} user schedule entries for month-wide indicators")
+                        _scheduleEntries.value = entries
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error loading user schedule", e)
+                }
+            }
+        }
 
         scheduleJob = viewModelScope.launch {
             try {
@@ -99,20 +118,10 @@ class ScheduleViewModel @Inject constructor(
                 _isRefreshing.value = false
             }
         }
-
-        rawScheduleJob = viewModelScope.launch {
-            try {
-                scheduleRepository.getScheduleForUser(userId).collect { entries ->
-                    Log.d(TAG, "Successfully loaded ${entries.size} user schedule entries for month-wide indicators")
-                    _scheduleEntries.value = entries
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error loading user schedule", e)
-            }
-        }
     }
 
     fun refreshAfterMedicineAdded() {
+        currentCalendarUserId = null
         _currentUserId.value?.let { userId ->
             loadScheduleForDate(userId, _selectedDate.value)
         }
@@ -121,6 +130,7 @@ class ScheduleViewModel @Inject constructor(
     fun markAsTaken(entryId: String, takenAt: String) {
         viewModelScope.launch {
             scheduleRepository.recordDoseTaken(entryId, "TAKEN_ON_TIME", takenAt, context)
+            currentCalendarUserId = null
             // Refresh the schedule after updating status
             _currentUserId.value?.let { userId ->
                 loadScheduleForDate(userId, _selectedDate.value)
@@ -131,7 +141,19 @@ class ScheduleViewModel @Inject constructor(
     fun markAsLate(entryId: String, takenAt: String) {
         viewModelScope.launch {
             scheduleRepository.recordDoseTaken(entryId, "TAKEN_LATE", takenAt, context)
+            currentCalendarUserId = null
             // Refresh the schedule after updating status
+            _currentUserId.value?.let { userId ->
+                loadScheduleForDate(userId, _selectedDate.value)
+            }
+        }
+    }
+
+    fun undoDoseTaken(entryId: String) {
+        viewModelScope.launch {
+            scheduleRepository.undoDoseTaken(entryId, context)
+            currentCalendarUserId = null
+            // Refresh the schedule after reverting status
             _currentUserId.value?.let { userId ->
                 loadScheduleForDate(userId, _selectedDate.value)
             }
@@ -142,6 +164,7 @@ class ScheduleViewModel @Inject constructor(
     fun markAsMissed(entryId: String) {
         viewModelScope.launch {
             scheduleRepository.updateMedicationStatus(entryId, "MISSED", null)
+            currentCalendarUserId = null
             // Refresh the schedule after updating status
             _currentUserId.value?.let { userId ->
                 loadScheduleForDate(userId, _selectedDate.value)

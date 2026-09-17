@@ -196,26 +196,6 @@ fun MenuScreen(navController: NavController) {
                 )
             }
 
-            // Help and Support
-            item {
-                MenuItem(
-                    icon = Icons.Default.HelpOutline,
-                    title = androidx.compose.ui.res.stringResource(R.string.menu_help_support),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    onClick = { navController.navigate("help_support") }
-                )
-            }
-
-            // About Dosezy
-            item {
-                MenuItem(
-                    icon = Icons.Outlined.Info,
-                    title = androidx.compose.ui.res.stringResource(R.string.menu_about_dosezy),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    onClick = { navController.navigate("about") }
-                )
-            }
-
             // Data & Sharing Section Header
             item {
                 Text(
@@ -278,7 +258,38 @@ fun MenuScreen(navController: NavController) {
                 )
             }
 
-            // 5. Check for Updates
+            // More Section Header
+            item {
+                Text(
+                    text = androidx.compose.ui.res.stringResource(R.string.menu_more_section),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+
+            // Help and Support
+            item {
+                MenuItem(
+                    icon = Icons.Default.HelpOutline,
+                    title = androidx.compose.ui.res.stringResource(R.string.menu_help_support),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    onClick = { navController.navigate("help_support") }
+                )
+            }
+
+            // About Dosezy
+            item {
+                MenuItem(
+                    icon = Icons.Outlined.Info,
+                    title = androidx.compose.ui.res.stringResource(R.string.menu_about_dosezy),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    onClick = { navController.navigate("about") }
+                )
+            }
+
+            // Check for Updates
             item {
                 MenuItem(
                     icon = Icons.Default.Refresh,

@@ -582,4 +582,31 @@
     <string name="notif_fullscreen_granted">फुल-स्क्रीन अलार्म विंडो की अनुमति है।</string>
     <string name="notif_fullscreen_desc">डिवाइस लॉक होने पर अलार्म स्क्रीन दिखाने के लिए आवश्यक है।</string>
     <string name="notif_oem_setup_btn">%1$s ऑटोस्टार्ट और पॉपअप सेटिंग्स ठीक करें</string>
+
+    <string name="btn_back">पीछे</string>
+    <string name="alarm_medication_reminder_multi">दवाइयों का रिमाइंडर (%d)</string>
+    <string name="alarm_take_all">सभी लें (%d)</string>
+    <string name="alarm_take_medicine">दवा लें</string>
+    <string name="alarm_snooze_format">स्नूज़ (%d मिनट)</string>
+    <string name="notif_action_snooze_format">स्नूज़ (%d मिनट)</string>
+    <string name="alarm_stock_remaining">स्टॉक: %d दवाएं शेष</string>
+    <string name="home_action_take">लें</string>
+    <string name="home_action_taken">ले ली</string>
+    <string name="home_action_missed">छूट गई</string>
+    <string name="home_action_mark_late">देर से ली</string>
+    <string name="home_dose_recorded">%s की खुराक दर्ज की गई</string>
+    <string name="btn_undo">पूर्ववत करें</string>
+    <string name="analytics_empty_title">अभी तक कोई दवा लॉग नहीं है</string>
+    <string name="analytics_empty_desc">जैसे ही आप दवा लेना दर्ज करेंगे, आपका स्कोर, साप्ताहिक स्ट्रीक और आंकड़े यहाँ दिखाई देंगे।</string>
+    <string name="validation_enter_med_name">कृपया दवा का नाम दर्ज करें</string>
+    <string name="validation_enter_dosage">कृपया खुराक दर्ज करें</string>
+    <string name="validation_select_days_week">कृपया सप्ताह का कम से कम एक दिन चुनें</string>
+    <string name="validation_select_days_month">कृपया महीने का कम से कम एक दिन चुनें</string>
+    <string name="menu_more_section">अधिक</string>
+    <string name="pref_section_general">सामान्य</string>
+    <string name="pref_section_notifications">सूचनाएँ और अलार्म</string>
+    <string name="pref_section_dose_tracking">खुराक ट्रैकिंग</string>
+    <string name="home_dose_reverted">%1$s खुराक को लंबित में वापस बदला गया</string>
+    <string name="search_medicines_hint">दवाइयाँ खोजें...</string>
+    <string name="btn_add_first_medicine">अपनी पहली दवा जोड़ें</string>
 </resources>

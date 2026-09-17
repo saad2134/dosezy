@@ -158,6 +158,16 @@ class BackupRestoreManager(
                 zos.putNextEntry(ZipEntry("$profileDir/schedules.json"))
                 zos.write(gson.toJson(schedules).toByteArray(Charsets.UTF_8))
                 zos.closeEntry()
+
+                // emergency_contacts.json (per-profile)
+                val emPrefs = context.getSharedPreferences("emergency_contacts", Context.MODE_PRIVATE)
+                val emContacts = emPrefs.getString("contacts_json_${user.userId}", null)
+                    ?: if (user.isCurrentUser) emPrefs.getString("contacts_json", null) else null
+                if (!emContacts.isNullOrEmpty()) {
+                    zos.putNextEntry(ZipEntry("$profileDir/emergency_contacts.json"))
+                    zos.write(emContacts.toByteArray(Charsets.UTF_8))
+                    zos.closeEntry()
+                }
             }
         }
 
@@ -354,6 +364,15 @@ class BackupRestoreManager(
                         }
 
                         scheduleRepository.rescheduleAllAlarms(newUserId, context)
+
+                        val emFile = File(pDir, "emergency_contacts.json")
+                        if (emFile.exists()) {
+                            val emJson = emFile.readText(Charsets.UTF_8)
+                            if (emJson.isNotBlank()) {
+                                val emPrefs = context.getSharedPreferences("emergency_contacts", Context.MODE_PRIVATE)
+                                emPrefs.edit().putString("contacts_json_$newUserId", emJson).apply()
+                            }
+                        }
                     }
 
                     ConflictStrategy.OVERWRITE -> {
@@ -399,6 +418,15 @@ class BackupRestoreManager(
                         }
 
                         scheduleRepository.rescheduleAllAlarms(targetUserId, context)
+
+                        val emFile = File(pDir, "emergency_contacts.json")
+                        if (emFile.exists()) {
+                            val emJson = emFile.readText(Charsets.UTF_8)
+                            if (emJson.isNotBlank()) {
+                                val emPrefs = context.getSharedPreferences("emergency_contacts", Context.MODE_PRIVATE)
+                                emPrefs.edit().putString("contacts_json_$targetUserId", emJson).apply()
+                            }
+                        }
                     }
 
                     ConflictStrategy.MERGE -> {
@@ -459,6 +487,17 @@ class BackupRestoreManager(
                         }
 
                         scheduleRepository.rescheduleAllAlarms(targetUserId, context)
+
+                        val emFile = File(pDir, "emergency_contacts.json")
+                        if (emFile.exists()) {
+                            val emJson = emFile.readText(Charsets.UTF_8)
+                            if (emJson.isNotBlank()) {
+                                val emPrefs = context.getSharedPreferences("emergency_contacts", Context.MODE_PRIVATE)
+                                if (!emPrefs.contains("contacts_json_$targetUserId")) {
+                                    emPrefs.edit().putString("contacts_json_$targetUserId", emJson).apply()
+                                }
+                            }
+                        }
                         totalProfiles++
                     }
 

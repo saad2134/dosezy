@@ -15,7 +15,7 @@ import Footer from '../components/Footer.astro';
 					<svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
 					</svg>
-					<span>DOSEZY USER MANUAL (v2.3.2)</span>
+					<span>DOSEZY USER MANUAL</span>
 				</div>
 				
 				<h1 class="text-4xl sm:text-6xl font-extrabold text-white font-display tracking-tight">
@@ -293,6 +293,14 @@ import Footer from '../components/Footer.astro';
 								</div>
 							</div>
 						</div>
+
+						<div class="bg-[#030407] p-4 rounded-2xl border border-white/10 text-xs text-neutral-300 space-y-2 mt-3">
+							<h4 class="font-bold text-white uppercase font-mono text-[10px] tracking-wider text-sky-400">Intake Undo & Daily Completion:</h4>
+							<ul class="list-disc list-inside space-y-1.5 text-neutral-300">
+								<li><strong class="text-white">5-Second Undo Action:</strong> Marking a dose taken displays an instant "Undo" snackbar. Dose cards also keep an active Undo button to revert status back to Pending and safely restore deducted stock.</li>
+								<li><strong class="text-white">Celebratory Completion Banner:</strong> When all doses for today are taken, a cheerful banner appears at the top while keeping today's full schedule visible underneath for continuous review.</li>
+							</ul>
+						</div>
 					</article>
 
 					<!-- Card 3: Adding Medication & Presets -->
@@ -302,30 +310,35 @@ import Footer from '../components/Footer.astro';
 						data-filter="basics"
 						data-difficulty="1"
 						data-readtime="1"
-						data-keywords="adding medication time picker daily presets frequency dosage food instructions photos"
+						data-keywords="adding medication search filter time picker daily presets frequency dosage food instructions photos archive discontinue"
 						class="manual-card vercel-card p-6 sm:p-8 rounded-3xl border border-white/10 bg-[#0a0c10]/95 space-y-4"
 					>
 						<div class="flex items-center justify-between border-b border-white/10 pb-4">
 							<div class="flex items-center space-x-3">
 								<span class="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-xs">3</span>
-								<h2 class="text-xl font-bold text-white font-display">Adding Medicines: Photos, Food Instructions & Presets</h2>
+								<h2 class="text-xl font-bold text-white font-display">Adding, Searching & Archiving Medicines</h2>
 							</div>
 							<div class="flex items-center space-x-2">
 								<span class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Easy</span>
-								<span class="px-2.5 py-0.5 rounded text-[10px] font-mono text-neutral-400 bg-white/5">1 min read</span>
+								<span class="px-2.5 py-0.5 rounded text-[10px] font-mono text-neutral-400 bg-white/5">2 min read</span>
 							</div>
 						</div>
 
 						<div class="space-y-3 text-xs text-neutral-300">
 							<ol class="list-decimal list-inside space-y-2 text-neutral-300">
-								<li>Tap <strong class="text-white">Medicines</strong> in the bottom bar, then tap <strong class="text-white">"+ Add Medicine"</strong>.</li>
-								<li>Enter the medicine name and dose unit (tablet, capsule, mg, mL, drops, puffs, units).</li>
+								<li>Tap <strong class="text-white">Medicines</strong> in the bottom bar, then tap <strong class="text-white">"+ Add Medicine"</strong> (or <strong class="text-white">"Add Your First Medication"</strong> on empty lists).</li>
+								<li>Enter the medicine name and dose unit (tablet, capsule, mg, mL, drops, puffs, units). Helpful validation toasts guide you if required fields are missing.</li>
 								<li>(Optional) Tap the camera icon to take or crop a pill box photo.</li>
 								<li>Select meal instructions (🍽️ Before Food, 🍲 With Food, 🥗 After Food, or ⏱️ No Instructions).</li>
-								<li>Choose <strong class="text-white">Daily</strong>, <strong class="text-white">Weekly</strong>, or <strong class="text-white">Monthly</strong> frequency.</li>
+								<li>Choose <strong class="text-white">Daily</strong>, <strong class="text-white">Weekly</strong>, <strong class="text-white">Monthly</strong>, or <strong class="text-white">As Needed (PRN)</strong> frequency.</li>
 								<li>Tap <strong class="text-sky-300 font-bold">1x, 2x, 3x, or 4x Daily</strong> chips to schedule standard multi-dose times instantly.</li>
 								<li>Adjust individual times using the intuitive <strong>12-First Grid Time Picker</strong> (12 is at the top).</li>
 							</ol>
+
+							<div class="bg-[#030407] p-3.5 rounded-2xl border border-white/10 space-y-1.5 mt-2">
+								<p><strong class="text-sky-300">Live Search & Filter:</strong> Use the top search bar on the Medicines screen to instantly filter pills by name or instructions in real time.</p>
+								<p><strong class="text-sky-300">Discontinue & Archive:</strong> When a course finishes, tap <em>Edit &gt; Discontinue</em> to safely archive the pill while keeping all past adherence history intact.</p>
+							</div>
 						</div>
 					</article>
 
@@ -336,13 +349,13 @@ import Footer from '../components/Footer.astro';
 						data-filter="basics"
 						data-difficulty="1"
 						data-readtime="1"
-						data-keywords="slot alarms grouped medicines take all snooze checklist"
+						data-keywords="slot alarms grouped medicines take all snooze dynamic duration checklist"
 						class="manual-card vercel-card p-6 sm:p-8 rounded-3xl border border-white/10 bg-[#0a0c10]/95 space-y-4"
 					>
 						<div class="flex items-center justify-between border-b border-white/10 pb-4">
 							<div class="flex items-center space-x-3">
 								<span class="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-xs">4</span>
-								<h2 class="text-xl font-bold text-white font-display">Grouped Alarms & One-Tap "Take All"</h2>
+								<h2 class="text-xl font-bold text-white font-display">Grouped Alarms, "Take All" & Dynamic Snooze</h2>
 							</div>
 							<div class="flex items-center space-x-2">
 								<span class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Easy</span>
@@ -353,6 +366,11 @@ import Footer from '../components/Footer.astro';
 						<p class="text-xs text-neutral-300 leading-relaxed">
 							When taking multiple tablets at the exact same minute (e.g. 8:00 AM), Dosezy rings with one grouped alarm. You can check off items individually or tap the large green <strong class="text-white">"TAKE ALL"</strong> button in a single tap to record all doses and decrement inventory simultaneously.
 						</p>
+
+						<div class="bg-[#030407] p-3.5 rounded-2xl border border-white/10 text-xs text-neutral-300 mt-2">
+							<strong class="text-amber-400 block mb-1">Customizable Snooze Duration:</strong>
+							Snooze intervals dynamically follow your preference in <strong class="text-white">Menu &gt; Preferences &gt; Notifications &amp; Alarms</strong> (5, 10, 15, 20, or 30 minutes) across both full-screen alarms and heads-up notification buttons.
+						</div>
 					</article>
 
 					<!-- Card 5: Stock Tracking -->
@@ -446,27 +464,26 @@ import Footer from '../components/Footer.astro';
 						data-filter="config"
 						data-difficulty="2"
 						data-readtime="1"
-						data-keywords="late missed alerts settings thresholds reminders preferences"
+						data-keywords="late missed alerts settings thresholds reminders preferences structured sections"
 						class="manual-card vercel-card p-6 sm:p-8 rounded-3xl border border-white/10 bg-[#0a0c10]/95 space-y-4"
 					>
 						<div class="flex items-center justify-between border-b border-white/10 pb-4">
 							<div class="flex items-center space-x-3">
 								<span class="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-xs">8</span>
-								<h2 class="text-xl font-bold text-white font-display">Adjusting Late & Missed Alert Windows</h2>
+								<h2 class="text-xl font-bold text-white font-display">Structured Preferences & Dose Thresholds</h2>
 							</div>
 							<div class="flex items-center space-x-2">
-								<span class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Quick Tip</span>
+								<span class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Preferences</span>
 								<span class="px-2.5 py-0.5 rounded text-[10px] font-mono text-neutral-400 bg-white/5">1 min read</span>
 							</div>
 						</div>
 
 						<div class="bg-[#030407] p-4 rounded-2xl border border-white/10 text-xs text-neutral-300 space-y-2">
-							<p>Customize how long Dosezy waits before marking a dose as late:</p>
+							<p>Preferences are organized into clean, focused sections in <strong class="text-white">Menu &gt; Preferences</strong>:</p>
 							<ul class="list-disc list-inside space-y-1.5 text-neutral-300">
-								<li>Open <strong class="text-white">Menu > Preferences</strong>.</li>
-								<li><strong class="text-white">Consider Late After:</strong> Select 1h, 2h, or 3h.</li>
-								<li><strong class="text-white">Consider Missed After:</strong> Select from 3h up to 9h.</li>
-								<li><strong class="text-white">Default Snooze Duration:</strong> Choose 5, 10, 15, 20, or 30 minutes.</li>
+								<li><strong class="text-white">General:</strong> App language (12 languages), Light/Dark theme, and 12h/24h time format.</li>
+								<li><strong class="text-white">Notifications &amp; Alarms:</strong> Default snooze interval (5, 10, 15, 20, or 30 min) and custom ringtones.</li>
+								<li><strong class="text-white">Dose Tracking:</strong> Adjust <em>Consider Late After</em> (1h–3h) and <em>Consider Missed After</em> (3h–9h) windows.</li>
 							</ul>
 						</div>
 					</article>
@@ -478,13 +495,13 @@ import Footer from '../components/Footer.astro';
 						data-filter="basics"
 						data-difficulty="1"
 						data-readtime="1"
-						data-keywords="emergency dialer 911 112 108 helpline international personal contacts"
+						data-keywords="emergency dialer 911 112 108 helpline international personal contacts profile backup"
 						class="manual-card vercel-card p-6 sm:p-8 rounded-3xl border border-white/10 bg-[#0a0c10]/95 space-y-4"
 					>
 						<div class="flex items-center justify-between border-b border-white/10 pb-4">
 							<div class="flex items-center space-x-3">
 								<span class="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-xs">9</span>
-								<h2 class="text-xl font-bold text-white font-display">International Emergency & Personal Contacts</h2>
+								<h2 class="text-xl font-bold text-white font-display">International Emergency & Profile Contacts</h2>
 							</div>
 							<div class="flex items-center space-x-2">
 								<span class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Easy</span>
@@ -493,12 +510,12 @@ import Footer from '../components/Footer.astro';
 						</div>
 
 						<p class="text-xs text-neutral-300 leading-relaxed">
-							Go to <strong class="text-white">Menu > Emergency Contacts</strong>:
+							Go to <strong class="text-white">Menu &gt; Emergency Contacts</strong>:
 						</p>
 
 						<ul class="list-disc list-inside space-y-1.5 text-xs text-neutral-300">
 							<li><strong class="text-white">Official Emergency Services:</strong> Dosezy automatically detects your country (India, US/Canada, UK, EU, China, Japan, Russia, Brazil, Bangladesh, Australia) to dial police, fire, or ambulance in 1 tap.</li>
-							<li><strong class="text-white">Personal Emergency Contacts:</strong> Tap <strong class="text-white">"+ Add Emergency Contact"</strong> to save personal phone numbers for your family doctor, partner, or caregiver.</li>
+							<li><strong class="text-white">Profile-Isolated Contacts:</strong> Tap <strong class="text-white">"+ Add Emergency Contact"</strong> to save numbers for your doctor or caregiver. Personal contacts are isolated per profile and included in encrypted backups.</li>
 						</ul>
 					</article>
 
@@ -524,7 +541,7 @@ import Footer from '../components/Footer.astro';
 						</div>
 
 						<p class="text-xs text-neutral-300 leading-relaxed">
-							Tap <strong class="text-white">Menu > Switch Profile</strong> to create independent profiles for family members. Each profile keeps its own schedule, medicine list, stock counts, and compliance logs completely separate.
+							Tap <strong class="text-white">Menu &gt; Switch Profile</strong> to create independent profiles for family members. Each profile keeps its own schedule, medicine list, stock counts, and compliance logs completely separate.
 						</p>
 					</article>
 
@@ -541,7 +558,7 @@ import Footer from '../components/Footer.astro';
 						<div class="flex items-center justify-between border-b border-white/10 pb-4">
 							<div class="flex items-center space-x-3">
 								<span class="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-xs">11</span>
-								<h2 class="text-xl font-bold text-white font-display">Doctor PDF Reports & Local Backups</h2>
+								<h2 class="text-xl font-bold text-white font-display">Doctor PDF Reports &amp; Local Backups</h2>
 							</div>
 							<div class="flex items-center space-x-2">
 								<span class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Quick Tip</span>
@@ -550,7 +567,7 @@ import Footer from '../components/Footer.astro';
 						</div>
 
 						<p class="text-xs text-neutral-300 leading-relaxed">
-							Before your next doctor visit, go to <strong class="text-white">Menu > Export Data</strong> and choose <strong class="text-white">PDF Report</strong> to generate a clean, printable medical report with current medicines, dosages, food instructions, and compliance records. You can also export JSON or CSV digital archives.
+							Before your next doctor visit, go to <strong class="text-white">Menu &gt; Export Data</strong> and choose <strong class="text-white">PDF Report</strong> to generate a clean, printable medical report with current medicines, dosages, food instructions, and compliance records. You can also export JSON or CSV digital archives.
 						</p>
 					</article>
 
@@ -561,7 +578,7 @@ import Footer from '../components/Footer.astro';
 						data-filter="config"
 						data-difficulty="1"
 						data-readtime="1"
-						data-keywords="updates store detection google play fdroid github"
+						data-keywords="updates store detection google play fdroid github more section"
 						class="manual-card vercel-card p-6 sm:p-8 rounded-3xl border border-white/10 bg-[#0a0c10]/95 space-y-4"
 					>
 						<div class="flex items-center justify-between border-b border-white/10 pb-4">
@@ -576,7 +593,7 @@ import Footer from '../components/Footer.astro';
 						</div>
 
 						<p class="text-xs text-neutral-300 leading-relaxed">
-							Tap <strong class="text-white">Menu > Check for Updates</strong>. Dosezy automatically detects where you downloaded the app from (Google Play, F-Droid, Huawei AppGallery, Samsung Galaxy Store, Xiaomi GetApps, Amazon Appstore, or GitHub) and opens your store client or browser safely.
+							Tap <strong class="text-white">Menu &gt; More &gt; Check for Updates</strong>. Dosezy automatically detects where you downloaded the app from (Google Play, F-Droid, Huawei AppGallery, Samsung Galaxy Store, Xiaomi GetApps, Amazon Appstore, or GitHub) and opens your store client or browser safely.
 						</p>
 					</article>
 
@@ -587,13 +604,13 @@ import Footer from '../components/Footer.astro';
 						data-filter="config"
 						data-difficulty="2"
 						data-readtime="1"
-						data-keywords="notification status battery optimization exact alarms permissions"
+						data-keywords="notification status reliability shield battery optimization exact alarms permissions"
 						class="manual-card vercel-card p-6 sm:p-8 rounded-3xl border border-white/10 bg-[#0a0c10]/95 space-y-4"
 					>
 						<div class="flex items-center justify-between border-b border-white/10 pb-4">
 							<div class="flex items-center space-x-3">
 								<span class="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-xs">13</span>
-								<h2 class="text-xl font-bold text-white font-display">Notification Status & Battery Optimization</h2>
+								<h2 class="text-xl font-bold text-white font-display">Notification Reliability Shield &amp; Battery</h2>
 							</div>
 							<div class="flex items-center space-x-2">
 								<span class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Troubleshooting</span>
@@ -602,13 +619,13 @@ import Footer from '../components/Footer.astro';
 						</div>
 
 						<p class="text-xs text-neutral-300 leading-relaxed">
-							If alarms are not ringing on your phone:
+							A persistent <strong class="text-emerald-400">Reliability Shield</strong> button is accessible in the TopBar across all main screens and subpages. Tapping it opens a live system diagnostic checklist:
 						</p>
 
 						<ol class="list-decimal list-inside space-y-1.5 text-xs text-neutral-300">
-							<li>Open <strong class="text-white">Menu > Notification Status</strong> to view your live permission diagnostic checklist.</li>
-							<li>Ensure <strong class="text-white">Exact Alarms</strong> and <strong class="text-white">Notifications</strong> are enabled.</li>
-							<li>Allow Dosezy to ignore battery optimization so alarms ring even when your device screen is locked.</li>
+							<li><strong class="text-white">Exact Alarms:</strong> Verifies precision alarm dispatch permission.</li>
+							<li><strong class="text-white">Notifications:</strong> Checks that alert channels are enabled.</li>
+							<li><strong class="text-white">Battery Optimization:</strong> Direct manufacturer links (Samsung, Xiaomi, Huawei, etc.) to prevent battery savers from killing alarms when the phone is locked.</li>
 						</ol>
 					</article>
 

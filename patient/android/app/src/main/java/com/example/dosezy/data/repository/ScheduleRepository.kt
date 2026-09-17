@@ -262,6 +262,36 @@ class ScheduleRepository(private val database: DosezyDatabase) {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun undoDoseTaken(entryId: String, context: Context? = null) {
+        // 1. Revert status to PENDING and clear takenAt
+        database.scheduleDao().updateMedicationStatus(entryId, "PENDING", null)
+
+        // 2. Revert stock auto-decrement if applicable
+        try {
+            val entry = database.scheduleDao().getScheduleEntryById(entryId)
+            if (entry != null) {
+                val medicine = database.medicineDao().getMedicineByIdDirect(entry.medicineId)
+                if (medicine != null && medicine.currentStock != null && medicine.autoDeductOnTake) {
+                    val addAmount = medicine.dosage.toInt().coerceAtLeast(1)
+                    val restoredStock = medicine.currentStock + addAmount
+                    val updatedMedicine = medicine.copy(currentStock = restoredStock)
+                    database.medicineDao().updateMedicine(updatedMedicine)
+                    Log.d(TAG, "Restored stock for ${medicine.medicationName}: ${medicine.currentStock} -> $restoredStock on undo")
+                }
+            }
+        } catch (ex: Exception) {
+            Log.e(TAG, "Error reverting stock in undoDoseTaken", ex)
+        }
+
+        // 3. Update app widgets
+        if (context != null) {
+            try {
+                com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+            } catch (_: Exception) {}
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun logAsNeededDose(
         medicine: com.example.dosezy.data.model.Medicine,
         userId: String,

@@ -101,7 +101,18 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                             autoSilenceSeconds = duration
                         )
 
-                        showNotification(context, entryId, entryIds, medicineName, medicineNames, scheduledTime, isNagging, naggingCount, user?.naggingMaxRepeats ?: 3)
+                        showNotification(
+                            context = context,
+                            entryId = entryId,
+                            entryIds = entryIds,
+                            medicineName = medicineName,
+                            medicineNames = medicineNames,
+                            scheduledTime = scheduledTime,
+                            isNagging = isNagging,
+                            naggingCount = naggingCount,
+                            maxNagging = user?.naggingMaxRepeats ?: 3,
+                            snoozeMinutes = user?.snoozeDuration ?: 10
+                        )
 
                         // Schedule next follow-up nagging reminder if enabled and below limit
                         if (user != null && user.naggingRemindersEnabled && naggingCount < user.naggingMaxRepeats) {
@@ -139,7 +150,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         scheduledTime: String?,
         isNagging: Boolean = false,
         naggingCount: Int = 0,
-        maxNagging: Int = 3
+        maxNagging: Int = 3,
+        snoozeMinutes: Int = 10
     ) {
         createNotificationChannel(context)
 
@@ -235,8 +247,10 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
         val notificationTitle = if (isNagging) {
             context.getString(R.string.notif_nagging_title, medicineName)
+        } else if (medicineNames != null && medicineNames.size > 1) {
+            context.getString(R.string.alarm_medication_reminder_multi, medicineNames.size)
         } else {
-            "Medicine Reminder: $medicineName"
+            context.getString(R.string.alarm_medication_reminder)
         }
 
         val notificationText = if (isNagging) {
@@ -259,12 +273,12 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             .setContentIntent(fullScreenPendingIntent)
             .addAction(
                 getNotificationIcon(context, Icons.Filled.Check),
-                "Taken",
+                context.getString(R.string.home_action_taken),
                 takenPendingIntent
             )
             .addAction(
                 getNotificationIcon(context, Icons.Filled.Snooze),
-                "Snooze (10 min)",
+                context.getString(R.string.notif_action_snooze_format, snoozeMinutes),
                 snoozePendingIntent
             )
             .setStyle(NotificationCompat.BigTextStyle().bigText(notificationText))

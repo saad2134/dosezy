@@ -88,14 +88,16 @@ class NotificationActionReceiver : BroadcastReceiver() {
             "SNOOZE_ACTION" -> {
                 Log.d(TAG, "Snoozing medicine reminder for entry: $entryId")
                 
-                // Fetch the medicine name from database
+                // Fetch the medicine name and user snooze preference from database
                 val entry = database.scheduleDao().getScheduleEntryById(entryId)
+                val user = entry?.let { database.userDao().getUserByIdDirect(it.userId) }
+                val snoozeMinutes = user?.snoozeDuration ?: 10
                 val medicine = entry?.let { database.medicineDao().getMedicineById(it.medicineId).first() }
                 val medicineName = medicine?.medicationName ?: "Medicine"
 
-                alarmScheduler.scheduleSnooze(entryId, 10, medicineName) // 10 minutes snooze
+                alarmScheduler.scheduleSnooze(entryId, snoozeMinutes, medicineName)
 
-                Log.d(TAG, "Medicine reminder snoozed for 10 minutes for entry: $entryId ($medicineName)")
+                Log.d(TAG, "Medicine reminder snoozed for $snoozeMinutes minutes for entry: $entryId ($medicineName)")
             }
             else -> {
                 Log.w(TAG, "Unknown action received: $action for entry: $entryId")

@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -66,6 +67,7 @@ import com.example.dosezy.utils.DateUtils
 import com.example.dosezy.utils.TimeCalculationUtils
 import com.example.dosezy.utils.TimeFormatUtils
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -91,6 +93,9 @@ fun HomeScreen(
     var currentTime by remember { mutableStateOf(java.time.LocalDateTime.now()) }
     var isPrnExpanded by remember { mutableStateOf(false) }
     var medToLogConfirm by remember { mutableStateOf<Medicine?>(null) }
+    val snackbarHostState = remember { androidx.compose.material3.SnackbarHostState() }
+    val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     // Auto-refresh every minute for real-time updates and run immediately on load
     LaunchedEffect(currentUser) {
@@ -166,12 +171,16 @@ fun HomeScreen(
         }
     }
 
-    Surface(
+    androidx.compose.material3.Scaffold(
         modifier = Modifier.fillMaxSize(),
-
-    ) {
+        containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = { androidx.compose.material3.SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
         Column(
-            modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             TopBar(
                 navController = navController,
@@ -193,25 +202,72 @@ fun HomeScreen(
                 ) {
                     if (hasMedications) {
                         if (allTaken) {
-                            AllGoodState()
-                        } else {
-                            groupedEntries.forEach { (time, entries) ->
-                                TimeSection(
-                                    time = time,
-                                    entries = entries,
-                                    currentDateTime = currentTime,
-                                    currentUser = currentUser,
-                                    onMarkAsTaken = { entryId ->
-                                        val takenAt = java.time.LocalDateTime.now().toString()
-                                        scheduleViewModel.markAsTaken(entryId, takenAt)
-                                    },
-                                    onMarkAsLate = { entryId ->
-                                        val takenAt = java.time.LocalDateTime.now().toString()
-                                        scheduleViewModel.markAsLate(entryId, takenAt)
+                            AllGoodBanner()
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                        groupedEntries.forEach { (time, entries) ->
+                            TimeSection(
+                                time = time,
+                                entries = entries,
+                                currentDateTime = currentTime,
+                                currentUser = currentUser,
+                                onMarkAsTaken = { entryId ->
+                                    val medName = todayEntries.find { it.scheduleEntry.entryId == entryId }?.medicine?.medicationName ?: ""
+                                    val takenAt = java.time.LocalDateTime.now().toString()
+                                    scheduleViewModel.markAsTaken(entryId, takenAt)
+                                    coroutineScope.launch {
+                                        val message = if (medName.isNotBlank()) {
+                                            context.getString(R.string.home_dose_recorded, medName)
+                                        } else {
+                                            context.getString(R.string.home_action_taken)
+                                        }
+                                        val result = snackbarHostState.showSnackbar(
+                                            message = message,
+                                            actionLabel = context.getString(R.string.btn_undo),
+                                            duration = androidx.compose.material3.SnackbarDuration.Short
+                                        )
+                                        if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+                                            scheduleViewModel.undoDoseTaken(entryId)
+                                        }
                                     }
-                                )
-                                Spacer(modifier = Modifier.height(16.dp))
-                            }
+                                },
+                                onMarkAsLate = { entryId ->
+                                    val medName = todayEntries.find { it.scheduleEntry.entryId == entryId }?.medicine?.medicationName ?: ""
+                                    val takenAt = java.time.LocalDateTime.now().toString()
+                                    scheduleViewModel.markAsLate(entryId, takenAt)
+                                    coroutineScope.launch {
+                                        val message = if (medName.isNotBlank()) {
+                                            context.getString(R.string.home_dose_recorded, medName)
+                                        } else {
+                                            context.getString(R.string.home_action_taken)
+                                        }
+                                        val result = snackbarHostState.showSnackbar(
+                                            message = message,
+                                            actionLabel = context.getString(R.string.btn_undo),
+                                            duration = androidx.compose.material3.SnackbarDuration.Short
+                                        )
+                                        if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+                                            scheduleViewModel.undoDoseTaken(entryId)
+                                        }
+                                    }
+                                },
+                                onUndo = { entryId ->
+                                    val medName = todayEntries.find { it.scheduleEntry.entryId == entryId }?.medicine?.medicationName ?: ""
+                                    scheduleViewModel.undoDoseTaken(entryId)
+                                    coroutineScope.launch {
+                                        val message = if (medName.isNotBlank()) {
+                                            context.getString(R.string.home_dose_reverted, medName)
+                                        } else {
+                                            context.getString(R.string.home_action_taken)
+                                        }
+                                        snackbarHostState.showSnackbar(
+                                            message = message,
+                                            duration = androidx.compose.material3.SnackbarDuration.Short
+                                        )
+                                    }
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
                         }
                     } else if (userMedicines.isEmpty()) {
                         NoMedicationsState()
@@ -417,17 +473,22 @@ private fun TimeSection(
     currentDateTime: java.time.LocalDateTime,
     currentUser: com.example.dosezy.data.model.User?,
     onMarkAsTaken: (String) -> Unit,
-    onMarkAsLate: (String) -> Unit
+    onMarkAsLate: (String) -> Unit,
+    onUndo: (String) -> Unit = {}
 ) {
-    Column {
-        // Time header
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // Time Header
         Text(
             text = time,
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Calculate time difference only for pending/late entries (not taken ones)
         val pendingEntries = entries.filter {
@@ -443,10 +504,13 @@ private fun TimeSection(
             )
         }
 
-        // Next dose indicator - Show time difference only for pending entries
+        val allTaken = entries.all {
+            it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
+                    it.scheduleEntry.status == MedicationStatus.TAKEN_LATE
+        }
+
         val statusText = when {
-            entries.all { it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
-                    it.scheduleEntry.status == MedicationStatus.TAKEN_LATE } -> {
+            allTaken -> {
                 androidx.compose.ui.res.stringResource(R.string.status_all_medications_taken)
             }
             timeDiff != null -> {
@@ -478,7 +542,8 @@ private fun TimeSection(
                 currentDateTime = currentDateTime,
                 currentUser = currentUser,
                 onMarkAsTaken = onMarkAsTaken,
-                onMarkAsLate = onMarkAsLate
+                onMarkAsLate = onMarkAsLate,
+                onUndo = onUndo
             )
             Spacer(modifier = Modifier.height(8.dp))
         }
@@ -491,7 +556,8 @@ private fun MedicationCard(
     currentDateTime: java.time.LocalDateTime,
     currentUser: com.example.dosezy.data.model.User?,
     onMarkAsTaken: (String) -> Unit,
-    onMarkAsLate: (String) -> Unit
+    onMarkAsLate: (String) -> Unit,
+    onUndo: (String) -> Unit = {}
 ) {
     val entry = scheduleWithMedicine.scheduleEntry
     val medicine = scheduleWithMedicine.medicine
@@ -522,10 +588,10 @@ private fun MedicationCard(
 
     // Determine button properties
     val buttonText = when {
-        isTaken -> "Taken"
-        isMissed -> "Missed"
-        isLate -> "Mark Late"
-        else -> "Take"
+        isTaken -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.home_action_taken)
+        isMissed -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.home_action_missed)
+        isLate -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.home_action_mark_late)
+        else -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.home_action_take)
     }
 
     val buttonColor = when {
@@ -542,7 +608,7 @@ private fun MedicationCard(
         else -> MaterialTheme.colorScheme.onPrimary
     }
 
-    val enabled = !isTaken && !isMissed
+    val enabled = !isMissed
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -637,8 +703,9 @@ private fun MedicationCard(
             Button(
                 onClick = {
                     when {
+                        isTaken -> onUndo(entry.entryId)
                         isLate -> onMarkAsLate(entry.entryId)
-                        !isTaken && !isMissed -> onMarkAsTaken(entry.entryId)
+                        !isMissed -> onMarkAsTaken(entry.entryId)
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
@@ -707,49 +774,50 @@ private fun NoMedicationsState() {
 }
 
 @Composable
-private fun AllGoodState() {
-    Column(
+private fun AllGoodBanner() {
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(bottom = 8.dp),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
     ) {
-        // Success icon
-        Box(
+        Row(
             modifier = Modifier
-                .size(96.dp)
-                .clip(MaterialTheme.shapes.extraLarge)
-                .background(MaterialTheme.colorScheme.primaryContainer),
-            contentAlignment = Alignment.Center
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Default.Check,
-                contentDescription = "All good",
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(48.dp)
-            )
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(14.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = androidx.compose.ui.res.stringResource(R.string.home_all_good),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = androidx.compose.ui.res.stringResource(R.string.home_all_good_desc),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Title
-        Text(
-            text = androidx.compose.ui.res.stringResource(R.string.home_all_good),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Description
-        Text(
-            text = androidx.compose.ui.res.stringResource(R.string.home_all_good_desc),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-        )
     }
 }
 

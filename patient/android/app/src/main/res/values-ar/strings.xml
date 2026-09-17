@@ -566,4 +566,31 @@
     <string name="notif_fullscreen_granted">تم السماح بنوافذ المنبه في وضع ملء الشاشة.</string>
     <string name="notif_fullscreen_desc">مطلوب لعرض شاشة المنبه عند قفل الجهاز.</string>
     <string name="notif_oem_setup_btn">ضبط إعدادات التشغيل التلقائي والنوافذ المنبثقة لـ %1$s</string>
+
+    <string name="btn_back">رجوع</string>
+    <string name="alarm_medication_reminder_multi">تذكير بالأدوية (%d)</string>
+    <string name="alarm_take_all">تناول الكل (%d)</string>
+    <string name="alarm_take_medicine">تناول الدواء</string>
+    <string name="alarm_snooze_format">تأجيل (%d دقيقة)</string>
+    <string name="notif_action_snooze_format">تأجيل (%d د)</string>
+    <string name="alarm_stock_remaining">المخزون المتبقي: %d وحدة</string>
+    <string name="home_action_take">تناول</string>
+    <string name="home_action_taken">تم التناول</string>
+    <string name="home_action_missed">فاتك</string>
+    <string name="home_action_mark_late">تسجيل متأخراً</string>
+    <string name="home_dose_recorded">تم تسجيل الجرعة لـ %s</string>
+    <string name="btn_undo">تراجع</string>
+    <string name="analytics_empty_title">لا توجد سجلات أدوية حتى الآن</string>
+    <string name="analytics_empty_desc">عند تسجيل أدويتك اليومية، ستظهر هنا نسبة التزامك وسلاسل الاستمرار وإحصاءات الجرعات.</string>
+    <string name="validation_enter_med_name">يرجى إدخال اسم الدواء</string>
+    <string name="validation_enter_dosage">يرجى إدخال الجرعة</string>
+    <string name="validation_select_days_week">يرجى تحديد يوم واحد على الأقل من أيام الأسبوع</string>
+    <string name="validation_select_days_month">يرجى تحديد يوم واحد على الأقل من أيام الشهر</string>
+    <string name="menu_more_section">المزيد</string>
+    <string name="pref_section_general">عام</string>
+    <string name="pref_section_notifications">الإشعارات والتنبيهات</string>
+    <string name="pref_section_dose_tracking">تتبع الجرعات</string>
+    <string name="home_dose_reverted">تم التراجع عن جرعة %1$s وإعادتها لقيد الانتظار</string>
+    <string name="search_medicines_hint">البحث في الأدوية...</string>
+    <string name="btn_add_first_medicine">أضف دواءك الأول</string>
 </resources>

@@ -1,0 +1,72 @@
+<en-IN>
+• Major UX overhaul: Added intake undo action, dynamic snooze durations, and multi-profile emergency backups
+• Medicine roster search, empty-state guidance, and celebratory daily review keeping today's schedule visible
+• Reorganized Preferences & Menu with structured sections; compact subpage topbars with reliability shield
+• Chronological schedule sorting, archived medicine fix, and calendar date-tap performance optimization
+</en-IN>
+<ar>
+• تحسينات شاملة لتجربة المستخدم: إضافة التراجع عن الجرعة، وتنبيهات تأجيل مخصصة، ونسخ احتياطي لجهات الطوارئ
+• تجربة تهيئة محسّنة مع توافق كامل مع الوضع الداكن، ودليل للإحصائيات، وتبديل سلس للحسابات
+• إعادة تنظيم الإعدادات والقائمة في أقسام واضحة مع إرشادات للتحقق من النماذج
+• ترتيب زمني دقيق للمواعيد، وإصلاح تعطل الأدوية المؤرشفة، وتحسين التوافق مع F-Droid
+</ar>
+<de-DE>
+• Umfassendes UX-Update: Dosis-Rückgängig-Funktion, anpassbare Schlummerdauer und Notfallkontakt-Backups
+• Optimierter Onboarding-Ablauf mit konsistentem Dunkelmodus, Statistik-Leitfaden und Profilwechsel
+• Übersichtliche Neustrukturierung von Einstellungen & Menü sowie Formular-Validierungshinweise
+• Chronologische Terminsortierung, Absturzbehebung bei archivierten Medikamenten und F-Droid-Optimierung
+</de-DE>
+<en-US>
+• Major UX overhaul: Added intake undo action, dynamic snooze durations, and multi-profile emergency backups
+• Medicine roster search, empty-state guidance, and celebratory daily review keeping today's schedule visible
+• Reorganized Preferences & Menu with structured sections; compact subpage topbars with reliability shield
+• Chronological schedule sorting, archived medicine fix, and calendar date-tap performance optimization
+</en-US>
+<es-419>
+• Gran actualización de UX: opción para deshacer toma, duración de posponer personalizada y copias de seguridad de emergencia
+• Flujo de inicio mejorado con compatibilidad total con modo oscuro, guías de estadísticas y cambio de perfil fluido
+• Ajustes y menú reorganizados en secciones claras con mensajes de validación de formulario
+• Orden cronológico en el horario diario, corrección de cierres en medicamentos archivados y mejoras para F-Droid
+</es-419>
+<fr-FR>
+• Améliorations majeures : annulation de prise, durée de rappel personnalisable et sauvegarde des contacts d'urgence
+• Parcours d'accueil peaufiné avec mode sombre harmonisé, guide des statistiques et changement de profil fluide
+• Préférences et menu réorganisés en sections claires avec aide à la validation des formulaires
+• Tri chronologique du planning, correction de plantage sur les médicaments archivés et compatibilité F-Droid
+</fr-FR>
+<hi-IN>
+• बड़ा UX सुधार: दवा लेने पर अनडू (Undo) विकल्प, अनुकूलन योग्य स्नूज़ समय और आपातकालीन संपर्क बैकअप
+• बेहतर ऑनबोर्डिंग अनुभव, डार्क मोड संगति, एनालिटिक्स मार्गदर्शिका और सहज प्रोफ़ाइल स्विचिंग
+• सेटिंग्स और मेनू का स्पष्ट अनुभागों में पुनर्गठन व फ़ॉर्म सत्यापन संकेत
+• समय अनुसार शेड्यूल क्रम, संग्रहीत दवाओं की त्रुटि सुधार और F-Droid संगतता में सुधार
+</hi-IN>
+<it-IT>
+• Importante aggiornamento UX: funzione Annulla assunzione, posticipo personalizzabile e backup dei contatti di emergenza
+• Configurazione iniziale perfezionata con tema scuro coerente, guida alle statistiche e cambio profilo fluido
+• Preferenze e menu riorganizzati in sezioni chiare con indicazioni per la compilazione dei moduli
+• Ordinamento cronologico, risoluzione arresti anomali su farmaci archiviati e ottimizzazioni per F-Droid
+</it-IT>
+<ja-JP>
+• 大幅なUX改善: 服薬取り消し（Undo）機能、カスタムスヌーズ時間、緊急連絡先のバックアップに対応
+• ダークモードの統一、分析ガイド、スムーズなプロファイル切り替えなど初期設定フローを洗練
+• 設定とメニューのセクション整理、入力フォームの必須項目案内を追加
+• スケジュールの時間順ソート、アーカイブ済み薬のクラッシュ修正、F-Droidビルド互換性の向上
+</ja-JP>
+<pt-BR>
+• Grande atualização de UX: desfazer registro de dose, duração de soneca dinâmica e backup de contatos de emergência
+• Fluxo de introdução refinado com modo escuro consistente, guias de estatísticas e troca de perfil fluida
+• Preferências e menu reorganizados em seções claras com dicas de validação de formulários
+• Ordenação cronológica da programação, correção de falhas em medicamentos arquivados e melhorias para F-Droid
+</pt-BR>
+<ru-RU>
+• Крупное улучшение UX: отмена отметки о приеме (Undo), настраиваемый повтор будильника и резервное копирование контактов
+• Улучшенная начальная настройка с идеальной темной темой, подсказками в аналитике и быстрым переключением профилей
+• Реорганизация настроек и меню по разделам, понятные подсказки при заполнении форм
+• Хронологический порядок в расписании, исправление вылета архивных лекарств и оптимизация для F-Droid
+</ru-RU>
+<zh-CN>
+• 重大体验升级：新增服药撤回（Undo）功能、动态小睡延迟、多档案紧急联系人备份
+• 全面优化新手引导流程，完善深色模式视觉一致性、统计指引与档案切换体验
+• 偏好设置与菜单分区优化，新增药品添加表单提示
+• 严格按时间先后排序每日日程，修复归档药品崩溃，完善 F-Droid 开源编译兼容性
+</zh-CN>

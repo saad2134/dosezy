@@ -566,4 +566,31 @@
     <string name="notif_fullscreen_granted">全画面アラームウィンドウの表示が許可されています。</string>
     <string name="notif_fullscreen_desc">画面ロック時にアラーム画面を表示するために必要です。</string>
     <string name="notif_oem_setup_btn">%1$s の自動起動とポップアップ設定を調整</string>
+
+    <string name="btn_back">戻る</string>
+    <string name="alarm_medication_reminder_multi">服薬リマインダー (%d)</string>
+    <string name="alarm_take_all">すべて服用 (%d)</string>
+    <string name="alarm_take_medicine">薬を服用</string>
+    <string name="alarm_snooze_format">スヌーズ (%d分)</string>
+    <string name="notif_action_snooze_format">スヌーズ (%d分)</string>
+    <string name="alarm_stock_remaining">在庫: 残り %d 錠</string>
+    <string name="home_action_take">服用</string>
+    <string name="home_action_taken">服用済み</string>
+    <string name="home_action_missed">飲み忘れ</string>
+    <string name="home_action_mark_late">遅れて服用</string>
+    <string name="home_dose_recorded">%s の服用を記録しました</string>
+    <string name="btn_undo">元に戻す</string>
+    <string name="analytics_empty_title">服薬記録がまだありません</string>
+    <string name="analytics_empty_desc">日々の服薬を記録すると、服薬遵守スコア、連続記録、摂取トレンドがここに表示されます。</string>
+    <string name="validation_enter_med_name">薬の名前を入力してください</string>
+    <string name="validation_enter_dosage">用量を入力してください</string>
+    <string name="validation_select_days_week">曜日を少なくとも1日選択してください</string>
+    <string name="validation_select_days_month">日付を少なくとも1日選択してください</string>
+    <string name="menu_more_section">その他</string>
+    <string name="pref_section_general">一般</string>
+    <string name="pref_section_notifications">通知とアラーム</string>
+    <string name="pref_section_dose_tracking">服薬トラッキング</string>
+    <string name="home_dose_reverted">%1$s の服薬記録を取り消しました</string>
+    <string name="search_medicines_hint">薬を検索...</string>
+    <string name="btn_add_first_medicine">最初の薬を追加</string>
 </resources>

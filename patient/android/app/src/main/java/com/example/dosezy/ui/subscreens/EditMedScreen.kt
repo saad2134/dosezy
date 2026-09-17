@@ -93,10 +93,14 @@ fun EditMedScreen(
     userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
 ) {
     val currentUser by userViewModel.currentUser.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
     val medicines by medicineViewModel.medicines.collectAsState()
+    val archivedMedicines by medicineViewModel.archivedMedicines.collectAsState()
 
-    // Find the medicine to edit
-    val medicineToEdit = medicines.find { it.medicineId == medicineId }
+    // Find the medicine to edit across both active and archived lists
+    val medicineToEdit = remember(medicines, archivedMedicines, medicineId) {
+        (medicines + archivedMedicines).find { it.medicineId == medicineId }
+    }
 
     // Form state - pre-filled with existing medicine data
     var medicationName by remember { mutableStateOf("") }
@@ -890,62 +894,74 @@ fun EditMedScreen(
                     val calcStartDate = if (isFiniteCourse) (medicineToEdit?.startDate ?: LocalDate.now()) else null
                     val calcEndDate = if (isFiniteCourse && durationDaysInt != null) (calcStartDate ?: LocalDate.now()).plusDays(durationDaysInt.toLong()) else null
 
+                    val isFormValid = medicationName.isNotBlank() && dosage.isNotBlank() && (
+                        selectedFrequency == FrequencyPattern.DAILY ||
+                        selectedFrequency == FrequencyPattern.AS_NEEDED ||
+                        selectedFrequency == FrequencyPattern.EVERY_X_HOURS ||
+                        selectedFrequency == FrequencyPattern.EVERY_X_DAYS ||
+                        (selectedFrequency == FrequencyPattern.WEEKLY && selectedDaysOfWeek.isNotEmpty()) ||
+                        (selectedFrequency == FrequencyPattern.MONTHLY && selectedDaysOfMonth.isNotEmpty()) ||
+                        selectedFrequency == FrequencyPattern.CUSTOM
+                    )
+
                     Button(
                         onClick = {
-                            if (medicationName.isNotBlank() && dosage.isNotBlank()) {
-                                val updatedMedicine = Medicine(
-                                    medicineId = medicineToEdit?.medicineId ?: UUID.randomUUID().toString(),
-                                    userId = currentUser?.userId ?: "",
-                                    medicationName = medicationName,
-                                    dosage = dosage.toDoubleOrNull() ?: 0.0,
-                                    dosageUnit = selectedDosageUnit,
-                                    timesPerDay = if (selectedFrequency == FrequencyPattern.AS_NEEDED) 0 else scheduledTimesList.size,
-                                    frequency = com.example.dosezy.data.model.Frequency(
-                                        pattern = selectedFrequency,
-                                        daysPerWeek = if (selectedFrequency == FrequencyPattern.WEEKLY) selectedDaysOfWeek.size else null,
-                                        daysPerMonth = if (selectedFrequency == FrequencyPattern.MONTHLY) selectedDaysOfMonth.size else null,
-                                        selectedDaysOfWeek = if (selectedFrequency == FrequencyPattern.WEEKLY) selectedDaysOfWeek else null,
-                                        selectedDaysOfMonth = if (selectedFrequency == FrequencyPattern.MONTHLY) selectedDaysOfMonth else null,
-                                        intervalHours = if (selectedFrequency == FrequencyPattern.EVERY_X_HOURS) intervalHoursText.toIntOrNull() else null,
-                                        intervalDays = if (selectedFrequency == FrequencyPattern.EVERY_X_DAYS) intervalDaysText.toIntOrNull() else null
-                                    ),
-                                    scheduledTimes = if (selectedFrequency == FrequencyPattern.AS_NEEDED) emptyList() else scheduledTimesList,
-                                    imageUri = medicineImagePath,
-                                    currentStock = currentStockText.toIntOrNull(),
-                                    refillThreshold = refillThresholdText.toIntOrNull(),
-                                    autoDeductOnTake = true,
-                                    notes = doctorNotes.trim().ifBlank { null },
-                                    pillShape = selectedPillShape,
-                                    pillColor = selectedPillColor,
-                                    startDate = calcStartDate,
-                                    endDate = calcEndDate,
-                                    durationDays = if (isFiniteCourse) durationDaysInt else null
-                                )
-
-                                if (medicineToEdit != null) {
-                                    medicineViewModel.updateMedicine(updatedMedicine)
-                                } else {
-                                    medicineViewModel.addMedicine(updatedMedicine)
+                            if (!isFormValid) {
+                                val errorMsg = when {
+                                    medicationName.isBlank() -> context.getString(R.string.validation_enter_med_name)
+                                    dosage.isBlank() -> context.getString(R.string.validation_enter_dosage)
+                                    selectedFrequency == FrequencyPattern.WEEKLY && selectedDaysOfWeek.isEmpty() -> context.getString(R.string.validation_select_days_week)
+                                    selectedFrequency == FrequencyPattern.MONTHLY && selectedDaysOfMonth.isEmpty() -> context.getString(R.string.validation_select_days_month)
+                                    else -> context.getString(R.string.validation_enter_med_name)
                                 }
-                                navController.popBackStack()
+                                android.widget.Toast.makeText(context, errorMsg, android.widget.Toast.LENGTH_SHORT).show()
+                                return@Button
                             }
+
+                            val updatedMedicine = Medicine(
+                                medicineId = medicineToEdit?.medicineId ?: UUID.randomUUID().toString(),
+                                userId = currentUser?.userId ?: "",
+                                medicationName = medicationName,
+                                dosage = dosage.toDoubleOrNull() ?: 0.0,
+                                dosageUnit = selectedDosageUnit,
+                                timesPerDay = if (selectedFrequency == FrequencyPattern.AS_NEEDED) 0 else scheduledTimesList.size,
+                                frequency = com.example.dosezy.data.model.Frequency(
+                                    pattern = selectedFrequency,
+                                    daysPerWeek = if (selectedFrequency == FrequencyPattern.WEEKLY) selectedDaysOfWeek.size else null,
+                                    daysPerMonth = if (selectedFrequency == FrequencyPattern.MONTHLY) selectedDaysOfMonth.size else null,
+                                    selectedDaysOfWeek = if (selectedFrequency == FrequencyPattern.WEEKLY) selectedDaysOfWeek else null,
+                                    selectedDaysOfMonth = if (selectedFrequency == FrequencyPattern.MONTHLY) selectedDaysOfMonth else null,
+                                    intervalHours = if (selectedFrequency == FrequencyPattern.EVERY_X_HOURS) intervalHoursText.toIntOrNull() else null,
+                                    intervalDays = if (selectedFrequency == FrequencyPattern.EVERY_X_DAYS) intervalDaysText.toIntOrNull() else null
+                                ),
+                                scheduledTimes = if (selectedFrequency == FrequencyPattern.AS_NEEDED) emptyList() else scheduledTimesList,
+                                imageUri = medicineImagePath,
+                                currentStock = currentStockText.toIntOrNull(),
+                                refillThreshold = refillThresholdText.toIntOrNull(),
+                                autoDeductOnTake = true,
+                                notes = doctorNotes.trim().ifBlank { null },
+                                pillShape = selectedPillShape,
+                                pillColor = selectedPillColor,
+                                startDate = calcStartDate,
+                                endDate = calcEndDate,
+                                durationDays = if (isFiniteCourse) durationDaysInt else null,
+                                isArchived = medicineToEdit?.isArchived ?: false
+                            )
+
+                            if (medicineToEdit != null) {
+                                medicineViewModel.updateMedicine(updatedMedicine)
+                            } else {
+                                medicineViewModel.addMedicine(updatedMedicine)
+                            }
+                            navController.popBackStack()
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF2084E4),
+                            containerColor = if (isFormValid) Color(0xFF2084E4) else Color(0xFF2084E4).copy(alpha = 0.6f),
                             contentColor = Color.White
-                        ),
-                        enabled = medicationName.isNotBlank() && dosage.isNotBlank() && (
-                            selectedFrequency == FrequencyPattern.DAILY ||
-                            selectedFrequency == FrequencyPattern.AS_NEEDED ||
-                            selectedFrequency == FrequencyPattern.EVERY_X_HOURS ||
-                            selectedFrequency == FrequencyPattern.EVERY_X_DAYS ||
-                            (selectedFrequency == FrequencyPattern.WEEKLY && selectedDaysOfWeek.isNotEmpty()) ||
-                            (selectedFrequency == FrequencyPattern.MONTHLY && selectedDaysOfMonth.isNotEmpty()) ||
-                            selectedFrequency == FrequencyPattern.CUSTOM
                         )
                     ) {
                         Text(
@@ -1040,9 +1056,11 @@ fun EditMedScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                medicineViewModel.archiveMedicine(medicineToEdit!!)
-                                showDeleteDialog = false
-                                navController.popBackStack()
+                                medicineToEdit?.let { med ->
+                                    medicineViewModel.archiveMedicine(med)
+                                    showDeleteDialog = false
+                                    navController.popBackStack()
+                                }
                             }
                     ) {
                         Column(modifier = Modifier.padding(14.dp)) {
@@ -1069,9 +1087,11 @@ fun EditMedScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                medicineViewModel.deleteMedicinePermanently(medicineToEdit!!)
-                                showDeleteDialog = false
-                                navController.popBackStack()
+                                medicineToEdit?.let { med ->
+                                    medicineViewModel.deleteMedicinePermanently(med)
+                                    showDeleteDialog = false
+                                    navController.popBackStack()
+                                }
                             }
                     ) {
                         Column(modifier = Modifier.padding(14.dp)) {

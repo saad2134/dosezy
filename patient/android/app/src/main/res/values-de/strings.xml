@@ -566,4 +566,31 @@ Möchten Sie fortfahren?</string>
     <string name="notif_fullscreen_granted">Vollbild-Alarmfenster ist zugelassen.</string>
     <string name="notif_fullscreen_desc">Erforderlich, um den Alarm auf dem Sperrbildschirm anzuzeigen.</string>
     <string name="notif_oem_setup_btn">%1$s Autostart- &amp; Popup-Einstellungen anpassen</string>
+
+    <string name="btn_back">Zurück</string>
+    <string name="alarm_medication_reminder_multi">Medikamenten-Erinnerung (%d)</string>
+    <string name="alarm_take_all">ALLE EINNEHMEN (%d)</string>
+    <string name="alarm_take_medicine">MEDIKAMENT EINNEHMEN</string>
+    <string name="alarm_snooze_format">SCHLUMMERN (%d MIN)</string>
+    <string name="notif_action_snooze_format">Schlummern (%d Min.)</string>
+    <string name="alarm_stock_remaining">Vorrat: %d Einheiten verbleibend</string>
+    <string name="home_action_take">Einnehmen</string>
+    <string name="home_action_taken">Eingenommen</string>
+    <string name="home_action_missed">Verpasst</string>
+    <string name="home_action_mark_late">Verspätet einnehmen</string>
+    <string name="home_dose_recorded">Einnahme für %s erfasst</string>
+    <string name="btn_undo">Rückgängig</string>
+    <string name="analytics_empty_title">Noch keine Einnahmedaten</string>
+    <string name="analytics_empty_desc">Sobald Sie tägliche Medikamente erfassen, erscheinen hier Ihr Therapietreue-Score, wöchentliche Serien und Auswertungen.</string>
+    <string name="validation_enter_med_name">Bitte geben Sie einen Medikamentennamen ein</string>
+    <string name="validation_enter_dosage">Bitte geben Sie eine Dosierung ein</string>
+    <string name="validation_select_days_week">Bitte wählen Sie mindestens einen Wochentag aus</string>
+    <string name="validation_select_days_month">Bitte wählen Sie mindestens einen Tag des Monats aus</string>
+    <string name="menu_more_section">Mehr</string>
+    <string name="pref_section_general">Allgemein</string>
+    <string name="pref_section_notifications">Benachrichtigungen &amp; Alarme</string>
+    <string name="pref_section_dose_tracking">Dosis-Tracking</string>
+    <string name="home_dose_reverted">Dosis von %1$s auf ausstehend zurückgesetzt</string>
+    <string name="search_medicines_hint">Medikamente suchen...</string>
+    <string name="btn_add_first_medicine">Erstes Medikament hinzufügen</string>
 </resources>

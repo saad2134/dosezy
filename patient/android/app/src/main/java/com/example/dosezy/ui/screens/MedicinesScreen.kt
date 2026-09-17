@@ -21,16 +21,24 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Medication
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -65,10 +73,7 @@ import com.example.dosezy.ui.viewmodels.MedicineViewModel
 import com.example.dosezy.ui.viewmodels.UserViewModel
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.TextButton
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.draw.alpha
@@ -124,6 +129,9 @@ fun MedicinesScreen(
                     },
                     onPermanentDeleteClick = { medicine ->
                         medicineToPermanentlyDelete = medicine
+                    },
+                    onAddMedicineClick = {
+                        navController.navigate("add_med")
                     },
                     modifier = Modifier
                         .fillMaxSize()
@@ -191,17 +199,69 @@ fun MedicinesContent(
     onRefillClick: (Medicine) -> Unit,
     onReactivateClick: (Medicine) -> Unit = {},
     onPermanentDeleteClick: (Medicine) -> Unit = {},
+    onAddMedicineClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var isArchivedExpanded by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+
+    val filteredMedicines = remember(medicines, searchQuery) {
+        if (searchQuery.isBlank()) medicines
+        else medicines.filter { it.medicationName.contains(searchQuery.trim(), ignoreCase = true) }
+    }
 
     if (medicines.isEmpty() && archivedMedicines.isEmpty()) {
-        EmptyMedicinesState()
+        EmptyMedicinesState(onAddMedicineClick = onAddMedicineClick)
     } else {
         LazyColumn(
             modifier = modifier
         ) {
-            items(medicines, key = { it.medicineId }) { medicine ->
+            // Search bar for medications roster
+            if (medicines.size >= 2 || searchQuery.isNotBlank()) {
+                item {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        placeholder = {
+                            Text(
+                                text = stringResource(R.string.search_medicines_hint),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        },
+                        trailingIcon = {
+                            if (searchQuery.isNotBlank()) {
+                                IconButton(onClick = { searchQuery = "" }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Clear,
+                                        contentDescription = "Clear search",
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        },
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        )
+                    )
+                }
+            }
+
+            items(filteredMedicines, key = { it.medicineId }) { medicine ->
                 MedicineItem(
                     medicine = medicine,
                     onClick = { onMedicineClick(medicine) },
@@ -570,7 +630,7 @@ fun MedicineImage(
 }
 
 @Composable
-fun EmptyMedicinesState() {
+fun EmptyMedicinesState(onAddMedicineClick: () -> Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -614,6 +674,27 @@ fun EmptyMedicinesState() {
             lineHeight = 20.sp,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(
+            onClick = onAddMedicineClick,
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            )
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = stringResource(R.string.btn_add_first_medicine),
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
 

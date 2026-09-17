@@ -195,7 +195,11 @@ fun DosezyApp() {
             isInitialized = true
             if (currentUser == null) {
                 navController.navigate("newuser/1") {
-                    popUpTo("home") { inclusive = true }
+                    popUpTo("loading") { inclusive = true }
+                }
+            } else {
+                navController.navigate("home") {
+                    popUpTo("loading") { inclusive = true }
                 }
             }
         }
@@ -209,7 +213,11 @@ fun DosezyApp() {
                 isInitialized = true
                 if (currentUser == null) {
                     navController.navigate("newuser/1") {
-                        popUpTo("home") { inclusive = true }
+                        popUpTo("loading") { inclusive = true }
+                    }
+                } else {
+                    navController.navigate("home") {
+                        popUpTo("loading") { inclusive = true }
                     }
                 }
             }
@@ -231,7 +239,7 @@ fun DosezyApp() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = "home",
+            startDestination = "loading",
             modifier = Modifier.padding(innerPadding),
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None },

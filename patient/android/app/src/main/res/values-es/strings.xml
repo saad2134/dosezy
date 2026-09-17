@@ -582,4 +582,31 @@
     <string name="notif_fullscreen_granted">Ventana de alarma a pantalla completa permitida.</string>
     <string name="notif_fullscreen_desc">Requerido para mostrar la pantalla de alarma con el dispositivo bloqueado.</string>
     <string name="notif_oem_setup_btn">Ajustar inicio automático y ventanas emergentes de %1$s</string>
+
+    <string name="btn_back">Atrás</string>
+    <string name="alarm_medication_reminder_multi">Recordatorio de Medicamentos (%d)</string>
+    <string name="alarm_take_all">TOMAR TODOS (%d)</string>
+    <string name="alarm_take_medicine">TOMAR MEDICAMENTO</string>
+    <string name="alarm_snooze_format">POSPONER (%d MIN)</string>
+    <string name="notif_action_snooze_format">Posponer (%d min)</string>
+    <string name="alarm_stock_remaining">Existencias: %d unidades restantes</string>
+    <string name="home_action_take">Tomar</string>
+    <string name="home_action_taken">Tomado</string>
+    <string name="home_action_missed">Perdido</string>
+    <string name="home_action_mark_late">Tomar tarde</string>
+    <string name="home_dose_recorded">Dosis registrada para %s</string>
+    <string name="btn_undo">Deshacer</string>
+    <string name="analytics_empty_title">Aún no hay registros de medicación</string>
+    <string name="analytics_empty_desc">A medida que registres tus tomas diarias, aquí aparecerán tu puntuación de adherencia, rachas semanales y tendencias.</string>
+    <string name="validation_enter_med_name">Por favor, introduce el nombre del medicamento</string>
+    <string name="validation_enter_dosage">Por favor, introduce la dosis</string>
+    <string name="validation_select_days_week">Por favor, selecciona al menos un día de la semana</string>
+    <string name="validation_select_days_month">Por favor, selecciona al menos un día del mes</string>
+    <string name="menu_more_section">Más</string>
+    <string name="pref_section_general">General</string>
+    <string name="pref_section_notifications">Notificaciones y Alarmas</string>
+    <string name="pref_section_dose_tracking">Seguimiento de Dosis</string>
+    <string name="home_dose_reverted">Dosis de %1$s revertida a pendiente</string>
+    <string name="search_medicines_hint">Buscar medicamentos...</string>
+    <string name="btn_add_first_medicine">Añadir tu primer medicamento</string>
 </resources>

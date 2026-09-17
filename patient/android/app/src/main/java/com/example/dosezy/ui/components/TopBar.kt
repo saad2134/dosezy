@@ -41,6 +41,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -89,141 +90,142 @@ fun TopBar(
                 drawPath(path = path, color = borderColor, style = Stroke(width = strokeWidth))
             }
     ) {
-        // First Row: Profile info and Notification button
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Left: Profile picture and user info
+        if (showBackButton) {
+            // Single-row sleek header for subscreens (Preferences, Emergency, Analytics, Backup, etc.)
             Row(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Profile Picture
-                ProfilePicture(
-                    currentUser = currentUser,
-                    onClick = { showProfileDialog = true },
-                    modifier = Modifier.size(48.dp)
-                )
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                // User Info
-                val currentHour = java.time.LocalTime.now().hour
-                val greetingRes = when (currentHour) {
-                    in 5..11 -> R.string.greeting_morning
-                    in 12..16 -> R.string.greeting_afternoon
-                    in 17..21 -> R.string.greeting_evening
-                    else -> R.string.greeting_night
-                }
-                val greetingText = androidx.compose.ui.res.stringResource(greetingRes)
-                val userName = currentUser?.fullName?.split(" ")?.get(0) ?: "User"
-
-                Column(
-                    modifier = Modifier.weight(1f, fill = false)
+                IconButton(
+                    onClick = { onBackClick?.invoke() ?: navController.popBackStack() },
+                    modifier = Modifier.size(44.dp)
                 ) {
-                    Text(
-                        text = "$greetingText $userName!",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
-                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = androidx.compose.ui.res.stringResource(R.string.health_quote),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
-            }
 
-            Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(4.dp))
 
-            // Right: Notification Status Button
-            if (showNotificationStatus) {
-                NotificationStatusButton(
-                    onClick = { showNotificationDialog = true }
-                )
-            }
-        }
-
-        //Spacer(modifier = Modifier.height(32.dp))
-
-        // Second Row: Screen Title
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(bottom=16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            if (showBackButton) {
-                // For subscreens: Back button + Title
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(
-                        onClick = { onBackClick?.invoke() ?: navController.popBackStack() },
-                        modifier = Modifier.size(48.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = resolvedTitleColor,
-                            textAlign = TextAlign.Center
-                        )
-                        subtitle?.let {
-                            Text(
-                                text = it,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-
-                    // Empty space to balance the back button
-                    Spacer(modifier = Modifier.size(48.dp))
-                }
-            } else {
-                // For main screens: Centered title only
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier.weight(1f)
                 ) {
                     Text(
                         text = title,
-                        style = MaterialTheme.typography.headlineMedium,
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = resolvedTitleColor,
-                        textAlign = TextAlign.Center
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     subtitle?.let {
                         Text(
                             text = it,
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
+                }
+
+                // Persistent notification status shield button on the right
+                if (showNotificationStatus) {
+                    NotificationStatusButton(
+                        onClick = { showNotificationDialog = true }
+                    )
+                }
+
+                actions()
+            }
+        } else {
+            // Two-row rich header for Main Screens (Home, Schedule, Medicines, Menu)
+            // First Row: Profile info and Notification button
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Left: Profile picture and user info
+                Row(
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    ProfilePicture(
+                        currentUser = currentUser,
+                        onClick = { showProfileDialog = true },
+                        modifier = Modifier.size(48.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    val currentHour = java.time.LocalTime.now().hour
+                    val greetingRes = when (currentHour) {
+                        in 5..11 -> R.string.greeting_morning
+                        in 12..16 -> R.string.greeting_afternoon
+                        in 17..21 -> R.string.greeting_evening
+                        else -> R.string.greeting_night
+                    }
+                    val greetingText = androidx.compose.ui.res.stringResource(greetingRes)
+                    val userName = currentUser?.fullName?.split(" ")?.get(0) ?: "User"
+
+                    Column(
+                        modifier = Modifier.weight(1f, fill = false)
+                    ) {
+                        Text(
+                            text = "$greetingText $userName!",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = androidx.compose.ui.res.stringResource(R.string.health_quote),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                // Right: Notification Status Button
+                if (showNotificationStatus) {
+                    NotificationStatusButton(
+                        onClick = { showNotificationDialog = true }
+                    )
+                }
+            }
+
+            // Second Row: Screen Title
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = resolvedTitleColor,
+                    textAlign = TextAlign.Center
+                )
+                subtitle?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         }

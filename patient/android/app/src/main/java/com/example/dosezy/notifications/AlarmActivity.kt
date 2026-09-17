@@ -384,7 +384,7 @@ fun GroupedAlarmScreenContent(
                         Spacer(modifier = Modifier.width(14.dp))
                         Column {
                             Text(
-                                text = "Reminder for:",
+                                text = stringResource(R.string.alarm_reminder_for),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontWeight = FontWeight.Medium,
@@ -414,7 +414,7 @@ fun GroupedAlarmScreenContent(
                 }
 
                 Text(
-                    text = if (medicinesList.size > 1) "Medication Reminder (${medicinesList.size})" else "Medication Reminder",
+                    text = if (medicinesList.size > 1) stringResource(R.string.alarm_medication_reminder_multi, medicinesList.size) else stringResource(R.string.alarm_medication_reminder),
                     style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -432,7 +432,7 @@ fun GroupedAlarmScreenContent(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = initialScheduledTime.ifEmpty { "Time to take your meds!" },
+                        text = initialScheduledTime.ifEmpty { stringResource(R.string.alarm_medication_reminder) },
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 26.sp
@@ -538,7 +538,7 @@ fun GroupedAlarmScreenContent(
                                         )
                                         med.currentStock?.let { stock ->
                                             Text(
-                                                text = "Stock: $stock units remaining",
+                                                text = stringResource(R.string.alarm_stock_remaining, stock),
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = Color(0xFF2E7D32),
                                                 fontWeight = FontWeight.SemiBold
@@ -580,6 +580,8 @@ fun GroupedAlarmScreenContent(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                val snoozeMinutes = user?.snoozeDuration ?: 10
+
                 // "Take / Take All" Green Primary Button
                 Button(
                     onClick = {
@@ -611,14 +613,14 @@ fun GroupedAlarmScreenContent(
                     Icon(imageVector = Icons.Default.Check, contentDescription = null, tint = Color.White)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = if (medicinesList.size > 1) "TAKE ALL (${medicinesList.size})" else "TAKE MEDICINE",
+                        text = if (medicinesList.size > 1) stringResource(R.string.alarm_take_all, medicinesList.size) else stringResource(R.string.alarm_take_medicine),
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                         color = Color.White,
                         fontSize = 17.sp
                     )
                 }
 
-                // "Snooze (10 minutes)" Orange Secondary Button (Identical Size 56dp)
+                // Dynamic Snooze Orange Secondary Button (Identical Size 56dp)
                 Button(
                     onClick = {
                         coroutineScope.launch {
@@ -626,11 +628,11 @@ fun GroupedAlarmScreenContent(
                                 val alarmScheduler = AlarmScheduler(context)
                                 if (medicinesList.isNotEmpty()) {
                                     medicinesList.forEach { (entry, med) ->
-                                        alarmScheduler.scheduleSnooze(entry.entryId, 10, med.medicationName)
+                                        alarmScheduler.scheduleSnooze(entry.entryId, snoozeMinutes, med.medicationName)
                                     }
                                 } else if (entryIds.isNotEmpty()) {
                                     entryIds.forEach { id ->
-                                        alarmScheduler.scheduleSnooze(id, 10, initialMedicineName)
+                                        alarmScheduler.scheduleSnooze(id, snoozeMinutes, initialMedicineName)
                                     }
                                 }
                             }
@@ -649,7 +651,7 @@ fun GroupedAlarmScreenContent(
                     Icon(imageVector = Icons.Default.Snooze, contentDescription = null, tint = Color.White)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "SNOOZE (10 MINUTES)",
+                        text = stringResource(R.string.alarm_snooze_format, snoozeMinutes),
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                         color = Color.White,
                         fontSize = 17.sp

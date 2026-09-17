@@ -566,4 +566,31 @@
     <string name="notif_fullscreen_granted">Полноэкранные окна будильников разрешены.</string>
     <string name="notif_fullscreen_desc">Требуется для отображения экрана будильника на экране блокировки.</string>
     <string name="notif_oem_setup_btn">Настроить автозапуск и всплывающие окна для %1$s</string>
+
+    <string name="btn_back">Назад</string>
+    <string name="alarm_medication_reminder_multi">Напоминание о лекарствах (%d)</string>
+    <string name="alarm_take_all">ПРИНЯТЬ ВСЕ (%d)</string>
+    <string name="alarm_take_medicine">ПРИНЯТЬ ЛЕКАРСТВО</string>
+    <string name="alarm_snooze_format">ОТЛОЖИТЬ (%d МИН)</string>
+    <string name="notif_action_snooze_format">Отложить (%d мин)</string>
+    <string name="alarm_stock_remaining">Запас: осталось %d ед.</string>
+    <string name="home_action_take">Принять</string>
+    <string name="home_action_taken">Принято</string>
+    <string name="home_action_missed">Пропущено</string>
+    <string name="home_action_mark_late">Принять позже</string>
+    <string name="home_dose_recorded">Прием записан для %s</string>
+    <string name="btn_undo">Отменить</string>
+    <string name="analytics_empty_title">Пока нет записей о приеме</string>
+    <string name="analytics_empty_desc">По мере того, как вы отмечаете прием лекарств, здесь появятся показатель регулярности, серии дней и статистика.</string>
+    <string name="validation_enter_med_name">Пожалуйста, введите название лекарства</string>
+    <string name="validation_enter_dosage">Пожалуйста, введите дозировку</string>
+    <string name="validation_select_days_week">Пожалуйста, выберите хотя бы один день недели</string>
+    <string name="validation_select_days_month">Пожалуйста, выберите хотя бы один день месяца</string>
+    <string name="menu_more_section">Ещё</string>
+    <string name="pref_section_general">Общие</string>
+    <string name="pref_section_notifications">Уведомления и Будильники</string>
+    <string name="pref_section_dose_tracking">Отслеживание Доз</string>
+    <string name="home_dose_reverted">Прием дозы %1$s отменен</string>
+    <string name="search_medicines_hint">Поиск лекарств...</string>
+    <string name="btn_add_first_medicine">Добавить первое лекарство</string>
 </resources>

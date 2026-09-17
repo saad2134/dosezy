@@ -878,12 +878,12 @@ fun NewUserBottomBar(
                                 .height(56.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFFF1F5F9),
-                                contentColor = Color(0xFF475569)
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         ) {
                             Text(
-                                text = stringResource(R.string.cancel),
+                                text = stringResource(R.string.btn_back),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -920,12 +920,12 @@ fun NewUserBottomBar(
                                 .height(56.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFFF1F5F9),
-                                contentColor = Color(0xFF475569)
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         ) {
                             Text(
-                                text = stringResource(R.string.cancel),
+                                text = stringResource(R.string.btn_back),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
                             )

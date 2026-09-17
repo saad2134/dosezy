@@ -594,4 +594,31 @@ Do you want to continue?</string>
     <string name="alarm_sound_custom">Custom Audio File</string>
     <string name="alarm_sound_select_file">Choose Audio File</string>
     <string name="alarm_sound_no_file_selected">No audio file chosen</string>
+
+    <string name="btn_back">Back</string>
+    <string name="alarm_medication_reminder_multi">Medication Reminder (%d)</string>
+    <string name="alarm_take_all">TAKE ALL (%d)</string>
+    <string name="alarm_take_medicine">TAKE MEDICINE</string>
+    <string name="alarm_snooze_format">SNOOZE (%d MIN)</string>
+    <string name="notif_action_snooze_format">Snooze (%d min)</string>
+    <string name="alarm_stock_remaining">Stock: %d units remaining</string>
+    <string name="home_action_take">Take</string>
+    <string name="home_action_taken">Taken</string>
+    <string name="home_action_missed">Missed</string>
+    <string name="home_action_mark_late">Mark Late</string>
+    <string name="home_dose_recorded">Dose recorded for %s</string>
+    <string name="btn_undo">Undo</string>
+    <string name="analytics_empty_title">No Medication Logs Yet</string>
+    <string name="analytics_empty_desc">As you record your daily medications, your adherence score, weekly streaks, and intake trends will appear here.</string>
+    <string name="validation_enter_med_name">Please enter a medication name</string>
+    <string name="validation_enter_dosage">Please enter dosage</string>
+    <string name="validation_select_days_week">Please select at least one day of the week</string>
+    <string name="validation_select_days_month">Please select at least one day of the month</string>
+    <string name="menu_more_section">More</string>
+    <string name="pref_section_general">General</string>
+    <string name="pref_section_notifications">Notifications &amp; Alarms</string>
+    <string name="pref_section_dose_tracking">Dose Tracking</string>
+    <string name="home_dose_reverted">%1$s dose reverted to pending</string>
+    <string name="search_medicines_hint">Search medications...</string>
+    <string name="btn_add_first_medicine">Add Your First Medication</string>
 </resources>

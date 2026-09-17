@@ -582,4 +582,31 @@
     <string name="notif_fullscreen_granted">已允许全屏闹钟弹窗。</string>
     <string name="notif_fullscreen_desc">锁屏时显示全屏闹钟界面所需的权限。</string>
     <string name="notif_oem_setup_btn">配置 %1$s 自启动与后台弹窗设置</string>
+
+    <string name="btn_back">返回</string>
+    <string name="alarm_medication_reminder_multi">用药提醒 (%d)</string>
+    <string name="alarm_take_all">全部服用 (%d)</string>
+    <string name="alarm_take_medicine">立即服药</string>
+    <string name="alarm_snooze_format">稍后提醒 (%d 分钟)</string>
+    <string name="notif_action_snooze_format">稍后提醒 (%d 分钟)</string>
+    <string name="alarm_stock_remaining">库存：剩余 %d 剂</string>
+    <string name="home_action_take">服用</string>
+    <string name="home_action_taken">已服</string>
+    <string name="home_action_missed">漏服</string>
+    <string name="home_action_mark_late">推迟服用</string>
+    <string name="home_dose_recorded">已记录 %s 的服药情况</string>
+    <string name="btn_undo">撤回</string>
+    <string name="analytics_empty_title">暂无服药记录</string>
+    <string name="analytics_empty_desc">随着您记录每日用药，您的依从率得分、每周连续记录和服药趋势将显示在这里。</string>
+    <string name="validation_enter_med_name">请输入药物名称</string>
+    <string name="validation_enter_dosage">请输入剂量</string>
+    <string name="validation_select_days_week">请至少选择一周中的一天</string>
+    <string name="validation_select_days_month">请至少选择一个月中的一天</string>
+    <string name="menu_more_section">更多</string>
+    <string name="pref_section_general">常规</string>
+    <string name="pref_section_notifications">通知与闹钟</string>
+    <string name="pref_section_dose_tracking">剂量追踪</string>
+    <string name="home_dose_reverted">%1$s 用药记录已撤回</string>
+    <string name="search_medicines_hint">搜索药物...</string>
+    <string name="btn_add_first_medicine">添加您的第一种药物</string>
 </resources>
