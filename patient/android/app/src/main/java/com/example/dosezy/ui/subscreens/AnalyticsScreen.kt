@@ -98,6 +98,9 @@ data class RangeAdherenceData(
 fun AnalyticsScreen(navController: NavController) {
     val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
     val currentUser by userViewModel.currentUser.collectAsState()
+    val targetLocale = remember(currentUser?.language) {
+        com.example.dosezy.utils.LocaleHelper.getLocale(currentUser?.language ?: com.example.dosezy.data.model.Language.SYSTEM)
+    }
 
     // Fetch all schedule entries for current user
     val scheduleEntries by produceState<List<ScheduleEntry>>(initialValue = emptyList(), key1 = currentUser?.userId) {
@@ -170,7 +173,7 @@ fun AnalyticsScreen(navController: NavController) {
         val dayRate = if (dayDecided > 0) ((dayTaken.toDouble() / dayDecided.toDouble()) * 100).toInt() else if (dayEntries.isNotEmpty()) 100 else 0
         DayStat(
             date = date,
-            dayLabel = date.dayOfWeek.name.take(3),
+            dayLabel = date.dayOfWeek.getDisplayName(java.time.format.TextStyle.SHORT, targetLocale).uppercase(targetLocale),
             total = dayEntries.size,
             taken = dayTaken,
             rate = dayRate

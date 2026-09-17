@@ -335,24 +335,31 @@ fun PillColorSelector(
                 val isSelected = hex.equals(selectedColorHex, ignoreCase = true)
                 Box(
                     modifier = Modifier
-                        .size(36.dp)
+                        .size(48.dp)
                         .clip(CircleShape)
-                        .background(color)
-                        .border(
-                            width = if (isSelected) 3.dp else 1.dp,
-                            color = if (isSelected) MaterialTheme.colorScheme.onSurface else Color.White.copy(alpha = 0.4f),
-                            shape = CircleShape
-                        )
                         .clickable { onColorSelected(hex) },
                     contentAlignment = Alignment.Center
                 ) {
-                    if (isSelected) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(18.dp)
-                        )
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(color)
+                            .border(
+                                width = if (isSelected) 3.dp else 1.dp,
+                                color = if (isSelected) MaterialTheme.colorScheme.onSurface else Color.White.copy(alpha = 0.4f),
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (isSelected) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -367,24 +374,31 @@ fun PillColorSelector(
                 val isSelected = hex.equals(selectedColorHex, ignoreCase = true)
                 Box(
                     modifier = Modifier
-                        .size(36.dp)
+                        .size(48.dp)
                         .clip(CircleShape)
-                        .background(color)
-                        .border(
-                            width = if (isSelected) 3.dp else 1.dp,
-                            color = if (isSelected) MaterialTheme.colorScheme.onSurface else Color.White.copy(alpha = 0.4f),
-                            shape = CircleShape
-                        )
                         .clickable { onColorSelected(hex) },
                     contentAlignment = Alignment.Center
                 ) {
-                    if (isSelected) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(18.dp)
-                        )
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(color)
+                            .border(
+                                width = if (isSelected) 3.dp else 1.dp,
+                                color = if (isSelected) MaterialTheme.colorScheme.onSurface else Color.White.copy(alpha = 0.4f),
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (isSelected) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
                     }
                 }
             }

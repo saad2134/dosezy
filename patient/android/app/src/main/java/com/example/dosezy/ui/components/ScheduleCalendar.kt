@@ -39,6 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,23 +62,36 @@ fun ScheduleCalendar(
     modifier: Modifier = Modifier
 ) {
     var currentMonth by remember { mutableStateOf(YearMonth.from(selectedDate)) }
+    val userViewModel: com.example.dosezy.ui.viewmodels.UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
+    val currentUser by userViewModel.currentUser.collectAsState()
+    val targetLocale = remember(currentUser?.language) {
+        com.example.dosezy.utils.LocaleHelper.getLocale(currentUser?.language ?: com.example.dosezy.data.model.Language.SYSTEM)
+    }
+    val firstDayOfWeek = remember(targetLocale) {
+        java.time.temporal.WeekFields.of(targetLocale).firstDayOfWeek
+    }
 
     Column(modifier = modifier) {
         // Month Navigation
         MonthNavigation(
             currentMonth = currentMonth,
+            targetLocale = targetLocale,
             onPreviousMonth = { currentMonth = currentMonth.minusMonths(1) },
             onNextMonth = { currentMonth = currentMonth.plusMonths(1) }
         )
 
         // Weekday headers
-        WeekdayHeaders()
+        WeekdayHeaders(
+            firstDayOfWeek = firstDayOfWeek,
+            targetLocale = targetLocale
+        )
 
         // Calendar grid
         CalendarGrid(
             currentMonth = currentMonth,
             selectedDate = selectedDate,
             scheduleEntries = scheduleEntries,
+            firstDayOfWeek = firstDayOfWeek,
             onDateSelected = { date ->
                 onDateSelected(date)
                 currentMonth = YearMonth.from(date)
@@ -88,6 +103,7 @@ fun ScheduleCalendar(
 @Composable
 private fun MonthNavigation(
     currentMonth: YearMonth,
+    targetLocale: java.util.Locale,
     onPreviousMonth: () -> Unit,
     onNextMonth: () -> Unit,
     modifier: Modifier = Modifier
@@ -106,11 +122,6 @@ private fun MonthNavigation(
             )
         }
 
-        val userViewModel: com.example.dosezy.ui.viewmodels.UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
-        val currentUser by userViewModel.currentUser.collectAsState()
-        val targetLocale = remember(currentUser?.language) {
-            com.example.dosezy.utils.LocaleHelper.getLocale(currentUser?.language ?: com.example.dosezy.data.model.Language.SYSTEM)
-        }
         val monthDisplay = currentMonth.month.getDisplayName(java.time.format.TextStyle.FULL, targetLocale).replaceFirstChar { it.titlecase(targetLocale) }
 
         Text(
@@ -129,8 +140,14 @@ private fun MonthNavigation(
 }
 
 @Composable
-private fun WeekdayHeaders(modifier: Modifier = Modifier) {
-    val weekdays = listOf("S", "M", "T", "W", "T", "F", "S")
+private fun WeekdayHeaders(
+    firstDayOfWeek: java.time.DayOfWeek = java.time.temporal.WeekFields.of(java.util.Locale.getDefault()).firstDayOfWeek,
+    targetLocale: java.util.Locale = java.util.Locale.getDefault(),
+    modifier: Modifier = Modifier
+) {
+    val weekdays = remember(firstDayOfWeek) {
+        (0..6).map { firstDayOfWeek.plus(it.toLong()) }
+    }
 
     Row(
         modifier = modifier
@@ -138,11 +155,14 @@ private fun WeekdayHeaders(modifier: Modifier = Modifier) {
             .padding(horizontal = 16.dp)
     ) {
         weekdays.forEach { day ->
+            val shortInitial = day.getDisplayName(java.time.format.TextStyle.NARROW, targetLocale)
+            val fullDayName = day.getDisplayName(java.time.format.TextStyle.FULL, targetLocale)
             Text(
-                text = day,
+                text = shortInitial,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(4.dp),
+                    .padding(4.dp)
+                    .semantics { contentDescription = fullDayName },
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
@@ -158,11 +178,12 @@ private fun CalendarGrid(
     selectedDate: LocalDate,
     scheduleEntries: List<ScheduleEntry>,
     onDateSelected: (LocalDate) -> Unit,
+    firstDayOfWeek: java.time.DayOfWeek = java.time.temporal.WeekFields.of(java.util.Locale.getDefault()).firstDayOfWeek,
     modifier: Modifier = Modifier
 ) {
     val firstDayOfMonth = currentMonth.atDay(1)
     val daysInMonth = currentMonth.lengthOfMonth()
-    val startOffset = (firstDayOfMonth.dayOfWeek.value % 7) // Sunday = 0
+    val startOffset = (firstDayOfMonth.dayOfWeek.value - firstDayOfWeek.value + 7) % 7
 
     Column(
         modifier = modifier

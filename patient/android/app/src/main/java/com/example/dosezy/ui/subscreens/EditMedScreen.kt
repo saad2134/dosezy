@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -403,7 +404,7 @@ fun EditMedScreen(
                                     modifier = Modifier.size(22.dp)
                                 )
                                 Text(
-                                    text = "Schedule & Dosing Times",
+                                    text = stringResource(R.string.scheduled_dosing_times_title),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface
@@ -539,14 +540,15 @@ fun EditMedScreen(
                                 )
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
                                     daysOfWeekNames.forEachIndexed { index, name ->
                                         val dayValue = index + 1
                                         val isSelected = selectedDaysOfWeek.contains(dayValue)
                                         Box(
                                             modifier = Modifier
-                                                .size(42.dp)
+                                                .weight(1f)
+                                                .heightIn(min = 48.dp)
                                                 .clip(RoundedCornerShape(8.dp))
                                                 .background(
                                                     if (isSelected) MaterialTheme.colorScheme.primary 
@@ -584,19 +586,20 @@ fun EditMedScreen(
                                 
                                 Column(
                                     modifier = Modifier.fillMaxWidth(),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                    verticalArrangement = Arrangement.spacedBy(6.dp)
                                 ) {
                                     val chunkedDays = (1..31).chunked(7)
                                     chunkedDays.forEach { rowDays ->
                                         Row(
                                             modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
                                         ) {
                                             rowDays.forEach { day ->
                                                 val isSelected = selectedDaysOfMonth.contains(day)
                                                 Box(
                                                     modifier = Modifier
-                                                        .size(42.dp)
+                                                        .weight(1f)
+                                                        .heightIn(min = 48.dp)
                                                         .clip(RoundedCornerShape(8.dp))
                                                         .background(
                                                             if (isSelected) MaterialTheme.colorScheme.primary 
@@ -622,7 +625,7 @@ fun EditMedScreen(
                                             }
                                             if (rowDays.size < 7) {
                                                 repeat(7 - rowDays.size) {
-                                                    Spacer(modifier = Modifier.size(42.dp))
+                                                    Spacer(modifier = Modifier.weight(1f))
                                                 }
                                             }
                                         }
