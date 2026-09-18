@@ -1,108 +1,108 @@
 <en-IN>
-• Controlled pharmacy refill orders with quantity steppers & stock privacy toggle
-• Instant language & RTL switching; full multilingual translations
+• 50% app size reduction: 34% smaller download & ~40MB on disk
+• Controlled pharmacy refill orders with quantity steppers & stock privacy
+• Instant, crash-proof language switching & full multilingual translations
 • 5-second countdown safety lock before permanent medicine deletion
 • Fixed adherence baseline starting from 0/0 for new medicines
-• Activity export dialog displays file name and full device storage path
+• Activity export dialog displays file name and full storage path
 • Targeted store update routing with Appteka marketplace support
-• Emergency country selection saved across app launches
 </en-IN>
 <en-US>
-• Controlled pharmacy refill orders with quantity steppers & stock privacy toggle
-• Instant language & RTL switching; full multilingual translations
+• 50% app size reduction: 34% smaller download & ~40MB on disk
+• Controlled pharmacy refill orders with quantity steppers & stock privacy
+• Instant, crash-proof language switching & full multilingual translations
 • 5-second countdown safety lock before permanent medicine deletion
 • Fixed adherence baseline starting from 0/0 for new medicines
-• Activity export dialog displays file name and full device storage path
+• Activity export dialog displays file name and full storage path
 • Targeted store update routing with Appteka marketplace support
-• Emergency country selection saved across app launches
 </en-US>
 <ar>
+• تقليص حجم التطبيق 50%: تنزيل أصغر بـ 34% ومساحة تثبيت ~40 ميجابايت
 • نموذج طلب صيدلية مُحكَم مع تحديد الكميات وخيار إخفاء المخزون
-• تبديل فوري للغة ومحاذاة اليمين لليسار مع ترجمة شاملة
+• تبديل لغة فوري ومستقر مع دعم كامل للغات ومحاذاة اليمين لليسار
 • قفل أمان 5 ثوانٍ قبل الحذف الدائم للأدوية
 • دقة إحصائيات الالتزام لتبدأ من 0/0 للأدوية الجديدة
 • عرض اسم الملف ومسار التخزين في نافذة تصدير التقارير
 • دعم متجر أبتيكا وتوجيه التحديثات للمتجر الأصلي
-• حفظ اختيار دولة الطوارئ عبر تشغيلات التطبيق
 </ar>
 <de-DE>
+• 50% weniger App-Größe: 34% kleinerer Download & ~40 MB Speicherplatz
 • Kontrollierte Apothekenbestellung mit Mengenregler & Bestandsschutz
-• Sofortiger Sprach- & RTL-Wechsel sowie vollständige Übersetzungen
-• 5-Sekunden-Sicherheitscountdown vor dauerhaftem Löschen von Medikamenten
+• Sofortiger, stabiler Sprachwechsel & vollständige Übersetzungen
+• 5-Sekunden-Sicherheitscountdown vor dauerhaftem Löschen
 • Korrekte Therapietreue-Statistik ab 0/0 für neue Medikamente
 • Export-Dialog zeigt Dateinamen und vollständigen Speicherpfad
 • Gezielte Store-Updates mit Appteka-Unterstützung
-• Auswahl des Notfall-Landes bleibt dauerhaft gespeichert
 </de-DE>
 <es-419>
+• Reducción del 50% de tamaño: descarga 34% menor y ~40 MB instalada
 • Pedidos de farmacia controlados con ajuste de cantidad y privacidad de stock
-• Cambio instantáneo de idioma y RTL con traducciones completas
+• Cambio instantáneo y estable de idioma con traducciones completas
 • Cuenta regresiva de 5 s antes de borrar medicamentos
 • Estadísticas de adherencia precisas iniciando en 0/0
 • Diálogo de exportación muestra nombre y ruta completa del archivo
 • Actualizaciones dirigidas a la tienda con soporte para Appteka
-• País de emergencia guardado entre sesiones
 </es-419>
 <fr-FR>
+• Réduction de 50% de taille: téléchargement 34% plus léger et ~40 Mo installé
 • Commandes pharmacie contrôlées avec ajustement de quantité et option de stock
-• Changement instantané de langue et RTL avec traductions complètes
-• Compte à rebours de 5 s avant suppression définitive d'un médicament
+• Changement de langue instantané et stable avec traductions complètes
+• Compte à rebours de 5 s avant suppression définitive
 • Observance précise débutant à 0/0 pour les nouveaux médicaments
 • La boîte d'exportation affiche le nom et le chemin complet du fichier
 • Mises à jour ciblées vers le store d'origine avec support d'Appteka
-• Pays d'urgence mémorisé entre les sessions
 </fr-FR>
 <hi-IN>
+• 50% कम ऐप आकार: 34% छोटा डाउनलोड और केवल ~40 MB स्पेस
 • दवा रिफिल ऑर्डर में मात्रा बदलने और स्टॉक गोपनीयता का विकल्प
-• तुरंत भाषा व RTL बदलाव और संपूर्ण बहुभाषी अनुवाद
+• बिना क्रैश तुरंत भाषा बदलाव और संपूर्ण बहुभाषी अनुवाद
 • दवा को हमेशा के लिए हटाने से पहले 5 सेकंड का सुरक्षा टाइमर
 • नई दवाओं के लिए सटीक एनालिटिक्स दर (0/0 से शुरू)
 • रिपोर्ट निर्यात विंडो में फ़ाइल का नाम और पूरा स्टोरेज पथ
 • ऐपटेका स्टोर सपोर्ट और सीधे मूल स्टोर से अपडेट
-• चुनी गई आपातकालीन देश प्राथमिकता हमेशा सुरक्षित
 </hi-IN>
 <it-IT>
+• Riduzione del 50% delle dimensioni: download 34% più piccolo e ~40 MB installato
 • Ordini farmacia controllati con regolazione quantità e privacy scorte
-• Cambio istantaneo di lingua e RTL con traduzioni complete
+• Cambio lingua istantaneo e stabile con traduzioni complete
 • Conto alla rovescia di sicurezza di 5 sec prima di eliminare farmaci
 • Aderenza precisa a partire da 0/0 per nuovi farmaci
 • Finestra di esportazione mostra nome file e percorso completo
 • Aggiornamenti mirati allo store con supporto Appteka
-• Paese di emergenza memorizzato tra le sessioni
 </it-IT>
 <ja-JP>
+• アプリサイズを50%削減：ダウンロード34%縮小、インストール後約40MB
 • 数量調整と在庫の非公開設定が可能な薬局リフィル注文
-• 言語およびRTL表示の即時切り替えと包括的な多言語対応
+• クラッシュのない即時言語切り替えと包括的な多言語対応
 • 薬の完全削除前の5秒間カウントダウン安全ロック
 • 新しい薬の服薬遵守率が0/0から正確に開始
 • レポートエクスポート画面にファイル名と保存先パスを表示
 • Apptekaストア対応とインストール元ストアへの直接更新
-• 緊急連絡先の国設定の永続保存
 </ja-JP>
 <pt-BR>
+• Redução de 50% no tamanho: download 34% menor e ~40 MB instalado
 • Pedidos de farmácia controlados com ajuste de quantidade e privacidade
-• Troca instantânea de idioma e RTL com traduções completas
+• Troca de idioma instantânea e estável com traduções completas
 • Contagem regressiva de segurança de 5 s antes de excluir remédios
 • Estatísticas de adesão precisas começando em 0/0
 • Diálogo de exportação exibe nome e caminho completo do arquivo
 • Atualizações direcionadas à loja com suporte para Appteka
-• País de emergência salvo permanentemente
 </pt-BR>
 <ru-RU>
+• Размер приложения уменьшен на 50%: загрузка на 34% меньше, ~40 МБ на диске
 • Контролируемый заказ в аптеку с настройкой количества и скрытием запаса
-• Мгновенное переключение языка и RTL, полный перевод интерфейса
+• Мгновенное и стабильное переключение языка, полный перевод
 • 5-секундный таймер безопасности перед удалением лекарств
 • Точная статистика приема, начинающаяся с 0/0 для новых лекарств
 • Окно экспорта показывает имя файла и полный путь на устройстве
 • Обновления через исходный магазин и поддержка Appteka
-• Выбранная страна экстренных служб сохраняется
 </ru-RU>
 <zh-CN>
+• 应用体积减少50%：下载包缩小34%，安装后仅占约40MB存储
 • 支持自定义数量调节与库存隐私开关的药房补药订单
-• 即时语言与RTL切换，全界面多语言本地化完善
+• 即时无闪退语言切换，全界面多语言本地化完善
 • 永久删除药物前5秒倒计时安全锁，防止误删
 • 新药物服药依从率基准从0/0精准起算
 • 报告导出弹窗显示完整文件名与存储路径
 • 针对性应用商店更新与Appteka商店支持
-• 永久保存已选紧急求助国家设置
 </zh-CN>
