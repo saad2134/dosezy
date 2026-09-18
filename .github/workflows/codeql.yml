@@ -25,9 +25,11 @@ jobs:
     permissions:
       contents: read
     outputs:
-      android: ${{ steps.filter.outputs.android }}
+      patient_android: ${{ steps.filter.outputs.patient_android }}
       website: ${{ steps.filter.outputs.website }}
       server: ${{ steps.filter.outputs.server }}
+      caregiver_web: ${{ steps.filter.outputs.caregiver_web }}
+      patient_ios: ${{ steps.filter.outputs.patient_ios }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -37,7 +39,7 @@ jobs:
         uses: dorny/paths-filter@v3
         with:
           filters: |
-            android:
+            patient_android:
               - 'patient/android/**'
               - '.github/workflows/codeql.yml'
             website:
@@ -46,14 +48,20 @@ jobs:
             server:
               - 'server/**'
               - '.github/workflows/codeql.yml'
+            caregiver_web:
+              - 'caregiver/web/**'
+              - '.github/workflows/codeql.yml'
+            patient_ios:
+              - 'patient/ios/**'
+              - '.github/workflows/codeql.yml'
 
   # ------------------------------------------------------------
-  # Android / Kotlin / Java
+  # Patient Android / Kotlin / Java
   # ------------------------------------------------------------
-  analyze-android:
-    name: Analyze (java-kotlin)
+  analyze-patient-android:
+    name: Analyze Patient Android (java-kotlin)
     needs: detect-changes
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || needs.detect-changes.outputs.android == 'true'
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || needs.detect-changes.outputs.patient_android == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -108,7 +116,7 @@ jobs:
   # Website / JavaScript / TypeScript
   # ------------------------------------------------------------
   analyze-website:
-    name: Analyze (javascript-typescript)
+    name: Analyze Website (javascript-typescript)
     needs: detect-changes
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || needs.detect-changes.outputs.website == 'true'
     runs-on: ubuntu-latest
@@ -122,18 +130,103 @@ jobs:
         with:
           languages: javascript-typescript
           build-mode: none
+          config: |
+            paths:
+              - website
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
-          category: "/language:javascript-typescript"
+          category: "/language:javascript-typescript/website"
 
 
   # ------------------------------------------------------------
-  # Server / Python
+  # Caregiver Web / JavaScript / TypeScript
+  # ------------------------------------------------------------
+  analyze-caregiver-web:
+    name: Analyze Caregiver Web (javascript-typescript)
+    needs: detect-changes
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || needs.detect-changes.outputs.caregiver_web == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for source files
+        id: check-files
+        shell: bash
+        run: |
+          if [ ! -d "caregiver/web" ] || [ -z "$(find caregiver/web -type f \( -name '*.js' -o -name '*.jsx' -o -name '*.ts' -o -name '*.tsx' -o -name '*.vue' -o -name '*.html' -o -name '*.htm' \) 2>/dev/null)" ]; then
+            echo "::notice::Directory 'caregiver/web' is missing or contains no JavaScript/TypeScript source files. Skipping CodeQL scan."
+            echo "has_files=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_files=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Initialize CodeQL
+        if: steps.check-files.outputs.has_files == 'true'
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          build-mode: none
+          config: |
+            paths:
+              - caregiver/web
+
+      - name: Perform CodeQL Analysis
+        if: steps.check-files.outputs.has_files == 'true'
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript-typescript/caregiver-web"
+
+
+  # ------------------------------------------------------------
+  # Patient iOS / Swift
+  # ------------------------------------------------------------
+  analyze-patient-ios:
+    name: Analyze Patient iOS (swift)
+    needs: detect-changes
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || needs.detect-changes.outputs.patient_ios == 'true'
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for source files
+        id: check-files
+        shell: bash
+        run: |
+          if [ ! -d "patient/ios" ] || [ -z "$(find patient/ios -type f \( -name '*.swift' -o -name '*.xcodeproj' -o -name '*.xcworkspace' -o -name 'Package.swift' \) 2>/dev/null)" ]; then
+            echo "::notice::Directory 'patient/ios' is missing or contains no Swift source files. Skipping CodeQL scan."
+            echo "has_files=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_files=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Initialize CodeQL
+        if: steps.check-files.outputs.has_files == 'true'
+        uses: github/codeql-action/init@v3
+        with:
+          languages: swift
+          build-mode: autobuild
+          config: |
+            paths:
+              - patient/ios
+
+      - name: Perform CodeQL Analysis
+        if: steps.check-files.outputs.has_files == 'true'
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:swift"
+
+
+  # ------------------------------------------------------------
+  # Server / TypeScript / JavaScript (Node.js & Fastify)
   # ------------------------------------------------------------
   analyze-server:
-    name: Analyze (python)
+    name: Analyze Server (javascript-typescript)
     needs: detect-changes
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || needs.detect-changes.outputs.server == 'true'
     runs-on: ubuntu-latest
@@ -142,13 +235,29 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Check for source files
+        id: check-files
+        shell: bash
+        run: |
+          if [ ! -d "server" ] || [ -z "$(find server -type f \( -name '*.js' -o -name '*.jsx' -o -name '*.ts' -o -name '*.tsx' -o -name '*.mjs' -o -name '*.cjs' \) 2>/dev/null)" ]; then
+            echo "::notice::Directory 'server' is missing or contains no JavaScript/TypeScript source files. Skipping CodeQL scan."
+            echo "has_files=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_files=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Initialize CodeQL
+        if: steps.check-files.outputs.has_files == 'true'
         uses: github/codeql-action/init@v3
         with:
-          languages: python
+          languages: javascript-typescript
           build-mode: none
+          config: |
+            paths:
+              - server
 
       - name: Perform CodeQL Analysis
+        if: steps.check-files.outputs.has_files == 'true'
         uses: github/codeql-action/analyze@v3
         with:
-          category: "/language:python"
+          category: "/language:javascript-typescript/server"
