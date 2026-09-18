@@ -30,7 +30,7 @@
   <details>
     <summary>Others</summary>
     <br>
-    <a href="https://appteka.store/apps/da4r321649">
+    <a href="https://appteka.store/apps/dcer321958">
       <img width="197" height="59" alt="AppTeka" src="assets/badges/appteka.png" />
     </a>
   </details>
