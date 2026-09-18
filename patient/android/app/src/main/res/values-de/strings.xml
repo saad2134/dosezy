@@ -209,7 +209,7 @@
     <string name="personal_contacts_cancel">Abbrechen</string>
     <!-- Alarm Activity -->
     <string name="alarm_medication_reminder">MEDIKAMENTENERINNERUNG</string>
-    <string name="alarm_reminder_for">Erinnerung für %s</string>
+    <string name="alarm_reminder_for">Erinnerung für:</string>
     <string name="alarm_scheduled">Geplant: %s</string>
     <string name="alarm_take_now">JETZT EINNEHMEN</string>
     <string name="alarm_snooze">SCHLUMMERN (%1$d MIN)</string>

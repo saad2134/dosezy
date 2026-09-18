@@ -136,9 +136,7 @@ fun MedicinesScreen(
                     onAddMedicineClick = {
                         navController.navigate("add_med")
                     },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
+                    modifier = Modifier.fillMaxSize()
                 )
             }
         }
@@ -236,7 +234,8 @@ fun MedicinesContent(
         EmptyMedicinesState(onAddMedicineClick = onAddMedicineClick)
     } else {
         LazyColumn(
-            modifier = modifier
+            modifier = modifier,
+            contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp)
         ) {
             // Search bar for medications roster
             if (medicines.size >= 2 || searchQuery.isNotBlank()) {

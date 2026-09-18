@@ -208,7 +208,7 @@
     <string name="personal_contacts_cancel">Cancelar</string>
     <!-- Alarm Activity -->
     <string name="alarm_medication_reminder">LEMBRETE DE MEDICAMENTO</string>
-    <string name="alarm_reminder_for">Lembrete para %s</string>
+    <string name="alarm_reminder_for">Lembrete para:</string>
     <string name="alarm_scheduled">Agendado: %s</string>
     <string name="alarm_take_now">TOMAR AGORA</string>
     <string name="alarm_snooze">ADIAR (%1$d MIN)</string>

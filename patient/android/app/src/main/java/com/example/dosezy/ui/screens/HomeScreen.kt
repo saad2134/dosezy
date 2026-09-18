@@ -179,7 +179,7 @@ fun HomeScreen(
     androidx.compose.material3.Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
-        snackbarHost = { androidx.compose.material3.SnackbarHost(snackbarHostState) }
+        snackbarHost = { com.example.dosezy.ui.components.DosezySnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Column(
             modifier = Modifier

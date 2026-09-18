@@ -103,9 +103,17 @@ fun PharmacyOrderDialog(
 
     // Calculate default quantity for a medicine given supply days
     fun calculateDefaultQty(med: Medicine, days: Int): Int {
-        val dailyDose = if (med.dosage > 0) med.dosage else 1.0
-        val dailyRequirement = (med.timesPerDay.coerceAtLeast(1)) * dailyDose
-        return (dailyRequirement * days).toInt().coerceAtLeast(1)
+        val dosesPerIntake = when (med.dosageUnit) {
+            com.example.dosezy.data.model.DosageUnit.TABLET, com.example.dosezy.data.model.DosageUnit.CAPSULE -> {
+                if (med.dosage > 0) med.dosage.toInt().coerceAtLeast(1) else 1
+            }
+            com.example.dosezy.data.model.DosageUnit.DROP, com.example.dosezy.data.model.DosageUnit.ML -> {
+                if (med.dosage > 0) med.dosage.toInt().coerceAtLeast(1) else 1
+            }
+            com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG -> 1
+        }
+        val dailyRequirement = (med.timesPerDay.coerceAtLeast(1)) * dosesPerIntake
+        return (dailyRequirement * days).coerceAtLeast(1)
     }
 
     // Initialize/update quantities whenever displayedMedicines or supplyDays changes

@@ -225,7 +225,7 @@
     <string name="personal_contacts_cancel">रद्द करें</string>
     <!-- Alarm Activity -->
     <string name="alarm_medication_reminder">दवा अनुस्मारक</string>
-    <string name="alarm_reminder_for">%s के लिए अनुस्मारक</string>
+    <string name="alarm_reminder_for">अनुस्मारक:</string>
     <string name="alarm_scheduled">निर्धारित: %s</string>
     <string name="alarm_take_now">अभी लें</string>
     <string name="alarm_snooze">स्नूज़ (%1$d मिनट)</string>

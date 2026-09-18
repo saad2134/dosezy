@@ -209,7 +209,7 @@
     <string name="personal_contacts_cancel">Отмена</string>
     <!-- Alarm Activity -->
     <string name="alarm_medication_reminder">НАПОМИНАНИЕ О ЛЕКАРСТВЕ</string>
-    <string name="alarm_reminder_for">Напоминание для %s</string>
+    <string name="alarm_reminder_for">Напоминание для:</string>
     <string name="alarm_scheduled">Запланировано: %s</string>
     <string name="alarm_take_now">ПРИНЯТЬ СЕЙЧАС</string>
     <string name="alarm_snooze">ОТЛОЖИТЬ (%1$d МИН)</string>

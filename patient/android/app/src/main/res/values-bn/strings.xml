@@ -209,7 +209,7 @@
     <string name="personal_contacts_cancel">বাতিল</string>
     <!-- Alarm Activity -->
     <string name="alarm_medication_reminder">ওষুধের অনুস্মারক</string>
-    <string name="alarm_reminder_for">%s এর জন্য অনুস্মারক</string>
+    <string name="alarm_reminder_for">এর জন্য অনুস্মারক:</string>
     <string name="alarm_scheduled">নির্ধারিত: %s</string>
     <string name="alarm_take_now">এখনই নিন</string>
     <string name="alarm_snooze">স্নুজ (%1$d মিনিট)</string>

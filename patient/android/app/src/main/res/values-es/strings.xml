@@ -225,7 +225,7 @@
     <string name="personal_contacts_cancel">Cancelar</string>
     <!-- Alarm Activity -->
     <string name="alarm_medication_reminder">RECORDATORIO DE MEDICAMENTO</string>
-    <string name="alarm_reminder_for">Recordatorio para %s</string>
+    <string name="alarm_reminder_for">Recordatorio para:</string>
     <string name="alarm_scheduled">Programado: %s</string>
     <string name="alarm_take_now">TOMAR AHORA</string>
     <string name="alarm_snooze">POSPONER (%1$d MIN)</string>

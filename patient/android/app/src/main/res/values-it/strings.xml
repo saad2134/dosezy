@@ -209,7 +209,7 @@
     <string name="personal_contacts_cancel">Annulla</string>
     <!-- Alarm Activity -->
     <string name="alarm_medication_reminder">PROMEMORIA FARMACO</string>
-    <string name="alarm_reminder_for">Promemoria per %s</string>
+    <string name="alarm_reminder_for">Promemoria per:</string>
     <string name="alarm_scheduled">Programmato: %s</string>
     <string name="alarm_take_now">PRENDI ORA</string>
     <string name="alarm_snooze">POSTICIPA (%1$d MIN)</string>

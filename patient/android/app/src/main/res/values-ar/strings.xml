@@ -209,7 +209,7 @@
     <string name="personal_contacts_cancel">إلغاء</string>
     <!-- Alarm Activity -->
     <string name="alarm_medication_reminder">تذكير بالدواء</string>
-    <string name="alarm_reminder_for">تذكير لـ %s</string>
+    <string name="alarm_reminder_for">:تذكير لـ</string>
     <string name="alarm_scheduled">مُجدول: %s</string>
     <string name="alarm_take_now">تناول الآن</string>
     <string name="alarm_snooze">تأجيل (%1$d دقائق)</string>

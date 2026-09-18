@@ -204,7 +204,7 @@
     <string name="personal_contacts_cancel">Cancel</string>
     <!-- Alarm Activity -->
     <string name="alarm_medication_reminder">MEDICATION REMINDER</string>
-    <string name="alarm_reminder_for">Reminder for %s</string>
+    <string name="alarm_reminder_for">Reminder for:</string>
     <string name="alarm_scheduled">Scheduled: %s</string>
     <string name="alarm_take_now">TAKE NOW</string>
     <string name="alarm_snooze">SNOOZE (%1$d MINS)</string>

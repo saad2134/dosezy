@@ -117,7 +117,7 @@ fun ManageProfileScreen(navController: NavController) {
                 actions = {}
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { com.example.dosezy.ui.components.DosezySnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -428,11 +428,19 @@ fun ManageProfileScreen(navController: NavController) {
     // Delete Confirmation Dialog
     if (showDeleteDialog) {
         val cannotDeleteMsg = stringResource(R.string.profile_cannot_delete_only)
+        var deleteCountdown by remember { mutableStateOf(5) }
+        LaunchedEffect(Unit) {
+            deleteCountdown = 5
+            while (deleteCountdown > 0) {
+                kotlinx.coroutines.delay(1000L)
+                deleteCountdown--
+            }
+        }
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
             tonalElevation = 0.dp,
             containerColor = MaterialTheme.colorScheme.surface,
-            title = { Text(stringResource(R.string.profile_delete_btn)) },
+            title = { Text(stringResource(R.string.profile_delete_btn), fontWeight = androidx.compose.ui.text.font.FontWeight.Bold) },
             text = { Text(stringResource(R.string.profile_delete_confirm_desc)) },
             confirmButton = {
                 Button(
@@ -449,11 +457,20 @@ fun ManageProfileScreen(navController: NavController) {
                         }
                         showDeleteDialog = false
                     },
+                    enabled = deleteCountdown == 0,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFDC2626)
+                        containerColor = Color(0xFFDC2626),
+                        disabledContainerColor = Color(0xFFDC2626).copy(alpha = 0.4f),
+                        disabledContentColor = Color.White.copy(alpha = 0.7f)
                     )
                 ) {
-                    Text(stringResource(R.string.form_delete))
+                    Text(
+                        if (deleteCountdown > 0) {
+                            "${stringResource(R.string.form_delete)} (${deleteCountdown}s)"
+                        } else {
+                            stringResource(R.string.form_delete)
+                        }
+                    )
                 }
             },
             dismissButton = {

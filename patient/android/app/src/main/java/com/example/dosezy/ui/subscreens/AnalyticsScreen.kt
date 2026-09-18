@@ -103,13 +103,16 @@ fun AnalyticsScreen(navController: NavController) {
     }
 
     // Fetch all schedule entries for current user
-    val scheduleEntries by produceState<List<ScheduleEntry>>(initialValue = emptyList(), key1 = currentUser?.userId) {
+    val scheduleEntriesNullable by produceState<List<ScheduleEntry>?>(initialValue = null, key1 = currentUser?.userId) {
         currentUser?.userId?.let { uid ->
             userViewModel.scheduleRepository.getScheduleForUser(uid).collect { list ->
                 value = list
             }
+        } ?: run {
+            value = emptyList()
         }
     }
+    val scheduleEntries = scheduleEntriesNullable ?: emptyList()
 
     val today = LocalDate.now()
     var selectedRange by remember { mutableStateOf(AdherenceRange.TOTAL) }
@@ -191,7 +194,20 @@ fun AnalyticsScreen(navController: NavController) {
             )
         }
     ) { paddingValues ->
-        if (totalEntries == 0) {
+        if (scheduleEntriesNullable == null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                androidx.compose.material3.CircularProgressIndicator(
+                    color = Color(0xFF1193D4),
+                    strokeWidth = 3.dp
+                )
+            }
+        } else if (totalEntries == 0) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
