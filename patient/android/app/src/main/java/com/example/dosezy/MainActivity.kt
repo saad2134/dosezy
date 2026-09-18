@@ -126,15 +126,17 @@ class MainActivity : ComponentActivity() {
                 "light" -> false
                 else -> isSystemInDarkTheme()
             }
-            androidx.compose.runtime.CompositionLocalProvider(
-                androidx.compose.ui.platform.LocalLayoutDirection provides layoutDirection
-            ) {
-                DosezyTheme(darkTheme = isDark) {
-                    androidx.compose.material3.Surface(
-                        modifier = androidx.compose.ui.Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background
-                    ) {
-                        DosezyApp()
+            androidx.compose.runtime.key(currentLang) {
+                androidx.compose.runtime.CompositionLocalProvider(
+                    androidx.compose.ui.platform.LocalLayoutDirection provides layoutDirection
+                ) {
+                    DosezyTheme(darkTheme = isDark) {
+                        androidx.compose.material3.Surface(
+                            modifier = androidx.compose.ui.Modifier.fillMaxSize(),
+                            color = MaterialTheme.colorScheme.background
+                        ) {
+                            DosezyApp()
+                        }
                     }
                 }
             }

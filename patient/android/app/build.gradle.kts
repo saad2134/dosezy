@@ -35,6 +35,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        resourceConfigurations.addAll(listOf("en", "ar", "bn", "de", "es", "fr", "hi", "it", "ja", "pt", "ru", "zh"))
     }
 
     dependenciesInfo {
@@ -62,8 +63,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
-            isShrinkResources = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             signingConfig = if (keystorePropertiesFile.exists()) signingConfigs.getByName("release") else null
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -143,14 +144,6 @@ dependencies {
     // Coil and image handling dependencies
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation("com.google.accompanist:accompanist-permissions:0.30.1")
-
-    // For image cropping
-    implementation("com.vanniktech:android-image-cropper:4.5.0")
-
-    // For camera and gallery (if using Jetpack CameraX)
-    implementation("androidx.camera:camera-camera2:1.3.0")
-    implementation("androidx.camera:camera-lifecycle:1.3.0")
-    implementation("androidx.camera:camera-view:1.3.0")
 
     implementation("com.google.code.gson:gson:2.10.1")
 

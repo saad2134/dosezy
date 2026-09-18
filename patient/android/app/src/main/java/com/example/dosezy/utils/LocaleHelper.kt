@@ -113,10 +113,9 @@ object LocaleHelper {
                 AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(languageTag))
             }
 
-            // MainActivity is a ComponentActivity (not AppCompatActivity) and does not automatically recreate
-            // on AppCompatDelegate locale changes. We explicitly recreate it on user-triggered language changes
-            // so Compose resets string caches and flips layout direction immediately.
-            if (forceRecreate) {
+            // On Android 13+ (API 33+), AppCompatDelegate / LocaleManager natively handles activity recreation.
+            // Calling activity.recreate() on top of setApplicationLocales causes a double-destroy race condition that kicks the user out of the app.
+            if (forceRecreate && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                 val activity = context.findActivity()
                 if (activity != null && !activity.isFinishing && !activity.isDestroyed) {
                     android.os.Handler(android.os.Looper.getMainLooper()).post {
