@@ -106,7 +106,7 @@
     <string name="notif_perm_desc">दवा रिमाइंडर और अलार्म भेजने के लिए आवश्यक।</string>
     <string name="notif_perm_exact_warning">सूचनाएं चालू हैं • समय पर अलार्म बजने के लिए सटीक अलार्म की अनुमति दें (अनुमति देने के लिए टैप करें)</string>
     <string name="notif_perm_all_granted">सूचनाएं और सटीक अलार्म पूरी तरह सक्षम हैं।</string>
-    <string name="notif_oem_bg_item_desc">समय पर अलार्म बजने के लिए %1$s बैकग्राउंड सेटिंग्स ठीक करें।</string>
+    <string name="notif_oem_bg_item_desc">समय पर अलार्म बजने के लिए बैकग्राउंड सेटिंग्स ठीक करें।</string>
 
     <string name="notif_perm_granted">सूचनाएं भेजने की अनुमति दी गई।</string>
     <string name="notif_battery_title">फ़ोन की बैटरी</string>
@@ -659,4 +659,44 @@
     <string name="pharmacy_order_footer_brand">Dosezy द्वारा तैयार</string>
     <string name="menu_pharmacy_order">फार्मेसी रीफ़िल ऑर्डर</string>
     <string name="menu_pharmacy_order_desc">व्हाट्सएप के ज़रिये दवा ऑर्डर बनाएं और शेयर करें</string>
+    <string name="pharmacy_order_markdown_preview">मार्कडाउन पूर्वावलोकन</string>
+
+    <string name="about_community_open_source">समुदाय और ओपन सोर्स</string>
+    <string name="about_version_build">संस्करण %1$s (बिल्ड %2$s)</string>
+    <string name="crypto_bitcoin">बिटकॉइन (BTC)</string>
+    <string name="crypto_ethereum">इथेरियम (ETH)</string>
+    <string name="crypto_solana">सोलाना (SOL)</string>
+    <string name="crypto_litecoin">लाइटकॉइन (LTC)</string>
+    <string name="crypto_zcash">ज़ीकैश (ZEC)</string>
+    <string name="crypto_name_btc">बिटकॉइन</string>
+    <string name="crypto_name_eth">इथेरियम</string>
+    <string name="crypto_name_sol">सोलाना</string>
+    <string name="crypto_name_ltc">लाइटकॉइन</string>
+    <string name="crypto_name_zec">ज़ीकैश</string>
+    <string name="country_india">भारत</string>
+    <string name="country_us_ca">संयुक्त राज्य अमेरिका / कनाडा</string>
+    <string name="country_uk">यूनाइटेड किंगडम</string>
+    <string name="country_eu">यूरोपीय संघ</string>
+    <string name="country_china">चीन</string>
+    <string name="country_japan">जापान</string>
+    <string name="country_russia">रूस</string>
+    <string name="country_brazil">ब्राज़ील</string>
+    <string name="country_bangladesh">बांग्लादेश</string>
+    <string name="country_australia">ऑस्ट्रेलिया</string>
+    <string name="pharmacy_order_refill_filter">रीफ़िल फ़िल्टर</string>
+    <string name="pharmacy_order_days_supply">आपूर्ति के दिन</string>
+    <string name="pharmacy_order_days_format_short">%1$d दिन</string>
+    <string name="pharmacy_order_medicines_include">शामिल दवाइयां (%1$d/%2$d)</string>
+    <string name="pharmacy_order_stock_left">%1$d शेष</string>
+    <string name="pharmacy_order_no_stock_tracked">स्टॉक ट्रैक नहीं किया गया</string>
+    <string name="pharmacy_order_header_title">📋 *Dosezy फ़ार्मेसी रीफ़िल ऑर्डर*</string>
+    <string name="pharmacy_order_frequency_format">आवृत्ति: दिन में %1$dx बार</string>
+    <string name="pharmacy_order_notes_format">नोट्स: %1$s</string>
+    <string name="notif_overlay_prompt_title">अलार्म पॉपअप की अनुमति दें</string>
+    <string name="notif_overlay_prompt_desc">व्हाट्सएप जैसे ऐप्स के ऊपर अलार्म पॉपअप तुरंत दिखाने के लिए, कृपया \'अन्य ऐप्स के ऊपर दिखाएं\' सक्षम करें।</string>
+    <string name="dialog_enable">सक्षम करें</string>
+    <string name="dialog_later">बाद में</string>
+
+    <string name="pharmacy_order_include_stock">संदेश में वर्तमान स्टॉक शामिल करें</string>
+    <string name="pharmacy_order_quantity_label">मात्रा</string>
 </resources>

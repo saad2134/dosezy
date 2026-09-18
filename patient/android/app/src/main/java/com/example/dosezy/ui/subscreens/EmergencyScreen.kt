@@ -64,7 +64,7 @@ import com.example.dosezy.ui.viewmodels.UserViewModel
 data class CountryEmergency(
     val code: String,
     val flag: String,
-    val name: String,
+    val nameRes: Int,
     val ambulance: String,
     val fire: String,
     val police: String,
@@ -72,16 +72,16 @@ data class CountryEmergency(
 )
 
 val emergencyCountries = listOf(
-    CountryEmergency("IN", "🇮🇳", "India", ambulance = "108", fire = "101", police = "100", universal = "112"),
-    CountryEmergency("US", "🇺🇸", "United States / Canada", ambulance = "911", fire = "911", police = "911", universal = "911"),
-    CountryEmergency("GB", "🇬🇧", "United Kingdom", ambulance = "999", fire = "999", police = "999", universal = "112"),
-    CountryEmergency("EU", "🇪🇺", "European Union", ambulance = "112", fire = "112", police = "112", universal = "112"),
-    CountryEmergency("CN", "🇨🇳", "China", ambulance = "120", fire = "119", police = "110"),
-    CountryEmergency("JP", "🇯🇵", "Japan", ambulance = "119", fire = "119", police = "110"),
-    CountryEmergency("RU", "🇷🇺", "Russia", ambulance = "103", fire = "101", police = "102", universal = "112"),
-    CountryEmergency("BR", "🇧🇷", "Brazil", ambulance = "192", fire = "193", police = "190"),
-    CountryEmergency("BD", "🇧🇩", "Bangladesh", ambulance = "999", fire = "999", police = "999", universal = "999"),
-    CountryEmergency("AU", "🇦🇺", "Australia", ambulance = "000", fire = "000", police = "000", universal = "000")
+    CountryEmergency("IN", "🇮🇳", R.string.country_india, ambulance = "108", fire = "101", police = "100", universal = "112"),
+    CountryEmergency("US", "🇺🇸", R.string.country_us_ca, ambulance = "911", fire = "911", police = "911", universal = "911"),
+    CountryEmergency("GB", "🇬🇧", R.string.country_uk, ambulance = "999", fire = "999", police = "999", universal = "112"),
+    CountryEmergency("EU", "🇪🇺", R.string.country_eu, ambulance = "112", fire = "112", police = "112", universal = "112"),
+    CountryEmergency("CN", "🇨🇳", R.string.country_china, ambulance = "120", fire = "119", police = "110"),
+    CountryEmergency("JP", "🇯🇵", R.string.country_japan, ambulance = "119", fire = "119", police = "110"),
+    CountryEmergency("RU", "🇷🇺", R.string.country_russia, ambulance = "103", fire = "101", police = "102", universal = "112"),
+    CountryEmergency("BR", "🇧🇷", R.string.country_brazil, ambulance = "192", fire = "193", police = "190"),
+    CountryEmergency("BD", "🇧🇩", R.string.country_bangladesh, ambulance = "999", fire = "999", police = "999", universal = "999"),
+    CountryEmergency("AU", "🇦🇺", R.string.country_australia, ambulance = "000", fire = "000", police = "000", universal = "000")
 )
 
 fun detectDeviceEmergencyCountry(context: android.content.Context, userLanguage: com.example.dosezy.data.model.Language): CountryEmergency {
@@ -170,8 +170,16 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
     val scrollState = rememberScrollState()
     val userLanguage = currentUser?.language ?: com.example.dosezy.data.model.Language.SYSTEM
 
-    val defaultCountry = remember(userLanguage, context) {
-        detectDeviceEmergencyCountry(context, userLanguage)
+    // Persist emergency country selection in SharedPreferences
+    val emergencyPrefs = remember { context.getSharedPreferences("emergency_prefs", android.content.Context.MODE_PRIVATE) }
+    val savedCountryCode = remember { emergencyPrefs.getString("selected_country_code", null) }
+
+    val defaultCountry = remember(userLanguage, context, savedCountryCode) {
+        if (!savedCountryCode.isNullOrBlank()) {
+            emergencyCountries.find { it.code == savedCountryCode }
+        } else {
+            null
+        } ?: detectDeviceEmergencyCountry(context, userLanguage)
     }
 
     var selectedCountry by remember { mutableStateOf(defaultCountry) }
@@ -328,7 +336,7 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
             onExpandedChange = { countryDropdownExpanded = !countryDropdownExpanded }
         ) {
             OutlinedTextField(
-                value = "${selectedCountry.flag} ${selectedCountry.name}",
+                value = "${selectedCountry.flag} ${stringResource(selectedCountry.nameRes)}",
                 onValueChange = {},
                 readOnly = true,
                 label = { Text(androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.emergency_select_country)) },
@@ -354,9 +362,10 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
             ) {
                 emergencyCountries.forEach { country ->
                     DropdownMenuItem(
-                        text = { Text("${country.flag} ${country.name}", color = MaterialTheme.colorScheme.onSurface) },
+                        text = { Text("${country.flag} ${stringResource(country.nameRes)}", color = MaterialTheme.colorScheme.onSurface) },
                         onClick = {
                             selectedCountry = country
+                            emergencyPrefs.edit().putString("selected_country_code", country.code).apply()
                             countryDropdownExpanded = false
                         },
                         modifier = Modifier.background(MaterialTheme.colorScheme.surface)

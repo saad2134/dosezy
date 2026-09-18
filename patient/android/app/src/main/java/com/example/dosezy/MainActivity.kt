@@ -116,17 +116,26 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
+            val currentLang = currentUser?.language ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+            val currentLocale = com.example.dosezy.utils.LocaleHelper.getLocale(currentLang)
+            val isRtl = currentLocale.language == "ar"
+            val layoutDirection = if (isRtl) androidx.compose.ui.unit.LayoutDirection.Rtl else androidx.compose.ui.unit.LayoutDirection.Ltr
+
             val isDark = when (spTheme) {
                 "dark" -> true
                 "light" -> false
                 else -> isSystemInDarkTheme()
             }
-            DosezyTheme(darkTheme = isDark) {
-                androidx.compose.material3.Surface(
-                    modifier = androidx.compose.ui.Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    DosezyApp()
+            androidx.compose.runtime.CompositionLocalProvider(
+                androidx.compose.ui.platform.LocalLayoutDirection provides layoutDirection
+            ) {
+                DosezyTheme(darkTheme = isDark) {
+                    androidx.compose.material3.Surface(
+                        modifier = androidx.compose.ui.Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        DosezyApp()
+                    }
                 }
             }
         }
@@ -171,14 +180,14 @@ fun DosezyApp() {
             onDismissRequest = { showOverlayPrompt = false },
             title = {
                 Text(
-                    text = "Allow Alarm Pop-ups",
+                    text = androidx.compose.ui.res.stringResource(R.string.notif_overlay_prompt_title),
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             },
             text = {
                 Text(
-                    text = "To ensure medication reminders pop up immediately over apps like WhatsApp, please enable 'Display over other apps'.",
+                    text = androidx.compose.ui.res.stringResource(R.string.notif_overlay_prompt_desc),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             },
@@ -192,7 +201,7 @@ fun DosezyApp() {
                     }
                 ) {
                     Text(
-                        text = "Enable",
+                        text = androidx.compose.ui.res.stringResource(R.string.dialog_enable),
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF1193D4)
                     )
@@ -206,7 +215,7 @@ fun DosezyApp() {
                         showOverlayPrompt = false
                     }
                 ) {
-                    Text("Later")
+                    Text(androidx.compose.ui.res.stringResource(R.string.dialog_later))
                 }
             },
             shape = RoundedCornerShape(20.dp),

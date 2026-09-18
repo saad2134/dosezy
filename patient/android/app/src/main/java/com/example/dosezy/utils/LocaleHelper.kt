@@ -86,6 +86,7 @@ object LocaleHelper {
                 LocaleList.setDefault(localeList)
                 config.setLocales(localeList)
             }
+            config.setLayoutDirection(targetLocale)
 
             @Suppress("DEPRECATION")
             resources.updateConfiguration(config, resources.displayMetrics)
@@ -112,9 +113,10 @@ object LocaleHelper {
                 AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(languageTag))
             }
 
-            // On Android 13+ (API 33+), AppCompatDelegate / LocaleManager natively handles activity recreation.
-            // Calling activity.recreate() on top of setApplicationLocales causes a double-destroy race condition that kicks the user out of the app.
-            if (forceRecreate && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            // MainActivity is a ComponentActivity (not AppCompatActivity) and does not automatically recreate
+            // on AppCompatDelegate locale changes. We explicitly recreate it on user-triggered language changes
+            // so Compose resets string caches and flips layout direction immediately.
+            if (forceRecreate) {
                 val activity = context.findActivity()
                 if (activity != null && !activity.isFinishing && !activity.isDestroyed) {
                     android.os.Handler(android.os.Looper.getMainLooper()).post {
@@ -146,6 +148,7 @@ object LocaleHelper {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 config.setLocales(LocaleList(locale))
             }
+            config.setLayoutDirection(locale)
             context.createConfigurationContext(config)
         } catch (e: Throwable) {
             android.util.Log.e("LocaleHelper", "Failed to updateContextLocale for $language", e)

@@ -96,7 +96,7 @@
     <string name="notif_perm_desc">Требуется для отправки напоминаний о приеме лекарств и сигналов.</string>
     <string name="notif_perm_exact_warning">Уведомления включены • Точные будильники нужны для звонка вовремя (нажмите, чтобы разрешить)</string>
     <string name="notif_perm_all_granted">Уведомления и точные будильники полностью включены.</string>
-    <string name="notif_oem_bg_item_desc">Настройте работу в фоновом режиме для %1$s, чтобы будильники звонили вовремя.</string>
+    <string name="notif_oem_bg_item_desc">Настройте работу в фоновом режиме, чтобы будильники звонили вовремя.</string>
 
     <string name="notif_perm_granted">Разрешение на отправку уведомлений получено.</string>
     <string name="notif_battery_title">Батарея телефона</string>
@@ -643,4 +643,44 @@
     <string name="pharmacy_order_footer_brand">Сформировано в Dosezy</string>
     <string name="menu_pharmacy_order">Заказ в аптеку</string>
     <string name="menu_pharmacy_order_desc">Создать и отправить заказ лекарств через WhatsApp</string>
+    <string name="pharmacy_order_markdown_preview">Предпросмотр Markdown</string>
+
+    <string name="about_community_open_source">Сообщество и открытый исходный код</string>
+    <string name="about_version_build">Версия %1$s (Сборка %2$s)</string>
+    <string name="crypto_bitcoin">Bitcoin (BTC)</string>
+    <string name="crypto_ethereum">Ethereum (ETH)</string>
+    <string name="crypto_solana">Solana (SOL)</string>
+    <string name="crypto_litecoin">Litecoin (LTC)</string>
+    <string name="crypto_zcash">Zcash (ZEC)</string>
+    <string name="crypto_name_btc">Bitcoin</string>
+    <string name="crypto_name_eth">Ethereum</string>
+    <string name="crypto_name_sol">Solana</string>
+    <string name="crypto_name_ltc">Litecoin</string>
+    <string name="crypto_name_zec">Zcash</string>
+    <string name="country_india">Индия</string>
+    <string name="country_us_ca">США / Канада</string>
+    <string name="country_uk">Великобритания</string>
+    <string name="country_eu">Европейский Союз</string>
+    <string name="country_china">Китай</string>
+    <string name="country_japan">Япония</string>
+    <string name="country_russia">Россия</string>
+    <string name="country_brazil">Бразилия</string>
+    <string name="country_bangladesh">Бангладеш</string>
+    <string name="country_australia">Австралия</string>
+    <string name="pharmacy_order_refill_filter">Фильтр пополнения</string>
+    <string name="pharmacy_order_days_supply">Запас на (дней)</string>
+    <string name="pharmacy_order_days_format_short">%1$d дн.</string>
+    <string name="pharmacy_order_medicines_include">Включить лекарства (%1$d/%2$d)</string>
+    <string name="pharmacy_order_stock_left">Осталось: %1$d</string>
+    <string name="pharmacy_order_no_stock_tracked">Запас не отслеживается</string>
+    <string name="pharmacy_order_header_title">📋 *Заказ в аптеку Dosezy*</string>
+    <string name="pharmacy_order_frequency_format">Частота: %1$dx в день</string>
+    <string name="pharmacy_order_notes_format">Заметки: %1$s</string>
+    <string name="notif_overlay_prompt_title">Разрешить всплывающие окна будильника</string>
+    <string name="notif_overlay_prompt_desc">Чтобы напоминания появлялись поверх таких приложений, как WhatsApp, включите \'Поверх других приложений\'.</string>
+    <string name="dialog_enable">Включить</string>
+    <string name="dialog_later">Позже</string>
+
+    <string name="pharmacy_order_include_stock">Включить текущий запас в сообщение</string>
+    <string name="pharmacy_order_quantity_label">Кол-во</string>
 </resources>

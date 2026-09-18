@@ -234,7 +234,8 @@ object NotificationUtils {
     fun areAllNotificationRequirementsMet(context: Context): Boolean {
         return hasNotificationPermission(context) &&
                 canScheduleExactAlarms(context) &&
-                isIgnoringBatteryOptimizations(context)
+                isIgnoringBatteryOptimizations(context) &&
+                isPhoneNotSilent(context)
     }
 
     /**
@@ -420,8 +421,7 @@ object NotificationUtils {
                 intentList.add(Intent().setComponent(android.content.ComponentName("com.iqoo.secure", "com.iqoo.secure.MainGuideActivity")).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
             }
             m.contains("samsung") -> {
-                intentList.add(Intent().setComponent(android.content.ComponentName("com.samsung.android.lool", "com.samsung.android.sm.battery.ui.BatteryActivity")).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
-                intentList.add(Intent().setComponent(android.content.ComponentName("com.samsung.android.sm", "com.samsung.android.sm.battery.ui.BatteryActivity")).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
+                // Let Samsung fall back to standard ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS or ACTION_APPLICATION_DETAILS_SETTINGS
             }
         }
 

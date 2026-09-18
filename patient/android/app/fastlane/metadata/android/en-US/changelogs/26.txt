@@ -1,0 +1,7 @@
+• Controlled pharmacy refill orders with quantity steppers & stock privacy toggle
+• Instant language & RTL switching; full multilingual translations
+• 5-second countdown safety lock before permanent medicine deletion
+• Fixed adherence baseline starting from 0/0 for new medicines
+• Activity export dialog displays file name and full device storage path
+• Targeted store update routing with Appteka marketplace support
+• Emergency country selection saved across app launches

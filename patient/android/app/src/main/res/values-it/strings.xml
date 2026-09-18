@@ -96,7 +96,7 @@
     <string name="notif_perm_desc">Richiesto per inviare promemoria e allarmi per i farmaci.</string>
     <string name="notif_perm_exact_warning">Notifiche attivate • Allarmi precisi necessari per suonare in orario (tocca per consentire)</string>
     <string name="notif_perm_all_granted">Notifiche e allarmi precisi completamente abilitati.</string>
-    <string name="notif_oem_bg_item_desc">Regola le impostazioni in background di %1$s per far suonare gli allarmi in orario.</string>
+    <string name="notif_oem_bg_item_desc">Regola le impostazioni in background per far suonare gli allarmi in orario.</string>
 
     <string name="notif_perm_granted">Autorizzazione all\'invio di notifiche concessa.</string>
     <string name="notif_battery_title">Batteria del Telefono</string>
@@ -643,4 +643,44 @@ Vuoi continuare?</string>
     <string name="pharmacy_order_footer_brand">Generato tramite Dosezy</string>
     <string name="menu_pharmacy_order">Ordine farmacia</string>
     <string name="menu_pharmacy_order_desc">Genera e condividi ordini di farmaci su WhatsApp</string>
+    <string name="pharmacy_order_markdown_preview">Anteprima Markdown</string>
+
+    <string name="about_community_open_source">Community &amp; Open Source</string>
+    <string name="about_version_build">Versione %1$s (Build %2$s)</string>
+    <string name="crypto_bitcoin">Bitcoin (BTC)</string>
+    <string name="crypto_ethereum">Ethereum (ETH)</string>
+    <string name="crypto_solana">Solana (SOL)</string>
+    <string name="crypto_litecoin">Litecoin (LTC)</string>
+    <string name="crypto_zcash">Zcash (ZEC)</string>
+    <string name="crypto_name_btc">Bitcoin</string>
+    <string name="crypto_name_eth">Ethereum</string>
+    <string name="crypto_name_sol">Solana</string>
+    <string name="crypto_name_ltc">Litecoin</string>
+    <string name="crypto_name_zec">Zcash</string>
+    <string name="country_india">India</string>
+    <string name="country_us_ca">Stati Uniti / Canada</string>
+    <string name="country_uk">Regno Unito</string>
+    <string name="country_eu">Unione Europea</string>
+    <string name="country_china">Cina</string>
+    <string name="country_japan">Giappone</string>
+    <string name="country_russia">Russia</string>
+    <string name="country_brazil">Brasile</string>
+    <string name="country_bangladesh">Bangladesh</string>
+    <string name="country_australia">Australia</string>
+    <string name="pharmacy_order_refill_filter">Filtro Ricarica</string>
+    <string name="pharmacy_order_days_supply">Giorni di Scorta</string>
+    <string name="pharmacy_order_days_format_short">%1$d g</string>
+    <string name="pharmacy_order_medicines_include">Farmaci da Includere (%1$d/%2$d)</string>
+    <string name="pharmacy_order_stock_left">%1$d rimasti</string>
+    <string name="pharmacy_order_no_stock_tracked">Scorta non monitorata</string>
+    <string name="pharmacy_order_header_title">📋 *Ordine Farmacia Dosezy*</string>
+    <string name="pharmacy_order_frequency_format">Frequenza: %1$dx al giorno</string>
+    <string name="pharmacy_order_notes_format">Note: %1$s</string>
+    <string name="notif_overlay_prompt_title">Consenti Popup Allarme</string>
+    <string name="notif_overlay_prompt_desc">Per mostrare immediatamente i promemoria sopra app come WhatsApp, attiva \'Mostra sopra altre applicazioni\'.</string>
+    <string name="dialog_enable">Abilita</string>
+    <string name="dialog_later">Più tardi</string>
+
+    <string name="pharmacy_order_include_stock">Includi scorta attuale nel messaggio</string>
+    <string name="pharmacy_order_quantity_label">Qtà</string>
 </resources>

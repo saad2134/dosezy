@@ -131,7 +131,7 @@ fun AnalyticsScreen(navController: NavController) {
         val taken = entries.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
         val missed = entries.count { it.status == MedicationStatus.MISSED }
         val decided = taken + missed
-        val rate = if (decided > 0) ((taken.toDouble() / decided.toDouble()) * 100).toInt() else if (total > 0) 100 else 0
+        val rate = if (decided > 0) ((taken.toDouble() / decided.toDouble()) * 100).toInt() else 0
         return RangeAdherenceData(range, label, taken, decided, total, rate)
     }
 
@@ -514,7 +514,7 @@ fun UnifiedAdherenceCard(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "${selectedData.takenCount}/${if (selectedData.decidedCount > 0) selectedData.decidedCount else selectedData.totalEntries}",
+                            text = "${selectedData.takenCount}/${selectedData.decidedCount}",
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,

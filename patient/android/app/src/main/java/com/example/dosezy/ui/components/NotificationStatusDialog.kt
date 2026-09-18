@@ -230,14 +230,7 @@ private fun createNotificationStatuses(
             description = if (backgroundPermStatus) {
                 context.getString(com.example.dosezy.R.string.notif_bg_granted)
             } else {
-                if (NotificationUtils.isKnownAggressiveOem()) {
-                    context.getString(
-                        com.example.dosezy.R.string.notif_oem_bg_item_desc,
-                        NotificationUtils.getOemName()
-                    )
-                } else {
-                    context.getString(com.example.dosezy.R.string.notif_bg_desc)
-                }
+                context.getString(com.example.dosezy.R.string.notif_oem_bg_item_desc)
             },
             isPassed = backgroundPermStatus,
             isWarning = false,
@@ -251,12 +244,8 @@ private fun createNotificationStatuses(
             },
             onFixClick = {
                 if (!backgroundPermStatus) {
-                    if (NotificationUtils.isKnownAggressiveOem()) {
-                        val opened = NotificationUtils.openOemBackgroundSettings(context)
-                        if (!opened) {
-                            NotificationUtils.openBatteryOptimizationSettings(context)
-                        }
-                    } else {
+                    val directSuccess = NotificationUtils.requestBatteryOptimizationExemption(context)
+                    if (!directSuccess) {
                         NotificationUtils.openBatteryOptimizationSettings(context)
                     }
                 }

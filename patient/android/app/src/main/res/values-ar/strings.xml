@@ -96,7 +96,7 @@
     <string name="notif_perm_desc">مطلوب لإرسال تذكيرات الجرعات والمنبهات.</string>
     <string name="notif_perm_exact_warning">الإشعارات مفعلة • يلزم إذن المنبهات الدقيقة لتنبيهك في الوقت المحدد (انقر للسماح)</string>
     <string name="notif_perm_all_granted">تم تفعيل الإشعارات والمنبهات الدقيقة بالكامل.</string>
-    <string name="notif_oem_bg_item_desc">اضبط إعدادات الخلفية لـ %1$s لضمان تشغيل المنبهات في الوقت المحدد.</string>
+    <string name="notif_oem_bg_item_desc">اضبط إعدادات الخلفية لضمان تشغيل المنبهات في الوقت المحدد.</string>
 
     <string name="notif_perm_granted">تم منح الإذن لإرسال الإشعارات.</string>
     <string name="notif_battery_title">بطارية الهاتف</string>
@@ -643,4 +643,44 @@
     <string name="pharmacy_order_footer_brand">تم الإنشاء عبر دوزيزي</string>
     <string name="menu_pharmacy_order">طلب إعادة تعبئة الصيدلية</string>
     <string name="menu_pharmacy_order_desc">إنشاء ومشاركة طلبات الأدوية عبر واتساب</string>
+    <string name="pharmacy_order_markdown_preview">معاينة ماركداون</string>
+
+    <string name="about_community_open_source">المجتمع والمصدر المفتوح</string>
+    <string name="about_version_build">الإصدار %1$s (بناء %2$s)</string>
+    <string name="crypto_bitcoin">بيتكوين (BTC)</string>
+    <string name="crypto_ethereum">إيثيريوم (ETH)</string>
+    <string name="crypto_solana">سولانا (SOL)</string>
+    <string name="crypto_litecoin">لايتكوين (LTC)</string>
+    <string name="crypto_zcash">زي كاش (ZEC)</string>
+    <string name="crypto_name_btc">بيتكوين</string>
+    <string name="crypto_name_eth">إيثيريوم</string>
+    <string name="crypto_name_sol">سولانا</string>
+    <string name="crypto_name_ltc">لايتكوين</string>
+    <string name="crypto_name_zec">زي كاش</string>
+    <string name="country_india">الهند</string>
+    <string name="country_us_ca">الولايات المتحدة / كندا</string>
+    <string name="country_uk">المملكة المتحدة</string>
+    <string name="country_eu">الاتحاد الأوروبي</string>
+    <string name="country_china">الصين</string>
+    <string name="country_japan">اليابان</string>
+    <string name="country_russia">روسيا</string>
+    <string name="country_brazil">البرازيل</string>
+    <string name="country_bangladesh">بنغلاديش</string>
+    <string name="country_australia">أستراليا</string>
+    <string name="pharmacy_order_refill_filter">تصفية إعادة التعبئة</string>
+    <string name="pharmacy_order_days_supply">مدة الإمداد بالأيام</string>
+    <string name="pharmacy_order_days_format_short">%1$d يوم</string>
+    <string name="pharmacy_order_medicines_include">الأدوية المشمولة (%1$d/%2$d)</string>
+    <string name="pharmacy_order_stock_left">المتبقي %1$d</string>
+    <string name="pharmacy_order_no_stock_tracked">المخزون غير متتبع</string>
+    <string name="pharmacy_order_header_title">📋 *طلب إعادة تعبئة صيدلية Dosezy*</string>
+    <string name="pharmacy_order_frequency_format">التكرار: %1$d مرات يومياً</string>
+    <string name="pharmacy_order_notes_format">ملاحظات: %1$s</string>
+    <string name="notif_overlay_prompt_title">السماح بنوافذ المنبه المنبثقة</string>
+    <string name="notif_overlay_prompt_desc">لضمان ظهور تنبيهات الأدوية فوراً فوق التطبيقات الأخرى مثل واتساب، يُرجى تمكين \'الظهور فوق التطبيقات الأخرى\'.</string>
+    <string name="dialog_enable">تمكين</string>
+    <string name="dialog_later">لاحقاً</string>
+
+    <string name="pharmacy_order_include_stock">تضمين المخزون الحالي في الرسالة</string>
+    <string name="pharmacy_order_quantity_label">الكمية</string>
 </resources>

@@ -114,6 +114,7 @@ fun EditMedScreen(
     var showTimePicker by remember { mutableStateOf(false) }
     var editingTimeIndex by remember { mutableStateOf<Int?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var showPermanentDeleteConfirmDialog by remember { mutableStateOf(false) }
     var selectedDaysOfWeek by remember { mutableStateOf(listOf<Int>()) }
     var selectedDaysOfMonth by remember { mutableStateOf(listOf<Int>()) }
 
@@ -1091,11 +1092,8 @@ fun EditMedScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                medicineToEdit?.let { med ->
-                                    medicineViewModel.deleteMedicinePermanently(med)
-                                    showDeleteDialog = false
-                                    navController.popBackStack()
-                                }
+                                showDeleteDialog = false
+                                showPermanentDeleteConfirmDialog = true
                             }
                     ) {
                         Column(modifier = Modifier.padding(14.dp)) {
@@ -1118,6 +1116,59 @@ fun EditMedScreen(
             confirmButton = {},
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    // Permanent Delete 5-second Safety Confirmation Dialog
+    if (showPermanentDeleteConfirmDialog && medicineToEdit != null) {
+        val med = medicineToEdit
+        var deleteCountdown by remember(med) { mutableStateOf(5) }
+        LaunchedEffect(med) {
+            deleteCountdown = 5
+            while (deleteCountdown > 0) {
+                kotlinx.coroutines.delay(1000L)
+                deleteCountdown--
+            }
+        }
+        AlertDialog(
+            onDismissRequest = { showPermanentDeleteConfirmDialog = false },
+            title = {
+                Text(
+                    text = stringResource(R.string.dialog_delete_permanent_title),
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(stringResource(R.string.dialog_delete_permanent_msg, med.medicationName))
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        medicineViewModel.deleteMedicinePermanently(med)
+                        showPermanentDeleteConfirmDialog = false
+                        navController.popBackStack()
+                    },
+                    enabled = deleteCountdown == 0,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFDC2626),
+                        disabledContainerColor = Color(0xFFDC2626).copy(alpha = 0.4f),
+                        disabledContentColor = Color.White.copy(alpha = 0.7f)
+                    )
+                ) {
+                    Text(
+                        if (deleteCountdown > 0) {
+                            "${stringResource(R.string.btn_delete_permanently)} (${deleteCountdown}s)"
+                        } else {
+                            stringResource(R.string.btn_delete_permanently)
+                        }
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPermanentDeleteConfirmDialog = false }) {
                     Text(stringResource(R.string.cancel))
                 }
             }

@@ -161,6 +161,14 @@ fun MedicinesScreen(
     // Permanent Delete Confirmation Dialog
     val medToDelete = medicineToPermanentlyDelete
     if (medToDelete != null) {
+        var deleteCountdown by remember(medToDelete) { mutableStateOf(5) }
+        LaunchedEffect(medToDelete) {
+            deleteCountdown = 5
+            while (deleteCountdown > 0) {
+                kotlinx.coroutines.delay(1000L)
+                deleteCountdown--
+            }
+        }
         AlertDialog(
             onDismissRequest = { medicineToPermanentlyDelete = null },
             title = {
@@ -178,11 +186,20 @@ fun MedicinesScreen(
                         medicineViewModel.deleteMedicinePermanently(medToDelete)
                         medicineToPermanentlyDelete = null
                     },
+                    enabled = deleteCountdown == 0,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFDC2626)
+                        containerColor = Color(0xFFDC2626),
+                        disabledContainerColor = Color(0xFFDC2626).copy(alpha = 0.4f),
+                        disabledContentColor = Color.White.copy(alpha = 0.7f)
                     )
                 ) {
-                    Text(stringResource(com.example.dosezy.R.string.btn_delete_permanently))
+                    Text(
+                        if (deleteCountdown > 0) {
+                            "${stringResource(com.example.dosezy.R.string.btn_delete_permanently)} (${deleteCountdown}s)"
+                        } else {
+                            stringResource(com.example.dosezy.R.string.btn_delete_permanently)
+                        }
+                    )
                 }
             },
             dismissButton = {

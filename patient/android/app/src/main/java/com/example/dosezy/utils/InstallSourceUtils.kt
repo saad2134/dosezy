@@ -171,6 +171,12 @@ object InstallSourceUtils {
                 storeUri = "market://details?id=$packageName",
                 webFallbackUrl = "https://aurorastore.org"
             )
+            "com.tomclaw.appsend", "com.hiaashuu.apptekaapp", "com.hiaashuu.appteka" -> InstallSourceDetails(
+                sourceName = "Appteka",
+                installerPackage = installerPackage,
+                storeUri = "market://details?id=$packageName",
+                webFallbackUrl = "https://appteka.store"
+            )
             else -> InstallSourceDetails(
                 sourceName = "GitHub Release / Direct Sideload",
                 installerPackage = installerPackage,
@@ -184,10 +190,37 @@ object InstallSourceUtils {
         val sourceDetails = detectInstallSource(context)
         try {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(sourceDetails.storeUri)).apply {
+                sourceDetails.installerPackage?.let { pkg ->
+                    // Directly target the installing store app so Android opens it directly
+                    // without prompting the user with an "Open with" chooser
+                    setPackage(pkg)
+                }
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
+            try {
+                // If setting explicit package failed (e.g. store app was uninstalled or doesn't resolve),
+                // retry without explicit package
+                val fallbackStoreIntent = Intent(Intent.ACTION_VIEW, Uri.parse(sourceDetails.storeUri)).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                context.startActivity(fallbackStoreIntent)
+            } catch (e2: Exception) {
+                try {
+                    val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(sourceDetails.webFallbackUrl)).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    context.startActivity(webIntent)
+                } catch (e3: Exception) {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.no_browser_found),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        } catch (e: Exception) {
             try {
                 val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(sourceDetails.webFallbackUrl)).apply {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -200,12 +233,6 @@ object InstallSourceUtils {
                     Toast.LENGTH_LONG
                 ).show()
             }
-        } catch (e: Exception) {
-            Toast.makeText(
-                context,
-                context.getString(R.string.no_browser_found),
-                Toast.LENGTH_LONG
-            ).show()
         }
     }
 }

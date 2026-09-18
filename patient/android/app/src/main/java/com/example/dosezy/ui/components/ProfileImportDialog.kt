@@ -182,7 +182,7 @@ fun ProfileImportDialog(
                                             color = textPrimary
                                         )
                                         Text(
-                                            text = "${profile.age} • ${profile.gender} • ${profile.medicineCount}",
+                                            text = "${androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.years_format, profile.age)} • ${profile.gender} • ${profile.medicineCount} ${androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.nav_medicines)}",
                                             style = MaterialTheme.typography.bodySmall,
                                             maxLines = 1,
                                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,

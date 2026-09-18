@@ -24,8 +24,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.outlined.ArrowOutward
 import androidx.compose.material.icons.outlined.Coffee
+import androidx.compose.material.icons.outlined.CurrencyBitcoin
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Icon
@@ -35,6 +38,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -131,7 +137,7 @@ fun AboutScreen(navController: NavController) {
                     )
 
                     Text(
-                        text = "Version $versionName (Build $versionCode)",
+                        text = stringResource(R.string.about_version_build, versionName ?: "2.5.1", versionCode),
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -152,7 +158,7 @@ fun AboutScreen(navController: NavController) {
 
             // Open Source & Community
             Text(
-                text = "Community & Open Source",
+                text = stringResource(R.string.about_community_open_source),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -212,74 +218,130 @@ fun AboutScreen(navController: NavController) {
                 }
             )
 
-            Spacer(modifier = Modifier.height(18.dp))
-
-            // Crypto Donations Header
-            Text(
-                text = stringResource(R.string.about_crypto_donations),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            // Bitcoin Card
-            CryptoAddressCard(
-                currencyName = "Bitcoin (BTC)",
-                address = btcAddress,
-                badgeColor = Color(0xFFF7931A),
-                onClick = {
-                    handleCryptoClick(context, clipboardManager, "Bitcoin", btcAddress, "bitcoin")
-                }
-            )
-
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Ethereum Card
-            CryptoAddressCard(
-                currencyName = "Ethereum (ETH)",
-                address = ethAddress,
-                badgeColor = Color(0xFF627EEA),
-                onClick = {
-                    handleCryptoClick(context, clipboardManager, "Ethereum", ethAddress, "ethereum")
+            // 3rd Option: Cryptocurrency Donations (Collapsible)
+            var isCryptoExpanded by remember { mutableStateOf(false) }
+
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { isCryptoExpanded = !isCryptoExpanded },
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.surface,
+                shadowElevation = 2.dp
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(44.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFFF7931A).copy(alpha = 0.12f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.CurrencyBitcoin,
+                                contentDescription = null,
+                                tint = Color(0xFFF7931A),
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(14.dp))
+
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.about_crypto_donations),
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = "BTC, ETH, SOL, LTC, ZEC",
+                                fontSize = 13.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                lineHeight = 17.sp
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(10.dp))
+
+                        Icon(
+                            imageVector = if (isCryptoExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                            contentDescription = if (isCryptoExpanded) "Collapse" else "Expand",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+
+                    if (isCryptoExpanded) {
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            // Bitcoin Card
+                            CryptoAddressCard(
+                                currencyName = stringResource(R.string.crypto_bitcoin),
+                                address = btcAddress,
+                                badgeColor = Color(0xFFF7931A),
+                                onClick = {
+                                    handleCryptoClick(context, clipboardManager, context.getString(R.string.crypto_name_btc), btcAddress, "bitcoin")
+                                }
+                            )
+
+                            // Ethereum Card
+                            CryptoAddressCard(
+                                currencyName = stringResource(R.string.crypto_ethereum),
+                                address = ethAddress,
+                                badgeColor = Color(0xFF627EEA),
+                                onClick = {
+                                    handleCryptoClick(context, clipboardManager, context.getString(R.string.crypto_name_eth), ethAddress, "ethereum")
+                                }
+                            )
+
+                            // Solana Card
+                            CryptoAddressCard(
+                                currencyName = stringResource(R.string.crypto_solana),
+                                address = solAddress,
+                                badgeColor = Color(0xFF14F195),
+                                onClick = {
+                                    handleCryptoClick(context, clipboardManager, context.getString(R.string.crypto_name_sol), solAddress, "solana")
+                                }
+                            )
+
+                            // Litecoin Card
+                            CryptoAddressCard(
+                                currencyName = stringResource(R.string.crypto_litecoin),
+                                address = ltcAddress,
+                                badgeColor = Color(0xFF345D9D),
+                                onClick = {
+                                    handleCryptoClick(context, clipboardManager, context.getString(R.string.crypto_name_ltc), ltcAddress, "litecoin")
+                                }
+                            )
+
+                            // Zcash Card
+                            CryptoAddressCard(
+                                currencyName = stringResource(R.string.crypto_zcash),
+                                address = zecAddress,
+                                badgeColor = Color(0xFFF4B728),
+                                onClick = {
+                                    handleCryptoClick(context, clipboardManager, context.getString(R.string.crypto_name_zec), zecAddress, "zcash")
+                                }
+                            )
+                        }
+                    }
                 }
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // Solana Card
-            CryptoAddressCard(
-                currencyName = "Solana (SOL)",
-                address = solAddress,
-                badgeColor = Color(0xFF14F195),
-                onClick = {
-                    handleCryptoClick(context, clipboardManager, "Solana", solAddress, "solana")
-                }
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // Litecoin Card
-            CryptoAddressCard(
-                currencyName = "Litecoin (LTC)",
-                address = ltcAddress,
-                badgeColor = Color(0xFF345D9D),
-                onClick = {
-                    handleCryptoClick(context, clipboardManager, "Litecoin", ltcAddress, "litecoin")
-                }
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // Zcash Card
-            CryptoAddressCard(
-                currencyName = "Zcash (ZEC)",
-                address = zecAddress,
-                badgeColor = Color(0xFFF4B728),
-                onClick = {
-                    handleCryptoClick(context, clipboardManager, "Zcash", zecAddress, "zcash")
-                }
-            )
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
         }

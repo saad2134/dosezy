@@ -107,7 +107,7 @@
     <string name="notif_perm_desc">用于发送服药提醒和闹钟。</string>
     <string name="notif_perm_exact_warning">通知已开启 • 需要精准闹钟权限以准时提醒（点击允许）</string>
     <string name="notif_perm_all_granted">通知与精准闹钟已全部开启。</string>
-    <string name="notif_oem_bg_item_desc">配置 %1$s 后台设置以确保闹钟准时响起。</string>
+    <string name="notif_oem_bg_item_desc">配置后台设置以确保闹钟准时响起。</string>
 
     <string name="notif_perm_granted">已授予发送通知的权限。</string>
     <string name="notif_battery_title">手机电量</string>
@@ -659,4 +659,44 @@
     <string name="pharmacy_order_footer_brand">由 Dosezy 生成</string>
     <string name="menu_pharmacy_order">药店补药清单</string>
     <string name="menu_pharmacy_order_desc">生成药品订单并通过微信或WhatsApp分享</string>
+    <string name="pharmacy_order_markdown_preview">Markdown 预览</string>
+
+    <string name="about_community_open_source">社区与开源</string>
+    <string name="about_version_build">版本 %1$s (构建 %2$s)</string>
+    <string name="crypto_bitcoin">比特币 (BTC)</string>
+    <string name="crypto_ethereum">以太坊 (ETH)</string>
+    <string name="crypto_solana">Solana (SOL)</string>
+    <string name="crypto_litecoin">莱特币 (LTC)</string>
+    <string name="crypto_zcash">大零币 (ZEC)</string>
+    <string name="crypto_name_btc">比特币</string>
+    <string name="crypto_name_eth">以太坊</string>
+    <string name="crypto_name_sol">Solana</string>
+    <string name="crypto_name_ltc">莱特币</string>
+    <string name="crypto_name_zec">大零币</string>
+    <string name="country_india">印度</string>
+    <string name="country_us_ca">美国 / 加拿大</string>
+    <string name="country_uk">英国</string>
+    <string name="country_eu">欧盟</string>
+    <string name="country_china">中国</string>
+    <string name="country_japan">日本</string>
+    <string name="country_russia">俄罗斯</string>
+    <string name="country_brazil">巴西</string>
+    <string name="country_bangladesh">孟加拉国</string>
+    <string name="country_australia">澳大利亚</string>
+    <string name="pharmacy_order_refill_filter">补药筛选</string>
+    <string name="pharmacy_order_days_supply">用药天数</string>
+    <string name="pharmacy_order_days_format_short">%1$d 天</string>
+    <string name="pharmacy_order_medicines_include">包含药品 (%1$d/%2$d)</string>
+    <string name="pharmacy_order_stock_left">剩余 %1$d</string>
+    <string name="pharmacy_order_no_stock_tracked">未追踪库存</string>
+    <string name="pharmacy_order_header_title">📋 *Dosezy 药房补药清单*</string>
+    <string name="pharmacy_order_frequency_format">频次：每日 %1$d 次</string>
+    <string name="pharmacy_order_notes_format">备注：%1$s</string>
+    <string name="notif_overlay_prompt_title">允许闹钟弹窗</string>
+    <string name="notif_overlay_prompt_desc">为确保服药提醒在微信、WhatsApp等应用之上及时弹出，请开启“在其他应用上层显示”。</string>
+    <string name="dialog_enable">开启</string>
+    <string name="dialog_later">稍后</string>
+
+    <string name="pharmacy_order_include_stock">在清单中包含当前库存</string>
+    <string name="pharmacy_order_quantity_label">数量</string>
 </resources>

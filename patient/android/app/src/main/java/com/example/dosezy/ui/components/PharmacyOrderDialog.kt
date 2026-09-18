@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -42,6 +43,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -85,6 +87,7 @@ fun PharmacyOrderDialog(
 
     var onlyLowStock by remember { mutableStateOf(lowStockMedicines.isNotEmpty()) }
     var supplyDays by remember { mutableIntStateOf(30) }
+    var includeStockInOrder by remember { mutableStateOf(false) }
 
     val displayedMedicines = remember(onlyLowStock, activeMedicines, lowStockMedicines) {
         if (onlyLowStock) lowStockMedicines else activeMedicines
@@ -96,13 +99,35 @@ fun PharmacyOrderDialog(
         }
     }
 
+    val customQuantities = remember { mutableStateMapOf<String, Int>() }
+
+    // Calculate default quantity for a medicine given supply days
+    fun calculateDefaultQty(med: Medicine, days: Int): Int {
+        val dailyDose = if (med.dosage > 0) med.dosage else 1.0
+        val dailyRequirement = (med.timesPerDay.coerceAtLeast(1)) * dailyDose
+        return (dailyRequirement * days).toInt().coerceAtLeast(1)
+    }
+
+    // Initialize/update quantities whenever displayedMedicines or supplyDays changes
+    androidx.compose.runtime.LaunchedEffect(displayedMedicines, supplyDays) {
+        displayedMedicines.forEach { med ->
+            customQuantities[med.medicineId] = calculateDefaultQty(med, supplyDays)
+        }
+    }
+
     val selectedMedicinesList = remember(displayedMedicines, selectedMedicineIds.toList()) {
         displayedMedicines.filter { it.medicineId in selectedMedicineIds }
     }
 
-    val orderText = remember(user, selectedMedicinesList, supplyDays) {
+    val orderText = remember(user, selectedMedicinesList, supplyDays, customQuantities.toMap(), includeStockInOrder) {
         if (selectedMedicinesList.isEmpty()) ""
-        else dataExporter.generatePharmacyOrderText(user, selectedMedicinesList, supplyDays)
+        else dataExporter.generatePharmacyOrderText(
+            user = user,
+            medicines = selectedMedicinesList,
+            supplyDays = supplyDays,
+            customQuantities = customQuantities.toMap(),
+            includeStock = includeStockInOrder
+        )
     }
 
     Dialog(
@@ -175,7 +200,7 @@ fun PharmacyOrderDialog(
 
                 // Scope Filter (Low Stock vs All)
                 Text(
-                    text = "Refill Filter",
+                    text = stringResource(R.string.pharmacy_order_refill_filter),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -224,7 +249,7 @@ fun PharmacyOrderDialog(
 
                 // Days of Supply Selection
                 Text(
-                    text = "Days of Supply",
+                    text = stringResource(R.string.pharmacy_order_days_supply),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -247,7 +272,7 @@ fun PharmacyOrderDialog(
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Text(
-                                    text = "$days d",
+                                    text = stringResource(R.string.pharmacy_order_days_format_short, days),
                                     fontSize = 12.sp,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                                     color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
@@ -259,10 +284,36 @@ fun PharmacyOrderDialog(
 
                 Spacer(modifier = Modifier.height(14.dp))
 
+                // Stock privacy toggle
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                        .clickable { includeStockInOrder = !includeStockInOrder }
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = includeStockInOrder,
+                        onCheckedChange = { includeStockInOrder = it },
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = MaterialTheme.colorScheme.primary
+                        )
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(R.string.pharmacy_order_include_stock),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
                 // Medicine Selection Checklist
                 if (displayedMedicines.isNotEmpty()) {
                     Text(
-                        text = "Medicines to Include (${selectedMedicineIds.size}/${displayedMedicines.size})",
+                        text = stringResource(R.string.pharmacy_order_medicines_include, selectedMedicineIds.size, displayedMedicines.size),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -278,7 +329,7 @@ fun PharmacyOrderDialog(
                         Column(
                             modifier = Modifier
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
-                                .heightIn(max = 160.dp)
+                                .heightIn(max = 200.dp)
                                 .verticalScroll(rememberScrollState())
                         ) {
                             displayedMedicines.forEach { med ->
@@ -286,13 +337,6 @@ fun PharmacyOrderDialog(
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .clickable {
-                                            if (isChecked) {
-                                                selectedMedicineIds.remove(med.medicineId)
-                                            } else {
-                                                selectedMedicineIds.add(med.medicineId)
-                                            }
-                                        }
                                         .padding(vertical = 4.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -311,8 +355,18 @@ fun PharmacyOrderDialog(
                                             checkedColor = MaterialTheme.colorScheme.primary
                                         )
                                     )
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Column(modifier = Modifier.weight(1f)) {
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Column(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .clickable {
+                                                if (isChecked) {
+                                                    selectedMedicineIds.remove(med.medicineId)
+                                                } else {
+                                                    selectedMedicineIds.add(med.medicineId)
+                                                }
+                                            }
+                                    ) {
                                         Text(
                                             text = med.medicationName,
                                             style = MaterialTheme.typography.bodyMedium,
@@ -320,7 +374,7 @@ fun PharmacyOrderDialog(
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis
                                         )
-                                        val stockText = med.currentStock?.let { "$it left" } ?: "No stock tracked"
+                                        val stockText = med.currentStock?.let { stringResource(R.string.pharmacy_order_stock_left, it) } ?: stringResource(R.string.pharmacy_order_no_stock_tracked)
                                         Text(
                                             text = "${med.dosage} ${med.dosageUnit.name.lowercase()} • $stockText",
                                             style = MaterialTheme.typography.bodySmall,
@@ -328,6 +382,67 @@ fun PharmacyOrderDialog(
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis
                                         )
+                                    }
+
+                                    // Interactive Quantity Stepper
+                                    if (isChecked) {
+                                        val currentQty = customQuantities[med.medicineId] ?: calculateDefaultQty(med, supplyDays)
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(8.dp))
+                                                .background(MaterialTheme.colorScheme.surface)
+                                                .padding(horizontal = 4.dp, vertical = 2.dp)
+                                        ) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(28.dp)
+                                                    .clip(RoundedCornerShape(6.dp))
+                                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                                    .clickable {
+                                                        if (currentQty > 1) {
+                                                            customQuantities[med.medicineId] = currentQty - 1
+                                                        }
+                                                    },
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = "−",
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 15.sp,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                            }
+
+                                            Text(
+                                                text = "$currentQty",
+                                                style = MaterialTheme.typography.labelLarge,
+                                                fontWeight = FontWeight.Bold,
+                                                modifier = Modifier
+                                                    .widthIn(min = 32.dp)
+                                                    .padding(horizontal = 4.dp),
+                                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                                color = MaterialTheme.colorScheme.primary
+                                            )
+
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(28.dp)
+                                                    .clip(RoundedCornerShape(6.dp))
+                                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
+                                                    .clickable {
+                                                        customQuantities[med.medicineId] = currentQty + 1
+                                                    },
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = "+",
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 15.sp,
+                                                    color = MaterialTheme.colorScheme.primary
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -354,7 +469,7 @@ fun PharmacyOrderDialog(
 
                 // Live Preview
                 Text(
-                    text = "WhatsApp Preview",
+                    text = stringResource(R.string.pharmacy_order_markdown_preview),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant

@@ -96,7 +96,7 @@
     <string name="notif_perm_desc">服薬リマインダーとアラームを送信するために必要です。</string>
     <string name="notif_perm_exact_warning">通知は有効です • 定刻に鳴らすには正確なアラーム権限が必要です（タップして許可）</string>
     <string name="notif_perm_all_granted">通知と正確なアラームは完全に有効です。</string>
-    <string name="notif_oem_bg_item_desc">%1$s のバックグラウンド設定を調整してアラームを定刻に鳴らします。</string>
+    <string name="notif_oem_bg_item_desc">バックグラウンド設定を調整してアラームを定刻に鳴らします。</string>
 
     <string name="notif_perm_granted">通知送信権限が許可されています。</string>
     <string name="notif_battery_title">バッテリー残量</string>
@@ -643,4 +643,44 @@
     <string name="pharmacy_order_footer_brand">Dosezy で生成</string>
     <string name="menu_pharmacy_order">薬局への注文リスト</string>
     <string name="menu_pharmacy_order_desc">医薬品の注文リストを作成してWhatsAppで共有</string>
+    <string name="pharmacy_order_markdown_preview">Markdownプレビュー</string>
+
+    <string name="about_community_open_source">コミュニティとオープンソース</string>
+    <string name="about_version_build">バージョン %1$s (ビルド %2$s)</string>
+    <string name="crypto_bitcoin">ビットコイン (BTC)</string>
+    <string name="crypto_ethereum">イーサリアム (ETH)</string>
+    <string name="crypto_solana">ソラナ (SOL)</string>
+    <string name="crypto_litecoin">ライトコイン (LTC)</string>
+    <string name="crypto_zcash">ジーキャッシュ (ZEC)</string>
+    <string name="crypto_name_btc">ビットコイン</string>
+    <string name="crypto_name_eth">イーサリアム</string>
+    <string name="crypto_name_sol">ソラナ</string>
+    <string name="crypto_name_ltc">ライトコイン</string>
+    <string name="crypto_name_zec">ジーキャッシュ</string>
+    <string name="country_india">インド</string>
+    <string name="country_us_ca">アメリカ / カナダ</string>
+    <string name="country_uk">イギリス</string>
+    <string name="country_eu">欧州連合 (EU)</string>
+    <string name="country_china">中国</string>
+    <string name="country_japan">日本</string>
+    <string name="country_russia">ロシア</string>
+    <string name="country_brazil">ブラジル</string>
+    <string name="country_bangladesh">バングラデシュ</string>
+    <string name="country_australia">オーストラリア</string>
+    <string name="pharmacy_order_refill_filter">補充フィルター</string>
+    <string name="pharmacy_order_days_supply">処方日数</string>
+    <string name="pharmacy_order_days_format_short">%1$d 日</string>
+    <string name="pharmacy_order_medicines_include">対象のお薬 (%1$d/%2$d)</string>
+    <string name="pharmacy_order_stock_left">残り %1$d</string>
+    <string name="pharmacy_order_no_stock_tracked">在庫追跡なし</string>
+    <string name="pharmacy_order_header_title">📋 *Dosezy 薬局補充注文*</string>
+    <string name="pharmacy_order_frequency_format">頻度: 1日 %1$d回</string>
+    <string name="pharmacy_order_notes_format">メモ: %1$s</string>
+    <string name="notif_overlay_prompt_title">アラームポップアップを許可</string>
+    <string name="notif_overlay_prompt_desc">LINEやWhatsAppなどのアプリ使用中にもアラームを確実にポップアップさせるため、\'他のアプリの上に重ねて表示\'を有効にしてください。</string>
+    <string name="dialog_enable">有効にする</string>
+    <string name="dialog_later">後で</string>
+
+    <string name="pharmacy_order_include_stock">メッセージに現在の在庫を含める</string>
+    <string name="pharmacy_order_quantity_label">数量</string>
 </resources>

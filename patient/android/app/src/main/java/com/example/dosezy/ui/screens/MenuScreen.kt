@@ -449,6 +449,7 @@ fun MenuScreen(navController: NavController) {
     // Export Success Dialog
     if (showExportDialog) {
         ExportDataDialog(
+            exportFile = exportFile,
             onDismiss = { showExportDialog = false },
             onShare = {
                 exportFile?.let { file ->
@@ -483,7 +484,7 @@ fun MenuScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Export Failed",
+                        text = stringResource(R.string.export_failed_title),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -511,7 +512,7 @@ fun MenuScreen(navController: NavController) {
                         )
                     ) {
                         Text(
-                            text = "OK",
+                            text = stringResource(R.string.ok),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -765,11 +766,11 @@ fun MenuItem(
 
 @Composable
 fun ExportDataDialog(
+    exportFile: File? = null,
     onDismiss: () -> Unit,
     onShare: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             modifier = modifier,
@@ -816,6 +817,37 @@ fun ExportDataDialog(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
+
+                exportFile?.let { file ->
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = file.name,
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = file.absolutePath,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                                lineHeight = 16.sp
+                            )
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
