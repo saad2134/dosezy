@@ -698,4 +698,24 @@ Vuoi continuare?</string>
     <string name="record_dose_time_confirm">Registra dose</string>
     <string name="unit_bottle">flacone</string>
     <string name="unit_bottles">flaconi</string>
+
+    <!-- Hide Navigation Add Button Preference -->
+    <string name="pref_hide_add_nav_button_title">Nascondi pulsante centrale Aggiungi</string>
+    <string name="pref_hide_add_nav_button_desc">Nasconde il pulsante \'+\' dalla barra di navigazione. Un pulsante \'Aggiungi farmaco\' sarà disponibile nella scheda Farmaci sotto la tua lista.</string>
+
+    <!-- About Screen Expansion -->
+    <string name="about_developer_title">Informazioni sullo sviluppatore</string>
+    <string name="about_developer_name">Saad</string>
+    <string name="about_developer_role">Creatore e sviluppatore principale</string>
+    <string name="about_developer_bio">Creato con cura per rendere il monitoraggio dei farmaci accessibile, privato e indipendente. Zero pubblicità, zero traccianti, 100% offline.</string>
+    <string name="about_developer_github">Profilo GitHub</string>
+    <string name="about_features_title">Perché Dosezy?</string>
+    <string name="about_feat_offline_title">100% offline e privato</string>
+    <string name="about_feat_offline_desc">Tutti i dati rimangono sul tuo dispositivo senza dipendenza dal cloud o traccianti.</string>
+    <string name="about_feat_smart_alarms_title">Sveglie affidabili e fusi orari</string>
+    <string name="about_feat_smart_alarms_desc">Promemoria precisi che risvegliano il dispositivo e si adattano ai fusi orari.</string>
+    <string name="about_feat_family_title">Cura familiare multi-profilo</string>
+    <string name="about_feat_family_desc">Gestisci i farmaci per tutta la famiglia con calcolo intelligente dei flaconi di gocce.</string>
+    <string name="about_feat_accessible_title">Accessibilità al primo posto</string>
+    <string name="about_feat_accessible_desc">Grafica ad alto contrasto con ampi pulsanti adatti anche agli anziani.</string>
 </resources>

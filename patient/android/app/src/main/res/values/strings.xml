@@ -726,4 +726,24 @@ Do you want to continue?</string>
     <string name="record_dose_time_confirm">Record Dose</string>
     <string name="unit_bottle">bottle</string>
     <string name="unit_bottles">bottles</string>
+
+    <!-- Hide Navigation Add Button Preference -->
+    <string name="pref_hide_add_nav_button_title">Hide Navigation Add Button</string>
+    <string name="pref_hide_add_nav_button_desc">Hides the \'+\' button from the bottom navigation bar. An \'Add Medicine\' button will be available in the Medicines tab below your medications.</string>
+
+    <!-- About Screen Expansion -->
+    <string name="about_developer_title">About the Developer</string>
+    <string name="about_developer_name">Saad</string>
+    <string name="about_developer_role">Creator &amp; Lead Maintainer</string>
+    <string name="about_developer_bio">Built with care to keep medication tracking accessible, completely private, and independent. Zero ads, zero trackers, 100% offline-first.</string>
+    <string name="about_developer_github">GitHub Profile</string>
+    <string name="about_features_title">Why Dosezy?</string>
+    <string name="about_feat_offline_title">100% Offline &amp; Private</string>
+    <string name="about_feat_offline_desc">All data stays strictly on your device with zero cloud dependency and no trackers.</string>
+    <string name="about_feat_smart_alarms_title">Reliable Alarms &amp; Timezones</string>
+    <string name="about_feat_smart_alarms_desc">Exact reminders that wake your device and shift smoothly with you across time zones.</string>
+    <string name="about_feat_family_title">Multi-Profile Family Care</string>
+    <string name="about_feat_family_desc">Manage medications for elderly parents, children, and pets with smart bottle calculations.</string>
+    <string name="about_feat_accessible_title">Accessibility First</string>
+    <string name="about_feat_accessible_desc">Large high-contrast visuals, tremor-friendly touch targets, and clear navigation.</string>
 </resources>

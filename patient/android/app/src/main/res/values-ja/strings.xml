@@ -698,4 +698,24 @@
     <string name="record_dose_time_confirm">服薬を記録</string>
     <string name="unit_bottle">本</string>
     <string name="unit_bottles">本</string>
+
+    <!-- Hide Navigation Add Button Preference -->
+    <string name="pref_hide_add_nav_button_title">中央の追加ボタンを非表示</string>
+    <string name="pref_hide_add_nav_button_desc">ナビゲーションバーの「+」ボタンを非表示にします。お薬タブの一覧の下部に「お薬を追加」ボタンが表示されます。</string>
+
+    <!-- About Screen Expansion -->
+    <string name="about_developer_title">開発者について</string>
+    <string name="about_developer_name">Saad</string>
+    <string name="about_developer_role">開発者・主管理者</string>
+    <string name="about_developer_bio">服薬管理を手軽で完全にプライベート、かつ独立したものにするために丁寧に開発されました。広告なし、トラッカーなし、100%オフライン設計。</string>
+    <string name="about_developer_github">GitHub プロフィール</string>
+    <string name="about_features_title">Dosezy の特長</string>
+    <string name="about_feat_offline_title">100% オフライン＆プライベート</string>
+    <string name="about_feat_offline_desc">すべてのデータはお手元の端末内にのみ保存され、クラウド送信や追跡は一切行われません。</string>
+    <string name="about_feat_smart_alarms_title">確実なアラームとタイムゾーン対応</string>
+    <string name="about_feat_smart_alarms_desc">端末を確実に鳴動させ、時差のある地域への移動時もスケジュールを自動調整します。</string>
+    <string name="about_feat_family_title">複数プロファイル対応の家族ケア</string>
+    <string name="about_feat_family_desc">点眼薬のボトル換算や薬局注文も含め、ご家族全員の服薬をまとめて管理。</string>
+    <string name="about_feat_accessible_title">アクセシビリティ最優先</string>
+    <string name="about_feat_accessible_desc">シニアの方でも見やすい大きな文字と押しやすい操作ボタン。</string>
 </resources>

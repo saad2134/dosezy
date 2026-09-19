@@ -1,72 +1,84 @@
 <en-IN>
 • Crossing Time Zones: Doses shift with you, keeping reminders on local routine
 • Manually Record Dose Time: Log exact time taken with accurate adherence stats
-• Enhanced Pharmacy Orders: Multi-profile refills, smart bottle counts, & copyable preview
-• Targeted store update routing with Appteka marketplace support
+• Navigation Options: Hide nav add button & add directly from medicines roster
+• Enhanced Pharmacy Orders: Multi-profile refills, smart bottle counts, & preview
+• Expanded about page, profile deletion text fix
 </en-IN>
 <en-US>
 • Crossing Time Zones: Doses shift with you, keeping reminders on local routine
 • Manually Record Dose Time: Log exact time taken with accurate adherence stats
-• Enhanced Pharmacy Orders: Multi-profile refills, smart bottle counts, & copyable preview
-• Targeted store update routing with Appteka marketplace support
+• Navigation Options: Hide nav add button & add directly from medicines roster
+• Enhanced Pharmacy Orders: Multi-profile refills, smart bottle counts, & preview
+• Expanded about page, profile deletion text fix
 </en-US>
 <ar>
 • عبور المناطق الزمنية: تتنقل الجرعات معك لتبقى التنبيهات مطابقة لروتينك المحلي
 • تسجيل وقت الجرعة يدويًا: تسجيل وقت تناول الدواء بدقة لحساب الالتزام
+• تخصيص شريط التنقل: إمكانية إخفاء زر الإضافة الأوسط والإضافة من شاشة الأدوية
 • تحسين طلبات الصيدلية: دمج طلبات العائلة وحساب العبوات ومعاينة قابلة للنسخ
-• دعم متجر أبتيكا وتوجيه التحديثات للمتجر الأصلي
+• توسيع صفحة حول التطبيق، وإصلاح نص حذف الملف الشخصي
 </ar>
 <de-DE>
 • Zeitzonenwechsel: Dosiszeiten passen sich an und bleiben an Ihrer Routine
 • Dosiszeit manuell erfassen: Exakte Einnahmezeit für genaue Therapietreue
+• Navigationsanpassung: Mittleren Hinzufügen-Button ausblenden & in Liste einfügen
 • Verbesserte Apothekenbestellung: Profile bündeln, Flaschenberechnung & Vorschau
-• Gezielte Store-Updates mit Appteka-Unterstützung
+• Erweiterte Info-Seite, Fehlerbehebung beim Text zum Profil-Löschen
 </de-DE>
 <es-419>
 • Cruce de zonas horarias: las dosis se ajustan a tu rutina local al viajar
 • Registrar hora de dosis manualmente: guarda la hora exacta de toma
+• Personalizar navegación: opción de ocultar botón de agregar y añadir desde lista
 • Pedidos de farmacia mejorados: combina perfiles, cálculo en frascos y vista copiable
-• Actualizaciones dirigidas a la tienda con soporte para Appteka
+• Pantalla Acerca de ampliada, corrección de texto al eliminar perfil
 </es-419>
 <fr-FR>
 • Changement de fuseau horaire: les rappels restent calés sur votre routine
 • Enregistrement manuel de l'heure: notez l'heure exacte de prise
+• Personnalisation navigation: masquer le bouton central d'ajout
 • Commandes pharmacie améliorées: profils groupés, calcul en flacons et aperçu copiable
-• Mises à jour ciblées vers le store d'origine avec support d'Appteka
+• Page À propos enrichie, correction du texte de suppression de profil
 </fr-FR>
 <hi-IN>
 • समय क्षेत्र बदलाव: यात्रा के दौरान खुराक का समय आपकी स्थानीय दिनचर्या के अनुसार रहेगा
 • खुराक का समय मैन्युअल दर्ज करें: दवा लेने का सही समय दर्ज करें और सटीक ट्रैकिंग पाएं
-• बेहतर फार्मेसी ऑर्डर: मल्टी-प्रोफाइल रिफिल, बोतलों की स्मार्ट गणना व कॉपी करने योग्य प्रिव्यू
-• ऐपटेका मार्केटप्लेस सपोर्ट के साथ स्टोर अपडेट रूटिंग
+• नेविगेशन कस्टमाइज़ेशन: बीच का जोड़ें बटन छिपाएं और दवा सूची से जोड़ें
+• बेहतर फार्मेसी ऑर्डर: मल्टी-प्रोफाइल रिफिल, बोतलों की गणना व कॉपी योग्य प्रिव्यू
+• विस्तृत 'ऐप के बारे में' पेज, प्रोफ़ाइल हटाने के टेक्स्ट में सुधार
 </hi-IN>
 <it-IT>
 • Cambio di fuso orario: i promemoria rimangono ancorati alla routine locale
 • Registra ora della dose manualmente: registra l'orario effettivo di assunzione
+• Personalizza barra di navigazione: nascondi il pulsante aggiungi centrale
 • Ordini farmacia migliorati: profili multipli, calcolo flaconi e anteprima copiabile
-• Aggiornamenti mirati allo store con supporto Appteka
+• Schermata Info arricchita, correzione testo eliminazione profilo
 </it-IT>
 <ja-JP>
 • タイムゾーン対応: 移動先でも現地時間に合わせてリマインダーを維持
 • 服用時間を手動記録: 正確な服用時間を記録し遵守率を正しく計算
+• ナビゲーション設定: 中央の追加ボタンを非表示にし薬一覧から追加可能
 • 処方箋注文の強化: 複数プロファイル統合・ボトル自動換算・コピー可能プレビュー
-• Apptekaストア対応とインストール元ストアへの直接更新
+• 「アプリ情報」画面の拡充、プロフィール削除文言の修正
 </ja-JP>
 <pt-BR>
 • Fuso horário: as doses se ajustam à sua rotina local ao viajar
 • Registrar horário da dose manualmente: anote a hora exata da medicação
+• Personalizar navegação: ocultar botão central e adicionar pela lista de remédios
 • Pedidos de farmácia aprimorados: consolidação de perfis, cálculo de frascos e prévia
-• Atualizações direcionadas à loja com suporte para Appteka
+• Tela Sobre expandida, correção de texto na exclusão de perfil
 </pt-BR>
 <ru-RU>
 • Смена часовых поясов: напоминания автоматически подстраиваются под местное время
 • Ручная запись времени приема: точное время приема для правильной статистики
+• Настройка навигации: скрыть центральную кнопку добавления и добавлять из списка
 • Улучшенный заказ в аптеку: объединение профилей, расчет флаконов и копирование
-• Обновления через исходный магазин и поддержка Appteka
+• Расширенное меню «О приложении», исправление текста удаления профиля
 </ru-RU>
 <zh-CN>
 • 跨时区自动适应：旅行时服药提醒自动对齐当地作息时间
 • 手动记录服药时间：可记录实际服药时刻并精确计算依从率
+• 导航栏自定义：可隐藏中间的添加按钮，并在药品列表底部直接添加
 • 药房订药增强：多档案合并订药、智能瓶装换算与可复制预览
-• 针对性应用商店更新与Appteka商店支持
+• 拓展“关于”页面，修复删除档案按钮文案
 </zh-CN>

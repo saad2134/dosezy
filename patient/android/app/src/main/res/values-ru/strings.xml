@@ -698,4 +698,24 @@
     <string name="record_dose_time_confirm">Записать прием</string>
     <string name="unit_bottle">флакон</string>
     <string name="unit_bottles">флаконов</string>
+
+    <!-- Hide Navigation Add Button Preference -->
+    <string name="pref_hide_add_nav_button_title">Скрыть центральную кнопку добавления</string>
+    <string name="pref_hide_add_nav_button_desc">Скрывает кнопку «+» на панели навигации. Кнопка «Добавить лекарство» появится на вкладке «Лекарства» под списком.</string>
+
+    <!-- About Screen Expansion -->
+    <string name="about_developer_title">О разработчике</string>
+    <string name="about_developer_name">Saad</string>
+    <string name="about_developer_role">Создатель и главный разработчик</string>
+    <string name="about_developer_bio">Создано с заботой, чтобы приём лекарств был удобным, приватным и независимым. Без рекламы, без трекеров, 100% офлайн.</string>
+    <string name="about_developer_github">Профиль на GitHub</string>
+    <string name="about_features_title">Почему Dosezy?</string>
+    <string name="about_feat_offline_title">100% офлайн и конфиденциально</string>
+    <string name="about_feat_offline_desc">Все данные хранятся только на вашем устройстве без облаков и отслеживания.</string>
+    <string name="about_feat_smart_alarms_title">Точные будильники и часовые пояса</string>
+    <string name="about_feat_smart_alarms_desc">Надёжные сигналы, которые будят телефон и подстраиваются при смене часового пояса.</string>
+    <string name="about_feat_family_title">Семейный уход с профилями</string>
+    <string name="about_feat_family_desc">Управляйте лекарствами близких с умным расчётом флаконов для капель.</string>
+    <string name="about_feat_accessible_title">Доступность превыше всего</string>
+    <string name="about_feat_accessible_desc">Крупные контрастные элементы для комфортного использования пожилыми людьми.</string>
 </resources>

@@ -1,4 +1,8 @@
-// User.kt
+/*
+ * Copyright (c) 2026 Saad <reach.saad@outlook.com> (@saad2134)
+ * Licensed under the MIT License. See LICENSE in the project root for license information.
+ */
+
 package com.example.dosezy.data.model
 
 import androidx.room.Entity
@@ -37,7 +41,8 @@ data class User(
     val customAlarmSoundTitle: String? = null,
     val alarmDurationSeconds: Int = 0, // 0 = Continuous, 30 = 30s, 60 = 1m, 120 = 2m, 300 = 5m
     val allowDoseSkipping: Boolean = false,
-    val allowCustomDoseTime: Boolean = false
+    val allowCustomDoseTime: Boolean = false,
+    val hideAddMedicineNavButton: Boolean = false
 )
 
 enum class AlarmSound(val rawResId: Int?) {

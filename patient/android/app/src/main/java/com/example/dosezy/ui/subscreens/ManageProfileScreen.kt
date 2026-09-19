@@ -466,9 +466,9 @@ fun ManageProfileScreen(navController: NavController) {
                 ) {
                     Text(
                         if (deleteCountdown > 0) {
-                            "${stringResource(R.string.form_delete)} (${deleteCountdown}s)"
+                            "${stringResource(R.string.profile_delete_btn)} (${deleteCountdown}s)"
                         } else {
-                            stringResource(R.string.form_delete)
+                            stringResource(R.string.profile_delete_btn)
                         }
                     )
                 }

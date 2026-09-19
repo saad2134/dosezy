@@ -697,4 +697,24 @@ Deseja continuar?</string>
     <string name="record_dose_time_confirm">Registrar dose</string>
     <string name="unit_bottle">frasco</string>
     <string name="unit_bottles">frascos</string>
+
+    <!-- Hide Navigation Add Button Preference -->
+    <string name="pref_hide_add_nav_button_title">Ocultar botão central de adicionar</string>
+    <string name="pref_hide_add_nav_button_desc">Oculta o botão \'+\' da barra de navegação. Um botão \'Adicionar medicamento\' estará disponível na aba Remédios abaixo da sua lista.</string>
+
+    <!-- About Screen Expansion -->
+    <string name="about_developer_title">Sobre o desenvolvedor</string>
+    <string name="about_developer_name">Saad</string>
+    <string name="about_developer_role">Criador e mantenedor principal</string>
+    <string name="about_developer_bio">Desenvolvido com carinho para tornar o controle de remédios acessível, privado e independente. Sem anúncios, sem rastreadores, 100% offline.</string>
+    <string name="about_developer_github">Perfil no GitHub</string>
+    <string name="about_features_title">Por que o Dosezy?</string>
+    <string name="about_feat_offline_title">100% offline e privado</string>
+    <string name="about_feat_offline_desc">Todos os dados ficam apenas no seu aparelho, sem nuvem e sem rastreamento.</string>
+    <string name="about_feat_smart_alarms_title">Alarmes confiáveis e fusos horários</string>
+    <string name="about_feat_smart_alarms_desc">Lembretes pontuais que acordam o aparelho e se ajustam a viagens entre fusos.</string>
+    <string name="about_feat_family_title">Cuidado familiar com múltiplos perfis</string>
+    <string name="about_feat_family_desc">Acompanhe remédios de familiares com cálculo inteligente de frascos de gotas.</string>
+    <string name="about_feat_accessible_title">Acessibilidade em primeiro lugar</string>
+    <string name="about_feat_accessible_desc">Visual com alto contraste e botões amplos projetados para idosos.</string>
 </resources>

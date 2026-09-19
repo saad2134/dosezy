@@ -698,4 +698,24 @@ Möchten Sie fortfahren?</string>
     <string name="record_dose_time_confirm">Dosis erfassen</string>
     <string name="unit_bottle">Flasche</string>
     <string name="unit_bottles">Flaschen</string>
+
+    <!-- Hide Navigation Add Button Preference -->
+    <string name="pref_hide_add_nav_button_title">Mittlere Hinzufügen-Taste ausblenden</string>
+    <string name="pref_hide_add_nav_button_desc">Blendet die „+“-Taste in der Navigationsleiste aus. Eine Schaltfläche „Medikament hinzufügen“ wird im Medikamente-Tab unter Ihrer Liste angezeigt.</string>
+
+    <!-- About Screen Expansion -->
+    <string name="about_developer_title">Über den Entwickler</string>
+    <string name="about_developer_name">Saad</string>
+    <string name="about_developer_role">Schöpfer &amp; Hauptentwickler</string>
+    <string name="about_developer_bio">Mit Sorgfalt entwickelt, um Medikamentenverwaltung zugänglich, privat und unabhängig zu halten. Keine Werbung, keine Tracker, 100 % offline.</string>
+    <string name="about_developer_github">GitHub-Profil</string>
+    <string name="about_features_title">Warum Dosezy?</string>
+    <string name="about_feat_offline_title">100 % offline &amp; privat</string>
+    <string name="about_feat_offline_desc">Alle Daten bleiben sicher auf Ihrem Gerät – ganz ohne Cloud oder Tracker.</string>
+    <string name="about_feat_smart_alarms_title">Zuverlässige Wecker &amp; Zeitzonen</string>
+    <string name="about_feat_smart_alarms_desc">Präzise Erinnerungen, die Ihr Gerät wecken und Zeitzonenwechsel automatisch anpassen.</string>
+    <string name="about_feat_family_title">Familienpflege mit Profilen</string>
+    <string name="about_feat_family_desc">Verwalten Sie Medikamente für Angehörige mit intelligenter Flaschenberechnung für Tropfen.</string>
+    <string name="about_feat_accessible_title">Barrierefreiheit im Fokus</string>
+    <string name="about_feat_accessible_desc">Große Schaltflächen und hoher Kontrast für einfache Bedienung durch Senioren.</string>
 </resources>

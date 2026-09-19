@@ -694,4 +694,24 @@
     <string name="record_dose_time_confirm">ডোজ রেকর্ড করুন</string>
     <string name="unit_bottle">বোতল</string>
     <string name="unit_bottles">বোতল</string>
+
+    <!-- Hide Navigation Add Button Preference -->
+    <string name="pref_hide_add_nav_button_title">নেভিগেশন যোগ বাটন লুকান</string>
+    <string name="pref_hide_add_nav_button_desc">নিচের নেভিগেশন বার থেকে \'+\' বাটনটি লুকায়। ওষুধ ট্যাবের তালিকায় নিচে \'ওষুধ যোগ করুন\' বাটন উপলব্ধ থাকবে।</string>
+
+    <!-- About Screen Expansion -->
+    <string name="about_developer_title">ডেভেলপার সম্পর্কে</string>
+    <string name="about_developer_name">Saad</string>
+    <string name="about_developer_role">স্রষ্টা ও প্রধান রক্ষণাবেক্ষণকারী</string>
+    <string name="about_developer_bio">ওষুধ ট্র্যাকিংকে সহজলভ্য, সম্পূর্ণ ব্যক্তিগত এবং স্বাধীন রাখার জন্য যত্ন সহকারে তৈরি। কোনো বিজ্ঞাপন নেই, কোনো ট্র্যাকার নেই, ১০০% অফলাইন।</string>
+    <string name="about_developer_github">GitHub প্রোফাইল</string>
+    <string name="about_features_title">কেন ডোজেজি?</string>
+    <string name="about_feat_offline_title">১০০% অফলাইন ও ব্যক্তিগত</string>
+    <string name="about_feat_offline_desc">সমস্ত ডেটা আপনার ডিভাইসেই থাকে, ক্লাউডের কোনো নির্ভরতা বা ট্র্যাকার নেই।</string>
+    <string name="about_feat_smart_alarms_title">নির্ভরযোগ্য অ্যালার্ম ও টাইম জোন</string>
+    <string name="about_feat_smart_alarms_desc">সঠিক অ্যালার্ম যা ডিভাইস জাগিয়ে তোলে এবং টাইম জোনের সাথে স্বয়ংক্রিয়ভাবে মানিয়ে নেয়।</string>
+    <string name="about_feat_family_title">মাল্টি-প্রোফাইল পারিবারিক যত্ন</string>
+    <string name="about_feat_family_desc">পরিবারের সদস্যদের ওষুধ ট্র্যাক করুন এবং ড্রপের বোতল গণনা সহজে পরিচালনা করুন।</string>
+    <string name="about_feat_accessible_title">সহজ ব্যবহারযোগ্যতা</string>
+    <string name="about_feat_accessible_desc">বড় ফন্ট এবং সহজে স্পর্শযোগ্য বোতাম যা প্রবীণদের জন্য আদর্শ।</string>
 </resources>

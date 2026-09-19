@@ -698,4 +698,24 @@ Voulez-vous continuer ?</string>
     <string name="record_dose_time_confirm">Enregistrer la prise</string>
     <string name="unit_bottle">flacon</string>
     <string name="unit_bottles">flacons</string>
+
+    <!-- Hide Navigation Add Button Preference -->
+    <string name="pref_hide_add_nav_button_title">Masquer le bouton central Ajouter</string>
+    <string name="pref_hide_add_nav_button_desc">Masque le bouton \'+\' de la barre de navigation. Un bouton \'Ajouter un médicament\' sera disponible dans l\'onglet Médicaments sous votre liste.</string>
+
+    <!-- About Screen Expansion -->
+    <string name="about_developer_title">À propos du développeur</string>
+    <string name="about_developer_name">Saad</string>
+    <string name="about_developer_role">Créateur et mainteneur principal</string>
+    <string name="about_developer_bio">Conçu avec soin pour un suivi des médicaments accessible, privé et autonome. Zéro publicité, zéro traceur, 100 % hors ligne.</string>
+    <string name="about_developer_github">Profil GitHub</string>
+    <string name="about_features_title">Pourquoi Dosezy ?</string>
+    <string name="about_feat_offline_title">100 % hors ligne et privé</string>
+    <string name="about_feat_offline_desc">Toutes les données restent sur votre appareil sans dépendance au cloud ni traceurs.</string>
+    <string name="about_feat_smart_alarms_title">Alarmes fiables et fuseaux horaires</string>
+    <string name="about_feat_smart_alarms_desc">Des rappels précis qui réveillent l\'appareil et s\'adaptent lors des changements de fuseau.</string>
+    <string name="about_feat_family_title">Soins familiaux multi-profils</string>
+    <string name="about_feat_family_desc">Gérez les traitements de vos proches avec calcul intelligent des flacons de gouttes.</string>
+    <string name="about_feat_accessible_title">Accessibilité avant tout</string>
+    <string name="about_feat_accessible_desc">Grands boutons bien contrastés conçus spécialement pour les personnes âgées.</string>
 </resources>

@@ -714,4 +714,24 @@
     <string name="record_dose_time_confirm">खुराक दर्ज करें</string>
     <string name="unit_bottle">शीशी</string>
     <string name="unit_bottles">शीशियां</string>
+
+    <!-- Hide Navigation Add Button Preference -->
+    <string name="pref_hide_add_nav_button_title">नेविगेशन जोड़ें बटन छिपाएं</string>
+    <string name="pref_hide_add_nav_button_desc">निचले नेविगेशन बार से \'+\' बटन छिपाता है। दवाएं टैब में आपकी सूची के नीचे \'दवा जोड़ें\' बटन उपलब्ध रहेगा।</string>
+
+    <!-- About Screen Expansion -->
+    <string name="about_developer_title">डेवलपर के बारे में</string>
+    <string name="about_developer_name">Saad</string>
+    <string name="about_developer_role">निर्माता और मुख्य अनुरक्षक</string>
+    <string name="about_developer_bio">दवा प्रबंधन को सुलभ, पूरी तरह से निजी और स्वतंत्र रखने के लिए समर्पित भाव से निर्मित। कोई विज्ञापन नहीं, कोई ट्रैकर नहीं, 100% ऑफ़लाइन।</string>
+    <string name="about_developer_github">GitHub प्रोफ़ाइल</string>
+    <string name="about_features_title">Dosezy क्यों चुनें?</string>
+    <string name="about_feat_offline_title">100% ऑफ़लाइन और निजी</string>
+    <string name="about_feat_offline_desc">सभी डेटा केवल आपके डिवाइस पर सुरक्षित रहता है, बिना किसी क्लाउड या ट्रैकर के।</string>
+    <string name="about_feat_smart_alarms_title">विश्वसनीय अलार्म और समय क्षेत्र</string>
+    <string name="about_feat_smart_alarms_desc">सटीक अलार्म जो डिवाइस को जगाते हैं और समय क्षेत्र बदलने पर खुद अनुकूलित होते हैं।</string>
+    <string name="about_feat_family_title">मल्टी-प्रोफ़ाइल पारिवारिक देखभाल</string>
+    <string name="about_feat_family_desc">परिवार के सदस्यों की दवाएं संभालें और ड्रॉप्स के लिए बोतल की सही गणना पाएं।</string>
+    <string name="about_feat_accessible_title">सुलभता सर्वोपरि</string>
+    <string name="about_feat_accessible_desc">बुजुर्गों के लिए बड़े स्पष्ट अक्षर और छूने में आसान बड़े बटन।</string>
 </resources>

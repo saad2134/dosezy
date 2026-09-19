@@ -698,4 +698,24 @@
     <string name="record_dose_time_confirm">تسجيل الجرعة</string>
     <string name="unit_bottle">زجاجة</string>
     <string name="unit_bottles">زجاجات</string>
+
+    <!-- Hide Navigation Add Button Preference -->
+    <string name="pref_hide_add_nav_button_title">إخفاء زر الإضافة من شريط التنقل</string>
+    <string name="pref_hide_add_nav_button_desc">يخفي زر \'+\' الأوسط من شريط التنقل. سيكون زر \'إضافة دواء\' متاحاً في تبويب الأدوية أسفل قائمتك.</string>
+
+    <!-- About Screen Expansion -->
+    <string name="about_developer_title">حول المطور</string>
+    <string name="about_developer_name">Saad</string>
+    <string name="about_developer_role">المنشئ والمطور الرئيسي</string>
+    <string name="about_developer_bio">صُمم بعناية ليكون تتبع الأدوية متاحاً وخاصاً ومستقلاً تماماً. بلا إعلانات، بلا تتبع، وبلا إنترنت 100%.</string>
+    <string name="about_developer_github">الملف الشخصي على GitHub</string>
+    <string name="about_features_title">لماذا دوزي؟</string>
+    <string name="about_feat_offline_title">100% بلا إنترنت وخاص</string>
+    <string name="about_feat_offline_desc">تبقى جميع بياناتك على جهازك فقط دون أي اعتماد على السحابة وبلا متتبعات.</string>
+    <string name="about_feat_smart_alarms_title">منبهات موثوقة ومناطق زمنية</string>
+    <string name="about_feat_smart_alarms_desc">تنبيهات دقيقة توقظ جهازك وتتكيف تلقائياً عند السفر عبر المناطق الزمنية.</string>
+    <string name="about_feat_family_title">رعاية عائلية متعددة الملفات</string>
+    <string name="about_feat_family_desc">إدارة أدوية الوالدين والأطفال مع حساب ذكي لزجاجات القطرات وطلبات الصيدلية.</string>
+    <string name="about_feat_accessible_title">سهولة الاستخدام أولاً</string>
+    <string name="about_feat_accessible_desc">نصوص واضحة وعناصر لمس كبيرة مصممة خصيصاً لكبار السن.</string>
 </resources>

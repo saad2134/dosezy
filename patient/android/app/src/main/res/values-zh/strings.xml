@@ -714,4 +714,24 @@
     <string name="record_dose_time_confirm">确认服药</string>
     <string name="unit_bottle">瓶</string>
     <string name="unit_bottles">瓶</string>
+
+    <!-- Hide Navigation Add Button Preference -->
+    <string name="pref_hide_add_nav_button_title">隐藏底部导航添加按钮</string>
+    <string name="pref_hide_add_nav_button_desc">隐藏底部导航栏中央的“+”按钮。可在“药物”页面的用药列表下方直接添加新药物。</string>
+
+    <!-- About Screen Expansion -->
+    <string name="about_developer_title">关于开发者</string>
+    <string name="about_developer_name">Saad</string>
+    <string name="about_developer_role">创建者与主维护人</string>
+    <string name="about_developer_bio">精心打造，致力于让服药管理更简便、纯粹私密且完全独立。无广告、无追踪器、100% 离线运行。</string>
+    <string name="about_developer_github">GitHub 个人主页</string>
+    <string name="about_features_title">为何选择 Dosezy？</string>
+    <string name="about_feat_offline_title">100% 离线与隐私安全</string>
+    <string name="about_feat_offline_desc">所有数据严格保存在您的设备本地，绝不依赖云端，零隐私追踪。</string>
+    <string name="about_feat_smart_alarms_title">可靠响铃与时区自适应</string>
+    <string name="about_feat_smart_alarms_desc">精准唤醒设备的提醒通知，跨时区旅行时服药时间自动平滑切换。</string>
+    <string name="about_feat_family_title">多档案家庭关爱</string>
+    <string name="about_feat_family_desc">轻松管理父母与家人的用药，支持眼药水滴剂智能折算瓶数与药房备药清单。</string>
+    <string name="about_feat_accessible_title">无障碍关怀设计</string>
+    <string name="about_feat_accessible_desc">大字体、高对比度与易于触控的大按钮，专为长辈贴心优化。</string>
 </resources>

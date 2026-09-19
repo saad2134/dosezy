@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2026 Saad <reach.saad@outlook.com> (@saad2134)
+ * Licensed under the MIT License. See LICENSE in the project root for license information.
+ */
+
 package com.example.dosezy.ui.screens
 
 import androidx.compose.ui.graphics.luminance
@@ -136,6 +141,7 @@ fun MedicinesScreen(
                     onAddMedicineClick = {
                         navController.navigate("add_med")
                     },
+                    currentUser = currentUser,
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -220,6 +226,7 @@ fun MedicinesContent(
     onReactivateClick: (Medicine) -> Unit = {},
     onPermanentDeleteClick: (Medicine) -> Unit = {},
     onAddMedicineClick: () -> Unit = {},
+    currentUser: com.example.dosezy.data.model.User? = null,
     modifier: Modifier = Modifier
 ) {
     var isArchivedExpanded by remember { mutableStateOf(false) }
@@ -338,9 +345,44 @@ fun MedicinesContent(
                 }
             }
 
-            if (archivedMedicines.isNotEmpty()) {
+            // Primary Add Medicine button (when center navigation button is hidden)
+            if (currentUser?.hideAddMedicineNavButton == true) {
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = onAddMedicineClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF2084E4)
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.form_add_medicine),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            color = Color.White
+                        )
+                    }
+                    if (archivedMedicines.isEmpty()) {
+                        Spacer(modifier = Modifier.height(24.dp))
+                    }
+                }
+            }
+
+            // Discontinued / Archived Medications Section
+            if (archivedMedicines.isNotEmpty()) {
+                item {
+                    Spacer(modifier = Modifier.height(20.dp))
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -396,6 +438,10 @@ fun MedicinesContent(
                                 .padding(vertical = 4.dp)
                         )
                     }
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(24.dp))
                 }
             }
         }

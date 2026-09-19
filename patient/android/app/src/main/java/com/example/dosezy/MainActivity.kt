@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2026 Saad <reach.saad@outlook.com> (@saad2134)
+ * Licensed under the MIT License. See LICENSE in the project root for license information.
+ */
+
 package com.example.dosezy
 
 import android.os.Bundle
@@ -275,7 +280,8 @@ fun DosezyApp() {
             if (showBottomBar) {
                 CustomNavigationBar(
                     navController = navController,
-                    currentDestination = currentDestination
+                    currentDestination = currentDestination,
+                    hideAddButton = currentUser?.hideAddMedicineNavButton == true
                 )
             }
         }

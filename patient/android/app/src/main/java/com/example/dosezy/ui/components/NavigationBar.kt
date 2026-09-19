@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2026 Saad <reach.saad@outlook.com> (@saad2134)
+ * Licensed under the MIT License. See LICENSE in the project root for license information.
+ */
+
 package com.example.dosezy.ui.components
 
 import androidx.compose.foundation.background
@@ -55,7 +60,8 @@ data class BottomNavItem(
 fun CustomNavigationBar(
     navController: NavController,
     currentDestination: NavDestination?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    hideAddButton: Boolean = false
 ) {
     val navItems = listOf(
         BottomNavItem(androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.nav_home), Icons.Default.Home, "home"),
@@ -132,39 +138,41 @@ fun CustomNavigationBar(
             modifier = Modifier.weight(1f)
         )
 
-        // Center Add Button with Squircle Shape
-        Box(
-            modifier = Modifier.weight(1f),
-            contentAlignment = Alignment.Center
-        ) {
-            IconButton(
-                onClick = {
-                    navController.navigate(navItems[2].route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
-                modifier = Modifier
-                    .size(56.dp)
-                    .shadow(
-                        elevation = 8.dp,
-                        shape = RoundedCornerShape(16.dp), // Squircle shape
-                        clip = false
-                    )
-                    .background(
-                        color = Color(0xFF2084E4),
-                        shape = RoundedCornerShape(16.dp) // Squircle shape
-                    )
+        // Center Add Button with Squircle Shape (conditionally displayed)
+        if (!hideAddButton) {
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add New Medicine",
-                    modifier = Modifier.size(28.dp),
-                    tint = Color.White
-                )
+                IconButton(
+                    onClick = {
+                        navController.navigate(navItems[2].route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    modifier = Modifier
+                        .size(56.dp)
+                        .shadow(
+                            elevation = 8.dp,
+                            shape = RoundedCornerShape(16.dp), // Squircle shape
+                            clip = false
+                        )
+                        .background(
+                            color = Color(0xFF2084E4),
+                            shape = RoundedCornerShape(16.dp) // Squircle shape
+                        )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add New Medicine",
+                        modifier = Modifier.size(28.dp),
+                        tint = Color.White
+                    )
+                }
             }
         }
 
