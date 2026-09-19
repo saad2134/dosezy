@@ -68,6 +68,7 @@ fun TopBar(
     val resolvedTitleColor = if (titleColor == Color.Unspecified) MaterialTheme.colorScheme.onSurface else titleColor
     var showProfileDialog by remember { mutableStateOf(false) }
     var showNotificationDialog by remember { mutableStateOf(false) }
+    var notifRefreshTrigger by remember { mutableStateOf(0) }
 
     val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
     val borderColor = if (isDark) Color(0xFF303235) else Color(0xFFD1D5DB)
@@ -138,6 +139,7 @@ fun TopBar(
                 // Persistent notification status shield button on the right
                 if (showNotificationStatus) {
                     NotificationStatusButton(
+                        refreshTrigger = notifRefreshTrigger,
                         onClick = { showNotificationDialog = true }
                     )
                 }
@@ -203,6 +205,7 @@ fun TopBar(
                 // Right: Notification Status Button
                 if (showNotificationStatus) {
                     NotificationStatusButton(
+                        refreshTrigger = notifRefreshTrigger,
                         onClick = { showNotificationDialog = true }
                     )
                 }
@@ -241,7 +244,10 @@ fun TopBar(
 
         if (showNotificationDialog) {
             NotificationStatusDialog(
-                onDismiss = { showNotificationDialog = false }
+                onDismiss = {
+                    showNotificationDialog = false
+                    notifRefreshTrigger++
+                }
             )
         }
     }
@@ -290,15 +296,11 @@ private fun ProfilePicture(
 @Composable
 private fun NotificationStatusButton(
     onClick: () -> Unit,
+    refreshTrigger: Int = 0,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     var refreshCounter by remember { mutableStateOf(0) }
-
-    // Auto-refresh status every 5 seconds
-    LaunchedEffect(refreshCounter) {
-        // ensures the status is rechecked periodically
-    }
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -307,7 +309,9 @@ private fun NotificationStatusButton(
         }
     }
 
-    val allPassed = NotificationUtils.areAllNotificationRequirementsMet(context)
+    val allPassed = remember(refreshCounter, refreshTrigger) {
+        NotificationUtils.areAllNotificationRequirementsMet(context)
+    }
 
     val buttonColor = if (allPassed) Color(0xFF10B981) else Color(0xFFEF4444)
     val iconColor = Color.White

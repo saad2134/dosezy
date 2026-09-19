@@ -234,8 +234,10 @@ object NotificationUtils {
     fun areAllNotificationRequirementsMet(context: Context): Boolean {
         return hasNotificationPermission(context) &&
                 canScheduleExactAlarms(context) &&
+                canDrawOverlays(context) &&
                 isIgnoringBatteryOptimizations(context) &&
-                isPhoneNotSilent(context)
+                isPhoneNotSilent(context) &&
+                isBatterySufficient(context)
     }
 
     /**

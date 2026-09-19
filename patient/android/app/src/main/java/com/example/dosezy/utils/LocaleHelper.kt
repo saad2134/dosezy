@@ -13,18 +13,36 @@ import java.util.Locale
 
 object LocaleHelper {
 
-    private val systemDefaultLocale: Locale by lazy { Locale.getDefault() }
     private val supportedLanguageCodes = setOf("en", "es", "hi", "zh", "pt", "ar", "fr", "de", "ja", "ru", "it", "bn")
 
+    /**
+     * Gets the true device-level system locale from Android OS Resources,
+     * immune to any app-level configuration or Locale.setDefault() mutations.
+     */
+    fun getSystemDefaultLocale(): Locale {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val locales = android.content.res.Resources.getSystem().configuration.locales
+            if (!locales.isEmpty) locales.get(0) else Locale.getDefault()
+        } else {
+            @Suppress("DEPRECATION")
+            android.content.res.Resources.getSystem().configuration.locale ?: Locale.getDefault()
+        }
+    }
+
     fun isSystemLanguageSupported(): Boolean {
-        return supportedLanguageCodes.contains(systemDefaultLocale.language.lowercase(Locale.ROOT))
+        return isLanguageSupported(getSystemDefaultLocale().language)
+    }
+
+    private fun isLanguageSupported(langCode: String): Boolean {
+        return supportedLanguageCodes.contains(langCode.lowercase(Locale.ROOT))
     }
 
     fun getLocale(language: Language): Locale {
         return when (language) {
             Language.SYSTEM -> {
-                if (isSystemLanguageSupported()) {
-                    systemDefaultLocale
+                val sysLocale = getSystemDefaultLocale()
+                if (isLanguageSupported(sysLocale.language)) {
+                    sysLocale
                 } else {
                     // Fallback to English for date/time formatting when system language is unsupported
                     Locale.ENGLISH
@@ -46,7 +64,8 @@ object LocaleHelper {
     }
 
     fun getSystemLanguageDisplayName(): String {
-        val langName = systemDefaultLocale.getDisplayLanguage(Locale.ENGLISH).replaceFirstChar { it.titlecase(Locale.ROOT) }
+        val sysLocale = getSystemDefaultLocale()
+        val langName = sysLocale.getDisplayLanguage(Locale.ENGLISH).replaceFirstChar { it.titlecase(Locale.ROOT) }
         return if (isSystemLanguageSupported()) {
             langName
         } else {
@@ -79,7 +98,11 @@ object LocaleHelper {
             } catch (_: Throwable) {}
 
             val targetLocale = getLocale(language)
-            Locale.setDefault(targetLocale)
+            if (language != Language.SYSTEM) {
+                Locale.setDefault(targetLocale)
+            } else {
+                Locale.setDefault(getSystemDefaultLocale())
+            }
 
             val resources = context.resources
             val config = Configuration(resources.configuration)
@@ -144,7 +167,11 @@ object LocaleHelper {
     fun updateContextLocale(context: Context, language: Language): Context {
         return try {
             val locale = getLocale(language)
-            Locale.setDefault(locale)
+            if (language != Language.SYSTEM) {
+                Locale.setDefault(locale)
+            } else {
+                Locale.setDefault(getSystemDefaultLocale())
+            }
 
             val config = Configuration(context.resources.configuration)
             config.setLocale(locale)
