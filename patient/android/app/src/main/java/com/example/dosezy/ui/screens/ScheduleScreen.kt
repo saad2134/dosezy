@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -111,9 +112,11 @@ fun ScheduleScreen(navController: NavController) {
                 }
 
                 // Date Header
+                val context = androidx.compose.ui.platform.LocalContext.current
+                val currentLocale = remember(context) { com.example.dosezy.utils.LocaleHelper.getCurrentLocale(context) }
                 Text(
                     text = selectedDate.format(
-                        DateTimeFormatter.ofPattern("MMMM d, yyyy")
+                        java.time.format.DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.LONG).withLocale(currentLocale)
                     ),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,

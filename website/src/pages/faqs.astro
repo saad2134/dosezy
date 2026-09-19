@@ -66,6 +66,19 @@ import Footer from '../components/Footer.astro';
 					</div>
 				</details>
 
+				<!-- Question: Time Zones & Travel -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>What happens when I travel across time zones?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4">
+						Dosezy automatically keeps your scheduled medication routine anchored to your daily local routine without time distortion. Your dose reminders shift seamlessly with your active timezone so you never need to manually recalibrate schedules while traveling.
+					</div>
+				</details>
+
 				<!-- Question 3: Grouped Alarms & Dynamic Snooze -->
 				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
 					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
@@ -124,6 +137,20 @@ import Footer from '../components/Footer.astro';
 					</div>
 				</details>
 
+				<!-- Question: Manually Record Past Dose Time -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>What if I took my medicine earlier but forgot to log it on time?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
+						<p>Dosezy lets you manually record your exact dose time. When confirming a dose later in the day, you can select the actual past time you took the medication rather than recording the current moment.</p>
+						<p>This ensures your daily adherence timeline, doctor reports, and analytics remain strictly accurate.</p>
+					</div>
+				</details>
+
 				<!-- Question 5: Completion Banner -->
 				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
 					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
@@ -174,7 +201,21 @@ import Footer from '../components/Footer.astro';
 						</svg>
 					</summary>
 					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4">
-						Instead of permanently deleting the medicine, open the medication and select <strong>Discontinue / Archive</strong>. The medicine will move to your Archived Medications list. All past compliance logs, adherence statistics, and calendar history are preserved permanently.
+						Instead of permanently deleting the medicine, open the medication and select <strong>Discontinue / Archive</strong>. The medicine moves to your <strong>Discontinued Medications</strong> section at the bottom of the Medicines screen in a collapsible accordion. All past compliance logs, adherence statistics, and calendar history are preserved permanently, and you can expand the section to reactivate it at any time.
+					</div>
+				</details>
+
+				<!-- Question: Bottom Navigation Customization -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>Can I customize the bottom navigation bar or hide the '+' button?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
+						<p>Yes! In <strong>Menu &gt; Preferences &gt; General</strong>, toggle on <strong>Hide Navigation Add Button</strong>.</p>
+						<p>The 4 main tabs (<em>Home</em>, <em>Schedule</em>, <em>Medicines</em>, <em>Menu</em>) expand symmetrically across the bar, and a convenient <strong>"Add Medicine"</strong> button appears directly below your active medications on the Medicines screen.</p>
 					</div>
 				</details>
 
@@ -202,8 +243,8 @@ import Footer from '../components/Footer.astro';
 					</summary>
 					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
 						<p>Open <strong>Menu &gt; Data Management &gt; Pharmacy Refill Order</strong> to quickly compile a formatted medication reorder list.</p>
-						<p>You can filter by <strong class="text-white">Low Stock Only</strong> (medicines at or below their refill warning threshold) or select <strong class="text-white">All Active</strong> medications. Choose your desired supply duration (<strong>15, 30, 60, or 90 Days</strong>) and Dosezy automatically calculates the required pill quantities based on daily frequencies and current stock.</p>
-						<p>Inspect the live formatted preview, then tap <strong class="text-emerald-400">Share via Chat</strong> to send directly to your pharmacist via WhatsApp, Telegram, or SMS, or tap <strong class="text-sky-400">Copy to Clipboard</strong> to paste into any app.</p>
+						<p>You can combine prescriptions for multiple family members into a single unified order or generate an order for an individual profile. Filter by <strong class="text-white">Low Stock Only</strong> (medicines at or below their refill warning threshold) or select <strong class="text-white">All Active</strong> medications.</p>
+						<p>Choose your desired supply duration (<strong>15, 30, 60, or 90 Days</strong>). For liquid medications and eye drops, Dosezy automatically computes orders in whole bottles rather than raw drops or milliliters. Inspect the live formatted preview, then tap <strong class="text-emerald-400">Share via Chat</strong> to send directly to your pharmacist via WhatsApp, Telegram, or SMS, or tap <strong class="text-sky-400">Copy to Clipboard</strong> to paste into any app.</p>
 					</div>
 				</details>
 

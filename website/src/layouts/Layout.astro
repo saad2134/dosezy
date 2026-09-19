@@ -5,12 +5,56 @@ import AiAssistantChat from '../components/AiAssistantChat.astro';
 interface Props {
 	title?: string;
 	description?: string;
+	keywords?: string;
 }
 
 const {
 	title = "Dosezy — Free, Open Source & Private Medicine Tracker",
-	description = "Dosezy transforms medication management into a simple, accessible, 100% private, offline-first experience. Features an accessible 12-Hour Grid Picker, localized emergency dialer, and zero network telemetry."
+	description = "Dosezy transforms medication management into a simple, accessible, 100% private, offline-first experience. Features an accessible 12-Hour Grid Picker, localized emergency dialer, and zero network telemetry.",
+	keywords = "medicine tracker, pill reminder, medication tracker, open source pill reminder, private medication app, dosezy, offline medicine tracker, elderly accessible medicine app"
 } = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || "https://dosezy.app");
+
+const schemaOrgData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "Dosezy",
+      "operatingSystem": "Android",
+      "applicationCategory": "HealthApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": description,
+      "url": "https://dosezy.app",
+      "image": "https://dosezy.app/dosezy_banner_rounded.png",
+      "screenshot": "https://dosezy.app/icon-squircle-1000px.png",
+      "author": {
+        "@type": "Person",
+        "name": "Saad",
+        "url": "https://github.com/saad2134"
+      }
+    },
+    {
+      "@type": "MedicalWebPage",
+      "name": title,
+      "description": description,
+      "url": canonicalURL.toString(),
+      "about": {
+        "@type": "MedicalCondition",
+        "name": "Prescription Medication Adherence & Schedule Tracking"
+      },
+      "audience": {
+        "@type": "Patient",
+        "audienceType": "Patients, Elderly Users, Caregivers"
+      }
+    }
+  ]
+};
 ---
 
 <!doctype html>
@@ -19,6 +63,9 @@ const {
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		
+		<!-- Canonical URL -->
+		<link rel="canonical" href={canonicalURL} />
+
 		<!-- Favicon using actual Dosezy Squircle Icon -->
 		<link rel="icon" type="image/png" href="/icon-squircle-1000px.png" />
 		<link rel="shortcut icon" type="image/png" href="/icon-squircle-1000px.png" />
@@ -30,18 +77,26 @@ const {
 		<title>{title}</title>
 		<meta name="title" content={title} />
 		<meta name="description" content={description} />
+		<meta name="keywords" content={keywords} />
 
 		<!-- Open Graph / Facebook -->
 		<meta property="og:type" content="website" />
+		<meta property="og:url" content={canonicalURL} />
+		<meta property="og:site_name" content="Dosezy" />
+		<meta property="og:locale" content="en_US" />
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
 		<meta property="og:image" content="/dosezy_banner_rounded.png" />
 
 		<!-- Twitter -->
 		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content={canonicalURL} />
 		<meta property="twitter:title" content={title} />
 		<meta property="twitter:description" content={description} />
 		<meta property="twitter:image" content="/dosezy_banner_rounded.png" />
+
+		<!-- Schema.org JSON-LD Structured Data -->
+		<script type="application/ld+json" set:html={JSON.stringify(schemaOrgData)} />
 
 		<!-- Google Fonts -->
 		<link rel="preconnect" href="https://fonts.googleapis.com">

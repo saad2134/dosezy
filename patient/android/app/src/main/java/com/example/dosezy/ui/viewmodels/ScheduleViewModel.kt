@@ -225,9 +225,9 @@ class ScheduleViewModel @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun getFormattedDate(): String {
+    fun getFormattedDate(locale: java.util.Locale = java.util.Locale.getDefault()): String {
         return selectedDate.value.format(
-            java.time.format.DateTimeFormatter.ofPattern("MMMM d, yyyy")
+            java.time.format.DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.LONG).withLocale(locale)
         )
     }
 }

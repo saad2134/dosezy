@@ -718,4 +718,8 @@
     <string name="about_feat_family_desc">إدارة أدوية الوالدين والأطفال مع حساب ذكي لزجاجات القطرات وطلبات الصيدلية.</string>
     <string name="about_feat_accessible_title">سهولة الاستخدام أولاً</string>
     <string name="about_feat_accessible_desc">نصوص واضحة وعناصر لمس كبيرة مصممة خصيصاً لكبار السن.</string>
+    <string name="notif_status_bg_allowed">يمكن للتطبيق العمل في الخلفية.</string>
+    <string name="notif_status_bg_restricted">قد تمنع قيود الخلفية ظهور الإشعارات.</string>
+    <string name="notif_status_dnd_enabled">تم تفعيل وضع عدم الإزعاج.</string>
+    <string name="notif_status_dnd_disabled">تم تعطيل وضع عدم الإزعاج.</string>
 </resources>

@@ -717,4 +717,8 @@ Deseja continuar?</string>
     <string name="about_feat_family_desc">Acompanhe remédios de familiares com cálculo inteligente de frascos de gotas.</string>
     <string name="about_feat_accessible_title">Acessibilidade em primeiro lugar</string>
     <string name="about_feat_accessible_desc">Visual com alto contraste e botões amplos projetados para idosos.</string>
+    <string name="notif_status_bg_allowed">O aplicativo pode ser executado em segundo plano.</string>
+    <string name="notif_status_bg_restricted">Restrições de segundo plano podem impedir notificações.</string>
+    <string name="notif_status_dnd_enabled">Não Perturbe está ativado.</string>
+    <string name="notif_status_dnd_disabled">Não Perturbe está desativado.</string>
 </resources>

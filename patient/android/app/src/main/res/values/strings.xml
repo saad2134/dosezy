@@ -746,4 +746,8 @@ Do you want to continue?</string>
     <string name="about_feat_family_desc">Manage medications for elderly parents, children, and pets with smart bottle calculations.</string>
     <string name="about_feat_accessible_title">Accessibility First</string>
     <string name="about_feat_accessible_desc">Large high-contrast visuals, tremor-friendly touch targets, and clear navigation.</string>
+    <string name="notif_status_bg_allowed">App can run in background.</string>
+    <string name="notif_status_bg_restricted">Background restrictions may prevent notifications.</string>
+    <string name="notif_status_dnd_enabled">Do Not Disturb is enabled.</string>
+    <string name="notif_status_dnd_disabled">Do Not Disturb is disabled.</string>
 </resources>

@@ -4,7 +4,7 @@ Welcome to the **Dosezy FAQ**! Here you will find clear, easy-to-understand answ
 
 ---
 
-## 🌟 Getting Started & Privacy
+## 🌟 Getting Started, Privacy & Travel
 
 ### What is Dosezy?
 Dosezy is a simple, friendly, and smart medication reminder app designed for everyday use. It helps you, your family members, and caregivers manage daily medicines, set alarms, track tablet stock, monitor adherence, and ensure no dose is ever forgotten.
@@ -17,6 +17,9 @@ Yes! Dosezy includes full native translations in **12 languages**:
 - 🇬🇧 English, 🇪🇸 Spanish (Español), 🇮🇳 Hindi (हिन्दी), 🇨🇳 Chinese (中文), 🇵🇹 Portuguese (Português), 🇸🇦 Arabic (العربية), 🇫🇷 French (Français), 🇩🇪 German (Deutsch), 🇯🇵 Japanese (日本語), 🇷🇺 Russian (Русский), 🇮🇹 Italian (Italiano), and 🇧🇩 Bengali (বাংলা).
 
 The app automatically opens in your phone's system language, and you can change languages anytime in **Menu > Preferences > General > Language**.
+
+### What happens when I travel across time zones?
+Dosezy automatically keeps your scheduled medication routine anchored to your daily local routine without time distortion. Your dose reminders shift seamlessly with your active timezone so you never need to manually recalibrate schedules while traveling.
 
 ---
 
@@ -38,7 +41,10 @@ The app automatically opens in your phone's system language, and you can change 
 On the **Medicines** screen, use the search bar at the top. Simply type the name of your medication or instructions to instantly filter your roster in real-time. If no items match, tap "Clear search" to reset the list.
 
 ### What should I do when a doctor stops or changes my prescription?
-Rather than deleting the medicine and losing past compliance history, open the medication from the Medicines screen, tap **Edit**, and select **Discontinue / Archive**. This moves the medicine to your **Archived Medications** section. Past calendar logs and adherence analytics remain completely intact, and you can reactivate the medication at any time if prescribed again.
+Rather than deleting the medicine and losing past compliance history, open the medication from the Medicines screen, tap **Edit**, and select **Discontinue / Archive**. This moves the medicine to your **Discontinued Medications** section at the bottom of the Medicines screen, neatly organized in an expandable and collapsible accordion. Past calendar logs and adherence analytics remain completely intact, and you can expand the section to reactivate any medication at any time.
+
+### Can I customize the bottom navigation bar or hide the '+' button?
+Yes! In **Menu > Preferences > General**, turn on **Hide Navigation Add Button**. The 4 main tabs (`Home`, `Schedule`, `Medicines`, `Menu`) expand symmetrically across the bar (25% width each), and a convenient **"Add Medicine"** button appears cleanly directly below your active medications on the Medicines screen.
 
 ---
 
@@ -64,7 +70,10 @@ Yes! In **Menu > Preferences > Notifications & Alarms > Default Snooze Duration*
 
 ---
 
-## 📝 Clinical Dose Skipping & Intake Undo
+## 📝 Clinical Dose Skipping, Intake Undo & Past Dose Logging
+
+### What if I took my medicine earlier but forgot to log it?
+Dosezy allows you to manually record your exact dose time. When confirming a dose later in the day, you can select the actual past time you consumed the medication instead of recording the current moment. This keeps your daily timeline and compliance records strictly accurate.
 
 ### Can I skip a dose if I am unwell, fasting, or advised by my doctor?
 Yes! Dosezy provides an opt-in **Clinical Dose Skipping** feature:
@@ -116,10 +125,12 @@ When adding or editing a medicine:
 ### Can I compile and send prescription refill orders to my pharmacy?
 Yes! Dosezy includes a built-in **Pharmacy Refill Order Generator**:
 1. Open the **Menu** tab and select **Pharmacy Refill Order** under Data Management.
-2. Filter by **Low Stock Only** (prescriptions at or under warning threshold) or **All Active** medications.
-3. Select your desired supply duration (**15 Days**, **30 Days**, **60 Days**, or **90 Days**). Dosezy automatically calculates required quantities based on daily dose frequencies and current inventory.
-4. Review the formatted checklist in the live preview box.
-5. Tap **Share via Chat** to instantly send the formatted order to your pharmacist via WhatsApp, Telegram, or SMS, or tap **Copy to Clipboard** to paste it anywhere.
+2. **Multi-Profile Family Consolidation**: Combine prescriptions for multiple family members into a single unified refill order, or generate an order for an individual profile.
+3. Filter by **Low Stock Only** (prescriptions at or under warning threshold) or **All Active** medications.
+4. Select your desired supply duration (**15 Days**, **30 Days**, **60 Days**, or **90 Days**).
+5. **Smart Bottle Supply**: For liquids and eye drops, Dosezy automatically computes orders in whole bottles rather than raw drops or milliliters, accounting for standard bottle volumes.
+6. Review the formatted checklist in the live preview box with clean WhatsApp markdown formatting.
+7. Tap **Share via Chat** to instantly send the formatted order to your pharmacist via WhatsApp, Telegram, or SMS, or tap **Copy to Clipboard** to paste it anywhere.
 
 ---
 
@@ -149,7 +160,8 @@ Go to **Menu > Analytics**. You will see your overall adherence percentage ring 
 ## 👨‍👩‍👧 Family Profiles, Backups & Doctor Reports
 
 ### Can I manage medicines for multiple family members?
-Yes! Tap **Menu > Switch Profile** to create separate profiles for parents, children, or partners. Each profile tracks its own medicines, dosages, stock counts, personal emergency contacts, and compliance logs completely independently. Single-profile accounts are protected against accidental deletion.
+Yes! Tap **Menu > Switch Profile** to create separate profiles for parents, children, or partners. Each profile tracks its own medicines, dosages, stock counts, personal emergency contacts, and compliance logs completely independently.
+- **Accidental Deletion Safeguards**: Single-profile accounts cannot delete their only profile. Deleting secondary profiles requires a deliberate **5-second safety countdown** before the confirmation button activates, preventing accidental loss of medical records.
 
 ### How do I back up my data or transfer it to a new phone?
 1. Go to **Menu > Backup & Restore**.

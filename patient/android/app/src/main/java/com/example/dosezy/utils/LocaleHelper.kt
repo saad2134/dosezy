@@ -64,6 +64,10 @@ object LocaleHelper {
         }
     }
 
+    fun getCurrentLocale(context: Context): Locale {
+        return getLocale(getSavedLanguage(context))
+    }
+
     fun applyLanguage(context: Context, language: Language, forceRecreate: Boolean = false) {
         try {
             // Persist selection so attachBaseContext uses it on subsequent launches

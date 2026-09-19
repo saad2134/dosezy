@@ -116,9 +116,9 @@ object NotificationUtils {
     fun getBackgroundPermissionStatus(context: Context): String {
         val isIgnoring = isIgnoringBatteryOptimizations(context)
         return if (isIgnoring) {
-            "App can run in background."
+            context.getString(R.string.notif_status_bg_allowed)
         } else {
-            "Background restrictions may prevent notifications."
+            context.getString(R.string.notif_status_bg_restricted)
         }
     }
 
@@ -255,9 +255,9 @@ object NotificationUtils {
      */
     fun getDoNotDisturbStatus(context: Context): String {
         return if (isDoNotDisturbEnabled(context)) {
-            "Do Not Disturb is enabled."
+            context.getString(R.string.notif_status_dnd_enabled)
         } else {
-            "Do Not Disturb is disabled."
+            context.getString(R.string.notif_status_dnd_disabled)
         }
     }
 

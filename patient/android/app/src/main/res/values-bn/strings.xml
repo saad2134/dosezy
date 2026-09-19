@@ -714,4 +714,11 @@
     <string name="about_feat_family_desc">পরিবারের সদস্যদের ওষুধ ট্র্যাক করুন এবং ড্রপের বোতল গণনা সহজে পরিচালনা করুন।</string>
     <string name="about_feat_accessible_title">সহজ ব্যবহারযোগ্যতা</string>
     <string name="about_feat_accessible_desc">বড় ফন্ট এবং সহজে স্পর্শযোগ্য বোতাম যা প্রবীণদের জন্য আদর্শ।</string>
+    <string name="notif_status_bg_allowed">অ্যাপটি ব্যাকগ্রাউন্ডে চলতে পারে।</string>
+    <string name="notif_status_bg_restricted">ব্যাকগ্রাউন্ড বিধিনিষেধ বিজ্ঞপ্তিতে বাধা দিতে পারে।</string>
+    <string name="notif_status_dnd_enabled">বিরক্ত করবেন না মোড চালু আছে।</string>
+    <string name="notif_status_dnd_disabled">বিরক্ত করবেন না মোড বন্ধ আছে।</string>
+    <string name="alarm_sound_custom">কাস্টম অডিও ফাইল</string>
+    <string name="alarm_sound_select_file">অডিও ফাইল নির্বাচন করুন</string>
+    <string name="alarm_sound_no_file_selected">কোনো ফাইল নির্বাচিত হয়নি</string>
 </resources>

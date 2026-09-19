@@ -366,7 +366,7 @@ components:
 
     FrequencyPattern:
       type: string
-      enum: [DAILY, WEEKLY, MONTHLY, CUSTOM]
+      enum: [DAILY, WEEKLY, MONTHLY, AS_NEEDED, EVERY_X_HOURS, EVERY_X_DAYS, CUSTOM]
 
     Frequency:
       type: object
@@ -397,10 +397,26 @@ components:
           items:
             type: integer
           example: [1, 15, 30]
+        intervalHours:
+          type: integer
+          nullable: true
+          description: Hourly interval for EVERY_X_HOURS pattern
+          example: 6
+        intervalDays:
+          type: integer
+          nullable: true
+          description: Day interval for EVERY_X_DAYS pattern
+          example: 2
 
     MedicationStatus:
       type: string
-      enum: [PENDING, TAKEN_ON_TIME, TAKEN_LATE, MISSED]
+      enum: [PENDING, TAKEN_ON_TIME, TAKEN_LATE, MISSED, SKIPPED]
+
+    PillShape:
+      type: string
+      enum: [ROUND, CAPSULE, OVAL, LIQUID, INHALER, INJECTION, DROPS, PATCH]
+      default: ROUND
+      example: ROUND
 
     User:
       type: object
@@ -455,6 +471,16 @@ components:
           description: Snooze duration in minutes (options 5, 10, 15, 20, 30)
           default: 10
           example: 10
+        allergies:
+          type: string
+          nullable: true
+          description: Known patient drug or substance allergies
+          example: Penicillin, Sulfa drugs
+        medicalConditions:
+          type: string
+          nullable: true
+          description: Diagnosed medical conditions or comorbidities
+          example: Hypertension, Type 2 Diabetes
 
     UserCreateInput:
       type: object
@@ -490,6 +516,14 @@ components:
           type: integer
         snoozeDuration:
           type: integer
+        allergies:
+          type: string
+          nullable: true
+          example: Penicillin
+        medicalConditions:
+          type: string
+          nullable: true
+          example: Asthma
 
     Medicine:
       type: object
@@ -531,6 +565,39 @@ components:
         imageUri:
           type: string
           nullable: true
+        pillShape:
+          $ref: '#/components/schemas/PillShape'
+        pillColor:
+          type: string
+          description: Hex representation of medicine visual color
+          example: '#1193D4'
+        startDate:
+          type: string
+          format: date
+          nullable: true
+          description: Start date of medication course (YYYY-MM-DD)
+          example: '2026-09-01'
+        endDate:
+          type: string
+          format: date
+          nullable: true
+          description: End date of medication course (YYYY-MM-DD)
+          example: '2026-09-30'
+        durationDays:
+          type: integer
+          nullable: true
+          description: Total duration of prescription in days
+          example: 30
+        isArchived:
+          type: boolean
+          description: Whether medication has been discontinued/archived
+          default: false
+          example: false
+        notes:
+          type: string
+          nullable: true
+          description: Clinical or patient instructions
+          example: Take with food or a full glass of water
         currentStock:
           type: integer
           nullable: true
@@ -579,6 +646,32 @@ components:
         imageUri:
           type: string
           nullable: true
+        pillShape:
+          $ref: '#/components/schemas/PillShape'
+        pillColor:
+          type: string
+          example: '#1193D4'
+        startDate:
+          type: string
+          format: date
+          nullable: true
+          example: '2026-09-01'
+        endDate:
+          type: string
+          format: date
+          nullable: true
+          example: '2026-09-30'
+        durationDays:
+          type: integer
+          nullable: true
+          example: 30
+        isArchived:
+          type: boolean
+          default: false
+        notes:
+          type: string
+          nullable: true
+          example: Take with food
         currentStock:
           type: integer
           nullable: true
@@ -619,6 +712,11 @@ components:
           type: string
           format: date-time
           nullable: true
+        skipReason:
+          type: string
+          nullable: true
+          description: Reason why dose was marked skipped
+          example: Doctor advised to pause
 
     ScheduleEntryInput:
       type: object
@@ -638,6 +736,10 @@ components:
           type: string
           format: date-time
           nullable: true
+        skipReason:
+          type: string
+          nullable: true
+          example: Fasting for lab test
 
     SyncPushRequest:
       type: object

@@ -302,9 +302,11 @@ import Footer from '../components/Footer.astro';
 						</div>
 
 						<div class="bg-[#030407] p-4 rounded-2xl border border-white/10 text-xs text-neutral-300 space-y-2 mt-3">
-							<h4 class="font-bold text-white uppercase font-mono text-[10px] tracking-wider text-sky-400">Intake Undo & Daily Completion:</h4>
+							<h4 class="font-bold text-white uppercase font-mono text-[10px] tracking-wider text-sky-400">Intake Undo, Manual Time & Time Zones:</h4>
 							<ul class="list-disc list-inside space-y-1.5 text-neutral-300">
 								<li><strong class="text-white">Instant Undo Action:</strong> Marking a dose taken or skipped displays a 5-second "Undo" snackbar. In addition, dose cards retain an active "Undo" button to safely revert status back to Pending and restore deducted stock.</li>
+								<li><strong class="text-white">Manually Record Dose Time:</strong> If you took a medication earlier, select the exact past time you consumed it rather than the current moment, ensuring adherence logs remain strictly accurate.</li>
+								<li><strong class="text-white">Crossing Time Zones:</strong> When traveling across time zones, dose reminders shift seamlessly with your local daily routine without manual recalibration.</li>
 								<li><strong class="text-white">Celebratory Completion Banner:</strong> When all doses for today are completed, a cheerful banner appears at the top while keeping today's full schedule visible underneath for continuous review.</li>
 							</ul>
 						</div>
@@ -344,7 +346,8 @@ import Footer from '../components/Footer.astro';
 
 							<div class="bg-[#030407] p-3.5 rounded-2xl border border-white/10 space-y-1.5 mt-2">
 								<p><strong class="text-sky-300">Live Search & Filter:</strong> Use the top search bar on the Medicines screen to instantly filter pills by name or instructions in real time.</p>
-								<p><strong class="text-sky-300">Discontinue & Archive:</strong> When a course finishes, tap <em>Edit &gt; Discontinue</em> to safely archive the pill while keeping all past adherence history intact.</p>
+								<p><strong class="text-sky-300">Discontinue & Archive Accordion:</strong> When a course finishes, tap <em>Edit &gt; Discontinue</em>. The medicine moves to a collapsible accordion at the bottom of your Medicines screen, keeping your active list clutter-free while preserving all past logs and reports.</p>
+								<p><strong class="text-sky-300">Flexible Add Button:</strong> When the bottom navigation '+' button is hidden in Preferences, an "Add Medicine" button appears conveniently below your active medications roster.</p>
 							</div>
 						</div>
 					</article>
@@ -433,8 +436,9 @@ import Footer from '../components/Footer.astro';
 								Under <strong class="text-white">Menu &gt; Data Management &gt; Pharmacy Refill Order</strong>, compile clean prescription refill orders:
 							</p>
 							<ul class="list-disc list-inside space-y-1 text-neutral-300 text-[11px]">
+								<li><strong class="text-white">Multi-Profile Consolidation:</strong> Combine prescription refills for multiple family members into a single unified order, or generate an order for an individual profile.</li>
 								<li><strong class="text-white">Filter Modes:</strong> Select <strong class="text-white">Low Stock Only</strong> (items needing replenishment) or <strong class="text-white">All Active</strong> medications.</li>
-								<li><strong class="text-white">Supply Durations:</strong> Choose 15, 30, 60, or 90 days. Dosezy automatically calculates estimated quantities from daily dosing rules and remaining stock.</li>
+								<li><strong class="text-white">Supply Durations &amp; Smart Bottles:</strong> Choose 15, 30, 60, or 90 days. For liquid medicines and eye drops, Dosezy automatically calculates whole bottles needed rather than raw drops or milliliters.</li>
 								<li><strong class="text-white">Share via Chat &amp; Copy:</strong> Preview the formatted WhatsApp markdown text, then tap <strong class="text-white">Share via Chat</strong> or copy to clipboard in 1 tap.</li>
 							</ul>
 						</div>
@@ -516,7 +520,7 @@ import Footer from '../components/Footer.astro';
 						<div class="bg-[#030407] p-4 rounded-2xl border border-white/10 text-xs text-neutral-300 space-y-2">
 							<p>Preferences are organized into clean, focused sections in <strong class="text-white">Menu &gt; Preferences</strong>:</p>
 							<ul class="list-disc list-inside space-y-1.5 text-neutral-300">
-								<li><strong class="text-white">General:</strong> App language (12 languages), Light/Dark theme, and 12h/24h time format.</li>
+								<li><strong class="text-white">General:</strong> App language (12 languages), Light/Dark theme, 12h/24h time format, and <em>Hide Navigation Add Button</em> (hides the center '+' button for a symmetrical 4-tab bar and places an "Add Medicine" button on the Medicines screen).</li>
 								<li><strong class="text-white">Notifications &amp; Alarms:</strong> Default snooze interval (5–30 min), custom ringtone selection, volume slider, and alarm sound duration (30s–5m/loop).</li>
 								<li><strong class="text-white">Dose Tracking:</strong> Adjust <em>Consider Late After</em> (1h–3h) and <em>Consider Missed After</em> (3h–9h) windows.</li>
 								<li><strong class="text-white">Allow Dose Skipping:</strong> Opt-in toggle to enable the secondary "Skip" button on dose cards and alarm screens. Requires choosing a mandatory clinical reason (doctor advised, adverse reaction, fasting, illness, or out of stock) without penalizing your adherence streak.</li>
@@ -578,6 +582,9 @@ import Footer from '../components/Footer.astro';
 
 						<p class="text-xs text-neutral-300 leading-relaxed">
 							Tap <strong class="text-white">Menu &gt; Switch Profile</strong> to create independent profiles for family members. Each profile keeps its own schedule, medicine list, stock counts, and compliance logs completely separate.
+						</p>
+						<p class="text-xs text-neutral-300 leading-relaxed">
+							<strong class="text-white">Deletion Safeguards:</strong> Single-profile accounts cannot delete their only profile. Removing secondary profiles requires a deliberate <strong>5-second safety countdown</strong> before the confirmation button activates, preventing accidental loss of medical records.
 						</p>
 					</article>
 

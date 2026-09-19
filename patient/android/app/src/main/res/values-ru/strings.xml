@@ -718,4 +718,8 @@
     <string name="about_feat_family_desc">Управляйте лекарствами близких с умным расчётом флаконов для капель.</string>
     <string name="about_feat_accessible_title">Доступность превыше всего</string>
     <string name="about_feat_accessible_desc">Крупные контрастные элементы для комфортного использования пожилыми людьми.</string>
+    <string name="notif_status_bg_allowed">Приложение может работать в фоновом режиме.</string>
+    <string name="notif_status_bg_restricted">Фоновые ограничения могут препятствовать показу уведомлений.</string>
+    <string name="notif_status_dnd_enabled">Режим «Не беспокоить» включен.</string>
+    <string name="notif_status_dnd_disabled">Режим «Не беспокоить» отключен.</string>
 </resources>

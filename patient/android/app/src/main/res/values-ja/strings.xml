@@ -718,4 +718,8 @@
     <string name="about_feat_family_desc">点眼薬のボトル換算や薬局注文も含め、ご家族全員の服薬をまとめて管理。</string>
     <string name="about_feat_accessible_title">アクセシビリティ最優先</string>
     <string name="about_feat_accessible_desc">シニアの方でも見やすい大きな文字と押しやすい操作ボタン。</string>
+    <string name="notif_status_bg_allowed">アプリはバックグラウンドで実行できます。</string>
+    <string name="notif_status_bg_restricted">バックグラウンド制限により通知が届かない場合があります。</string>
+    <string name="notif_status_dnd_enabled">マナーモード（サイレント）が有効です。</string>
+    <string name="notif_status_dnd_disabled">マナーモード（サイレント）は無効です。</string>
 </resources>

@@ -76,13 +76,15 @@ Dosezy transforms daily medication management into a stress-free experience. Inp
 - 🛒 **Dosezy Pharmacy Refill Order** – Instantly compile formatted prescription refill orders for 15, 30, 60, or 90 days from active inventory or low-stock filters with multi-profile consolidation and smart bottle supply calculations for eye drops. Preview your order with live WhatsApp markdown formatting, then tap to Share via Chat or copy to clipboard.
 - 🕒 **Manually Record Dose Time** – Easily record the actual time you took medications when logging doses later to maintain accurate adherence histories.
 - 🌐 **Crossing Time Zones (Doses Shift With You)** – Traveling across time zones? Dosezy automatically keeps your reminders anchored to your local daily routine without time distortion.
+- 🧭 **Customizable Bottom Navigation** – Toggle to hide the central '+' button for a clean, symmetrical 4-tab layout, placing an "Add Medicine" button directly below active medications on the Medicines screen.
 - ↩️ **Instant Intake Undo** – Made a mistake? Reverse accidental dose logging immediately using the 5-second action snackbar or the persistent Undo button on dose cards, automatically returning deducted tablets to stock.
 - 📝 **Clinical Dose Skipping** – Safely pause doses with required clinical explanations (*Doctor advised pause*, *Adverse reaction*, *Fasting*, *Illness*, *Ran out of medicine*) without penalizing your adherence streak.
 - 🕒 **12-First Grid Time Picker** – Visual, tremor-friendly grid time selector that places 12 at the top for natural morning/night scheduling, avoiding frustrating circular clock dials.
 - 📅 **Interactive Schedule Calendar** – Day, week, and month calendar views with color-coded compliance dots (taken, late, missed, skipped) and full TalkBack screen reader accessibility for visually impaired users.
 - 📊 **Adherence Analytics & Compliance Scores** – Multi-ring progress tracking across Today, 7 Days, 30 Days, 90 Days, and All-Time, plus individual medication compliance rates to keep you and your doctor informed.
 - 🔍 **Real-Time Medicine Search** – Rapidly find and filter prescriptions in large medicine rosters by name or instruction with instant empty-state guidance.
-- 👥 **Multi-Family Profiles** – Manage medications for parents, children, or partners on one device. Each profile keeps separate medicines, schedules, stock counts, and emergency contacts with safe deletion guards.
+- 💊 **Discontinued Medications Archive** – Neatly archives stopped medications into an expandable accordion at the bottom of the Medicines screen, preserving all past adherence history while keeping active prescriptions clutter-free.
+- 👥 **Multi-Family Profiles** – Manage medications for parents, children, or partners on one device with separate medicines, schedules, stock counts, personal emergency contacts, and 5-second deletion countdown safeguards.
 - 📄 **Doctor PDF Reports & Data Exports** – Generate clean, print-ready adherence summary reports for medical appointments, or export JSON backups and CSV spreadsheets anytime.
 - 🔒 **Full Encrypted ZIP Backups & Selective Restore** – Export complete encrypted archives. Restore individual profiles with intelligent conflict resolution (Merge Data, Overwrite, or Create New Profile).
 - 🚨 **Emergency Services & Personal Contacts** – 1-tap dialing for national emergency numbers across 10 regions (auto-detected via SIM/locale), plus dedicated personal doctor and family emergency contacts per profile.
@@ -195,7 +197,7 @@ dosezy/
 │   └── UserManual.md
 ├── scripts/                  # Code generation, release packaging, and translation sync automation
 ├── server/                   # Open-source self-hostable sync server (PostgreSQL + REST API)
-├── website/                  # Next.js marketing and landing page web app (React 19 & Tailwind CSS v4)
+├── website/                  # Astro marketing and documentation web app (Astro, TypeScript & Tailwind CSS)
 ├── CONTRIBUTING.md           # Contribution guidelines and coding standards
 ├── LICENSE                   # Open-source MIT License
 └── README.md                 # Master project documentation
@@ -215,18 +217,11 @@ dosezy/
   </thead>
   <tbody>
     <tr>
-      <td><strong>v1.0 – v2.3</strong></td>
-      <td><strong>Local-First Android Client</strong></td>
-      <td>Core Medication Adherence</td>
-      <td>Jetpack Compose UI, 12 native localizations, Room offline database, customizable late/missed thresholds, full-screen alarms, emergency dialer, zero account barrier.</td>
-      <td align="center">🟢 Released</td>
-    </tr>
-    <tr>
-      <td><strong>v2.5</strong></td>
-      <td><strong>Domain & API Contract</strong></td>
-      <td>Schema & Boundary Decoupling</td>
-      <td>Canonical domain models (<code>Medication</code>, <code>Schedule</code>, <code>DoseEvent</code>), <code>api/openapi.yaml</code> OpenAPI 3.0 specification, multi-platform client generation.</td>
-      <td align="center">🟡 In Design</td>
+      <td><strong>v1.0 – v2.5</strong></td>
+      <td><strong>Local-First Android Client & Schema Parity</strong></td>
+      <td>Core Adherence & Ecosystem Parity</td>
+      <td>Jetpack Compose UI, 12 native localizations, Room offline database v13, time zone travel, manual dose recording, pharmacy refill orders with smart bottle supplies, full-screen alarms, emergency dialer, shared OpenAPI 3.0 contract.</td>
+      <td align="center">🟢 Released (v2.5.2)</td>
     </tr>
     <tr>
       <td><strong>v3.0 – v3.9</strong></td>
@@ -354,7 +349,7 @@ Developed and published by **Saad (@saad2134)**.
 
 ## 🏷 Tags  
 
-`android` `ios` `swiftui` `jetpack-compose` `kotlin` `open-source` `local-first` `offline-first` `medicine-reminder` `medicine-management` `medication-adherence` `caregiver` `elderly-care` `health-tech` `self-hosted` `dosezy` `nextjs`
+`android` `ios` `swiftui` `jetpack-compose` `kotlin` `open-source` `local-first` `offline-first` `medicine-reminder` `medicine-management` `medication-adherence` `caregiver` `elderly-care` `health-tech` `self-hosted` `dosezy` `astro`
 
 ---
 

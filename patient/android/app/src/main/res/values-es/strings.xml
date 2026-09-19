@@ -734,4 +734,8 @@
     <string name="about_feat_family_desc">Gestiona medicamentos para familiares con cálculo inteligente de frascos de gotas.</string>
     <string name="about_feat_accessible_title">Accesibilidad ante todo</string>
     <string name="about_feat_accessible_desc">Botones grandes de alto contraste pensados para personas mayores.</string>
+    <string name="notif_status_bg_allowed">La aplicación puede ejecutarse en segundo plano.</string>
+    <string name="notif_status_bg_restricted">Las restricciones en segundo plano pueden impedir las notificaciones.</string>
+    <string name="notif_status_dnd_enabled">No molestar está activado.</string>
+    <string name="notif_status_dnd_disabled">No molestar está desactivado.</string>
 </resources>

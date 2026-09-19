@@ -718,4 +718,8 @@ Möchten Sie fortfahren?</string>
     <string name="about_feat_family_desc">Verwalten Sie Medikamente für Angehörige mit intelligenter Flaschenberechnung für Tropfen.</string>
     <string name="about_feat_accessible_title">Barrierefreiheit im Fokus</string>
     <string name="about_feat_accessible_desc">Große Schaltflächen und hoher Kontrast für einfache Bedienung durch Senioren.</string>
+    <string name="notif_status_bg_allowed">App kann im Hintergrund ausgeführt werden.</string>
+    <string name="notif_status_bg_restricted">Hintergrundeinschränkungen können Benachrichtigungen verhindern.</string>
+    <string name="notif_status_dnd_enabled">Bitte nicht stören ist aktiviert.</string>
+    <string name="notif_status_dnd_disabled">Bitte nicht stören ist deaktiviert.</string>
 </resources>

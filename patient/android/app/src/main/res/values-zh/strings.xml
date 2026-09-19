@@ -734,4 +734,8 @@
     <string name="about_feat_family_desc">轻松管理父母与家人的用药，支持眼药水滴剂智能折算瓶数与药房备药清单。</string>
     <string name="about_feat_accessible_title">无障碍关怀设计</string>
     <string name="about_feat_accessible_desc">大字体、高对比度与易于触控的大按钮，专为长辈贴心优化。</string>
+    <string name="notif_status_bg_allowed">应用可以在后台运行。</string>
+    <string name="notif_status_bg_restricted">后台运行限制可能会影响通知接收。</string>
+    <string name="notif_status_dnd_enabled">勿扰模式已开启。</string>
+    <string name="notif_status_dnd_disabled">勿扰模式已关闭。</string>
 </resources>

@@ -718,4 +718,8 @@ Voulez-vous continuer ?</string>
     <string name="about_feat_family_desc">Gérez les traitements de vos proches avec calcul intelligent des flacons de gouttes.</string>
     <string name="about_feat_accessible_title">Accessibilité avant tout</string>
     <string name="about_feat_accessible_desc">Grands boutons bien contrastés conçus spécialement pour les personnes âgées.</string>
+    <string name="notif_status_bg_allowed">L\'application peut fonctionner en arrière-plan.</string>
+    <string name="notif_status_bg_restricted">Les restrictions en arrière-plan peuvent bloquer les notifications.</string>
+    <string name="notif_status_dnd_enabled">Le mode Ne pas déranger est activé.</string>
+    <string name="notif_status_dnd_disabled">Le mode Ne pas déranger est désactivé.</string>
 </resources>

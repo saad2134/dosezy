@@ -734,4 +734,8 @@
     <string name="about_feat_family_desc">परिवार के सदस्यों की दवाएं संभालें और ड्रॉप्स के लिए बोतल की सही गणना पाएं।</string>
     <string name="about_feat_accessible_title">सुलभता सर्वोपरि</string>
     <string name="about_feat_accessible_desc">बुजुर्गों के लिए बड़े स्पष्ट अक्षर और छूने में आसान बड़े बटन।</string>
+    <string name="notif_status_bg_allowed">ऐप बैकग्राउंड में चल सकता है।</string>
+    <string name="notif_status_bg_restricted">बैकग्राउंड प्रतिबंध सूचनाओं को रोक सकते हैं।</string>
+    <string name="notif_status_dnd_enabled">डू नॉट डिस्टर्ब (DND) सक्षम है।</string>
+    <string name="notif_status_dnd_disabled">डू नॉट डिस्टर्ब (DND) अक्षम है।</string>
 </resources>

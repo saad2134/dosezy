@@ -93,6 +93,16 @@ If you tap "Take" or "Mark Late" by mistake:
 2. Even after the snackbar disappears, the medication card remains interactive with an active **"Undo"** button.
 3. Tapping Undo instantly rolls back the dose status to **Pending** and safely returns deducted tablet counts back into your stock inventory.
 
+### Manually Record Dose Time:
+If you took a medication earlier but forgot to mark it on time, you can record the exact past time you took the dose:
+1. When logging a dose, select or enter the exact time the medication was consumed.
+2. Dosezy logs your specified intake time rather than just the current moment, ensuring your adherence timeline and medical compliance history remain strictly accurate.
+
+### Crossing Time Zones (Doses Shift With You):
+When traveling across time zones:
+- Dosezy automatically keeps your scheduled medication routine anchored to your daily local routine without time distortion.
+- Reminders shift seamlessly with your active timezone so you never have to manually recalibrate schedules while traveling.
+
 ---
 
 ## 3. Clinical Dose Skipping & Mandatory Reason Logging
@@ -173,7 +183,10 @@ Tap any dose time chip to open the intuitive time picker:
 When a treatment course finishes:
 1. Open the medication from the Medicines screen and tap **Edit**.
 2. Tap **Discontinue / Archive**.
-3. The medicine moves to your **Archived Medications** roster. Its past calendar logs, historical compliance rates, and doctor reports are preserved permanently. You can reactivate it at any time.
+3. The medicine moves to your **Discontinued Medications** section at the bottom of the Medicines screen. It is neatly organized within an expandable and collapsible accordion so active medications remain clutter-free. Its past calendar logs, historical compliance rates, and doctor reports are preserved permanently. You can expand the section and reactivate any medication at any time.
+
+### Flexible Add Medicine Placement:
+When the navigation '+' button is hidden via Preferences, an **"Add Medicine"** button appears cleanly directly below your active medications roster (and above the Discontinued Medications section). On an empty roster, the friendly initial "Add Your First Medication" button guides you.
 
 ### Form Validation Feedback & Confirmation:
 When adding or editing a medication, Dosezy highlights missing fields in red with clear guidance. Saving a medication confirms success with a brief on-screen confirmation toast.
@@ -241,14 +254,16 @@ Dosezy includes automatic inventory management and prescription refill order gen
 When you need to reorder medicines from your local pharmacy or doctor:
 1. Tap the **Menu** tab at the bottom right.
 2. Under the **Data Management** section, tap **Pharmacy Refill Order**.
-3. Choose your filter:
+3. **Multi-Profile Family Consolidation**: Combine prescriptions for multiple family members into a single unified refill order, or generate an order for a single profile.
+4. Choose your filter:
    - **Low Stock Only**: Quickly displays only medications currently at or below their refill warning threshold.
    - **All Active**: Displays all currently active prescriptions in your profile.
-4. Select your **Supply Duration**:
-   - Choose `15 Days`, `30 Days`, `60 Days`, or `90 Days`. Dosezy automatically calculates the required quantity based on daily intake frequencies and current stock.
-5. Review individual medications using checkboxes, or tap **Select All / Deselect All**.
-6. **Live Preview**: Check the formatted prescription order in the preview box (includes patient name, date, required supplies, current stock, and dosage instructions).
-7. Tap **Share via Chat** to instantly send the order via WhatsApp, Telegram, SMS, or any installed messaging app, or tap **Copy to Clipboard** to paste it anywhere.
+5. Select your **Supply Duration**:
+   - Choose `15 Days`, `30 Days`, `60 Days`, or `90 Days`.
+   - **Smart Bottle Supply**: For liquid medications and eye drops, Dosezy automatically computes orders in whole bottles rather than raw drops or milliliters, accounting for standard bottle volumes.
+6. Review individual medications using checkboxes, or tap **Select All / Deselect All**.
+7. **Live Preview**: Check the formatted prescription order in the preview box with clean WhatsApp markdown formatting (patient name, date, required supplies, current stock, and dosage instructions).
+8. Tap **Share via Chat** to instantly send the order via WhatsApp, Telegram, SMS, or any installed messaging app, or tap **Copy to Clipboard** to paste it anywhere.
 
 ---
 
@@ -280,7 +295,11 @@ Tap **Analytics** from the Menu to view comprehensive compliance charts:
 ## 11. Structured Preferences & Dose Tracking Settings
 
 The **Preferences** screen is organized into dedicated categories:
-- **General**: Language selection (12 languages), Theme (System/Light/Dark), Time Format (12h/24h).
+- **General**:
+  - **Language**: Selection across 12 languages.
+  - **Theme**: System Default, Light Mode, or Dark Mode.
+  - **Time Format**: 12-Hour (AM/PM) or 24-Hour.
+  - **Hide Navigation Add Button**: Toggle to hide the center '+' button from the bottom navigation bar. When enabled, the remaining 4 tabs (`Home`, `Schedule`, `Medicines`, `Menu`) expand symmetrically across the bar (25% each), and an "Add Medicine" button is cleanly placed on the Medicines screen below your active prescriptions.
 - **Notifications & Alarms**: Default Snooze Duration (5–30 min), Custom Ringtone, Sound Volume, Alarm Duration (30s to 5m/loop).
 - **Dose Tracking**:
   - **Allow Dose Skipping**: Toggle the clinical dose skipping option.
@@ -320,7 +339,9 @@ Manage medications for your whole household on a single phone:
 2. Tap **Add Profile** to create a profile for an elderly parent, child, or partner.
 3. Enter their Name, Age, Gender, and optional Profile Picture.
 4. Tap any profile card to switch active users. Tapping the currently selected profile returns smoothly to your dashboard. Each profile maintains its own separate medicine list, schedules, stock counts, personal emergency contacts, and adherence history.
-5. **Deletion Safeguards**: When managing profiles, single-profile accounts cannot accidentally delete their only profile. The delete action is protected with clear guidance requiring at least one active profile.
+5. **Deletion Safeguards & Countdown Protection**:
+   - Single-profile accounts cannot delete their only profile (at least one profile must always remain active).
+   - Deleting a secondary profile requires opening profile settings and waiting through a deliberate **5-second safety countdown** before the confirm button enables with an explicit **"Delete Profile"** action, eliminating accidental loss of medical histories.
 
 ---
 
@@ -355,12 +376,20 @@ Export health records for doctor visits or personal analysis:
 
 ---
 
-## 16. Help, Support & Checking for Updates
+## 16. Help, Support, About Dosezy & Updates
 
 Under the **More** section in **Menu**:
 - **Help & Support**: Step-by-step guides, FAQs, and developer contact.
-- **About Dosezy**: App version details, open-source licenses, and acknowledgments.
-- **Check for Updates**: 1-tap check across Google Play, F-Droid, or GitHub.
+- **About Dosezy**:
+  - **Core Pillars**: Highlights Dosezy's core architectural commitments:
+    - 🛡️ *100% Offline & Private* (zero accounts, zero cloud dependencies, on-device encryption).
+    - ⏰ *Reliable Alarms & Timezones* (exact alarm dispatch, deep sleep bypass, timezone preservation).
+    - 👨‍👩‍👧 *Multi-Profile Family Care* (independent medicines, logs, and emergency contacts for every family member).
+    - ♿ *Accessibility First* (48dp touch targets, high contrast, TalkBack screen reader support).
+  - **Meet the Developer**: Creator and lead maintainer attribution (`Saad` / `@saad2134`) with direct GitHub repository links.
+  - **Open-Source License**: Licensed under the MIT License with tamper-resistant bytecode author attribution.
+- **Check for Updates**: 1-tap check across Google Play, F-Droid, or GitHub Releases.
+
 
 ---
 
