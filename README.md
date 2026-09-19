@@ -99,6 +99,19 @@ Dosezy transforms daily medication management into a stress-free experience. Inp
 
 ---
 
+## 🌐 Links
+
+<div align="center">
+
+[![Website](https://img.shields.io/badge/Website-dosezy.attenomy.com-1e293b?style=flat&logo=googlechrome&logoColor=white&labelColor=0284c7)](https://dosezy.attenomy.com)
+[![X (Twitter)](https://img.shields.io/badge/X%20(Twitter)-%40dosezyapp-1e293b?style=flat&logo=x&logoColor=white&labelColor=000000)](https://x.com/dosezyapp)
+[![YouTube](https://img.shields.io/badge/YouTube-%40dosezyapp-1e293b?style=flat&logo=youtube&logoColor=white&labelColor=ff0000)](https://www.youtube.com/@dosezyapp)
+[![Reddit](https://img.shields.io/badge/Reddit-r%2FDosezy-1e293b?style=flat&logo=reddit&logoColor=white&labelColor=ff4500)](https://www.reddit.com/r/Dosezy/)
+
+</div>
+
+---
+
 ## ⚙️ Platforms & Ecosystem Status
 
 | Module | Platform | Status | Min / Target | Tech Stack |
