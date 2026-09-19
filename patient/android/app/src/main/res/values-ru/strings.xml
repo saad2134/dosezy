@@ -640,7 +640,7 @@
     <string name="pharmacy_order_date_header">Дата: %1$s</string>
     <string name="pharmacy_order_supply_header">Заказ на %1$d дн. запаса:</string>
     <string name="pharmacy_order_footer_confirm">Пожалуйста, подтвердите наличие и доставку. Спасибо!</string>
-    <string name="pharmacy_order_footer_brand">Сформировано в Dosezy\n(Ваш помощник по приему лекарств)</string>
+    <string name="pharmacy_order_footer_brand">Сформировано в Dosezy (Ваш помощник по приему лекарств)</string>
     <string name="menu_pharmacy_order">Заказ в аптеку</string>
     <string name="menu_pharmacy_order_desc">Создать и отправить заказ лекарств через WhatsApp</string>
     <string name="pharmacy_order_markdown_preview">Предпросмотр Markdown</string>

@@ -620,8 +620,13 @@ class DataExporter(
             }
         }
 
-        sb.append("_").append(context.getString(com.example.dosezy.R.string.pharmacy_order_footer_confirm)).append("_\n\n")
-        sb.append("_").append(context.getString(com.example.dosezy.R.string.pharmacy_order_footer_brand)).append("_")
+        val footerConfirm = context.getString(com.example.dosezy.R.string.pharmacy_order_footer_confirm)
+        val formattedConfirm = footerConfirm.lines().filter { it.isNotBlank() }.joinToString("\n") { "_${it.trim()}_" }
+        sb.append(formattedConfirm).append("\n\n")
+
+        val brandText = context.getString(com.example.dosezy.R.string.pharmacy_order_footer_brand)
+        val formattedBrand = brandText.lines().filter { it.isNotBlank() }.joinToString("\n") { "_${it.trim()}_" }
+        sb.append(formattedBrand)
 
         return sb.toString()
     }

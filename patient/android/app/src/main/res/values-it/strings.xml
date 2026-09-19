@@ -640,7 +640,7 @@ Vuoi continuare?</string>
     <string name="pharmacy_order_date_header">Data: %1$s</string>
     <string name="pharmacy_order_supply_header">Ordine per una fornitura di %1$d giorni:</string>
     <string name="pharmacy_order_footer_confirm">Si prega di confermare disponibilità e consegna. Grazie!</string>
-    <string name="pharmacy_order_footer_brand">Generato tramite Dosezy\n(Il tuo assistente terapeutico)</string>
+    <string name="pharmacy_order_footer_brand">Generato tramite Dosezy (Il tuo assistente terapeutico)</string>
     <string name="menu_pharmacy_order">Ordine farmacia</string>
     <string name="menu_pharmacy_order_desc">Genera e condividi ordini di farmaci su WhatsApp</string>
     <string name="pharmacy_order_markdown_preview">Anteprima Markdown</string>

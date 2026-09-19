@@ -639,7 +639,7 @@ Deseja continuar?</string>
     <string name="pharmacy_order_date_header">Data: %1$s</string>
     <string name="pharmacy_order_supply_header">Pedido para suprimento de %1$d dias:</string>
     <string name="pharmacy_order_footer_confirm">Por favor, confirme a disponibilidade e a entrega. Obrigado!</string>
-    <string name="pharmacy_order_footer_brand">Gerado via Dosezy\n(Seu companheiro de medicação)</string>
+    <string name="pharmacy_order_footer_brand">Gerado via Dosezy (Seu companheiro de medicação)</string>
     <string name="menu_pharmacy_order">Pedido para farmácia</string>
     <string name="menu_pharmacy_order_desc">Gerar e compartilhar pedidos de medicamentos pelo WhatsApp</string>
     <string name="pharmacy_order_markdown_preview">Prévia em Markdown</string>

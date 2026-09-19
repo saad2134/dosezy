@@ -656,7 +656,7 @@
     <string name="pharmacy_order_date_header">दिनांक: %1$s</string>
     <string name="pharmacy_order_supply_header">%1$d दिनों की आपूर्ति हेतु ऑर्डर सूची:</string>
     <string name="pharmacy_order_footer_confirm">कृपया दवाओं की उपलब्धता और डिलीवरी की पुष्टि करें। धन्यवाद!</string>
-    <string name="pharmacy_order_footer_brand">Dosezy द्वारा तैयार\n(आपका दवा साथी)</string>
+    <string name="pharmacy_order_footer_brand">Dosezy द्वारा तैयार (आपका दवा साथी)</string>
     <string name="menu_pharmacy_order">फार्मेसी रीफ़िल ऑर्डर</string>
     <string name="menu_pharmacy_order_desc">व्हाट्सएप के ज़रिये दवा ऑर्डर बनाएं और शेयर करें</string>
     <string name="pharmacy_order_markdown_preview">मार्कडाउन पूर्वावलोकन</string>

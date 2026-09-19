@@ -636,7 +636,7 @@
     <string name="pharmacy_order_date_header">তারিখ: %1$s</string>
     <string name="pharmacy_order_supply_header">%1$d দিনের জন্য অর্ডারের তালিকা:</string>
     <string name="pharmacy_order_footer_confirm">দয়া করে প্রাপ্যতা এবং ডেলিভারি নিশ্চিত করুন। ধন্যবাদ!</string>
-    <string name="pharmacy_order_footer_brand">Dosezy দ্বারা প্রস্তুতকৃত\n(আপনার ওষুধের সঙ্গী)</string>
+    <string name="pharmacy_order_footer_brand">Dosezy দ্বারা প্রস্তুতকৃত (আপনার ওষুধের সঙ্গী)</string>
     <string name="menu_pharmacy_order">ফার্মেসি রিফিল অর্ডার</string>
     <string name="menu_pharmacy_order_desc">হোয়াটসঅ্যাপের মাধ্যমে ওষুধের অর্ডার তৈরি ও শেয়ার করুন</string>
     <string name="pharmacy_order_markdown_preview">মার্কডাউন প্রিভিউ</string>

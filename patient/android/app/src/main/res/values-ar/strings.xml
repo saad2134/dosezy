@@ -640,7 +640,7 @@
     <string name="pharmacy_order_date_header">التاريخ: %1$s</string>
     <string name="pharmacy_order_supply_header">طلب لإمداد %1$d يومًا:</string>
     <string name="pharmacy_order_footer_confirm">يرجى تأكيد التوفر وإمكانية التوصيل. شكراً لك!</string>
-    <string name="pharmacy_order_footer_brand">تم الإنشاء عبر Dosezy\n(رفيقك الدوائي)</string>
+    <string name="pharmacy_order_footer_brand">تم الإنشاء عبر Dosezy (رفيقك الدوائي)</string>
     <string name="menu_pharmacy_order">طلب إعادة تعبئة الصيدلية</string>
     <string name="menu_pharmacy_order_desc">إنشاء ومشاركة طلبات الأدوية عبر واتساب</string>
     <string name="pharmacy_order_markdown_preview">معاينة ماركداون</string>

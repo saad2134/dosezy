@@ -640,7 +640,7 @@
     <string name="pharmacy_order_date_header">日付: %1$s</string>
     <string name="pharmacy_order_supply_header">%1$d 日分の処方注文:</string>
     <string name="pharmacy_order_footer_confirm">在庫の確認および配送の確認をお願い申し上げます。ありがとうございます。</string>
-    <string name="pharmacy_order_footer_brand">Dosezy で生成\n(あなたの服薬パートナー)</string>
+    <string name="pharmacy_order_footer_brand">Dosezy で生成 (あなたの服薬パートナー)</string>
     <string name="menu_pharmacy_order">薬局への注文リスト</string>
     <string name="menu_pharmacy_order_desc">医薬品の注文リストを作成してWhatsAppで共有</string>
     <string name="pharmacy_order_markdown_preview">Markdownプレビュー</string>

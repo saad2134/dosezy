@@ -668,7 +668,7 @@ Do you want to continue?</string>
     <string name="pharmacy_order_date_header">Date: %1$s</string>
     <string name="pharmacy_order_supply_header">Order for %1$d Days Supply:</string>
     <string name="pharmacy_order_footer_confirm">Please confirm availability and delivery. Thank you!</string>
-    <string name="pharmacy_order_footer_brand">Generated via Dosezy\n(Your Medication companion)</string>
+    <string name="pharmacy_order_footer_brand">Generated via Dosezy (Your Medication companion)</string>
     <string name="menu_pharmacy_order">Pharmacy Refill Order</string>
     <string name="menu_pharmacy_order_desc">Generate and share medication orders via WhatsApp</string>
     <string name="pharmacy_order_markdown_preview">Markdown Preview</string>
