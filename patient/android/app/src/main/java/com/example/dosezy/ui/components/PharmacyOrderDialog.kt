@@ -17,8 +17,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -72,10 +74,36 @@ fun PharmacyOrderDialog(
     medicines: List<Medicine>,
     dataExporter: DataExporter,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    allUsers: List<User> = listOf(user)
 ) {
     val context = LocalContext.current
-    val activeMedicines = remember(medicines) { medicines.filter { !it.isArchived } }
+    val selectedUserIds = remember { mutableStateListOf(user.userId) }
+
+    // Map of userId -> list of active medicines
+    var allProfilesMedicines by remember {
+        mutableStateOf<Map<String, List<Medicine>>>(mapOf(user.userId to medicines.filter { !it.isArchived }))
+    }
+
+    androidx.compose.runtime.LaunchedEffect(selectedUserIds.toList(), allUsers) {
+        val map = mutableMapOf<String, List<Medicine>>()
+        selectedUserIds.forEach { uid ->
+            if (uid == user.userId) {
+                map[uid] = medicines.filter { !it.isArchived }
+            } else {
+                try {
+                    map[uid] = dataExporter.medicineRepository.getMedicinesByUserSync(uid).filter { !it.isArchived }
+                } catch (e: Exception) {
+                    map[uid] = emptyList()
+                }
+            }
+        }
+        allProfilesMedicines = map
+    }
+
+    val activeMedicines = remember(allProfilesMedicines) {
+        allProfilesMedicines.values.flatten()
+    }
 
     val lowStockMedicines = remember(activeMedicines) {
         activeMedicines.filter { med ->
@@ -88,6 +116,7 @@ fun PharmacyOrderDialog(
     var onlyLowStock by remember { mutableStateOf(lowStockMedicines.isNotEmpty()) }
     var supplyDays by remember { mutableIntStateOf(30) }
     var includeStockInOrder by remember { mutableStateOf(false) }
+    var includeDosageInOrder by remember { mutableStateOf(true) }
 
     val displayedMedicines = remember(onlyLowStock, activeMedicines, lowStockMedicines) {
         if (onlyLowStock) lowStockMedicines else activeMedicines
@@ -103,14 +132,23 @@ fun PharmacyOrderDialog(
 
     // Calculate default quantity for a medicine given supply days
     fun calculateDefaultQty(med: Medicine, days: Int): Int {
+        val isDrop = med.dosageUnit == com.example.dosezy.data.model.DosageUnit.DROP ||
+                med.pillShape == com.example.dosezy.data.model.PillShape.DROPS
+
+        if (isDrop) {
+            val dropsPerIntake = if (med.dosage > 0) med.dosage.toInt().coerceAtLeast(1) else 1
+            val totalDrops = (med.timesPerDay.coerceAtLeast(1)) * dropsPerIntake * days
+            return kotlin.math.ceil(totalDrops / 100.0).toInt().coerceAtLeast(1)
+        }
+
         val dosesPerIntake = when (med.dosageUnit) {
             com.example.dosezy.data.model.DosageUnit.TABLET, com.example.dosezy.data.model.DosageUnit.CAPSULE -> {
                 if (med.dosage > 0) med.dosage.toInt().coerceAtLeast(1) else 1
             }
-            com.example.dosezy.data.model.DosageUnit.DROP, com.example.dosezy.data.model.DosageUnit.ML -> {
+            com.example.dosezy.data.model.DosageUnit.ML -> {
                 if (med.dosage > 0) med.dosage.toInt().coerceAtLeast(1) else 1
             }
-            com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG -> 1
+            com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG, com.example.dosezy.data.model.DosageUnit.DROP -> 1
         }
         val dailyRequirement = (med.timesPerDay.coerceAtLeast(1)) * dosesPerIntake
         return (dailyRequirement * days).coerceAtLeast(1)
@@ -127,15 +165,25 @@ fun PharmacyOrderDialog(
         displayedMedicines.filter { it.medicineId in selectedMedicineIds }
     }
 
-    val orderText = remember(user, selectedMedicinesList, supplyDays, customQuantities.toMap(), includeStockInOrder) {
+    val orderText = remember(allProfilesMedicines, selectedMedicinesList, supplyDays, customQuantities.toMap(), includeStockInOrder, includeDosageInOrder) {
         if (selectedMedicinesList.isEmpty()) ""
-        else dataExporter.generatePharmacyOrderText(
-            user = user,
-            medicines = selectedMedicinesList,
-            supplyDays = supplyDays,
-            customQuantities = customQuantities.toMap(),
-            includeStock = includeStockInOrder
-        )
+        else {
+            val selectedUsers = allUsers.filter { it.userId in selectedUserIds }
+            val profilesWithMeds = selectedUsers.map { u ->
+                val userMeds = (allProfilesMedicines[u.userId] ?: emptyList()).filter { med ->
+                    med.medicineId in selectedMedicineIds
+                }
+                u to userMeds
+            }.filter { it.second.isNotEmpty() }
+
+            dataExporter.generateConsolidatedPharmacyOrderText(
+                profilesWithMedicines = profilesWithMeds,
+                supplyDays = supplyDays,
+                customQuantities = customQuantities.toMap(),
+                includeStock = includeStockInOrder,
+                includeDosage = includeDosageInOrder
+            )
+        }
     }
 
     Dialog(
@@ -205,6 +253,60 @@ fun PharmacyOrderDialog(
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
+
+                // Multi-Profile Selection (if multiple users exist)
+                if (allUsers.size > 1) {
+                    Text(
+                        text = stringResource(R.string.pharmacy_order_profile_filter),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        allUsers.forEach { profile ->
+                            val isSelected = profile.userId in selectedUserIds
+                            FilterChip(
+                                selected = isSelected,
+                                onClick = {
+                                    if (isSelected) {
+                                        if (selectedUserIds.size > 1) {
+                                            selectedUserIds.remove(profile.userId)
+                                        }
+                                    } else {
+                                        selectedUserIds.add(profile.userId)
+                                    }
+                                },
+                                label = {
+                                    Text(
+                                        text = profile.fullName,
+                                        fontSize = 12.sp,
+                                        maxLines = 1
+                                    )
+                                },
+                                leadingIcon = if (isSelected) {
+                                    {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                } else null,
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(14.dp))
+                }
 
                 // Scope Filter (Low Stock vs All)
                 Text(
@@ -292,28 +394,58 @@ fun PharmacyOrderDialog(
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                // Stock privacy toggle
+                Spacer(modifier = Modifier.height(14.dp))
+
+                // Options: Dosage & Stock privacy toggles
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(10.dp))
-                        .clickable { includeStockInOrder = !includeStockInOrder }
-                        .padding(vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Checkbox(
-                        checked = includeStockInOrder,
-                        onCheckedChange = { includeStockInOrder = it },
-                        colors = CheckboxDefaults.colors(
-                            checkedColor = MaterialTheme.colorScheme.primary
+                    Row(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(10.dp))
+                            .clickable { includeDosageInOrder = !includeDosageInOrder }
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = includeDosageInOrder,
+                            onCheckedChange = { includeDosageInOrder = it },
+                            colors = CheckboxDefaults.colors(
+                                checkedColor = MaterialTheme.colorScheme.primary
+                            )
                         )
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = stringResource(R.string.pharmacy_order_include_stock),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = stringResource(R.string.pharmacy_order_include_dosage),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(10.dp))
+                            .clickable { includeStockInOrder = !includeStockInOrder }
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = includeStockInOrder,
+                            onCheckedChange = { includeStockInOrder = it },
+                            colors = CheckboxDefaults.colors(
+                                checkedColor = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = stringResource(R.string.pharmacy_order_include_stock),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -328,6 +460,9 @@ fun PharmacyOrderDialog(
                     )
                     Spacer(modifier = Modifier.height(6.dp))
 
+                    val selectedUsersList = allUsers.filter { it.userId in selectedUserIds }
+                    val isMultiProfileSelected = selectedUsersList.size > 1
+
                     Surface(
                         shape = RoundedCornerShape(14.dp),
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
@@ -336,16 +471,23 @@ fun PharmacyOrderDialog(
                     ) {
                         Column(
                             modifier = Modifier
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                                .heightIn(max = 200.dp)
-                                .verticalScroll(rememberScrollState())
+                                .padding(horizontal = 8.dp, vertical = 6.dp)
                         ) {
-                            displayedMedicines.forEach { med ->
+                            @Composable
+                            fun MedicineItemRow(med: Medicine) {
                                 val isChecked = med.medicineId in selectedMedicineIds
+                                val isDrop = med.dosageUnit == com.example.dosezy.data.model.DosageUnit.DROP ||
+                                        med.pillShape == com.example.dosezy.data.model.PillShape.DROPS
+                                val currentQty = customQuantities[med.medicineId] ?: calculateDefaultQty(med, supplyDays)
+                                val unitSuffix = if (isDrop) {
+                                    if (currentQty > 1) " ${stringResource(R.string.unit_bottles)}" else " ${stringResource(R.string.unit_bottle)}"
+                                } else ""
+
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = 4.dp),
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .padding(horizontal = 4.dp, vertical = 2.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Checkbox(
@@ -359,11 +501,12 @@ fun PharmacyOrderDialog(
                                                 selectedMedicineIds.remove(med.medicineId)
                                             }
                                         },
+                                        modifier = Modifier.size(32.dp),
                                         colors = CheckboxDefaults.colors(
                                             checkedColor = MaterialTheme.colorScheme.primary
                                         )
                                     )
-                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Spacer(modifier = Modifier.width(6.dp))
                                     Column(
                                         modifier = Modifier
                                             .weight(1f)
@@ -375,26 +518,51 @@ fun PharmacyOrderDialog(
                                                 }
                                             }
                                     ) {
-                                        Text(
-                                            text = med.medicationName,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.SemiBold,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                        val stockText = med.currentStock?.let { stringResource(R.string.pharmacy_order_stock_left, it) } ?: stringResource(R.string.pharmacy_order_no_stock_tracked)
-                                        Text(
-                                            text = "${med.dosage} ${med.dosageUnit.name.lowercase()} • $stockText",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            Text(
+                                                text = med.medicationName,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = MaterialTheme.colorScheme.onSurface,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                            if (includeDosageInOrder && med.dosage > 0) {
+                                                val dStr = if (med.dosage % 1.0 == 0.0) "${med.dosage.toInt()}" else "${med.dosage}"
+                                                Text(
+                                                    text = " ($dStr ${med.dosageUnit.name.lowercase()})",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis
+                                                )
+                                            }
+                                        }
+                                        if (includeStockInOrder && med.currentStock != null) {
+                                            val stockUnitStr = if (isDrop) {
+                                                if (med.currentStock > 1) "drops" else "drop"
+                                            } else {
+                                                when (med.dosageUnit) {
+                                                    com.example.dosezy.data.model.DosageUnit.TABLET -> if (med.currentStock > 1) "tablets" else "tablet"
+                                                    com.example.dosezy.data.model.DosageUnit.CAPSULE -> if (med.currentStock > 1) "capsules" else "capsule"
+                                                    com.example.dosezy.data.model.DosageUnit.DROP -> if (med.currentStock > 1) "drops" else "drop"
+                                                    com.example.dosezy.data.model.DosageUnit.ML -> "ml"
+                                                    com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG -> if (med.currentStock > 1) "units" else "unit"
+                                                }
+                                            }
+                                            Text(
+                                                text = stringResource(R.string.pharmacy_order_current_stock, med.currentStock, stockUnitStr),
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.outline
+                                            )
+                                        }
                                     }
 
-                                    // Interactive Quantity Stepper
+                                    // Compact Stepper
                                     if (isChecked) {
-                                        val currentQty = customQuantities[med.medicineId] ?: calculateDefaultQty(med, supplyDays)
                                         Row(
                                             verticalAlignment = Alignment.CenterVertically,
                                             modifier = Modifier
@@ -404,7 +572,7 @@ fun PharmacyOrderDialog(
                                         ) {
                                             Box(
                                                 modifier = Modifier
-                                                    .size(28.dp)
+                                                    .size(26.dp)
                                                     .clip(RoundedCornerShape(6.dp))
                                                     .background(MaterialTheme.colorScheme.surfaceVariant)
                                                     .clickable {
@@ -417,17 +585,17 @@ fun PharmacyOrderDialog(
                                                 Text(
                                                     text = "−",
                                                     fontWeight = FontWeight.Bold,
-                                                    fontSize = 15.sp,
+                                                    fontSize = 14.sp,
                                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                                 )
                                             }
 
                                             Text(
-                                                text = "$currentQty",
-                                                style = MaterialTheme.typography.labelLarge,
+                                                text = "$currentQty$unitSuffix",
+                                                style = MaterialTheme.typography.labelMedium,
                                                 fontWeight = FontWeight.Bold,
                                                 modifier = Modifier
-                                                    .widthIn(min = 32.dp)
+                                                    .widthIn(min = 28.dp)
                                                     .padding(horizontal = 4.dp),
                                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                                                 color = MaterialTheme.colorScheme.primary
@@ -435,7 +603,7 @@ fun PharmacyOrderDialog(
 
                                             Box(
                                                 modifier = Modifier
-                                                    .size(28.dp)
+                                                    .size(26.dp)
                                                     .clip(RoundedCornerShape(6.dp))
                                                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
                                                     .clickable {
@@ -446,12 +614,60 @@ fun PharmacyOrderDialog(
                                                 Text(
                                                     text = "+",
                                                     fontWeight = FontWeight.Bold,
-                                                    fontSize = 15.sp,
+                                                    fontSize = 14.sp,
                                                     color = MaterialTheme.colorScheme.primary
                                                 )
                                             }
                                         }
                                     }
+                                }
+                            }
+
+                            if (isMultiProfileSelected) {
+                                selectedUsersList.forEach { profileUser ->
+                                    val profileMeds = (allProfilesMedicines[profileUser.userId] ?: emptyList()).filter { med ->
+                                        if (onlyLowStock) {
+                                            val stock = med.currentStock ?: return@filter false
+                                            val threshold = med.refillThreshold ?: 0
+                                            stock <= threshold || stock <= 5
+                                        } else true
+                                    }
+                                    if (profileMeds.isNotEmpty()) {
+                                        Surface(
+                                            shape = RoundedCornerShape(8.dp),
+                                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 4.dp)
+                                        ) {
+                                            Row(
+                                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Text(
+                                                    text = "👤 ${profileUser.fullName}",
+                                                    style = MaterialTheme.typography.labelMedium,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = MaterialTheme.colorScheme.primary
+                                                )
+                                                Spacer(modifier = Modifier.weight(1f))
+                                                val count = profileMeds.count { it.medicineId in selectedMedicineIds }
+                                                Text(
+                                                    text = "$count/${profileMeds.size}",
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                            }
+                                        }
+
+                                        profileMeds.forEach { med ->
+                                            MedicineItemRow(med)
+                                        }
+                                    }
+                                }
+                            } else {
+                                displayedMedicines.forEach { med ->
+                                    MedicineItemRow(med)
                                 }
                             }
                         }
@@ -475,7 +691,7 @@ fun PharmacyOrderDialog(
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                // Live Preview
+                // Live Preview (Fully visible without scroll)
                 Text(
                     text = stringResource(R.string.pharmacy_order_markdown_preview),
                     style = MaterialTheme.typography.labelMedium,
@@ -491,18 +707,17 @@ fun PharmacyOrderDialog(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Box(
-                        modifier = Modifier
-                            .heightIn(min = 100.dp, max = 150.dp)
-                            .padding(12.dp)
-                            .verticalScroll(rememberScrollState())
+                        modifier = Modifier.padding(12.dp)
                     ) {
-                        Text(
-                            text = if (orderText.isNotBlank()) orderText else stringResource(R.string.pharmacy_order_empty),
-                            style = MaterialTheme.typography.bodySmall,
-                            fontFamily = FontFamily.Monospace,
-                            fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                        SelectionContainer {
+                            Text(
+                                text = if (orderText.isNotBlank()) orderText else stringResource(R.string.pharmacy_order_empty),
+                                style = MaterialTheme.typography.bodySmall,
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                     }
                 }
 

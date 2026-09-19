@@ -28,7 +28,7 @@ import java.util.zip.ZipOutputStream
 class DataExporter(
     private val context: Context,
     private val userRepository: UserRepository,
-    private val medicineRepository: MedicineRepository,
+    val medicineRepository: MedicineRepository,
     private val scheduleRepository: ScheduleRepository
 ) {
 
@@ -509,68 +509,118 @@ class DataExporter(
         medicines: List<Medicine>,
         supplyDays: Int = 30,
         customQuantities: Map<String, Int> = emptyMap(),
-        includeStock: Boolean = false
+        includeStock: Boolean = false,
+        includeDosage: Boolean = true
+    ): String {
+        return generateConsolidatedPharmacyOrderText(
+            profilesWithMedicines = listOf(user to medicines),
+            supplyDays = supplyDays,
+            customQuantities = customQuantities,
+            includeStock = includeStock,
+            includeDosage = includeDosage
+        )
+    }
+
+    fun generateConsolidatedPharmacyOrderText(
+        profilesWithMedicines: List<Pair<User, List<Medicine>>>,
+        supplyDays: Int = 30,
+        customQuantities: Map<String, Int> = emptyMap(),
+        includeStock: Boolean = false,
+        includeDosage: Boolean = true
     ): String {
         val dateFormatter = java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy")
         val dateStr = java.time.LocalDate.now().format(dateFormatter)
 
         val sb = StringBuilder()
         sb.append(context.getString(com.example.dosezy.R.string.pharmacy_order_header_title)).append("\n")
-        sb.append(context.getString(com.example.dosezy.R.string.pharmacy_order_patient_header, user.fullName)).append("\n")
+
+        val isMultiProfile = profilesWithMedicines.size > 1
+
+        if (!isMultiProfile && profilesWithMedicines.isNotEmpty()) {
+            val singleUser = profilesWithMedicines.first().first
+            sb.append(context.getString(com.example.dosezy.R.string.pharmacy_order_patient_header, singleUser.fullName)).append("\n")
+        }
         sb.append(context.getString(com.example.dosezy.R.string.pharmacy_order_date_header, dateStr)).append("\n\n")
         sb.append("*").append(context.getString(com.example.dosezy.R.string.pharmacy_order_supply_header, supplyDays)).append("*\n\n")
 
-        medicines.forEachIndexed { index, med ->
-            val totalNeeded = customQuantities[med.medicineId] ?: run {
-                val dosesPerIntake = when (med.dosageUnit) {
-                    com.example.dosezy.data.model.DosageUnit.TABLET, com.example.dosezy.data.model.DosageUnit.CAPSULE -> {
-                        if (med.dosage > 0) med.dosage.toInt().coerceAtLeast(1) else 1
-                    }
-                    com.example.dosezy.data.model.DosageUnit.DROP, com.example.dosezy.data.model.DosageUnit.ML -> {
-                        if (med.dosage > 0) med.dosage.toInt().coerceAtLeast(1) else 1
-                    }
-                    com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG -> 1
-                }
-                val dailyRequirement = (med.timesPerDay.coerceAtLeast(1)) * dosesPerIntake
-                (dailyRequirement * supplyDays).coerceAtLeast(1)
-            }
-            val dosageDisplay = if (med.dosage > 0) {
-                if (med.dosage % 1.0 == 0.0) "${med.dosage.toInt()}" else "${med.dosage}"
-            } else ""
-            val strengthUnitStr = med.dosageUnit.name.lowercase()
+        profilesWithMedicines.forEach { (profileUser, profileMeds) ->
+            if (profileMeds.isEmpty()) return@forEach
 
-            val orderUnitStr = when (med.dosageUnit) {
-                com.example.dosezy.data.model.DosageUnit.TABLET -> if (totalNeeded > 1) "tablets" else "tablet"
-                com.example.dosezy.data.model.DosageUnit.CAPSULE -> if (totalNeeded > 1) "capsules" else "capsule"
-                com.example.dosezy.data.model.DosageUnit.DROP -> if (totalNeeded > 1) "drops" else "drop"
-                com.example.dosezy.data.model.DosageUnit.ML -> "ml"
-                com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG -> if (totalNeeded > 1) "units" else "unit"
+            if (isMultiProfile) {
+                sb.append("👤 *${profileUser.fullName}:*\n")
             }
 
-            sb.append("${index + 1}. *${med.medicationName}*")
-            if (dosageDisplay.isNotBlank()) {
-                sb.append(" ($dosageDisplay $strengthUnitStr)")
-            }
-            sb.append("\n")
-            sb.append("   • ").append(context.getString(com.example.dosezy.R.string.pharmacy_order_qty_needed, totalNeeded, orderUnitStr)).append("\n")
-            if (includeStock && med.currentStock != null) {
-                val stockUnitStr = when (med.dosageUnit) {
-                    com.example.dosezy.data.model.DosageUnit.TABLET -> if (med.currentStock > 1) "tablets" else "tablet"
-                    com.example.dosezy.data.model.DosageUnit.CAPSULE -> if (med.currentStock > 1) "capsules" else "capsule"
-                    com.example.dosezy.data.model.DosageUnit.DROP -> if (med.currentStock > 1) "drops" else "drop"
-                    com.example.dosezy.data.model.DosageUnit.ML -> "ml"
-                    com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG -> if (med.currentStock > 1) "units" else "unit"
+            profileMeds.forEachIndexed { index, med ->
+                val isDrop = med.dosageUnit == com.example.dosezy.data.model.DosageUnit.DROP ||
+                        med.pillShape == com.example.dosezy.data.model.PillShape.DROPS
+
+                val totalNeeded = customQuantities[med.medicineId] ?: run {
+                    if (isDrop) {
+                        val dropsPerIntake = if (med.dosage > 0) med.dosage.toInt().coerceAtLeast(1) else 1
+                        val totalDrops = (med.timesPerDay.coerceAtLeast(1)) * dropsPerIntake * supplyDays
+                        kotlin.math.ceil(totalDrops / 100.0).toInt().coerceAtLeast(1)
+                    } else {
+                        val dosesPerIntake = when (med.dosageUnit) {
+                            com.example.dosezy.data.model.DosageUnit.TABLET, com.example.dosezy.data.model.DosageUnit.CAPSULE -> {
+                                if (med.dosage > 0) med.dosage.toInt().coerceAtLeast(1) else 1
+                            }
+                            com.example.dosezy.data.model.DosageUnit.ML -> {
+                                if (med.dosage > 0) med.dosage.toInt().coerceAtLeast(1) else 1
+                            }
+                            com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG, com.example.dosezy.data.model.DosageUnit.DROP -> 1
+                        }
+                        val dailyRequirement = (med.timesPerDay.coerceAtLeast(1)) * dosesPerIntake
+                        (dailyRequirement * supplyDays).coerceAtLeast(1)
+                    }
                 }
-                sb.append("   • ").append(context.getString(com.example.dosezy.R.string.pharmacy_order_current_stock, med.currentStock, stockUnitStr)).append("\n")
+
+                val showDosageInTitle = includeDosage && when (med.dosageUnit) {
+                    com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG, com.example.dosezy.data.model.DosageUnit.ML -> true
+                    else -> med.dosage > 0
+                }
+                val dosageDisplay = if (med.dosage > 0) {
+                    if (med.dosage % 1.0 == 0.0) "${med.dosage.toInt()}" else "${med.dosage}"
+                } else ""
+                val strengthUnitStr = med.dosageUnit.name.lowercase()
+
+                val orderUnitStr = if (isDrop) {
+                    if (totalNeeded > 1) context.getString(com.example.dosezy.R.string.unit_bottles) else context.getString(com.example.dosezy.R.string.unit_bottle)
+                } else {
+                    when (med.dosageUnit) {
+                        com.example.dosezy.data.model.DosageUnit.TABLET -> if (totalNeeded > 1) "tablets" else "tablet"
+                        com.example.dosezy.data.model.DosageUnit.CAPSULE -> if (totalNeeded > 1) "capsules" else "capsule"
+                        com.example.dosezy.data.model.DosageUnit.DROP -> if (totalNeeded > 1) context.getString(com.example.dosezy.R.string.unit_bottles) else context.getString(com.example.dosezy.R.string.unit_bottle)
+                        com.example.dosezy.data.model.DosageUnit.ML -> "ml"
+                        com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG -> if (totalNeeded > 1) "units" else "unit"
+                    }
+                }
+
+                sb.append("${index + 1}. *${med.medicationName}*")
+                if (showDosageInTitle && dosageDisplay.isNotBlank()) {
+                    sb.append(" ($dosageDisplay $strengthUnitStr)")
+                }
+                sb.append("\n")
+                sb.append("   • ").append(context.getString(com.example.dosezy.R.string.pharmacy_order_qty_needed, totalNeeded, orderUnitStr)).append("\n")
+
+                if (includeStock && med.currentStock != null) {
+                    val stockUnitStr = if (isDrop) {
+                        if (med.currentStock > 1) "drops" else "drop"
+                    } else {
+                        when (med.dosageUnit) {
+                            com.example.dosezy.data.model.DosageUnit.TABLET -> if (med.currentStock > 1) "tablets" else "tablet"
+                            com.example.dosezy.data.model.DosageUnit.CAPSULE -> if (med.currentStock > 1) "capsules" else "capsule"
+                            com.example.dosezy.data.model.DosageUnit.DROP -> if (med.currentStock > 1) "drops" else "drop"
+                            com.example.dosezy.data.model.DosageUnit.ML -> "ml"
+                            com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG -> if (med.currentStock > 1) "units" else "unit"
+                        }
+                    }
+                    sb.append("   • ").append(context.getString(com.example.dosezy.R.string.pharmacy_order_current_stock, med.currentStock, stockUnitStr)).append("\n")
+                }
+                sb.append("\n")
             }
-            sb.append("   • ").append(context.getString(com.example.dosezy.R.string.pharmacy_order_frequency_format, med.timesPerDay)).append("\n")
-            if (!med.notes.isNullOrBlank()) {
-                sb.append("   • ").append(context.getString(com.example.dosezy.R.string.pharmacy_order_notes_format, med.notes)).append("\n")
-            }
-            sb.append("\n")
         }
 
-        sb.append("_").append(context.getString(com.example.dosezy.R.string.pharmacy_order_footer_confirm)).append("_\n")
+        sb.append("_").append(context.getString(com.example.dosezy.R.string.pharmacy_order_footer_confirm)).append("_\n\n")
         sb.append("_").append(context.getString(com.example.dosezy.R.string.pharmacy_order_footer_brand)).append("_")
 
         return sb.toString()

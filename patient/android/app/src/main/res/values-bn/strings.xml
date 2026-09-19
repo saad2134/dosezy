@@ -636,7 +636,7 @@
     <string name="pharmacy_order_date_header">তারিখ: %1$s</string>
     <string name="pharmacy_order_supply_header">%1$d দিনের জন্য অর্ডারের তালিকা:</string>
     <string name="pharmacy_order_footer_confirm">দয়া করে প্রাপ্যতা এবং ডেলিভারি নিশ্চিত করুন। ধন্যবাদ!</string>
-    <string name="pharmacy_order_footer_brand">Dosezy দ্বারা তৈরি</string>
+    <string name="pharmacy_order_footer_brand">Dosezy দ্বারা প্রস্তুতকৃত\n(আপনার ওষুধের সঙ্গী)</string>
     <string name="menu_pharmacy_order">ফার্মেসি রিফিল অর্ডার</string>
     <string name="menu_pharmacy_order_desc">হোয়াটসঅ্যাপের মাধ্যমে ওষুধের অর্ডার তৈরি ও শেয়ার করুন</string>
     <string name="pharmacy_order_markdown_preview">মার্কডাউন প্রিভিউ</string>
@@ -669,7 +669,7 @@
     <string name="pharmacy_order_medicines_include">অন্তর্ভুক্ত ওষুধ (%1$d/%2$d)</string>
     <string name="pharmacy_order_stock_left">%1$d অবশিষ্ট</string>
     <string name="pharmacy_order_no_stock_tracked">স্টক ট্র্যাক করা নেই</string>
-    <string name="pharmacy_order_header_title">📋 *Dosezy ফার্মেসি রিফিল অর্ডার*</string>
+    <string name="pharmacy_order_header_title">📋 *ওষুধের অর্ডার*</string>
     <string name="pharmacy_order_frequency_format">মাত্রা: দিনে %1$dx বার</string>
     <string name="pharmacy_order_notes_format">নোট: %1$s</string>
     <string name="notif_overlay_prompt_title">অ্যালার্ম পপআপের অনুমতি দিন</string>
@@ -678,5 +678,20 @@
     <string name="dialog_later">পরে</string>
 
     <string name="pharmacy_order_include_stock">বার্তায় বর্তমান স্টক অন্তর্ভুক্ত করুন</string>
+    <string name="pharmacy_order_include_dosage">ডোজ / ক্ষমতা অন্তর্ভুক্ত করুন</string>
     <string name="pharmacy_order_quantity_label">পরিমাণ</string>
+    <string name="pharmacy_order_profile_filter">অন্তর্ভুক্ত করার প্রোফাইল</string>
+
+    <!-- Manual Dose Recording Strings -->
+    <string name="pref_manually_record_dose_time_title">ম্যানুয়ালি ডোজ সময় রেকর্ড করুন</string>
+    <string name="pref_manually_record_dose_time_desc">ডোজ রেকর্ড করার সময় আপনি ওষুধ খাওয়ার সঠিক সময় জানতে চাইবে।</string>
+    <string name="record_dose_time_title">ডোজ সময় রেকর্ড করুন</string>
+    <string name="record_dose_time_subtitle">আপনি কখন %1$s গ্রহণ করেছেন?</string>
+    <string name="record_dose_time_just_now">এইমাত্র (%1$s)</string>
+    <string name="record_dose_time_scheduled">নির্ধারিত সময়ে (%1$s)</string>
+    <string name="record_dose_time_custom">পছন্দমতো সময় (%1$s)</string>
+    <string name="record_dose_time_select">সময় পরিবর্তন করুন</string>
+    <string name="record_dose_time_confirm">ডোজ রেকর্ড করুন</string>
+    <string name="unit_bottle">বোতল</string>
+    <string name="unit_bottles">বোতল</string>
 </resources>

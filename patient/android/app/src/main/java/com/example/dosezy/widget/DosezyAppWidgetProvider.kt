@@ -91,9 +91,10 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
 
                     val today = java.time.LocalDate.now()
                     val zoneId = java.time.ZoneId.systemDefault()
-                    val startOfDay = today.atStartOfDay(zoneId).toInstant().toEpochMilli()
-                    val endOfDay = today.plusDays(1).atStartOfDay(zoneId).toInstant().toEpochMilli() - 1
-                    val next7Days = today.plusDays(7).atStartOfDay(zoneId).toInstant().toEpochMilli() - 1
+                    val zoneUtc = java.time.ZoneOffset.UTC
+                    val startOfDay = today.atStartOfDay(zoneUtc).toInstant().toEpochMilli()
+                    val endOfDay = today.plusDays(1).atStartOfDay(zoneUtc).toInstant().toEpochMilli() - 1
+                    val next7Days = today.plusDays(7).atStartOfDay(zoneUtc).toInstant().toEpochMilli() - 1
 
                     val todayEntries = db.scheduleDao().getScheduleForDateRangeDirect(user.userId, startOfDay, endOfDay)
                     val todayPending = todayEntries.filter { it.status == MedicationStatus.PENDING }.sortedBy { it.scheduledDateTime }

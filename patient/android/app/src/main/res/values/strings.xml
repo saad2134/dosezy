@@ -668,7 +668,7 @@ Do you want to continue?</string>
     <string name="pharmacy_order_date_header">Date: %1$s</string>
     <string name="pharmacy_order_supply_header">Order for %1$d Days Supply:</string>
     <string name="pharmacy_order_footer_confirm">Please confirm availability and delivery. Thank you!</string>
-    <string name="pharmacy_order_footer_brand">Generated via Dosezy</string>
+    <string name="pharmacy_order_footer_brand">Generated via Dosezy\n(Your Medication companion)</string>
     <string name="menu_pharmacy_order">Pharmacy Refill Order</string>
     <string name="menu_pharmacy_order_desc">Generate and share medication orders via WhatsApp</string>
     <string name="pharmacy_order_markdown_preview">Markdown Preview</string>
@@ -701,7 +701,7 @@ Do you want to continue?</string>
     <string name="pharmacy_order_medicines_include">Medicines to Include (%1$d/%2$d)</string>
     <string name="pharmacy_order_stock_left">%1$d left</string>
     <string name="pharmacy_order_no_stock_tracked">No stock tracked</string>
-    <string name="pharmacy_order_header_title">📋 *Dosezy Pharmacy Refill Order*</string>
+    <string name="pharmacy_order_header_title">📋 *Medicine Order*</string>
     <string name="pharmacy_order_frequency_format">Frequency: %1$dx daily</string>
     <string name="pharmacy_order_notes_format">Notes: %1$s</string>
     <string name="notif_overlay_prompt_title">Allow Alarm Pop-ups</string>
@@ -710,5 +710,20 @@ Do you want to continue?</string>
     <string name="dialog_later">Later</string>
 
     <string name="pharmacy_order_include_stock">Include current stock in message</string>
+    <string name="pharmacy_order_include_dosage">Include dosage / strength</string>
     <string name="pharmacy_order_quantity_label">Qty</string>
+    <string name="pharmacy_order_profile_filter">Profiles to Include</string>
+
+    <!-- Manual Dose Recording Strings -->
+    <string name="pref_manually_record_dose_time_title">Manually Record Dose Time</string>
+    <string name="pref_manually_record_dose_time_desc">Prompt for the actual time you took the medication when recording doses.</string>
+    <string name="record_dose_time_title">Record Dose Time</string>
+    <string name="record_dose_time_subtitle">When did you take %1$s?</string>
+    <string name="record_dose_time_just_now">Just now (%1$s)</string>
+    <string name="record_dose_time_scheduled">At scheduled time (%1$s)</string>
+    <string name="record_dose_time_custom">Custom time (%1$s)</string>
+    <string name="record_dose_time_select">Change Time</string>
+    <string name="record_dose_time_confirm">Record Dose</string>
+    <string name="unit_bottle">bottle</string>
+    <string name="unit_bottles">bottles</string>
 </resources>

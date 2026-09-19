@@ -1,1 +1,4 @@
-
+• Crossing Time Zones: Doses shift with you, keeping reminders on local routine
+• Manually Record Dose Time: Log exact time taken with accurate adherence stats
+• Enhanced Pharmacy Refill Orders: Multi-profile consolidation, smart bottle calculations for drops, and selectable cleaner previews
+• Targeted store update routing with Appteka marketplace support

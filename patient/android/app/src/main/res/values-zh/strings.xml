@@ -656,7 +656,7 @@
     <string name="pharmacy_order_date_header">日期：%1$s</string>
     <string name="pharmacy_order_supply_header">%1$d 天用量补购订单：</string>
     <string name="pharmacy_order_footer_confirm">请确认药品库存及配送安排，十分感谢！</string>
-    <string name="pharmacy_order_footer_brand">由 Dosezy 生成</string>
+    <string name="pharmacy_order_footer_brand">由 Dosezy 生成\n(您的贴身用药管家)</string>
     <string name="menu_pharmacy_order">药店补药清单</string>
     <string name="menu_pharmacy_order_desc">生成药品订单并通过微信或WhatsApp分享</string>
     <string name="pharmacy_order_markdown_preview">Markdown 预览</string>
@@ -689,7 +689,7 @@
     <string name="pharmacy_order_medicines_include">包含药品 (%1$d/%2$d)</string>
     <string name="pharmacy_order_stock_left">剩余 %1$d</string>
     <string name="pharmacy_order_no_stock_tracked">未追踪库存</string>
-    <string name="pharmacy_order_header_title">📋 *Dosezy 药房补药清单*</string>
+    <string name="pharmacy_order_header_title">📋 *药品订购单*</string>
     <string name="pharmacy_order_frequency_format">频次：每日 %1$d 次</string>
     <string name="pharmacy_order_notes_format">备注：%1$s</string>
     <string name="notif_overlay_prompt_title">允许闹钟弹窗</string>
@@ -698,5 +698,20 @@
     <string name="dialog_later">稍后</string>
 
     <string name="pharmacy_order_include_stock">在清单中包含当前库存</string>
+    <string name="pharmacy_order_include_dosage">在清单中包含药品剂量与规格</string>
     <string name="pharmacy_order_quantity_label">数量</string>
+    <string name="pharmacy_order_profile_filter">包含的个人资料</string>
+
+    <!-- Manual Dose Recording Strings -->
+    <string name="pref_manually_record_dose_time_title">手动记录服药时间</string>
+    <string name="pref_manually_record_dose_time_desc">记录服药时询问实际服药时间。</string>
+    <string name="record_dose_time_title">记录服药时间</string>
+    <string name="record_dose_time_subtitle">您什么时候服用了 %1$s？</string>
+    <string name="record_dose_time_just_now">刚刚 (%1$s)</string>
+    <string name="record_dose_time_scheduled">按计划时间 (%1$s)</string>
+    <string name="record_dose_time_custom">自定义时间 (%1$s)</string>
+    <string name="record_dose_time_select">更改时间</string>
+    <string name="record_dose_time_confirm">确认服药</string>
+    <string name="unit_bottle">瓶</string>
+    <string name="unit_bottles">瓶</string>
 </resources>

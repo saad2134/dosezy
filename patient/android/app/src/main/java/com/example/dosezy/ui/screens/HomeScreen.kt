@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import com.example.dosezy.ui.components.SkipReasonDialog
+import com.example.dosezy.ui.components.RecordDoseTimeDialog
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.clickable
@@ -97,6 +98,7 @@ fun HomeScreen(
     var isPrnExpanded by remember { mutableStateOf(false) }
     var medToLogConfirm by remember { mutableStateOf<Medicine?>(null) }
     var skippingEntryId by remember { mutableStateOf<String?>(null) }
+    var manualRecordEntry by remember { mutableStateOf<ScheduleWithMedicine?>(null) }
     val snackbarHostState = remember { androidx.compose.material3.SnackbarHostState() }
     val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -176,6 +178,39 @@ fun HomeScreen(
         }
     }
 
+    val executeTakeDose: (String, java.time.LocalDateTime) -> Unit = { entryId, resolvedDateTime ->
+        val medName = todayEntries.find { it.scheduleEntry.entryId == entryId }?.medicine?.medicationName ?: ""
+        val lateAfter = currentUser?.considerLateAfter ?: 3
+        val missedAfter = currentUser?.considerMissedAfter ?: 6
+        val targetScheduleEntry = todayEntries.find { it.scheduleEntry.entryId == entryId }?.scheduleEntry
+        val isLate = if (targetScheduleEntry != null) {
+            TimeCalculationUtils.isLate(targetScheduleEntry.scheduledDateTime, resolvedDateTime, lateAfter, missedAfter)
+        } else false
+
+        val takenAt = resolvedDateTime.toString()
+        if (isLate) {
+            scheduleViewModel.markAsLate(entryId, takenAt)
+        } else {
+            scheduleViewModel.markAsTaken(entryId, takenAt)
+        }
+
+        coroutineScope.launch {
+            val message = if (medName.isNotBlank()) {
+                context.getString(R.string.home_dose_recorded, medName)
+            } else {
+                context.getString(R.string.home_action_taken)
+            }
+            val result = snackbarHostState.showSnackbar(
+                message = message,
+                actionLabel = context.getString(R.string.btn_undo),
+                duration = androidx.compose.material3.SnackbarDuration.Short
+            )
+            if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+                scheduleViewModel.undoDoseTaken(entryId)
+            }
+        }
+    }
+
     androidx.compose.material3.Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
@@ -217,43 +252,27 @@ fun HomeScreen(
                                 currentDateTime = currentTime,
                                 currentUser = currentUser,
                                 onMarkAsTaken = { entryId ->
-                                    val medName = todayEntries.find { it.scheduleEntry.entryId == entryId }?.medicine?.medicationName ?: ""
-                                    val takenAt = java.time.LocalDateTime.now().toString()
-                                    scheduleViewModel.markAsTaken(entryId, takenAt)
-                                    coroutineScope.launch {
-                                        val message = if (medName.isNotBlank()) {
-                                            context.getString(R.string.home_dose_recorded, medName)
+                                    if (currentUser?.allowCustomDoseTime == true) {
+                                        val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
+                                        if (target != null) {
+                                            manualRecordEntry = target
                                         } else {
-                                            context.getString(R.string.home_action_taken)
+                                            executeTakeDose(entryId, java.time.LocalDateTime.now())
                                         }
-                                        val result = snackbarHostState.showSnackbar(
-                                            message = message,
-                                            actionLabel = context.getString(R.string.btn_undo),
-                                            duration = androidx.compose.material3.SnackbarDuration.Short
-                                        )
-                                        if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
-                                            scheduleViewModel.undoDoseTaken(entryId)
-                                        }
+                                    } else {
+                                        executeTakeDose(entryId, java.time.LocalDateTime.now())
                                     }
                                 },
                                 onMarkAsLate = { entryId ->
-                                    val medName = todayEntries.find { it.scheduleEntry.entryId == entryId }?.medicine?.medicationName ?: ""
-                                    val takenAt = java.time.LocalDateTime.now().toString()
-                                    scheduleViewModel.markAsLate(entryId, takenAt)
-                                    coroutineScope.launch {
-                                        val message = if (medName.isNotBlank()) {
-                                            context.getString(R.string.home_dose_recorded, medName)
+                                    if (currentUser?.allowCustomDoseTime == true) {
+                                        val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
+                                        if (target != null) {
+                                            manualRecordEntry = target
                                         } else {
-                                            context.getString(R.string.home_action_taken)
+                                            executeTakeDose(entryId, java.time.LocalDateTime.now())
                                         }
-                                        val result = snackbarHostState.showSnackbar(
-                                            message = message,
-                                            actionLabel = context.getString(R.string.btn_undo),
-                                            duration = androidx.compose.material3.SnackbarDuration.Short
-                                        )
-                                        if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
-                                            scheduleViewModel.undoDoseTaken(entryId)
-                                        }
+                                    } else {
+                                        executeTakeDose(entryId, java.time.LocalDateTime.now())
                                     }
                                 },
                                 onUndo = { entryId ->
@@ -498,6 +517,21 @@ fun HomeScreen(
             },
             onDismiss = {
                 skippingEntryId = null
+            }
+        )
+    }
+
+    if (manualRecordEntry != null) {
+        val target = manualRecordEntry!!
+        RecordDoseTimeDialog(
+            entry = target.scheduleEntry,
+            medicineName = target.medicine?.medicationName ?: "",
+            timeFormat = currentUser?.timeFormat ?: TimeFormat.HOUR_12,
+            onDismiss = { manualRecordEntry = null },
+            onConfirm = { resolvedDateTime ->
+                val targetId = target.scheduleEntry.entryId
+                manualRecordEntry = null
+                executeTakeDose(targetId, resolvedDateTime)
             }
         )
     }

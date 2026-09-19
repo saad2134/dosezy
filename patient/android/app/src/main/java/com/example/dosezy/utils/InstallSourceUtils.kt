@@ -175,7 +175,7 @@ object InstallSourceUtils {
                 sourceName = "Appteka",
                 installerPackage = installerPackage,
                 storeUri = "market://details?id=$packageName",
-                webFallbackUrl = "https://appteka.store"
+                webFallbackUrl = "https://appteka.store/app/$packageName"
             )
             else -> InstallSourceDetails(
                 sourceName = "GitHub Release / Direct Sideload",

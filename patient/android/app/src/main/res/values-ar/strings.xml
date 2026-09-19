@@ -640,7 +640,7 @@
     <string name="pharmacy_order_date_header">التاريخ: %1$s</string>
     <string name="pharmacy_order_supply_header">طلب لإمداد %1$d يومًا:</string>
     <string name="pharmacy_order_footer_confirm">يرجى تأكيد التوفر وإمكانية التوصيل. شكراً لك!</string>
-    <string name="pharmacy_order_footer_brand">تم الإنشاء عبر دوزيزي</string>
+    <string name="pharmacy_order_footer_brand">تم الإنشاء عبر Dosezy\n(رفيقك الدوائي)</string>
     <string name="menu_pharmacy_order">طلب إعادة تعبئة الصيدلية</string>
     <string name="menu_pharmacy_order_desc">إنشاء ومشاركة طلبات الأدوية عبر واتساب</string>
     <string name="pharmacy_order_markdown_preview">معاينة ماركداون</string>
@@ -673,7 +673,7 @@
     <string name="pharmacy_order_medicines_include">الأدوية المشمولة (%1$d/%2$d)</string>
     <string name="pharmacy_order_stock_left">المتبقي %1$d</string>
     <string name="pharmacy_order_no_stock_tracked">المخزون غير متتبع</string>
-    <string name="pharmacy_order_header_title">📋 *طلب إعادة تعبئة صيدلية Dosezy*</string>
+    <string name="pharmacy_order_header_title">📋 *طلب الأدوية*</string>
     <string name="pharmacy_order_frequency_format">التكرار: %1$d مرات يومياً</string>
     <string name="pharmacy_order_notes_format">ملاحظات: %1$s</string>
     <string name="notif_overlay_prompt_title">السماح بنوافذ المنبه المنبثقة</string>
@@ -682,5 +682,20 @@
     <string name="dialog_later">لاحقاً</string>
 
     <string name="pharmacy_order_include_stock">تضمين المخزون الحالي في الرسالة</string>
+    <string name="pharmacy_order_include_dosage">تضمين الجرعة / القوة</string>
     <string name="pharmacy_order_quantity_label">الكمية</string>
+    <string name="pharmacy_order_profile_filter">الملفات الشخصية المطلوبة</string>
+
+    <!-- Manual Dose Recording Strings -->
+    <string name="pref_manually_record_dose_time_title">تسجيل وقت الجرعة يدويًا</string>
+    <string name="pref_manually_record_dose_time_desc">السؤال عن الوقت الفعلي لتناول الدواء عند تسجيل الجرعات.</string>
+    <string name="record_dose_time_title">تسجيل وقت الجرعة</string>
+    <string name="record_dose_time_subtitle">متى تناولت %1$s؟</string>
+    <string name="record_dose_time_just_now">الآن (%1$s)</string>
+    <string name="record_dose_time_scheduled">في الوقت المحدد (%1$s)</string>
+    <string name="record_dose_time_custom">وقت مخصص (%1$s)</string>
+    <string name="record_dose_time_select">تغيير الوقت</string>
+    <string name="record_dose_time_confirm">تسجيل الجرعة</string>
+    <string name="unit_bottle">زجاجة</string>
+    <string name="unit_bottles">زجاجات</string>
 </resources>

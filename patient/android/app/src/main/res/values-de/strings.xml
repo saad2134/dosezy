@@ -640,7 +640,7 @@ Möchten Sie fortfahren?</string>
     <string name="pharmacy_order_date_header">Datum: %1$s</string>
     <string name="pharmacy_order_supply_header">Bestellung für einen Bedarf von %1$d Tagen:</string>
     <string name="pharmacy_order_footer_confirm">Bitte Verfügbarkeit und Lieferung bestätigen. Vielen Dank!</string>
-    <string name="pharmacy_order_footer_brand">Erstellt über Dosezy</string>
+    <string name="pharmacy_order_footer_brand">Erstellt über Dosezy\n(Ihr Medikamenten-Begleiter)</string>
     <string name="menu_pharmacy_order">Apotheken-Nachbestellung</string>
     <string name="menu_pharmacy_order_desc">Medikamentenbestellungen erstellen und über WhatsApp teilen</string>
     <string name="pharmacy_order_markdown_preview">Markdown-Vorschau</string>
@@ -673,7 +673,7 @@ Möchten Sie fortfahren?</string>
     <string name="pharmacy_order_medicines_include">Einzubeziehende Medikamente (%1$d/%2$d)</string>
     <string name="pharmacy_order_stock_left">Noch %1$d übrig</string>
     <string name="pharmacy_order_no_stock_tracked">Kein Bestand erfasst</string>
-    <string name="pharmacy_order_header_title">📋 *Dosezy Apotheken-Nachbestellung*</string>
+    <string name="pharmacy_order_header_title">📋 *Medikamentenbestellung*</string>
     <string name="pharmacy_order_frequency_format">Häufigkeit: %1$dx täglich</string>
     <string name="pharmacy_order_notes_format">Hinweise: %1$s</string>
     <string name="notif_overlay_prompt_title">Alarm-Popups erlauben</string>
@@ -681,6 +681,21 @@ Möchten Sie fortfahren?</string>
     <string name="dialog_enable">Aktivieren</string>
     <string name="dialog_later">Später</string>
 
-    <string name="pharmacy_order_include_stock">Aktuellen Bestand in Nachricht einfügen</string>
+    <string name="pharmacy_order_include_stock">Aktuellen Bestand in Nachricht einbeziehen</string>
+    <string name="pharmacy_order_include_dosage">Dosierung / Stärke einbeziehen</string>
     <string name="pharmacy_order_quantity_label">Menge</string>
+    <string name="pharmacy_order_profile_filter">Einzuschließende Profile</string>
+
+    <!-- Manual Dose Recording Strings -->
+    <string name="pref_manually_record_dose_time_title">Dosiszeit manuell erfassen</string>
+    <string name="pref_manually_record_dose_time_desc">Beim Erfassen von Dosen nach dem tatsächlichen Einnahmezeitpunkt fragen.</string>
+    <string name="record_dose_time_title">Dosiszeit erfassen</string>
+    <string name="record_dose_time_subtitle">Wann haben Sie %1$s eingenommen?</string>
+    <string name="record_dose_time_just_now">Gerade eben (%1$s)</string>
+    <string name="record_dose_time_scheduled">Zur geplanten Zeit (%1$s)</string>
+    <string name="record_dose_time_custom">Benutzerdefinierte Zeit (%1$s)</string>
+    <string name="record_dose_time_select">Zeit ändern</string>
+    <string name="record_dose_time_confirm">Dosis erfassen</string>
+    <string name="unit_bottle">Flasche</string>
+    <string name="unit_bottles">Flaschen</string>
 </resources>

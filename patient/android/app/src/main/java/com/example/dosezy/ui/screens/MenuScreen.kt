@@ -402,6 +402,7 @@ fun MenuScreen(navController: NavController) {
     if (showPharmacyOrderDialog && currentUser != null) {
         com.example.dosezy.ui.components.PharmacyOrderDialog(
             user = currentUser!!,
+            allUsers = users,
             medicines = medicines,
             dataExporter = dataExporter,
             onDismiss = { showPharmacyOrderDialog = false }

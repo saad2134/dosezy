@@ -639,7 +639,7 @@ Deseja continuar?</string>
     <string name="pharmacy_order_date_header">Data: %1$s</string>
     <string name="pharmacy_order_supply_header">Pedido para suprimento de %1$d dias:</string>
     <string name="pharmacy_order_footer_confirm">Por favor, confirme a disponibilidade e a entrega. Obrigado!</string>
-    <string name="pharmacy_order_footer_brand">Gerado via Dosezy</string>
+    <string name="pharmacy_order_footer_brand">Gerado via Dosezy\n(Seu companheiro de medicação)</string>
     <string name="menu_pharmacy_order">Pedido para farmácia</string>
     <string name="menu_pharmacy_order_desc">Gerar e compartilhar pedidos de medicamentos pelo WhatsApp</string>
     <string name="pharmacy_order_markdown_preview">Prévia em Markdown</string>
@@ -672,7 +672,7 @@ Deseja continuar?</string>
     <string name="pharmacy_order_medicines_include">Medicamentos a Incluir (%1$d/%2$d)</string>
     <string name="pharmacy_order_stock_left">%1$d restantes</string>
     <string name="pharmacy_order_no_stock_tracked">Sem controle de estoque</string>
-    <string name="pharmacy_order_header_title">📋 *Pedido de Farmácia Dosezy*</string>
+    <string name="pharmacy_order_header_title">📋 *Pedido de Medicamentos*</string>
     <string name="pharmacy_order_frequency_format">Frequência: %1$dx ao dia</string>
     <string name="pharmacy_order_notes_format">Notas: %1$s</string>
     <string name="notif_overlay_prompt_title">Permitir Pop-ups de Alarme</string>
@@ -681,5 +681,20 @@ Deseja continuar?</string>
     <string name="dialog_later">Mais tarde</string>
 
     <string name="pharmacy_order_include_stock">Incluir estoque atual na mensagem</string>
-    <string name="pharmacy_order_quantity_label">Qtd.</string>
+    <string name="pharmacy_order_include_dosage">Incluir dosagem / concentração</string>
+    <string name="pharmacy_order_quantity_label">Qtd</string>
+    <string name="pharmacy_order_profile_filter">Perfis a incluir</string>
+
+    <!-- Manual Dose Recording Strings -->
+    <string name="pref_manually_record_dose_time_title">Registrar horário da dose manualmente</string>
+    <string name="pref_manually_record_dose_time_desc">Perguntar o horário real em que você tomou o medicamento ao registrar as doses.</string>
+    <string name="record_dose_time_title">Registrar horário da dose</string>
+    <string name="record_dose_time_subtitle">Quando você tomou %1$s?</string>
+    <string name="record_dose_time_just_now">Agora mesmo (%1$s)</string>
+    <string name="record_dose_time_scheduled">No horário programado (%1$s)</string>
+    <string name="record_dose_time_custom">Horário personalizado (%1$s)</string>
+    <string name="record_dose_time_select">Alterar horário</string>
+    <string name="record_dose_time_confirm">Registrar dose</string>
+    <string name="unit_bottle">frasco</string>
+    <string name="unit_bottles">frascos</string>
 </resources>

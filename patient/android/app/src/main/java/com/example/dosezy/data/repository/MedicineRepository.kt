@@ -93,7 +93,7 @@ class MedicineRepository @Inject constructor(
 
             if (scheduleChanged) {
                 val startOfToday = LocalDate.now().atStartOfDay()
-                val startOfTodayEpochMillis = startOfToday.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+                val startOfTodayEpochMillis = startOfToday.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
 
                 // Delete all untaken schedule entries from start of today onwards for this medicine
                 database.scheduleDao().deleteUntakenScheduleEntriesFrom(medicine.medicineId, startOfTodayEpochMillis)

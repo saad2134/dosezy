@@ -640,7 +640,7 @@
     <string name="pharmacy_order_date_header">日付: %1$s</string>
     <string name="pharmacy_order_supply_header">%1$d 日分の処方注文:</string>
     <string name="pharmacy_order_footer_confirm">在庫の確認および配送の確認をお願い申し上げます。ありがとうございます。</string>
-    <string name="pharmacy_order_footer_brand">Dosezy で生成</string>
+    <string name="pharmacy_order_footer_brand">Dosezy で生成\n(あなたの服薬パートナー)</string>
     <string name="menu_pharmacy_order">薬局への注文リスト</string>
     <string name="menu_pharmacy_order_desc">医薬品の注文リストを作成してWhatsAppで共有</string>
     <string name="pharmacy_order_markdown_preview">Markdownプレビュー</string>
@@ -673,7 +673,7 @@
     <string name="pharmacy_order_medicines_include">対象のお薬 (%1$d/%2$d)</string>
     <string name="pharmacy_order_stock_left">残り %1$d</string>
     <string name="pharmacy_order_no_stock_tracked">在庫追跡なし</string>
-    <string name="pharmacy_order_header_title">📋 *Dosezy 薬局補充注文*</string>
+    <string name="pharmacy_order_header_title">📋 *医薬品注文書*</string>
     <string name="pharmacy_order_frequency_format">頻度: 1日 %1$d回</string>
     <string name="pharmacy_order_notes_format">メモ: %1$s</string>
     <string name="notif_overlay_prompt_title">アラームポップアップを許可</string>
@@ -681,6 +681,21 @@
     <string name="dialog_enable">有効にする</string>
     <string name="dialog_later">後で</string>
 
-    <string name="pharmacy_order_include_stock">メッセージに現在の在庫を含める</string>
+    <string name="pharmacy_order_include_stock">メッセージに現在の在庫数を含める</string>
+    <string name="pharmacy_order_include_dosage">用量・規格を含める</string>
     <string name="pharmacy_order_quantity_label">数量</string>
+    <string name="pharmacy_order_profile_filter">含めるプロフィール</string>
+
+    <!-- Manual Dose Recording Strings -->
+    <string name="pref_manually_record_dose_time_title">服薬時間を手動で記録</string>
+    <string name="pref_manually_record_dose_time_desc">服薬を記録する際に、実際に薬を服用した時間を尋ねます。</string>
+    <string name="record_dose_time_title">服薬時間を記録</string>
+    <string name="record_dose_time_subtitle">%1$sをいつ服用しましたか？</string>
+    <string name="record_dose_time_just_now">今すぐ (%1$s)</string>
+    <string name="record_dose_time_scheduled">予定時間通り (%1$s)</string>
+    <string name="record_dose_time_custom">カスタム時間 (%1$s)</string>
+    <string name="record_dose_time_select">時間を変更</string>
+    <string name="record_dose_time_confirm">服薬を記録</string>
+    <string name="unit_bottle">本</string>
+    <string name="unit_bottles">本</string>
 </resources>

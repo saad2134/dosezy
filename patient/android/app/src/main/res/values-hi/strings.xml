@@ -656,7 +656,7 @@
     <string name="pharmacy_order_date_header">दिनांक: %1$s</string>
     <string name="pharmacy_order_supply_header">%1$d दिनों की आपूर्ति हेतु ऑर्डर सूची:</string>
     <string name="pharmacy_order_footer_confirm">कृपया दवाओं की उपलब्धता और डिलीवरी की पुष्टि करें। धन्यवाद!</string>
-    <string name="pharmacy_order_footer_brand">Dosezy द्वारा तैयार</string>
+    <string name="pharmacy_order_footer_brand">Dosezy द्वारा तैयार\n(आपका दवा साथी)</string>
     <string name="menu_pharmacy_order">फार्मेसी रीफ़िल ऑर्डर</string>
     <string name="menu_pharmacy_order_desc">व्हाट्सएप के ज़रिये दवा ऑर्डर बनाएं और शेयर करें</string>
     <string name="pharmacy_order_markdown_preview">मार्कडाउन पूर्वावलोकन</string>
@@ -689,7 +689,7 @@
     <string name="pharmacy_order_medicines_include">शामिल दवाइयां (%1$d/%2$d)</string>
     <string name="pharmacy_order_stock_left">%1$d शेष</string>
     <string name="pharmacy_order_no_stock_tracked">स्टॉक ट्रैक नहीं किया गया</string>
-    <string name="pharmacy_order_header_title">📋 *Dosezy फ़ार्मेसी रीफ़िल ऑर्डर*</string>
+    <string name="pharmacy_order_header_title">📋 *दवा का ऑर्डर*</string>
     <string name="pharmacy_order_frequency_format">आवृत्ति: दिन में %1$dx बार</string>
     <string name="pharmacy_order_notes_format">नोट्स: %1$s</string>
     <string name="notif_overlay_prompt_title">अलार्म पॉपअप की अनुमति दें</string>
@@ -698,5 +698,20 @@
     <string name="dialog_later">बाद में</string>
 
     <string name="pharmacy_order_include_stock">संदेश में वर्तमान स्टॉक शामिल करें</string>
+    <string name="pharmacy_order_include_dosage">दवा की खुराक / क्षमता शामिल करें</string>
     <string name="pharmacy_order_quantity_label">मात्रा</string>
+    <string name="pharmacy_order_profile_filter">शामिल करने योग्य प्रोफ़ाइल</string>
+
+    <!-- Manual Dose Recording Strings -->
+    <string name="pref_manually_record_dose_time_title">खुराक का समय मैन्युअल रूप से दर्ज करें</string>
+    <string name="pref_manually_record_dose_time_desc">खुराक दर्ज करते समय दवा लेने का वास्तविक समय पूछें।</string>
+    <string name="record_dose_time_title">खुराक का समय दर्ज करें</string>
+    <string name="record_dose_time_subtitle">आपने %1$s कब ली?</string>
+    <string name="record_dose_time_just_now">अभी-अभी (%1$s)</string>
+    <string name="record_dose_time_scheduled">निर्धारित समय पर (%1$s)</string>
+    <string name="record_dose_time_custom">कस्टम समय (%1$s)</string>
+    <string name="record_dose_time_select">समय बदलें</string>
+    <string name="record_dose_time_confirm">खुराक दर्ज करें</string>
+    <string name="unit_bottle">शीशी</string>
+    <string name="unit_bottles">शीशियां</string>
 </resources>

@@ -30,11 +30,16 @@
   <details>
     <summary>Others</summary>
     <br>
-    <a href="https://appteka.store/apps/dcer321958">
+    <a href="https://appteka.store/app/com.saad2134.dosezy">
       <img width="197" height="59" alt="AppTeka" src="assets/badges/appteka.png" />
+    </a>
+    <a href="https://www.openapk.net/dosezy/com.saad2134.dosezy/">
+      <img width="197" height="59" alt="OpenAPK" src="assets/badges/openapk.png" />
     </a>
   </details>
 </div>
+
+
 
 #### Coming Soon On
 
@@ -64,7 +69,9 @@ Dosezy transforms daily medication management into a stress-free experience. Inp
 - 🔔 **Critical Full-Screen Alarms** – High-visibility alarm screen rings reliably even when your phone is in deep sleep or silent mode. Intercept with physical volume keys to instantly silence audio, or snooze safely with a back gesture.
 - 🎵 **Custom Sounds & Dynamic Snooze** – Choose from gentle built-in alert tones or your own device ringtones with in-app audio previews, dedicated alarm volume controls, and customizable snooze intervals (5, 10, 15, 20, or 30 minutes).
 - 📦 **Pill Inventory & Low-Stock Warnings** – Real-time stock tracking with automatic deduction on intake. Configurable low-stock alerts notify you well before running out of essential medications.
-- 🛒 **Dosezy Pharmacy Refill Order** – Instantly compile formatted prescription refill orders for 15, 30, 60, or 90 days from active inventory or low-stock filters. Preview your order with live WhatsApp markdown formatting, then tap to Share via Chat or copy to clipboard.
+- 🛒 **Dosezy Pharmacy Refill Order** – Instantly compile formatted prescription refill orders for 15, 30, 60, or 90 days from active inventory or low-stock filters with multi-profile consolidation and smart bottle supply calculations for eye drops. Preview your order with live WhatsApp markdown formatting, then tap to Share via Chat or copy to clipboard.
+- 🕒 **Manually Record Dose Time** – Easily record the actual time you took medications when logging doses later to maintain accurate adherence histories.
+- 🌐 **Crossing Time Zones (Doses Shift With You)** – Traveling across time zones? Dosezy automatically keeps your reminders anchored to your local daily routine without time distortion.
 - ↩️ **Instant Intake Undo** – Made a mistake? Reverse accidental dose logging immediately using the 5-second action snackbar or the persistent Undo button on dose cards, automatically returning deducted tablets to stock.
 - 📝 **Clinical Dose Skipping** – Safely pause doses with required clinical explanations (*Doctor advised pause*, *Adverse reaction*, *Fasting*, *Illness*, *Ran out of medicine*) without penalizing your adherence streak.
 - 🕒 **12-First Grid Time Picker** – Visual, tremor-friendly grid time selector that places 12 at the top for natural morning/night scheduling, avoiding frustrating circular clock dials.

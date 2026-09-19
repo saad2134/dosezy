@@ -335,9 +335,10 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 scheduleRepository.rescheduleAllAlarms(user.userId, context)
             }
 
-            Log.d(TAG, "Successfully rescheduled alarms for ${allUsers.size} users after boot")
+            Log.d(TAG, "Successfully rescheduled alarms for ${allUsers.size} users after boot/timezone change")
+            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
         } catch (e: Exception) {
-            Log.e(TAG, "Error rescheduling alarms after boot", e)
+            Log.e(TAG, "Error rescheduling alarms after boot/timezone change", e)
         }
     }
 

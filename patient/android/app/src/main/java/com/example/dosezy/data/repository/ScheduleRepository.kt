@@ -24,15 +24,15 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun getScheduleForDate(userId: String, date: LocalDate): Flow<List<ScheduleEntry>> {
-        val startOfDay = date.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
-        val endOfDay = date.atTime(java.time.LocalTime.MAX).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val startOfDay = date.atStartOfDay(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+        val endOfDay = date.atTime(java.time.LocalTime.MAX).atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
         return database.scheduleDao().getScheduleForDateRange(userId, startOfDay, endOfDay)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun getScheduleWithMedicineForDate(userId: String, date: LocalDate): Flow<List<ScheduleWithMedicine>> {
-        val startOfDay = date.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
-        val endOfDay = date.atTime(java.time.LocalTime.MAX).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val startOfDay = date.atStartOfDay(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+        val endOfDay = date.atTime(java.time.LocalTime.MAX).atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
         return database.scheduleDao().getScheduleWithMedicineForDateRange(userId, startOfDay, endOfDay)
     }
 
@@ -161,8 +161,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         val alarmScheduler = AlarmScheduler(context)
 
         try {
-            val startMillis = startDate.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
-            val endMillis = endDate.atTime(java.time.LocalTime.MAX).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+            val startMillis = startDate.atStartOfDay(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+            val endMillis = endDate.atTime(java.time.LocalTime.MAX).atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
             val entries = database.scheduleDao().getScheduleForDateRange(userId, startMillis, endMillis).first()
 
             var scheduledCount = 0
@@ -186,8 +186,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun getScheduleForDateRange(userId: String, startDate: LocalDate, endDate: LocalDate): Flow<List<ScheduleEntry>> {
-        val startMillis = startDate.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
-        val endMillis = endDate.atTime(java.time.LocalTime.MAX).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val startMillis = startDate.atStartOfDay(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+        val endMillis = endDate.atTime(java.time.LocalTime.MAX).atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
         return database.scheduleDao().getScheduleForDateRange(userId, startMillis, endMillis)
     }
 

@@ -44,23 +44,23 @@ class Converters {
     // LocalDateTime converters
     @RequiresApi(Build.VERSION_CODES.O)
     @TypeConverter
-    fun fromLocalDateTime(dateTime: LocalDateTime?): Long? = dateTime?.atZone(java.time.ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
+    fun fromLocalDateTime(dateTime: LocalDateTime?): Long? = dateTime?.atZone(java.time.ZoneOffset.UTC)?.toInstant()?.toEpochMilli()
 
     @RequiresApi(Build.VERSION_CODES.O)
     @TypeConverter
     fun toLocalDateTime(value: Long?): LocalDateTime? = value?.let {
-        java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime()
+        java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneOffset.UTC).toLocalDateTime()
     }
 
     // LocalDate converters
     @RequiresApi(Build.VERSION_CODES.O)
     @TypeConverter
-    fun fromLocalDate(date: LocalDate?): Long? = date?.atStartOfDay(java.time.ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
+    fun fromLocalDate(date: LocalDate?): Long? = date?.atStartOfDay(java.time.ZoneOffset.UTC)?.toInstant()?.toEpochMilli()
 
     @RequiresApi(Build.VERSION_CODES.O)
     @TypeConverter
     fun toLocalDate(value: Long?): LocalDate? = value?.let {
-        java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+        java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneOffset.UTC).toLocalDate()
     }
 
     // LocalTime converters
