@@ -1,0 +1,3 @@
+• Critical Inventory Fix: Accurately deducts 1 pill/unit when recording taken doses for mg and mcg medications, preventing inventory from erroneously dropping to 0 (Fixes #80)
+• Stock Consistency: Accurate stock restoration on undo and PRN logging
+• General performance and reliability enhancements

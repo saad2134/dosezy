@@ -1,0 +1,60 @@
+<en-IN>
+• Critical Inventory Fix: Accurately deducts 1 pill/unit when recording taken doses for mg and mcg medications, preventing inventory from erroneously dropping to 0 (Fixes #80)
+• Stock Consistency: Accurate stock restoration on undo and PRN logging
+• General performance and reliability enhancements
+</en-IN>
+<en-US>
+• Critical Inventory Fix: Accurately deducts 1 pill/unit when recording taken doses for mg and mcg medications, preventing inventory from erroneously dropping to 0 (Fixes #80)
+• Stock Consistency: Accurate stock restoration on undo and PRN logging
+• General performance and reliability enhancements
+</en-US>
+<ar>
+• تصحيح حرج لخصم المخزون: خصم حبة/وحدة واحدة بدقة عند تسجيل الجرعات للأدوية المحددة بالملغ والميكروغرام، مما يمنع انخفاض المخزون إلى صفر بالخطأ
+• دقة المخزون: استعادة دقيقة للكمية عند التراجع عن تسجيل الجرعة
+• تحسينات عامة في الأداء والموثوقية
+</ar>
+<de-DE>
+• Wichtiges Bestands-Update: Zieht bei mg/mcg-Medikamenten exakt 1 Tablette/Einheit ab und verhindert, dass der Bestand fehlerhaft auf 0 fällt (Behebt #80)
+• Bestandskonsistenz: Exakte Wiederherstellung beim Rückgängigmachen von Einnahmen
+• Allgemeine Verbesserungen der Zuverlässigkeit
+</de-DE>
+<es-419>
+• Corrección crítica de inventario: descuenta con precisión 1 unidad al registrar dosis en mg/mcg, evitando que el stock se reduzca a 0 por error (Resuelve #80)
+• Consistencia de stock: restauración exacta al deshacer tomas
+• Mejoras generales de rendimiento y confiabilidad
+</es-419>
+<fr-FR>
+• Correction critique du stock: déduit exactement 1 unité lors de la prise de médicaments dosés en mg/mcg, empêchant le stock de tomber à 0 par erreur (Résout #80)
+• Cohérence des stocks: restauration exacte lors de l'annulation d'une prise
+• Améliorations générales des performances et de la fiabilité
+</fr-FR>
+<hi-IN>
+• महत्वपूर्ण स्टॉक सुधार: mg और mcg वाली दवाओं के लिए खुराक लेने पर अब ठीक 1 यूनिट/गोली की कटौती होगी, जिससे स्टॉक शून्य नहीं होगा (समस्या #80 का समाधान)
+• सटीक स्टॉक बहाली: खुराक पूर्ववत (Undo) करने पर स्टॉक सही बहाल होगा
+• सामान्य स्थिरता व प्रदर्शन में सुधार
+</hi-IN>
+<it-IT>
+• Correzione critica delle scorte: scala esattamente 1 unità all'assunzione per farmaci in mg/mcg, evitando l'azzeramento erroneo delle scorte (Risolve #80)
+• Coerenza inventario: ripristino accurato delle scorte in caso di annullamento
+• Miglioramenti generali delle prestazioni e dell'affidabilità
+</it-IT>
+<ja-JP>
+• 在庫減算の重大な修正: mgやmcg単位の薬の服用時に正確に1錠/1単位のみ減算し、在庫が誤って0になる問題を解消 (Issue #80解決)
+• 在庫の一貫性向上: 服用取り消し時の正確な在庫復元
+• 全体的な安定性とパフォーマンスの向上
+</ja-JP>
+<pt-BR>
+• Correção crítica de estoque: desconta com precisão 1 unidade ao registrar doses em mg/mcg, evitando que o estoque zere por engano (Corrige #80)
+• Consistência de estoque: restauração precisa ao desfazer registros de dose
+• Melhorias gerais de desempenho e confiabilidade
+</pt-BR>
+<ru-RU>
+• Критическое исправление учета запасов: точное списание 1 единицы при приеме лекарств в мг/мкг, что предотвращает ошибочное обнуление запаса (Фикс #80)
+• Точность остатков: корректное восстановление при отмене приема
+• Общие улучшения стабильности и надежности
+</ru-RU>
+<zh-CN>
+• 关键库存扣减修复：记录mg和mcg单位药品时准确扣减1粒/1个单位，防止库存被错误清零（修复 #80）
+• 库存一致性：撤销服药记录时精准恢复对应库存
+• 整体性能与可靠性优化
+</zh-CN>

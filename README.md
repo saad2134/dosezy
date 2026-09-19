@@ -9,7 +9,7 @@
 
 <div align="center">
 
-[![Android Patient App](https://img.shields.io/badge/Android%20Patient-v2.5.2%20Released-1e293b?style=flat&logo=android&logoColor=white&labelColor=2ea44f)](https://github.com/saad2134/dosezy/releases)
+[![Android Patient App](https://img.shields.io/badge/Android%20Patient-v2.5.3%20Released-1e293b?style=flat&logo=android&logoColor=white&labelColor=2ea44f)](https://github.com/saad2134/dosezy/releases)
 [![iOS Patient App](https://img.shields.io/badge/iOS%20Patient-Planned-1e293b?style=flat&logo=apple&logoColor=white&labelColor=007aff)](https://github.com/saad2134/dosezy)
 [![Server Node](https://img.shields.io/badge/Server%20Node-In%20Dev-1e293b?style=flat&logo=fastify&logoColor=white&labelColor=8b5cf6)](https://github.com/saad2134/dosezy)
 [![Caregiver Web](https://img.shields.io/badge/Caregiver%20Web-In%20Dev-1e293b?style=flat&logo=astro&logoColor=white&labelColor=f59e0b)](https://github.com/saad2134/dosezy)
@@ -117,7 +117,7 @@ Dosezy transforms daily medication management into a stress-free experience. Inp
 
 | Module | Platform | Status | Min / Target | Tech Stack |
 | :--- | :--- | :--- | :--- | :--- |
-| **📱 Patient App** | Android | Released (v2.5.2) | Android 7.0+ (API 24+) | Kotlin, Jetpack Compose, Room |
+| **📱 Patient App** | Android | Released (v2.5.3) | Android 7.0+ (API 24+) | Kotlin, Jetpack Compose, Room |
 | **🍎 Patient App** | iOS | Planned | iOS 16+ | Swift, SwiftUI, SwiftData |
 | **☁️ Server Node** | Server / API | In Development | Docker / Self-Host | Node.js, Fastify, TypeScript, SQLite/Postgres |
 | **🩺 Caregiver Portal** | Web | In Development | Modern Browsers | Astro, TypeScript, Tailwind |

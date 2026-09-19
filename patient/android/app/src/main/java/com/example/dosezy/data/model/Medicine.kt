@@ -201,6 +201,28 @@ data class Medicine(
             String.format("%d:%02d %s", displayHour, minute, amPm)
         }
     }
+
+    /**
+     * Calculates the number of inventory stock units to deduct when this medication is taken.
+     *
+     * - For solid medications measured by chemical strength (MG, MCG): physical stock is tracked
+     *   in count of units/pills (e.g. 150 pills in a bottle). Taking a dose consumes 1 unit (not 150/500 units).
+     * - For TABLET / CAPSULE: deducts the tablet/capsule quantity (defaulting to 1 if dosage is <= 0 or
+     *   if an unusually large number like 500 was entered representing mg strength).
+     * - For liquid / drops (ML, DROP): deducts the specified dose quantity (at least 1).
+     */
+    fun getStockDeductionAmount(): Int {
+        return when (dosageUnit) {
+            DosageUnit.MG, DosageUnit.MCG -> 1
+            DosageUnit.TABLET, DosageUnit.CAPSULE -> {
+                val count = dosage.toInt()
+                if (count in 1..10) count else 1
+            }
+            DosageUnit.DROP, DosageUnit.ML -> {
+                dosage.toInt().coerceAtLeast(1)
+            }
+        }
+    }
 }
 
 enum class DosageUnit {

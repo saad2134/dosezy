@@ -226,11 +226,11 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             if (entry != null) {
                 val medicine = database.medicineDao().getMedicineByIdDirect(entry.medicineId)
                 if (medicine != null && medicine.currentStock != null && medicine.autoDeductOnTake) {
-                    val deductAmount = medicine.dosage.toInt().coerceAtLeast(1)
+                    val deductAmount = medicine.getStockDeductionAmount()
                     val newStock = (medicine.currentStock - deductAmount).coerceAtLeast(0)
                     val updatedMedicine = medicine.copy(currentStock = newStock)
                     database.medicineDao().updateMedicine(updatedMedicine)
-                    Log.d(TAG, "Decremented stock for ${medicine.medicationName}: ${medicine.currentStock} -> $newStock")
+                    Log.d(TAG, "Decremented stock for ${medicine.medicationName}: ${medicine.currentStock} -> $newStock (deducted $deductAmount)")
 
                     // 3. Trigger refill warning notification if stock is below threshold
                     if (context != null && medicine.refillThreshold != null && newStock <= medicine.refillThreshold) {
@@ -296,11 +296,11 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             if (entry != null) {
                 val medicine = database.medicineDao().getMedicineByIdDirect(entry.medicineId)
                 if (medicine != null && medicine.currentStock != null && medicine.autoDeductOnTake) {
-                    val addAmount = medicine.dosage.toInt().coerceAtLeast(1)
+                    val addAmount = medicine.getStockDeductionAmount()
                     val restoredStock = medicine.currentStock + addAmount
                     val updatedMedicine = medicine.copy(currentStock = restoredStock)
                     database.medicineDao().updateMedicine(updatedMedicine)
-                    Log.d(TAG, "Restored stock for ${medicine.medicationName}: ${medicine.currentStock} -> $restoredStock on undo")
+                    Log.d(TAG, "Restored stock for ${medicine.medicationName}: ${medicine.currentStock} -> $restoredStock on undo (restored $addAmount)")
                 }
             }
         } catch (ex: Exception) {
@@ -335,7 +335,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
         // Decrement stock if enabled
         if (medicine.currentStock != null && medicine.autoDeductOnTake) {
-            val deductAmount = medicine.dosage.toInt().coerceAtLeast(1)
+            val deductAmount = medicine.getStockDeductionAmount()
             val newStock = (medicine.currentStock - deductAmount).coerceAtLeast(0)
             val updatedMedicine = medicine.copy(currentStock = newStock)
             database.medicineDao().updateMedicine(updatedMedicine)
