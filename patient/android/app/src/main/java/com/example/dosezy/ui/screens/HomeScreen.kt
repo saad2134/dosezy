@@ -91,12 +91,11 @@ fun HomeScreen(
     val userMedicines by medicineViewModel.medicines.collectAsState()
 
     val currentUser by userViewModel.currentUser.collectAsState()
-    val scheduleWithMedicine by scheduleViewModel.scheduleWithMedicine.collectAsState()
+    val todayEntries by scheduleViewModel.todayScheduleWithMedicine.collectAsState()
+    val isTodayLoading by scheduleViewModel.isTodayLoading.collectAsState()
 
     // Get current day for subtitle
     val dayOfWeek = DateUtils.getCurrentDayOfWeekLegacy()
-    val today = java.time.LocalDate.now()
-    val currentDateTime = java.time.LocalDateTime.now()
 
     // State for real-time updates
     var currentTime by remember { mutableStateOf(java.time.LocalDateTime.now()) }
@@ -131,32 +130,9 @@ fun HomeScreen(
     }
 
 
-    LaunchedEffect(shouldRefresh, currentUser) {
-        currentUser?.let { user ->
-            Log.d("HomeScreen", "Refreshing schedule for user: ${user.userId}")
-            scheduleViewModel.setSelectedDate(today)
-            // Force immediate refresh
-            scheduleViewModel.loadScheduleForDate(user.userId, today)
-        }
-    }
-
-    // Also listen for navigation events to refresh when coming back from AddMedScreen
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    LaunchedEffect(navBackStackEntry) {
-        // Refresh when we come back to home screen (eg from adding medicine)
-        if (navBackStackEntry?.destination?.route == "home") {
-            currentUser?.let { user ->
-                scheduleViewModel.loadScheduleForDate(user.userId, java.time.LocalDate.now())
-            }
-        }
-    }
-
-    val isRefreshing by scheduleViewModel.isRefreshing.collectAsState()
-
-    // Filter today's schedule entries
-    val todayEntries = remember(scheduleWithMedicine) {
-        scheduleWithMedicine.filter {
-            it.scheduleEntry.scheduledDateTime.toLocalDate() == java.time.LocalDate.now()
+    LaunchedEffect(shouldRefresh) {
+        if (shouldRefresh) {
+            scheduleViewModel.refreshAfterMedicineAdded()
         }
     }
 
@@ -235,7 +211,7 @@ fun HomeScreen(
                 actions = {}
             )
 
-            if (isRefreshing && !hasMedications) {
+            if (isTodayLoading && !hasMedications) {
                 com.example.dosezy.ui.components.HomeSkeletonView()
             } else {
                 // Main content with scrolling

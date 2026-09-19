@@ -2,4 +2,4 @@
 • Manually Record Dose Time: Log exact time taken with accurate adherence stats
 • Navigation Options: Hide nav add button & add directly from medicines roster
 • Enhanced Pharmacy Orders: Multi-profile refills, smart bottle counts, & preview
-• Expanded about page, profile deletion text fix
+• Expanded about page, profile deletion text fix, UI Improvements

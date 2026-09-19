@@ -793,7 +793,8 @@ fun EmptyMedicinesState(onAddMedicineClick: () -> Unit = {}) {
             onClick = onAddMedicineClick,
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary
+                containerColor = Color(0xFF1193D4),
+                contentColor = Color.White
             )
         ) {
             Icon(

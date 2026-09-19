@@ -22,9 +22,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Schedule
+import com.example.dosezy.ui.components.GridTimePickerDialog
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -646,86 +648,191 @@ fun EditMedScreen(
                                         color = MaterialTheme.colorScheme.onSurface,
                                         modifier = Modifier.padding(bottom = 6.dp)
                                     )
-                                    FlowRow(
+                                    val presets = listOf(
+                                        "1x" to listOf(LocalTime.of(8, 0)),
+                                        "2x" to listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
+                                        "3x" to listOf(LocalTime.of(8, 0), LocalTime.of(14, 0), LocalTime.of(20, 0)),
+                                        "4x" to listOf(LocalTime.of(8, 0), LocalTime.of(12, 0), LocalTime.of(16, 0), LocalTime.of(20, 0))
+                                    )
+                                    Row(
                                         modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                                     ) {
-                                        val presets = listOf(
-                                            "1x" to listOf(LocalTime.of(8, 0)),
-                                            "2x" to listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
-                                            "3x" to listOf(LocalTime.of(8, 0), LocalTime.of(14, 0), LocalTime.of(20, 0)),
-                                            "4x" to listOf(LocalTime.of(8, 0), LocalTime.of(12, 0), LocalTime.of(16, 0), LocalTime.of(20, 0))
-                                        )
                                         presets.forEach { (label, times) ->
                                             val isSelected = selectedDosePreset == label
-                                            androidx.compose.material3.FilterChip(
-                                                selected = isSelected,
-                                                onClick = {
-                                                    selectedDosePreset = label
-                                                    scheduledTimesList = times
-                                                    selectedTime = times.first()
-                                                },
-                                                label = { Text(text = stringResource(R.string.frequency_preset_daily, label)) },
-                                                colors = androidx.compose.material3.FilterChipDefaults.filterChipColors(
-                                                    selectedContainerColor = Color(0xFF1193D4),
-                                                    selectedLabelColor = Color.White
-                                                )
-                                            )
+                                            Surface(
+                                                modifier = Modifier
+                                                    .weight(1f)
+                                                    .heightIn(min = 48.dp)
+                                                    .clip(RoundedCornerShape(12.dp))
+                                                    .clickable {
+                                                        selectedDosePreset = label
+                                                        scheduledTimesList = times
+                                                        selectedTime = times.first()
+                                                    },
+                                                color = if (isSelected) Color(0xFF1193D4) else MaterialTheme.colorScheme.surface,
+                                                border = androidx.compose.foundation.BorderStroke(
+                                                    1.dp,
+                                                    if (isSelected) Color(0xFF1193D4) else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                                                ),
+                                                shape = RoundedCornerShape(12.dp)
+                                            ) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(vertical = 12.dp),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Text(
+                                                        text = label,
+                                                        color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
+                                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                                        fontSize = 15.sp
+                                                    )
+                                                }
+                                            }
                                         }
                                     }
 
                                     Spacer(modifier = Modifier.height(14.dp))
                                 }
 
-                                // 3. Custom Dosing Times Chips
+                                // 3. Custom Dosing Times Chips - 2-items-per-row expanded layout
                                 Text(
                                     text = stringResource(R.string.scheduled_dosing_times_title),
                                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
                                     color = MaterialTheme.colorScheme.onSurface,
                                     modifier = Modifier.padding(bottom = 6.dp)
                                 )
-                                FlowRow(
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                                    modifier = Modifier.fillMaxWidth()
+                                val totalItems = scheduledTimesList.size + 1
+                                val rowCount = (totalItems + 1) / 2
+                                Column(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    scheduledTimesList.forEachIndexed { idx, time ->
-                                        val formatted = com.example.dosezy.utils.TimeFormatUtils.formatLocalTime(time, currentUser?.timeFormat ?: TimeFormat.HOUR_12, activeLocale)
-                                        androidx.compose.material3.InputChip(
-                                            selected = selectedTime == time,
-                                            onClick = {
-                                                selectedTime = time
-                                                editingTimeIndex = idx
-                                                showTimePicker = true
-                                            },
-                                            label = { Text("⏰ $formatted") },
-                                            trailingIcon = {
-                                                if (scheduledTimesList.size > 1) {
-                                                    Icon(
-                                                        imageVector = Icons.Default.Close,
-                                                        contentDescription = stringResource(R.string.med_time_remove_cd),
-                                                        modifier = Modifier
-                                                            .size(16.dp)
-                                                            .clickable {
-                                                                scheduledTimesList = scheduledTimesList - time
-                                                                if (selectedTime == time && scheduledTimesList.isNotEmpty()) {
-                                                                    selectedTime = scheduledTimesList.first()
-                                                                }
-                                                                selectedDosePreset = "Custom"
-                                                            }
+                                    for (rowIdx in 0 until rowCount) {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            for (colIdx in 0..1) {
+                                                val itemIndex = rowIdx * 2 + colIdx
+                                                if (itemIndex < scheduledTimesList.size) {
+                                                    val time = scheduledTimesList[itemIndex]
+                                                    val formatted = com.example.dosezy.utils.TimeFormatUtils.formatLocalTime(
+                                                        time,
+                                                        currentUser?.timeFormat ?: TimeFormat.HOUR_12,
+                                                        activeLocale
                                                     )
+                                                    val isSelected = selectedTime == time
+                                                    Surface(
+                                                        modifier = Modifier
+                                                            .weight(1f)
+                                                            .heightIn(min = 48.dp)
+                                                            .clip(RoundedCornerShape(12.dp))
+                                                            .clickable {
+                                                                selectedTime = time
+                                                                editingTimeIndex = itemIndex
+                                                                showTimePicker = true
+                                                            },
+                                                        color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else MaterialTheme.colorScheme.surface,
+                                                        border = androidx.compose.foundation.BorderStroke(
+                                                            1.dp,
+                                                            if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                                                        ),
+                                                        shape = RoundedCornerShape(12.dp)
+                                                    ) {
+                                                        Row(
+                                                            modifier = Modifier
+                                                                .fillMaxWidth()
+                                                                .padding(horizontal = 10.dp, vertical = 10.dp),
+                                                            verticalAlignment = Alignment.CenterVertically
+                                                        ) {
+                                                            Icon(
+                                                                imageVector = Icons.Default.Schedule,
+                                                                contentDescription = null,
+                                                                tint = MaterialTheme.colorScheme.primary,
+                                                                modifier = Modifier.size(18.dp)
+                                                            )
+                                                            Text(
+                                                                text = formatted,
+                                                                style = MaterialTheme.typography.bodyMedium,
+                                                                fontWeight = FontWeight.SemiBold,
+                                                                color = MaterialTheme.colorScheme.onSurface,
+                                                                modifier = Modifier
+                                                                    .weight(1f)
+                                                                    .padding(horizontal = 6.dp)
+                                                            )
+                                                            if (scheduledTimesList.size > 1) {
+                                                                Box(
+                                                                    modifier = Modifier
+                                                                        .size(24.dp)
+                                                                        .clip(androidx.compose.foundation.shape.CircleShape)
+                                                                        .clickable {
+                                                                            scheduledTimesList = scheduledTimesList - time
+                                                                            if (selectedTime == time && scheduledTimesList.isNotEmpty()) {
+                                                                                selectedTime = scheduledTimesList.first()
+                                                                            }
+                                                                            selectedDosePreset = "Custom"
+                                                                        },
+                                                                    contentAlignment = Alignment.Center
+                                                                ) {
+                                                                    Icon(
+                                                                        imageVector = Icons.Default.Close,
+                                                                        contentDescription = stringResource(R.string.med_time_remove_cd),
+                                                                        modifier = Modifier.size(16.dp),
+                                                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                                                    )
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                } else if (itemIndex == scheduledTimesList.size) {
+                                                    // + Add Time Button
+                                                    Surface(
+                                                        modifier = Modifier
+                                                            .weight(1f)
+                                                            .heightIn(min = 48.dp)
+                                                            .clip(RoundedCornerShape(12.dp))
+                                                            .clickable {
+                                                                editingTimeIndex = null
+                                                                showTimePicker = true
+                                                            },
+                                                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                                                        border = androidx.compose.foundation.BorderStroke(
+                                                            1.dp,
+                                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                                                        ),
+                                                        shape = RoundedCornerShape(12.dp)
+                                                    ) {
+                                                        Row(
+                                                            modifier = Modifier
+                                                                .fillMaxWidth()
+                                                                .padding(horizontal = 10.dp, vertical = 10.dp),
+                                                            horizontalArrangement = Arrangement.Center,
+                                                            verticalAlignment = Alignment.CenterVertically
+                                                        ) {
+                                                            Icon(
+                                                                imageVector = Icons.Default.Add,
+                                                                contentDescription = null,
+                                                                tint = MaterialTheme.colorScheme.primary,
+                                                                modifier = Modifier.size(18.dp)
+                                                            )
+                                                            Spacer(modifier = Modifier.width(4.dp))
+                                                            Text(
+                                                                text = stringResource(R.string.med_time_add_btn),
+                                                                style = MaterialTheme.typography.bodyMedium,
+                                                                fontWeight = FontWeight.SemiBold,
+                                                                color = MaterialTheme.colorScheme.primary
+                                                            )
+                                                        }
+                                                    }
+                                                } else {
+                                                    Spacer(modifier = Modifier.weight(1f))
                                                 }
                                             }
-                                        )
+                                        }
                                     }
-                                    androidx.compose.material3.AssistChip(
-                                        onClick = {
-                                            editingTimeIndex = null
-                                            showTimePicker = true
-                                        },
-                                        label = { Text(stringResource(R.string.med_time_add_btn)) }
-                                    )
                                 }
                             }
                         }
@@ -1013,7 +1120,7 @@ fun EditMedScreen(
 
     // Time Picker Dialog
     if (showTimePicker) {
-        CustomTimePickerDialog(
+        GridTimePickerDialog(
             initialTime = selectedTime,
             timeFormat = currentUser?.timeFormat ?: com.example.dosezy.data.model.TimeFormat.HOUR_12,
             onTimeSelected = { time ->
@@ -1176,206 +1283,6 @@ fun EditMedScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CustomTimePickerDialog(
-    initialTime: LocalTime,
-    timeFormat: com.example.dosezy.data.model.TimeFormat = com.example.dosezy.data.model.TimeFormat.HOUR_12,
-    onTimeSelected: (LocalTime) -> Unit,
-    onDismiss: () -> Unit
-) {
-    var selectedTimeState by remember { mutableStateOf(initialTime) }
-
-    val is12Hour = timeFormat == com.example.dosezy.data.model.TimeFormat.HOUR_12
-    val isAm = selectedTimeState.hour < 12
-    val hour12Display = run {
-        val h = selectedTimeState.hour % 12
-        if (h == 0) 12 else h
-    }
-
-    val activeLocale = remember {
-        com.example.dosezy.utils.LocaleHelper.getLocale(com.example.dosezy.data.model.Language.SYSTEM)
-    }
-    val displayString = com.example.dosezy.utils.TimeFormatUtils.formatLocalTime(selectedTimeState, timeFormat, activeLocale)
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        tonalElevation = 0.dp,
-        containerColor = MaterialTheme.colorScheme.surface,
-        title = { Text(stringResource(R.string.form_time), style = MaterialTheme.typography.headlineSmall) },
-        text = {
-            Column(
-                modifier = Modifier.verticalScroll(rememberScrollState())
-            ) {
-                Text(
-                    "Selected: $displayString",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
-
-                if (is12Hour) {
-                    // AM / PM Toggle chips
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 12.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        androidx.compose.material3.FilterChip(
-                            selected = isAm,
-                            onClick = {
-                                if (!isAm) {
-                                    selectedTimeState = selectedTimeState.minusHours(12)
-                                }
-                            },
-                            label = { Text("AM", fontWeight = FontWeight.Bold) },
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                        androidx.compose.material3.FilterChip(
-                            selected = !isAm,
-                            onClick = {
-                                if (isAm) {
-                                    selectedTimeState = selectedTimeState.plusHours(12)
-                                }
-                            },
-                            label = { Text("PM", fontWeight = FontWeight.Bold) }
-                        )
-                    }
-
-                    Text(stringResource(R.string.time_picker_hour_12_label), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    val hours12 = listOf(12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
-                    val rows12 = hours12.chunked(4)
-
-                    rows12.forEach { rowHours ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 2.dp),
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            rowHours.forEach { h12 ->
-                                val isSelected = hour12Display == h12
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .height(40.dp)
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(
-                                            if (isSelected) MaterialTheme.colorScheme.primary 
-                                            else MaterialTheme.colorScheme.surfaceVariant
-                                        )
-                                        .clickable {
-                                            val hour24 = if (isAm) {
-                                                if (h12 == 12) 0 else h12
-                                            } else {
-                                                if (h12 == 12) 12 else h12 + 12
-                                            }
-                                            selectedTimeState = selectedTimeState.withHour(hour24)
-                                        },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = h12.toString(),
-                                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary 
-                                                else MaterialTheme.colorScheme.onSurfaceVariant,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    Text(stringResource(R.string.time_picker_hour_24_label), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    val hours24 = (0..23).toList().chunked(6)
-                    hours24.forEach { rowHours ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 2.dp),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            rowHours.forEach { h24 ->
-                                val isSelected = selectedTimeState.hour == h24
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .height(36.dp)
-                                        .clip(RoundedCornerShape(6.dp))
-                                        .background(
-                                            if (isSelected) MaterialTheme.colorScheme.primary 
-                                            else MaterialTheme.colorScheme.surfaceVariant
-                                        )
-                                        .clickable {
-                                            selectedTimeState = selectedTimeState.withHour(h24)
-                                        },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = String.format("%02d", h24),
-                                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary 
-                                                else MaterialTheme.colorScheme.onSurfaceVariant,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 12.sp
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(14.dp))
-
-                Text(stringResource(R.string.time_picker_minute_label, selectedTimeState.minute), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    listOf(0, 15, 30, 45).forEach { min ->
-                        val isSelected = selectedTimeState.minute == min
-                        androidx.compose.material3.FilterChip(
-                            selected = isSelected,
-                            onClick = { selectedTimeState = selectedTimeState.withMinute(min) },
-                            label = { Text(":$min", fontWeight = FontWeight.Bold) },
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
-
-                Slider(
-                    value = selectedTimeState.minute.toFloat(),
-                    onValueChange = { newMinute ->
-                        selectedTimeState = selectedTimeState.withMinute(newMinute.toInt().coerceIn(0, 59))
-                    },
-                    valueRange = 0f..59f
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onTimeSelected(selectedTimeState) }
-            ) {
-                Text(stringResource(R.string.ok))
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = onDismiss
-            ) {
-                Text(stringResource(R.string.cancel))
-            }
-        }
-    )
-}
 
 @Preview(showBackground = true)
 @Composable

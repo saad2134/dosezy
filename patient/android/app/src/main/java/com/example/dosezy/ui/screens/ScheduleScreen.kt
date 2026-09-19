@@ -54,15 +54,13 @@ fun ScheduleScreen(navController: NavController) {
     // Get user's time format preference
     val timeFormat = currentUser?.timeFormat ?: TimeFormat.HOUR_12
 
-    // Load schedule and auto-mark missed medications when screen is composed or when user/date changes
-    LaunchedEffect(currentUser, selectedDate) {
+    // Auto-mark missed medications when user changes
+    LaunchedEffect(currentUser) {
         currentUser?.let { user ->
-            Log.d("ScheduleScreen", "Loading schedule and auto-marking missed for user: ${user.userId}, date: $selectedDate")
             scheduleViewModel.autoMarkMissedMedications(
                 user.userId,
                 user.considerMissedAfter
             )
-            scheduleViewModel.loadScheduleForDate(user.userId, selectedDate)
         }
     }
 

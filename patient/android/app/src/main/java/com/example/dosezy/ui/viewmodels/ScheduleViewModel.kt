@@ -45,15 +45,39 @@ class ScheduleViewModel @Inject constructor(
     private val _scheduleWithMedicine = MutableStateFlow<List<ScheduleWithMedicine>>(emptyList())
     val scheduleWithMedicine: StateFlow<List<ScheduleWithMedicine>> = _scheduleWithMedicine.asStateFlow()
 
+    private val _todayScheduleWithMedicine = MutableStateFlow<List<ScheduleWithMedicine>>(emptyList())
+    val todayScheduleWithMedicine: StateFlow<List<ScheduleWithMedicine>> = _todayScheduleWithMedicine.asStateFlow()
+
     private val _currentUserId = MutableStateFlow<String?>(null)
     private val _isRefreshing = MutableStateFlow(true)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
+    private val _isTodayLoading = MutableStateFlow(true)
+    val isTodayLoading: StateFlow<Boolean> = _isTodayLoading.asStateFlow()
+
     private var scheduleJob: kotlinx.coroutines.Job? = null
     private var rawScheduleJob: kotlinx.coroutines.Job? = null
+    private var todayJob: kotlinx.coroutines.Job? = null
 
     init {
         loadCurrentUserAndSchedule()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun observeTodaySchedule(userId: String) {
+        todayJob?.cancel()
+        _isTodayLoading.value = true
+        todayJob = viewModelScope.launch {
+            try {
+                scheduleRepository.getScheduleWithMedicineForDate(userId, LocalDate.now()).collect { entries ->
+                    _todayScheduleWithMedicine.value = entries
+                    _isTodayLoading.value = false
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error observing today schedule", e)
+                _isTodayLoading.value = false
+            }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -64,9 +88,10 @@ class ScheduleViewModel @Inject constructor(
                 _currentUserId.value = currentUser?.userId
 
                 currentUser?.let { user ->
-                    // Load schedule for current date
-                    loadScheduleForDate(user.userId, LocalDate.now())
+                    observeTodaySchedule(user.userId)
+                    loadScheduleForDate(user.userId, _selectedDate.value)
                 } ?: run {
+                    _isTodayLoading.value = false
                     _isRefreshing.value = false
                 }
             }
@@ -76,18 +101,18 @@ class ScheduleViewModel @Inject constructor(
     private var currentCalendarUserId: String? = null
 
     fun setSelectedDate(date: LocalDate) {
-        if (_selectedDate.value != date) {
-            _selectedDate.value = date
+        if (_selectedDate.value == date && !_isRefreshing.value) return
+        _selectedDate.value = date
+        _scheduleWithMedicine.value = emptyList()
+        _isRefreshing.value = true
+        _currentUserId.value?.let { userId ->
+            loadScheduleForDate(userId, date)
         }
     }
 
     fun loadScheduleForDate(userId: String, date: LocalDate) {
         scheduleJob?.cancel()
-
-        // Only show skeleton on initial load when data is empty
-        if (_scheduleWithMedicine.value.isEmpty()) {
-            _isRefreshing.value = true
-        }
+        _isRefreshing.value = true
 
         // Load month-wide indicators once per user or on updates, not on every date click
         if (currentCalendarUserId != userId || _scheduleEntries.value.isEmpty()) {
@@ -123,6 +148,7 @@ class ScheduleViewModel @Inject constructor(
     fun refreshAfterMedicineAdded() {
         currentCalendarUserId = null
         _currentUserId.value?.let { userId ->
+            observeTodaySchedule(userId)
             loadScheduleForDate(userId, _selectedDate.value)
         }
     }

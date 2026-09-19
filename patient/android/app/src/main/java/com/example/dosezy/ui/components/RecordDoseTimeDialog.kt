@@ -1,6 +1,5 @@
 package com.example.dosezy.ui.components
 
-import android.app.TimePickerDialog
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -65,7 +64,6 @@ fun RecordDoseTimeDialog(
     onDismiss: () -> Unit,
     onConfirm: (LocalDateTime) -> Unit
 ) {
-    val context = LocalContext.current
     var selectedMode by remember { mutableStateOf(DoseTimeSelectionMode.JUST_NOW) }
 
     val now = remember { LocalDateTime.now() }
@@ -77,20 +75,10 @@ fun RecordDoseTimeDialog(
         )
     }
 
-    val is24Hour = timeFormat == TimeFormat.HOUR_24
+    var showGridTimePicker by remember { mutableStateOf(false) }
 
     fun showTimePicker() {
-        val picker = TimePickerDialog(
-            context,
-            { _, hourOfDay, minute ->
-                customTime = LocalTime.of(hourOfDay, minute)
-                selectedMode = DoseTimeSelectionMode.CUSTOM_TIME
-            },
-            customTime.hour,
-            customTime.minute,
-            is24Hour
-        )
-        picker.show()
+        showGridTimePicker = true
     }
 
     val formattedNow = TimeFormatUtils.formatTime(now, timeFormat)
@@ -252,6 +240,19 @@ fun RecordDoseTimeDialog(
             }
         }
     )
+
+    if (showGridTimePicker) {
+        GridTimePickerDialog(
+            initialTime = customTime,
+            timeFormat = timeFormat,
+            onTimeSelected = { newTime ->
+                customTime = newTime
+                selectedMode = DoseTimeSelectionMode.CUSTOM_TIME
+                showGridTimePicker = false
+            },
+            onDismiss = { showGridTimePicker = false }
+        )
+    }
 }
 
 @Composable
