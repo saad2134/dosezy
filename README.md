@@ -4,19 +4,23 @@
  </a>
 </h1>
 
-> <p align="center">🚨 <strong> A smart medicine tracking app that is free, open source, offline and private by default with coming soon, optional Caregiver Cloud Platform for analytics, multi-device sync and family sharing. Dosezy transforms medication management into a simple, stress-free experience. Built with accessibility at its core, the app features clear, large text and intuitive navigation: perfect for elderly users and anyone managing multiple prescriptions.</strong></p>  
+> <p align="center"><strong>An accessible, open-source medication management ecosystem designed for patients and caregivers. Dosezy pairs a 100% offline-first, private mobile client with an optional self-hostable Caregiver Cloud for family sync, clinical adherence analytics, and remote care. Built with accessibility at its core: high-contrast visuals, tremor-friendly touch targets, and reliable alarms for elderly users and families managing complex prescriptions.</strong></p>  
 
 
 <div align="center">
 
-![Phase](https://img.shields.io/badge/🛠️%20Phase-Released%20v2%2E5%2E2-blue?style=for-the-badge)
-![Platforms](https://img.shields.io/badge/🌐%20Platforms-Android-28a745?style=for-the-badge)
+[![Android Patient App](https://img.shields.io/badge/Android%20Patient-v2.5.2%20Released-1e293b?style=flat&logo=android&logoColor=white&labelColor=2ea44f)](https://github.com/saad2134/dosezy/releases)
+[![iOS Patient App](https://img.shields.io/badge/iOS%20Patient-Planned-1e293b?style=flat&logo=apple&logoColor=white&labelColor=007aff)](https://github.com/saad2134/dosezy)
+[![Server Node](https://img.shields.io/badge/Server%20Node-In%20Dev-1e293b?style=flat&logo=fastify&logoColor=white&labelColor=8b5cf6)](https://github.com/saad2134/dosezy)
+[![Caregiver Web](https://img.shields.io/badge/Caregiver%20Web-In%20Dev-1e293b?style=flat&logo=astro&logoColor=white&labelColor=f59e0b)](https://github.com/saad2134/dosezy)
 
 </div>
 
 ## 🛍️ Download Now 
 
 ### 💊 Patient App (Free, Open-source, Offline & Private by Default)
+
+> <sub>💡 **Note:** Some stores (such as F-Droid, etc.) may take a few days (usually 2-5 days) to review and publish new releases. For immediate access to the latest updates, download directly from [GitHub Releases](https://github.com/saad2134/dosezy/releases).</sub>
 
 <div align="center">
   <a href="https://f-droid.org/en/packages/com.saad2134.dosezy">
@@ -93,31 +97,14 @@ Dosezy transforms daily medication management into a stress-free experience. Inp
 
 ---
 
-## ⚙️ Platforms
+## ⚙️ Platforms & Ecosystem Status
 
-### Patient App
-
-<table border="1" cellpadding="10" cellspacing="0">
-  <thead>
-    <tr>
-      <th>Platform</th>
-      <th>Min Version</th>
-      <th>Supported?</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Android</td>
-      <td>v7.0 or later</td>
-      <td>✅</td>
-    </tr>
-    <tr>
-      <td>iOS</td>
-      <td>Coming Soon</td>
-      <td>⏳</td>
-    </tr>
-  </tbody>
-</table>
+| Module | Platform | Status | Min / Target | Tech Stack |
+| :--- | :--- | :--- | :--- | :--- |
+| **📱 Patient App** | Android | Released (v2.5.2) | Android 7.0+ (API 24+) | Kotlin, Jetpack Compose, Room |
+| **🍎 Patient App** | iOS | Planned | iOS 16+ | Swift, SwiftUI, SwiftData |
+| **☁️ Server Node** | Server / API | In Development | Docker / Self-Host | Node.js, Fastify, TypeScript, SQLite/Postgres |
+| **🩺 Caregiver Portal** | Web | In Development | Modern Browsers | Astro, TypeScript, Tailwind |
 
 
 ## 🛠️ Tech Stack
