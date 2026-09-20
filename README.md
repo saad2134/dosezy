@@ -111,6 +111,17 @@ Dosezy transforms daily medication management into a stress-free experience. Inp
 
 </div>
 
+<p align="center">
+  <a href="https://alternativeto.net/software/dosezy/about/?utm_source=badge&utm_medium=referral" target="_blank">
+    <img
+      src="https://alternativeto.net/static/badges/badge-compact-color.svg"
+      alt="Dosezy | AlternativeTo"
+      width="195"
+      height="63"
+    />
+  </a>
+</p>
+
 ---
 
 ## ⚙️ Platforms & Ecosystem Status
