@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.Schedule
 import com.example.dosezy.ui.components.GridTimePickerDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,6 +42,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -77,7 +79,6 @@ import com.example.dosezy.data.model.TimeFormat
 import com.example.dosezy.data.model.getLocalizedName
 import com.example.dosezy.ui.components.PillColorSelector
 import com.example.dosezy.ui.components.PillShapeSelector
-import com.example.dosezy.ui.components.ProfilePicturePicker
 import com.example.dosezy.ui.theme.DosezyTheme
 import com.example.dosezy.ui.viewmodels.MedicineViewModel
 import com.example.dosezy.ui.viewmodels.UserViewModel
@@ -111,6 +112,8 @@ fun AddMedScreen(
     // Multi-Dose Presets & Stock Inventory State
     var selectedDosePreset by remember { mutableStateOf("1x") }
     var scheduledTimesList by remember { mutableStateOf(listOf(defaultInitialTime)) }
+    var hasDifferentDosages by remember { mutableStateOf(false) }
+    var perTimeDosages by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var currentStockText by remember { mutableStateOf("") }
     var refillThresholdText by remember { mutableStateOf("") }
 
@@ -788,6 +791,121 @@ fun AddMedScreen(
                                     }
                                 }
                             }
+
+                            // --- Variable Dosages Per Scheduled Time (Issue #82) ---
+                            if (scheduledTimesList.size > 1) {
+                                Spacer(modifier = Modifier.height(14.dp))
+                                Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+                                        Text(
+                                            text = stringResource(R.string.med_different_dosages_toggle),
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                        Text(
+                                            text = stringResource(R.string.med_different_dosages_subtitle),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                    Switch(
+                                        checked = hasDifferentDosages,
+                                        onCheckedChange = { isChecked ->
+                                            hasDifferentDosages = isChecked
+                                            if (isChecked) {
+                                                val updated = perTimeDosages.toMutableMap()
+                                                scheduledTimesList.forEach { t ->
+                                                    val key = String.format("%02d:%02d", t.hour, t.minute)
+                                                    if (updated[key].isNullOrBlank()) {
+                                                        updated[key] = dosage
+                                                    }
+                                                }
+                                                perTimeDosages = updated
+                                            }
+                                        }
+                                    )
+                                }
+
+                                if (hasDifferentDosages) {
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        scheduledTimesList.forEach { time ->
+                                            val key = String.format("%02d:%02d", time.hour, time.minute)
+                                            val hour = time.hour
+                                            val minute = time.minute
+                                            val amPm = if (hour < 12) "AM" else "PM"
+                                            val displayHour = if (hour % 12 == 0) 12 else hour % 12
+                                            val formattedTime = String.format("%d:%02d %s", displayHour, minute, amPm)
+
+                                            Surface(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                shape = RoundedCornerShape(12.dp),
+                                                color = MaterialTheme.colorScheme.surface,
+                                                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                                            ) {
+                                                Row(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    horizontalArrangement = Arrangement.SpaceBetween
+                                                ) {
+                                                    Row(
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                    ) {
+                                                        Icon(
+                                                            imageVector = Icons.Default.Schedule,
+                                                            contentDescription = null,
+                                                            tint = MaterialTheme.colorScheme.primary,
+                                                            modifier = Modifier.size(18.dp)
+                                                        )
+                                                        Text(
+                                                            text = formattedTime,
+                                                            style = MaterialTheme.typography.bodyMedium,
+                                                            fontWeight = FontWeight.SemiBold,
+                                                            color = MaterialTheme.colorScheme.onSurface
+                                                        )
+                                                    }
+
+                                                    Row(
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                                    ) {
+                                                        OutlinedTextField(
+                                                            value = perTimeDosages[key] ?: (if (dosage.isNotBlank()) dosage else ""),
+                                                            onValueChange = { newVal ->
+                                                                if (newVal.all { it.isDigit() || it == '.' }) {
+                                                                    perTimeDosages = perTimeDosages + (key to newVal)
+                                                                }
+                                                            },
+                                                            modifier = Modifier.width(85.dp),
+                                                            textStyle = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                                            singleLine = true,
+                                                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                                            shape = RoundedCornerShape(10.dp)
+                                                        )
+                                                        Text(
+                                                            text = selectedDosageUnit.getLocalizedName(),
+                                                            style = MaterialTheme.typography.bodyMedium,
+                                                            fontWeight = FontWeight.Medium,
+                                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -983,6 +1101,17 @@ fun AddMedScreen(
                             return@Button
                         }
 
+                        val finalCustomDosages: Map<String, Double>? = if (hasDifferentDosages && scheduledTimesList.size > 1) {
+                            val map = mutableMapOf<String, Double>()
+                            val baseDose = dosage.toDoubleOrNull() ?: 0.0
+                            scheduledTimesList.forEach { t ->
+                                val key = String.format("%02d:%02d", t.hour, t.minute)
+                                val entered = perTimeDosages[key]?.toDoubleOrNull() ?: baseDose
+                                map[key] = entered
+                            }
+                            if (map.isNotEmpty()) map else null
+                        } else null
+
                         val newMedicine = Medicine(
                             medicineId = UUID.randomUUID().toString(),
                             userId = currentUser?.userId ?: "",
@@ -1009,7 +1138,8 @@ fun AddMedScreen(
                             pillColor = selectedPillColor,
                             startDate = calcStartDate,
                             endDate = calcEndDate,
-                            durationDays = if (isFiniteCourse) durationDaysInt else null
+                            durationDays = if (isFiniteCourse) durationDaysInt else null,
+                            customDosages = finalCustomDosages
                         )
                         medicineViewModel.addMedicine(newMedicine)
                         android.widget.Toast.makeText(context, context.getString(R.string.medication_added_success), android.widget.Toast.LENGTH_SHORT).show()

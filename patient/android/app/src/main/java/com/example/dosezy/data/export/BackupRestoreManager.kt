@@ -619,7 +619,14 @@ class BackupRestoreManager(
                 startDate = startDate,
                 endDate = endDate,
                 durationDays = obj.get("durationDays")?.let { if (it.isJsonNull) null else it.asInt },
-                isArchived = obj.get("isArchived")?.asBoolean ?: false
+                isArchived = obj.get("isArchived")?.asBoolean ?: false,
+                customDosages = obj.getAsJsonObject("customDosages")?.let { cObj ->
+                    val map = mutableMapOf<String, Double>()
+                    cObj.entrySet().forEach { (k, v) ->
+                        try { map[k] = v.asDouble } catch (_: Exception) {}
+                    }
+                    if (map.isNotEmpty()) map else null
+                }
             )
             list.add(med)
         }
@@ -637,7 +644,8 @@ class BackupRestoreManager(
                 medicineId = obj.get("medicineId").asString,
                 scheduledDateTime = LocalDateTime.parse(obj.get("scheduledDateTime").asString),
                 status = try { MedicationStatus.valueOf(obj.get("status").asString) } catch (_: Exception) { MedicationStatus.PENDING },
-                takenAt = obj.get("takenAt")?.let { if (it.isJsonNull) null else try { LocalDateTime.parse(it.asString) } catch (_: Exception) { null } }
+                takenAt = obj.get("takenAt")?.let { if (it.isJsonNull) null else try { LocalDateTime.parse(it.asString) } catch (_: Exception) { null } },
+                dosage = obj.get("dosage")?.let { if (it.isJsonNull) null else it.asDouble }
             )
             list.add(entry)
         }

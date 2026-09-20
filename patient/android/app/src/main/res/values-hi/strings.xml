@@ -738,4 +738,7 @@
     <string name="notif_status_bg_restricted">बैकग्राउंड प्रतिबंध सूचनाओं को रोक सकते हैं।</string>
     <string name="notif_status_dnd_enabled">डू नॉट डिस्टर्ब (DND) सक्षम है।</string>
     <string name="notif_status_dnd_disabled">डू नॉट डिस्टर्ब (DND) अक्षम है।</string>
+    <string name="med_different_dosages_toggle">प्रत्येक समय के लिए अलग खुराक</string>
+    <string name="med_different_dosages_subtitle">सुबह, दोपहर या शाम के लिए अलग मात्रा निर्धारित करें</string>
+    <string name="med_dosage_for_time">%1$s के लिए खुराक</string>
 </resources>

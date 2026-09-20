@@ -148,7 +148,7 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                             views.setViewVisibility(R.id.widget_item_1, View.VISIBLE)
                             views.setTextViewText(R.id.widget_item_1_time, formatTimeLabel(item1))
                             views.setTextViewText(R.id.widget_item_1_name, med1?.medicationName ?: "Medicine")
-                            views.setTextViewText(R.id.widget_item_1_dose, if (med1 != null) "${med1.dosage.toInt()} ${med1.dosageUnit}" else "")
+                            views.setTextViewText(R.id.widget_item_1_dose, if (med1 != null) med1.getDosageDisplay(item1.scheduledDateTime.toLocalTime()) else "")
                         } else {
                             views.setViewVisibility(R.id.widget_item_1, View.GONE)
                         }
@@ -160,7 +160,7 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                             views.setViewVisibility(R.id.widget_item_2, View.VISIBLE)
                             views.setTextViewText(R.id.widget_item_2_time, formatTimeLabel(item2))
                             views.setTextViewText(R.id.widget_item_2_name, med2?.medicationName ?: "Medicine")
-                            views.setTextViewText(R.id.widget_item_2_dose, if (med2 != null) "${med2.dosage.toInt()} ${med2.dosageUnit}" else "")
+                            views.setTextViewText(R.id.widget_item_2_dose, if (med2 != null) med2.getDosageDisplay(item2.scheduledDateTime.toLocalTime()) else "")
                         } else {
                             views.setViewVisibility(R.id.widget_item_2, View.GONE)
                         }
@@ -172,7 +172,7 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                             views.setViewVisibility(R.id.widget_item_3, View.VISIBLE)
                             views.setTextViewText(R.id.widget_item_3_time, formatTimeLabel(item3))
                             views.setTextViewText(R.id.widget_item_3_name, med3?.medicationName ?: "Medicine")
-                            views.setTextViewText(R.id.widget_item_3_dose, if (med3 != null) "${med3.dosage.toInt()} ${med3.dosageUnit}" else "")
+                            views.setTextViewText(R.id.widget_item_3_dose, if (med3 != null) med3.getDosageDisplay(item3.scheduledDateTime.toLocalTime()) else "")
                         } else {
                             views.setViewVisibility(R.id.widget_item_3, View.GONE)
                         }

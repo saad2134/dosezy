@@ -199,4 +199,30 @@ class Converters {
     } catch (_: Exception) {
         com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT
     }
+
+    // Map<String, Double> converters for per-time custom dosages (e.g. {"08:00": 20.0, "20:00": 10.0})
+    @TypeConverter
+    fun fromCustomDosagesMap(map: Map<String, Double>?): String? {
+        if (map == null) return null
+        val obj = JSONObject()
+        map.forEach { (k, v) -> obj.put(k, v) }
+        return obj.toString()
+    }
+
+    @TypeConverter
+    fun toCustomDosagesMap(value: String?): Map<String, Double>? {
+        if (value.isNullOrEmpty()) return null
+        return try {
+            val map = mutableMapOf<String, Double>()
+            val obj = JSONObject(value)
+            val keys = obj.keys()
+            while (keys.hasNext()) {
+                val key = keys.next()
+                map[key] = obj.getDouble(key)
+            }
+            map
+        } catch (_: Exception) {
+            null
+        }
+    }
 }

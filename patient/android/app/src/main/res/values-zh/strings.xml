@@ -738,4 +738,7 @@
     <string name="notif_status_bg_restricted">后台运行限制可能会影响通知接收。</string>
     <string name="notif_status_dnd_enabled">勿扰模式已开启。</string>
     <string name="notif_status_dnd_disabled">勿扰模式已关闭。</string>
+    <string name="med_different_dosages_toggle">每个时间段不同剂量</string>
+    <string name="med_different_dosages_subtitle">为早、中、晚设定不同的自定义剂量</string>
+    <string name="med_dosage_for_time">%1$s 的剂量</string>
 </resources>

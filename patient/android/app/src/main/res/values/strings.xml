@@ -750,4 +750,7 @@ Do you want to continue?</string>
     <string name="notif_status_bg_restricted">Background restrictions may prevent notifications.</string>
     <string name="notif_status_dnd_enabled">Do Not Disturb is enabled.</string>
     <string name="notif_status_dnd_disabled">Do Not Disturb is disabled.</string>
+    <string name="med_different_dosages_toggle">Different dose for each time</string>
+    <string name="med_different_dosages_subtitle">Set custom amounts for morning, afternoon, or evening</string>
+    <string name="med_dosage_for_time">Dose for %1$s</string>
 </resources>

@@ -721,4 +721,7 @@
     <string name="alarm_sound_custom">কাস্টম অডিও ফাইল</string>
     <string name="alarm_sound_select_file">অডিও ফাইল নির্বাচন করুন</string>
     <string name="alarm_sound_no_file_selected">কোনো ফাইল নির্বাচিত হয়নি</string>
+    <string name="med_different_dosages_toggle">প্রতিটি সময়ের জন্য ভিন্ন ডোজ</string>
+    <string name="med_different_dosages_subtitle">সকাল, দুপুর বা সন্ধ্যার জন্য কাস্টম পরিমাণ নির্ধারণ করুন</string>
+    <string name="med_dosage_for_time">%1$s এর ডোজ</string>
 </resources>

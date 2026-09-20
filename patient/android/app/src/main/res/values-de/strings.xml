@@ -722,4 +722,7 @@ Möchten Sie fortfahren?</string>
     <string name="notif_status_bg_restricted">Hintergrundeinschränkungen können Benachrichtigungen verhindern.</string>
     <string name="notif_status_dnd_enabled">Bitte nicht stören ist aktiviert.</string>
     <string name="notif_status_dnd_disabled">Bitte nicht stören ist deaktiviert.</string>
+    <string name="med_different_dosages_toggle">Unterschiedliche Dosis pro Einnahmezeit</string>
+    <string name="med_different_dosages_subtitle">Individuelle Dosierung für morgens, mittags oder abends festlegen</string>
+    <string name="med_dosage_for_time">Dosis für %1$s</string>
 </resources>

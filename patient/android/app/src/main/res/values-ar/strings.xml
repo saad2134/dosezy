@@ -722,4 +722,7 @@
     <string name="notif_status_bg_restricted">قد تمنع قيود الخلفية ظهور الإشعارات.</string>
     <string name="notif_status_dnd_enabled">تم تفعيل وضع عدم الإزعاج.</string>
     <string name="notif_status_dnd_disabled">تم تعطيل وضع عدم الإزعاج.</string>
+    <string name="med_different_dosages_toggle">جرعة مختلفة لكل وقت</string>
+    <string name="med_different_dosages_subtitle">تحديد كميات مخصصة للصباح أو بعد الظهر أو المساء</string>
+    <string name="med_dosage_for_time">جرعة %1$s</string>
 </resources>

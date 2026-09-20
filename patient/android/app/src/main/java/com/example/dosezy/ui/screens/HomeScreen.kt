@@ -708,7 +708,7 @@ private fun MedicationCard(
 
                 // 2. Qty / Dosage
                 Text(
-                    text = medicine?.getDosageDisplay() ?: "Unknown dosage",
+                    text = medicine?.getDosageDisplay(entry.scheduledDateTime.toLocalTime()) ?: "Unknown dosage",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

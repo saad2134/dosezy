@@ -722,4 +722,7 @@
     <string name="notif_status_bg_restricted">バックグラウンド制限により通知が届かない場合があります。</string>
     <string name="notif_status_dnd_enabled">マナーモード（サイレント）が有効です。</string>
     <string name="notif_status_dnd_disabled">マナーモード（サイレント）は無効です。</string>
+    <string name="med_different_dosages_toggle">時間帯ごとに異なる服用量</string>
+    <string name="med_different_dosages_subtitle">朝、昼、晩で個別の服用量を設定します</string>
+    <string name="med_dosage_for_time">%1$s の服用量</string>
 </resources>

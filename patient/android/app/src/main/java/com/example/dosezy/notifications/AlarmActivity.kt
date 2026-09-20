@@ -526,7 +526,7 @@ fun GroupedAlarmScreenContent(
                     val cardBgColor = if (isDarkTheme) Color(0xFF1A1D24) else MaterialTheme.colorScheme.surfaceVariant
                     val cardBorder = if (isDarkTheme) androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF2D323E)) else null
 
-                    medicinesList.forEach { (_, med) ->
+                    medicinesList.forEach { (entry, med) ->
                         Card(
                             shape = RoundedCornerShape(20.dp),
                             colors = CardDefaults.cardColors(containerColor = cardBgColor),
@@ -577,7 +577,7 @@ fun GroupedAlarmScreenContent(
                                             color = MaterialTheme.colorScheme.onSurface
                                         )
                                         Text(
-                                            text = med.getDosageDisplay(),
+                                            text = med.getDosageDisplay(entry.scheduledDateTime.toLocalTime()),
                                             style = MaterialTheme.typography.bodyMedium,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )

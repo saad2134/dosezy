@@ -738,4 +738,7 @@
     <string name="notif_status_bg_restricted">Las restricciones en segundo plano pueden impedir las notificaciones.</string>
     <string name="notif_status_dnd_enabled">No molestar está activado.</string>
     <string name="notif_status_dnd_disabled">No molestar está desactivado.</string>
+    <string name="med_different_dosages_toggle">Dosis diferente para cada horario</string>
+    <string name="med_different_dosages_subtitle">Establece dosis personalizadas para la mañana, tarde o noche</string>
+    <string name="med_dosage_for_time">Dosis para las %1$s</string>
 </resources>

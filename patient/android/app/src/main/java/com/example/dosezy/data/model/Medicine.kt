@@ -44,8 +44,18 @@ data class Medicine(
     val startDate: LocalDate? = null,
     val endDate: LocalDate? = null,
     val durationDays: Int? = null,
-    val isArchived: Boolean = false
+    val isArchived: Boolean = false,
+    val customDosages: Map<String, Double>? = null
 ) {
+
+    /**
+     * Resolves dosage for a specific scheduled time, falling back to base dosage.
+     */
+    fun getDosageForTime(time: LocalTime?): Double {
+        if (time == null || customDosages.isNullOrEmpty()) return dosage
+        val key = String.format("%02d:%02d", time.hour, time.minute)
+        return customDosages[key] ?: dosage
+    }
 
     /**
      * Generates schedule entries for this medicine for a given date range
@@ -86,7 +96,8 @@ data class Medicine(
                         userId = userId,
                         medicineId = medicineId,
                         scheduledDateTime = scheduledDateTime,
-                        status = MedicationStatus.PENDING
+                        status = MedicationStatus.PENDING,
+                        dosage = getDosageForTime(cleanTime)
                     )
                     entries.add(entry)
                 }
@@ -147,9 +158,10 @@ data class Medicine(
     }
 
     /**
-     * Gets a display string for the dosage (e.g., "100mg", "5mL")
+     * Gets a display string for the dosage (e.g., "100 mg", "5 mL"), optionally for a specific scheduled time.
      */
-    fun getDosageDisplay(): String {
+    fun getDosageDisplay(time: LocalTime? = null): String {
+        val targetDosage = getDosageForTime(time)
         val unitAbbr = when (dosageUnit) {
             DosageUnit.MG -> "mg"
             DosageUnit.MCG -> "mcg"
@@ -160,10 +172,10 @@ data class Medicine(
         }
 
         // Remove decimal if it's a whole number
-        return if (dosage % 1 == 0.0) {
-            "${dosage.toInt()} $unitAbbr"
+        return if (targetDosage % 1 == 0.0) {
+            "${targetDosage.toInt()} $unitAbbr"
         } else {
-            "$dosage $unitAbbr"
+            "$targetDosage $unitAbbr"
         }
     }
 
@@ -203,7 +215,8 @@ data class Medicine(
     }
 
     /**
-     * Calculates the number of inventory stock units to deduct when this medication is taken.
+     * Calculates the number of inventory stock units to deduct when this medication is taken,
+     * optionally taking into account a slot-specific custom dosage.
      *
      * - For solid medications measured by chemical strength (MG, MCG): physical stock is tracked
      *   in count of units/pills (e.g. 150 pills in a bottle). Taking a dose consumes 1 unit (not 150/500 units).
@@ -211,15 +224,16 @@ data class Medicine(
      *   if an unusually large number like 500 was entered representing mg strength).
      * - For liquid / drops (ML, DROP): deducts the specified dose quantity (at least 1).
      */
-    fun getStockDeductionAmount(): Int {
+    fun getStockDeductionAmount(time: LocalTime? = null): Int {
+        val targetDosage = getDosageForTime(time)
         return when (dosageUnit) {
             DosageUnit.MG, DosageUnit.MCG -> 1
             DosageUnit.TABLET, DosageUnit.CAPSULE -> {
-                val count = dosage.toInt()
+                val count = targetDosage.toInt()
                 if (count in 1..10) count else 1
             }
             DosageUnit.DROP, DosageUnit.ML -> {
-                dosage.toInt().coerceAtLeast(1)
+                targetDosage.toInt().coerceAtLeast(1)
             }
         }
     }

@@ -226,7 +226,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             if (entry != null) {
                 val medicine = database.medicineDao().getMedicineByIdDirect(entry.medicineId)
                 if (medicine != null && medicine.currentStock != null && medicine.autoDeductOnTake) {
-                    val deductAmount = medicine.getStockDeductionAmount()
+                    val deductAmount = medicine.getStockDeductionAmount(entry.scheduledDateTime.toLocalTime())
                     val newStock = (medicine.currentStock - deductAmount).coerceAtLeast(0)
                     val updatedMedicine = medicine.copy(currentStock = newStock)
                     database.medicineDao().updateMedicine(updatedMedicine)
@@ -296,7 +296,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             if (entry != null) {
                 val medicine = database.medicineDao().getMedicineByIdDirect(entry.medicineId)
                 if (medicine != null && medicine.currentStock != null && medicine.autoDeductOnTake) {
-                    val addAmount = medicine.getStockDeductionAmount()
+                    val addAmount = medicine.getStockDeductionAmount(entry.scheduledDateTime.toLocalTime())
                     val restoredStock = medicine.currentStock + addAmount
                     val updatedMedicine = medicine.copy(currentStock = restoredStock)
                     database.medicineDao().updateMedicine(updatedMedicine)

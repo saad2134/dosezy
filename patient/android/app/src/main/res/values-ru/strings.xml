@@ -722,4 +722,7 @@
     <string name="notif_status_bg_restricted">Фоновые ограничения могут препятствовать показу уведомлений.</string>
     <string name="notif_status_dnd_enabled">Режим «Не беспокоить» включен.</string>
     <string name="notif_status_dnd_disabled">Режим «Не беспокоить» отключен.</string>
+    <string name="med_different_dosages_toggle">Разная дозировка для каждого времени</string>
+    <string name="med_different_dosages_subtitle">Настройте дозировку для утра, дня или вечера</string>
+    <string name="med_dosage_for_time">Доза на %1$s</string>
 </resources>

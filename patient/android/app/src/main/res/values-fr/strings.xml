@@ -722,4 +722,7 @@ Voulez-vous continuer ?</string>
     <string name="notif_status_bg_restricted">Les restrictions en arrière-plan peuvent bloquer les notifications.</string>
     <string name="notif_status_dnd_enabled">Le mode Ne pas déranger est activé.</string>
     <string name="notif_status_dnd_disabled">Le mode Ne pas déranger est désactivé.</string>
+    <string name="med_different_dosages_toggle">Dose différente selon l\'horaire</string>
+    <string name="med_different_dosages_subtitle">Définissez des quantités personnalisées pour le matin, l\'après-midi ou le soir</string>
+    <string name="med_dosage_for_time">Dose pour %1$s</string>
 </resources>
