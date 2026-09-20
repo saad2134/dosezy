@@ -414,7 +414,7 @@ Do you want to continue?</string>
     <string name="med_frequency_days_pattern">Every %1$d days</string>
     <string name="med_stock_current_placeholder">e.g. 30</string>
     <string name="med_stock_refill_placeholder">e.g. 5</string>
-    <string name="med_time_add_btn">+ Add Time</string>
+    <string name="med_time_add_btn">Add Time</string>
     <string name="med_time_label">Time %1$d</string>
     <string name="med_time_remove_cd">Remove time</string>
     <string name="med_time_select_title">Select Dose Time</string>

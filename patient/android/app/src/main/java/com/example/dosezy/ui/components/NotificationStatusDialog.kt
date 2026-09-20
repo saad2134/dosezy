@@ -167,33 +167,51 @@ private fun createNotificationStatuses(
     val batteryStatus = NotificationUtils.isBatterySufficient(context)
 
     return listOf(
-        // Notification & Exact Alarms Item (Combines notification permission and exact alarm explanation with warning support)
+        // Notification Permission Item
         NotificationStatus(
             title = context.getString(com.example.dosezy.R.string.notif_perm_title),
-            description = when {
-                !notificationPermStatus -> context.getString(com.example.dosezy.R.string.notif_perm_desc)
-                !exactAlarmsStatus -> context.getString(com.example.dosezy.R.string.notif_perm_exact_warning)
-                else -> context.getString(com.example.dosezy.R.string.notif_perm_all_granted)
+            description = if (notificationPermStatus) {
+                context.getString(com.example.dosezy.R.string.notif_perm_granted)
+            } else {
+                context.getString(com.example.dosezy.R.string.notif_perm_desc)
             },
-            isPassed = notificationPermStatus && exactAlarmsStatus,
-            isWarning = notificationPermStatus && !exactAlarmsStatus,
+            isPassed = notificationPermStatus,
+            isWarning = false,
             icon = {
-                val iconTint = when {
-                    notificationPermStatus && !exactAlarmsStatus -> Color(0xFFF59E0B) // Orange warning for exact alarms
-                    notificationPermStatus && exactAlarmsStatus -> Color(0xFF10B981) // Green
-                    else -> Color(0xFFEF4444) // Red
-                }
                 Icon(
-                    imageVector = if (notificationPermStatus && !exactAlarmsStatus) Icons.Default.Alarm else Icons.Default.Notifications,
-                    contentDescription = "Notification & Alarm Permission",
+                    imageVector = Icons.Default.Notifications,
+                    contentDescription = "Notification Permission",
                     modifier = Modifier.size(30.dp),
-                    tint = iconTint
+                    tint = if (notificationPermStatus) Color(0xFF10B981) else Color(0xFFEF4444)
                 )
             },
             onFixClick = {
                 if (!notificationPermStatus) {
                     NotificationUtils.requestNotificationPermission(context)
-                } else if (!exactAlarmsStatus) {
+                }
+            }
+        ),
+
+        // Exact Alarms Item (Crucial for alarms to trigger reliably on time)
+        NotificationStatus(
+            title = context.getString(com.example.dosezy.R.string.notif_exact_alarm_title),
+            description = if (exactAlarmsStatus) {
+                context.getString(com.example.dosezy.R.string.notif_exact_alarm_granted)
+            } else {
+                context.getString(com.example.dosezy.R.string.notif_exact_alarm_desc)
+            },
+            isPassed = exactAlarmsStatus,
+            isWarning = false,
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Alarm,
+                    contentDescription = "Exact Alarms",
+                    modifier = Modifier.size(30.dp),
+                    tint = if (exactAlarmsStatus) Color(0xFF10B981) else Color(0xFFEF4444)
+                )
+            },
+            onFixClick = {
+                if (!exactAlarmsStatus) {
                     NotificationUtils.requestExactAlarmPermission(context)
                 }
             }

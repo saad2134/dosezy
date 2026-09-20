@@ -8,6 +8,8 @@ package com.example.dosezy
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -66,6 +68,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         window.decorView.setBackgroundColor(android.graphics.Color.parseColor("#0F172A"))
         super.onCreate(savedInstanceState)
 
@@ -149,6 +152,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 fun DosezyApp() {
     val navController = rememberNavController()
@@ -171,6 +175,10 @@ fun DosezyApp() {
         kotlinx.coroutines.delay(1000)
         if (!com.example.dosezy.utils.NotificationUtils.isIgnoringBatteryOptimizations(context)) {
             com.example.dosezy.utils.NotificationUtils.requestBatteryOptimizationExemption(context)
+        }
+        kotlinx.coroutines.delay(1000)
+        if (!com.example.dosezy.utils.NotificationUtils.canScheduleExactAlarms(context)) {
+            com.example.dosezy.utils.NotificationUtils.requestExactAlarmPermission(context)
         }
         kotlinx.coroutines.delay(1000)
         if (!com.example.dosezy.utils.NotificationUtils.canDrawOverlays(context)) {
@@ -289,7 +297,10 @@ fun DosezyApp() {
         NavHost(
             navController = navController,
             startDestination = "loading",
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding),
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None },
             popEnterTransition = { EnterTransition.None },

@@ -1,0 +1,72 @@
+<en-IN>
+• Navigation Bar Insets: Fixed device navigation buttons overlapping bottom menu on Android 15 (Pixel, Redmi)
+• Alarm Reliability: Guaranteed exact alarm delivery in Doze mode and after restarts
+• Notification Reliability: Added dedicated Exact Alarms check with 1-tap setup
+• Top Bar Gap Fix: Eliminated double status bar spacing on Home and settings
+</en-IN>
+<en-US>
+• Navigation Bar Insets: Fixed device navigation buttons overlapping bottom menu on Android 15 (Pixel, Redmi)
+• Alarm Reliability: Guaranteed exact alarm delivery in Doze mode and after restarts
+• Notification Reliability: Added dedicated Exact Alarms check with 1-tap setup
+• Top Bar Gap Fix: Eliminated double status bar spacing on Home and settings
+</en-US>
+<ar>
+• شريط التنقل: إصلاح تداخل أزرار التنقل مع القائمة السفلية في أندرويد 15
+• موثوقية التنبيهات: ضمان تشغيل المنبه الدقيق في وضع السكون وبعد إعادة التشغيل
+• درع الموثوقية: إضافة فحص مخصص للمنبهات الدقيقة مع إصلاح بنقرة واحدة
+• ضبط شريط العنوان: إزالة الفراغ المزدوج لشريط الحالة في الصفحة الرئيسية
+</ar>
+<de-DE>
+• Navigationsleiste: Überlappung der Systemtasten mit unterem Menü auf Android 15 behoben
+• Alarm-Zuverlässigkeit: Genaue Alarmauslösung im Doze-Modus und nach Neustart
+• Zuverlässigkeits-Schild: Eigene Prüfung für genaue Alarme mit 1-Klick-Lösung
+• Kopfzeilen-Abstand: Doppelter Statusleisten-Abstand entfernt
+</de-DE>
+<es-419>
+• Barra de navegación: Se corrigió la superposición de botones del sistema en Android 15
+• Fiabilidad de alarmas: Alarmas exactas garantizadas en modo Doze y tras reiniciar
+• Escudo de fiabilidad: Diagnóstico dedicado de alarmas exactas con ajuste en 1 toque
+• Corrección superior: Eliminado el doble espacio de barra de estado
+</es-419>
+<fr-FR>
+• Barre de navigation: Correction du chevauchement des boutons système sous Android 15
+• Fiabilité des alarmes: Déclenchement exact garanti en mode veille et après redémarrage
+• Bouclier de fiabilité: Diagnostic dédié pour les alarmes exactes en 1 clic
+• Correction en-tête: Suppression du double espacement de barre d'état
+</fr-FR>
+<hi-IN>
+• नेविगेशन बार: Android 15 पर सिस्टम बटनों के निचले मेनू पर आने की समस्या ठीक की गई
+• अलार्म विश्वसनीयता: डोज़ मोड और फोन रीस्टार्ट के बाद सटीक अलार्म सुनिश्चित
+• विश्वसनीयता शील्ड: 1-टैप समाधान के साथ सटीक अलार्म की अलग जांच
+• हेडर स्पेसिंग सुधार: स्टेटस बार का अतिरिक्त गैप हटाया गया
+</hi-IN>
+<it-IT>
+• Barra di navigazione: Risolta la sovrapposizione dei tasti di sistema su Android 15
+• Affidabilità allarmi: Allarmi esatti garantiti in modalità Doze e dopo il riavvio
+• Scudo di affidabilità: Controllo dedicato per allarmi precisi con fix in 1 tocco
+• Spaziatura superiore: Rimosso il doppio spazio della barra di stato
+</it-IT>
+<ja-JP>
+• ナビゲーションバー: Android 15でシステムボタンが下部メニューと重なる問題を解消
+• アラーム信頼性: Dozeモード中および再起動後の正確なアラーム鳴動を保証
+• 信頼性診断: ワンタップ設定が可能な「正確なアラーム」専用診断項目を追加
+• ヘッダー余白修正: ステータスバーの二重余白を削除
+</ja-JP>
+<pt-BR>
+• Barra de navegação: Corrigida sobreposição dos botões do sistema no Android 15
+• Confiabilidade de alarmes: Alarmas exatos garantidos no modo Doze e após reiniciar
+• Escudo de confiabilidade: Diagnóstico dedicado de alarmes exatos com ajuste em 1 toque
+• Correção superior: Removido o espaçamento duplo da barra de status
+</pt-BR>
+<ru-RU>
+• Панель навигации: Исправлено наложение системных кнопок на меню в Android 15
+• Надежность будильников: Гарантированное срабатывание в режиме Doze и после перезагрузки
+• Экран надежности: Добавлена отдельная проверка точных будильников в 1 касание
+• Отступ сверху: Устранен двойной отступ строки состояния
+</ru-RU>
+<zh-CN>
+• 导航栏适配：修复 Android 15 上系统导航键遮挡底部菜单的问题
+• 闹钟可靠性：确保休眠 Doze 模式与设备重启后闹钟准时响起
+• 可靠性防护盾：新增独立“精确闹钟”诊断与一键直达修复
+• 顶部间距修复：消除主页与设置页面的双重状态栏间距
+</zh-CN>

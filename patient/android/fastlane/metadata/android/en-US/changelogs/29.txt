@@ -1,0 +1,2 @@
+• Fixed navigation buttons overlapping bottom menu and top bar spacing on Android 15
+• Improved overnight alarm reliability with dedicated Exact Alarms diagnostic check

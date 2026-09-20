@@ -47,7 +47,9 @@ fun DosezyTheme(
             val window = (view.context as? Activity)?.window
             window?.statusBarColor = colorScheme.background.toArgb()
             window?.let {
-                WindowCompat.getInsetsController(it, view).isAppearanceLightStatusBars = !darkTheme
+                val insetsController = WindowCompat.getInsetsController(it, view)
+                insetsController.isAppearanceLightStatusBars = !darkTheme
+                insetsController.isAppearanceLightNavigationBars = !darkTheme
             }
         }
     }
