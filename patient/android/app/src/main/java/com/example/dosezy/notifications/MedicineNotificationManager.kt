@@ -13,6 +13,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -62,19 +63,17 @@ class MedicineNotificationManager @Inject constructor(
         }
     }
 
-    fun cancelAllAlarmsForUser(userId: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val allEntries = scheduleRepository.getSchedulesByUserSync(userId)
-                allEntries.forEach { entry ->
-                    alarmScheduler.cancelAlarm(entry.entryId)
-                    alarmScheduler.cancelSnooze(entry.entryId)
-                    alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
-                }
-                Log.d(TAG, "Cancelled all alarms for user: $userId (${allEntries.size} entries)")
-            } catch (e: Exception) {
-                Log.e(TAG, "Error cancelling alarms for user: $userId", e)
+    suspend fun cancelAllAlarmsForUser(userId: String) = withContext(Dispatchers.IO) {
+        try {
+            val allEntries = scheduleRepository.getSchedulesByUserSync(userId)
+            allEntries.forEach { entry ->
+                alarmScheduler.cancelAlarm(entry.entryId)
+                alarmScheduler.cancelSnooze(entry.entryId)
+                alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
             }
+            Log.d(TAG, "Cancelled all alarms for user: $userId (${allEntries.size} entries)")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error cancelling alarms for user: $userId", e)
         }
     }
 

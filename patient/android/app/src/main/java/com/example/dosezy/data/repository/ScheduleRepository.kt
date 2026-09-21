@@ -41,19 +41,21 @@ class ScheduleRepository(private val database: DosezyDatabase) {
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun autoExtendSchedules(userId: String) {
         try {
-            val medicines = database.medicineDao().getMedicinesByUser(userId).first()
+            val medicines = database.medicineDao().getActiveMedicinesByUser(userId).first()
             medicines.forEach { medicine ->
-                val scheduleEntries = database.scheduleDao().getScheduleEntriesByMedicine(medicine.medicineId)
-                val latestEntry = scheduleEntries.maxByOrNull { it.scheduledDateTime }
+                if (!medicine.isArchived) {
+                    val scheduleEntries = database.scheduleDao().getScheduleEntriesByMedicine(medicine.medicineId)
+                    val latestEntry = scheduleEntries.maxByOrNull { it.scheduledDateTime }
 
-                // If no entries exist, or the latest entry is less than 15 days in the future,
-                // auto-generate/append next 30 days of schedules
-                if (latestEntry == null || latestEntry.scheduledDateTime.isBefore(LocalDateTime.now().plusDays(15))) {
-                    val startGenerateFrom = latestEntry?.scheduledDateTime?.toLocalDate()?.plusDays(1) ?: LocalDate.now()
-                    val newEntries = medicine.generateScheduleEntries(startGenerateFrom, 30)
-                    if (newEntries.isNotEmpty()) {
-                        database.scheduleDao().insertScheduleEntries(newEntries)
-                        Log.d(TAG, "Auto-extended schedule for medicine: ${medicine.medicationName} by 30 days starting from $startGenerateFrom")
+                    // If no entries exist, or the latest entry is less than 15 days in the future,
+                    // auto-generate/append next 30 days of schedules
+                    if (latestEntry == null || latestEntry.scheduledDateTime.isBefore(LocalDateTime.now().plusDays(15))) {
+                        val startGenerateFrom = latestEntry?.scheduledDateTime?.toLocalDate()?.plusDays(1) ?: LocalDate.now()
+                        val newEntries = medicine.generateScheduleEntries(startGenerateFrom, 30)
+                        if (newEntries.isNotEmpty()) {
+                            database.scheduleDao().insertScheduleEntries(newEntries)
+                            Log.d(TAG, "Auto-extended schedule for medicine: ${medicine.medicationName} by 30 days starting from $startGenerateFrom")
+                        }
                     }
                 }
             }
@@ -64,31 +66,10 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun scheduleAlarmsForMedicine(medicineId: String, context: Context) {
-        val alarmScheduler = AlarmScheduler(context)
-        val medicine = database.medicineDao().getMedicineById(medicineId).first()
-
+        val medicine = database.medicineDao().getMedicineByIdDirect(medicineId)
         if (medicine != null) {
-            // First check and extend schedules for this user
-            autoExtendSchedules(medicine.userId)
-
-            val scheduleEntries = database.scheduleDao().getScheduleEntriesByMedicine(medicineId)
-            var scheduledCount = 0
-            val limitTime = LocalDateTime.now().plusDays(7)
-
-            scheduleEntries.forEach { entry ->
-                if (entry.status == MedicationStatus.PENDING &&
-                    entry.scheduledDateTime.isAfter(LocalDateTime.now()) &&
-                    entry.scheduledDateTime.isBefore(limitTime)) {
-
-                    alarmScheduler.scheduleMedicineAlarm(entry, medicine.medicationName)
-                    scheduledCount++
-                } else {
-                    // Cancel alarms that are further in the future or no longer pending
-                    alarmScheduler.cancelAlarm(entry.entryId)
-                    alarmScheduler.cancelSnooze(entry.entryId)
-                }
-            }
-            Log.d(TAG, "Scheduled alarms for medicine: ${medicine.medicationName} ($scheduledCount/${scheduleEntries.size} entries, limit 7 days)")
+            rescheduleAllAlarms(medicine.userId, context)
+            Log.d(TAG, "Rescheduled slot alarms for medicine: ${medicine.medicationName}")
         } else {
             Log.w(TAG, "Medicine not found for ID: $medicineId - cannot schedule alarms")
         }
@@ -169,15 +150,21 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             val entries = database.scheduleDao().getScheduleForDateRange(userId, startMillis, endMillis).first()
 
             var scheduledCount = 0
-            entries.forEach { entry ->
-                if (entry.status == MedicationStatus.PENDING &&
-                    entry.scheduledDateTime.isAfter(LocalDateTime.now())) {
-
-                    val medicine = database.medicineDao().getMedicineById(entry.medicineId).first()
-                    medicine?.let {
-                        alarmScheduler.scheduleMedicineAlarm(entry, it.medicationName)
-                        scheduledCount++
-                    }
+            val pendingEntries = entries.filter {
+                it.status == MedicationStatus.PENDING &&
+                it.scheduledDateTime.isAfter(LocalDateTime.now())
+            }
+            val groupedByTime = pendingEntries.groupBy { it.scheduledDateTime.withSecond(0).withNano(0) }
+            groupedByTime.forEach { (slotDateTime, entriesInSlot) ->
+                val entriesWithNames = entriesInSlot.mapNotNull { entry ->
+                    val med = database.medicineDao().getMedicineByIdDirect(entry.medicineId)
+                    med?.let { Pair(entry, it.medicationName) }
+                }
+                if (entriesWithNames.isNotEmpty()) {
+                    val entriesList = entriesWithNames.map { it.first }
+                    val namesList = entriesWithNames.map { it.second }
+                    alarmScheduler.scheduleGroupedMedicineAlarm(slotDateTime, entriesList, namesList)
+                    scheduledCount += entriesWithNames.size
                 }
             }
 
@@ -205,8 +192,25 @@ class ScheduleRepository(private val database: DosezyDatabase) {
     suspend fun insertScheduleEntry(entry: ScheduleEntry) =
         database.scheduleDao().insertScheduleEntry(entry)
 
-    suspend fun updateMedicationStatus(entryId: String, status: String, takenAt: String?) {
-        database.scheduleDao().updateMedicationStatus(entryId, status, takenAt)
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun updateMedicationStatus(entryId: String, status: String, takenAt: LocalDateTime?) {
+        val takenAtMillis = takenAt?.atZone(java.time.ZoneOffset.UTC)?.toInstant()?.toEpochMilli()
+        database.scheduleDao().updateMedicationStatus(entryId, status, takenAtMillis)
+        com.example.dosezy.notifications.AlarmActivity.stopActiveAlarm()
+    }
+
+    suspend fun updateMedicationStatus(entryId: String, status: String, takenAtMillis: Long?) {
+        database.scheduleDao().updateMedicationStatus(entryId, status, takenAtMillis)
+        com.example.dosezy.notifications.AlarmActivity.stopActiveAlarm()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun updateMedicationStatus(entryId: String, status: String, takenAtStr: String?) {
+        val takenAt = takenAtStr?.let {
+            try { LocalDateTime.parse(it) } catch (_: Exception) { LocalDateTime.now() }
+        }
+        val takenAtMillis = takenAt?.atZone(java.time.ZoneOffset.UTC)?.toInstant()?.toEpochMilli()
+        database.scheduleDao().updateMedicationStatus(entryId, status, takenAtMillis)
         com.example.dosezy.notifications.AlarmActivity.stopActiveAlarm()
     }
 
@@ -214,15 +218,16 @@ class ScheduleRepository(private val database: DosezyDatabase) {
     suspend fun recordDoseTaken(
         entryId: String,
         status: String = "TAKEN_ON_TIME",
-        takenAt: String = LocalDateTime.now().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+        takenAt: LocalDateTime = LocalDateTime.now(),
         context: Context? = null
     ) {
         // Inspect previous status to prevent double stock deduction
         val previousEntry = database.scheduleDao().getScheduleEntryById(entryId)
         val alreadyTaken = previousEntry?.status == MedicationStatus.TAKEN_ON_TIME || previousEntry?.status == MedicationStatus.TAKEN_LATE
 
-        // 1. Update schedule entry status in database
-        database.scheduleDao().updateMedicationStatus(entryId, status, takenAt)
+        // 1. Update schedule entry status in database with UTC epoch millis
+        val takenAtMillis = takenAt.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+        database.scheduleDao().updateMedicationStatus(entryId, status, takenAtMillis)
 
         // 2. Stop any active alarm sound / popup
         com.example.dosezy.notifications.AlarmActivity.stopActiveAlarm()
@@ -278,6 +283,17 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
             } catch (_: Exception) {}
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun recordDoseTaken(
+        entryId: String,
+        status: String,
+        takenAtStr: String,
+        context: Context? = null
+    ) {
+        val takenAt = try { LocalDateTime.parse(takenAtStr) } catch (_: Exception) { LocalDateTime.now() }
+        recordDoseTaken(entryId, status, takenAt, context)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

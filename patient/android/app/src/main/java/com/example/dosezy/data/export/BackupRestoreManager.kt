@@ -378,7 +378,18 @@ class BackupRestoreManager(
 
                     ConflictStrategy.OVERWRITE -> {
                         val targetUserId = decision.summary.existingLocalUserId ?: originalUser.userId
-                        
+
+                        // Cancel existing alarms before deleting records to prevent orphaned alarms
+                        try {
+                            val alarmScheduler = com.example.dosezy.notifications.AlarmScheduler(context)
+                            val existingSchedules = scheduleRepository.getSchedulesByUserSync(targetUserId)
+                            existingSchedules.forEach { entry ->
+                                alarmScheduler.cancelAlarm(entry.entryId)
+                                alarmScheduler.cancelSnooze(entry.entryId)
+                                alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
+                            }
+                        } catch (_: Exception) {}
+
                         // Clear old records for this profile
                         database.scheduleDao().deleteScheduleByUser(targetUserId)
                         database.medicineDao().deleteMedicinesByUser(targetUserId)

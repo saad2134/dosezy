@@ -131,7 +131,9 @@ class MedicineRepository @Inject constructor(
         database.scheduleDao().deleteFuturePendingScheduleEntries(medicine.medicineId, nowMillis)
         // 3. Mark medicine as archived
         database.medicineDao().setArchivedStatus(medicine.medicineId, true)
-        // 4. Update home widget
+        // 4. Reschedule remaining active alarms for user to ensure sibling medicines in slots are preserved
+        scheduleRepository.rescheduleAllAlarms(medicine.userId, this.context)
+        // 5. Update home widget
         try {
             com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(this.context)
         } catch (_: Exception) {}
@@ -144,8 +146,8 @@ class MedicineRepository @Inject constructor(
         // 2. Generate new schedule entries starting from today for 30 days
         val newEntries = medicine.copy(isArchived = false).generateScheduleEntries(LocalDate.now(), 30)
         database.scheduleDao().insertScheduleEntries(newEntries)
-        // 3. Schedule alarms
-        scheduleRepository.scheduleAlarmsForMedicine(medicine.medicineId, this.context)
+        // 3. Reschedule all alarms for user so grouped slots are safely reconstructed
+        scheduleRepository.rescheduleAllAlarms(medicine.userId, this.context)
         // 4. Update home widget
         try {
             com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(this.context)
@@ -160,6 +162,8 @@ class MedicineRepository @Inject constructor(
         database.scheduleDao().deleteScheduleEntriesByMedicine(medicine.medicineId)
         // Then delete the medicine
         database.medicineDao().deleteMedicine(medicine)
+        // Reschedule remaining active alarms for user to preserve sibling medicines
+        scheduleRepository.rescheduleAllAlarms(medicine.userId, this.context)
 
         // Update home screen widget
         try {
@@ -174,12 +178,17 @@ class MedicineRepository @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun deleteMedicine(medicineId: String) {
+        val med = database.medicineDao().getMedicineByIdDirect(medicineId)
+        val userId = med?.userId
         // Cancel alarms first
         scheduleRepository.cancelAlarmsForMedicine(medicineId, this.context)
         // Delete schedule entries first
         database.scheduleDao().deleteScheduleEntriesByMedicine(medicineId)
         // Then delete the medicine using the new method
         database.medicineDao().deleteMedicineById(medicineId)
+        if (userId != null) {
+            scheduleRepository.rescheduleAllAlarms(userId, this.context)
+        }
 
         // Update home screen widget
         try {

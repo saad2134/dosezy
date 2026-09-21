@@ -65,8 +65,8 @@ data class Medicine(
      */
     @RequiresApi(Build.VERSION_CODES.O)
     fun generateScheduleEntries(startDateRange: LocalDate, days: Int = 30): List<ScheduleEntry> {
-        // As-needed (PRN) medications do not generate automated scheduled reminder slots
-        if (frequency.pattern == FrequencyPattern.AS_NEEDED) {
+        // As-needed (PRN) and archived medications do not generate automated scheduled reminder slots
+        if (frequency.pattern == FrequencyPattern.AS_NEEDED || isArchived) {
             return emptyList()
         }
 
