@@ -367,7 +367,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             medicineId = medicine.medicineId,
             scheduledDateTime = dateTime,
             takenAt = dateTime,
-            status = MedicationStatus.TAKEN_ON_TIME
+            status = MedicationStatus.TAKEN_ON_TIME,
+            dosage = medicine.getDosageForTime(dateTime.toLocalTime())
         )
         database.scheduleDao().insertScheduleEntry(entry)
 

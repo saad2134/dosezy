@@ -707,10 +707,15 @@ fun MedicineImage(
         contentAlignment = Alignment.Center
     ) {
         if (!imageUri.isNullOrEmpty()) {
+            val modelData = remember(imageUri) {
+                val cleanPath = imageUri.removePrefix("file://")
+                val file = java.io.File(cleanPath)
+                if (file.exists()) file else Uri.parse(imageUri)
+            }
             Image(
                 painter = rememberAsyncImagePainter(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(Uri.parse(imageUri))
+                        .data(modelData)
                         .crossfade(true)
                         .build()
                 ),
@@ -820,16 +825,6 @@ private fun formatDosageInfo(medicine: Medicine): String {
     val timesText = stringResource(R.string.times_per_day_format, medicine.timesPerDay)
     return "$dosageText, $timesText"
 }
-
-private val DosageUnit.displayName: String
-    get() = when (this) {
-        DosageUnit.MG -> "mg"
-        DosageUnit.MCG -> "mcg"
-        DosageUnit.ML -> "ml"
-        DosageUnit.DROP -> "drop"
-        DosageUnit.TABLET -> "tablet"
-        DosageUnit.CAPSULE -> "capsule"
-    }
 
 @Preview(showBackground = true)
 @Composable

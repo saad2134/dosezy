@@ -8,6 +8,7 @@ import android.graphics.pdf.PdfDocument
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.dosezy.data.model.Medicine
+import com.example.dosezy.data.model.getLocalizedName
 import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.data.model.User
 import com.example.dosezy.data.repository.MedicineRepository
@@ -377,7 +378,7 @@ class DataExporter(
             checkPageBreak(20f)
             canvas.drawText(med.medicationName, 40f, y, textPaint)
             canvas.drawText("${med.dosage} ${med.dosageUnit}", 220f, y, textPaint)
-            val freqLabel = if (med.frequency.pattern == com.example.dosezy.data.model.FrequencyPattern.AS_NEEDED) "As needed" else "${med.timesPerDay}x daily"
+            val freqLabel = med.getFrequencyDisplay()
             canvas.drawText(freqLabel, 360f, y, textPaint)
             y += 16f
         }
@@ -615,18 +616,12 @@ class DataExporter(
                 val dosageDisplay = if (med.dosage > 0) {
                     if (med.dosage % 1.0 == 0.0) "${med.dosage.toInt()}" else "${med.dosage}"
                 } else ""
-                val strengthUnitStr = med.dosageUnit.name.lowercase()
+                val strengthUnitStr = med.dosageUnit.getLocalizedName(context)
 
                 val orderUnitStr = if (isDrop) {
                     if (totalNeeded > 1) context.getString(com.example.dosezy.R.string.unit_bottles) else context.getString(com.example.dosezy.R.string.unit_bottle)
                 } else {
-                    when (med.dosageUnit) {
-                        com.example.dosezy.data.model.DosageUnit.TABLET -> if (totalNeeded > 1) "tablets" else "tablet"
-                        com.example.dosezy.data.model.DosageUnit.CAPSULE -> if (totalNeeded > 1) "capsules" else "capsule"
-                        com.example.dosezy.data.model.DosageUnit.DROP -> if (totalNeeded > 1) context.getString(com.example.dosezy.R.string.unit_bottles) else context.getString(com.example.dosezy.R.string.unit_bottle)
-                        com.example.dosezy.data.model.DosageUnit.ML -> "ml"
-                        com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG -> if (totalNeeded > 1) "units" else "unit"
-                    }
+                    med.dosageUnit.getLocalizedName(context)
                 }
 
                 sb.append("${index + 1}. *${med.medicationName}*")
@@ -638,15 +633,9 @@ class DataExporter(
 
                 if (includeStock && med.currentStock != null) {
                     val stockUnitStr = if (isDrop) {
-                        if (med.currentStock > 1) "drops" else "drop"
+                        context.getString(com.example.dosezy.R.string.unit_drop)
                     } else {
-                        when (med.dosageUnit) {
-                            com.example.dosezy.data.model.DosageUnit.TABLET -> if (med.currentStock > 1) "tablets" else "tablet"
-                            com.example.dosezy.data.model.DosageUnit.CAPSULE -> if (med.currentStock > 1) "capsules" else "capsule"
-                            com.example.dosezy.data.model.DosageUnit.DROP -> if (med.currentStock > 1) "drops" else "drop"
-                            com.example.dosezy.data.model.DosageUnit.ML -> "ml"
-                            com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG -> if (med.currentStock > 1) "units" else "unit"
-                        }
+                        med.dosageUnit.getLocalizedName(context)
                     }
                     sb.append("   • ").append(context.getString(com.example.dosezy.R.string.pharmacy_order_current_stock, med.currentStock, stockUnitStr)).append("\n")
                 }

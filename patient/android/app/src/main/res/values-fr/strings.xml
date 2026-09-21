@@ -731,4 +731,7 @@ Voulez-vous continuer ?</string>
     <string name="notif_channel_refill_desc">Alertes lorsque le stock de médicaments passe sous votre seuil choisi</string>
     <string name="widget_tomorrow">Demain </string>
     <string name="med_start_date_label">Date de début</string>
+
+    <string name="prn_logged_success">Dose au besoin enregistrée pour %1$s</string>
+    <string name="btn_jump_to_today">Aujourd\'hui</string>
 </resources>

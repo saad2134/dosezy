@@ -731,4 +731,7 @@
     <string name="notif_channel_refill_desc">Оповещения, когда запас лекарств опускается ниже выбранного порога</string>
     <string name="widget_tomorrow">Завтра </string>
     <string name="med_start_date_label">Дата начала</string>
+
+    <string name="prn_logged_success">Приём по требованию записан для %1$s</string>
+    <string name="btn_jump_to_today">Сегодня</string>
 </resources>

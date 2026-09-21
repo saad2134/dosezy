@@ -731,4 +731,7 @@
     <string name="notif_channel_refill_desc">薬の在庫が設定した補充しきい値を下回ったときのアラート</string>
     <string name="widget_tomorrow">明日 </string>
     <string name="med_start_date_label">開始日</string>
+
+    <string name="prn_logged_success">%1$s の頓服薬を記録しました</string>
+    <string name="btn_jump_to_today">今日</string>
 </resources>

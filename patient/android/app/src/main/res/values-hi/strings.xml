@@ -747,4 +747,7 @@
     <string name="notif_channel_refill_desc">दवा का स्टॉक आपकी चुनी हुई सीमा से कम होने पर अलर्ट</string>
     <string name="widget_tomorrow">कल </string>
     <string name="med_start_date_label">शुरुआती तारीख</string>
+
+    <string name="prn_logged_success">%1$s के लिए आवश्यकतानुसार खुराक दर्ज की गई</string>
+    <string name="btn_jump_to_today">आज</string>
 </resources>

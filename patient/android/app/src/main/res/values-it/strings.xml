@@ -731,4 +731,7 @@ Vuoi continuare?</string>
     <string name="notif_channel_refill_desc">Avvisi quando le scorte di medicinali scendono sotto la soglia scelta</string>
     <string name="widget_tomorrow">Domani </string>
     <string name="med_start_date_label">Data di inizio</string>
+
+    <string name="prn_logged_success">Dose al bisogno registrata per %1$s</string>
+    <string name="btn_jump_to_today">Oggi</string>
 </resources>

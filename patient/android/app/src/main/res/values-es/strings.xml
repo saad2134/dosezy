@@ -747,4 +747,7 @@
     <string name="notif_channel_refill_desc">Alertas cuando el stock de medicamentos baja de su umbral elegido</string>
     <string name="widget_tomorrow">Mañana </string>
     <string name="med_start_date_label">Fecha de inicio</string>
+
+    <string name="prn_logged_success">Dosis según sea necesario registrada para %1$s</string>
+    <string name="btn_jump_to_today">Hoy</string>
 </resources>

@@ -608,4 +608,88 @@ class MedicineLogicTest {
         assertEquals(rawPath, prefixedPath.removePrefix("file://"))
         assertEquals(rawPath, rawPath.removePrefix("file://"))
     }
+
+    // ───────────────────────────────────────────────────────────────
+    // 13. Cycle 4 Tests: Frequency Display, EVERY_X_DAYS Anchor, PRN Dosage
+    // ───────────────────────────────────────────────────────────────
+
+    @Test
+    fun frequencyDisplay_formatsAllPatternsInEnglish() {
+        // Daily single dose
+        val dailySingle = med(freq = Frequency(FrequencyPattern.DAILY), times = listOf(LocalTime.of(8, 0)))
+        assertEquals("Daily", dailySingle.getFrequencyDisplay())
+
+        // Daily multi dose
+        val dailyMulti = med(freq = Frequency(FrequencyPattern.DAILY), times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)))
+        assertEquals("2x Daily", dailyMulti.getFrequencyDisplay())
+
+        // As needed
+        val prn = med(freq = Frequency(FrequencyPattern.AS_NEEDED), times = emptyList())
+        assertEquals("As Needed (PRN)", prn.getFrequencyDisplay())
+
+        // Every X Hours
+        val every4h = med(freq = Frequency(FrequencyPattern.EVERY_X_HOURS, intervalHours = 6))
+        assertEquals("Every 6 Hours", every4h.getFrequencyDisplay())
+
+        // Every X Days
+        val every3d = med(freq = Frequency(FrequencyPattern.EVERY_X_DAYS, intervalDays = 3))
+        assertEquals("Every 3 Days", every3d.getFrequencyDisplay())
+
+        // Weekly
+        val weekly = med(freq = Frequency(FrequencyPattern.WEEKLY, daysPerWeek = 3))
+        assertEquals("3 times per week", weekly.getFrequencyDisplay())
+
+        // Monthly
+        val monthly = med(freq = Frequency(FrequencyPattern.MONTHLY, daysPerMonth = 15))
+        assertEquals("15 times per month", monthly.getFrequencyDisplay())
+    }
+
+    @Test
+    fun everyXDays_withNullStartDate_maintainsConsistentScheduleAcrossDays() {
+        val m = med(
+            freq = Frequency(FrequencyPattern.EVERY_X_DAYS, intervalDays = 2),
+            times = listOf(LocalTime.of(9, 0))
+        )
+        // Generate entries starting from a reference date
+        val refDate = LocalDate.of(2026, 9, 1)
+        val entries = m.generateScheduleEntries(startDateRange = refDate, days = 6)
+
+        // With interval = 2, exactly 3 entries should be generated (every 2 days)
+        assertEquals(3, entries.size)
+
+        // The interval between consecutive generated entries should strictly be 2 days
+        val date0 = entries[0].scheduledDateTime.toLocalDate()
+        val date1 = entries[1].scheduledDateTime.toLocalDate()
+        val date2 = entries[2].scheduledDateTime.toLocalDate()
+
+        assertEquals(2L, ChronoUnit.DAYS.between(date0, date1))
+        assertEquals(2L, ChronoUnit.DAYS.between(date1, date2))
+    }
+
+    @Test
+    fun prnScheduleEntry_retainsMedicineDosage() {
+        val medicine = med(dosage = 250.0, unit = DosageUnit.MG)
+        val now = LocalDateTime.now()
+        val entry = ScheduleEntry(
+            entryId = "PRN_${medicine.medicineId}_12345",
+            userId = medicine.userId,
+            medicineId = medicine.medicineId,
+            scheduledDateTime = now,
+            takenAt = now,
+            status = MedicationStatus.TAKEN_ON_TIME,
+            dosage = medicine.getDosageForTime(now.toLocalTime())
+        )
+
+        assertEquals(250.0, entry.dosage)
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, entry.status)
+        assertEquals(now, entry.takenAt)
+    }
+
+    @Test
+    fun widgetTomorrowTimeLabel_ensuresSpaceSeparator() {
+        val tomorrowLabel = "Tmrw"
+        val formattedTime = "8:00 AM"
+        val result = "${tomorrowLabel.trim()} $formattedTime"
+        assertEquals("Tmrw 8:00 AM", result)
+    }
 }

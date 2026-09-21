@@ -730,4 +730,7 @@
     <string name="notif_channel_refill_desc">ওষুধের স্টক আপনার নির্ধারিত সীমার নিচে নামলে সতর্কতা</string>
     <string name="widget_tomorrow">কাল </string>
     <string name="med_start_date_label">শুরুর তারিখ</string>
+
+    <string name="prn_logged_success">%1$s এর জন্য প্রয়োজনমতো ডোজ রেকর্ড করা হয়েছে</string>
+    <string name="btn_jump_to_today">আজ</string>
 </resources>

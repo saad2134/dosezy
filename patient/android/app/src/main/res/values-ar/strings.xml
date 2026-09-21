@@ -731,4 +731,7 @@
     <string name="notif_channel_refill_desc">تنبيهات عندما ينخفض مخزون الدواء عن الحد الذي حددته</string>
     <string name="widget_tomorrow">غداً </string>
     <string name="med_start_date_label">تاريخ البدء</string>
+
+    <string name="prn_logged_success">تم تسجيل جرعة عند الحاجة لـ %1$s</string>
+    <string name="btn_jump_to_today">اليوم</string>
 </resources>

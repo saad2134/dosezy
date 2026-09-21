@@ -759,4 +759,7 @@ Do you want to continue?</string>
     <string name="notif_channel_refill_desc">Alerts when medicine stock drops below your chosen refill threshold</string>
     <string name="widget_tomorrow">Tmrw </string>
     <string name="med_start_date_label">Start Date</string>
+
+    <string name="prn_logged_success">Logged as-needed dose for %1$s</string>
+    <string name="btn_jump_to_today">Today</string>
 </resources>

@@ -139,7 +139,7 @@ data class Medicine(
             FrequencyPattern.EVERY_X_HOURS -> true
             FrequencyPattern.EVERY_X_DAYS -> {
                 val interval = (frequency.intervalDays ?: 2).coerceAtLeast(1)
-                val baseDate = startDate ?: LocalDate.now()
+                val baseDate = startDate ?: LocalDate.of(2020, 1, 1)
                 val daysDiff = java.time.temporal.ChronoUnit.DAYS.between(baseDate, date)
                 daysDiff % interval == 0L
             }
@@ -200,7 +200,7 @@ data class Medicine(
      */
     fun getFrequencyDisplay(): String {
         return when (frequency.pattern) {
-            FrequencyPattern.DAILY -> "Daily"
+            FrequencyPattern.DAILY -> if (timesPerDay > 1) "${timesPerDay}x Daily" else "Daily"
             FrequencyPattern.AS_NEEDED -> "As Needed (PRN)"
             FrequencyPattern.EVERY_X_HOURS -> "Every ${frequency.intervalHours ?: 4} Hours"
             FrequencyPattern.EVERY_X_DAYS -> "Every ${frequency.intervalDays ?: 2} Days"
@@ -326,6 +326,17 @@ fun DosageUnit.getLocalizedName(): String {
         DosageUnit.DROP -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_drop)
         DosageUnit.TABLET -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_tablet)
         DosageUnit.CAPSULE -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_capsule)
+    }
+}
+
+fun DosageUnit.getLocalizedName(context: android.content.Context): String {
+    return when (this) {
+        DosageUnit.MG -> context.getString(com.example.dosezy.R.string.unit_mg)
+        DosageUnit.MCG -> context.getString(com.example.dosezy.R.string.unit_mcg)
+        DosageUnit.ML -> context.getString(com.example.dosezy.R.string.unit_ml)
+        DosageUnit.DROP -> context.getString(com.example.dosezy.R.string.unit_drop)
+        DosageUnit.TABLET -> context.getString(com.example.dosezy.R.string.unit_tablet)
+        DosageUnit.CAPSULE -> context.getString(com.example.dosezy.R.string.unit_capsule)
     }
 }
 

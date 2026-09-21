@@ -461,8 +461,15 @@ fun HomeScreen(
             confirmButton = {
                 Button(
                     onClick = {
+                        val medName = med.medicationName
                         scheduleViewModel.logAsNeededDose(med)
                         medToLogConfirm = null
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = context.getString(R.string.prn_logged_success, medName),
+                                duration = androidx.compose.material3.SnackbarDuration.Short
+                            )
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1193D4))
                 ) {
@@ -672,7 +679,7 @@ private fun MedicationCard(
         else -> MaterialTheme.colorScheme.onPrimary
     }
 
-    val enabled = !isMissed
+    val enabled = if (isMissed) (currentUser?.allowCustomDoseTime == true) else true
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -783,7 +790,7 @@ private fun MedicationCard(
                         when {
                             isTaken || isSkipped -> onUndo(entry.entryId)
                             isLate -> onMarkAsLate(entry.entryId)
-                            !isMissed -> onMarkAsTaken(entry.entryId)
+                            else -> onMarkAsTaken(entry.entryId)
                         }
                     },
                     colors = ButtonDefaults.buttonColors(

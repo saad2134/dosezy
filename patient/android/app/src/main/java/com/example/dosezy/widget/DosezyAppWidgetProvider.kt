@@ -137,7 +137,7 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                             val dateObj = java.util.Date.from(entry.scheduledDateTime.atZone(zoneId).toInstant())
                             return when (itemDate) {
                                 today -> userTimeFormat.format(dateObj)
-                                today.plusDays(1) -> tomorrowLabel + userTimeFormat.format(dateObj)
+                                today.plusDays(1) -> "${tomorrowLabel.trim()} " + userTimeFormat.format(dateObj)
                                 else -> {
                                     val dayName = itemDate.dayOfWeek.getDisplayName(java.time.format.TextStyle.SHORT, Locale.getDefault())
                                     "$dayName " + userTimeFormat.format(dateObj)

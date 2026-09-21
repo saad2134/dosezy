@@ -731,4 +731,7 @@ Möchten Sie fortfahren?</string>
     <string name="notif_channel_refill_desc">Benachrichtigungen, wenn der Medikamentenvorrat unter Ihren Schwellenwert fällt</string>
     <string name="widget_tomorrow">Morgen </string>
     <string name="med_start_date_label">Startdatum</string>
+
+    <string name="prn_logged_success">Bedarfsdosis für %1$s protokolliert</string>
+    <string name="btn_jump_to_today">Heute</string>
 </resources>

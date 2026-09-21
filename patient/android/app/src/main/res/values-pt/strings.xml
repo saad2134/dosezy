@@ -730,4 +730,7 @@ Deseja continuar?</string>
     <string name="notif_channel_refill_desc">Alertas quando o estoque de medicamentos cai abaixo do limite escolhido</string>
     <string name="widget_tomorrow">Amanhã </string>
     <string name="med_start_date_label">Data de início</string>
+
+    <string name="prn_logged_success">Dose conforme necessário registrada para %1$s</string>
+    <string name="btn_jump_to_today">Hoje</string>
 </resources>
