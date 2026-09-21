@@ -188,7 +188,7 @@ class ScheduleViewModel @Inject constructor(
 
     fun markAsMissed(entryId: String) {
         viewModelScope.launch {
-            scheduleRepository.updateMedicationStatus(entryId, "MISSED", null)
+            scheduleRepository.updateMedicationStatus(entryId, "MISSED", null as Long?)
             currentCalendarUserId = null
             // Refresh the schedule after updating status
             _currentUserId.value?.let { userId ->
@@ -226,7 +226,7 @@ class ScheduleViewModel @Inject constructor(
                         missedAfterHours
                     )
                     if (isMissed) {
-                        scheduleRepository.updateMedicationStatus(entry.entryId, "MISSED", null)
+                        scheduleRepository.updateMedicationStatus(entry.entryId, "MISSED", null as Long?)
                         hasUpdated = true
                     }
                 }
