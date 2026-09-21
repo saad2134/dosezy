@@ -32,8 +32,9 @@
   
   <a> </a>
   <details>
-    <summary>Other Stores (Unofficial)</summary>
-    <br>
+    <summary>Other Stores</summary>
+    <sub>⚠️ Note: Some of the listed stores are either unofficial or are non-actively maintained. Proceed at your own risk before downloading. ⚠️</sub>
+    <br><br>
     <a href="https://appteka.store/app/com.saad2134.dosezy">
       <img width="197" height="59" alt="AppTeka" src="assets/badges/appteka.png" />
     </a>
@@ -42,9 +43,6 @@
     </a>
     <a href="https://www.androidfreeware.net/download-dosezy-apk.html">
       <img width="197" height="59" alt="AndroidFreeware" src="assets/badges/android-freeware.png" />
-    </a>
-    <a href="https://trashbox.ru/topics/218525">
-      <img width="197" height="59" alt="TrashBox" src="assets/badges/trashbox-ru.png" />
     </a>
   </details>
 </div>

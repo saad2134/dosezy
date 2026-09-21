@@ -28,11 +28,13 @@ class NotificationActionReceiver : BroadcastReceiver() {
             val medicine = database.medicineDao().getMedicineByIdDirect(medicineId)
             if (medicine != null && medicine.currentStock != null && medicine.refillThreshold != null) {
                 if (medicine.currentStock <= medicine.refillThreshold) {
+                    val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+                    val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
                     val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
                     val builder = androidx.core.app.NotificationCompat.Builder(context, MedicineAlarmReceiver.CHANNEL_ID)
                         .setSmallIcon(com.example.dosezy.R.drawable.loader_icon)
-                        .setContentTitle(context.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
-                        .setContentText(context.getString(com.example.dosezy.R.string.notif_refill_alert_text, medicine.currentStock))
+                        .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
+                        .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, medicine.currentStock))
                         .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
                         .setCategory(androidx.core.app.NotificationCompat.CATEGORY_ALARM)
                         .setAutoCancel(true)

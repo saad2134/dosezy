@@ -234,11 +234,13 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
                     // 3. Trigger refill warning notification if stock is below threshold
                     if (context != null && medicine.refillThreshold != null && newStock <= medicine.refillThreshold) {
+                        val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+                        val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
                         val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
                         val builder = androidx.core.app.NotificationCompat.Builder(context, com.example.dosezy.notifications.MedicineAlarmReceiver.CHANNEL_ID)
                             .setSmallIcon(com.example.dosezy.R.drawable.loader_icon)
-                            .setContentTitle(context.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
-                            .setContentText(context.getString(com.example.dosezy.R.string.notif_refill_alert_text, newStock))
+                            .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
+                            .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, newStock))
                             .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
                             .setAutoCancel(true)
                         nManager.notify((entry.medicineId + "_refill").hashCode(), builder.build())
@@ -341,11 +343,13 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             database.medicineDao().updateMedicine(updatedMedicine)
 
             if (context != null && medicine.refillThreshold != null && newStock <= medicine.refillThreshold) {
+                val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+                val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
                 val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
                 val builder = androidx.core.app.NotificationCompat.Builder(context, com.example.dosezy.notifications.MedicineAlarmReceiver.CHANNEL_ID)
                     .setSmallIcon(com.example.dosezy.R.drawable.loader_icon)
-                    .setContentTitle(context.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
-                    .setContentText(context.getString(com.example.dosezy.R.string.notif_refill_alert_text, newStock))
+                    .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
+                    .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, newStock))
                     .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
                     .setAutoCancel(true)
                 nManager.notify((medicine.medicineId + "_refill").hashCode(), builder.build())

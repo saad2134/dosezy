@@ -89,6 +89,15 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                         val user = database.userDao().getUserByIdDirect(entry.userId)
                         val isNagging = naggingCount > 0
 
+                        // Retrieve medicine dosage details for each entry in this alarm
+                        val allEntryIds = entryIds ?: listOf(entryId)
+                        val medicineDetails = allEntryIds.mapNotNull { id ->
+                            val e = database.scheduleDao().getScheduleEntryById(id) ?: return@mapNotNull null
+                            val m = database.medicineDao().getMedicineByIdDirect(e.medicineId) ?: return@mapNotNull null
+                            val dose = m.getDosageDisplay(e.scheduledDateTime.toLocalTime())
+                            Pair(m.medicationName, dose)
+                        }
+
                         // Immediately trigger centralized alarm audio & vibration
                         val sound = user?.alarmSound ?: com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT
                         val customPath = user?.customAlarmSoundPath
@@ -107,6 +116,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                             entryIds = entryIds,
                             medicineName = medicineName,
                             medicineNames = medicineNames,
+                            medicineDetails = medicineDetails,
                             scheduledTime = scheduledTime,
                             isNagging = isNagging,
                             naggingCount = naggingCount,
@@ -133,7 +143,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                         customPath = null,
                         autoSilenceSeconds = 0
                     )
-                    showNotification(context, entryId, entryIds, medicineName, medicineNames, scheduledTime, false, 0, 3)
+                    showNotification(context, entryId, entryIds, medicineName, medicineNames, emptyList(), scheduledTime, false, 0, 3)
                 } finally {
                     pendingResult.finish()
                 }
@@ -147,17 +157,36 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         entryIds: ArrayList<String>?,
         medicineName: String,
         medicineNames: ArrayList<String>?,
+        medicineDetails: List<Pair<String, String>> = emptyList(),
         scheduledTime: String?,
         isNagging: Boolean = false,
         naggingCount: Int = 0,
         maxNagging: Int = 3,
         snoozeMinutes: Int = 10
     ) {
-        createNotificationChannel(context)
+        val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+        val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
 
-        val contentText = scheduledTime?.let {
-            context.getString(R.string.notif_content_scheduled_format, it)
-        } ?: context.getString(R.string.notif_content_generic_reminder)
+        createNotificationChannel(localizedContext)
+
+        val scheduledTimeStr = scheduledTime?.let {
+            localizedContext.getString(R.string.notif_content_scheduled_format, it)
+        } ?: localizedContext.getString(R.string.notif_content_generic_reminder)
+
+        val effectiveDetails = if (medicineDetails.isNotEmpty()) {
+            medicineDetails
+        } else if (medicineNames != null && medicineNames.isNotEmpty()) {
+            medicineNames.map { Pair(it, "") }
+        } else {
+            listOf(Pair(medicineName, ""))
+        }
+
+        val primaryMedLabel = if (effectiveDetails.isNotEmpty()) {
+            val first = effectiveDetails.first()
+            if (first.second.isNotEmpty()) "${first.first} (${first.second})" else first.first
+        } else {
+            medicineName
+        }
 
         // Create intent for opening the app
         val mainIntent = Intent(context, MainActivity::class.java).apply {
@@ -246,21 +275,41 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         }
 
         val notificationTitle = if (isNagging) {
-            context.getString(R.string.notif_nagging_title, medicineName)
-        } else if (medicineNames != null && medicineNames.size > 1) {
-            context.getString(R.string.alarm_medication_reminder_multi, medicineNames.size)
+            localizedContext.getString(R.string.notif_nagging_title, primaryMedLabel)
+        } else if (effectiveDetails.size > 1) {
+            localizedContext.getString(R.string.alarm_medication_reminder_multi, effectiveDetails.size)
         } else {
-            context.getString(R.string.alarm_medication_reminder)
+            localizedContext.getString(R.string.alarm_medication_reminder)
         }
 
         val notificationText = if (isNagging) {
-            context.getString(R.string.notif_nagging_text, naggingCount, maxNagging, scheduledTime ?: "")
+            localizedContext.getString(R.string.notif_nagging_text, naggingCount, maxNagging, scheduledTime ?: "")
+        } else if (effectiveDetails.size == 1) {
+            "$primaryMedLabel • $scheduledTimeStr"
         } else {
-            contentText
+            val summary = effectiveDetails.joinToString(", ") { (name, dose) ->
+                if (dose.isNotEmpty()) "$name ($dose)" else name
+            }
+            "$summary • $scheduledTimeStr"
+        }
+
+        val bigText = if (isNagging) {
+            notificationText
+        } else {
+            buildString {
+                effectiveDetails.forEach { (name, dose) ->
+                    append("• ").append(name)
+                    if (dose.isNotEmpty()) {
+                        append(" (").append(dose).append(")")
+                    }
+                    append("\n")
+                }
+                append(scheduledTimeStr)
+            }.trimEnd()
         }
 
         // Create silent notification: AlarmAudioPlayer is the single source of sound & vibration
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+        val notification = NotificationCompat.Builder(localizedContext, CHANNEL_ID)
             .setSmallIcon(R.drawable.loader_icon)
             .setContentTitle(notificationTitle)
             .setContentText(notificationText)
@@ -273,15 +322,15 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             .setContentIntent(fullScreenPendingIntent)
             .addAction(
                 getNotificationIcon(context, Icons.Filled.Check),
-                context.getString(R.string.home_action_taken),
+                localizedContext.getString(R.string.home_action_taken),
                 takenPendingIntent
             )
             .addAction(
                 getNotificationIcon(context, Icons.Filled.Snooze),
-                context.getString(R.string.notif_action_snooze_format, snoozeMinutes),
+                localizedContext.getString(R.string.notif_action_snooze_format, snoozeMinutes),
                 snoozePendingIntent
             )
-            .setStyle(NotificationCompat.BigTextStyle().bigText(notificationText))
+            .setStyle(NotificationCompat.BigTextStyle().bigText(bigText))
             .build()
 
         val notificationManager =
