@@ -105,12 +105,28 @@ class UserViewModel @Inject constructor(
             _isLoading.value = true
             try {
                 withContext(Dispatchers.IO) {
-                    userRepository.insertUser(user)
-
-                    // If this is the first user, automatically set as current
                     val allUsers = userRepository.getAllUsersList()
-                    if (allUsers.isEmpty() || allUsers.none { it.isCurrentUser }) {
-                        setCurrentUser(user)
+                    val shouldBeCurrent = user.isCurrentUser || allUsers.isEmpty() || allUsers.none { it.isCurrentUser }
+
+                    if (shouldBeCurrent) {
+                        // Demote existing users to maintain the single current user invariant
+                        allUsers.forEach { existingUser ->
+                            if (existingUser.isCurrentUser) {
+                                userRepository.updateUser(existingUser.copy(isCurrentUser = false))
+                            }
+                        }
+                    }
+
+                    val userToInsert = user.copy(isCurrentUser = shouldBeCurrent)
+                    userRepository.insertUser(userToInsert)
+
+                    if (shouldBeCurrent) {
+                        withContext(Dispatchers.Main) {
+                            _currentUser.value = userToInsert
+                        }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            medicineNotificationManager.scheduleAlarmsForUser(userToInsert.userId)
+                        }
                     }
                 }
                 _isLoading.value = false

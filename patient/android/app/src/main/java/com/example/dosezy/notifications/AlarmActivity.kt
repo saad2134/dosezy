@@ -311,13 +311,11 @@ fun GroupedAlarmScreenContent(
             withContext(Dispatchers.IO) {
                 val alarmScheduler = AlarmScheduler(context)
                 if (medicinesList.isNotEmpty()) {
-                    medicinesList.forEach { (entry, med) ->
-                        alarmScheduler.scheduleSnooze(entry.entryId, snoozeMinutes, med.medicationName)
-                    }
+                    val ids = medicinesList.map { it.first.entryId }
+                    val names = medicinesList.map { it.second.medicationName }
+                    alarmScheduler.scheduleGroupedSnooze(ids, snoozeMinutes, names)
                 } else if (entryIds.isNotEmpty()) {
-                    entryIds.forEach { id ->
-                        alarmScheduler.scheduleSnooze(id, snoozeMinutes, initialMedicineName)
-                    }
+                    alarmScheduler.scheduleGroupedSnooze(entryIds, snoozeMinutes, listOf(initialMedicineName))
                 }
             }
             onDismiss()

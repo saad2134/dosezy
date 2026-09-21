@@ -123,7 +123,7 @@ data class Medicine(
             FrequencyPattern.EVERY_X_HOURS -> true
             FrequencyPattern.EVERY_X_DAYS -> {
                 val interval = (frequency.intervalDays ?: 2).coerceAtLeast(1)
-                val baseDate = startDate ?: LocalDate.of(2024, 1, 1)
+                val baseDate = startDate ?: LocalDate.now()
                 val daysDiff = java.time.temporal.ChronoUnit.DAYS.between(baseDate, date)
                 daysDiff % interval == 0L
             }

@@ -213,26 +213,29 @@ class ScheduleViewModel @Inject constructor(
     fun autoMarkMissedMedications(userId: String, missedAfterHours: Int) {
         viewModelScope.launch {
             val currentTime = LocalDateTime.now()
+            val cutoffTime = currentTime.minusHours(missedAfterHours.toLong())
             try {
-                // Get all schedule entries for the user
-                val allEntries = scheduleRepository.getSchedulesByUserSync(userId)
+                // Query only pending entries that have passed the missed cutoff time
+                val overdueEntries = scheduleRepository.getPendingEntriesBefore(userId, cutoffTime)
 
-                allEntries.forEach { entry ->
-                    if (entry.status == MedicationStatus.PENDING) {
-                        val isMissed = TimeCalculationUtils.isMissed(
-                            entry.scheduledDateTime,
-                            currentTime,
-                            missedAfterHours
-                        )
-                        if (isMissed) {
-                            scheduleRepository.updateMedicationStatus(entry.entryId, "MISSED", null)
-                        }
+                var hasUpdated = false
+                overdueEntries.forEach { entry ->
+                    val isMissed = TimeCalculationUtils.isMissed(
+                        entry.scheduledDateTime,
+                        currentTime,
+                        missedAfterHours
+                    )
+                    if (isMissed) {
+                        scheduleRepository.updateMedicationStatus(entry.entryId, "MISSED", null)
+                        hasUpdated = true
                     }
                 }
 
-                // Refresh the current view after updating
-                _currentUserId.value?.let { currentUserId ->
-                    loadScheduleForDate(currentUserId, _selectedDate.value)
+                // Refresh the current view only if any entry was marked missed
+                if (hasUpdated) {
+                    _currentUserId.value?.let { currentUserId ->
+                        loadScheduleForDate(currentUserId, _selectedDate.value)
+                    }
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error auto-marking missed medications", e)

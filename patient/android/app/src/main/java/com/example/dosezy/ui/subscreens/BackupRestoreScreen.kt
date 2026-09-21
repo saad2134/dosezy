@@ -402,7 +402,7 @@ fun BackupRestoreScreen(
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = statusMessage ?: stringResource(R.string.backup_restore_in_progress),
+                                text = loadingMessage ?: stringResource(R.string.backup_restore_in_progress),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = textPrimary

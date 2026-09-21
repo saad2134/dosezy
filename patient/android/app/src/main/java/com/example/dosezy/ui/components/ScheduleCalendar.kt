@@ -201,9 +201,9 @@ private fun CalendarGrid(
             ) {
                 repeat(7) { dayIndex ->
                     val currentDay = dayCounter
-                    val date = try {
+                    val date = if (currentDay in 1..daysInMonth) {
                         currentMonth.atDay(currentDay)
-                    } catch (e: Exception) {
+                    } else {
                         null
                     }
 
@@ -298,14 +298,24 @@ private fun getDateStatusColor(entries: List<ScheduleEntry>): Color {
 
     val hasMissed = entries.any { it.status == MedicationStatus.MISSED }
     val hasLate = entries.any { it.status == MedicationStatus.TAKEN_LATE }
-    val allTaken = entries.all {
+    val allCompleted = entries.all {
         it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE || it.status == MedicationStatus.SKIPPED
+    }
+    val hasTaken = entries.any {
+        it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE
+    }
+    val allSkipped = entries.all { it.status == MedicationStatus.SKIPPED }
+
+    // Dynamic check: Overdue pending doses in the past should show as red (missed)
+    val hasPastPending = entries.any {
+        it.status == MedicationStatus.PENDING && it.scheduledDateTime.isBefore(java.time.LocalDateTime.now().minusMinutes(1))
     }
 
     return when {
-        hasMissed -> Color(0xFFEF4444) // Red
+        hasMissed || hasPastPending -> Color(0xFFEF4444) // Red
         hasLate -> Color(0xFFF59E0B) // Amber
-        allTaken -> Color(0xFF10B981) // Green
+        allCompleted && hasTaken -> Color(0xFF10B981) // Green
+        allSkipped -> Color(0xFF9CA3AF) // Slate Gray for skipped (neutral)
         else -> Color(0xFF6B7280) // Gray for pending
     }
 }

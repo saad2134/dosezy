@@ -204,6 +204,7 @@ fun NewUserScreen(
                 )
                 2 -> FeaturesPage()
                 3 -> ProfileSetupPage(
+                    isDefaultUser = !isCreatingNewProfile && (users.isEmpty() || users.none { it.isCurrentUser }),
                     onComplete = { user ->
                         userViewModel.addUser(user)
                         // User is added to database, navigation handled by bottom bar
@@ -461,6 +462,7 @@ fun FeaturesPage() {
 @Composable
 fun ProfileSetupPage(
     onComplete: (User) -> Unit,
+    isDefaultUser: Boolean = false,
     onValidationChange: (Boolean) -> Unit = {},
     setCompleteAction: (() -> Unit) -> Unit = {}
 ) {
@@ -722,7 +724,7 @@ fun ProfileSetupPage(
                 contactNumber = contactNumber.trim(),
                 allergies = allergies.trim().ifBlank { null },
                 medicalConditions = medicalConditions.trim().ifBlank { null },
-                isCurrentUser = true
+                isCurrentUser = isDefaultUser
             )
             onComplete(user)
         }

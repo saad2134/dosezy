@@ -31,12 +31,20 @@ class NotificationActionReceiver : BroadcastReceiver() {
                     val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
                     val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
                     val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-                    val builder = androidx.core.app.NotificationCompat.Builder(context, MedicineAlarmReceiver.CHANNEL_ID)
+                    val contentIntent = android.app.PendingIntent.getActivity(
+                        context,
+                        (medicineId + "_refill_topbar_click").hashCode(),
+                        Intent(context, com.example.dosezy.MainActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        },
+                        android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+                    )
+                    val builder = androidx.core.app.NotificationCompat.Builder(context, MedicineAlarmReceiver.REFILL_CHANNEL_ID)
                         .setSmallIcon(com.example.dosezy.R.drawable.loader_icon)
                         .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
                         .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, medicine.currentStock))
-                        .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
-                        .setCategory(androidx.core.app.NotificationCompat.CATEGORY_ALARM)
+                        .setPriority(androidx.core.app.NotificationCompat.PRIORITY_DEFAULT)
+                        .setContentIntent(contentIntent)
                         .setAutoCancel(true)
                     nManager.notify((medicineId + "_refill_topbar").hashCode(), builder.build())
                 }
@@ -102,17 +110,19 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 Log.d(TAG, "Marked ${allIds.size} medicines as taken and processed")
             }
             "SNOOZE_ACTION" -> {
-                allIds.forEach { id ->
-                    Log.d(TAG, "Snoozing medicine reminder for entry: $id")
-                    val entry = database.scheduleDao().getScheduleEntryById(id)
-                    val user = entry?.let { database.userDao().getUserByIdDirect(it.userId) }
-                    val snoozeMinutes = user?.snoozeDuration ?: 10
-                    val medicine = entry?.let { database.medicineDao().getMedicineByIdDirect(it.medicineId) }
-                    val medicineName = medicine?.medicationName ?: "Medicine"
+                Log.d(TAG, "Snoozing medicine reminder for ${allIds.size} entries")
+                val firstEntry = database.scheduleDao().getScheduleEntryById(primaryEntryId)
+                val user = firstEntry?.let { database.userDao().getUserByIdDirect(it.userId) }
+                val snoozeMinutes = user?.snoozeDuration ?: 10
 
-                    alarmScheduler.scheduleSnooze(id, snoozeMinutes, medicineName)
-                    Log.d(TAG, "Medicine reminder snoozed for $snoozeMinutes minutes for entry: $id ($medicineName)")
+                val medicineNames = allIds.mapNotNull { id ->
+                    val entry = database.scheduleDao().getScheduleEntryById(id)
+                    val med = entry?.let { database.medicineDao().getMedicineByIdDirect(it.medicineId) }
+                    med?.medicationName
                 }
+
+                alarmScheduler.scheduleGroupedSnooze(allIds, snoozeMinutes, medicineNames)
+                Log.d(TAG, "Medicine reminder snoozed for $snoozeMinutes minutes for ${allIds.size} entries")
             }
             else -> {
                 Log.w(TAG, "Unknown action received: $action for entry: $primaryEntryId")

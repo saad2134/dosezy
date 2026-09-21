@@ -366,11 +366,20 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
                 val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
                 val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-                val builder = androidx.core.app.NotificationCompat.Builder(context, com.example.dosezy.notifications.MedicineAlarmReceiver.CHANNEL_ID)
+                val contentIntent = android.app.PendingIntent.getActivity(
+                    context,
+                    (medicine.medicineId + "_refill_click").hashCode(),
+                    Intent(context, com.example.dosezy.MainActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    },
+                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+                )
+                val builder = androidx.core.app.NotificationCompat.Builder(context, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
                     .setSmallIcon(com.example.dosezy.R.drawable.loader_icon)
                     .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
                     .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, newStock))
-                    .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+                    .setPriority(androidx.core.app.NotificationCompat.PRIORITY_DEFAULT)
+                    .setContentIntent(contentIntent)
                     .setAutoCancel(true)
                 nManager.notify((medicine.medicineId + "_refill").hashCode(), builder.build())
             }
@@ -381,5 +390,11 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
             } catch (_: Exception) {}
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getPendingEntriesBefore(userId: String, cutoffTime: LocalDateTime): List<ScheduleEntry> {
+        val cutoffMillis = cutoffTime.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+        return database.scheduleDao().getPendingEntriesBefore(userId, cutoffMillis)
     }
 }

@@ -109,14 +109,25 @@ class AlarmScheduler(private val context: Context) {
 
     @SuppressLint("ScheduleExactAlarm")
     fun scheduleSnooze(entryId: String, minutes: Int, medicineName: String) {
+        scheduleGroupedSnooze(listOf(entryId), minutes, listOf(medicineName))
+    }
+
+    @SuppressLint("ScheduleExactAlarm")
+    fun scheduleGroupedSnooze(entryIds: List<String>, minutes: Int, medicineNames: List<String>) {
+        if (entryIds.isEmpty()) return
+        val primaryId = entryIds.first()
+        val medNameSummary = if (medicineNames.isNotEmpty()) medicineNames.joinToString(", ") else "Medicine"
+
         val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
-            putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, entryId)
-            putExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME, medicineName)
+            putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, primaryId)
+            putStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS, ArrayList(entryIds))
+            putExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME, medNameSummary)
+            putStringArrayListExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAMES, ArrayList(medicineNames))
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            entryId.hashCode() + 1000,
+            primaryId.hashCode() + 1000,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -126,7 +137,7 @@ class AlarmScheduler(private val context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
             val showIntent = PendingIntent.getActivity(
                 context,
-                entryId.hashCode() + 1500,
+                primaryId.hashCode() + 1500,
                 Intent(context, MainActivity::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
@@ -152,7 +163,7 @@ class AlarmScheduler(private val context: Context) {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
         }
 
-        Log.d(TAG, "Scheduled snooze for entry: $entryId in $minutes minutes")
+        Log.d(TAG, "Scheduled grouped snooze for ${entryIds.size} entries in $minutes minutes (primaryId=$primaryId)")
     }
 
     fun cancelAlarm(entryId: String) {

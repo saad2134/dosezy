@@ -436,13 +436,28 @@ class DataExporter(
         return pdfDocument
     }
 
+    private fun escapeCsv(value: Any?): String {
+        val str = value?.toString() ?: ""
+        return "\"${str.replace("\"", "\"\"")}\""
+    }
+
     private fun buildCsvContent(user: User, medicines: List<Medicine>, schedules: List<ScheduleEntry>): String {
         val csvBuilder = StringBuilder()
 
         // User Information Section
         csvBuilder.append("USER INFORMATION\n")
         csvBuilder.append("User ID,Full Name,Age,Gender,Contact Number,Allergies,Medical Conditions,Profile Picture Path,Is Current User\n")
-        csvBuilder.append("\"${user.userId}\",\"${user.fullName}\",${user.age},${user.gender},\"${user.contactNumber}\",\"${user.allergies ?: ""}\",\"${user.medicalConditions ?: ""}\",\"${user.profilePicPath ?: ""}\",${user.isCurrentUser}\n\n")
+        csvBuilder.append(
+            "${escapeCsv(user.userId)}," +
+            "${escapeCsv(user.fullName)}," +
+            "${user.age}," +
+            "${user.gender}," +
+            "${escapeCsv(user.contactNumber)}," +
+            "${escapeCsv(user.allergies ?: "")}," +
+            "${escapeCsv(user.medicalConditions ?: "")}," +
+            "${escapeCsv(user.profilePicPath ?: "")}," +
+            "${user.isCurrentUser}\n\n"
+        )
 
         // Medicines Section
         csvBuilder.append("MEDICINES\n")
@@ -450,24 +465,24 @@ class DataExporter(
         medicines.forEach { medicine ->
             val scheduledTimesStr = medicine.scheduledTimes.joinToString(";") { it.toString() }
             csvBuilder.append(
-                "\"${medicine.medicineId}\"," +
-                        "\"${medicine.userId}\"," +
-                        "\"${medicine.medicationName}\"," +
-                        "${medicine.dosage}," +
-                        "${medicine.dosageUnit}," +
-                        "${medicine.timesPerDay}," +
-                        "${medicine.frequency.pattern}," +
-                        "${medicine.frequency.intervalHours ?: ""}," +
-                        "${medicine.frequency.intervalDays ?: ""}," +
-                        "\"$scheduledTimesStr\"," +
-                        "\"${medicine.pillShape.name}\"," +
-                        "\"${medicine.pillColor}\"," +
-                        "\"${(medicine.notes ?: "").replace("\"", "\"\"")}\"," +
-                        "\"${medicine.startDate ?: ""}\"," +
-                        "\"${medicine.endDate ?: ""}\"," +
-                        "${medicine.durationDays ?: ""}," +
-                        "${medicine.currentStock ?: ""}," +
-                        "\"${medicine.imageUri ?: ""}\"\n"
+                "${escapeCsv(medicine.medicineId)}," +
+                "${escapeCsv(medicine.userId)}," +
+                "${escapeCsv(medicine.medicationName)}," +
+                "${medicine.dosage}," +
+                "${medicine.dosageUnit}," +
+                "${medicine.timesPerDay}," +
+                "${medicine.frequency.pattern}," +
+                "${medicine.frequency.intervalHours ?: ""}," +
+                "${medicine.frequency.intervalDays ?: ""}," +
+                "${escapeCsv(scheduledTimesStr)}," +
+                "${escapeCsv(medicine.pillShape.name)}," +
+                "${escapeCsv(medicine.pillColor)}," +
+                "${escapeCsv(medicine.notes ?: "")}," +
+                "${escapeCsv(medicine.startDate ?: "")}," +
+                "${escapeCsv(medicine.endDate ?: "")}," +
+                "${medicine.durationDays ?: ""}," +
+                "${medicine.currentStock ?: ""}," +
+                "${escapeCsv(medicine.imageUri ?: "")}\n"
             )
         }
         csvBuilder.append("\n")
@@ -477,13 +492,13 @@ class DataExporter(
         csvBuilder.append("Entry ID,User ID,Medicine ID,Scheduled DateTime,Status,Skip Reason,Taken At\n")
         schedules.forEach { schedule ->
             csvBuilder.append(
-                "\"${schedule.entryId}\"," +
-                        "\"${schedule.userId}\"," +
-                        "\"${schedule.medicineId}\"," +
-                        "\"${schedule.scheduledDateTime}\"," +
-                        "${schedule.status}," +
-                        "\"${(schedule.skipReason ?: "").replace("\"", "\"\"")}\"," +
-                        "\"${schedule.takenAt ?: ""}\"\n"
+                "${escapeCsv(schedule.entryId)}," +
+                "${escapeCsv(schedule.userId)}," +
+                "${escapeCsv(schedule.medicineId)}," +
+                "${escapeCsv(schedule.scheduledDateTime)}," +
+                "${schedule.status}," +
+                "${escapeCsv(schedule.skipReason ?: "")}," +
+                "${escapeCsv(schedule.takenAt ?: "")}\n"
             )
         }
 

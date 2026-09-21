@@ -69,6 +69,7 @@ class MedicineNotificationManager @Inject constructor(
                 allEntries.forEach { entry ->
                     alarmScheduler.cancelAlarm(entry.entryId)
                     alarmScheduler.cancelSnooze(entry.entryId)
+                    alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
                 }
                 Log.d(TAG, "Cancelled all alarms for user: $userId (${allEntries.size} entries)")
             } catch (e: Exception) {

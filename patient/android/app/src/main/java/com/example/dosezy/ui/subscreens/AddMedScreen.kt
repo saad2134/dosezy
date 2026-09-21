@@ -1125,10 +1125,11 @@ fun AddMedScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Add Medication Button
                 val durationDaysInt = durationDaysText.toIntOrNull()
                 val calcStartDate = selectedStartDate
-                val calcEndDate = if (isFiniteCourse && durationDaysInt != null) selectedStartDate.plusDays(durationDaysInt.toLong()) else null
+                val calcEndDate = if (isFiniteCourse && durationDaysInt != null) {
+                    selectedStartDate.plusDays((durationDaysInt - 1).toLong().coerceAtLeast(0L))
+                } else null
 
                 val isFormValid = medicationName.isNotBlank() && dosage.isNotBlank() && (
                     selectedFrequency == FrequencyPattern.DAILY ||

@@ -638,9 +638,11 @@ fun PreferencesScreen(navController: NavController) {
         if (showLateAfterDialog) {
             LateAfterSelectionDialog(
                 currentHours = currentUser?.considerLateAfter ?: 3,
+                currentMissedHours = currentUser?.considerMissedAfter ?: 6,
                 onHoursSelected = { newHours ->
                     currentUser?.let { user ->
-                        userViewModel.updateUser(user.copy(considerLateAfter = newHours))
+                        val safeMissed = if (user.considerMissedAfter <= newHours) newHours + 1 else user.considerMissedAfter
+                        userViewModel.updateUser(user.copy(considerLateAfter = newHours, considerMissedAfter = safeMissed))
                     }
                     showLateAfterDialog = false
                 },
@@ -652,9 +654,11 @@ fun PreferencesScreen(navController: NavController) {
         if (showMissedAfterDialog) {
             MissedAfterSelectionDialog(
                 currentHours = currentUser?.considerMissedAfter ?: 6,
+                currentLateHours = currentUser?.considerLateAfter ?: 3,
                 onHoursSelected = { newHours ->
                     currentUser?.let { user ->
-                        userViewModel.updateUser(user.copy(considerMissedAfter = newHours))
+                        val safeLate = if (user.considerLateAfter >= newHours) newHours - 1 else user.considerLateAfter
+                        userViewModel.updateUser(user.copy(considerMissedAfter = newHours, considerLateAfter = safeLate))
                     }
                     showMissedAfterDialog = false
                 },
@@ -1067,16 +1071,18 @@ fun TimeFormatSelectionDialog(
 @Composable
 fun LateAfterSelectionDialog(
     currentHours: Int,
+    currentMissedHours: Int = 6,
     onHoursSelected: (Int) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val hourOptionStrings = (1..3).map { hours ->
+    val maxLate = (currentMissedHours - 1).coerceIn(1, 8)
+    val hourOptionStrings = (1..maxLate).map { hours ->
         androidx.compose.ui.res.stringResource(R.string.hours_format, hours) to hours
     }
     com.example.dosezy.ui.components.SelectionDialog(
         title = androidx.compose.ui.res.stringResource(R.string.pref_late_after),
         options = hourOptionStrings,
-        currentSelection = currentHours,
+        currentSelection = currentHours.coerceIn(1, maxLate),
         onOptionSelected = onHoursSelected,
         onDismiss = onDismiss
     )
@@ -1086,16 +1092,18 @@ fun LateAfterSelectionDialog(
 @Composable
 fun MissedAfterSelectionDialog(
     currentHours: Int,
+    currentLateHours: Int = 3,
     onHoursSelected: (Int) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val hourOptionStrings = (3..9).map { hours ->
+    val minMissed = (currentLateHours + 1).coerceIn(2, 9)
+    val hourOptionStrings = (minMissed..9).map { hours ->
         androidx.compose.ui.res.stringResource(R.string.hours_format, hours) to hours
     }
     com.example.dosezy.ui.components.SelectionDialog(
         title = androidx.compose.ui.res.stringResource(R.string.pref_mark_missed_after),
         options = hourOptionStrings,
-        currentSelection = currentHours,
+        currentSelection = currentHours.coerceIn(minMissed, 9),
         onOptionSelected = onHoursSelected,
         onDismiss = onDismiss
     )

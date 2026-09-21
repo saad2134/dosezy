@@ -137,11 +137,15 @@ fun HomeScreen(
         }
     }
 
-    // Check if all medications are taken or skipped
-    val allTaken = todayEntries.all {
+    // Check if all medications are completed (taken or skipped) and at least one was actually taken
+    val allCompleted = todayEntries.isNotEmpty() && todayEntries.all {
         it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
                 it.scheduleEntry.status == MedicationStatus.TAKEN_LATE ||
                 it.scheduleEntry.status == MedicationStatus.SKIPPED
+    }
+    val hasTaken = todayEntries.any {
+        it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
+                it.scheduleEntry.status == MedicationStatus.TAKEN_LATE
     }
 
     // Check if there are any medications
@@ -224,7 +228,7 @@ fun HomeScreen(
                         .padding(16.dp)
                 ) {
                     if (hasMedications) {
-                        if (allTaken) {
+                        if (allCompleted && hasTaken) {
                             AllGoodBanner()
                             Spacer(modifier = Modifier.height(8.dp))
                         }

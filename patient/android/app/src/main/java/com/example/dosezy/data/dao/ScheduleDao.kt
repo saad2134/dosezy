@@ -76,4 +76,8 @@ interface ScheduleDao {
     // Delete all untaken (pending or untaken missed) schedule entries for a specific medicine from a timestamp onwards
     @Query("DELETE FROM schedule_entries WHERE medicineId = :medicineId AND (status = 'PENDING' OR (status = 'MISSED' AND takenAt IS NULL)) AND scheduledDateTime >= :fromEpochMillis")
     suspend fun deleteUntakenScheduleEntriesFrom(medicineId: String, fromEpochMillis: Long)
+
+    // Query only pending entries that have passed the cutoff time to avoid scanning all history
+    @Query("SELECT * FROM schedule_entries WHERE userId = :userId AND status = 'PENDING' AND scheduledDateTime <= :cutoffMillis")
+    suspend fun getPendingEntriesBefore(userId: String, cutoffMillis: Long): List<ScheduleEntry>
 }
