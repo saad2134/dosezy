@@ -697,6 +697,7 @@ Deseja continuar?</string>
     <string name="record_dose_time_confirm">Registrar dose</string>
     <string name="unit_bottle">frasco</string>
     <string name="unit_bottles">frascos</string>
+    <string name="unit_units">unidades</string>
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">Ocultar botão central de adicionar</string>

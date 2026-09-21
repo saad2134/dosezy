@@ -714,6 +714,7 @@
     <string name="record_dose_time_confirm">确认服药</string>
     <string name="unit_bottle">瓶</string>
     <string name="unit_bottles">瓶</string>
+    <string name="unit_units">单位</string>
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">隐藏底部导航添加按钮</string>

@@ -726,6 +726,7 @@ Do you want to continue?</string>
     <string name="record_dose_time_confirm">Record Dose</string>
     <string name="unit_bottle">bottle</string>
     <string name="unit_bottles">bottles</string>
+    <string name="unit_units">units</string>
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">Hide Navigation Add Button</string>

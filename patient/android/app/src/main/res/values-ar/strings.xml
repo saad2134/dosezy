@@ -698,6 +698,7 @@
     <string name="record_dose_time_confirm">تسجيل الجرعة</string>
     <string name="unit_bottle">زجاجة</string>
     <string name="unit_bottles">زجاجات</string>
+    <string name="unit_units">وحدة</string>
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">إخفاء زر الإضافة من شريط التنقل</string>

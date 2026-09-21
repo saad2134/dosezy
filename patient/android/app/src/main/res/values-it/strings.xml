@@ -698,6 +698,7 @@ Vuoi continuare?</string>
     <string name="record_dose_time_confirm">Registra dose</string>
     <string name="unit_bottle">flacone</string>
     <string name="unit_bottles">flaconi</string>
+    <string name="unit_units">unità</string>
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">Nascondi pulsante centrale Aggiungi</string>

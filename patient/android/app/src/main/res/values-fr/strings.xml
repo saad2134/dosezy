@@ -698,6 +698,7 @@ Voulez-vous continuer ?</string>
     <string name="record_dose_time_confirm">Enregistrer la prise</string>
     <string name="unit_bottle">flacon</string>
     <string name="unit_bottles">flacons</string>
+    <string name="unit_units">unités</string>
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">Masquer le bouton central Ajouter</string>

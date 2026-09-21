@@ -694,6 +694,7 @@
     <string name="record_dose_time_confirm">ডোজ রেকর্ড করুন</string>
     <string name="unit_bottle">বোতল</string>
     <string name="unit_bottles">বোতল</string>
+    <string name="unit_units">ইউনিট</string>
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">নেভিগেশন যোগ বাটন লুকান</string>

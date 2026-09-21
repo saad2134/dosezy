@@ -698,6 +698,7 @@ Möchten Sie fortfahren?</string>
     <string name="record_dose_time_confirm">Dosis erfassen</string>
     <string name="unit_bottle">Flasche</string>
     <string name="unit_bottles">Flaschen</string>
+    <string name="unit_units">Einheiten</string>
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">Mittlere Hinzufügen-Taste ausblenden</string>

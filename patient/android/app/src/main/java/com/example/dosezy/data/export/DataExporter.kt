@@ -620,8 +620,11 @@ class DataExporter(
 
                 val orderUnitStr = if (isDrop) {
                     if (totalNeeded > 1) context.getString(com.example.dosezy.R.string.unit_bottles) else context.getString(com.example.dosezy.R.string.unit_bottle)
-                } else {
-                    med.dosageUnit.getLocalizedName(context)
+                } else when (med.dosageUnit) {
+                    com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG -> {
+                        context.getString(com.example.dosezy.R.string.unit_units)
+                    }
+                    else -> med.dosageUnit.getLocalizedName(context)
                 }
 
                 sb.append("${index + 1}. *${med.medicationName}*")
