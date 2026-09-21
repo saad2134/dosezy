@@ -1,5 +1,8 @@
 package com.example.dosezy.ui.subscreens
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +27,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
+
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -60,6 +63,7 @@ import androidx.compose.ui.res.stringResource
 import com.example.dosezy.R
 import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.getLocalizedName
+import com.example.dosezy.ui.components.ManageProfileSkeletonView
 import com.example.dosezy.ui.components.ProfilePicturePicker
 import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.viewmodels.UserViewModel
@@ -95,6 +99,9 @@ fun ManageProfileScreen(navController: NavController) {
     var ageError by remember { mutableStateOf(false) }
     var genderError by remember { mutableStateOf(false) }
 
+    // Skeleton loader state
+    var isDataLoaded by remember { mutableStateOf(false) }
+
     // Initialize form with current user data
     LaunchedEffect(currentUser) {
         currentUser?.let { user ->
@@ -105,6 +112,8 @@ fun ManageProfileScreen(navController: NavController) {
             allergies = user.allergies ?: ""
             medicalConditions = user.medicalConditions ?: ""
             profilePicPath = user.profilePicPath
+            kotlinx.coroutines.delay(120L)
+            isDataLoaded = true
         }
     }
 
@@ -127,10 +136,13 @@ fun ManageProfileScreen(navController: NavController) {
                 .padding(innerPadding)
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
+            Crossfade(
+                targetState = isDataLoaded && !isLoading,
+                animationSpec = tween(250),
+                label = "profile_skeleton_crossfade"
+            ) { dataReady ->
+            if (!dataReady) {
+                ManageProfileSkeletonView()
             } else {
                 Column(
                     modifier = Modifier
@@ -423,6 +435,7 @@ fun ManageProfileScreen(navController: NavController) {
                         }
                     }
                 }
+            }
             }
         }
     }

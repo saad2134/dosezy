@@ -84,9 +84,12 @@ import com.example.dosezy.data.model.Medicine
 import com.example.dosezy.data.model.PillShape
 import com.example.dosezy.data.model.TimeFormat
 import com.example.dosezy.data.model.getLocalizedName
+import com.example.dosezy.data.model.normalizeArabicDigits
 import com.example.dosezy.ui.components.PillColorSelector
 import com.example.dosezy.ui.components.PillShapeSelector
-import com.example.dosezy.ui.components.ProfilePicturePicker
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
+import com.example.dosezy.ui.components.EditMedSkeletonView
 import com.example.dosezy.ui.theme.DosezyTheme
 import com.example.dosezy.ui.viewmodels.MedicineViewModel
 import com.example.dosezy.ui.viewmodels.UserViewModel
@@ -147,6 +150,7 @@ fun EditMedScreen(
     // Dropdown states
     var dosageUnitExpanded by remember { mutableStateOf(false) }
     var frequencyExpanded by remember { mutableStateOf(false) }
+    var isDataLoaded by remember { mutableStateOf(false) }
 
     // Load existing medicine data when screen loads or medicine changes
     LaunchedEffect(medicineToEdit) {
@@ -171,8 +175,10 @@ fun EditMedScreen(
             intervalHoursText = medicineToEdit.frequency.intervalHours?.toString() ?: "4"
             intervalDaysText = medicineToEdit.frequency.intervalDays?.toString() ?: "2"
             hasDifferentDosages = medicineToEdit.customDosages != null && medicineToEdit.customDosages.isNotEmpty()
-            perTimeDosages = medicineToEdit.customDosages?.mapValues {
-                if (it.value % 1 == 0.0) it.value.toInt().toString() else it.value.toString()
+            perTimeDosages = medicineToEdit.customDosages?.entries?.associate { (k, v) ->
+                val normKey = k.normalizeArabicDigits()
+                val strVal = if (v % 1 == 0.0) v.toInt().toString() else v.toString()
+                normKey to strVal
             } ?: emptyMap()
             selectedDosePreset = when (scheduledTimesList.size) {
                 1 -> "1x"
@@ -181,6 +187,9 @@ fun EditMedScreen(
                 4 -> "4x"
                 else -> "Custom"
             }
+            // Small subtle delay to allow smooth animation transition from skeleton to loaded content
+            kotlinx.coroutines.delay(120)
+            isDataLoaded = true
         }
     }
 
@@ -220,18 +229,29 @@ fun EditMedScreen(
             )
         },
         content = { paddingValues ->
-            Column(
+            Crossfade(
+                targetState = isDataLoaded,
+                animationSpec = tween(durationMillis = 250),
+                label = "edit_med_load_crossfade",
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
                     .background(MaterialTheme.colorScheme.background)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
+            ) { loaded ->
+                if (!loaded) {
+                    EditMedSkeletonView()
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .background(MaterialTheme.colorScheme.background)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        ) {
                     // Medicine Image Selection
                     Text(
                         text = stringResource(R.string.form_medicine_image),
@@ -881,7 +901,7 @@ fun EditMedScreen(
                                                 if (isChecked) {
                                                     val updated = perTimeDosages.toMutableMap()
                                                     scheduledTimesList.forEach { t ->
-                                                        val key = String.format("%02d:%02d", t.hour, t.minute)
+                                                        val key = String.format(java.util.Locale.US, "%02d:%02d", t.hour, t.minute)
                                                         if (updated[key].isNullOrBlank()) {
                                                             updated[key] = dosage
                                                         }
@@ -896,7 +916,7 @@ fun EditMedScreen(
                                         Spacer(modifier = Modifier.height(12.dp))
                                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                              scheduledTimesList.forEach { time ->
-                                                 val key = String.format("%02d:%02d", time.hour, time.minute)
+                                                 val key = String.format(java.util.Locale.US, "%02d:%02d", time.hour, time.minute)
                                                  val formattedTime = time.format(DateTimeFormatter.ofPattern("hh:mm a"))
 
                                                 Surface(
@@ -937,7 +957,7 @@ fun EditMedScreen(
                                                             OutlinedTextField(
                                                                 value = perTimeDosages[key] ?: (if (dosage.isNotBlank()) dosage else ""),
                                                                 onValueChange = { newVal ->
-                                                                    if (newVal.all { it.isDigit() || it == '.' }) {
+                                                                    if (newVal.all { it.isDigit() || it == '.' || it == ',' || it == '\u066B' }) {
                                                                         perTimeDosages = perTimeDosages + (key to newVal)
                                                                     }
                                                                 },
@@ -1023,36 +1043,7 @@ fun EditMedScreen(
                                 }
                             }
 
-                            if (isFiniteCourse) {
-                                Spacer(modifier = Modifier.height(12.dp))
-                                OutlinedTextField(
-                                    value = durationDaysText,
-                                    onValueChange = { if (it.all { c -> c.isDigit() }) durationDaysText = it },
-                                    label = { Text(stringResource(R.string.course_duration_days_label)) },
-                                    placeholder = { Text(stringResource(R.string.course_duration_days_placeholder)) },
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    shape = RoundedCornerShape(16.dp),
-                                    modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 56.dp),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = Color(0xFF1193D4),
-                                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                                    )
-                                )
-
-                                 val days = durationDaysText.toIntOrNull()
-                                if (days != null && days > 0) {
-                                    val endDate = selectedStartDate.plusDays(days.toLong())
-                                    Spacer(modifier = Modifier.height(6.dp))
-                                    Text(
-                                        text = stringResource(R.string.course_end_date_label, endDate.toString()),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        fontWeight = FontWeight.SemiBold
-                                    )
-                                }
-                            }
-
-                            // Start Date Picker Row
+                            // Start Date Picker Row (placed before course duration for logical workflow)
                             val dateFormatter = remember { DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM) }
                             Spacer(modifier = Modifier.height(14.dp))
                             Row(
@@ -1102,6 +1093,35 @@ fun EditMedScreen(
                                             color = MaterialTheme.colorScheme.onSurface
                                         )
                                     }
+                                }
+                            }
+
+                            if (isFiniteCourse) {
+                                Spacer(modifier = Modifier.height(12.dp))
+                                OutlinedTextField(
+                                    value = durationDaysText,
+                                    onValueChange = { if (it.all { c -> c.isDigit() }) durationDaysText = it },
+                                    label = { Text(stringResource(R.string.course_duration_days_label)) },
+                                    placeholder = { Text(stringResource(R.string.course_duration_days_placeholder)) },
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    shape = RoundedCornerShape(16.dp),
+                                    modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 56.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = Color(0xFF1193D4),
+                                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                                    )
+                                )
+
+                                 val days = durationDaysText.toIntOrNull()
+                                if (days != null && days > 0) {
+                                    val endDate = selectedStartDate.plusDays(days.toLong())
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    Text(
+                                        text = stringResource(R.string.course_end_date_label, endDate.toString()),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
                                 }
                             }
                         }
@@ -1211,10 +1231,10 @@ fun EditMedScreen(
 
                             val finalCustomDosages: Map<String, Double>? = if (hasDifferentDosages && scheduledTimesList.size > 1) {
                                 val map = mutableMapOf<String, Double>()
-                                val baseDose = dosage.toDoubleOrNull() ?: 0.0
+                                val baseDose = dosage.normalizeArabicDigits().toDoubleOrNull() ?: 0.0
                                 scheduledTimesList.forEach { t ->
-                                    val key = String.format("%02d:%02d", t.hour, t.minute)
-                                    val entered = perTimeDosages[key]?.toDoubleOrNull() ?: baseDose
+                                    val key = String.format(java.util.Locale.US, "%02d:%02d", t.hour, t.minute)
+                                    val entered = perTimeDosages[key]?.normalizeArabicDigits()?.toDoubleOrNull() ?: baseDose
                                     map[key] = entered
                                 }
                                 if (map.isNotEmpty()) map else null
@@ -1304,6 +1324,8 @@ fun EditMedScreen(
                     }
 
                     Spacer(modifier = Modifier.height(32.dp))
+                        }
+                    }
                 }
             }
         }

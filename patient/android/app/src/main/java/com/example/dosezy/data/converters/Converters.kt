@@ -11,6 +11,7 @@ import com.example.dosezy.data.model.Language
 import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.Theme
 import com.example.dosezy.data.model.TimeFormat
+import com.example.dosezy.data.model.normalizeArabicDigits
 import org.json.JSONArray
 import org.json.JSONObject
 import java.time.LocalDate
@@ -217,8 +218,9 @@ class Converters {
             val obj = JSONObject(value)
             val keys = obj.keys()
             while (keys.hasNext()) {
-                val key = keys.next()
-                map[key] = obj.getDouble(key)
+                val rawKey = keys.next()
+                val normalizedKey = rawKey.normalizeArabicDigits()
+                map[normalizedKey] = obj.getDouble(rawKey)
             }
             map
         } catch (_: Exception) {

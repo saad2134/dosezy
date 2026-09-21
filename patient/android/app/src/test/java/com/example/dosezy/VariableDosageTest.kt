@@ -133,4 +133,24 @@ class VariableDosageTest {
         assertEquals(20.0, morningEntry.dosage ?: 0.0, 0.001)
         assertEquals(10.0, eveningEntry.dosage ?: 0.0, 0.001)
     }
+
+    @Test
+    fun testVariableDosageInArabicLocale() {
+        val originalLocale = java.util.Locale.getDefault()
+        try {
+            java.util.Locale.setDefault(java.util.Locale("ar"))
+            val custom = mapOf(
+                "08:00" to 20.0,
+                "20:00" to 10.0
+            )
+            val med = createMedicine(baseDosage = 15.0, customDosages = custom)
+
+            // In Arabic, String.format("%02d:%02d", 8, 0) without Locale.US produced "٠٨:٠٠",
+            // which failed to match "08:00" and returned baseDosage 15.0 instead of 20.0!
+            assertEquals(20.0, med.getDosageForTime(LocalTime.of(8, 0)), 0.001)
+        } finally {
+            java.util.Locale.setDefault(originalLocale)
+        }
+    }
 }
+

@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -93,68 +94,74 @@ fun PillShapeVisual(
 
             when (shape) {
                 PillShape.ROUND -> {
-                    drawCircle(
-                        color = pillColor,
-                        radius = w * 0.42f,
-                        center = center
-                    )
-                    // Score line
-                    drawLine(
-                        color = Color.White.copy(alpha = 0.6f),
-                        start = Offset(w * 0.5f, h * 0.22f),
-                        end = Offset(w * 0.5f, h * 0.78f),
-                        strokeWidth = w * 0.06f
-                    )
+                    rotate(degrees = -45f) {
+                        drawCircle(
+                            color = pillColor,
+                            radius = w * 0.42f,
+                            center = center
+                        )
+                        // Score line
+                        drawLine(
+                            color = Color.White.copy(alpha = 0.6f),
+                            start = Offset(w * 0.5f, h * 0.22f),
+                            end = Offset(w * 0.5f, h * 0.78f),
+                            strokeWidth = w * 0.06f
+                        )
+                    }
                 }
                 PillShape.CAPSULE -> {
-                    val capsuleRect = Size(w * 0.76f, h * 0.42f)
-                    val topLeft = Offset(w * 0.12f, h * 0.29f)
-                    val cornerRadius = CornerRadius(h * 0.21f, h * 0.21f)
+                    rotate(degrees = -45f) {
+                        val capsuleRect = Size(w * 0.76f, h * 0.42f)
+                        val topLeft = Offset(w * 0.12f, h * 0.29f)
+                        val cornerRadius = CornerRadius(h * 0.21f, h * 0.21f)
 
-                    val capsulePath = Path().apply {
-                        addRoundRect(
-                            RoundRect(
-                                rect = Rect(
-                                    offset = topLeft,
-                                    size = capsuleRect
-                                ),
-                                cornerRadius = cornerRadius
+                        val capsulePath = Path().apply {
+                            addRoundRect(
+                                RoundRect(
+                                    rect = Rect(
+                                        offset = topLeft,
+                                        size = capsuleRect
+                                    ),
+                                    cornerRadius = cornerRadius
+                                )
                             )
+                        }
+
+                        // Draw base capsule
+                        drawPath(path = capsulePath, color = pillColor)
+
+                        // Right half overlay highlight clipped to capsule bounds so it never leaks
+                        clipPath(capsulePath) {
+                            drawRect(
+                                color = Color.White.copy(alpha = 0.35f),
+                                topLeft = Offset(w * 0.5f, h * 0.29f),
+                                size = Size(w * 0.38f, h * 0.42f)
+                            )
+                        }
+
+                        // Center separator
+                        drawLine(
+                            color = Color.White.copy(alpha = 0.8f),
+                            start = Offset(w * 0.5f, h * 0.29f),
+                            end = Offset(w * 0.5f, h * 0.71f),
+                            strokeWidth = w * 0.05f
                         )
                     }
-
-                    // Draw base capsule
-                    drawPath(path = capsulePath, color = pillColor)
-
-                    // Right half overlay highlight clipped to capsule bounds so it never leaks
-                    clipPath(capsulePath) {
-                        drawRect(
-                            color = Color.White.copy(alpha = 0.35f),
-                            topLeft = Offset(w * 0.5f, h * 0.29f),
-                            size = Size(w * 0.38f, h * 0.42f)
-                        )
-                    }
-
-                    // Center separator
-                    drawLine(
-                        color = Color.White.copy(alpha = 0.8f),
-                        start = Offset(w * 0.5f, h * 0.29f),
-                        end = Offset(w * 0.5f, h * 0.71f),
-                        strokeWidth = w * 0.05f
-                    )
                 }
                 PillShape.OVAL -> {
-                    drawOval(
-                        color = pillColor,
-                        topLeft = Offset(w * 0.12f, h * 0.25f),
-                        size = Size(w * 0.76f, h * 0.5f)
-                    )
-                    drawLine(
-                        color = Color.White.copy(alpha = 0.6f),
-                        start = Offset(w * 0.5f, h * 0.28f),
-                        end = Offset(w * 0.5f, h * 0.72f),
-                        strokeWidth = w * 0.05f
-                    )
+                    rotate(degrees = -45f) {
+                        drawOval(
+                            color = pillColor,
+                            topLeft = Offset(w * 0.12f, h * 0.25f),
+                            size = Size(w * 0.76f, h * 0.5f)
+                        )
+                        drawLine(
+                            color = Color.White.copy(alpha = 0.6f),
+                            start = Offset(w * 0.5f, h * 0.28f),
+                            end = Offset(w * 0.5f, h * 0.72f),
+                            strokeWidth = w * 0.05f
+                        )
+                    }
                 }
                 PillShape.LIQUID -> {
                     // Bottle shape
@@ -196,27 +203,29 @@ fun PillShapeVisual(
                     drawPath(path = path, color = pillColor)
                 }
                 PillShape.INJECTION -> {
-                    // Syringe
-                    drawRoundRect(
-                        color = pillColor,
-                        topLeft = Offset(w * 0.35f, h * 0.3f),
-                        size = Size(w * 0.3f, h * 0.45f),
-                        cornerRadius = CornerRadius(w * 0.05f, w * 0.05f)
-                    )
-                    // Needle
-                    drawLine(
-                        color = Color.Gray,
-                        start = Offset(w * 0.5f, h * 0.75f),
-                        end = Offset(w * 0.5f, h * 0.92f),
-                        strokeWidth = w * 0.05f
-                    )
-                    // Plunger
-                    drawLine(
-                        color = pillColor,
-                        start = Offset(w * 0.5f, h * 0.15f),
-                        end = Offset(w * 0.5f, h * 0.3f),
-                        strokeWidth = w * 0.08f
-                    )
+                    rotate(degrees = -45f) {
+                        // Syringe
+                        drawRoundRect(
+                            color = pillColor,
+                            topLeft = Offset(w * 0.35f, h * 0.3f),
+                            size = Size(w * 0.3f, h * 0.45f),
+                            cornerRadius = CornerRadius(w * 0.05f, w * 0.05f)
+                        )
+                        // Needle
+                        drawLine(
+                            color = Color.Gray,
+                            start = Offset(w * 0.5f, h * 0.75f),
+                            end = Offset(w * 0.5f, h * 0.92f),
+                            strokeWidth = w * 0.05f
+                        )
+                        // Plunger
+                        drawLine(
+                            color = pillColor,
+                            start = Offset(w * 0.5f, h * 0.15f),
+                            end = Offset(w * 0.5f, h * 0.3f),
+                            strokeWidth = w * 0.08f
+                        )
+                    }
                 }
                 PillShape.DROPS -> {
                     // Tear drop
@@ -248,7 +257,6 @@ fun PillShapeVisual(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PillShapeSelector(
     selectedShape: PillShape,
@@ -264,42 +272,56 @@ fun PillShapeSelector(
             color = MaterialTheme.colorScheme.onSurface
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-        FlowRow(
+        // Uniform 4x2 grid of equal-sized cards
+        val chunkedShapes = PillShape.values().toList().chunked(4)
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            PillShape.values().forEach { shape ->
-                val isSelected = (shape == selectedShape)
-                Surface(
-                    shape = RoundedCornerShape(14.dp),
-                    color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-                    border = BorderStroke(
-                        width = if (isSelected) 2.dp else 1.dp,
-                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
-                    ),
-                    modifier = Modifier
-                        .clickable { onShapeSelected(shape) }
+            chunkedShapes.forEach { rowShapes ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-                    ) {
-                        PillShapeVisual(
-                            shape = shape,
-                            colorHex = selectedColorHex,
-                            size = 32.dp
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = shape.getLocalizedName(),
-                            style = MaterialTheme.typography.labelSmall,
-                            fontSize = 11.sp,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                    rowShapes.forEach { shape ->
+                        val isSelected = (shape == selectedShape)
+                        Surface(
+                            shape = RoundedCornerShape(14.dp),
+                            color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                            border = BorderStroke(
+                                width = if (isSelected) 2.dp else 1.dp,
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                            ),
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable { onShapeSelected(shape) }
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 10.dp, horizontal = 2.dp)
+                            ) {
+                                PillShapeVisual(
+                                    shape = shape,
+                                    colorHex = selectedColorHex,
+                                    size = 32.dp
+                                )
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Text(
+                                    text = shape.getLocalizedName(),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontSize = 11.sp,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                )
+                            }
+                        }
                     }
                 }
             }

@@ -50,11 +50,19 @@ data class Medicine(
 
     /**
      * Resolves dosage for a specific scheduled time, falling back to base dosage.
+     * Uses Locale.US to ensure time slot keys ("HH:mm") remain invariant across all system/app locales.
      */
     fun getDosageForTime(time: LocalTime?): Double {
         if (time == null || customDosages.isNullOrEmpty()) return dosage
-        val key = String.format("%02d:%02d", time.hour, time.minute)
-        return customDosages[key] ?: dosage
+        val key = String.format(java.util.Locale.US, "%02d:%02d", time.hour, time.minute)
+        val directMatch = customDosages[key]
+        if (directMatch != null) return directMatch
+
+        // Backward-compatibility fallback if medicine was saved previously with localized Arabic-Indic numerals
+        val normalizedMap = customDosages.entries.associate { (k, v) ->
+            k.normalizeArabicDigits() to v
+        }
+        return normalizedMap[key] ?: dosage
     }
 
     /**
@@ -226,7 +234,7 @@ data class Medicine(
             val minute = time.minute
             val amPm = if (hour < 12) "AM" else "PM"
             val displayHour = if (hour % 12 == 0) 12 else hour % 12
-            String.format("%d:%02d %s", displayHour, minute, amPm)
+            String.format(java.util.Locale.US, "%d:%02d %s", displayHour, minute, amPm)
         }
     }
 
@@ -414,4 +422,19 @@ fun Medicine.getLocalizedFrequencyDisplay(): String {
         }
         FrequencyPattern.CUSTOM -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_custom)
     }
+}
+
+/**
+ * Normalizes Eastern Arabic-Indic numerals (\u0660-\u0669), Persian/Urdu numerals (\u06F0-\u06F9),
+ * and localized decimal separators (\u066B, comma) into standard ASCII numbers and periods.
+ */
+fun String.normalizeArabicDigits(): String {
+    return this.map { c ->
+        when (c) {
+            in '\u0660'..'\u0669' -> '0' + (c - '\u0660')
+            in '\u06F0'..'\u06F9' -> '0' + (c - '\u06F0')
+            '\u066B', ',' -> '.'
+            else -> c
+        }
+    }.joinToString("")
 }
