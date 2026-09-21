@@ -9,7 +9,7 @@
 
 <div align="center">
 
-[![Android Patient App](https://img.shields.io/badge/Android%20Patient-v2.5.4%20Released-1e293b?style=flat&logo=android&logoColor=white&labelColor=2ea44f)](https://github.com/saad2134/dosezy/releases)
+[![Android Patient App](https://img.shields.io/badge/Android%20Patient-v2.5.5%20Released-1e293b?style=flat&logo=android&logoColor=white&labelColor=2ea44f)](https://github.com/saad2134/dosezy/releases)
 [![iOS Patient App](https://img.shields.io/badge/iOS%20Patient-Planned-1e293b?style=flat&logo=apple&logoColor=white&labelColor=007aff)](https://github.com/saad2134/dosezy)
 [![Server Node](https://img.shields.io/badge/Server%20Node-In%20Dev-1e293b?style=flat&logo=fastify&logoColor=white&labelColor=8b5cf6)](https://github.com/saad2134/dosezy)
 [![Caregiver Web](https://img.shields.io/badge/Caregiver%20Web-In%20Dev-1e293b?style=flat&logo=astro&logoColor=white&labelColor=f59e0b)](https://github.com/saad2134/dosezy)
@@ -32,13 +32,19 @@
   
   <a> </a>
   <details>
-    <summary>Others</summary>
+    <summary>Other Stores (Unofficial)</summary>
     <br>
     <a href="https://appteka.store/app/com.saad2134.dosezy">
       <img width="197" height="59" alt="AppTeka" src="assets/badges/appteka.png" />
     </a>
     <a href="https://www.openapk.net/dosezy/com.saad2134.dosezy/">
       <img width="197" height="59" alt="OpenAPK" src="assets/badges/openapk.png" />
+    </a>
+    <a href="https://www.androidfreeware.net/download-dosezy-apk.html">
+      <img width="197" height="59" alt="AndroidFreeware" src="assets/badges/android-freeware.png" />
+    </a>
+    <a href="https://trashbox.ru/topics/218525">
+      <img width="197" height="59" alt="TrashBox" src="assets/badges/trashbox-ru.png" />
     </a>
   </details>
 </div>
