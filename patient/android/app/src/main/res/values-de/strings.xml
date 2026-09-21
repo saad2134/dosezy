@@ -725,4 +725,10 @@ Möchten Sie fortfahren?</string>
     <string name="med_different_dosages_toggle">Unterschiedliche Dosis pro Einnahmezeit</string>
     <string name="med_different_dosages_subtitle">Individuelle Dosierung für morgens, mittags oder abends festlegen</string>
     <string name="med_dosage_for_time">Dosis für %1$s</string>
+
+    <string name="analytics_skipped_doses">Ausgelassene Dosen</string>
+    <string name="notif_channel_refill_name">Nachfüll-Erinnerungen</string>
+    <string name="notif_channel_refill_desc">Benachrichtigungen, wenn der Medikamentenvorrat unter Ihren Schwellenwert fällt</string>
+    <string name="widget_tomorrow">Morgen </string>
+    <string name="med_start_date_label">Startdatum</string>
 </resources>

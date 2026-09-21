@@ -741,4 +741,10 @@
     <string name="med_different_dosages_toggle">प्रत्येक समय के लिए अलग खुराक</string>
     <string name="med_different_dosages_subtitle">सुबह, दोपहर या शाम के लिए अलग मात्रा निर्धारित करें</string>
     <string name="med_dosage_for_time">%1$s के लिए खुराक</string>
+
+    <string name="analytics_skipped_doses">छोड़ी गई खुराकें</string>
+    <string name="notif_channel_refill_name">रिफिल रिमाइंडर</string>
+    <string name="notif_channel_refill_desc">दवा का स्टॉक आपकी चुनी हुई सीमा से कम होने पर अलर्ट</string>
+    <string name="widget_tomorrow">कल </string>
+    <string name="med_start_date_label">शुरुआती तारीख</string>
 </resources>

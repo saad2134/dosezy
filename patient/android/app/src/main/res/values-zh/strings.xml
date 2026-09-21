@@ -741,4 +741,10 @@
     <string name="med_different_dosages_toggle">每个时间段不同剂量</string>
     <string name="med_different_dosages_subtitle">为早、中、晚设定不同的自定义剂量</string>
     <string name="med_dosage_for_time">%1$s 的剂量</string>
+
+    <string name="analytics_skipped_doses">已跳过剂量</string>
+    <string name="notif_channel_refill_name">补药提醒</string>
+    <string name="notif_channel_refill_desc">当药品库存低于您设定的阈值时的提醒</string>
+    <string name="widget_tomorrow">明天 </string>
+    <string name="med_start_date_label">开始日期</string>
 </resources>

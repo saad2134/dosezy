@@ -179,6 +179,16 @@ class AlarmScheduler(private val context: Context) {
         )
 
         alarmManager.cancel(pendingIntent)
+        pendingIntent.cancel()
+
+        val showIntent = PendingIntent.getActivity(
+            context,
+            slotKey.hashCode() + 500,
+            Intent(context, MainActivity::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        showIntent.cancel()
+
         Log.d(TAG, "Cancelled grouped slot alarm: $slotKey")
     }
 

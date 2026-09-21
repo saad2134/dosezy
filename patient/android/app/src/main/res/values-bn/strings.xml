@@ -724,4 +724,10 @@
     <string name="med_different_dosages_toggle">প্রতিটি সময়ের জন্য ভিন্ন ডোজ</string>
     <string name="med_different_dosages_subtitle">সকাল, দুপুর বা সন্ধ্যার জন্য কাস্টম পরিমাণ নির্ধারণ করুন</string>
     <string name="med_dosage_for_time">%1$s এর ডোজ</string>
+
+    <string name="analytics_skipped_doses">বাদ দেওয়া ডোজ</string>
+    <string name="notif_channel_refill_name">রিফিল অনুস্মারক</string>
+    <string name="notif_channel_refill_desc">ওষুধের স্টক আপনার নির্ধারিত সীমার নিচে নামলে সতর্কতা</string>
+    <string name="widget_tomorrow">কাল </string>
+    <string name="med_start_date_label">শুরুর তারিখ</string>
 </resources>

@@ -165,29 +165,74 @@ fun DosezyApp() {
         onResult = {}
     )
 
+    val prefs = remember { context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE) }
+    var showBatteryPrompt by remember { mutableStateOf(false) }
     var showOverlayPrompt by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         }
-        // Delay slightly to prevent standard permission dialog overlap
-        kotlinx.coroutines.delay(1000)
-        if (!com.example.dosezy.utils.NotificationUtils.isIgnoringBatteryOptimizations(context)) {
-            com.example.dosezy.utils.NotificationUtils.requestBatteryOptimizationExemption(context)
-        }
-        kotlinx.coroutines.delay(1000)
-        if (!com.example.dosezy.utils.NotificationUtils.canScheduleExactAlarms(context)) {
-            com.example.dosezy.utils.NotificationUtils.requestExactAlarmPermission(context)
-        }
-        kotlinx.coroutines.delay(1000)
-        if (!com.example.dosezy.utils.NotificationUtils.canDrawOverlays(context)) {
-            val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+        val batteryDismissed = prefs.getBoolean("battery_prompt_dismissed", false)
+        if (!batteryDismissed && !com.example.dosezy.utils.NotificationUtils.isIgnoringBatteryOptimizations(context)) {
+            kotlinx.coroutines.delay(1200)
+            showBatteryPrompt = true
+        } else if (!com.example.dosezy.utils.NotificationUtils.canDrawOverlays(context)) {
             val dismissed = prefs.getBoolean("overlay_prompt_dismissed", false)
             if (!dismissed) {
+                kotlinx.coroutines.delay(1200)
                 showOverlayPrompt = true
             }
         }
+    }
+
+    if (showBatteryPrompt) {
+        AlertDialog(
+            onDismissRequest = {
+                prefs.edit().putBoolean("battery_prompt_dismissed", true).apply()
+                showBatteryPrompt = false
+            },
+            title = {
+                Text(
+                    text = androidx.compose.ui.res.stringResource(R.string.notif_bg_title),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            },
+            text = {
+                Text(
+                    text = androidx.compose.ui.res.stringResource(R.string.notif_bg_desc),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        prefs.edit().putBoolean("battery_prompt_dismissed", true).apply()
+                        showBatteryPrompt = false
+                        com.example.dosezy.utils.NotificationUtils.requestBatteryOptimizationExemption(context)
+                    }
+                ) {
+                    Text(
+                        text = androidx.compose.ui.res.stringResource(R.string.dialog_enable),
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1193D4)
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        prefs.edit().putBoolean("battery_prompt_dismissed", true).apply()
+                        showBatteryPrompt = false
+                    }
+                ) {
+                    Text(androidx.compose.ui.res.stringResource(R.string.dialog_later))
+                }
+            },
+            shape = RoundedCornerShape(20.dp),
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     }
 
     if (showOverlayPrompt) {
@@ -209,7 +254,6 @@ fun DosezyApp() {
             confirmButton = {
                 TextButton(
                     onClick = {
-                        val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
                         prefs.edit().putBoolean("overlay_prompt_dismissed", true).apply()
                         showOverlayPrompt = false
                         com.example.dosezy.utils.NotificationUtils.requestOverlayPermission(context)
@@ -225,7 +269,6 @@ fun DosezyApp() {
             dismissButton = {
                 TextButton(
                     onClick = {
-                        val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
                         prefs.edit().putBoolean("overlay_prompt_dismissed", true).apply()
                         showOverlayPrompt = false
                     }

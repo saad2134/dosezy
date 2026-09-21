@@ -34,6 +34,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
     companion object {
         const val TAG = "MedicineAlarmReceiver"
         const val CHANNEL_ID = "dosezy_medicine_reminders_v3"
+        const val REFILL_CHANNEL_ID = "dosezy_refill_alerts"
         const val EXTRA_ENTRY_ID = "entry_id"
         const val EXTRA_MEDICINE_NAME = "medicine_name"
         const val EXTRA_SCHEDULED_TIME = "scheduled_time"
@@ -205,11 +206,21 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         val takenIntent = Intent(context, NotificationActionReceiver::class.java).apply {
             action = "TAKEN_ACTION"
             putExtra(EXTRA_ENTRY_ID, entryId)
+            if (entryIds != null) {
+                putStringArrayListExtra(EXTRA_ENTRY_IDS, entryIds)
+            }
         }
 
         val snoozeIntent = Intent(context, NotificationActionReceiver::class.java).apply {
             action = "SNOOZE_ACTION"
             putExtra(EXTRA_ENTRY_ID, entryId)
+            if (entryIds != null) {
+                putStringArrayListExtra(EXTRA_ENTRY_IDS, entryIds)
+            }
+            putExtra(EXTRA_MEDICINE_NAME, medicineName)
+            if (medicineNames != null) {
+                putStringArrayListExtra(EXTRA_MEDICINE_NAMES, medicineNames)
+            }
         }
 
         val takenPendingIntent = PendingIntent.getBroadcast(
@@ -366,6 +377,18 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             }
 
             notificationManager.createNotificationChannel(channel)
+
+            val refillChannel = NotificationChannel(
+                REFILL_CHANNEL_ID,
+                context.getString(com.example.dosezy.R.string.notif_channel_refill_name),
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = context.getString(com.example.dosezy.R.string.notif_channel_refill_desc)
+                enableLights(true)
+                enableVibration(true)
+                setShowBadge(true)
+            }
+            notificationManager.createNotificationChannel(refillChannel)
         }
     }
 

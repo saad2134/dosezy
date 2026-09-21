@@ -741,4 +741,10 @@
     <string name="med_different_dosages_toggle">Dosis diferente para cada horario</string>
     <string name="med_different_dosages_subtitle">Establece dosis personalizadas para la mañana, tarde o noche</string>
     <string name="med_dosage_for_time">Dosis para las %1$s</string>
+
+    <string name="analytics_skipped_doses">Dosis omitidas</string>
+    <string name="notif_channel_refill_name">Recordatorios de recarga</string>
+    <string name="notif_channel_refill_desc">Alertas cuando el stock de medicamentos baja de su umbral elegido</string>
+    <string name="widget_tomorrow">Mañana </string>
+    <string name="med_start_date_label">Fecha de inicio</string>
 </resources>

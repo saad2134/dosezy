@@ -127,7 +127,7 @@ class MedicineRepository @Inject constructor(
         // 1. Cancel future alarms for this medicine
         scheduleRepository.cancelAlarmsForMedicine(medicine.medicineId, this.context)
         // 2. Delete only future pending schedule entries (preserves all past taken/missed records!)
-        val nowMillis = System.currentTimeMillis()
+        val nowMillis = java.time.LocalDateTime.now().atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
         database.scheduleDao().deleteFuturePendingScheduleEntries(medicine.medicineId, nowMillis)
         // 3. Mark medicine as archived
         database.medicineDao().setArchivedStatus(medicine.medicineId, true)

@@ -753,4 +753,10 @@ Do you want to continue?</string>
     <string name="med_different_dosages_toggle">Different dose for each time</string>
     <string name="med_different_dosages_subtitle">Set custom amounts for morning, afternoon, or evening</string>
     <string name="med_dosage_for_time">Dose for %1$s</string>
+
+    <string name="analytics_skipped_doses">Skipped Doses</string>
+    <string name="notif_channel_refill_name">Refill Reminders</string>
+    <string name="notif_channel_refill_desc">Alerts when medicine stock drops below your chosen refill threshold</string>
+    <string name="widget_tomorrow">Tmrw </string>
+    <string name="med_start_date_label">Start Date</string>
 </resources>

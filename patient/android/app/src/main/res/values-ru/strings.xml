@@ -725,4 +725,10 @@
     <string name="med_different_dosages_toggle">Разная дозировка для каждого времени</string>
     <string name="med_different_dosages_subtitle">Настройте дозировку для утра, дня или вечера</string>
     <string name="med_dosage_for_time">Доза на %1$s</string>
+
+    <string name="analytics_skipped_doses">Пропущенные дозы</string>
+    <string name="notif_channel_refill_name">Напоминания о пополнении</string>
+    <string name="notif_channel_refill_desc">Оповещения, когда запас лекарств опускается ниже выбранного порога</string>
+    <string name="widget_tomorrow">Завтра </string>
+    <string name="med_start_date_label">Дата начала</string>
 </resources>

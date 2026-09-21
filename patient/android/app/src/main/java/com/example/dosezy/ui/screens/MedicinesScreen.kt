@@ -814,6 +814,9 @@ fun EmptyMedicinesState(onAddMedicineClick: () -> Unit = {}) {
 @Composable
 private fun formatDosageInfo(medicine: Medicine): String {
     val dosageText = medicine.getLocalizedDosageDisplay()
+    if (medicine.frequency.pattern == com.example.dosezy.data.model.FrequencyPattern.AS_NEEDED) {
+        return "$dosageText, ${stringResource(R.string.freq_as_needed)}"
+    }
     val timesText = stringResource(R.string.times_per_day_format, medicine.timesPerDay)
     return "$dosageText, $timesText"
 }

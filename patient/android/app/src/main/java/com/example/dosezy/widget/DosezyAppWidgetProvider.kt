@@ -65,7 +65,6 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
             views.setOnClickPendingIntent(R.id.widget_root, pendingIntent)
 
             val dateFormat = SimpleDateFormat("EEE, MMM d", Locale.getDefault())
-            val timeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
             views.setTextViewText(R.id.widget_date_text, dateFormat.format(System.currentTimeMillis()))
             
             // Push initial synchronous update so launcher immediately has a valid layout
@@ -88,6 +87,10 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                         appWidgetManager.updateAppWidget(appWidgetId, views)
                         return@launch
                     }
+
+                    val is24Hour = user.timeFormat == com.example.dosezy.data.model.TimeFormat.HOUR_24
+                    val timePattern = if (is24Hour) "HH:mm" else "h:mm a"
+                    val userTimeFormat = SimpleDateFormat(timePattern, Locale.getDefault())
 
                     val today = java.time.LocalDate.now()
                     val zoneId = java.time.ZoneId.systemDefault()
@@ -128,15 +131,16 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                     } else {
                         views.setViewVisibility(R.id.widget_status_message, View.GONE)
 
+                        val tomorrowLabel = context.getString(R.string.widget_tomorrow)
                         fun formatTimeLabel(entry: com.example.dosezy.data.model.ScheduleEntry): String {
                             val itemDate = entry.scheduledDateTime.toLocalDate()
                             val dateObj = java.util.Date.from(entry.scheduledDateTime.atZone(zoneId).toInstant())
                             return when (itemDate) {
-                                today -> timeFormat.format(dateObj)
-                                today.plusDays(1) -> "Tmrw " + timeFormat.format(dateObj)
+                                today -> userTimeFormat.format(dateObj)
+                                today.plusDays(1) -> tomorrowLabel + userTimeFormat.format(dateObj)
                                 else -> {
                                     val dayName = itemDate.dayOfWeek.getDisplayName(java.time.format.TextStyle.SHORT, Locale.getDefault())
-                                    "$dayName " + timeFormat.format(dateObj)
+                                    "$dayName " + userTimeFormat.format(dateObj)
                                 }
                             }
                         }

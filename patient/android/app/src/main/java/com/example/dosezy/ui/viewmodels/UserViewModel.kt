@@ -75,10 +75,6 @@ class UserViewModel @Inject constructor(
                     allUsers.forEach { existingUser ->
                         if (existingUser.isCurrentUser && existingUser.userId != user.userId) {
                             userRepository.updateUser(existingUser.copy(isCurrentUser = false))
-                            // Cancel alarms for the previous current user
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                medicineNotificationManager.cancelAllAlarmsForUser(existingUser.userId)
-                            }
                         }
                     }
 

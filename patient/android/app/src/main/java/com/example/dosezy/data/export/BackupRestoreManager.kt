@@ -95,7 +95,7 @@ class BackupRestoreManager(
     suspend fun createFullBackupZip(): File = withContext(Dispatchers.IO) {
         val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
         val exportDir = context.getExternalFilesDir(null) ?: context.filesDir
-        val zipFile = File(exportDir, "dosezy_backup_v2.4.0_$timestamp.zip")
+        val zipFile = File(exportDir, "dosezy_backup_v${com.example.dosezy.BuildConfig.VERSION_NAME}_$timestamp.zip")
 
         val users = database.userDao().getAllUsersDirect()
         val profileIds = users.map { it.userId }
@@ -317,11 +317,12 @@ class BackupRestoreManager(
                             targetAvatar.absolutePath
                         } else null
 
+                        val existingUsers = database.userDao().getAllUsersDirect()
                         val newUser = originalUser.copy(
                             userId = newUserId,
                             fullName = newName,
                             profilePicPath = finalPicPath,
-                            isCurrentUser = (totalProfiles == 0)
+                            isCurrentUser = (existingUsers.isEmpty() && totalProfiles == 0)
                         )
                         database.userDao().insertUser(newUser)
                         if (firstRestoredUserId == null) firstRestoredUserId = newUserId
@@ -645,6 +646,7 @@ class BackupRestoreManager(
                 scheduledDateTime = LocalDateTime.parse(obj.get("scheduledDateTime").asString),
                 status = try { MedicationStatus.valueOf(obj.get("status").asString) } catch (_: Exception) { MedicationStatus.PENDING },
                 takenAt = obj.get("takenAt")?.let { if (it.isJsonNull) null else try { LocalDateTime.parse(it.asString) } catch (_: Exception) { null } },
+                skipReason = obj.get("skipReason")?.let { if (it.isJsonNull) null else it.asString },
                 dosage = obj.get("dosage")?.let { if (it.isJsonNull) null else it.asDouble }
             )
             list.add(entry)

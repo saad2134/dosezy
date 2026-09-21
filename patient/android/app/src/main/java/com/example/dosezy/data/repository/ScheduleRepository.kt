@@ -2,6 +2,7 @@
 package com.example.dosezy.data.repository
 
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -100,6 +101,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         scheduleEntries.forEach { entry ->
             alarmScheduler.cancelAlarm(entry.entryId)
             alarmScheduler.cancelSnooze(entry.entryId)
+            alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
         }
         Log.d(TAG, "Cancelled alarms for medicine ID: $medicineId (${scheduleEntries.size} entries)")
     }
@@ -119,6 +121,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             allEntries.forEach { entry ->
                 alarmScheduler.cancelAlarm(entry.entryId)
                 alarmScheduler.cancelSnooze(entry.entryId)
+                alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
             }
 
             // Schedule grouped alarms for pending future entries within the 7-day window
@@ -214,41 +217,55 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         takenAt: String = LocalDateTime.now().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME),
         context: Context? = null
     ) {
+        // Inspect previous status to prevent double stock deduction
+        val previousEntry = database.scheduleDao().getScheduleEntryById(entryId)
+        val alreadyTaken = previousEntry?.status == MedicationStatus.TAKEN_ON_TIME || previousEntry?.status == MedicationStatus.TAKEN_LATE
+
         // 1. Update schedule entry status in database
         database.scheduleDao().updateMedicationStatus(entryId, status, takenAt)
 
         // 2. Stop any active alarm sound / popup
         com.example.dosezy.notifications.AlarmActivity.stopActiveAlarm()
 
-        // 3. Stock Auto-Decrement Logic
-        try {
-            val entry = database.scheduleDao().getScheduleEntryById(entryId)
-            if (entry != null) {
-                val medicine = database.medicineDao().getMedicineByIdDirect(entry.medicineId)
+        // 3. Stock Auto-Decrement Logic (only if not already taken)
+        if (!alreadyTaken && previousEntry != null) {
+            try {
+                val medicine = database.medicineDao().getMedicineByIdDirect(previousEntry.medicineId)
                 if (medicine != null && medicine.currentStock != null && medicine.autoDeductOnTake) {
-                    val deductAmount = medicine.getStockDeductionAmount(entry.scheduledDateTime.toLocalTime())
+                    val deductAmount = medicine.getStockDeductionAmount(previousEntry.scheduledDateTime.toLocalTime())
                     val newStock = (medicine.currentStock - deductAmount).coerceAtLeast(0)
                     val updatedMedicine = medicine.copy(currentStock = newStock)
                     database.medicineDao().updateMedicine(updatedMedicine)
                     Log.d(TAG, "Decremented stock for ${medicine.medicationName}: ${medicine.currentStock} -> $newStock (deducted $deductAmount)")
 
-                    // 3. Trigger refill warning notification if stock is below threshold
+                    // Trigger refill warning notification if stock is below threshold
                     if (context != null && medicine.refillThreshold != null && newStock <= medicine.refillThreshold) {
                         val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
                         val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
                         val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-                        val builder = androidx.core.app.NotificationCompat.Builder(context, com.example.dosezy.notifications.MedicineAlarmReceiver.CHANNEL_ID)
+
+                        val contentIntent = android.app.PendingIntent.getActivity(
+                            context,
+                            (previousEntry.medicineId + "_refill_click").hashCode(),
+                            Intent(context, com.example.dosezy.MainActivity::class.java).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                            },
+                            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+                        )
+
+                        val builder = androidx.core.app.NotificationCompat.Builder(context, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
                             .setSmallIcon(com.example.dosezy.R.drawable.loader_icon)
                             .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
                             .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, newStock))
-                            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+                            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_DEFAULT)
+                            .setContentIntent(contentIntent)
                             .setAutoCancel(true)
-                        nManager.notify((entry.medicineId + "_refill").hashCode(), builder.build())
+                        nManager.notify((previousEntry.medicineId + "_refill").hashCode(), builder.build())
                     }
                 }
+            } catch (ex: Exception) {
+                Log.e(TAG, "Error performing stock auto-decrement in recordDoseTaken", ex)
             }
-        } catch (ex: Exception) {
-            Log.e(TAG, "Error performing stock auto-decrement in recordDoseTaken", ex)
         }
 
         // 4. Cancel active notification for this entry and update widgets
@@ -289,24 +306,27 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun undoDoseTaken(entryId: String, context: Context? = null) {
+        // Inspect previous status to only restore stock if it was actually taken
+        val previousEntry = database.scheduleDao().getScheduleEntryById(entryId)
+        val wasTaken = previousEntry?.status == MedicationStatus.TAKEN_ON_TIME || previousEntry?.status == MedicationStatus.TAKEN_LATE
+
         // 1. Revert status to PENDING and clear takenAt and skipReason
         database.scheduleDao().updateMedicationStatusWithReason(entryId, "PENDING", null, null)
 
-        // 2. Revert stock auto-decrement if applicable
-        try {
-            val entry = database.scheduleDao().getScheduleEntryById(entryId)
-            if (entry != null) {
-                val medicine = database.medicineDao().getMedicineByIdDirect(entry.medicineId)
+        // 2. Revert stock auto-decrement only if previously taken
+        if (wasTaken && previousEntry != null) {
+            try {
+                val medicine = database.medicineDao().getMedicineByIdDirect(previousEntry.medicineId)
                 if (medicine != null && medicine.currentStock != null && medicine.autoDeductOnTake) {
-                    val addAmount = medicine.getStockDeductionAmount(entry.scheduledDateTime.toLocalTime())
+                    val addAmount = medicine.getStockDeductionAmount(previousEntry.scheduledDateTime.toLocalTime())
                     val restoredStock = medicine.currentStock + addAmount
                     val updatedMedicine = medicine.copy(currentStock = restoredStock)
                     database.medicineDao().updateMedicine(updatedMedicine)
                     Log.d(TAG, "Restored stock for ${medicine.medicationName}: ${medicine.currentStock} -> $restoredStock on undo (restored $addAmount)")
                 }
+            } catch (ex: Exception) {
+                Log.e(TAG, "Error reverting stock in undoDoseTaken", ex)
             }
-        } catch (ex: Exception) {
-            Log.e(TAG, "Error reverting stock in undoDoseTaken", ex)
         }
 
         // 3. Update app widgets

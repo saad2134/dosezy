@@ -725,4 +725,10 @@
     <string name="med_different_dosages_toggle">جرعة مختلفة لكل وقت</string>
     <string name="med_different_dosages_subtitle">تحديد كميات مخصصة للصباح أو بعد الظهر أو المساء</string>
     <string name="med_dosage_for_time">جرعة %1$s</string>
+
+    <string name="analytics_skipped_doses">الجرعات التي تم تخطيها</string>
+    <string name="notif_channel_refill_name">تذكيرات إعادة التعبئة</string>
+    <string name="notif_channel_refill_desc">تنبيهات عندما ينخفض مخزون الدواء عن الحد الذي حددته</string>
+    <string name="widget_tomorrow">غداً </string>
+    <string name="med_start_date_label">تاريخ البدء</string>
 </resources>

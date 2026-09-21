@@ -56,16 +56,23 @@ class NotificationActionReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
         val action = intent?.action
         val entryId = intent?.getStringExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID)
+        val entryIds = intent?.getStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS)
+        val allIds = (entryIds ?: if (entryId != null) listOf(entryId) else emptyList()).filter { it.isNotEmpty() }.distinct()
 
-        if (entryId != null) {
+        if (allIds.isNotEmpty()) {
+            val pendingResult = goAsync()
             CoroutineScope(Dispatchers.IO).launch {
-                handleAction(context, action, entryId)
+                try {
+                    handleAction(context, action, allIds, entryId ?: allIds.first())
+                } finally {
+                    pendingResult.finish()
+                }
             }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private suspend fun handleAction(context: Context, action: String?, entryId: String) {
+    private suspend fun handleAction(context: Context, action: String?, allIds: List<String>, primaryEntryId: String) {
         val scheduleRepository = ScheduleRepository(database)
 
         // Immediately stop active alarm sound and dismiss full-screen activity
@@ -73,36 +80,42 @@ class NotificationActionReceiver : BroadcastReceiver() {
         AlarmActivity.stopActiveAlarm()
 
         val alarmScheduler = AlarmScheduler(context)
-        alarmScheduler.cancelNagging(entryId)
+        allIds.forEach { id ->
+            alarmScheduler.cancelNagging(id)
+        }
 
         // Cancel notification for both Taken and Snooze actions
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-        notificationManager.cancel(entryId.hashCode())
+        notificationManager.cancel(primaryEntryId.hashCode())
+        allIds.forEach { id ->
+            notificationManager.cancel(id.hashCode())
+        }
 
         when (action) {
             "TAKEN_ACTION" -> {
-                Log.d(TAG, "Marking medicine as taken for entry: $entryId")
                 val takenAt = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-                scheduleRepository.recordDoseTaken(entryId, "TAKEN_ON_TIME", takenAt, context)
-                Log.d(TAG, "Medicine marked as taken and processed for entry: $entryId")
+                allIds.forEach { id ->
+                    Log.d(TAG, "Marking medicine as taken for entry: $id")
+                    scheduleRepository.recordDoseTaken(id, "TAKEN_ON_TIME", takenAt, context)
+                }
+                Log.d(TAG, "Marked ${allIds.size} medicines as taken and processed")
             }
             "SNOOZE_ACTION" -> {
-                Log.d(TAG, "Snoozing medicine reminder for entry: $entryId")
-                
-                // Fetch the medicine name and user snooze preference from database
-                val entry = database.scheduleDao().getScheduleEntryById(entryId)
-                val user = entry?.let { database.userDao().getUserByIdDirect(it.userId) }
-                val snoozeMinutes = user?.snoozeDuration ?: 10
-                val medicine = entry?.let { database.medicineDao().getMedicineById(it.medicineId).first() }
-                val medicineName = medicine?.medicationName ?: "Medicine"
+                allIds.forEach { id ->
+                    Log.d(TAG, "Snoozing medicine reminder for entry: $id")
+                    val entry = database.scheduleDao().getScheduleEntryById(id)
+                    val user = entry?.let { database.userDao().getUserByIdDirect(it.userId) }
+                    val snoozeMinutes = user?.snoozeDuration ?: 10
+                    val medicine = entry?.let { database.medicineDao().getMedicineByIdDirect(it.medicineId) }
+                    val medicineName = medicine?.medicationName ?: "Medicine"
 
-                alarmScheduler.scheduleSnooze(entryId, snoozeMinutes, medicineName)
-
-                Log.d(TAG, "Medicine reminder snoozed for $snoozeMinutes minutes for entry: $entryId ($medicineName)")
+                    alarmScheduler.scheduleSnooze(id, snoozeMinutes, medicineName)
+                    Log.d(TAG, "Medicine reminder snoozed for $snoozeMinutes minutes for entry: $id ($medicineName)")
+                }
             }
             else -> {
-                Log.w(TAG, "Unknown action received: $action for entry: $entryId")
+                Log.w(TAG, "Unknown action received: $action for entry: $primaryEntryId")
             }
         }
     }

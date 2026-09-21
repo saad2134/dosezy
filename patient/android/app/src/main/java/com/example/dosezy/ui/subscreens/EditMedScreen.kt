@@ -27,6 +27,9 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.CalendarMonth
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import com.example.dosezy.ui.components.GridTimePickerDialog
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -136,6 +139,7 @@ fun EditMedScreen(
     var selectedPillColor by remember { mutableStateOf("#1193D4") }
     var doctorNotes by remember { mutableStateOf("") }
     var isFiniteCourse by remember { mutableStateOf(false) }
+    var selectedStartDate by remember { mutableStateOf(medicineToEdit?.startDate ?: LocalDate.now()) }
     var durationDaysText by remember { mutableStateOf("") }
     var intervalHoursText by remember { mutableStateOf("4") }
     var intervalDaysText by remember { mutableStateOf("2") }
@@ -162,6 +166,7 @@ fun EditMedScreen(
             selectedPillColor = medicineToEdit.pillColor
             doctorNotes = medicineToEdit.notes ?: ""
             isFiniteCourse = (medicineToEdit.endDate != null || medicineToEdit.durationDays != null)
+            selectedStartDate = medicineToEdit.startDate ?: LocalDate.now()
             durationDaysText = medicineToEdit.durationDays?.toString() ?: ""
             intervalHoursText = medicineToEdit.frequency.intervalHours?.toString() ?: "4"
             intervalDaysText = medicineToEdit.frequency.intervalDays?.toString() ?: "2"
@@ -890,13 +895,9 @@ fun EditMedScreen(
                                     if (hasDifferentDosages) {
                                         Spacer(modifier = Modifier.height(12.dp))
                                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                            scheduledTimesList.forEach { time ->
-                                                val key = String.format("%02d:%02d", time.hour, time.minute)
-                                                val hour = time.hour
-                                                val minute = time.minute
-                                                val amPm = if (hour < 12) "AM" else "PM"
-                                                val displayHour = if (hour % 12 == 0) 12 else hour % 12
-                                                val formattedTime = String.format("%d:%02d %s", displayHour, minute, amPm)
+                                             scheduledTimesList.forEach { time ->
+                                                 val key = String.format("%02d:%02d", time.hour, time.minute)
+                                                 val formattedTime = time.format(DateTimeFormatter.ofPattern("hh:mm a"))
 
                                                 Surface(
                                                     modifier = Modifier.fillMaxWidth(),
@@ -1038,10 +1039,9 @@ fun EditMedScreen(
                                     )
                                 )
 
-                                val days = durationDaysText.toIntOrNull()
+                                 val days = durationDaysText.toIntOrNull()
                                 if (days != null && days > 0) {
-                                    val start = medicineToEdit?.startDate ?: LocalDate.now()
-                                    val endDate = start.plusDays(days.toLong())
+                                    val endDate = selectedStartDate.plusDays(days.toLong())
                                     Spacer(modifier = Modifier.height(6.dp))
                                     Text(
                                         text = stringResource(R.string.course_end_date_label, endDate.toString()),
@@ -1049,6 +1049,59 @@ fun EditMedScreen(
                                         color = MaterialTheme.colorScheme.primary,
                                         fontWeight = FontWeight.SemiBold
                                     )
+                                }
+                            }
+
+                            // Start Date Picker Row
+                            val dateFormatter = remember { DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM) }
+                            Spacer(modifier = Modifier.height(14.dp))
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        android.app.DatePickerDialog(
+                                            context,
+                                            { _, y, m, d ->
+                                                selectedStartDate = LocalDate.of(y, m + 1, d)
+                                            },
+                                            selectedStartDate.year,
+                                            selectedStartDate.monthValue - 1,
+                                            selectedStartDate.dayOfMonth
+                                        ).show()
+                                    }
+                                    .padding(vertical = 4.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.med_start_date_label),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = MaterialTheme.colorScheme.surfaceVariant,
+                                    modifier = Modifier.padding(2.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.CalendarMonth,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(16.dp),
+                                            tint = Color(0xFF1193D4)
+                                        )
+                                        Text(
+                                            text = selectedStartDate.format(dateFormatter),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -1128,8 +1181,8 @@ fun EditMedScreen(
 
                     // Save Changes Button
                     val durationDaysInt = durationDaysText.toIntOrNull()
-                    val calcStartDate = if (isFiniteCourse) (medicineToEdit?.startDate ?: LocalDate.now()) else null
-                    val calcEndDate = if (isFiniteCourse && durationDaysInt != null) (calcStartDate ?: LocalDate.now()).plusDays(durationDaysInt.toLong()) else null
+                    val calcStartDate = selectedStartDate
+                    val calcEndDate = if (isFiniteCourse && durationDaysInt != null) selectedStartDate.plusDays(durationDaysInt.toLong()) else null
 
                     val isFormValid = medicationName.isNotBlank() && dosage.isNotBlank() && (
                         selectedFrequency == FrequencyPattern.DAILY ||

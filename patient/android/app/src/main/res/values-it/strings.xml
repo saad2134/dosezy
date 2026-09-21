@@ -725,4 +725,10 @@ Vuoi continuare?</string>
     <string name="med_different_dosages_toggle">Dose diversa per ogni orario</string>
     <string name="med_different_dosages_subtitle">Imposta dosaggi personalizzati per mattina, pomeriggio o sera</string>
     <string name="med_dosage_for_time">Dose per le %1$s</string>
+
+    <string name="analytics_skipped_doses">Dosi saltate</string>
+    <string name="notif_channel_refill_name">Promemoria di ricarica</string>
+    <string name="notif_channel_refill_desc">Avvisi quando le scorte di medicinali scendono sotto la soglia scelta</string>
+    <string name="widget_tomorrow">Domani </string>
+    <string name="med_start_date_label">Data di inizio</string>
 </resources>

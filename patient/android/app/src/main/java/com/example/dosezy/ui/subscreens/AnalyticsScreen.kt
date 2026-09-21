@@ -120,12 +120,24 @@ fun AnalyticsScreen(navController: NavController) {
 
     fun getRangeEntries(range: AdherenceRange): List<ScheduleEntry> {
         return when (range) {
-            AdherenceRange.LAST_7_DAYS -> scheduleEntries.filter { it.scheduledDateTime.toLocalDate() >= today.minusDays(7) }
-            AdherenceRange.LAST_30_DAYS -> scheduleEntries.filter { it.scheduledDateTime.toLocalDate() >= today.minusDays(30) }
-            AdherenceRange.SIX_MONTHS -> scheduleEntries.filter { it.scheduledDateTime.toLocalDate() >= today.minusMonths(6) }
-            AdherenceRange.TWELVE_MONTHS -> scheduleEntries.filter { it.scheduledDateTime.toLocalDate() >= today.minusMonths(12) }
-            AdherenceRange.TOTAL -> scheduleEntries
-            AdherenceRange.ALL -> scheduleEntries
+            AdherenceRange.LAST_7_DAYS -> scheduleEntries.filter { 
+                val d = it.scheduledDateTime.toLocalDate()
+                d >= today.minusDays(7) && d <= today 
+            }
+            AdherenceRange.LAST_30_DAYS -> scheduleEntries.filter { 
+                val d = it.scheduledDateTime.toLocalDate()
+                d >= today.minusDays(30) && d <= today 
+            }
+            AdherenceRange.SIX_MONTHS -> scheduleEntries.filter { 
+                val d = it.scheduledDateTime.toLocalDate()
+                d >= today.minusMonths(6) && d <= today 
+            }
+            AdherenceRange.TWELVE_MONTHS -> scheduleEntries.filter { 
+                val d = it.scheduledDateTime.toLocalDate()
+                d >= today.minusMonths(12) && d <= today 
+            }
+            AdherenceRange.TOTAL -> scheduleEntries.filter { it.scheduledDateTime.toLocalDate() <= today }
+            AdherenceRange.ALL -> scheduleEntries.filter { it.scheduledDateTime.toLocalDate() <= today }
         }
     }
 
@@ -150,11 +162,13 @@ fun AnalyticsScreen(navController: NavController) {
 
     val selectedData = rangeDataList.find { it.range == selectedRange } ?: rangeDataList.last()
 
-    // Global overall stats for breakdown grid
-    val totalEntries = scheduleEntries.size
-    val takenOnTime = scheduleEntries.count { it.status == MedicationStatus.TAKEN_ON_TIME }
-    val takenLate = scheduleEntries.count { it.status == MedicationStatus.TAKEN_LATE }
-    val missed = scheduleEntries.count { it.status == MedicationStatus.MISSED }
+    // Global overall stats for breakdown grid (constrained to past & today)
+    val pastAndTodayEntries = scheduleEntries.filter { it.scheduledDateTime.toLocalDate() <= today }
+    val totalEntries = pastAndTodayEntries.size
+    val takenOnTime = pastAndTodayEntries.count { it.status == MedicationStatus.TAKEN_ON_TIME }
+    val takenLate = pastAndTodayEntries.count { it.status == MedicationStatus.TAKEN_LATE }
+    val missed = pastAndTodayEntries.count { it.status == MedicationStatus.MISSED }
+    val skipped = pastAndTodayEntries.count { it.status == MedicationStatus.SKIPPED }
     val totalTaken = takenOnTime + takenLate
     val totalDecided = totalTaken + missed
 
@@ -174,7 +188,7 @@ fun AnalyticsScreen(navController: NavController) {
         val dayTaken = dayEntries.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
         val dayMissed = dayEntries.count { it.status == MedicationStatus.MISSED }
         val dayDecided = dayTaken + dayMissed
-        val dayRate = if (dayDecided > 0) ((dayTaken.toDouble() / dayDecided.toDouble()) * 100).toInt() else if (dayEntries.isNotEmpty()) 100 else 0
+        val dayRate = if (dayDecided > 0) ((dayTaken.toDouble() / dayDecided.toDouble()) * 100).toInt() else 0
         DayStat(
             date = date,
             dayLabel = date.dayOfWeek.getDisplayName(java.time.format.TextStyle.SHORT, targetLocale).uppercase(targetLocale),
@@ -321,14 +335,24 @@ fun AnalyticsScreen(navController: NavController) {
                         )
                         StatCard(
                             modifier = Modifier.weight(1f),
-                            title = stringResource(R.string.analytics_total_doses),
-                            value = "$totalEntries",
-                            subtitle = stringResource(R.string.status_taken) + ": $totalTaken",
-                            icon = Icons.Default.Medication,
-                            color = Color(0xFF0277BD),
-                            bgColor = Color(0xFF0277BD).copy(alpha = 0.12f)
+                            title = stringResource(R.string.analytics_skipped_doses),
+                            value = "$skipped",
+                            subtitle = if (totalEntries > 0) "${((skipped.toDouble() / totalEntries) * 100).toInt()}%" else "0%",
+                            icon = Icons.Default.Schedule,
+                            color = Color(0xFF6B7280),
+                            bgColor = Color(0xFF6B7280).copy(alpha = 0.12f)
                         )
                     }
+
+                    StatCard(
+                        modifier = Modifier.fillMaxWidth(),
+                        title = stringResource(R.string.analytics_total_doses),
+                        value = "$totalEntries",
+                        subtitle = stringResource(R.string.status_taken) + ": $totalTaken",
+                        icon = Icons.Default.Medication,
+                        color = Color(0xFF0277BD),
+                        bgColor = Color(0xFF0277BD).copy(alpha = 0.12f)
+                    )
                 }
             }
 

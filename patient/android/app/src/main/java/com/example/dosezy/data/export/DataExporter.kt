@@ -220,9 +220,10 @@ class DataExporter(
     @RequiresApi(Build.VERSION_CODES.O)
     private fun buildPdfDocument(user: User, medicines: List<Medicine>, schedules: List<ScheduleEntry>): PdfDocument {
         val pdfDocument = PdfDocument()
-        val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create() // Standard A4 page
-        val page = pdfDocument.startPage(pageInfo)
-        val canvas = page.canvas
+        var pageNumber = 1
+        var pageInfo = PdfDocument.PageInfo.Builder(595, 842, pageNumber).create()
+        var page = pdfDocument.startPage(pageInfo)
+        var canvas = page.canvas
 
         val titlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.parseColor("#1193D4")
@@ -252,6 +253,30 @@ class DataExporter(
             strokeWidth = 1f
         }
 
+        fun drawFooter(c: android.graphics.Canvas, pNum: Int) {
+            c.drawLine(40f, 800f, 555f, 800f, linePaint)
+            c.drawText("Dosezy Medicine Tracker • Confidential Patient Record", 40f, 816f, subtitlePaint)
+            c.drawText("Page $pNum", 520f, 816f, subtitlePaint)
+        }
+
+        var y = 38f
+
+        fun checkPageBreak(neededHeight: Float) {
+            if (y + neededHeight > 780f) {
+                drawFooter(canvas, pageNumber)
+                pdfDocument.finishPage(page)
+                pageNumber++
+                pageInfo = PdfDocument.PageInfo.Builder(595, 842, pageNumber).create()
+                page = pdfDocument.startPage(pageInfo)
+                canvas = page.canvas
+                y = 40f
+                canvas.drawText("Dosezy Report - ${user.fullName}", 40f, y, subtitlePaint)
+                y += 12f
+                canvas.drawLine(40f, y, 555f, y, linePaint)
+                y += 20f
+            }
+        }
+
         // Top-left App Brand Icon (matching New User & Alarm popup brand icon)
         val brandIcon = androidx.core.content.ContextCompat.getDrawable(context, com.example.dosezy.R.drawable.loader_icon)
         if (brandIcon != null) {
@@ -259,7 +284,6 @@ class DataExporter(
             brandIcon.draw(canvas)
         }
 
-        var y = 38f
         canvas.drawText("DOSEZY - Patient Health & Medication Report", 76f, y, titlePaint)
         y += 16f
         val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
@@ -279,7 +303,7 @@ class DataExporter(
         // Allergies & Medical Conditions in PDF
         val allergiesText = if (!user.allergies.isNullOrBlank()) user.allergies else "None recorded"
         val conditionsText = if (!user.medicalConditions.isNullOrBlank()) user.medicalConditions else "None recorded"
-        
+
         if (!user.allergies.isNullOrBlank()) {
             canvas.drawText("Allergies: $allergiesText", 40f, y, alertHeaderPaint)
         } else {
@@ -335,7 +359,8 @@ class DataExporter(
         canvas.drawLine(40f, y, 555f, y, linePaint)
         y += 20f
 
-        // Medicines Table
+        // Active Medications Table
+        checkPageBreak(50f)
         canvas.drawText("Active Medications (${medicines.size})", 40f, y, headerPaint)
         y += 18f
 
@@ -348,10 +373,12 @@ class DataExporter(
         y += 16f
 
         subtitlePaint.isFakeBoldText = false
-        medicines.take(10).forEach { med ->
+        medicines.forEach { med ->
+            checkPageBreak(20f)
             canvas.drawText(med.medicationName, 40f, y, textPaint)
             canvas.drawText("${med.dosage} ${med.dosageUnit}", 220f, y, textPaint)
-            canvas.drawText("${med.timesPerDay}x daily", 360f, y, textPaint)
+            val freqLabel = if (med.frequency.pattern == com.example.dosezy.data.model.FrequencyPattern.AS_NEEDED) "As needed" else "${med.timesPerDay}x daily"
+            canvas.drawText(freqLabel, 360f, y, textPaint)
             y += 16f
         }
         if (medicines.isEmpty()) {
@@ -364,6 +391,7 @@ class DataExporter(
         y += 25f
 
         // Schedule Logs Table
+        checkPageBreak(50f)
         canvas.drawText("Recent Dose History (${schedules.size} entries)", 40f, y, headerPaint)
         y += 18f
 
@@ -376,7 +404,8 @@ class DataExporter(
         y += 16f
 
         subtitlePaint.isFakeBoldText = false
-        schedules.take(18).forEach { sch ->
+        schedules.take(150).forEach { sch ->
+            checkPageBreak(20f)
             val dateStr = sch.scheduledDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
             canvas.drawText(dateStr, 40f, y, textPaint)
             val statusLabel = when (sch.status) {
@@ -402,10 +431,7 @@ class DataExporter(
             y += 16f
         }
 
-        y = 810f
-        canvas.drawLine(40f, y - 10f, 555f, y - 10f, linePaint)
-        canvas.drawText("Dosezy Medicine Tracker • Confidential Patient Record", 40f, y, subtitlePaint)
-
+        drawFooter(canvas, pageNumber)
         pdfDocument.finishPage(page)
         return pdfDocument
     }
