@@ -310,6 +310,14 @@ fun GroupedAlarmScreenContent(
         coroutineScope.launch {
             withContext(Dispatchers.IO) {
                 val alarmScheduler = AlarmScheduler(context)
+                val allIds = if (medicinesList.isNotEmpty()) {
+                    medicinesList.map { it.first.entryId }
+                } else {
+                    entryIds
+                }
+                allIds.forEach { id ->
+                    alarmScheduler.cancelNagging(id)
+                }
                 if (medicinesList.isNotEmpty()) {
                     val ids = medicinesList.map { it.first.entryId }
                     val names = medicinesList.map { it.second.medicationName }
@@ -400,10 +408,11 @@ fun GroupedAlarmScreenContent(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
                     ) {
-                        if (user?.profilePicPath != null && File(user!!.profilePicPath!!).exists()) {
+                        val profilePicPath = user?.profilePicPath?.removePrefix("file://")
+                        if (profilePicPath != null && File(profilePicPath).exists()) {
                             AsyncImage(
                                 model = ImageRequest.Builder(LocalContext.current)
-                                    .data(File(user!!.profilePicPath!!))
+                                    .data(File(profilePicPath))
                                     .crossfade(true)
                                     .build(),
                                 contentDescription = "Profile Picture",
@@ -553,10 +562,11 @@ fun GroupedAlarmScreenContent(
                                             .background(Color(0xFF1193D4).copy(alpha = 0.15f)),
                                         contentAlignment = Alignment.Center
                                     ) {
-                                        if (med.imageUri != null && File(med.imageUri).exists()) {
+                                        val medImagePath = med.imageUri?.removePrefix("file://")
+                                        if (medImagePath != null && File(medImagePath).exists()) {
                                             AsyncImage(
                                                 model = ImageRequest.Builder(LocalContext.current)
-                                                    .data(File(med.imageUri))
+                                                    .data(File(medImagePath))
                                                     .crossfade(true)
                                                     .build(),
                                                 contentDescription = "Medicine Image",
@@ -634,6 +644,15 @@ fun GroupedAlarmScreenContent(
                     onClick = {
                         coroutineScope.launch {
                             withContext(Dispatchers.IO) {
+                                val alarmScheduler = AlarmScheduler(context)
+                                val allIds = if (medicinesList.isNotEmpty()) {
+                                    medicinesList.map { it.first.entryId }
+                                } else {
+                                    entryIds
+                                }
+                                allIds.forEach { id ->
+                                    alarmScheduler.cancelNagging(id)
+                                }
                                 val nowStr = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
                                 if (medicinesList.isNotEmpty()) {
                                     medicinesList.forEach { (entry, _) ->
@@ -721,6 +740,15 @@ fun GroupedAlarmScreenContent(
                 showSkipReasonDialog = false
                 coroutineScope.launch {
                     withContext(Dispatchers.IO) {
+                        val alarmScheduler = AlarmScheduler(context)
+                        val allIds = if (medicinesList.isNotEmpty()) {
+                            medicinesList.map { it.first.entryId }
+                        } else {
+                            entryIds
+                        }
+                        allIds.forEach { id ->
+                            alarmScheduler.cancelNagging(id)
+                        }
                         if (medicinesList.isNotEmpty()) {
                             medicinesList.forEach { (entry, _) ->
                                 scheduleRepository.recordDoseSkipped(entry.entryId, reason, context)

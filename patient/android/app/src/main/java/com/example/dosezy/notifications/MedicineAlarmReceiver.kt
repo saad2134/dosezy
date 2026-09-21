@@ -132,7 +132,10 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                                 entryId = entryId,
                                 minutes = user.naggingIntervalMinutes,
                                 medicineName = medicineName,
-                                naggingCount = naggingCount + 1
+                                naggingCount = naggingCount + 1,
+                                entryIds = entryIds,
+                                medicineNames = medicineNames,
+                                scheduledTime = scheduledTime
                             )
                         }
                     }

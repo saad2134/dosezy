@@ -525,4 +525,87 @@ class MedicineLogicTest {
         assertEquals(8, late)
         assertEquals(9, missed)
     }
+
+    // ───────────────────────────────────────────────────────────────
+    // 11. calculateRefillQuantity tests across all frequencies
+    // ───────────────────────────────────────────────────────────────
+
+    @Test
+    fun refillQuantity_dailyMedicine_30Days() {
+        // Daily, 1 tablet, 1x/day -> 30 tablets
+        val m = med(dosage = 1.0, unit = DosageUnit.TABLET, freq = Frequency(FrequencyPattern.DAILY), times = listOf(LocalTime.of(8, 0)))
+        assertEquals(30, m.calculateRefillQuantity(30))
+
+        // Daily, 2 tablets, 2x/day -> 120 tablets
+        val m2 = med(dosage = 2.0, unit = DosageUnit.TABLET, freq = Frequency(FrequencyPattern.DAILY), times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)))
+        assertEquals(120, m2.calculateRefillQuantity(30))
+    }
+
+    @Test
+    fun refillQuantity_weeklyMedicine_preventsOverdose() {
+        // Weekly on 1 day (e.g. Methotrexate), 1 tablet -> ceil(1/7 * 30) = 5 tablets (NOT 30!)
+        val m = med(dosage = 1.0, unit = DosageUnit.TABLET, freq = Frequency(FrequencyPattern.WEEKLY, daysPerWeek = 1))
+        assertEquals(5, m.calculateRefillQuantity(30))
+
+        // Weekly on 3 days (Mon/Wed/Fri), 1 tablet, 30 days -> ceil(3/7 * 30) = ceil(12.85) = 13 tablets
+        val m2 = med(dosage = 1.0, unit = DosageUnit.TABLET, freq = Frequency(FrequencyPattern.WEEKLY, selectedDaysOfWeek = listOf(1, 3, 5)))
+        assertEquals(13, m2.calculateRefillQuantity(30))
+    }
+
+    @Test
+    fun refillQuantity_monthlyMedicine_preventsOverdose() {
+        // Monthly on 1 day, 1 tablet, 30 days -> ceil(1/30 * 30) = 1 tablet (NOT 30!)
+        val m = med(dosage = 1.0, unit = DosageUnit.TABLET, freq = Frequency(FrequencyPattern.MONTHLY, daysPerMonth = 1))
+        assertEquals(1, m.calculateRefillQuantity(30))
+    }
+
+    @Test
+    fun refillQuantity_everyXDays_preventsOverdose() {
+        // Every 3 days, 1 tablet, 30 days -> ceil(30 / 3) = 10 tablets (NOT 30!)
+        val m = med(dosage = 1.0, unit = DosageUnit.TABLET, freq = Frequency(FrequencyPattern.EVERY_X_DAYS, intervalDays = 3))
+        assertEquals(10, m.calculateRefillQuantity(30))
+    }
+
+    @Test
+    fun refillQuantity_everyXHours() {
+        // Every 4 hours = 6 doses/day, 1 tablet, 30 days -> 180 tablets
+        val m = med(dosage = 1.0, unit = DosageUnit.TABLET, freq = Frequency(FrequencyPattern.EVERY_X_HOURS, intervalHours = 4))
+        assertEquals(180, m.calculateRefillQuantity(30))
+
+        // Every 6 hours = 4 doses/day, 1 tablet, 30 days -> 120 tablets
+        val m2 = med(dosage = 1.0, unit = DosageUnit.TABLET, freq = Frequency(FrequencyPattern.EVERY_X_HOURS, intervalHours = 6))
+        assertEquals(120, m2.calculateRefillQuantity(30))
+    }
+
+    @Test
+    fun refillQuantity_asNeeded_safeEstimate() {
+        // PRN for 30 days -> ~10 doses (NOT 30!)
+        val m = med(dosage = 1.0, unit = DosageUnit.TABLET, freq = Frequency(FrequencyPattern.AS_NEEDED))
+        assertEquals(10, m.calculateRefillQuantity(30))
+    }
+
+    @Test
+    fun refillQuantity_dropsConvertedToBottles() {
+        // 5 drops per dose, 2x/day, 30 days = 60 doses * 5 = 300 drops = 3 bottles (100 drops/bottle)
+        val m = med(
+            dosage = 5.0,
+            unit = DosageUnit.DROP,
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0))
+        )
+        assertEquals(3, m.calculateRefillQuantity(30))
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // 12. Image URI normalization (raw path vs file://)
+    // ───────────────────────────────────────────────────────────────
+
+    @Test
+    fun imageUri_removesFilePrefixDefensively() {
+        val rawPath = "/data/user/0/com.example.dosezy/files/medicines/123/image.jpg"
+        val prefixedPath = "file://$rawPath"
+
+        assertEquals(rawPath, prefixedPath.removePrefix("file://"))
+        assertEquals(rawPath, rawPath.removePrefix("file://"))
+    }
 }

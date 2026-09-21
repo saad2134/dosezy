@@ -81,7 +81,23 @@ data class Medicine(
             // Check if medicine should be taken on this day based on frequency
             if (shouldTakeOnDate(currentDate)) {
                 val now = LocalDateTime.now()
-                scheduledTimes.forEach { time ->
+                val effectiveTimes = if (frequency.pattern == FrequencyPattern.EVERY_X_HOURS) {
+                    val interval = (frequency.intervalHours ?: 4).coerceIn(1, 23)
+                    val startTime = scheduledTimes.firstOrNull() ?: LocalTime.of(8, 0)
+                    val generated = mutableListOf<LocalTime>()
+                    var t = startTime
+                    while (true) {
+                        generated.add(t)
+                        val nextHour = t.hour + interval
+                        if (nextHour >= 24) break
+                        t = t.plusHours(interval.toLong())
+                    }
+                    generated
+                } else {
+                    scheduledTimes
+                }
+
+                effectiveTimes.forEach { time ->
                     val cleanTime = time.withSecond(0).withNano(0)
                     val scheduledDateTime = LocalDateTime.of(currentDate, cleanTime)
 
@@ -236,6 +252,64 @@ data class Medicine(
                 targetDosage.toInt().coerceAtLeast(1)
             }
         }
+    }
+
+    /**
+     * Calculates the estimated refill quantity needed for a given number of supply days.
+     * Accurately accounts for frequency pattern, interval, dose amount, and dosage unit.
+     */
+    fun calculateRefillQuantity(supplyDays: Int): Int {
+        val days = supplyDays.coerceAtLeast(1)
+        val isDrop = dosageUnit == DosageUnit.DROP || pillShape == PillShape.DROPS
+
+        val totalIntakes: Double = when (frequency.pattern) {
+            FrequencyPattern.DAILY -> {
+                (timesPerDay.coerceAtLeast(1) * days).toDouble()
+            }
+            FrequencyPattern.WEEKLY -> {
+                val daysPerWk = frequency.selectedDaysOfWeek?.size ?: frequency.daysPerWeek ?: 1
+                val totalDoseDays = kotlin.math.ceil((daysPerWk.toDouble() / 7.0) * days)
+                totalDoseDays * timesPerDay.coerceAtLeast(1)
+            }
+            FrequencyPattern.MONTHLY -> {
+                val daysPerMo = frequency.selectedDaysOfMonth?.size ?: frequency.daysPerMonth ?: 1
+                val totalDoseDays = kotlin.math.ceil((daysPerMo.toDouble() / 30.0) * days)
+                totalDoseDays * timesPerDay.coerceAtLeast(1)
+            }
+            FrequencyPattern.EVERY_X_DAYS -> {
+                val interval = (frequency.intervalDays ?: 2).coerceAtLeast(1)
+                val totalDoseDays = kotlin.math.ceil(days.toDouble() / interval.toDouble())
+                totalDoseDays * timesPerDay.coerceAtLeast(1)
+            }
+            FrequencyPattern.EVERY_X_HOURS -> {
+                val interval = (frequency.intervalHours ?: 4).coerceIn(1, 23)
+                val dosesPerDay = (24 / interval).coerceAtLeast(1)
+                (dosesPerDay * days).toDouble()
+            }
+            FrequencyPattern.AS_NEEDED -> {
+                // PRN estimate: safe non-overdose estimate (~1 dose per 3 days)
+                val estimatedDays = kotlin.math.ceil(days.toDouble() / 3.0)
+                estimatedDays.coerceAtLeast(1.0)
+            }
+            FrequencyPattern.CUSTOM -> {
+                (timesPerDay.coerceAtLeast(1) * days).toDouble()
+            }
+        }
+
+        if (isDrop) {
+            val dropsPerIntake = if (dosage > 0) dosage.toInt().coerceAtLeast(1) else 1
+            val totalDrops = totalIntakes * dropsPerIntake
+            return kotlin.math.ceil(totalDrops / 100.0).toInt().coerceAtLeast(1)
+        }
+
+        val dosesPerIntake = when (dosageUnit) {
+            DosageUnit.TABLET, DosageUnit.CAPSULE, DosageUnit.ML -> {
+                if (dosage > 0) dosage.toInt().coerceAtLeast(1) else 1
+            }
+            DosageUnit.MG, DosageUnit.MCG, DosageUnit.DROP -> 1
+        }
+
+        return kotlin.math.ceil(totalIntakes * dosesPerIntake).toInt().coerceAtLeast(1)
     }
 }
 

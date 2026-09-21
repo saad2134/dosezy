@@ -339,7 +339,7 @@ class BackupRestoreManager(
                                 medAssetsDir.mkdirs()
                                 val targetMedAsset = File(medAssetsDir, "image.jpg")
                                 medAssetFile.copyTo(targetMedAsset, overwrite = true)
-                                "file://${targetMedAsset.absolutePath}"
+                                targetMedAsset.absolutePath
                             } else null
 
                             val newMed = med.copy(
@@ -415,7 +415,7 @@ class BackupRestoreManager(
                                 medAssetsDir.mkdirs()
                                 val targetMedAsset = File(medAssetsDir, "image.jpg")
                                 medAssetFile.copyTo(targetMedAsset, overwrite = true)
-                                "file://${targetMedAsset.absolutePath}"
+                                targetMedAsset.absolutePath
                             } else med.imageUri
 
                             val restoredMed = med.copy(userId = targetUserId, imageUri = finalImageUri)

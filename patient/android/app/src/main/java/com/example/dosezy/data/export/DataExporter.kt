@@ -392,22 +392,33 @@ class DataExporter(
 
         // Schedule Logs Table
         checkPageBreak(50f)
-        canvas.drawText("Recent Dose History (${schedules.size} entries)", 40f, y, headerPaint)
+        val sortedSchedules = schedules.sortedByDescending { it.scheduledDateTime }
+        val medMap = medicines.associateBy { it.medicineId }
+        canvas.drawText("Recent Dose History (${sortedSchedules.size} entries)", 40f, y, headerPaint)
         y += 18f
 
         subtitlePaint.isFakeBoldText = true
         canvas.drawText("Scheduled Date/Time", 40f, y, subtitlePaint)
-        canvas.drawText("Status", 260f, y, subtitlePaint)
-        canvas.drawText("Recorded Time", 400f, y, subtitlePaint)
+        canvas.drawText("Medication", 155f, y, subtitlePaint)
+        canvas.drawText("Status", 340f, y, subtitlePaint)
+        canvas.drawText("Recorded Time", 440f, y, subtitlePaint)
         y += 12f
         canvas.drawLine(40f, y, 555f, y, linePaint)
         y += 16f
 
         subtitlePaint.isFakeBoldText = false
-        schedules.take(150).forEach { sch ->
+        sortedSchedules.take(150).forEach { sch ->
             checkPageBreak(20f)
             val dateStr = sch.scheduledDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
             canvas.drawText(dateStr, 40f, y, textPaint)
+
+            val med = medMap[sch.medicineId]
+            val medName = med?.medicationName ?: "Unknown"
+            val doseStr = med?.let { " (${it.getDosageDisplay(sch.scheduledDateTime.toLocalTime())})" } ?: ""
+            val fullMed = "$medName$doseStr"
+            val truncatedMed = if (fullMed.length > 28) fullMed.take(25) + "..." else fullMed
+            canvas.drawText(truncatedMed, 155f, y, textPaint)
+
             val statusLabel = when (sch.status) {
                 com.example.dosezy.data.model.MedicationStatus.TAKEN_ON_TIME -> "Taken On Time"
                 com.example.dosezy.data.model.MedicationStatus.TAKEN_LATE -> "Taken Late"
@@ -415,7 +426,7 @@ class DataExporter(
                 com.example.dosezy.data.model.MedicationStatus.SKIPPED -> "Skipped"
                 com.example.dosezy.data.model.MedicationStatus.PENDING -> "Pending"
             }
-            canvas.drawText(statusLabel, 260f, y, textPaint)
+            canvas.drawText(statusLabel, 340f, y, textPaint)
             val takenStr = if (sch.takenAt != null && sch.takenAt.year > 1970) {
                 sch.takenAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
             } else if (sch.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_ON_TIME || sch.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_LATE) {
@@ -423,7 +434,7 @@ class DataExporter(
             } else {
                 "-"
             }
-            canvas.drawText(takenStr, 400f, y, textPaint)
+            canvas.drawText(takenStr, 440f, y, textPaint)
             y += 16f
         }
         if (schedules.isEmpty()) {
@@ -595,25 +606,7 @@ class DataExporter(
                 val isDrop = med.dosageUnit == com.example.dosezy.data.model.DosageUnit.DROP ||
                         med.pillShape == com.example.dosezy.data.model.PillShape.DROPS
 
-                val totalNeeded = customQuantities[med.medicineId] ?: run {
-                    if (isDrop) {
-                        val dropsPerIntake = if (med.dosage > 0) med.dosage.toInt().coerceAtLeast(1) else 1
-                        val totalDrops = (med.timesPerDay.coerceAtLeast(1)) * dropsPerIntake * supplyDays
-                        kotlin.math.ceil(totalDrops / 100.0).toInt().coerceAtLeast(1)
-                    } else {
-                        val dosesPerIntake = when (med.dosageUnit) {
-                            com.example.dosezy.data.model.DosageUnit.TABLET, com.example.dosezy.data.model.DosageUnit.CAPSULE -> {
-                                if (med.dosage > 0) med.dosage.toInt().coerceAtLeast(1) else 1
-                            }
-                            com.example.dosezy.data.model.DosageUnit.ML -> {
-                                if (med.dosage > 0) med.dosage.toInt().coerceAtLeast(1) else 1
-                            }
-                            com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG, com.example.dosezy.data.model.DosageUnit.DROP -> 1
-                        }
-                        val dailyRequirement = (med.timesPerDay.coerceAtLeast(1)) * dosesPerIntake
-                        (dailyRequirement * supplyDays).coerceAtLeast(1)
-                    }
-                }
+                val totalNeeded = customQuantities[med.medicineId] ?: med.calculateRefillQuantity(supplyDays)
 
                 val showDosageInTitle = includeDosage && when (med.dosageUnit) {
                     com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG, com.example.dosezy.data.model.DosageUnit.ML -> true

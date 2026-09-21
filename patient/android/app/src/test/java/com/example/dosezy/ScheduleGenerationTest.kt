@@ -279,4 +279,64 @@ class ScheduleGenerationTest {
         assertTrue(entries.all { it.userId == "usr_1" })
         assertTrue(entries.all { it.medicineId == "med_1" })
     }
+
+    // ───────────────────────────────────────────────────────────────
+    // 11. EVERY_X_HOURS frequency
+    // ───────────────────────────────────────────────────────────────
+
+    @Test
+    fun everyXHours_generatesIntervalsThroughoutDay() {
+        // Start date in future so no "skip past reminders" interference
+        val start = LocalDate.of(2030, 1, 1)
+        val m = med(
+            Frequency(FrequencyPattern.EVERY_X_HOURS, intervalHours = 4),
+            times = listOf(LocalTime.of(8, 0)),
+            start = start
+        )
+        // 1 day (days = 0)
+        val entries = m.generateScheduleEntries(startDateRange = start, days = 0)
+        val times = entries.map { it.scheduledDateTime.toLocalTime() }
+
+        // Starting at 08:00 every 4 hours: 08:00, 12:00, 16:00, 20:00 -> 4 slots
+        assertEquals(4, entries.size)
+        assertEquals(
+            listOf(LocalTime.of(8, 0), LocalTime.of(12, 0), LocalTime.of(16, 0), LocalTime.of(20, 0)),
+            times
+        )
+    }
+
+    @Test
+    fun everyXHours_defaultsTo4HoursWhenIntervalNull() {
+        val start = LocalDate.of(2030, 1, 1)
+        val m = med(
+            Frequency(FrequencyPattern.EVERY_X_HOURS, intervalHours = null),
+            times = listOf(LocalTime.of(6, 0)),
+            start = start
+        )
+        // Interval null -> default 4. Starting at 06:00 -> 06:00, 10:00, 14:00, 18:00, 22:00 -> 5 slots
+        val entries = m.generateScheduleEntries(startDateRange = start, days = 0)
+        val times = entries.map { it.scheduledDateTime.toLocalTime() }
+        assertEquals(5, entries.size)
+        assertEquals(
+            listOf(LocalTime.of(6, 0), LocalTime.of(10, 0), LocalTime.of(14, 0), LocalTime.of(18, 0), LocalTime.of(22, 0)),
+            times
+        )
+    }
+
+    @Test
+    fun everyXHours_sixHourIntervalSpansFourSlots() {
+        val start = LocalDate.of(2030, 1, 1)
+        val m = med(
+            Frequency(FrequencyPattern.EVERY_X_HOURS, intervalHours = 6),
+            times = listOf(LocalTime.of(0, 0)),
+            start = start
+        )
+        // 00:00, 06:00, 12:00, 18:00 -> 4 slots
+        val entries = m.generateScheduleEntries(startDateRange = start, days = 0)
+        assertEquals(4, entries.size)
+        assertEquals(
+            listOf(LocalTime.of(0, 0), LocalTime.of(6, 0), LocalTime.of(12, 0), LocalTime.of(18, 0)),
+            entries.map { it.scheduledDateTime.toLocalTime() }
+        )
+    }
 }

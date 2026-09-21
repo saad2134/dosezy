@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ScheduleDao {
 
-    // Get ALL schedule entries for a user (manual filter)
-    @Query("SELECT * FROM schedule_entries WHERE userId = :userId")
+    // Get ALL schedule entries for a user (ordered chronologically descending)
+    @Query("SELECT * FROM schedule_entries WHERE userId = :userId ORDER BY scheduledDateTime DESC")
     fun getScheduleForUser(userId: String): Flow<List<ScheduleEntry>>
 
     @Query("SELECT * FROM schedule_entries WHERE userId = :userId AND scheduledDateTime BETWEEN :startDate AND :endDate ORDER BY scheduledDateTime ASC")
@@ -48,9 +48,9 @@ interface ScheduleDao {
     @Query("DELETE FROM schedule_entries WHERE userId = :userId")
     suspend fun deleteScheduleByUser(userId: String)
 
-    // Get ALL schedule entries with medicine for a user (manual filter)
+    // Get ALL schedule entries with medicine for a user (ordered chronologically descending)
     @Transaction
-    @Query("SELECT * FROM schedule_entries WHERE userId = :userId")
+    @Query("SELECT * FROM schedule_entries WHERE userId = :userId ORDER BY scheduledDateTime DESC")
     fun getScheduleWithMedicineForUser(userId: String): Flow<List<ScheduleWithMedicine>>
 
     // ADD THIS METHOD: Get schedule entries by medicine ID

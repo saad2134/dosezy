@@ -217,11 +217,28 @@ class AlarmScheduler(private val context: Context) {
     }
 
     @SuppressLint("ScheduleExactAlarm")
-    fun scheduleNaggingReminder(entryId: String, minutes: Int, medicineName: String, naggingCount: Int) {
+    fun scheduleNaggingReminder(
+        entryId: String,
+        minutes: Int,
+        medicineName: String,
+        naggingCount: Int,
+        entryIds: ArrayList<String>? = null,
+        medicineNames: ArrayList<String>? = null,
+        scheduledTime: String? = null
+    ) {
         val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
             putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, entryId)
             putExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME, medicineName)
             putExtra(MedicineAlarmReceiver.EXTRA_NAGGING_COUNT, naggingCount)
+            if (!entryIds.isNullOrEmpty()) {
+                putStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS, entryIds)
+            }
+            if (!medicineNames.isNullOrEmpty()) {
+                putStringArrayListExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAMES, medicineNames)
+            }
+            if (!scheduledTime.isNullOrBlank()) {
+                putExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME, scheduledTime)
+            }
         }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
