@@ -734,4 +734,8 @@ Vuoi continuare?</string>
 
     <string name="prn_logged_success">Dose al bisogno registrata per %1$s</string>
     <string name="btn_jump_to_today">Oggi</string>
+    <string name="dialog_low_storage_title">Spazio di archiviazione in esaurimento</string>
+    <string name="dialog_low_storage_message">Lo spazio di archiviazione del dispositivo è quasi esaurito. Libera spazio immediatamente per evitare perdite di dati o il mancato avvio degli allarmi per i farmaci.</string>
+    <string name="dialog_low_storage_action">Libera spazio</string>
+    <string name="dialog_low_storage_dismiss">Chiudi</string>
 </resources>

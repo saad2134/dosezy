@@ -1,24 +1,72 @@
 <en-IN>
+• Storage Defense: Critical low storage alert prevents data loss and failed reminders
+• 1-Tap Cleanup: Direct shortcut to Android storage settings when space is low
+• 12 Languages: Full native translations for storage protection prompts
+• App Stability: Comprehensive logic and database verification for rock-solid adherence
 </en-IN>
 <en-US>
+• Storage Defense: Critical low storage alert prevents data loss and failed reminders
+• 1-Tap Cleanup: Direct shortcut to Android storage settings when space is low
+• 12 Languages: Full native translations for storage protection prompts
+• App Stability: Comprehensive logic and database verification for rock-solid adherence
 </en-US>
 <ar>
+• حماية مساحة التخزين: تنبيه عند انخفاض مساحة التخزين لمنع فقدان البيانات أو التذكيرات
+• تحرير المساحة بنقرة واحدة: اختصار مباشر لإعدادات التخزين لإخلاء المساحة
+• 12 لغة: ترجمة كاملة لجميع تنبيهات حماية التخزين عبر كافة اللغات
+• استقرار فائق: اختبارات وتأكيدات شاملة لقواعد البيانات وجداول الأدوية
 </ar>
 <de-DE>
+• Speicher-Schutz: Warnung bei kritischem Speicherplatz verhindert Datenverlust und Alarm-Ausfälle
+• 1-Klick-Bereinigung: Direkte Verknüpfung zu den Speicher-Einstellungen
+• 12 Sprachen: Vollständige Übersetzungen für alle Speicher-Warnungen
+• Höchste Stabilität: Umfassende Tests für Datenbank- und Zeitplan-Zuverlässigkeit
 </de-DE>
 <es-419>
+• Protección de almacenamiento: Alerta de espacio crítico para evitar pérdida de datos o alarmas
+• Limpieza en 1 toque: Acceso directo a los ajustes de almacenamiento de Android
+• 12 idiomas: Traducciones completas de todas las alertas de almacenamiento
+• Máxima estabilidad: Verificación integral de base de datos y flujos de medicación
 </es-419>
 <fr-FR>
+• Protection du stockage: Alerte d'espace critique pour éviter la perte de données ou des rappels
+• Nettoyage en 1 clic: Accès direct aux paramètres de stockage d'Android
+• 12 langues: Traductions natives complètes pour les alertes de stockage
+• Stabilité renforcée: Vérification approfondie de la base de données et des plannings
 </fr-FR>
 <hi-IN>
+• स्टोरेज सुरक्षा: डेटा हानि या अलार्म विफलता से बचाने के लिए क्रिटिकल स्टोरेज चेतावनी
+• 1-टैप सफाई: स्पेस खाली करने के लिए सीधे Android स्टोरेज सेटिंग्स का शॉर्टकट
+• 12 भाषाएं: स्टोरेज सुरक्षा चेतावनियों के लिए पूर्ण देशी अनुवाद
+• उच्च स्थिरता: डेटाबेस और खुराक समय-सारणी का संपूर्ण सत्यापन
 </hi-IN>
 <it-IT>
+• Protezione archiviazione: Avviso di spazio critico per prevenire perdite di dati o allarmi
+• Pulizia in 1 tocco: Accesso rapido alle impostazioni di archiviazione Android
+• 12 lingue: Traduzioni native complete per tutti gli avvisi di archiviazione
+• Massima stabilità: Test e verifiche approfondite per database e orari dei farmaci
 </it-IT>
 <ja-JP>
+• ストレージ保護: 空き容量不足の警告によりデータ損失やアラーム停止を防止
+• ワンタップ整理: 空き容量を確保するためのAndroidストレージ設定ショートカット
+• 12言語対応: ストレージ保護アラートの完全な多言語翻訳を提供
+• 安定性の向上: データベースおよび服薬スケジュールの包括的な検証を実施
 </ja-JP>
 <pt-BR>
+• Proteção de armazenamento: Alerta de espaço crítico evita perda de dados e falhas de alarme
+• Limpeza em 1 toque: Atalho direto para as configurações de armazenamento do Android
+• 12 idiomas: Traduções completas para todos os avisos de armazenamento
+• Maior estabilidade: Verificação detalhada do banco de dados e rotinas de medicação
 </pt-BR>
 <ru-RU>
+• Защита памяти: Предупреждение о нехватке места предотвращает потерю данных и сбои
+• Очистка в 1 клик: Быстрый переход в настройки памяти устройства
+• 12 языков: Полная локализация всех предупреждений о заполнении памяти
+• Надежность и стабильность: Всестороннее тестирование базы данных и расписаний
 </ru-RU>
 <zh-CN>
+• 存储保护: 严重空间不足警告，防止数据丢失和提醒失效
+• 一键清理: 空间不足时提供直达系统存储设置的快捷入口
+• 12种语言: 存储警告弹窗全面支持本地化多语言翻译
+• 稳定性提升: 数据库与服药日程流的全面验证与测试
 </zh-CN>

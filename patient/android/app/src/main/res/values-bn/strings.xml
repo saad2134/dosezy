@@ -733,4 +733,8 @@
 
     <string name="prn_logged_success">%1$s এর জন্য প্রয়োজনমতো ডোজ রেকর্ড করা হয়েছে</string>
     <string name="btn_jump_to_today">আজ</string>
+    <string name="dialog_low_storage_title">কম স্টোরেজ স্পেস</string>
+    <string name="dialog_low_storage_message">আপনার ডিভাইসে স্টোরেজ স্পেস আশঙ্কাজনকভাবে কম। ডেটা ক্ষতি বা ওষুধের অনুস্মারক অ্যালার্ম ব্যর্থতা রোধ করতে অনুগ্রহ করে অবিলম্বে স্থান খালি করুন।</string>
+    <string name="dialog_low_storage_action">স্থান খালি করুন</string>
+    <string name="dialog_low_storage_dismiss">বাতিল করুন</string>
 </resources>

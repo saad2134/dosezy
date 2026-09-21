@@ -750,4 +750,8 @@
 
     <string name="prn_logged_success">Dosis según sea necesario registrada para %1$s</string>
     <string name="btn_jump_to_today">Hoy</string>
+    <string name="dialog_low_storage_title">Espacio de almacenamiento crítico</string>
+    <string name="dialog_low_storage_message">El almacenamiento de su dispositivo es críticamente bajo. Libere espacio de inmediato para evitar pérdida de datos o fallos en las alarmas de medicamentos.</string>
+    <string name="dialog_low_storage_action">Liberar espacio</string>
+    <string name="dialog_low_storage_dismiss">Descartar</string>
 </resources>

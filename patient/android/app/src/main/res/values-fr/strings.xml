@@ -734,4 +734,8 @@ Voulez-vous continuer ?</string>
 
     <string name="prn_logged_success">Dose au besoin enregistrée pour %1$s</string>
     <string name="btn_jump_to_today">Aujourd\'hui</string>
+    <string name="dialog_low_storage_title">Espace de stockage critique</string>
+    <string name="dialog_low_storage_message">L\'espace de stockage de votre appareil est presque saturé. Veuillez libérer de l\'espace immédiatement pour éviter toute perte de données ou échec des rappels de médicaments.</string>
+    <string name="dialog_low_storage_action">Libérer de l\'espace</string>
+    <string name="dialog_low_storage_dismiss">Ignorer</string>
 </resources>

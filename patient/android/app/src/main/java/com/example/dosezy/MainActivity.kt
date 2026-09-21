@@ -168,8 +168,12 @@ fun DosezyApp() {
     val prefs = remember { context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE) }
     var showBatteryPrompt by remember { mutableStateOf(false) }
     var showOverlayPrompt by remember { mutableStateOf(false) }
+    var showLowStorageDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
+        if (com.example.dosezy.utils.StorageUtils.isStorageCriticallyLow(context)) {
+            showLowStorageDialog = true
+        }
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         }
@@ -278,6 +282,12 @@ fun DosezyApp() {
             },
             shape = RoundedCornerShape(20.dp),
             containerColor = MaterialTheme.colorScheme.surface
+        )
+    }
+
+    if (showLowStorageDialog) {
+        com.example.dosezy.ui.components.LowStorageDialog(
+            onDismiss = { showLowStorageDialog = false }
         )
     }
 

@@ -734,4 +734,8 @@
 
     <string name="prn_logged_success">%1$s の頓服薬を記録しました</string>
     <string name="btn_jump_to_today">今日</string>
+    <string name="dialog_low_storage_title">ストレージ容量が不足しています</string>
+    <string name="dialog_low_storage_message">デバイスの空き容量が危機的に少なくなっています。服薬リマインダーのアラーム停止やデータ損失を防ぐため、すぐに空き容量を確保してください。</string>
+    <string name="dialog_low_storage_action">空き容量を増やす</string>
+    <string name="dialog_low_storage_dismiss">閉じる</string>
 </resources>

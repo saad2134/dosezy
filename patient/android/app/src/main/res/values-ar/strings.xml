@@ -734,4 +734,8 @@
 
     <string name="prn_logged_success">تم تسجيل جرعة عند الحاجة لـ %1$s</string>
     <string name="btn_jump_to_today">اليوم</string>
+    <string name="dialog_low_storage_title">مساحة التخزين منخفضة للغاية</string>
+    <string name="dialog_low_storage_message">مساحة التخزين على جهازك منخفضة للغاية. يرجى تحرير مساحة على الفور لمنع فقدان البيانات أو فشل تنبيهات الأدوية.</string>
+    <string name="dialog_low_storage_action">إخلاء مساحة</string>
+    <string name="dialog_low_storage_dismiss">تجاهل</string>
 </resources>

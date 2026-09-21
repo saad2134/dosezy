@@ -734,4 +734,8 @@
 
     <string name="prn_logged_success">Приём по требованию записан для %1$s</string>
     <string name="btn_jump_to_today">Сегодня</string>
+    <string name="dialog_low_storage_title">Недостаточно памяти</string>
+    <string name="dialog_low_storage_message">Память на вашем устройстве почти заполнена. Освободите место прямо сейчас, чтобы избежать потери данных или сбоя напоминаний о приеме лекарств.</string>
+    <string name="dialog_low_storage_action">Освободить место</string>
+    <string name="dialog_low_storage_dismiss">Закрыть</string>
 </resources>

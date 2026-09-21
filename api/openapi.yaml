@@ -418,6 +418,12 @@ components:
       default: ROUND
       example: ROUND
 
+    AlarmSound:
+      type: string
+      enum: [SYSTEM_DEFAULT, GENTLE_CHIME, MEDICAL_MARIMBA, BRISK_PULSE, CALM_BELL, CUSTOM]
+      default: SYSTEM_DEFAULT
+      example: SYSTEM_DEFAULT
+
     User:
       type: object
       required:
@@ -481,6 +487,52 @@ components:
           nullable: true
           description: Diagnosed medical conditions or comorbidities
           example: Hypertension, Type 2 Diabetes
+        naggingRemindersEnabled:
+          type: boolean
+          description: Whether nagging periodic reminder alarms are enabled
+          default: false
+          example: false
+        naggingIntervalMinutes:
+          type: integer
+          description: Interval in minutes between nagging alarms (5, 10, 15)
+          default: 5
+          example: 5
+        naggingMaxRepeats:
+          type: integer
+          description: Maximum number of nagging reminder repeats (1, 2, 3)
+          default: 3
+          example: 3
+        alarmSound:
+          $ref: '#/components/schemas/AlarmSound'
+          default: SYSTEM_DEFAULT
+        customAlarmSoundPath:
+          type: string
+          nullable: true
+          description: File path to custom imported alarm sound
+        customAlarmSoundTitle:
+          type: string
+          nullable: true
+          description: Display title of custom alarm sound
+        alarmDurationSeconds:
+          type: integer
+          description: Alarm auto-silence duration in seconds (0=continuous, 30, 60, 120, 300)
+          default: 0
+          example: 0
+        allowDoseSkipping:
+          type: boolean
+          description: Whether patient is allowed to log a dose as skipped with a clinical reason
+          default: false
+          example: false
+        allowCustomDoseTime:
+          type: boolean
+          description: Whether patient can record a custom backdated or forward timestamp when taking a dose
+          default: false
+          example: false
+        hideAddMedicineNavButton:
+          type: boolean
+          description: Whether the bottom navigation bar hides the center Add button
+          default: false
+          example: false
 
     UserCreateInput:
       type: object
@@ -524,6 +576,28 @@ components:
           type: string
           nullable: true
           example: Asthma
+        naggingRemindersEnabled:
+          type: boolean
+        naggingIntervalMinutes:
+          type: integer
+        naggingMaxRepeats:
+          type: integer
+        alarmSound:
+          $ref: '#/components/schemas/AlarmSound'
+        customAlarmSoundPath:
+          type: string
+          nullable: true
+        customAlarmSoundTitle:
+          type: string
+          nullable: true
+        alarmDurationSeconds:
+          type: integer
+        allowDoseSkipping:
+          type: boolean
+        allowCustomDoseTime:
+          type: boolean
+        hideAddMedicineNavButton:
+          type: boolean
 
     Medicine:
       type: object
@@ -613,6 +687,16 @@ components:
           description: Automatically decrement currentStock when a scheduled dose is taken
           default: true
           example: true
+        customDosages:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+          nullable: true
+          description: Optional variable dosage amounts mapped by scheduled time HH:mm
+          example:
+            "08:00": 20.0
+            "20:00": 40.0
 
     MedicineInput:
       type: object
@@ -683,6 +767,15 @@ components:
         autoDeductOnTake:
           type: boolean
           default: true
+        customDosages:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+          nullable: true
+          example:
+            "08:00": 20.0
+            "20:00": 40.0
 
     ScheduleEntry:
       type: object
@@ -717,6 +810,12 @@ components:
           nullable: true
           description: Reason why dose was marked skipped
           example: Doctor advised to pause
+        dosage:
+          type: number
+          format: double
+          nullable: true
+          description: Resolved dosage strength for this specific scheduled slot
+          example: 20.0
 
     ScheduleEntryInput:
       type: object
@@ -740,6 +839,11 @@ components:
           type: string
           nullable: true
           example: Fasting for lab test
+        dosage:
+          type: number
+          format: double
+          nullable: true
+          example: 20.0
 
     SyncPushRequest:
       type: object

@@ -762,4 +762,8 @@ Do you want to continue?</string>
 
     <string name="prn_logged_success">Logged as-needed dose for %1$s</string>
     <string name="btn_jump_to_today">Today</string>
+    <string name="dialog_low_storage_title">Low Storage Space</string>
+    <string name="dialog_low_storage_message">Your device is critically low on storage space. Please free up space immediately to prevent data loss or failed medication reminder alarms.</string>
+    <string name="dialog_low_storage_action">Free Up Space</string>
+    <string name="dialog_low_storage_dismiss">Dismiss</string>
 </resources>

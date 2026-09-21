@@ -750,4 +750,8 @@
 
     <string name="prn_logged_success">%1$s के लिए आवश्यकतानुसार खुराक दर्ज की गई</string>
     <string name="btn_jump_to_today">आज</string>
+    <string name="dialog_low_storage_title">स्टोरेज स्पेस बहुत कम है</string>
+    <string name="dialog_low_storage_message">आपके डिवाइस में स्टोरेज स्पेस बहुत कम बचा है। डेटा हानि या दवा अनुस्मारक अलार्म विफल होने से रोकने के लिए कृपया तुरंत स्पेस खाली करें।</string>
+    <string name="dialog_low_storage_action">स्पेस खाली करें</string>
+    <string name="dialog_low_storage_dismiss">खारिज करें</string>
 </resources>

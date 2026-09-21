@@ -1,1 +1,4 @@
-• In development
+• Critical storage defense: Proactive warning alert prevents data loss and reminder failures on low storage
+• 1-Tap settings shortcut to quickly free up device space when storage is exhausted
+• 12 native language translations for storage alerts
+• Massive test expansion and logic hardening across ViewModel flows, SQLite queries, and backup security

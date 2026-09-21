@@ -750,4 +750,8 @@
 
     <string name="prn_logged_success">已记录 %1$s 的按需剂量</string>
     <string name="btn_jump_to_today">今天</string>
+    <string name="dialog_low_storage_title">存储空间不足</string>
+    <string name="dialog_low_storage_message">您的设备存储空间严重不足。请立即清理空间，以防止数据丢失或服药提醒闹钟失效。</string>
+    <string name="dialog_low_storage_action">清理空间</string>
+    <string name="dialog_low_storage_dismiss">忽略</string>
 </resources>
