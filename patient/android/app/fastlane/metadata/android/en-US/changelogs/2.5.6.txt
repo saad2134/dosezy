@@ -1,4 +1,4 @@
 • Fix Android 14+ background alarm and notification crash (#85)
-• Hardened alarm fallback error handling and exception isolation
-• Removed middle '+' button shadow in light theme
-• Curved subscreen topbars to match main pages
+• Dose undo confirmation dialog and preferences toggle
+• Per-dose notes logging on medication intake
+• Subscreen topbar styling parity and light theme polish

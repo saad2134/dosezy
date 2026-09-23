@@ -219,7 +219,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         entryId: String,
         status: String = "TAKEN_ON_TIME",
         takenAt: LocalDateTime = LocalDateTime.now(),
-        context: Context? = null
+        context: Context? = null,
+        notes: String? = null
     ) {
         // Inspect previous status to prevent double stock deduction
         val previousEntry = database.scheduleDao().getScheduleEntryById(entryId)
@@ -227,7 +228,11 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
         // 1. Update schedule entry status in database with UTC epoch millis
         val takenAtMillis = takenAt.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
-        database.scheduleDao().updateMedicationStatus(entryId, status, takenAtMillis)
+        if (notes != null) {
+            database.scheduleDao().updateMedicationStatusWithNotes(entryId, status, takenAtMillis, notes)
+        } else {
+            database.scheduleDao().updateMedicationStatus(entryId, status, takenAtMillis)
+        }
 
         // 2. Stop any active alarm sound / popup
         com.example.dosezy.notifications.AlarmActivity.stopActiveAlarm()
@@ -290,10 +295,11 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         entryId: String,
         status: String,
         takenAtStr: String,
-        context: Context? = null
+        context: Context? = null,
+        notes: String? = null
     ) {
         val takenAt = try { LocalDateTime.parse(takenAtStr) } catch (_: Exception) { LocalDateTime.now() }
-        recordDoseTaken(entryId, status, takenAt, context)
+        recordDoseTaken(entryId, status, takenAt, context, notes)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -326,8 +332,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         val previousEntry = database.scheduleDao().getScheduleEntryById(entryId)
         val wasTaken = previousEntry?.status == MedicationStatus.TAKEN_ON_TIME || previousEntry?.status == MedicationStatus.TAKEN_LATE
 
-        // 1. Revert status to PENDING and clear takenAt and skipReason
-        database.scheduleDao().updateMedicationStatusWithReason(entryId, "PENDING", null, null)
+        // 1. Revert status to PENDING and clear takenAt, skipReason, and doseNotes
+        database.scheduleDao().resetScheduleEntryToPending(entryId)
 
         // 2. Revert stock auto-decrement only if previously taken
         if (wasTaken && previousEntry != null) {
@@ -351,6 +357,10 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
             } catch (_: Exception) {}
         }
+    }
+
+    suspend fun updateDoseNotes(entryId: String, notes: String?) {
+        database.scheduleDao().updateDoseNotes(entryId, notes)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

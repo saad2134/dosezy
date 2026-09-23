@@ -767,4 +767,17 @@ Do you want to continue?</string>
     <string name="dialog_low_storage_message">Your device is critically low on storage space. Please free up space immediately to prevent data loss or failed medication reminder alarms.</string>
     <string name="dialog_low_storage_action">Free Up Space</string>
     <string name="dialog_low_storage_dismiss">Dismiss</string>
+    <string name="pref_allow_undo_title">Allow Dose Undo</string>
+    <string name="pref_allow_undo_desc">Allow reverting recorded doses back to pending. Requires confirmation before undoing.</string>
+    <string name="pref_prompt_dose_notes_title">Add Note on Dose Taken</string>
+    <string name="pref_prompt_dose_notes_desc">Prompt to record a note, meal context, or symptom whenever a dose is marked as taken.</string>
+    <string name="dialog_undo_dose_title">Undo Dose?</string>
+    <string name="dialog_undo_dose_msg">Are you sure you want to revert %1$s back to pending? Any deducted inventory stock will be restored.</string>
+    <string name="dialog_dose_note_title">Dose Note</string>
+    <string name="dialog_dose_note_subtitle">Add an optional note for %1$s</string>
+    <string name="dialog_dose_note_hint">e.g. Taken with food, felt dizzy, mild nausea...</string>
+    <string name="btn_skip_note">Skip Note</string>
+    <string name="home_dose_note_label">Note: %1$s</string>
+    <string name="btn_edit_note">Edit Note</string>
+    <string name="dialog_edit_note_title">Edit Dose Note</string>
 </resources>

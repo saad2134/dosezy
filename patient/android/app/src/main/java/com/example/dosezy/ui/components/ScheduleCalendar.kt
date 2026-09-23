@@ -393,6 +393,14 @@ fun ScheduleListItem(
                     maxLines = 1
                 )
             }
+            if (!entry.doseNotes.isNullOrBlank()) {
+                Text(
+                    text = "💬 ${entry.doseNotes}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1
+                )
+            }
             Text(
                 text = medicine?.getDosageDisplay(entry.scheduledDateTime.toLocalTime()) ?: "Unknown dosage",
                 style = MaterialTheme.typography.bodyMedium,

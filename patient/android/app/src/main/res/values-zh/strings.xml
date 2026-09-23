@@ -755,4 +755,17 @@
     <string name="dialog_low_storage_message">您的设备存储空间严重不足。请立即清理空间，以防止数据丢失或服药提醒闹钟失效。</string>
     <string name="dialog_low_storage_action">清理空间</string>
     <string name="dialog_low_storage_dismiss">忽略</string>
+    <string name="pref_allow_undo_title">允许撤销服药记录</string>
+    <string name="pref_allow_undo_desc">允许将已记录的服药状态恢复为待服。撤销前需确认。</string>
+    <string name="pref_prompt_dose_notes_title">服药时添加备注</string>
+    <string name="pref_prompt_dose_notes_desc">每次标记已服药时，提示记录备注、饮食情况或身体症状。</string>
+    <string name="dialog_undo_dose_title">撤销此服药？</string>
+    <string name="dialog_undo_dose_msg">确定要将 %1$s 恢复为待服状态吗？已扣减的库存将被恢复。</string>
+    <string name="dialog_dose_note_title">服药备注</string>
+    <string name="dialog_dose_note_subtitle">为 %1$s 添加可选备注</string>
+    <string name="dialog_dose_note_hint">例如：饭后服用、有些头晕、轻微恶心...</string>
+    <string name="btn_skip_note">跳过备注</string>
+    <string name="home_dose_note_label">备注：%1$s</string>
+    <string name="btn_edit_note">修改备注</string>
+    <string name="dialog_edit_note_title">编辑服药备注</string>
 </resources>

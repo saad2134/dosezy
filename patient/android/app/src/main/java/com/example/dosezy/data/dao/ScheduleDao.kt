@@ -42,8 +42,17 @@ interface ScheduleDao {
     @Query("UPDATE schedule_entries SET status = :status, takenAt = :takenAt WHERE entryId = :entryId")
     suspend fun updateMedicationStatus(entryId: String, status: String, takenAt: Long?)
 
+    @Query("UPDATE schedule_entries SET status = :status, takenAt = :takenAt, doseNotes = :notes WHERE entryId = :entryId")
+    suspend fun updateMedicationStatusWithNotes(entryId: String, status: String, takenAt: Long?, notes: String?)
+
+    @Query("UPDATE schedule_entries SET doseNotes = :notes WHERE entryId = :entryId")
+    suspend fun updateDoseNotes(entryId: String, notes: String?)
+
     @Query("UPDATE schedule_entries SET status = :status, takenAt = :takenAt, skipReason = :skipReason WHERE entryId = :entryId")
     suspend fun updateMedicationStatusWithReason(entryId: String, status: String, takenAt: Long?, skipReason: String?)
+
+    @Query("UPDATE schedule_entries SET status = 'PENDING', takenAt = NULL, skipReason = NULL, doseNotes = NULL WHERE entryId = :entryId")
+    suspend fun resetScheduleEntryToPending(entryId: String)
 
     @Query("DELETE FROM schedule_entries WHERE userId = :userId")
     suspend fun deleteScheduleByUser(userId: String)

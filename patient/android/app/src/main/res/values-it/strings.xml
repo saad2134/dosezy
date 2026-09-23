@@ -739,4 +739,17 @@ Vuoi continuare?</string>
     <string name="dialog_low_storage_message">Lo spazio di archiviazione del dispositivo è quasi esaurito. Libera spazio immediatamente per evitare perdite di dati o il mancato avvio degli allarmi per i farmaci.</string>
     <string name="dialog_low_storage_action">Libera spazio</string>
     <string name="dialog_low_storage_dismiss">Chiudi</string>
+    <string name="pref_allow_undo_title">Consenti annullamento dose</string>
+    <string name="pref_allow_undo_desc">Consente di ripristinare le dosi registrate come in sospeso. Richiede conferma.</string>
+    <string name="pref_prompt_dose_notes_title">Aggiungi nota all\'assunzione</string>
+    <string name="pref_prompt_dose_notes_desc">Chiedi di inserire una nota, pasto o sintomo ogni volta che una dose viene registrata.</string>
+    <string name="dialog_undo_dose_title">Annullare la dose?</string>
+    <string name="dialog_undo_dose_msg">Sei sicuro di voler riportare %1$s in sospeso? Le scorte detratte verranno ripristinate.</string>
+    <string name="dialog_dose_note_title">Nota della dose</string>
+    <string name="dialog_dose_note_subtitle">Aggiungi una nota facoltativa per %1$s</string>
+    <string name="dialog_dose_note_hint">es. Assunto con cibo, lievi vertigini...</string>
+    <string name="btn_skip_note">Salta nota</string>
+    <string name="home_dose_note_label">Nota: %1$s</string>
+    <string name="btn_edit_note">Modifica nota</string>
+    <string name="dialog_edit_note_title">Modifica nota della dose</string>
 </resources>

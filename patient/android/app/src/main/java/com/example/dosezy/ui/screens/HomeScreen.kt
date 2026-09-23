@@ -24,6 +24,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import com.example.dosezy.ui.components.SkipReasonDialog
 import com.example.dosezy.ui.components.RecordDoseTimeDialog
+import com.example.dosezy.ui.components.UndoConfirmationDialog
+import com.example.dosezy.ui.components.DoseNoteDialog
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.clickable
@@ -104,6 +106,9 @@ fun HomeScreen(
     var medToLogConfirm by remember { mutableStateOf<Medicine?>(null) }
     var skippingEntryId by remember { mutableStateOf<String?>(null) }
     var manualRecordEntry by remember { mutableStateOf<ScheduleWithMedicine?>(null) }
+    var undoConfirmTarget by remember { mutableStateOf<ScheduleWithMedicine?>(null) }
+    var notePromptEntry by remember { mutableStateOf<ScheduleWithMedicine?>(null) }
+    var noteEditEntry by remember { mutableStateOf<ScheduleWithMedicine?>(null) }
     val snackbarHostState = remember { androidx.compose.material3.SnackbarHostState() }
     val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -164,7 +169,7 @@ fun HomeScreen(
         }
     }
 
-    val executeTakeDose: (String, java.time.LocalDateTime) -> Unit = { entryId, resolvedDateTime ->
+    val executeTakeDose: (String, java.time.LocalDateTime, String?) -> Unit = { entryId, resolvedDateTime, note ->
         val medName = todayEntries.find { it.scheduleEntry.entryId == entryId }?.medicine?.medicationName ?: ""
         val lateAfter = currentUser?.considerLateAfter ?: 3
         val missedAfter = currentUser?.considerMissedAfter ?: 6
@@ -175,9 +180,9 @@ fun HomeScreen(
 
         val takenAt = resolvedDateTime.toString()
         if (isLate) {
-            scheduleViewModel.markAsLate(entryId, takenAt)
+            scheduleViewModel.markAsLate(entryId, takenAt, note)
         } else {
-            scheduleViewModel.markAsTaken(entryId, takenAt)
+            scheduleViewModel.markAsTaken(entryId, takenAt, note)
         }
 
         coroutineScope.launch {
@@ -186,13 +191,14 @@ fun HomeScreen(
             } else {
                 context.getString(R.string.home_action_taken)
             }
+            val allowUndo = currentUser?.allowDoseUndo == true
             val result = snackbarHostState.showSnackbar(
                 message = message,
-                actionLabel = context.getString(R.string.btn_undo),
+                actionLabel = if (allowUndo) context.getString(R.string.btn_undo) else null,
                 duration = androidx.compose.material3.SnackbarDuration.Short
             )
-            if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
-                scheduleViewModel.undoDoseTaken(entryId)
+            if (result == androidx.compose.material3.SnackbarResult.ActionPerformed && allowUndo) {
+                undoConfirmTarget = todayEntries.find { it.scheduleEntry.entryId == entryId }
             }
         }
     }
@@ -239,42 +245,51 @@ fun HomeScreen(
                                 currentDateTime = currentTime,
                                 currentUser = currentUser,
                                 onMarkAsTaken = { entryId ->
+                                    val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
                                     if (currentUser?.allowCustomDoseTime == true) {
-                                        val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
                                         if (target != null) {
                                             manualRecordEntry = target
                                         } else {
-                                            executeTakeDose(entryId, java.time.LocalDateTime.now())
+                                            executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
+                                        }
+                                    } else if (currentUser?.promptDoseNotes == true) {
+                                        if (target != null) {
+                                            notePromptEntry = target
+                                        } else {
+                                            executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
                                         }
                                     } else {
-                                        executeTakeDose(entryId, java.time.LocalDateTime.now())
+                                        executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
                                     }
                                 },
                                 onMarkAsLate = { entryId ->
+                                    val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
                                     if (currentUser?.allowCustomDoseTime == true) {
-                                        val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
                                         if (target != null) {
                                             manualRecordEntry = target
                                         } else {
-                                            executeTakeDose(entryId, java.time.LocalDateTime.now())
+                                            executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
+                                        }
+                                    } else if (currentUser?.promptDoseNotes == true) {
+                                        if (target != null) {
+                                            notePromptEntry = target
+                                        } else {
+                                            executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
                                         }
                                     } else {
-                                        executeTakeDose(entryId, java.time.LocalDateTime.now())
+                                        executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
                                     }
                                 },
                                 onUndo = { entryId ->
-                                    val medName = todayEntries.find { it.scheduleEntry.entryId == entryId }?.medicine?.medicationName ?: ""
-                                    scheduleViewModel.undoDoseTaken(entryId)
-                                    coroutineScope.launch {
-                                        val message = if (medName.isNotBlank()) {
-                                            context.getString(R.string.home_dose_reverted, medName)
-                                        } else {
-                                            context.getString(R.string.home_action_taken)
-                                        }
-                                        snackbarHostState.showSnackbar(
-                                            message = message,
-                                            duration = androidx.compose.material3.SnackbarDuration.Short
-                                        )
+                                    val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
+                                    if (currentUser?.allowDoseUndo == true && target != null) {
+                                        undoConfirmTarget = target
+                                    }
+                                },
+                                onEditNote = { entryId ->
+                                    val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
+                                    if (target != null) {
+                                        noteEditEntry = target
                                     }
                                 },
                                 onSkip = { entryId ->
@@ -493,6 +508,7 @@ fun HomeScreen(
                 val medName = todayEntries.find { it.scheduleEntry.entryId == targetId }?.medicine?.medicationName ?: ""
                 scheduleViewModel.markAsSkipped(targetId, reason)
                 skippingEntryId = null
+                val allowUndo = currentUser?.allowDoseUndo == true
                 coroutineScope.launch {
                     val message = if (medName.isNotBlank()) {
                         context.getString(R.string.home_dose_skipped, medName)
@@ -501,11 +517,11 @@ fun HomeScreen(
                     }
                     val result = snackbarHostState.showSnackbar(
                         message = message,
-                        actionLabel = context.getString(R.string.btn_undo),
+                        actionLabel = if (allowUndo) context.getString(R.string.btn_undo) else null,
                         duration = androidx.compose.material3.SnackbarDuration.Short
                     )
-                    if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
-                        scheduleViewModel.undoDoseTaken(targetId)
+                    if (result == androidx.compose.material3.SnackbarResult.ActionPerformed && allowUndo) {
+                        undoConfirmTarget = todayEntries.find { it.scheduleEntry.entryId == targetId }
                     }
                 }
             },
@@ -521,11 +537,78 @@ fun HomeScreen(
             entry = target.scheduleEntry,
             medicineName = target.medicine?.medicationName ?: "",
             timeFormat = currentUser?.timeFormat ?: TimeFormat.HOUR_12,
+            promptDoseNotes = currentUser?.promptDoseNotes == true,
             onDismiss = { manualRecordEntry = null },
-            onConfirm = { resolvedDateTime ->
+            onConfirm = { resolvedDateTime, note ->
                 val targetId = target.scheduleEntry.entryId
                 manualRecordEntry = null
-                executeTakeDose(targetId, resolvedDateTime)
+                executeTakeDose(targetId, resolvedDateTime, note)
+            }
+        )
+    }
+
+    if (undoConfirmTarget != null) {
+        val target = undoConfirmTarget!!
+        val medName = target.medicine?.medicationName ?: ""
+        val entryId = target.scheduleEntry.entryId
+        UndoConfirmationDialog(
+            medicationName = medName,
+            onConfirm = {
+                undoConfirmTarget = null
+                scheduleViewModel.undoDoseTaken(entryId)
+                coroutineScope.launch {
+                    val message = if (medName.isNotBlank()) {
+                        context.getString(R.string.home_dose_reverted, medName)
+                    } else {
+                        context.getString(R.string.home_action_taken)
+                    }
+                    snackbarHostState.showSnackbar(
+                        message = message,
+                        duration = androidx.compose.material3.SnackbarDuration.Short
+                    )
+                }
+            },
+            onDismiss = {
+                undoConfirmTarget = null
+            }
+        )
+    }
+
+    if (notePromptEntry != null) {
+        val target = notePromptEntry!!
+        val medName = target.medicine?.medicationName ?: ""
+        val entryId = target.scheduleEntry.entryId
+        DoseNoteDialog(
+            medicationName = medName,
+            isEditing = false,
+            onConfirm = { note ->
+                notePromptEntry = null
+                executeTakeDose(entryId, java.time.LocalDateTime.now(), note.takeIf { it.isNotBlank() })
+            },
+            onSkip = {
+                notePromptEntry = null
+                executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
+            },
+            onDismiss = {
+                notePromptEntry = null
+            }
+        )
+    }
+
+    if (noteEditEntry != null) {
+        val target = noteEditEntry!!
+        val medName = target.medicine?.medicationName ?: ""
+        val entryId = target.scheduleEntry.entryId
+        DoseNoteDialog(
+            medicationName = medName,
+            initialNote = target.scheduleEntry.doseNotes ?: "",
+            isEditing = true,
+            onConfirm = { newNote ->
+                noteEditEntry = null
+                scheduleViewModel.updateDoseNotes(entryId, newNote.takeIf { it.isNotBlank() })
+            },
+            onDismiss = {
+                noteEditEntry = null
             }
         )
     }
@@ -540,7 +623,8 @@ private fun TimeSection(
     onMarkAsTaken: (String) -> Unit,
     onMarkAsLate: (String) -> Unit,
     onUndo: (String) -> Unit = {},
-    onSkip: (String) -> Unit = {}
+    onSkip: (String) -> Unit = {},
+    onEditNote: (String) -> Unit = {}
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -611,7 +695,8 @@ private fun TimeSection(
                 onMarkAsTaken = onMarkAsTaken,
                 onMarkAsLate = onMarkAsLate,
                 onUndo = onUndo,
-                onSkip = onSkip
+                onSkip = onSkip,
+                onEditNote = onEditNote
             )
             Spacer(modifier = Modifier.height(8.dp))
         }
@@ -626,7 +711,8 @@ private fun MedicationCard(
     onMarkAsTaken: (String) -> Unit,
     onMarkAsLate: (String) -> Unit,
     onUndo: (String) -> Unit = {},
-    onSkip: (String) -> Unit = {}
+    onSkip: (String) -> Unit = {},
+    onEditNote: (String) -> Unit = {}
 ) {
     val entry = scheduleWithMedicine.scheduleEntry
     val medicine = scheduleWithMedicine.medicine
@@ -679,7 +765,11 @@ private fun MedicationCard(
         else -> MaterialTheme.colorScheme.onPrimary
     }
 
-    val enabled = if (isMissed) (currentUser?.allowCustomDoseTime == true) else true
+    val enabled = when {
+        isTaken || isSkipped -> currentUser?.allowDoseUndo == true
+        isMissed -> currentUser?.allowCustomDoseTime == true
+        else -> true
+    }
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -744,6 +834,38 @@ private fun MedicationCard(
                     )
                 }
 
+                // 3c. Dose note if taken
+                if (isTaken) {
+                    if (!entry.doseNotes.isNullOrBlank()) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .clickable { onEditNote(entry.entryId) }
+                                .padding(vertical = 2.dp)
+                        ) {
+                            Text(
+                                text = "💬 " + androidx.compose.ui.res.stringResource(R.string.home_dose_note_label, entry.doseNotes),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                maxLines = 2
+                            )
+                        }
+                    } else {
+                        androidx.compose.material3.TextButton(
+                            onClick = { onEditNote(entry.entryId) },
+                            modifier = Modifier.height(24.dp),
+                            contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp)
+                        ) {
+                            Text(
+                                text = "💬 " + androidx.compose.ui.res.stringResource(R.string.btn_edit_note),
+                                style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                        }
+                    }
+                }
+
                 // 4. Refill warning / stock badge
                 medicine?.currentStock?.let { stock ->
                     val isLow = medicine.refillThreshold != null && stock <= medicine.refillThreshold
@@ -788,14 +910,20 @@ private fun MedicationCard(
                 Button(
                     onClick = {
                         when {
-                            isTaken || isSkipped -> onUndo(entry.entryId)
+                            isTaken || isSkipped -> {
+                                if (currentUser?.allowDoseUndo == true) {
+                                    onUndo(entry.entryId)
+                                }
+                            }
                             isLate -> onMarkAsLate(entry.entryId)
                             else -> onMarkAsTaken(entry.entryId)
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = buttonColor,
-                        contentColor = textColor
+                        contentColor = textColor,
+                        disabledContainerColor = buttonColor.copy(alpha = 0.5f),
+                        disabledContentColor = textColor.copy(alpha = 0.5f)
                     ),
                     enabled = enabled,
                     modifier = Modifier

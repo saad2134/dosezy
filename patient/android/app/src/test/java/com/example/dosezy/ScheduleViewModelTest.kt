@@ -141,10 +141,30 @@ class ScheduleViewModelTest {
                 entryId = "entry_1",
                 status = "TAKEN_ON_TIME",
                 takenAtStr = takenAt,
-                context = context
+                context = context,
+                notes = null
             )
         }
         coVerify(atLeast = 1) { scheduleRepository.getScheduleWithMedicineForDate("user_123", any()) }
+    }
+
+    @Test
+    fun markAsTaken_withNotes_passesNotesToRepository() = runTest {
+        val viewModel = createViewModel()
+        val takenAt = "2026-09-21T08:05:00"
+        val note = "With breakfast"
+
+        viewModel.markAsTaken("entry_1", takenAt, note)
+
+        coVerify {
+            scheduleRepository.recordDoseTaken(
+                entryId = "entry_1",
+                status = "TAKEN_ON_TIME",
+                takenAtStr = takenAt,
+                context = context,
+                notes = note
+            )
+        }
     }
 
     @Test
@@ -159,9 +179,22 @@ class ScheduleViewModelTest {
                 entryId = "entry_1",
                 status = "TAKEN_LATE",
                 takenAtStr = takenAt,
-                context = context
+                context = context,
+                notes = null
             )
         }
+    }
+
+    @Test
+    fun updateDoseNotes_callsRepositoryAndRefreshesSchedule() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.updateDoseNotes("entry_1", "Mild headache")
+
+        coVerify {
+            scheduleRepository.updateDoseNotes("entry_1", "Mild headache")
+        }
+        coVerify(atLeast = 1) { scheduleRepository.getScheduleWithMedicineForDate("user_123", any()) }
     }
 
     @Test

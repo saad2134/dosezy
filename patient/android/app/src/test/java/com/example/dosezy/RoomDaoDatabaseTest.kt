@@ -385,4 +385,61 @@ class RoomDaoDatabaseTest {
         // All schedule entries belonging to the user must be cascade deleted
         assertEquals(0, scheduleDao.getAllScheduleEntries("u_del").size)
     }
+
+    // ───────────────────────────────────────────────────────────────
+    // 6. User Preferences: Undo & Dose Notes Logging
+    // ───────────────────────────────────────────────────────────────
+
+    @Test
+    fun userPreferences_allowDoseUndoAndPromptDoseNotes_defaultsAndUpdates() = runBlocking {
+        val user = sampleUser("u_prefs")
+        userDao.insertUser(user)
+
+        val retrieved = userDao.getUserByIdDirect("u_prefs")
+        assertNotNull(retrieved)
+        // Defaults must both be false
+        assertEquals(false, retrieved?.allowDoseUndo)
+        assertEquals(false, retrieved?.promptDoseNotes)
+
+        // Update preferences
+        val updated = retrieved!!.copy(allowDoseUndo = true, promptDoseNotes = true)
+        userDao.updateUser(updated)
+
+        val updatedRetrieved = userDao.getUserByIdDirect("u_prefs")
+        assertEquals(true, updatedRetrieved?.allowDoseUndo)
+        assertEquals(true, updatedRetrieved?.promptDoseNotes)
+    }
+
+    @Test
+    fun scheduleEntry_withDoseNotes_insertRetrieveUpdateAndReset() = runBlocking {
+        userDao.insertUser(sampleUser("u_notes"))
+        medicineDao.insertMedicine(sampleMedicine("m_notes", "u_notes"))
+
+        val entry = sampleScheduleEntry(
+            entryId = "s_notes_1",
+            userId = "u_notes",
+            medicineId = "m_notes",
+            dateTime = LocalDateTime.of(2026, 9, 21, 9, 0)
+        ).copy(doseNotes = "Taken with breakfast")
+
+        scheduleDao.insertScheduleEntry(entry)
+
+        val retrieved = scheduleDao.getScheduleEntryById("s_notes_1")
+        assertNotNull(retrieved)
+        assertEquals("Taken with breakfast", retrieved?.doseNotes)
+
+        // Update dose note
+        scheduleDao.updateDoseNotes("s_notes_1", "Mild dizziness after taking")
+        val updatedNote = scheduleDao.getScheduleEntryById("s_notes_1")
+        assertEquals("Mild dizziness after taking", updatedNote?.doseNotes)
+
+        // Reset to pending (Undo)
+        scheduleDao.resetScheduleEntryToPending("s_notes_1")
+        val resetEntry = scheduleDao.getScheduleEntryById("s_notes_1")
+        assertNotNull(resetEntry)
+        assertEquals(MedicationStatus.PENDING, resetEntry?.status)
+        assertNull(resetEntry?.takenAt)
+        assertNull(resetEntry?.skipReason)
+        assertNull(resetEntry?.doseNotes)
+    }
 }

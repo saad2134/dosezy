@@ -738,4 +738,17 @@ Deseja continuar?</string>
     <string name="dialog_low_storage_message">O armazenamento do seu dispositivo está criticamente baixo. Libere espaço imediatamente para evitar perda de dados ou falhas nos alarmes de medicamentos.</string>
     <string name="dialog_low_storage_action">Liberar espaço</string>
     <string name="dialog_low_storage_dismiss">Dispensar</string>
+    <string name="pref_allow_undo_title">Permitir desfazer dose</string>
+    <string name="pref_allow_undo_desc">Permite reverter doses registradas para pendentes. Requer confirmação.</string>
+    <string name="pref_prompt_dose_notes_title">Adicionar nota ao tomar dose</string>
+    <string name="pref_prompt_dose_notes_desc">Solicitar uma nota, refeição ou sintoma sempre que uma dose for marcada como tomada.</string>
+    <string name="dialog_undo_dose_title">Desfazer dose?</string>
+    <string name="dialog_undo_dose_msg">Tem certeza de que deseja reverter %1$s para pendente? O estoque deduzido será restaurado.</string>
+    <string name="dialog_dose_note_title">Nota da dose</string>
+    <string name="dialog_dose_note_subtitle">Adicionar nota opcional para %1$s</string>
+    <string name="dialog_dose_note_hint">ex.: Tomado com comida, tontura leve...</string>
+    <string name="btn_skip_note">Pular nota</string>
+    <string name="home_dose_note_label">Nota: %1$s</string>
+    <string name="btn_edit_note">Editar nota</string>
+    <string name="dialog_edit_note_title">Editar nota da dose</string>
 </resources>

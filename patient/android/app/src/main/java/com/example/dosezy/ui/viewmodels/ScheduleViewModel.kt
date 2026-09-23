@@ -153,9 +153,9 @@ class ScheduleViewModel @Inject constructor(
         }
     }
 
-    fun markAsTaken(entryId: String, takenAt: String) {
+    fun markAsTaken(entryId: String, takenAt: String, notes: String? = null) {
         viewModelScope.launch {
-            scheduleRepository.recordDoseTaken(entryId, "TAKEN_ON_TIME", takenAt, context)
+            scheduleRepository.recordDoseTaken(entryId, "TAKEN_ON_TIME", takenAt, context, notes)
             currentCalendarUserId = null
             // Refresh the schedule after updating status
             _currentUserId.value?.let { userId ->
@@ -164,11 +164,21 @@ class ScheduleViewModel @Inject constructor(
         }
     }
 
-    fun markAsLate(entryId: String, takenAt: String) {
+    fun markAsLate(entryId: String, takenAt: String, notes: String? = null) {
         viewModelScope.launch {
-            scheduleRepository.recordDoseTaken(entryId, "TAKEN_LATE", takenAt, context)
+            scheduleRepository.recordDoseTaken(entryId, "TAKEN_LATE", takenAt, context, notes)
             currentCalendarUserId = null
             // Refresh the schedule after updating status
+            _currentUserId.value?.let { userId ->
+                loadScheduleForDate(userId, _selectedDate.value)
+            }
+        }
+    }
+
+    fun updateDoseNotes(entryId: String, notes: String?) {
+        viewModelScope.launch {
+            scheduleRepository.updateDoseNotes(entryId, notes)
+            currentCalendarUserId = null
             _currentUserId.value?.let { userId ->
                 loadScheduleForDate(userId, _selectedDate.value)
             }

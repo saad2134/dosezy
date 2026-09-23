@@ -739,4 +739,17 @@ Möchten Sie fortfahren?</string>
     <string name="dialog_low_storage_message">Der Speicherplatz Ihres Geräts ist kritisch niedrig. Bitte geben Sie sofort Speicherplatz frei, um Datenverlust oder fehlschlagende Medikamenten-Erinnerungen zu vermeiden.</string>
     <string name="dialog_low_storage_action">Speicher freigeben</string>
     <string name="dialog_low_storage_dismiss">Schließen</string>
+    <string name="pref_allow_undo_title">Dosis-Rückgängigmachen erlauben</string>
+    <string name="pref_allow_undo_desc">Erlaubt das Zurücksetzen erfasster Dosen auf ausstehend. Erfordert Bestätigung.</string>
+    <string name="pref_prompt_dose_notes_title">Notiz bei Dosisaufnahme hinzufügen</string>
+    <string name="pref_prompt_dose_notes_desc">Aufforderung zur Eingabe einer Notiz, Mahlzeit oder Symptome bei jeder Dosiserfassung.</string>
+    <string name="dialog_undo_dose_title">Dosis rückgängig machen?</string>
+    <string name="dialog_undo_dose_msg">Möchten Sie %1$s wirklich auf ausstehend zurücksetzen? Abgezogener Lagerbestand wird wiederhergestellt.</string>
+    <string name="dialog_dose_note_title">Dosis-Notiz</string>
+    <string name="dialog_dose_note_subtitle">Optionale Notiz für %1$s hinzufügen</string>
+    <string name="dialog_dose_note_hint">z. B. Mit dem Essen eingenommen, Schwindelgefühl...</string>
+    <string name="btn_skip_note">Ohne Notiz</string>
+    <string name="home_dose_note_label">Notiz: %1$s</string>
+    <string name="btn_edit_note">Notiz bearbeiten</string>
+    <string name="dialog_edit_note_title">Dosis-Notiz bearbeiten</string>
 </resources>

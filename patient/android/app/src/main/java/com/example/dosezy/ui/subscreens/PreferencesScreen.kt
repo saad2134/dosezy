@@ -54,6 +54,8 @@ import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Snooze
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.VolumeUp
 import com.example.dosezy.utils.SoundUtils
 import java.io.File
@@ -521,6 +523,110 @@ fun PreferencesScreen(navController: NavController) {
                             onCheckedChange = { isChecked ->
                                 currentUser?.let { user ->
                                     userViewModel.updateUser(user.copy(allowCustomDoseTime = isChecked))
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+
+            // Allow Dose Undo Switch & Card
+            item {
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            modifier = Modifier.weight(1f).padding(end = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Undo,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Column {
+                                Text(
+                                    text = stringResource(R.string.pref_allow_undo_title),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Text(
+                                    text = stringResource(R.string.pref_allow_undo_desc),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                        Switch(
+                            checked = currentUser?.allowDoseUndo == true,
+                            onCheckedChange = { isChecked ->
+                                currentUser?.let { user ->
+                                    userViewModel.updateUser(user.copy(allowDoseUndo = isChecked))
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+
+            // Prompt Dose Notes Switch & Card
+            item {
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            modifier = Modifier.weight(1f).padding(end = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.EditNote,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Column {
+                                Text(
+                                    text = stringResource(R.string.pref_prompt_dose_notes_title),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Text(
+                                    text = stringResource(R.string.pref_prompt_dose_notes_desc),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                        Switch(
+                            checked = currentUser?.promptDoseNotes == true,
+                            onCheckedChange = { isChecked ->
+                                currentUser?.let { user ->
+                                    userViewModel.updateUser(user.copy(promptDoseNotes = isChecked))
                                 }
                             }
                         )

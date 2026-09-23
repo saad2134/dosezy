@@ -739,4 +739,17 @@
     <string name="dialog_low_storage_message">Память на вашем устройстве почти заполнена. Освободите место прямо сейчас, чтобы избежать потери данных или сбоя напоминаний о приеме лекарств.</string>
     <string name="dialog_low_storage_action">Освободить место</string>
     <string name="dialog_low_storage_dismiss">Закрыть</string>
+    <string name="pref_allow_undo_title">Разрешить отмену приема дозы</string>
+    <string name="pref_allow_undo_desc">Позволяет вернуть принятую дозу в статус ожидания. Требует подтверждения.</string>
+    <string name="pref_prompt_dose_notes_title">Добавлять заметку при приеме дозы</string>
+    <string name="pref_prompt_dose_notes_desc">Предлагать добавить заметку, прием пищи или симптомы при каждой отметке о приеме дозы.</string>
+    <string name="dialog_undo_dose_title">Отменить прием дозы?</string>
+    <string name="dialog_undo_dose_msg">Вы уверены, что хотите вернуть %1$s в статус ожидания? Списанный остаток восстановится.</string>
+    <string name="dialog_dose_note_title">Заметка к дозе</string>
+    <string name="dialog_dose_note_subtitle">Добавить заметку для %1$s (необязательно)</string>
+    <string name="dialog_dose_note_hint">напр., принят во время еды, легкое головокружение...</string>
+    <string name="btn_skip_note">Пропустить заметку</string>
+    <string name="home_dose_note_label">Заметка: %1$s</string>
+    <string name="btn_edit_note">Изменить заметку</string>
+    <string name="dialog_edit_note_title">Редактировать заметку к дозе</string>
 </resources>

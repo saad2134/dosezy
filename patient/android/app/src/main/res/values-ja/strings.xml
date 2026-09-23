@@ -739,4 +739,17 @@
     <string name="dialog_low_storage_message">デバイスの空き容量が危機的に少なくなっています。服薬リマインダーのアラーム停止やデータ損失を防ぐため、すぐに空き容量を確保してください。</string>
     <string name="dialog_low_storage_action">空き容量を増やす</string>
     <string name="dialog_low_storage_dismiss">閉じる</string>
+    <string name="pref_allow_undo_title">服薬の取り消しを許可</string>
+    <string name="pref_allow_undo_desc">記録された服薬を保留中に戻すことを許可します。取り消す前に確認が必要です。</string>
+    <string name="pref_prompt_dose_notes_title">服薬時にメモを追加</string>
+    <string name="pref_prompt_dose_notes_desc">服薬記録のたびに、メモ、食事の状況、または症状の記録を促します。</string>
+    <string name="dialog_undo_dose_title">服薬を取り消しますか？</string>
+    <string name="dialog_undo_dose_msg">%1$s を保留中に戻してもよろしいですか？差し引かれた在庫は復元されます。</string>
+    <string name="dialog_dose_note_title">服薬メモ</string>
+    <string name="dialog_dose_note_subtitle">%1$s の任意のメモを追加</string>
+    <string name="dialog_dose_note_hint">例：食後に服用、軽いめまい...</string>
+    <string name="btn_skip_note">メモをスキップ</string>
+    <string name="home_dose_note_label">メモ: %1$s</string>
+    <string name="btn_edit_note">メモを編集</string>
+    <string name="dialog_edit_note_title">服薬メモの編集</string>
 </resources>

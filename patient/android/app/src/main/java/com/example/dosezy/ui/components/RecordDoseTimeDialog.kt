@@ -25,6 +25,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -61,10 +63,12 @@ fun RecordDoseTimeDialog(
     entry: ScheduleEntry,
     medicineName: String,
     timeFormat: TimeFormat = TimeFormat.HOUR_12,
+    promptDoseNotes: Boolean = false,
     onDismiss: () -> Unit,
-    onConfirm: (LocalDateTime) -> Unit
+    onConfirm: (LocalDateTime, String?) -> Unit
 ) {
     var selectedMode by remember { mutableStateOf(DoseTimeSelectionMode.JUST_NOW) }
+    var doseNote by remember { mutableStateOf("") }
 
     val now = remember { LocalDateTime.now() }
     val scheduledTime = entry.scheduledDateTime
@@ -208,6 +212,25 @@ fun RecordDoseTimeDialog(
                         }
                     }
                 }
+
+                if (promptDoseNotes) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = doseNote,
+                        onValueChange = { if (it.length <= 250) doseNote = it },
+                        placeholder = {
+                            Text(
+                                text = stringResource(R.string.dialog_dose_note_hint),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                            )
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        minLines = 2,
+                        maxLines = 3,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         },
         confirmButton = {
@@ -220,7 +243,7 @@ fun RecordDoseTimeDialog(
                             entry.scheduledDateTime.toLocalDate().atTime(customTime)
                         }
                     }
-                    onConfirm(resolvedDateTime)
+                    onConfirm(resolvedDateTime, doseNote.trim().takeIf { it.isNotBlank() })
                 },
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)

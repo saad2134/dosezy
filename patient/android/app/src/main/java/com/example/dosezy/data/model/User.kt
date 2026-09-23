@@ -42,7 +42,9 @@ data class User(
     val alarmDurationSeconds: Int = 0, // 0 = Continuous, 30 = 30s, 60 = 1m, 120 = 2m, 300 = 5m
     val allowDoseSkipping: Boolean = false,
     val allowCustomDoseTime: Boolean = false,
-    val hideAddMedicineNavButton: Boolean = false
+    val hideAddMedicineNavButton: Boolean = false,
+    val allowDoseUndo: Boolean = false,
+    val promptDoseNotes: Boolean = false
 )
 
 enum class AlarmSound(val rawResId: Int?) {
