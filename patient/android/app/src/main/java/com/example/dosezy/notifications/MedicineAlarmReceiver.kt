@@ -141,13 +141,17 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                     }
                 } catch (ex: Exception) {
                     Log.e(TAG, "Error processing alarm in background", ex)
-                    AlarmAudioPlayer.play(
-                        context = context,
-                        sound = com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT,
-                        customPath = null,
-                        autoSilenceSeconds = 0
-                    )
-                    showNotification(context, entryId, entryIds, medicineName, medicineNames, emptyList(), scheduledTime, false, 0, 3)
+                    try {
+                        AlarmAudioPlayer.play(
+                            context = context,
+                            sound = com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT,
+                            customPath = null,
+                            autoSilenceSeconds = 0
+                        )
+                        showNotification(context, entryId, entryIds, medicineName, medicineNames, emptyList(), scheduledTime, false, 0, 3)
+                    } catch (fallbackEx: Exception) {
+                        Log.e(TAG, "Error in fallback alarm/notification handling", fallbackEx)
+                    }
                 } finally {
                     pendingResult.finish()
                 }
@@ -258,10 +262,10 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             putExtra(EXTRA_SCHEDULED_TIME, scheduledTime ?: "")
         }
 
-        // Android 14+ background activity start options
+        // Android 14+ background activity start options for PendingIntent creation
         val optionsBundle = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             android.app.ActivityOptions.makeBasic().apply {
-                setPendingIntentBackgroundActivityStartMode(
+                setPendingIntentCreatorBackgroundActivityStartMode(
                     android.app.ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED
                 )
             }.toBundle()
@@ -279,11 +283,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
         // Launch AlarmActivity directly if permitted (e.g., overlay granted or app in foreground)
         try {
-            if (optionsBundle != null) {
-                context.startActivity(alarmIntent, optionsBundle)
-            } else {
-                context.startActivity(alarmIntent)
-            }
+            context.startActivity(alarmIntent)
         } catch (e: Exception) {
             Log.e(TAG, "Could not start AlarmActivity directly", e)
         }
@@ -347,11 +347,14 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             .setStyle(NotificationCompat.BigTextStyle().bigText(bigText))
             .build()
 
-        val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(entryId.hashCode(), notification)
-
-        Log.d(TAG, "Showing notification and launching full-screen alarm for: $medicineName")
+        try {
+            val notificationManager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.notify(entryId.hashCode(), notification)
+            Log.d(TAG, "Showing notification and launching full-screen alarm for: $medicineName")
+        } catch (e: Exception) {
+            Log.e(TAG, "Could not post alarm notification", e)
+        }
     }
 
     private fun createNotificationChannel(context: Context) {

@@ -163,10 +163,16 @@ fun CustomNavigationBar(
                     },
                     modifier = Modifier
                         .size(56.dp)
-                        .shadow(
-                            elevation = 8.dp,
-                            shape = RoundedCornerShape(16.dp), // Squircle shape
-                            clip = false
+                        .then(
+                            if (isDark) {
+                                Modifier.shadow(
+                                    elevation = 8.dp,
+                                    shape = RoundedCornerShape(16.dp), // Squircle shape
+                                    clip = false
+                                )
+                            } else {
+                                Modifier
+                            }
                         )
                         .background(
                             color = Color(0xFF2084E4),

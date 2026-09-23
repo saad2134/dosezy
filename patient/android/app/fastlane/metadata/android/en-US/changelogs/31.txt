@@ -1,1 +1,4 @@
-• In development
+• Fix Android 14+ background alarm and notification crash (#85)
+• Hardened alarm fallback error handling and exception isolation
+• Removed middle '+' button shadow in light theme
+• Curved subscreen topbars to match main pages

@@ -148,7 +148,9 @@ fun EmergencyScreen(navController: NavController) {
     val currentUser by userViewModel.currentUser.collectAsState()
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
     ) {
         TopBar(
             navController = navController,

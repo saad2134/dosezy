@@ -91,7 +91,7 @@ The entry point triggered by `AlarmManager`.
 - Runs via `goAsync()` to safely query user preferences and medication schedules on `Dispatchers.IO`.
 - Dispatches `AlarmAudioPlayer.play(...)` with the user's selected ringtone before any UI interaction.
 - Creates and manages the silent notification channel `dosezy_medicine_reminders_v3`.
-- Attaches `ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED` on Android 14+ (`UPSIDE_DOWN_CAKE`).
+- Attaches `ActivityOptions.setPendingIntentCreatorBackgroundActivityStartMode(MODE_BACKGROUND_ACTIVITY_START_ALLOWED)` when building the full-screen PendingIntent on Android 14+ (`UPSIDE_DOWN_CAKE`).
 - Automatically reschedules all patient alarms following device reboots (`BOOT_COMPLETED`, `LOCKED_BOOT_COMPLETED`, `TIMEZONE_CHANGED`, `TIME_SET`).
 
 ### C. [`AlarmActivity.kt`](file:///patient/android/app/src/main/java/com/example/dosezy/notifications/AlarmActivity.kt) (Interactive Full-Screen UI)
@@ -177,7 +177,7 @@ graph TD
 | :--- | :--- | :--- | :--- |
 | **Android 8.0 - 9.0** | API 26 - 28 | Notification Channel Sound Caching | Notification channel bumped to `dosezy_medicine_reminders_v3`. Older channels `_v2` and original are explicitly deleted via `deleteNotificationChannel()` on cold start. |
 | **Android 10 - 13** | API 29 - 33 | Background Activity Launch (BAL) Restrictions | `SYSTEM_ALERT_WINDOW` ("Display over other apps") prompt in `MainActivity.kt`. If permission is withheld, `AlarmAudioPlayer` plays sound from receiver and banner tap opens `AlarmActivity`. |
-| **Android 14 - 15+** | API 34 - 35+ | PendingIntent Background Launch Restrictions | Requires `ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED`. Bundled into both direct `startActivity` and `PendingIntent.fullScreenIntent`. |
+| **Android 14 - 15+** | API 34 - 35+ | PendingIntent Background Launch Restrictions | Requires `ActivityOptions.setPendingIntentCreatorBackgroundActivityStartMode(MODE_BACKGROUND_ACTIVITY_START_ALLOWED)` on `PendingIntent.fullScreenIntent` creation. |
 | **All Versions** | Any | Doze Mode / Deep Sleep | Alarms scheduled via `AlarmManager.setExactAndAllowWhileIdle()`. Receiver and Player hold CPU `PARTIAL_WAKE_LOCK`. |
 | **All Versions** | Any | Device Reboots & Time Travel | Manifest receivers listen for `BOOT_COMPLETED`, `LOCKED_BOOT_COMPLETED`, `QUICKBOOT_POWERON`, `REBOOT`, `TIME_SET`, and `TIMEZONE_CHANGED`. All alarms are recalculated and rescheduled automatically. |
 

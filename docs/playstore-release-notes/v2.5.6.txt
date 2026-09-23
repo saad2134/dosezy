@@ -1,24 +1,48 @@
 <en-IN>
+• Android 14+ Alarm Fix: Resolved background PendingIntent exception preventing alarms and notifications from sounding on Android 14, 15, and 16
+• Background Resilience: Hardened error isolation and fallback alarm dispatch to guarantee medication reminders trigger reliably
 </en-IN>
 <en-US>
+• Android 14+ Alarm Fix: Resolved background PendingIntent exception preventing alarms and notifications from sounding on Android 14, 15, and 16
+• Background Resilience: Hardened error isolation and fallback alarm dispatch to guarantee medication reminders trigger reliably
 </en-US>
 <ar>
+• إصلاح تنبيهات أندرويد 14+: معالجة استثناء PendingIntent لضمان تشغيل المنبهات والإشعارات دون انقطاع على أندرويد 14 و15 و16
+• مرونة فائقة: تحسين معالجة الأخطاء والتنبيهات الاحتياطية لضمان وصول تذكيرات الأدوية دائمًا
 </ar>
 <de-DE>
+• Android 14+ Alarm-Fix: Fehler mit Hintergrund-PendingIntent behoben, damit Alarme und Benachrichtigungen unter Android 14, 15 und 16 zuverlässig auslösen
+• Erhöhte Ausfallsicherheit: Verbesserte Fehlerbehandlung für unterbrechungsfreie Medikamentenerinnerungen
 </de-DE>
 <es-419>
+• Corrección para Android 14+: Solucionado el error de PendingIntent en segundo plano para que las alarmas y notificaciones suenen en Android 14, 15 y 16
+• Mayor fiabilidad: Aislamiento reforzado de errores para garantizar que los recordatorios de medicamentos nunca fallen
 </es-419>
 <fr-FR>
+• Correctif alarmes Android 14+: Résolution de l'exception PendingIntent en arrière-plan pour garantir le déclenchement des rappels sur Android 14, 15 et 16
+• Fiabilité renforcée: Meilleure isolation des erreurs pour assurer la sonnerie de tous les rappels de médicaments
 </fr-FR>
 <hi-IN>
+• Android 14+ अलार्म सुधार: Android 14, 15 और 16 पर अलार्म और नोटिफिकेशन न बजने वाली PendingIntent त्रुटि का समाधान
+• बेहतर विश्वसनीयता: दवा के रिमाइंडर्स समय पर बजना सुनिश्चित करने के लिए मजबूत त्रुटि प्रबंधन
 </hi-IN>
 <it-IT>
+• Risoluzione allarmi Android 14+: Risolto l'errore PendingIntent in background per garantire la corretta attivazione di allarmi e notifiche su Android 14, 15 e 16
+• Massima affidabilidade: Gestione degli errori rafforzata per non perdere mai un promemoria farmaci
 </it-IT>
 <ja-JP>
+• Android 14+アラーム修正: Android 14、15、16でアラームや通知が作動しないPendingIntentの例外を解消
+• バックグラウンド強化: 服薬リマインダーが確実に鳴るようエラー保護と代替処理を強化
 </ja-JP>
 <pt-BR>
+• Correção para Android 14+: Corrigida exceção de PendingIntent em segundo plano para que alarmes e notificações toquem no Android 14, 15 e 16
+• Mais confiabilidade: Isolamento aprimorado de erros para garantir o disparo pontual dos lembretes de remédios
 </pt-BR>
 <ru-RU>
+• Исправление будильника Android 14+: Устранена ошибка PendingIntent в фоновом режиме, мешавшая срабатыванию напоминаний на Android 14, 15 и 16
+• Надежность в фоне: Усиленная обработка сбоев гарантирует своевременное срабатывание сигналов о приеме лекарств
 </ru-RU>
 <zh-CN>
+• Android 14+ 闹钟修复：解决后台 PendingIntent 异常，确保 Android 14、15 和 16 上的闹钟与通知正常触发
+• 后台稳定性提升：强化错误隔离与备用警报机制，确保服药提醒准时响铃
 </zh-CN>
