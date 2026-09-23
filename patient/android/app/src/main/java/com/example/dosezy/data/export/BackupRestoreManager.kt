@@ -364,6 +364,7 @@ class BackupRestoreManager(
                             totalSchedules += newSchedules.size
                         }
 
+                        scheduleRepository.reconcileLegacyScheduleEntries(newUserId, context)
                         scheduleRepository.rescheduleAllAlarms(newUserId, context)
 
                         val emFile = File(pDir, "emergency_contacts.json")
@@ -429,6 +430,7 @@ class BackupRestoreManager(
                             totalSchedules += restoredSchedules.size
                         }
 
+                        scheduleRepository.reconcileLegacyScheduleEntries(targetUserId, context)
                         scheduleRepository.rescheduleAllAlarms(targetUserId, context)
 
                         val emFile = File(pDir, "emergency_contacts.json")
@@ -498,6 +500,7 @@ class BackupRestoreManager(
                             totalSchedules += mergedSchedules.size
                         }
 
+                        scheduleRepository.reconcileLegacyScheduleEntries(targetUserId, context)
                         scheduleRepository.rescheduleAllAlarms(targetUserId, context)
 
                         val emFile = File(pDir, "emergency_contacts.json")

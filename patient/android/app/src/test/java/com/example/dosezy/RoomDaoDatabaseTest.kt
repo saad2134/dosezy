@@ -397,16 +397,18 @@ class RoomDaoDatabaseTest {
 
         val retrieved = userDao.getUserByIdDirect("u_prefs")
         assertNotNull(retrieved)
-        // Defaults must both be false
+        // Defaults must all be false
         assertEquals(false, retrieved?.allowDoseUndo)
+        assertEquals(false, retrieved?.allowDoseNotes)
         assertEquals(false, retrieved?.promptDoseNotes)
 
         // Update preferences
-        val updated = retrieved!!.copy(allowDoseUndo = true, promptDoseNotes = true)
+        val updated = retrieved!!.copy(allowDoseUndo = true, allowDoseNotes = true, promptDoseNotes = true)
         userDao.updateUser(updated)
 
         val updatedRetrieved = userDao.getUserByIdDirect("u_prefs")
         assertEquals(true, updatedRetrieved?.allowDoseUndo)
+        assertEquals(true, updatedRetrieved?.allowDoseNotes)
         assertEquals(true, updatedRetrieved?.promptDoseNotes)
     }
 

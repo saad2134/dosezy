@@ -21,6 +21,48 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
     companion object {
         private const val TAG = "ScheduleRepository"
+        val ENTRY_ID_DATETIME_REGEX = Regex("""_(\d{4})_(\d{2})_(\d{2})_(\d{2})_(\d{2})(?:_(\d{2}))?$""")
+
+        @RequiresApi(Build.VERSION_CODES.O)
+        fun parseDateTimeFromEntryId(entryId: String): LocalDateTime? {
+            if (entryId.startsWith("PRN_")) return null
+            val match = ENTRY_ID_DATETIME_REGEX.find(entryId) ?: return null
+            return try {
+                val year = match.groupValues[1].toInt()
+                val month = match.groupValues[2].toInt()
+                val day = match.groupValues[3].toInt()
+                val hour = match.groupValues[4].toInt()
+                val minute = match.groupValues[5].toInt()
+                val second = if (match.groupValues.size > 6 && match.groupValues[6].isNotBlank()) {
+                    match.groupValues[6].toInt()
+                } else 0
+                LocalDateTime.of(year, month, day, hour, minute, second)
+            } catch (_: Exception) {
+                null
+            }
+        }
+
+        @RequiresApi(Build.VERSION_CODES.O)
+        fun findClosestScheduledTime(entryDateTime: LocalDateTime, scheduledTimes: List<java.time.LocalTime>): LocalDateTime? {
+            if (scheduledTimes.isEmpty()) return null
+            val entryTime = entryDateTime.toLocalTime()
+            if (entryTime in scheduledTimes) return entryDateTime
+
+            var bestCandidate: LocalDateTime? = null
+            var minDiffMinutes = Long.MAX_VALUE
+
+            for (slot in scheduledTimes) {
+                for (dayOffset in listOf(0L, 1L, -1L)) {
+                    val candidate = LocalDateTime.of(entryDateTime.toLocalDate().plusDays(dayOffset), slot)
+                    val diff = kotlin.math.abs(java.time.Duration.between(entryDateTime, candidate).toMinutes())
+                    if (diff < minDiffMinutes) {
+                        minDiffMinutes = diff
+                        bestCandidate = candidate
+                    }
+                }
+            }
+            return if (minDiffMinutes <= 14 * 60) bestCandidate else null
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -41,6 +83,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun autoExtendSchedules(userId: String) {
         try {
+            reconcileLegacyScheduleEntries(userId)
             val medicines = database.medicineDao().getActiveMedicinesByUser(userId).first()
             medicines.forEach { medicine ->
                 if (!medicine.isArchived) {
@@ -423,5 +466,77 @@ class ScheduleRepository(private val database: DosezyDatabase) {
     suspend fun getPendingEntriesBefore(userId: String, cutoffTime: LocalDateTime): List<ScheduleEntry> {
         val cutoffMillis = cutoffTime.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
         return database.scheduleDao().getPendingEntriesBefore(userId, cutoffMillis)
+    }
+
+    /**
+     * Automatically detects and corrects schedule entries that were serialized using legacy
+     * pre-v2.5.2 ZoneId.systemDefault() epoch converters.
+     * Uses entryId timestamp encoding and Medicine.scheduledTimes as untainted sources of truth.
+     *
+     * @return Number of schedule entries that were corrected.
+     */
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun reconcileLegacyScheduleEntries(userId: String, context: Context? = null): Int {
+        var correctedCount = 0
+        try {
+            val allEntries = database.scheduleDao().getAllScheduleEntries(userId)
+            if (allEntries.isEmpty()) return 0
+
+            val medicines = database.medicineDao().getMedicinesByUserDirect(userId)
+            val medMap = medicines.associateBy { it.medicineId }
+
+            for (entry in allEntries) {
+                if (entry.entryId.startsWith("PRN_")) continue
+
+                // 1. Try parsing intended LocalDateTime directly from entryId
+                var intendedDateTime = parseDateTimeFromEntryId(entry.entryId)
+
+                // 2. Fallback: match against parent Medicine.scheduledTimes
+                if (intendedDateTime == null) {
+                    val med = medMap[entry.medicineId]
+                    if (med != null && med.scheduledTimes.isNotEmpty()) {
+                        intendedDateTime = findClosestScheduledTime(entry.scheduledDateTime, med.scheduledTimes)
+                    }
+                }
+
+                // 3. If intendedDateTime differs from scheduledDateTime, recalibrate and update
+                if (intendedDateTime != null && intendedDateTime != entry.scheduledDateTime) {
+                    val duration = java.time.Duration.between(entry.scheduledDateTime, intendedDateTime)
+                    val correctedTakenAt = entry.takenAt?.plus(duration)
+
+                    val correctedEntry = entry.copy(
+                        scheduledDateTime = intendedDateTime,
+                        takenAt = correctedTakenAt
+                    )
+                    database.scheduleDao().updateScheduleEntry(correctedEntry)
+                    correctedCount++
+                    Log.d(TAG, "Reconciled legacy entry ${entry.entryId}: ${entry.scheduledDateTime} -> $intendedDateTime")
+                }
+            }
+
+            if (correctedCount > 0 && context != null) {
+                rescheduleAllAlarms(userId, context)
+                try {
+                    com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+                } catch (_: Exception) {}
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error reconciling legacy schedule entries for user: $userId", e)
+        }
+        return correctedCount
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun reconcileAllProfiles(context: Context? = null): Int {
+        var total = 0
+        try {
+            val users = database.userDao().getAllUsersDirect()
+            users.forEach { user ->
+                total += reconcileLegacyScheduleEntries(user.userId, context)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error reconciling all profiles", e)
+        }
+        return total
     }
 }

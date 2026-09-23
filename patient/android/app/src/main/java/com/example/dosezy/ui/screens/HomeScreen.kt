@@ -252,7 +252,7 @@ fun HomeScreen(
                                         } else {
                                             executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
                                         }
-                                    } else if (currentUser?.promptDoseNotes == true) {
+                                    } else if (currentUser?.allowDoseNotes == true && currentUser?.promptDoseNotes == true) {
                                         if (target != null) {
                                             notePromptEntry = target
                                         } else {
@@ -270,7 +270,7 @@ fun HomeScreen(
                                         } else {
                                             executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
                                         }
-                                    } else if (currentUser?.promptDoseNotes == true) {
+                                    } else if (currentUser?.allowDoseNotes == true && currentUser?.promptDoseNotes == true) {
                                         if (target != null) {
                                             notePromptEntry = target
                                         } else {
@@ -537,7 +537,7 @@ fun HomeScreen(
             entry = target.scheduleEntry,
             medicineName = target.medicine?.medicationName ?: "",
             timeFormat = currentUser?.timeFormat ?: TimeFormat.HOUR_12,
-            promptDoseNotes = currentUser?.promptDoseNotes == true,
+            allowDoseNotes = currentUser?.allowDoseNotes == true,
             onDismiss = { manualRecordEntry = null },
             onConfirm = { resolvedDateTime, note ->
                 val targetId = target.scheduleEntry.entryId
@@ -841,7 +841,13 @@ private fun MedicationCard(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(6.dp))
-                                .clickable { onEditNote(entry.entryId) }
+                                .then(
+                                    if (currentUser?.allowDoseNotes == true) {
+                                        Modifier.clickable { onEditNote(entry.entryId) }
+                                    } else {
+                                        Modifier
+                                    }
+                                )
                                 .padding(vertical = 2.dp)
                         ) {
                             Text(
@@ -851,14 +857,14 @@ private fun MedicationCard(
                                 maxLines = 2
                             )
                         }
-                    } else {
+                    } else if (currentUser?.allowDoseNotes == true) {
                         androidx.compose.material3.TextButton(
                             onClick = { onEditNote(entry.entryId) },
                             modifier = Modifier.height(24.dp),
                             contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp)
                         ) {
                             Text(
-                                text = "💬 " + androidx.compose.ui.res.stringResource(R.string.btn_edit_note),
+                                text = "💬 " + androidx.compose.ui.res.stringResource(R.string.btn_add_note),
                                 style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
                                 color = MaterialTheme.colorScheme.outline
                             )

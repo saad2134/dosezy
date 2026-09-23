@@ -741,7 +741,7 @@ Voulez-vous continuer ?</string>
     <string name="dialog_low_storage_dismiss">Ignorer</string>
     <string name="pref_allow_undo_title">Autoriser l\'annulation de dose</string>
     <string name="pref_allow_undo_desc">Permet de rétablir les doses enregistrées en attente. Nécessite une confirmation.</string>
-    <string name="pref_prompt_dose_notes_title">Ajouter une note lors de la prise</string>
+    <string name="pref_prompt_dose_notes_title">Demander une note lors de la prise</string>
     <string name="pref_prompt_dose_notes_desc">Demander une note, repas ou symptôme chaque fois qu\'une dose est marquée comme prise.</string>
     <string name="dialog_undo_dose_title">Annuler la dose ?</string>
     <string name="dialog_undo_dose_msg">Voulez-vous vraiment rétablir %1$s en attente ? Le stock déduit sera restauré.</string>
@@ -752,4 +752,7 @@ Voulez-vous continuer ?</string>
     <string name="home_dose_note_label">Note : %1$s</string>
     <string name="btn_edit_note">Modifier la note</string>
     <string name="dialog_edit_note_title">Modifier la note de dose</string>
+    <string name="pref_allow_dose_notes_title">Notes de dose</string>
+    <string name="pref_allow_dose_notes_desc">Permettre d\'enregistrer des notes, le contexte des repas ou les symptômes avec les doses.</string>
+    <string name="btn_add_note">+ Ajouter une note</string>
 </resources>

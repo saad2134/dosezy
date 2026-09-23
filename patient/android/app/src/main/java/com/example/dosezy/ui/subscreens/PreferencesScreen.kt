@@ -582,7 +582,7 @@ fun PreferencesScreen(navController: NavController) {
                 }
             }
 
-            // Prompt Dose Notes Switch & Card
+            // Dose Notes Switch & Card
             item {
                 Card(
                     shape = RoundedCornerShape(16.dp),
@@ -591,45 +591,102 @@ fun PreferencesScreen(navController: NavController) {
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 4.dp)
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        // Master Switch: Allow Dose Notes
                         Row(
-                            modifier = Modifier.weight(1f).padding(end = 12.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.EditNote,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                            Column {
-                                Text(
-                                    text = stringResource(R.string.pref_prompt_dose_notes_title),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onSurface
+                            Row(
+                                modifier = Modifier.weight(1f).padding(end = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.EditNote,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
                                 )
-                                Text(
-                                    text = stringResource(R.string.pref_prompt_dose_notes_desc),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                Column {
+                                    Text(
+                                        text = stringResource(R.string.pref_allow_dose_notes_title),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.pref_allow_dose_notes_desc),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                            Switch(
+                                checked = currentUser?.allowDoseNotes == true,
+                                onCheckedChange = { isChecked ->
+                                    currentUser?.let { user ->
+                                        val updated = if (!isChecked) {
+                                            user.copy(allowDoseNotes = false, promptDoseNotes = false)
+                                        } else {
+                                            user.copy(allowDoseNotes = true)
+                                        }
+                                        userViewModel.updateUser(updated)
+                                    }
+                                }
+                            )
+                        }
+
+                        // Child Switch: Prompt on Dose Taken (only visible when Dose Notes is enabled)
+                        if (currentUser?.allowDoseNotes == true) {
+                            Divider(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                            )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 20.dp, end = 16.dp, top = 12.dp, bottom = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row(
+                                    modifier = Modifier.weight(1f).padding(end = 12.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(14.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Schedule,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
+                                        modifier = Modifier.size(22.dp)
+                                    )
+                                    Column {
+                                        Text(
+                                            text = stringResource(R.string.pref_prompt_dose_notes_title),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Medium,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                        Text(
+                                            text = stringResource(R.string.pref_prompt_dose_notes_desc),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                                Switch(
+                                    checked = currentUser?.promptDoseNotes == true,
+                                    onCheckedChange = { isChecked ->
+                                        currentUser?.let { user ->
+                                            userViewModel.updateUser(user.copy(promptDoseNotes = isChecked))
+                                        }
+                                    }
                                 )
                             }
                         }
-                        Switch(
-                            checked = currentUser?.promptDoseNotes == true,
-                            onCheckedChange = { isChecked ->
-                                currentUser?.let { user ->
-                                    userViewModel.updateUser(user.copy(promptDoseNotes = isChecked))
-                                }
-                            }
-                        )
                     }
                 }
             }

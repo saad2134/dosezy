@@ -63,7 +63,7 @@ fun RecordDoseTimeDialog(
     entry: ScheduleEntry,
     medicineName: String,
     timeFormat: TimeFormat = TimeFormat.HOUR_12,
-    promptDoseNotes: Boolean = false,
+    allowDoseNotes: Boolean = false,
     onDismiss: () -> Unit,
     onConfirm: (LocalDateTime, String?) -> Unit
 ) {
@@ -213,7 +213,7 @@ fun RecordDoseTimeDialog(
                     }
                 }
 
-                if (promptDoseNotes) {
+                if (allowDoseNotes) {
                     Spacer(modifier = Modifier.height(12.dp))
                     OutlinedTextField(
                         value = doseNote,

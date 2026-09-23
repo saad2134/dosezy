@@ -757,7 +757,7 @@
     <string name="dialog_low_storage_dismiss">खारिज करें</string>
     <string name="pref_allow_undo_title">खुराक पूर्ववत करने की अनुमति दें</string>
     <string name="pref_allow_undo_desc">दर्ज खुराक को वापस लंबित में बदलने की अनुमति दें। पुष्टि आवश्यक है।</string>
-    <string name="pref_prompt_dose_notes_title">खुराक लेने पर नोट जोड़ें</string>
+    <string name="pref_prompt_dose_notes_title">खुराक लेने पर नोट के लिए पूछें</string>
     <string name="pref_prompt_dose_notes_desc">हर बार खुराक लेने पर कोई नोट, भोजन का विवरण या लक्षण दर्ज करने के लिए पूछें।</string>
     <string name="dialog_undo_dose_title">खुराक पूर्ववत करें?</string>
     <string name="dialog_undo_dose_msg">क्या आप वाकई %1$s को वापस लंबित में बदलना चाहते हैं? स्टॉक वापस जुड़ जाएगा।</string>
@@ -768,4 +768,7 @@
     <string name="home_dose_note_label">नोट: %1$s</string>
     <string name="btn_edit_note">नोट बदलें</string>
     <string name="dialog_edit_note_title">खुराक नोट संपादित करें</string>
+    <string name="pref_allow_dose_notes_title">खुराक के नोट</string>
+    <string name="pref_allow_dose_notes_desc">खुराक के साथ नोट, भोजन का विवरण या लक्षण दर्ज करने की अनुमति दें।</string>
+    <string name="btn_add_note">+ नोट जोड़ें</string>
 </resources>

@@ -757,7 +757,7 @@
     <string name="dialog_low_storage_dismiss">Descartar</string>
     <string name="pref_allow_undo_title">Permitir deshacer dosis</string>
     <string name="pref_allow_undo_desc">Permite revertir dosis registradas a pendientes. Requiere confirmación.</string>
-    <string name="pref_prompt_dose_notes_title">Añadir nota al tomar la dosis</string>
+    <string name="pref_prompt_dose_notes_title">Preguntar por nota al tomar dosis</string>
     <string name="pref_prompt_dose_notes_desc">Solicitar una nota, comida o síntoma cada vez que se marque una dosis como tomada.</string>
     <string name="dialog_undo_dose_title">¿Deshacer dosis?</string>
     <string name="dialog_undo_dose_msg">¿Seguro que deseas revertir %1$s a pendiente? Se restaurará cualquier stock descontado.</string>
@@ -768,4 +768,7 @@
     <string name="home_dose_note_label">Nota: %1$s</string>
     <string name="btn_edit_note">Editar nota</string>
     <string name="dialog_edit_note_title">Editar nota de la dosis</string>
+    <string name="pref_allow_dose_notes_title">Notas de dosis</string>
+    <string name="pref_allow_dose_notes_desc">Permitir registrar notas, comidas o síntomas junto con las dosis.</string>
+    <string name="btn_add_note">+ Añadir nota</string>
 </resources>

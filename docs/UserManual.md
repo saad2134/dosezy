@@ -98,8 +98,10 @@ To prevent accidental reversals, Dosezy includes an optional Dose Undo safety se
 
 ### Per-Dose Notes & Meal Logging:
 Track how your medications affect you or record meal conditions at intake:
-1. Enable **Add Note on Dose Taken** in **Menu > Preferences > Dose Tracking**.
-2. When marking a dose as Taken or Late, the **Dose Notes** dialog opens automatically.
+1. Enable **Dose Notes** in **Menu > Preferences**. When turned off, note-taking is completely disabled and "+ Add Note" is hidden for a clean, distraction-free home screen.
+2. When Dose Notes is enabled:
+   - A **"+ Add Note"** button appears beneath taken doses, allowing you to attach notes or symptoms whenever you want.
+   - You can also toggle **Prompt on Dose Taken** to automatically open the note prompt whenever a dose is marked as Taken or Late.
 3. Tap quick suggestion tags (such as *"With food"*, *"Empty stomach"*, *"Before meal"*, *"After meal"*, *"Mild nausea"*, *"Headache"*, *"Dizziness"*) or type custom symptoms and notes.
 4. Tap **Save Note** to log the note with your dose, or tap **Skip** if you do not need to add notes.
 5. Recorded notes appear directly on the dose card and in your schedule calendar.

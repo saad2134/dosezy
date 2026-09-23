@@ -741,7 +741,7 @@
     <string name="dialog_low_storage_dismiss">تجاهل</string>
     <string name="pref_allow_undo_title">السماح بالتراجع عن الجرعة</string>
     <string name="pref_allow_undo_desc">السماح بإعادة الجرعات المسجلة إلى معلقة. يتطلب تأكيداً قبل التراجع.</string>
-    <string name="pref_prompt_dose_notes_title">إضافة ملاحظة عند تناول الجرعة</string>
+    <string name="pref_prompt_dose_notes_title">المطالبة بملاحظة عند تناول الجرعة</string>
     <string name="pref_prompt_dose_notes_desc">المطالبة بتسجيل ملاحظة أو سياق وجبة أو أعراض كلما تم تحديد جرعة على أنها تم تناولها.</string>
     <string name="dialog_undo_dose_title">التراجع عن الجرعة؟</string>
     <string name="dialog_undo_dose_msg">هل أنت متأكد من رغبتك في إعادة %1$s إلى معلق؟ ستتم استعادة أي مخزون مخصوم.</string>
@@ -752,4 +752,7 @@
     <string name="home_dose_note_label">ملاحظة: %1$s</string>
     <string name="btn_edit_note">تعديل الملاحظة</string>
     <string name="dialog_edit_note_title">تعديل ملاحظة الجرعة</string>
+    <string name="pref_allow_dose_notes_title">ملاحظات الجرعة</string>
+    <string name="pref_allow_dose_notes_desc">السماح بتسجيل الملاحظات أو سياق الوجبات أو الأعراض مع الجرعات.</string>
+    <string name="btn_add_note">+ إضافة ملاحظة</string>
 </resources>

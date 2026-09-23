@@ -60,8 +60,13 @@ class Converters {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @TypeConverter
-    fun toLocalDate(value: Long?): LocalDate? = value?.let {
-        java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneOffset.UTC).toLocalDate()
+    fun toLocalDate(value: Long?): LocalDate? = value?.let { millis ->
+        if (millis % 86400000L == 0L) {
+            java.time.Instant.ofEpochMilli(millis).atZone(java.time.ZoneOffset.UTC).toLocalDate()
+        } else {
+            // Legacy pre-v2.5.2 timestamp stored with ZoneId.systemDefault()
+            java.time.Instant.ofEpochMilli(millis).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+        }
     }
 
     // LocalTime converters

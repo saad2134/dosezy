@@ -769,7 +769,7 @@ Do you want to continue?</string>
     <string name="dialog_low_storage_dismiss">Dismiss</string>
     <string name="pref_allow_undo_title">Allow Dose Undo</string>
     <string name="pref_allow_undo_desc">Allow reverting recorded doses back to pending. Requires confirmation before undoing.</string>
-    <string name="pref_prompt_dose_notes_title">Add Note on Dose Taken</string>
+    <string name="pref_prompt_dose_notes_title">Prompt on Dose Taken</string>
     <string name="pref_prompt_dose_notes_desc">Prompt to record a note, meal context, or symptom whenever a dose is marked as taken.</string>
     <string name="dialog_undo_dose_title">Undo Dose?</string>
     <string name="dialog_undo_dose_msg">Are you sure you want to revert %1$s back to pending? Any deducted inventory stock will be restored.</string>
@@ -780,4 +780,7 @@ Do you want to continue?</string>
     <string name="home_dose_note_label">Note: %1$s</string>
     <string name="btn_edit_note">Edit Note</string>
     <string name="dialog_edit_note_title">Edit Dose Note</string>
+    <string name="pref_allow_dose_notes_title">Dose Notes</string>
+    <string name="pref_allow_dose_notes_desc">Allow recording notes, meal context, or symptoms with doses.</string>
+    <string name="btn_add_note">+ Add Note</string>
 </resources>

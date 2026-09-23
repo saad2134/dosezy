@@ -88,6 +88,9 @@ class ScheduleViewModel @Inject constructor(
                 _currentUserId.value = currentUser?.userId
 
                 currentUser?.let { user ->
+                    launch {
+                        scheduleRepository.reconcileLegacyScheduleEntries(user.userId, context)
+                    }
                     observeTodaySchedule(user.userId)
                     loadScheduleForDate(user.userId, _selectedDate.value)
                 } ?: run {

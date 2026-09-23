@@ -44,6 +44,7 @@ data class User(
     val allowCustomDoseTime: Boolean = false,
     val hideAddMedicineNavButton: Boolean = false,
     val allowDoseUndo: Boolean = false,
+    val allowDoseNotes: Boolean = false,
     val promptDoseNotes: Boolean = false
 )
 

@@ -96,8 +96,8 @@ Dosezy provides a configurable **Dose Undo** safety feature:
 
 ### Can I add a note or record symptoms when taking a dose?
 Yes! Dosezy lets you record meal details, symptoms, or side effects for every dose:
-1. Go to **Menu > Preferences > Dose Tracking** and turn on **Add Note on Dose Taken**.
-2. Whenever you mark a dose as Taken or Late, Dosezy opens the **Dose Notes** dialog.
+1. Go to **Menu > Preferences** and turn on **Dose Notes**. (When turned off, notes are completely disabled and "+ Add Note" is hidden).
+2. With Dose Notes enabled, a **"+ Add Note"** button appears on taken doses. You can also turn on **Prompt on Dose Taken** if you want Dosezy to automatically open the note prompt whenever you mark a dose as Taken or Late.
 3. You can quickly tap suggested tags (like *"With food"*, *"Empty stomach"*, *"Before meal"*, *"Mild nausea"*, *"Headache"*, *"Dizziness"*) or type your own custom notes.
 4. If you do not need a note for that dose, simply tap **Skip** to continue without saving notes.
 5. Your notes appear directly on the dose card and schedule calendar. You can also tap the note text anytime on a taken card or calendar item to view or update your note later.
