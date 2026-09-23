@@ -132,8 +132,22 @@ import Footer from '../components/Footer.astro';
 						</svg>
 					</summary>
 					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
-						<p>Dosezy includes an instant <strong>Intake Undo</strong> action. When you confirm a dose, a 5-second snackbar with an <strong>"Undo"</strong> button appears.</p>
-						<p>Additionally, medication cards on the Home screen remain interactive with an enabled Undo button. Tapping Undo immediately rolls back the dose status to Pending and restores the deducted pill count back into your stock inventory.</p>
+						<p>Dosezy includes a configurable <strong>Dose Undo</strong> safety feature. To prevent accidental reversals, you can enable <em>Allow Dose Undo</em> in <strong>Menu &gt; Preferences &gt; Dose Tracking</strong>.</p>
+						<p>When enabled, tapping "Undo" on the 5-second snackbar or dose card displays a confirmation dialog asking you to confirm the action. Once confirmed, Dosezy safely reverts the dose status to Pending and returns the deducted pills back into your stock inventory.</p>
+					</div>
+				</details>
+
+				<!-- Question: Per-Dose Notes & Symptom Logging -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>Can I add a note or record symptoms when taking a dose?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
+						<p>Yes! Under <strong>Menu &gt; Preferences &gt; Dose Tracking</strong>, turn on <strong>Add Note on Dose Taken</strong>. Whenever you mark a dose as Taken or Late, Dosezy opens the <em>Dose Notes</em> dialog.</p>
+						<p>You can tap quick suggestion tags (such as <em>"With food"</em>, <em>"Empty stomach"</em>, <em>"Before meal"</em>, <em>"Mild nausea"</em>, <em>"Headache"</em>) or type custom notes. You can also skip adding notes anytime, and edit notes later from your dose cards or schedule calendar.</p>
 					</div>
 				</details>
 

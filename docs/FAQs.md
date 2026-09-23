@@ -89,10 +89,18 @@ Yes! Dosezy provides an opt-in **Clinical Dose Skipping** feature:
 4. Skipped doses display an informative `📝 Skipped: <Reason>` badge and do **not** penalize your compliance streak in Analytics adherence calculations.
 
 ### What if I accidentally tap "Take" or "Skip" by mistake?
-Dosezy provides an instant **Intake Undo** feature:
-1. Whenever you mark a dose as taken, late, or skipped, a 5-second snackbar appears with an **"Undo"** button.
-2. Even after the bar dismisses, the medication card on your Home screen remains interactive with an active **"Undo"** option.
-3. Tapping Undo instantly reverts the dose status back to Pending and safely restores any deducted pill count back into your stock inventory.
+Dosezy provides a configurable **Dose Undo** safety feature:
+1. To enable undo, go to **Menu > Preferences > Dose Tracking** and switch on **Allow Dose Undo** (disabled by default to prevent accidental reversals).
+2. When enabled, if you mark a dose as taken or late, you can tap **"Undo"** on the 5-second reminder snackbar or directly on the dose card.
+3. Dosezy displays a quick confirmation prompt asking you to confirm the undo. Once confirmed, your dose reverts back to Pending and any deducted pills are safely returned to your stock inventory.
+
+### Can I add a note or record symptoms when taking a dose?
+Yes! Dosezy lets you record meal details, symptoms, or side effects for every dose:
+1. Go to **Menu > Preferences > Dose Tracking** and turn on **Add Note on Dose Taken**.
+2. Whenever you mark a dose as Taken or Late, Dosezy opens the **Dose Notes** dialog.
+3. You can quickly tap suggested tags (like *"With food"*, *"Empty stomach"*, *"Before meal"*, *"Mild nausea"*, *"Headache"*, *"Dizziness"*) or type your own custom notes.
+4. If you do not need a note for that dose, simply tap **Skip** to continue without saving notes.
+5. Your notes appear directly on the dose card and schedule calendar. You can also tap the note text anytime on a taken card or calendar item to view or update your note later.
 
 ### Can I customize when a dose is considered "Late" or "Missed"?
 Yes! Go to **Menu > Preferences > Dose Tracking**:

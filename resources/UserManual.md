@@ -87,16 +87,29 @@ Each medicine card displays its pill visual, name, dosage, meal instructions, st
 - 🔴 **Missed**: Indicates a dose that passed your missed window.
 - 📝 **Skipped**: Shows when a dose was paused for clinical reasons with its recorded explanation (e.g., `Skipped: Doctor advised pause`).
 
-### Instant Intake Undo:
-If you tap "Take" or "Mark Late" by mistake:
-1. A 5-second snackbar immediately appears at the bottom with an **"Undo"** action.
-2. Even after the snackbar disappears, the medication card remains interactive with an active **"Undo"** button.
-3. Tapping Undo instantly rolls back the dose status to **Pending** and safely returns deducted tablet counts back into your stock inventory.
+### Configurable Dose Undo with Safety Confirmation:
+To prevent accidental reversals, Dosezy includes an optional Dose Undo safety setting:
+1. Enable **Allow Dose Undo** under **Menu > Preferences > Dose Tracking** (disabled by default to protect your stock counts and compliance logs).
+2. When enabled, if you mark a dose as Taken or Late:
+   - A 5-second snackbar appears at the bottom with an **"Undo"** button.
+   - The medication card also displays an interactive **"Undo"** button.
+3. Tapping Undo displays a confirmation dialog asking you to confirm the reversal. Once confirmed, Dosezy resets the dose status back to **Pending** and safely returns any deducted tablet counts to your inventory.
+4. When disabled, recorded doses remain safely locked to prevent inadvertent taps.
+
+### Per-Dose Notes & Meal Logging:
+Track how your medications affect you or record meal conditions at intake:
+1. Enable **Add Note on Dose Taken** in **Menu > Preferences > Dose Tracking**.
+2. When marking a dose as Taken or Late, the **Dose Notes** dialog opens automatically.
+3. Tap quick suggestion tags (such as *"With food"*, *"Empty stomach"*, *"Before meal"*, *"After meal"*, *"Mild nausea"*, *"Headache"*, *"Dizziness"*) or type custom symptoms and notes.
+4. Tap **Save Note** to log the note with your dose, or tap **Skip** if you do not need to add notes.
+5. Recorded notes appear directly on the dose card and in your schedule calendar.
+6. **View & Edit Anytime**: Tap the note text or icon on any taken card or calendar item to update your notes whenever needed.
 
 ### Manually Record Dose Time:
 If you took a medication earlier but forgot to mark it on time, you can record the exact past time you took the dose:
 1. When logging a dose, select or enter the exact time the medication was consumed.
-2. Dosezy logs your specified intake time rather than just the current moment, ensuring your adherence timeline and medical compliance history remain strictly accurate.
+2. If note logging is enabled, you can also attach intake notes directly within the time picker dialog.
+3. Dosezy logs your specified intake time rather than just the current moment, ensuring your adherence timeline and medical compliance history remain strictly accurate.
 
 ### Crossing Time Zones (Doses Shift With You):
 When traveling across time zones:
@@ -277,6 +290,7 @@ Tap **Schedule** in the bottom navigation bar to view your full medication calen
   - 🔴 **Red**: Missed doses.
   - 🔵 **Blue**: Clinically skipped doses.
 - **Fast Date Switching**: Tapping any day instantly loads that date's chronological schedule.
+- **Dose Notes in Schedule View**: Taken medications display their recorded meal and symptom notes directly under each entry. Tap any entry or note to review or update notes for that day.
 - **TalkBack Screen Reader Support**: For visually impaired users, every status badge and icon announces its exact status (e.g., *"Taken"*, *"Late"*, *"Skipped"*, *"Missed"*, *"Pending"*), rather than generic labels.
 
 ---
@@ -302,6 +316,8 @@ The **Preferences** screen is organized into dedicated categories:
   - **Hide Navigation Add Button**: Toggle to hide the center '+' button from the bottom navigation bar. When enabled, the remaining 4 tabs (`Home`, `Schedule`, `Medicines`, `Menu`) expand symmetrically across the bar (25% each), and an "Add Medicine" button is cleanly placed on the Medicines screen below your active prescriptions.
 - **Notifications & Alarms**: Default Snooze Duration (5–30 min), Custom Ringtone, Sound Volume, Alarm Duration (30s to 5m/loop).
 - **Dose Tracking**:
+  - **Allow Dose Undo**: Toggle whether taken or late doses can be undone from dose cards or reminder snackbars (default is disabled for safety). Includes a confirmation dialog before reversing status and restoring pill stock.
+  - **Add Note on Dose Taken**: Prompt for notes (meal context, side effects, symptoms) whenever a dose is marked as taken (default is disabled).
   - **Allow Dose Skipping**: Toggle the clinical dose skipping option.
   - **Consider Late After**: Choose `1 hour`, `2 hours`, or `3 hours` (default is **3 hours**).
   - **Consider Missed After**: Choose between `3 hours` and `9 hours` (default is **6 hours**).

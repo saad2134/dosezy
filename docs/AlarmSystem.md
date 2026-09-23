@@ -1,7 +1,7 @@
 # ⏰ Dosezy Fail-Safe Alarm System Architecture
 
 > **Document Status:** Active Specification  
-> **Target Version:** v2.4.5+  
+> **Target Version:** v2.5.6+  
 > **Core Principle:** Accuracy & Performance >>> Efficiency  
 > **Guarantee:** Zero double ringtones, 100% reliable sound over foreground apps, cascading audio fallbacks, and complete lifecycle synchronization.
 

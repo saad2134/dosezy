@@ -302,9 +302,10 @@ import Footer from '../components/Footer.astro';
 						</div>
 
 						<div class="bg-[#030407] p-4 rounded-2xl border border-white/10 text-xs text-neutral-300 space-y-2 mt-3">
-							<h4 class="font-bold text-white uppercase font-mono text-[10px] tracking-wider text-sky-400">Intake Undo, Manual Time & Time Zones:</h4>
+							<h4 class="font-bold text-white uppercase font-mono text-[10px] tracking-wider text-sky-400">Dose Undo, Notes & Time Zones:</h4>
 							<ul class="list-disc list-inside space-y-1.5 text-neutral-300">
-								<li><strong class="text-white">Instant Undo Action:</strong> Marking a dose taken or skipped displays a 5-second "Undo" snackbar. In addition, dose cards retain an active "Undo" button to safely revert status back to Pending and restore deducted stock.</li>
+								<li><strong class="text-white">Configurable Dose Undo:</strong> Turn on Dose Undo in Preferences to revert accidental taps with a confirmation dialog, safely returning deducted tablets to inventory.</li>
+								<li><strong class="text-white">Per-Dose Notes &amp; Symptoms:</strong> Prompt for meal conditions (<em>"With food"</em>, <em>"Empty stomach"</em>) or side effects when logging a dose, with quick-tap suggestions and easy editing from your dose cards or schedule calendar.</li>
 								<li><strong class="text-white">Manually Record Dose Time:</strong> If you took a medication earlier, select the exact past time you consumed it rather than the current moment, ensuring adherence logs remain strictly accurate.</li>
 								<li><strong class="text-white">Crossing Time Zones:</strong> When traveling across time zones, dose reminders shift seamlessly with your local daily routine without manual recalibration.</li>
 								<li><strong class="text-white">Celebratory Completion Banner:</strong> When all doses for today are completed, a cheerful banner appears at the top while keeping today's full schedule visible underneath for continuous review.</li>
@@ -522,8 +523,14 @@ import Footer from '../components/Footer.astro';
 							<ul class="list-disc list-inside space-y-1.5 text-neutral-300">
 								<li><strong class="text-white">General:</strong> App language (12 languages), Light/Dark theme, 12h/24h time format, and <em>Hide Navigation Add Button</em> (hides the center '+' button for a symmetrical 4-tab bar and places an "Add Medicine" button on the Medicines screen).</li>
 								<li><strong class="text-white">Notifications &amp; Alarms:</strong> Default snooze interval (5–30 min), custom ringtone selection, volume slider, and alarm sound duration (30s–5m/loop).</li>
-								<li><strong class="text-white">Dose Tracking:</strong> Adjust <em>Consider Late After</em> (1h–3h) and <em>Consider Missed After</em> (3h–9h) windows.</li>
-								<li><strong class="text-white">Allow Dose Skipping:</strong> Opt-in toggle to enable the secondary "Skip" button on dose cards and alarm screens. Requires choosing a mandatory clinical reason (doctor advised, adverse reaction, fasting, illness, or out of stock) without penalizing your adherence streak.</li>
+								<li><strong class="text-white">Dose Tracking:</strong>
+									<ul class="list-disc list-inside ml-3 mt-1 space-y-1 text-[11px] text-neutral-300">
+										<li><strong class="text-white">Allow Dose Undo:</strong> Toggle whether doses can be undone from cards or snackbars, with a safety confirmation dialog before restoring stock counts (default off).</li>
+										<li><strong class="text-white">Add Note on Dose Taken:</strong> Prompt for meal context and symptom notes upon logging a dose (default off).</li>
+										<li><strong class="text-white">Allow Dose Skipping:</strong> Opt-in secondary "Skip" button with mandatory clinical reasons that protect your compliance streak.</li>
+										<li><strong class="text-white">Late &amp; Missed Windows:</strong> Adjust <em>Consider Late After</em> (1h–3h) and <em>Consider Missed After</em> (3h–9h).</li>
+									</ul>
+								</li>
 							</ul>
 						</div>
 					</article>

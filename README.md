@@ -81,8 +81,9 @@ Dosezy transforms daily medication management into a stress-free experience. Inp
 - 🕒 **Manually Record Dose Time** – Easily record the actual time you took medications when logging doses later to maintain accurate adherence histories.
 - 🌐 **Crossing Time Zones (Doses Shift With You)** – Traveling across time zones? Dosezy automatically keeps your reminders anchored to your local daily routine without time distortion.
 - 🧭 **Customizable Bottom Navigation** – Toggle to hide the central '+' button for a clean, symmetrical 4-tab layout, placing an "Add Medicine" button directly below active medications on the Medicines screen.
-- ↩️ **Instant Intake Undo** – Made a mistake? Reverse accidental dose logging immediately using the 5-second action snackbar or the persistent Undo button on dose cards, automatically returning deducted tablets to stock.
-- 📝 **Clinical Dose Skipping** – Safely pause doses with required clinical explanations (*Doctor advised pause*, *Adverse reaction*, *Fasting*, *Illness*, *Ran out of medicine*) without penalizing your adherence streak.
+- ↩️ **Configurable Dose Undo & Protection** – Made a mistake? Revert accidental dose taps from the reminder bar or dose card, backed by a safety confirmation dialog so your tablet stock and adherence records are never reset by accident.
+- ✍️ **Per-Dose Notes & Symptom Logging** – Keep track of meals and how you feel. Attach notes, meal context (*"With food"*), or side effects when logging a dose with quick-tap suggestions, and view or edit notes anytime from your dose cards or calendar.
+- ⏸️ **Clinical Dose Skipping** – Safely pause doses with required clinical explanations (*Doctor advised pause*, *Adverse reaction*, *Fasting*, *Illness*, *Ran out of medicine*) without penalizing your adherence streak.
 - 🕒 **12-First Grid Time Picker** – Visual, tremor-friendly grid time selector that places 12 at the top for natural morning/night scheduling, avoiding frustrating circular clock dials.
 - 📅 **Interactive Schedule Calendar** – Day, week, and month calendar views with color-coded compliance dots (taken, late, missed, skipped) and full TalkBack screen reader accessibility for visually impaired users.
 - 📊 **Adherence Analytics & Compliance Scores** – Multi-ring progress tracking across Today, 7 Days, 30 Days, 90 Days, and All-Time, plus individual medication compliance rates to keep you and your doctor informed.
@@ -132,7 +133,7 @@ Dosezy transforms daily medication management into a stress-free experience. Inp
 
 | Module | Platform | Status | Min / Target | Tech Stack |
 | :--- | :--- | :--- | :--- | :--- |
-| **📱 Patient App** | Android | Released (v2.5.3) | Android 7.0+ (API 24+) | Kotlin, Jetpack Compose, Room |
+| **📱 Patient App** | Android | Released (v2.5.6) | Android 7.0+ (API 24+) | Kotlin, Jetpack Compose, Room |
 | **🍎 Patient App** | iOS | Planned | iOS 16+ | Swift, SwiftUI, SwiftData |
 | **☁️ Server Node** | Server / API | In Development | Docker / Self-Host | Node.js, Fastify, TypeScript, SQLite/Postgres |
 | **🩺 Caregiver Portal** | Web | In Development | Modern Browsers | Astro, TypeScript, Tailwind |
@@ -249,8 +250,8 @@ dosezy/
       <td><strong>v1.0 – v2.5</strong></td>
       <td><strong>Local-First Android Client & Schema Parity</strong></td>
       <td>Core Adherence & Ecosystem Parity</td>
-      <td>Jetpack Compose UI, 12 native localizations, Room offline database v13, time zone travel, manual dose recording, pharmacy refill orders with smart bottle supplies, full-screen alarms, emergency dialer, shared OpenAPI 3.0 contract.</td>
-      <td align="center">🟢 Released (v2.5.5)</td>
+      <td>Jetpack Compose UI, 12 native localizations, Room offline database v15, time zone travel, manual dose recording, per-dose symptom notes, dose undo confirmation, pharmacy refill orders with smart bottle supplies, full-screen alarms, emergency dialer, shared OpenAPI 3.0 contract.</td>
+      <td align="center">🟢 Released (v2.5.6)</td>
     </tr>
     <tr>
       <td><strong>v3.0 – v3.9</strong></td>
