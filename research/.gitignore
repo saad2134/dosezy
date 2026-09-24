@@ -1,4 +1,14 @@
-# Ignore internal submission guide in research directory
-Submission_Guide.md
-/submissions
-/__pycache__ 
+# Ignore Python cache
+__pycache__/
+*.py[cod]
+
+# Ignore untracked agent logs and working documents
+AGENTS.md
+
+# Ignore local build artifacts
+*.aux
+*.log
+*.out
+*.bbl
+*.blg
+*.synctex.gz

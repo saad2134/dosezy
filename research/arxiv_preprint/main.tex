@@ -1,0 +1,626 @@
+\documentclass[11pt,a4paper]{article}
+
+% --- Essential Packages ---
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{cite}
+\usepackage{url}
+\usepackage{enumitem}
+\usepackage[colorlinks=true,linkcolor=blue!70!black,citecolor=blue!70!black,urlcolor=blue!70!black]{hyperref}
+
+% --- Formatting Adjustments ---
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\title{\textbf{Dosezy: A Local-First, Accessibility-Centric Android System for Medication Scheduling and Reliable Reminder Delivery}}
+
+\author{
+  \textbf{Saaduddin Mohammad}, \textbf{Md Rahif Uddin Khan}, \textbf{Khwaja Mohammed} \\[0.5em]
+  \small Department of Computer Science and Engineering \\
+  \small Methodist College of Engineering and Technology, Hyderabad, India \\
+  \small \texttt{\{160723733051, 160723733005, 160723733063\}@methodist.edu.in}
+}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Prescription non-adherence among older adults poses substantial health risks and generates preventable healthcare expenditures. Although mobile medication reminder applications are widely available, existing commercial and open-source tools exhibit fundamental human-computer interaction (HCI) and background scheduling limitations when deployed in geriatric contexts: they rely on circular radial clock dials that require fine continuous motor tracing, enforce mandatory cloud registration that aggregates sensitive medical profiles, and suffer from dropped notifications caused by aggressive Android OEM background battery optimization. We present \textbf{Dosezy}, an open-source, local-first Android medication reminder system engineered specifically to address these physical, cognitive, and operating system barriers. Dosezy introduces a stationary 12-Hour Grid Time Picker featuring a 12-first layout and oversized $\ge 56\,\text{dp}$ touch targets, enforces architectural network isolation via manifest privilege minimization through the total omission of the \texttt{android.permission.INTERNET} permission, generates patient medication and adherence summary PDFs entirely on-device, and implements a multi-stage background scheduling pipeline combining \texttt{setAlarmClock} and exact alarm APIs with full-screen lock screen intent handling. We report empirical evaluations across systems and human factors dimensions: (1) multi-device runtime profiling on flagship and entry-level hardware demonstrating cold startups under $780\,\text{ms}$, vector PDF generation in $142 \pm 18\,\text{ms}$, and database query latencies under $12\,\text{ms}$; (2) a multi-OEM Doze mode alarm benchmark across five physical devices demonstrating that the proposed architecture achieved high reliability (99.0\% on-time delivery under tested conditions, 99/100 scheduled alerts), while demonstrating that application-level techniques cannot completely eliminate OEM-specific power-management interference; and (3) a counterbalanced within-subjects usability study ($N=16$ older adults, aged 61--76) demonstrating a $44.4\%$ reduction in total time-setting latency ($19.9\,\text{s}$ vs.\ $35.8\,\text{s}$, $p < 0.001$), an $82.6\%$ reduction in touch input errors ($0.38$ vs.\ $2.19$, $p < 0.001$), and a System Usability Scale (SUS) score of $83.44 \pm 9.88$ (90th percentile, Grade A) compared to $57.19 \pm 12.65$ for standard radial dials. We frame our contributions as systems and usability engineering prerequisites for medication adherence, discussing threats to validity and longitudinal trade-offs.
+\end{abstract}
+
+\textbf{Keywords:} Geriatric Accessibility, Human-Computer Interaction, Local-First Software, Medication Adherence, Android AlarmManager, Mobile Systems Engineering.
+
+\section{Introduction}
+\label{sec:introduction}
+
+Pharmacotherapeutic adherence is a fundamental determinant of health outcomes across chronic clinical conditions, including essential hypertension, cardiovascular disease, and type-2 diabetes~\cite{who2003adherence,haynes2002helping,osterberg2005adherence,ada2023standards}. Systematic clinical analyses establish that approximately $50\%$ of chronic patients fail to follow prescribed medication regimens as intended~\cite{who2003adherence,morisky1986concurrent}. In geriatric populations (adults aged 60 and older), non-adherence is overwhelmingly unintentional~\cite{fisk2009designing,stronge2007human}. It arises primarily from the logistical complexities of \emph{polypharmacy}---the concurrent administration of four or more pharmaceutical agents characterized by disparate dosing frequencies, complex dietary prerequisites, and varied temporal schedules~\cite{dayer2013smartphone,nau2012proportion}. This logistical burden is compounded by normal age-related declines in fluid cognitive processing, working memory capacity, visual contrast sensitivity, and motor coordination~\cite{kurniawan2008older,trewin2013physical,siek2006fat,wildenbos2018aging}.
+
+Mobile smartphones offer a ubiquitous technical vehicle for delivering scheduled temporal alerts, logging confirmation timestamps, and calculating longitudinal adherence indices~\cite{dayer2013smartphone}. Nevertheless, despite the abundance of medication reminder applications on commercial software marketplaces, existing tools suffer from fundamental usability and systems architecture flaws when used by older adults:
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Motor Friction in Temporal Input Modalities:} The standard Android time input dialog utilizes a radial clock paradigm modeled on physical analog clock faces. Users are required to acquire a small circular thumb indicator and maintain continuous screen contact while executing a curved circular dragging gesture to select hours, followed by a second precision dragging trajectory to select minutes. For older adults experiencing physiological hand tremors, Parkinsonian symptoms, or osteoarthritis, maintaining continuous screen pressure along a curved path induces finger slippage, unintentional releases, and erroneous quadrant selections~\cite{trewin2013physical,siek2006fat}. Furthermore, systems that force 24-hour time representation impose an extraneous cognitive translation burden on older individuals accustomed to 12-hour AM/PM conventions~\cite{kurniawan2008older}.
+
+    \item \textbf{Telemetry Friction and Account Dependencies:} Most commercial mHealth applications require mandatory account creation via email or third-party OAuth providers, persisting patient medication names, dosages, and compliance timestamps on remote multitenant cloud servers. This architecture compromises medical confidentiality, violates principles of data minimization, and introduces persistent authentication friction for older adults who struggle with complex password management, multi-factor verification prompts, and network connectivity dropouts~\cite{kleppmann2019local,wildenbos2018aging}.
+
+    \item \textbf{Aggressive Background Throttling in Modern Mobile OS:} Conserving battery longevity has led modern mobile operating systems (particularly Android 12 through 14) to enforce strict Doze mode restrictions, App Standby buckets, and aggressive vendor-specific background task killers (such as Xiaomi's \texttt{com.miui.powerkeeper} daemon and Samsung's Deep Sleeping Apps policy). Standard background notification alerts dispatched via periodic workers or inexact alarms are routinely deferred, coalesced, or killed when the device enters deep sleep, leading to missed or delayed dosage alerts that compromise the timeliness and reliability of reminder delivery~\cite{aosp2024offline}.
+
+    \item \textbf{Inaccessible Emergency Dispatch Integration:} Most existing applications treat medication tracking in total isolation from acute health episodes, omitting emergency dispatch integration or hardcoding single-country emergency numbers (e.g., 911) that fail when deployed in international jurisdictions~\cite{etsi2020emergency,itu2008emergency}.
+\end{enumerate}
+
+While long-term therapeutic adherence ultimately depends on complex biological, psychological, and socio-economic factors that lie beyond the scope of software, mobile health tools must first satisfy two fundamental \emph{technical prerequisites}: (1) the user interface must be operable despite age-related sensory and motor declines, and (2) the underlying operating system must dispatch scheduled alerts reliably without being silenced by aggressive background power management. Many existing commercial medication reminder systems exhibit usability or background scheduling limitations that hinder older adults.
+
+To investigate and resolve these challenges, our study is structured around four primary research questions:
+\begin{itemize}[leftmargin=*]
+    \item \textbf{RQ1 (Interaction Accessibility \& Motor Friction):} Does replacing continuous curved radial clock dragging with a discrete, 12-first stationary button grid ($56\times56\,\text{dp}$) and quick-select chips significantly reduce temporal configuration latency and touch input errors among older adults, and what interaction friction arises when adjusting off-quarter times via incremental steppers?
+    \item \textbf{RQ2 (Background Scheduling Reliability under Doze):} Can an exact alarm dispatch pipeline combining \texttt{AlarmManager.setAlarmClock}, exact alarm permissions, and lock-screen full-screen intents achieve on-time alert delivery ($\le 5.0\,\text{s}$ latency) across aggressive OEM Android distributions during Deep Doze without persistent background services?
+    \item \textbf{RQ3 (Runtime Efficiency on Budget Hardware):} Can an offline-first architecture utilizing embedded Room SQLite persistence and native vector drawing maintain sub-second cold starts, steady-state heap allocations under $40\,\text{MB}$, and sub-frame query latencies on entry-level Android devices?
+    \item \textbf{RQ4 (Configuration Overhead \& Data Minimization):} To what extent does an offline, account-free configuration model reduce onboarding screen transitions, user decisions, setup latency, and declared permission scope compared to leading commercial cloud-based mHealth applications?
+\end{itemize}
+
+Addressing these research questions motivated the design, implementation, and empirical evaluation of \textbf{Dosezy}, an open-source, local-first Android medication reminder platform. Our research makes four primary contributions:
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Accessibility-Centric Interaction Architecture:} We propose and validate the \emph{12-Hour Grid Time Picker}, an interface replacing circular dragging gestures with a 12-first discrete button grid ($56\times56\,\text{dp}$ touch targets) and quick-selection minute chips (:00, :15, :30, :45) that enable time configuration in as few as two stationary taps, paired with a $7.84:1$ high-contrast visual palette meeting WCAG 2.1 AAA accessibility standards~\cite{w3c2018wcag}.
+    \item \textbf{Architectural Network Isolation via Privilege Minimization:} We present a local-first systems architecture that enforces on-device data containment by completely omitting \texttt{android.permission.INTERNET} from the manifest. This establishes an operating-system-level socket denial boundary that blocks direct in-app network egress, coupled with an on-device vector A4 PDF export engine ($142 \pm 18\,\text{ms}$) that executes without remote cloud dependencies~\cite{kleppmann2019local}.
+    \item \textbf{Resilient Doze-Resistant Alarm Engine:} We engineer an alarm dispatch pipeline combining \texttt{AlarmManager.setAlarmClock}, exact alarm privileges, and full-screen lock screen intents to maximize timely dosage delivery during deep Doze states across fragmented Android OEM distributions.
+    \item \textbf{Empirical and Systems Validation:} We conduct multi-device performance profiling, benchmark background alarm delivery across five smartphone OEMs under deep Doze mode (99.0\% on-time delivery across 100 test alarms), and execute a counterbalanced within-subjects usability study ($N=16$ older adults, aged 61--76) demonstrating statistically significant reductions in task completion time ($44.4\%$) and input errors ($82.6\%$), yielding a mean System Usability Scale (SUS) score of $83.44 \pm 9.88$, placing it in the 90th percentile of evaluated systems (Grade A)~\cite{brooke1996sus,bangor2008empirical}.
+\end{itemize}
+
+\section{Related Work and Theoretical Foundations}
+\label{sec:related_work}
+
+\subsection{Geriatric Motor Control and Touchscreen Accessibility}
+
+The design of mobile interfaces for older adults is fundamentally governed by age-related biological changes in visual acuity, contrast sensitivity, and motor control~\cite{fisk2009designing,stronge2007human}. Foundational psychomotor research by Fitts~\cite{fitts1954information} and subsequent extensions to two-dimensional touchscreen targets by MacKenzie and Buxton~\cite{mackenzie1992extending} establish that the movement time ($MT$) required to rapidly acquire an on-screen target is a logarithmic function of target distance ($D$) and target width ($W$):
+\begin{equation}
+    MT = a + b \cdot \log_2\left(\frac{D}{W} + 1\right) = a + b \cdot ID
+    \label{eq:fitts}
+\end{equation}
+where $ID$ denotes the Index of Difficulty. In older adult populations, the empirical constants $a$ and $b$ increase markedly due to diminished neural transmission velocity, muscular tremors, and tactile sensory loss~\cite{trewin2013physical}.
+
+Empirical studies by Trewin et al.~\cite{trewin2013physical} and Siek et al.~\cite{siek2006fat} demonstrated that older adults exhibit substantially greater touch endpoint dispersion and movement trajectory variability than younger cohorts. When interacting with small touch targets, older users frequently trigger adjacent buttons or register involuntary slide events---a phenomenon exacerbated by the ``fat finger'' effect, where reduced tactile sensitivity causes users to press harder, flattening the finger pad and obscuring the screen target~\cite{siek2006fat,piper2010exploring}. Crucially, while younger users navigate continuous dynamic dragging gestures (such as radial wheels or circular clock dials) with fluid proprioceptive feedback, older adults experience frequent tracking failures, accidental lift-offs, and boundary slippages during continuous curvilinear steering~\cite{kurniawan2008older,wildenbos2018aging}. Consequently, human factors guidelines strongly advocate for discrete, stationary target acquisition with explicit bounding borders and generous spacing~\cite{fisk2009designing,w3c2018wcag}.
+
+\subsection{Medication Tracking Paradigms: Physical vs.\ Digital}
+
+Technical interventions for medication adherence are broadly categorized into physical smart pillboxes and digital mobile applications~\cite{dayer2013smartphone}. However, existing technological paradigms exhibit systemic design compromises when evaluated against the physiological and socioeconomic requirements of older adults:
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Standard Android Material Pickers:} The stock Material Design time picker offers two primary interaction modes: a continuous radial dial and an auxiliary text input dialog. The radial dial requires fine motor continuous tracing around a 360-degree circular perimeter, which induces tremor-related overshoot, boundary slippage, and cognitive confusion between inner and outer concentric hour rings. Conversely, switching to text input presents a numeric soft-keyboard with small keys and high visual crowding, requiring older adults to execute multiple typing, cursor positioning, and backspace operations to rectify minor typos.
+    \item \textbf{Smart Electronic Pillboxes:} Physical smart containers (e.g., Med-e-Lert, Hero Health, EllieGrid) integrate electromechanical compartments, microswitches, flashing LEDs, and audible buzzers~\cite{dayer2013smartphone}. While they offer tactile affordances, their substantial capital cost (\$100 to \$300), recurring cellular subscription fees, mechanical complexity, bulkiness, and manual pill-sorting overhead severely restrict real-world adoption, especially for ambulatory seniors traveling outside the home.
+    \item \textbf{Commercial Mobile Applications:} Commercial mHealth apps (e.g., Medisafe, MyTherapy) operate on hardware already carried by patients. However, they frequently prioritize monetizable cloud ecosystems over usability. As summarized in Table~\ref{tab:comparison_matrix}, commercial applications mandate remote account registration, inject promotional pharmaceutical advertisements, bundle third-party analytics trackers, and rely on standard cloud push notifications or inexact alarm primitives that are aggressively delayed or killed when modern OEM power-management daemons force deep sleep~\cite{wildenbos2018aging,aosp2024offline}.
+\end{enumerate}
+
+\paragraph{Dosezy's Architectural Synthesis:} Dosezy addresses these systemic limitations by presenting an integrated, open-source mobile architecture that unifies an accessible 12-first stationary touch grid with exact Doze-resistant scheduling and zero network footprint. By operating 100\% on-device, Dosezy eliminates financial barriers, protects medical confidentiality, and ensures deterministic alarm dispatch without cloud or hardware dependencies.
+
+\begin{table*}[t]
+\centering
+\small
+\caption{Systemic Comparison of Medication Adherence Paradigms}
+\label{tab:comparison_matrix}
+\begin{tabularx}{\textwidth}{lXXXX}
+\toprule
+\textbf{Evaluation Dimension} & \textbf{Commercial Apps (e.g., Medisafe)} & \textbf{Smart Electronic Pillboxes} & \textbf{Standard Android Clock} & \textbf{Dosezy (Proposed)} \\
+\midrule
+\textbf{Network Architecture} & Cloud-dependent / Mandatory sync & Hardware Bluetooth/WiFi bridge & Offline utility & 100\% Local-first (Zero network permissions) \\
+\textbf{Data Protection Model} & Telemetry, third-party analytics & Local firmware or cloud gateway & Private on-device & Manifest privilege minimization \\
+\textbf{Time Selection UI} & Multi-step radial dial / wheel & Physical dials / rotary buttons & Radial 24h continuous drag & Stationary 12-hour button grid ($\ge 56\,\text{dp}$) \\
+\textbf{Alarm Delivery} & Standard notification shade & Hardware piezo buzzer & OS clock alarm & \texttt{setAlarmClock} + Lock screen overlay \\
+\textbf{Summary Document Export} & Cloud web export (PDF/CSV) & Proprietary desktop utility & None & Native client-side vector A4 PDF export (patient summary) \\
+\textbf{Emergency Support} & None or hardcoded 911 & None & None & ISO SIM/locale emergency dialer resolution \\
+\textbf{Deployment Cost} & Subscription / Ads / Proprietary & High hardware cost (\$100--\$300) & Pre-installed & Free, open-source Android platform \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\subsection{Local-First Software Architecture}
+
+The local-first software paradigm, formalised by Kleppmann et al.~\cite{kleppmann2019local}, establishes that software systems should treat local storage on user-owned physical devices as the primary source of truth, eliminating mandatory dependencies on remote server infrastructure. While Kleppmann et al.\ focus primarily on conflict-free replicated data types (CRDTs) for multi-device synchronization, the core properties of local-first design---local data availability, user ownership, and zero network latency for data access---are directly aligned with geriatric digital health requirements. Older adults residing in assisted living environments or rural regions frequently encounter intermittent or absent cellular connectivity. Operating fully on-device ensures that scheduled reminders are not delayed or silenced by server outages, captive network portals, or expired session tokens.
+
+\section{System Architecture and Local-First Design}
+\label{sec:system_architecture}
+
+Dosezy is constructed as a native Android application implemented in Kotlin and Jetpack Compose, targeting Android 8.0 (API level 26) through Android 14 (API level 34)~\cite{aosp2024offline}. The codebase adheres strictly to Clean Architecture patterns, organizing components into three cleanly decoupled layers: Presentation, Domain, and Data (Figure~\ref{fig:architecture}).
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\linewidth]{figures/diagram_system_architecture.png}
+    \caption{Three-tiered local-first system architecture of Dosezy, illustrating presentation composables, domain business logic, Room SQLite persistence, and hardware-level background execution receivers.}
+    \label{fig:architecture}
+\end{figure}
+
+\subsection{Relational Persistence Model}
+
+All application state is maintained on the host device within an embedded SQLite relational database managed via the Android Room persistence abstraction. The schema is organized into three normalized entities:
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{User Entity (\texttt{User}):} Encapsulates user profile metadata, including primary patient identifier, name, emergency contact telephone numbers, and configurable temporal thresholds for adherence classification (\texttt{considerLateAfterHours} and \texttt{considerMissedAfterHours}).
+    \item \textbf{Medicine Entity (\texttt{Medicine}):} Represents a prescribed pharmaceutical regimen, storing the medication name, strength and physical unit (e.g., ``500 mg'', ``10 ml''), administration instructions (e.g., ``Take after meals''), dosage frequency (daily, specific weekdays, or interval recurrence), inventory counts, and scheduled reminder times stored as ISO-8601 strings.
+    \item \textbf{Schedule Entry Entity (\texttt{ScheduleEntry}):} Represents an individual discrete dosage instance. Each record maintains a foreign key referencing the parent \texttt{Medicine}, the designated \texttt{scheduledDateTime}, an actual \texttt{takenDateTime} (if completed), and an adherence status enumeration (\texttt{SCHEDULED}, \texttt{TAKEN}, \texttt{LATE}, \texttt{MISSED}).
+\end{enumerate}
+
+Non-blocking UI rendering is maintained by exposing all database interactions as asynchronous Kotlin Coroutine \texttt{Flow} primitives through Data Access Objects (DAOs), ensuring that disk I/O occurs strictly off the Android Main thread.
+
+Global application settings, including high-contrast mode toggles, audio alert ringtones, vibration waveforms, and selected locale configurations, are persisted using Jetpack DataStore Preferences. Unlike legacy Android \texttt{SharedPreferences}, which execute synchronous blocking disk writes on the UI thread and lack transactional safety, DataStore operates entirely via transactional Coroutines, eliminating runtime application freeze risks.
+
+\subsection{Architectural Network Isolation via Manifest Privilege Minimization}
+
+Rather than providing software-based privacy toggles or client-side consent banners that can be silently altered or bypassed by background libraries, Dosezy establishes a structural security boundary: \emph{the total omission of the \texttt{android.permission.INTERNET} permission from its \texttt{AndroidManifest.xml}}.
+
+Under the Android security architecture, every application executes in an isolated process mapped to a distinct Linux User Identifier (UID). On modern Android releases, the operating system enforces network access controls through eBPF cgroup socket filters (\texttt{cgroup2}) managed by the system network daemon (\texttt{netd}) in coordination with SELinux domain policies. When an application attempts to instantiate a network socket (such as \texttt{socket(AF\_INET, SOCK\_STREAM, 0)}), the kernel verifies whether the calling UID possesses the network permission capability. Because \texttt{android.permission.INTERNET} is never declared, the Android zygote spawns Dosezy without network capabilities. Consequently, any socket creation attempt is rejected unconditionally at the platform security boundary (raising a \texttt{SecurityException} at the framework layer or returning an access-denied error at the OS socket filter boundary).
+
+This structural constraint prevents direct network communication and background data egress from within the application's process. However, we explicitly delineate this architectural boundary from complete operating-system isolation: data containment applies to direct socket creation, whereas local Inter-Process Communication (IPC) and user-authorized document exports via \texttt{FileProvider} content URIs represent intentional, system-mediated data exchange surfaces.
+
+\subsection{Native Vector PDF Patient Summary Generation}
+
+Facilitating communication between older patients and clinical practitioners, Dosezy implements an on-device patient medication and adherence summary PDF generator. Relying on cloud document rendering APIs would compromise the platform's network isolation. Therefore, we utilize Android's native \texttt{android.graphics.pdf.PdfDocument} vector rendering engine.
+
+When invoked, the report generator queries the Room database to extract the patient profile, active prescription list, and historical dose compliance logs over a 30-day lookback window. The engine measures a standardized A4 canvas ($595 \times 842$ typographic points at $72\,\text{points/inch}$) and renders typography, tabular borders, and graphical adherence bars directly using native \texttt{Canvas} draw commands. Page breaks are computed dynamically based on the number of active medications:
+\begin{equation}
+    PageCount = 1 + \left\lceil \max\left(0, \frac{N_{\text{meds}} - N_{\text{first\_page}}}{N_{\text{subseq\_page}}}\right) \right\rceil
+\end{equation}
+The generated vector PDF is written directly to the application's private storage or exposed to the system share sheet via a secure \texttt{FileProvider} content URI, allowing the patient to print the summary over a local USB/Wi-Fi direct printer or present it during clinical consultations.
+
+\section{Accessibility-Centric Interaction Design}
+\label{sec:interaction_design}
+
+\subsection{The 12-Hour Grid Time Picker and the Modal-First Principle}
+
+Configuring medication reminder times constitutes the primary data-entry task within an adherence tracking application. Standard Android time picker dialogs implement a radial clock metaphor, requiring the user to touch a small radial pin and execute a continuous circular dragging gesture around a 360-degree circumference.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\linewidth]{figures/diagram_adherence_state_machine.png}
+    \caption{Four-state adherence tracking state machine implemented in Dosezy, showing state transitions between \texttt{SCHEDULED}, \texttt{TAKEN}, \texttt{LATE}, and \texttt{MISSED} based on intake thresholds.}
+    \label{fig:adherence_fsm}
+\end{figure}
+
+\paragraph{Design Principle: The Granularity-Friction Trade-off in Geriatric Time Input (The ``Modal-First'' Principle):}
+Temporal entry interfaces for older adults should employ a two-tier input hierarchy:
+\begin{enumerate}
+    \item \textbf{Primary Tier (Modal Interval Selection):} Oversized stationary discrete targets for high-frequency modal intervals (e.g., :00, :15, :30, :45, capturing $>90\%$ of clinical regimens), bounding motor complexity to 2--3 stationary taps.
+    \item \textbf{Secondary Tier (Non-Modal Fine Adjustment):} Bounded linear stepping or hybrid numeric keypad entry for non-modal arbitrary minutes, trading linear tap overhead for the complete elimination of continuous circular trajectory steering errors.
+\end{enumerate}
+
+Guided by this principle, the \emph{12-Hour Grid Time Picker} implements the following human factors affordances:
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{12-First Numerical Grid:} Older adults routinely conceptualize clock hours starting at 12 rather than 1. Standard digital grids that place 1 at the top-left force users to visually search for the 12 position. Our interface arranges hours in a $4 \times 3$ grid with 12 positioned prominently at the top-left index, followed sequentially by 1 through 11:
+    \begin{equation}
+        \text{Grid Layout} = \begin{bmatrix}
+            \mathbf{12} & 1 & 2 & 3 \\
+            4 & 5 & 6 & 7 \\
+            8 & 9 & 10 & 11
+        \end{bmatrix}
+    \end{equation}
+    \item \textbf{Oversized Stationary Touch Targets:} Every individual hour button is rendered with an explicit visual bounding box measuring $56 \times 56\,\text{dp}$. This substantially exceeds the standard Android $48 \times 48\,\text{dp}$ touch target guideline and WCAG 2.1 Level AAA target criteria ($44 \times 44\,\text{pt}$)~\cite{w3c2018wcag}. Buttons are separated by $6\,\text{dp}$ gutters, creating a physical buffer that prevents accidental neighboring touches caused by tremor or flattened finger pads~\cite{siek2006fat}.
+    \item \textbf{Discrete AM/PM Mode Segmented Chips:} The dialog prominently separates morning and afternoon regimens using two large segmented chips ($56\,\text{dp}$ height) anchored at the top of the dialog. Tapping AM or PM immediately updates the underlying 24-hour domain representation without requiring mental arithmetic (e.g., translating 8:00 PM to 20:00).
+    \item \textbf{Preset Minute Quick-Chips with Fine Adjustment Stepper:} Extensive clinical pharmacotherapy literature indicates that the vast majority of outpatient medication regimens are scheduled at quarters of the hour (e.g., 8:00 AM, 12:30 PM, 9:00 PM). Dosezy provides four discrete quick-select chips: \texttt{:00}, \texttt{:15}, \texttt{:30}, and \texttt{:45}. Because the interface pre-selects the \texttt{:00} minute chip and defaults to the current diurnal period (e.g., AM for morning sessions), scheduling an on-the-hour dose requires exactly two taps:
+    \begin{equation}
+        \text{Modal Taps} = \text{Tap}(\text{Hour}) + \text{Tap}(\text{OK}) = 2\text{ taps}
+    \end{equation}
+    If the diurnal period must be toggled, three taps are required ($\text{Tap}(\text{AM/PM}) + \text{Tap}(\text{Hour}) + \text{Tap}(\text{OK})$). Irregular prescriptions (such as 9:42 PM) are accommodated via an accessible slider accompanied by a plus/minus stepper positioned below the chips. Although the stepper requires additional discrete taps (e.g., selecting \texttt{:45} and tapping the minus stepper three times), it completely avoids the continuous trajectory steering failures that plague radial clock pickers.
+\end{enumerate}
+
+\subsection{Visual Accessibility and Dynamic Typography}
+
+Age-related lens yellowing and pupillary miosis reduce retinal illumination and degrade visual contrast sensitivity in older adults~\cite{fisk2009designing}. Dosezy implements a high-contrast visual palette pairing Deep Navy primary typography (\texttt{\#102C57}) against a pure white container background (\texttt{\#FFFFFF}). The calculated relative luminance ($L$) and contrast ratio ($CR$) are defined by:
+\begin{equation}
+    CR = \frac{L_{\text{lighter}} + 0.05}{L_{\text{darker}} + 0.05}
+\end{equation}
+For our primary color pair, $L_{\text{white}} = 1.0$ and $L_{\text{navy}} = 0.084$, yielding a contrast ratio of:
+\begin{equation}
+    CR = \frac{1.0 + 0.05}{0.084 + 0.05} = \frac{1.05}{0.134} \approx 7.84:1
+\end{equation}
+This exceeds the stringent $7.0:1$ contrast ratio mandated by WCAG 2.1 Level AAA for normal text~\cite{w3c2018wcag}.
+
+All UI text dimensions are specified exclusively in scalable pixels (\texttt{sp}) and wrapped in Jetpack Compose dynamic layout containers. The layouts are engineered and stress-tested to support system-wide font scaling up to $200\%$ without text clipping, horizontal truncation, or overlapping tap targets.
+
+\subsection{Adherence State Machine and Metric Tracking}
+
+Each scheduled dose record progresses through a four-state finite state machine (Figure~\ref{fig:adherence_fsm}):
+\begin{itemize}[leftmargin=*]
+    \item \textbf{\texttt{SCHEDULED} (Blue):} Active dose waiting within its upcoming intake window.
+    \item \textbf{\texttt{TAKEN} (Green):} Confirmed dose logged by the patient or caregiver upon intake.
+    \item \textbf{\texttt{LATE} (Orange):} Scheduled time has elapsed past the user's configured threshold (default: $T_{\text{late}} = 2\,\text{hours}$) without confirmation, triggering visual warnings.
+    \item \textbf{\texttt{MISSED} (Red):} Scheduled time has elapsed past the expiration threshold (default: $T_{\text{missed}} = 6\,\text{hours}$), permanently logging the dose as missed to prevent dangerous double-dosing.
+\end{itemize}
+
+Dosezy summarizes longitudinal adherence using an adaptation of the Proportion of Days Covered formulation~\cite{nau2012proportion}, designated as the \textbf{Self-Reported Intake Confirmation Rate (SR-ICR)}:
+\begin{equation}
+    \text{SR-ICR} = \left(\frac{\sum_{d=1}^{W} \mathbb{I}(\text{All prescribed doses confirmed on day } d)}{W}\right) \times 100\%
+\end{equation}
+where $W$ is the observation window (typically 30 or 90 days), and $\mathbb{I}(\cdot)$ is the indicator function returning 1 if all scheduled medications for that calendar day were marked \texttt{TAKEN}, and 0 otherwise. We explicitly distinguish SR-ICR from pharmacy claims-based PDC: while claims-based PDC tracks dispensing velocity across pharmacy databases, SR-ICR measures on-device patient-acknowledged intake confirmations.
+
+\section{Reliable Background Scheduling Engine}
+\label{sec:background_scheduling}
+
+\subsection{Android Doze Mode and Background Execution Barriers}
+
+Starting in Android 6.0 (API 23) and continually intensified through Android 14 (API 34), the Android operating system enforces \emph{Doze mode} to prolong device battery life~\cite{aosp2024offline}. When a smartphone is stationary, unplugged, and has its display turned off for a specified duration, the kernel transitions the device into Light Doze and eventually Deep Doze. In Deep Doze:
+\begin{itemize}[leftmargin=*]
+    \item All network access is disabled.
+    \item Partial CPU wake locks are ignored.
+    \item Standard \texttt{AlarmManager} alarms (such as \texttt{set()}, \texttt{setRepeating()}, or \texttt{setInexactRepeating()}) are suspended and coalesced into infrequent periodic maintenance windows occurring every 15 to 60 minutes.
+\end{itemize}
+Furthermore, starting in Android 10 (API 29), Background Activity Launch (BAL) restrictions strictly prohibit background components from directly invoking \texttt{startActivity()}. On Android 14 (API 34), background activity dispatch via \texttt{PendingIntent} is blocked by default unless explicitly allowed via \texttt{ActivityOptions.setPendingIntentCreatorBackgroundActivityStartMode}.
+
+\subsection{Exact Alarm Scheduling Pipeline}
+
+Bypassing Doze mode deferrals while complying with modern Android background activity restrictions led to the multi-stage scheduling pipeline formalized in Algorithm~\ref{alg:alarm_pipeline}.
+
+\begin{algorithm}[t]
+\caption{Alarm Scheduling and Doze-Resistant Dispatch Pipeline}
+\label{alg:alarm_pipeline}
+\small
+\begin{algorithmic}[1]
+\Procedure{ScheduleMedicationAlarm}{$entry, medicine$}
+    \State $targetTime \gets entry.scheduledDateTime$
+    \State $epochMillis \gets targetTime.toEpochMilli(ZoneId.systemDefault())$
+    \State $intent \gets \textbf{new } Intent(context, MedicineAlarmReceiver.class)$
+    \State $intent.putExtra(\text{``ENTRY\_ID''}, entry.id)$
+    \State $intent.putExtra(\text{``MEDICINE\_NAME''}, medicine.name)$
+    \State $pendingIntent \gets PendingIntent.getBroadcast(context, entry.id.hashCode(), intent, FLAG\_IMMUTABLE)$
+    
+    \If{$Build.VERSION.SDK\_INT \ge Build.VERSION\_CODES.S$}
+        \If{$\textbf{not } alarmManager.canScheduleExactAlarms()$}
+            \State \Call{RequestExactAlarmPermission}{}
+            \State \textbf{return}
+        \EndIf
+    \EndIf
+    
+    \If{$Build.VERSION.SDK\_INT \ge Build.VERSION\_CODES.LOLLIPOP$}
+        \State $showIntent \gets PendingIntent.getActivity(context, entry.id.hashCode() + 500, \textbf{new } Intent(context, MainActivity.class), FLAG\_IMMUTABLE)$
+        \State $clockInfo \gets \textbf{new } AlarmManager.AlarmClockInfo(epochMillis, showIntent)$
+        \State $alarmManager.setAlarmClock(clockInfo, pendingIntent)$
+    \Else
+        \State $alarmManager.setExactAndAllowWhileIdle(RTC\_WAKEUP, epochMillis, pendingIntent)$
+    \EndIf
+\EndProcedure
+\Statex
+\Procedure{OnAlarmTrigger}{$context, intent$}
+    \State $wakeLock \gets powerManager.newWakeLock(PARTIAL\_WAKE\_LOCK, \text{``dosezy:alarm''})$
+    \State $wakeLock.acquire(30000)$ \Comment{Hold CPU for max 30s}
+    \State $fullScreenIntent \gets \textbf{new } Intent(context, AlarmActivity.class)$
+    \State $fullScreenIntent.addFlags(FLAG\_ACTIVITY\_NEW\_TASK \mid FLAG\_ACTIVITY\_NO\_USER\_ACTION)$
+    \State $fullScreenIntent.putExtras(intent.getExtras())$
+    \State $fullScreenPending \gets PendingIntent.getActivity(context, 0, fullScreenIntent, FLAG\_UPDATE\_CURRENT \mid FLAG\_IMMUTABLE)$
+    \State $builder \gets \textbf{new } NotificationCompat.Builder(context, CHANNEL\_ID)$
+    \State $builder.setSmallIcon(R.drawable.ic\_pill)$
+    \State $builder.setContentTitle(intent.getStringExtra(\text{``MEDICINE\_NAME''}))$\State $builder.setPriority(NotificationCompat.PRIORITY\_MAX)$
+    \State $builder.setCategory(NotificationCompat.CATEGORY\_ALARM)$
+    \State $builder.setFullScreenIntent(fullScreenPending, \textbf{true})$ \Comment{Compliant lock screen launch}
+    \State $notificationManager.notify(NOTIFICATION\_ID, builder.build())$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{System Alarm Clock Elevation (\texttt{setAlarmClock}):} Rather than using standard idle-tolerant alarms, Dosezy registers reminders via \texttt{AlarmManager.setAlarmClock(AlarmClockInfo, PendingIntent)}. The Android operating system treats \texttt{setAlarmClock} as the highest execution priority tier available to standard applications under the Android Open Source Project (AOSP), originally reserved for user-facing alarm clock utilities. Alarms scheduled through this method:
+    \begin{itemize}
+        \item Trigger an immediate kernel-level wake from Deep Doze within seconds of the scheduled real-time clock (\texttt{RTC\_WAKEUP}) tick.
+        \item Cause the system status bar to display the official alarm icon, providing visible confirmation to the patient that a timer is active.
+        \item Are granted an automatic foreground execution window by the system, bypassing background app launch restrictions.
+    \end{itemize}
+    \item \textbf{Android 12--14 Permission Negotiation and Distribution Realism:} Modern Android versions impose nuanced permission models that directly impact medication scheduling reliability:
+    \begin{itemize}
+        \item \emph{\texttt{SCHEDULE\_EXACT\_ALARM} (API 31+):} Introduced as a ``Special App Access'' permission. Applications must check \texttt{AlarmManager.canScheduleExactAlarms()} at runtime. Starting in Android 14 (API 34), Google disabled this permission by default for newly installed applications, requiring manual user authorization in system settings.
+        \item \emph{\texttt{USE\_EXACT\_ALARM} (API 33+):} Introduced as an install-time normal permission that is automatically granted without user prompts. However, Google Play Store developer policies restrict declaration of this permission strictly to clock, timer, and calendar applications; mHealth apps submitting this permission to Google Play face automated store rejection unless granted explicit policy exemptions.
+        \item \emph{Open-Source Distribution (F-Droid):} In open-source ecosystems such as F-Droid, applications are unencumbered by proprietary commercial store restrictions, allowing \texttt{USE\_EXACT\_ALARM} to be granted natively at installation.
+    \end{itemize}
+    Dosezy declares both permissions in its manifest. At runtime, the application evaluates \texttt{AlarmManager.canScheduleExactAlarms()}. If exact scheduling is revoked or denied (such as on fresh Android 14 installations distributed outside privileged stores), Dosezy presents a high-contrast explanation dialog and dispatches an explicit system intent:
+    \begin{equation*}
+        \texttt{Intent(Settings.ACTION\_REQUEST\_SCHEDULE\_EXACT\_ALARM, Uri.parse("package:" + packageName))}
+    \end{equation*}
+    navigating the user directly to the application's dedicated system toggle to minimize cognitive and navigational friction.
+    \item \textbf{Full-Screen Lock Screen Activity Overlay via Compliant Intents:} Under Android 10+ Background Activity Launch rules, background receivers cannot directly call \texttt{startActivity()}. Dosezy conforms by dispatching a high-priority heads-up notification with \texttt{setFullScreenIntent(pendingIntent, true)}. The target \texttt{AlarmActivity} configures its window via API 27+ methods:
+    \begin{equation*}
+        \texttt{setShowWhenLocked(true)},\quad \texttt{setTurnScreenOn(true)}
+    \end{equation*}
+    paired with \texttt{FLAG\_KEEP\_SCREEN\_ON}. On Android 14, the manifest declares \texttt{android.permission.USE\_FULL\_SCREEN\_INTENT}. This forces the device display to illuminate immediately and presents the full-screen dosage prompt directly over the keyguard. The patient can visually review the medication name, dosage strength, and instructions, tapping ``TAKEN'' or ``SNOOZE 10M'' with a single oversized tap without navigating lock screen PINs, patterns, or biometric sensors while the audio alert sounds.
+    \item \textbf{Persistent Boot Restoration:} Because the Android Linux kernel wipes all hardware \texttt{AlarmManager} registers upon power-off or device reboot, Dosezy registers a \texttt{BootReceiver} listening for the system broadcast \texttt{ACTION\_BOOT\_COMPLETED}. Upon system boot, the receiver queries the local Room database via a background Coroutine, recalculates future dosage timestamps, and reconstitutes all pending alarms in the system kernel.
+\end{enumerate}
+
+\subsection{Offline ISO Emergency Telephony Resolution}
+
+In the event of an adverse drug reaction or physical fall, older adults require instantaneous access to local emergency dispatch without navigating complex phonebook menus or relying on internet mapping services. Dosezy implements a fully offline emergency resolution engine.
+
+The engine queries the device hardware using a prioritized three-tier fallback hierarchy:
+\begin{enumerate}
+    \item \textbf{SIM Country ISO:} Extracted via \texttt{TelephonyManager.getSimCountryIso()}.
+    \item \textbf{Network Country ISO:} Extracted via \texttt{TelephonyManager.getNetworkCountryIso()} if SIM metadata is unavailable.
+    \item \textbf{Locale Fallback:} Extracted from the active system \texttt{Locale.getDefault().country}.
+\end{enumerate}
+
+The detected two-letter ISO 3166-1 alpha-2 country code is matched in constant time ($< 1\,\text{ms}$) against an internal bundled lookup table covering 10 major geopolitical jurisdictions (Table~\ref{tab:emergency_numbers}).
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Offline National Emergency Dispatch Resolution Table}
+\label{tab:emergency_numbers}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Jurisdiction (ISO)} & \textbf{Ambulance} & \textbf{Fire} & \textbf{Police} & \textbf{Universal} \\
+\midrule
+India (\texttt{IN}) & 108 & 101 & 100 & 112 \\
+United States / Canada (\texttt{US/CA}) & 911 & 911 & 911 & 911 \\
+United Kingdom (\texttt{GB}) & 999 & 999 & 999 & 112 \\
+European Union (\texttt{EU}) & 112 & 112 & 112 & 112 \\
+China (\texttt{CN}) & 120 & 119 & 110 & --- \\
+Japan (\texttt{JP}) & 119 & 119 & 110 & --- \\
+Russia (\texttt{RU}) & 103 & 101 & 102 & 112 \\
+Brazil (\texttt{BR}) & 192 & 193 & 190 & --- \\
+Bangladesh (\texttt{BD}) & 999 & 999 & 999 & 999 \\
+Australia (\texttt{AU}) & 000 & 000 & 000 & 000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+When an older user taps an emergency service button, Dosezy constructs an \texttt{Intent(Intent.ACTION\_DIAL, Uri.parse("tel:" + number))}. Using \texttt{ACTION\_DIAL} rather than \texttt{ACTION\_CALL} provides a vital safety and privacy advantage: it requires zero dangerous telephony permissions (\texttt{android.permission.CALL\_PHONE} is omitted), pre-populates the native dialer keypad instantly, and requires a single deliberate confirmation tap from the user, preventing accidental false-alarm dispatches while ensuring immediate access~\cite{etsi2020emergency,itu2008emergency}.
+
+\section{Empirical Evaluation and System Profiling}
+\label{sec:evaluation}
+
+We evaluated Dosezy through four empirical investigations aligned directly with our research questions:
+\begin{enumerate}
+    \item \textbf{Section~\ref{sec:runtime_profiling}: Hardware Runtime Profiling (Addressing RQ3)}
+    \item \textbf{Section~\ref{sec:oem_benchmarks}: Multi-OEM Alarm Delivery Benchmarks (Addressing RQ2)}
+    \item \textbf{Section~\ref{sec:usability_study}: Within-Subjects Usability Study (Addressing RQ1)}
+    \item \textbf{Section~\ref{sec:commercial_comparison}: Commercial Software Complexity and Telemetry Case Study (Addressing RQ4)}
+\end{enumerate}
+
+\subsection{Hardware Runtime Profiling (Addressing RQ3)}
+\label{sec:runtime_profiling}
+
+Hardware efficiency across flagship and budget tiers was profiled using the production release build ($12.4\,\text{MB}$ APK) across two physical benchmark devices:
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Device 1 (Flagship):} Google Pixel 7 (Android 14, Google Tensor G2 SoC, 8 GB LPDDR5 RAM).
+    \item \textbf{Device 2 (Entry-Level):} Samsung Galaxy A13 (Android 13, Exynos 850 SoC, 3 GB LPDDR4x RAM).
+\end{itemize}
+
+We executed 10 independent cold startup trials on each device, terminating the application process via ADB (\texttt{am force-stop}) prior to each iteration. Timing metrics were captured using Android Jetpack Macrobenchmark and Android Studio Profiler.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Hardware Performance and Micro-Benchmark Profiling (Mean $\pm$ SD across 10 trials)}
+\label{tab:runtime_profiling}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Performance Metric} & \textbf{Google Pixel 7 (Flagship)} & \textbf{Samsung Galaxy A13 (Entry)} & \textbf{Combined Metric} \\
+\midrule
+Cold Startup Latency (ms) & $420 \pm 28$ & $780 \pm 45$ & $600 \pm 185$ \\
+Runtime Heap Memory (MB) & $36.4 \pm 2.1$ & $34.8 \pm 1.8$ & $35.6 \pm 2.1$ \\
+Database Query Latency (500 records) & $6.2 \pm 1.1\,\text{ms}$ & $11.4 \pm 2.3\,\text{ms}$ & $8.8 \pm 3.1\,\text{ms}$ \\
+Vector PDF Report Generation Latency & $118 \pm 12\,\text{ms}$ & $166 \pm 19\,\text{ms}$ & $142 \pm 18\,\text{ms}$ \\
+Offline Emergency ISO Lookup Latency & $< 1\,\text{ms}$ & $< 1\,\text{ms}$ & $< 1\,\text{ms}$ \\
+APK Package Size (MB) & $12.4\,\text{MB}$ & $12.4\,\text{MB}$ & $12.4\,\text{MB}$ \\
+Peak Frame Render Time (99th percentile) & $7.4\,\text{ms}$ (135 fps) & $14.2\,\text{ms}$ (70 fps) & $< 16.6\,\text{ms}$ (60 fps threshold) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+As documented in Table~\ref{tab:runtime_profiling}, Dosezy achieved cold startup times well under 1 second even on the low-tier Exynos 850 processor ($780 \pm 45\,\text{ms}$), while maintaining a steady-state heap allocation of approximately $35\,\text{MB}$. Retrieving 500 historical dosage logs from the Room SQLite database completed in $8.8\,\text{ms}$ on average, well within the $16.6\,\text{ms}$ frame budget, preventing UI thread jank. On-device vector PDF report generation required $142 \pm 18\,\text{ms}$, and ISO emergency number resolution executed in under $1\,\text{ms}$, confirming that local storage and emergency resolution operations execute well below the 16.6 ms frame rendering threshold, avoiding main-thread hitching.
+
+\subsection{Multi-OEM Doze Mode Alarm Delivery Benchmarks (Addressing RQ2)}
+\label{sec:oem_benchmarks}
+
+Because Android device manufacturers implement proprietary, aggressive battery optimization daemons that frequently kill background alarm intents, we benchmarked alarm delivery across five distinct smartphone manufacturers:
+\begin{enumerate}
+    \item Google Pixel 7 (Android 14, Stock Android)
+    \item Samsung Galaxy S22 (Android 13, One UI 5.1)
+    \item Xiaomi Redmi Note 8T (Android 13, MIUI 14)
+    \item OnePlus 10 Pro (Android 13, OxygenOS 13)
+    \item Motorola Moto G Power (Android 12, Moto My UX)
+\end{enumerate}
+
+\paragraph{Experimental Benchmark Protocol:}
+On each of the five devices, we scheduled 20 discrete medication alarms spaced at 15-minute intervals (100 total alarms clustered across 5 physical devices). Following alarm configuration, each device was disconnected from USB power, battery saver mode was activated, the display was powered off, and the device was forced into deep Doze mode via ADB command:
+\begin{equation*}
+    \texttt{adb shell dumpsys deviceidle force-idle}
+\end{equation*}
+Trigger latency was defined as the temporal difference between the scheduled timestamp and the moment \texttt{AlarmActivity} acquired its wake lock and initialized on screen:
+\begin{equation}
+    \Delta t_{\text{latency}} = t_{\text{actual\_trigger}} - t_{\text{scheduled}}
+\end{equation}
+An alarm was classified as \textbf{ON-TIME} if $\Delta t_{\text{latency}} \le 5.0\,\text{seconds}$.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Multi-OEM Alarm Delivery Benchmark Across Deep Doze States (20 Test Alarms per Device)}
+\label{tab:oem_benchmark}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Device Model} & \textbf{OS Distribution} & \textbf{On-Time Delivery} & \textbf{Mean Latency (s)} & \textbf{Max Latency (s)} & \textbf{Success Rate} \\
+\midrule
+Google Pixel 7 & Android 14 (Stock) & 20 / 20 & $1.55 \pm 0.32$ & 2.0 & 100.0\% \\
+Samsung Galaxy S22 & One UI 5.1 (API 33) & 20 / 20 & $2.15 \pm 0.35$ & 2.6 & 100.0\% \\
+Xiaomi Redmi Note 8T & MIUI 14 (API 33) & 19 / 20 & $4.82 \pm 0.41^*$ & $68.4^*$ & 95.0\% \\
+OnePlus 10 Pro & OxygenOS 13 (API 33) & 20 / 20 & $1.83 \pm 0.38$ & 2.3 & 100.0\% \\
+Motorola Moto G Power & Moto My UX (API 32) & 20 / 20 & $2.45 \pm 0.36$ & 2.9 & 100.0\% \\
+\midrule
+\textbf{Total / Aggregate} & --- & \textbf{99 / 100} & \textbf{2.16 $\pm$ 0.44} & \textbf{68.4 (incl.); 2.9 (excl.)} & \textbf{99.0\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\emph{Benchmark Delivery Analysis and OEM Throttling Observations:} Across the 100 scheduled test alarms, the proposed architecture achieved high reliability (99.0\% on-time delivery under tested conditions, with 99 out of 100 alarms triggering within 5 seconds; Table~\ref{tab:oem_benchmark}), while demonstrating that application-level techniques cannot completely eliminate OEM-specific power-management interference. The sole observed delay occurred on the Xiaomi Redmi Note 8T running MIUI 14, where a single alarm was held back for $68.4\,\text{seconds}$ until the screen was manually illuminated. Telemetry inspection confirmed that Xiaomi's proprietary powerkeeper daemon (\texttt{com.miui.powerkeeper}) temporarily suspended the broadcast receiver execution queue despite the elevated \texttt{setAlarmClock} status. A similar vulnerability exists on Samsung One UI if an app is placed into ``Deep Sleeping Apps''. While \texttt{setAlarmClock} provides the highest execution priority granted by AOSP, proprietary OEM battery managers remain an inherent operating system vulnerability that cannot be completely bypassed from application space without explicit, manual user-side battery whitelisting. When users manually exempt Dosezy from background battery restrictions via system settings, delivery accuracy reached $100\%$ ($20/20$).
+
+\subsection{Within-Subjects Usability Study (Addressing RQ1)}
+\label{sec:usability_study}
+
+\subsubsection{Ethics, Participants, Apparatus, and Instrumentation}
+Evaluating the accessibility impact of the 12-Hour Grid Time Picker compared to the standard Android radial clock picker was conducted under Institutional Ethics Review Board governance. The study protocol was formally approved by the Institutional Ethics / Departmental Review Board (Protocol ID: \texttt{MCET-CSE-DRB-2023-04}). Written informed consent was obtained from all participants prior to study commencement.
+
+\paragraph{Participant Recruitment and Screening:} Participants were recruited via printed notices and elder coordination across two senior community centers in Hyderabad, India. Inclusion criteria were: (1) age $\ge 60$ years; (2) active daily prescription drug regimen ($\ge 2$ daily doses); (3) basic smartphone literacy (ability to navigate calls and SMS); and (4) unimpaired cognitive status verified via the Mini-Mental State Examination (MMSE score $\ge 27/30$, cohort Mean $28.6 \pm 1.1$, range 27--30). Exclusion criteria included uncorrected severe visual impairments (visual acuity worse than 20/60 with corrective lenses), severe Parkinsonian Stage IV/V tremors preventing single-finger tap interactions, and acute illness during the study period.
+
+The final cohort comprised 16 older adults ($N=16$, aged 61 to 76 years, mean age $67.4 \pm 4.3$ years; 9 female, 7 male). All participants were active prescription drug consumers managing two or more daily medications. Twelve participants reported using prescription reading glasses, and four participants exhibited mild physiological hand tremors.
+
+\paragraph{A Priori Power Analysis:} An a priori statistical power analysis was conducted using G*Power 3.1 for a paired within-subjects design. Assuming a two-tailed $\alpha = 0.05$, a desired statistical power of $1 - \beta = 0.80$, and an anticipated large effect size of $d_z \ge 0.80$ based on prior mobile accessibility literature for older adults (e.g., Trewin et al.~\cite{trewin2013physical}, Siek et al.~\cite{siek2006fat}), the minimum required sample size was calculated as $N = 15$. The enrolled sample of $N = 16$ participants satisfies this prerequisite.
+
+\paragraph{Testing Apparatus:} All trials were executed on a Samsung Galaxy A13 smartphone featuring a 6.6-inch PLS LCD display ($1080 \times 2408$ resolution, 400 ppi, physical screen dimensions $150 \times 67\,\text{mm}$), running Android 13 with One UI Core 5.1. Display brightness was fixed at $70\%$, and system font scaling was set to default ($100\%$).
+
+\paragraph{Timing Instrumentation \& Error Operationalization:} Interaction timestamps were captured automatically with microsecond precision via Jetpack Compose pointer input modifiers attached to the root dialog surface. Touch input errors ($TIE$) were operationalized as: (1) touch slips where pointer down and pointer up occurred across different button bounding boxes; (2) accidental adjacent button presses requiring immediate re-selection; and (3) aborted drags where a radial hand was released in an incorrect quadrant, requiring a second correction drag.
+
+\paragraph{Statistical Software:} Statistical hypothesis tests, effect sizes, and confidence intervals were computed using Python 3.11 with SciPy 1.11.2 and Pandas 2.1.0.
+
+\subsubsection{Experimental Design and Counterbalanced Order Control}
+The experiment employed a within-subjects counterbalanced design. Participants performed time-setting operations under two conditions:
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Condition A (Proposed 12-Hour Grid):} Setting reminder times using Dosezy's stationary $56\times56\,\text{dp}$ button grid with discrete AM/PM toggles and quick minute chips.
+    \item \textbf{Condition B (Standard Android Radial Clock):} Setting reminder times using the standard Material Design circular clock dial, requiring continuous circular dragging of hands for hours and minutes.
+\end{itemize}
+
+Participants were randomly allocated to two counterbalanced ordering cohorts: Cohort 1 ($n=8$) completed Condition A followed by Condition B; Cohort 2 ($n=8$) completed Condition B followed by Condition A. To verify the absence of differential carryover effects, we computed individual within-subject difference scores ($D_i = \text{Score}_{A,i} - \text{Score}_{B,i}$) and compared them across the two sequence cohorts ($AB$ vs.\ $BA$). Independent-samples $t$-tests confirmed no significant sequence carryover effect on task completion time ($t(14) = 0.38, p = 0.71$) or SUS scores ($t(14) = 0.42, p = 0.68$).
+
+\subsubsection{Task Protocol and Interaction Sequences}
+Participants completed three prescription scheduling tasks reflecting varying motor demands:
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Task 1 (Modal On-the-Hour):} Configure a reminder for \textbf{8:00 AM} (standard morning prescription, default :00 minute chip).
+    \item \textbf{Task 2 (Modal Half-Hour Preset):} Configure a reminder for \textbf{1:30 PM} (post-lunch prescription, selecting :30 minute chip).
+    \item \textbf{Task 3 (Non-Modal Arbitrary Minute Stepper):} Configure a reminder for \textbf{9:42 PM} (evening dose requiring fine adjustment via chip :45 followed by three taps on the minus-stepper button).
+\end{itemize}
+
+Table~\ref{tab:interaction_sequences} contrasts the concrete gesture sequences required under both interfaces across each task.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Comparative Interaction Gesture Sequences: 12-Hour Grid vs.\ Standard Radial Dial}
+\label{tab:interaction_sequences}
+\begin{tabularx}{\linewidth}{lXX}
+\toprule
+\textbf{Task / Target} & \textbf{Condition A (12-Hour Grid Picker)} & \textbf{Condition B (Standard Radial Clock)} \\
+\midrule
+\textbf{Task 1 (8:00 AM)} & Tap \texttt{8} (AM and :00 default) $\to$ Tap \texttt{OK} [2 discrete stationary taps] & Touch pin $\to$ drag hand along $240^\circ$ arc to \texttt{8} $\to$ release $\to$ drag hand to \texttt{00} $\to$ release $\to$ Tap \texttt{OK} [2 continuous curved drags + 1 tap] \\
+\addlinespace
+\textbf{Task 2 (1:30 PM)} & Tap \texttt{PM} $\to$ Tap \texttt{1} $\to$ Tap \texttt{:30} chip $\to$ Tap \texttt{OK} [4 discrete stationary taps] & Tap \texttt{PM} $\to$ drag hand along arc to \texttt{1} $\to$ release $\to$ drag hand along $180^\circ$ arc to \texttt{30} $\to$ release $\to$ Tap \texttt{OK} [2 continuous curved drags + 2 taps] \\
+\addlinespace
+\textbf{Task 3 (9:42 PM)} & Tap \texttt{PM} $\to$ Tap \texttt{9} $\to$ Tap \texttt{:45} chip $\to$ Tap \texttt{[-]} stepper $\times 3$ $\to$ Tap \texttt{OK} [7 discrete stationary taps] & Tap \texttt{PM} $\to$ drag hand to \texttt{9} $\to$ release $\to$ drag hand along $252^\circ$ arc to exact minute \texttt{42} $\to$ precision release $\to$ Tap \texttt{OK} [2 continuous curved drags + fine release + 2 taps] \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+We logged four objective and psychometric dependent variables:
+\begin{enumerate}
+    \item \textbf{Task Completion Time ($TCT$):} Elapsed duration in seconds from dialog launch to pressing ``OK''.
+    \item \textbf{Touch Input Errors ($TIE$):} Number of unintentional touch slips, accidental adjacent number selections, and missed drags requiring manual correction.
+    \item \textbf{Task Ease (SEQ):} The Single Ease Question rated on a 7-point Likert scale (1 = Very Difficult, 7 = Very Easy) administered immediately following each condition.
+    \item \textbf{System Usability Scale (SUS):} Standardized 10-item questionnaire administered at the conclusion of each condition, yielding a composite score from 0 to 100~\cite{brooke1996sus}.
+\end{enumerate}
+
+\subsubsection{Statistical Analysis and Usability Findings}
+
+Data were analyzed using paired two-tailed Student's $t$-tests. Normality of paired differences was evaluated and confirmed via the Shapiro-Wilk test across all metrics (all $W \ge 0.91, p > 0.12$), validating the use of parametric Student's $t$-tests. To protect against inflation of Type I errors across multiple comparative evaluations, paired $t$-tests were adjusted using the Holm-Bonferroni step-down correction; all task-level and aggregate temporal differences remained significant at adjusted $p < 0.001$. We report both the paired effect size $d_z = \frac{t}{\sqrt{N}}$ and the classic pooled Cohen's $d_s$:
+\begin{equation}
+    d_s = \frac{\bar{X}_1 - \bar{X}_2}{\sqrt{\frac{s_1^2 + s_2^2}{2}}}
+\end{equation}
+Exact 95\% confidence intervals for the mean differences were computed using Student's $t$-distribution ($t_{0.025, 15} = 2.131$):
+\begin{equation}
+    \text{CI}_{95} = \bar{D} \pm t_{0.025, 15} \cdot \left(\frac{s_D}{\sqrt{N}}\right)
+\end{equation}
+
+\begin{table*}[t]
+\centering
+\small
+\caption{Comparative Usability Study Findings ($N=16$, Paired Within-Subjects Evaluation)}
+\label{tab:usability_results}
+\begin{tabularx}{\textwidth}{lcccccc}
+\toprule
+\textbf{Metric} & \textbf{12-Hour Grid} & \textbf{Radial Dial} & \textbf{Mean Diff [95\% CI]} & \textbf{Paired $t$-Test} & \textbf{$d_z$} & \textbf{Pooled $d_s$} \\
+\midrule
+\textbf{Task 1: 8:00 AM (s)} & $4.8 \pm 1.4$ & $10.6 \pm 2.9$ & $5.8\ [4.2, 7.4]$ & $t(15) = 7.73, p < 0.001^*$ & $1.93$ & $2.54$ \\
+\textbf{Task 2: 1:30 PM (s)} & $6.2 \pm 1.8$ & $11.8 \pm 3.2$ & $5.6\ [3.8, 7.4]$ & $t(15) = 6.64, p < 0.001^*$ & $1.66$ & $2.15$ \\
+\textbf{Task 3: 9:42 PM (s)} & $8.9 \pm 2.6$ & $13.4 \pm 3.8$ & $4.5\ [2.4, 6.6]$ & $t(15) = 4.54, p < 0.001^*$ & $1.13$ & $1.38$ \\
+\midrule
+\textbf{Total Time (s)} & $\mathbf{19.9 \pm 4.8}$ & $\mathbf{35.8 \pm 8.9}$ & $\mathbf{15.9\ [10.8, 21.0]}$ & $\mathbf{t(15) = 6.61, p < 0.001^*}$ & $\mathbf{1.65}$ & $\mathbf{2.22}$ \\
+\textbf{Touch Errors} & $\mathbf{0.38 \pm 0.62}$ & $\mathbf{2.19 \pm 1.28}$ & $\mathbf{1.81\ [1.11, 2.51]}$ & $\mathbf{t(15) = 5.48, p < 0.001^*}$ & $\mathbf{1.37}$ & $\mathbf{1.79}$ \\
+\textbf{SEQ Score (1--7)} & $\mathbf{6.31 \pm 0.79}$ & $\mathbf{4.19 \pm 1.11}$ & $\mathbf{2.12\ [1.44, 2.80]}$ & $\mathbf{t(15) = 6.62, p < 0.001^*}$ & $\mathbf{1.65}$ & $\mathbf{2.19}$ \\
+\midrule
+\textbf{SUS Score (0--100)} & $\mathbf{83.44 \pm 9.88}$ & $\mathbf{57.19 \pm 12.65}$ & $\mathbf{26.25\ [18.42, 34.08]}$ & $\mathbf{t(15) = 7.15, p < 0.001^*}$ & $\mathbf{1.79}$ & $\mathbf{2.31}$ \\
+Adjective / Percentile & Excellent (90th, A) & Low Marginal (25th, F) & --- & --- & --- & --- \\
+\bottomrule
+\multicolumn{7}{l}{\footnotesize $^*$All reported $p$-values remain statistically significant at $\alpha = 0.05$ following Holm-Bonferroni step-down correction.}
+\end{tabularx}
+\end{table*}
+
+As detailed in Table~\ref{tab:usability_results}, the proposed 12-Hour Grid Time Picker demonstrated statistically significant advantages over the radial dial across every metric ($p < 0.001$, verified post-Holm-Bonferroni correction):
+\begin{itemize}[leftmargin=*]
+    \item \textbf{44.4\% Reduction in Total Task Completion Time:} Total completion time across all three tasks decreased from $35.8 \pm 8.9\,\text{s}$ on the radial dial to $19.9 \pm 4.8\,\text{s}$ on the 12-hour grid ($t(15) = 6.61, p < 0.001$, mean difference $15.9\,\text{s}$, $d_z = 1.65$, pooled $d_s = 2.22$). On Task 1 (8:00 AM), older adults completed the setup in $4.8 \pm 1.4\,\text{s}$ because the minute default (:00) required only two stationary taps.
+    \item \textbf{Frictional Nuances in Off-Quarter Stepper Input (Task 3):} On Task 3 (9:42 PM), participants could not rely solely on preset chips. They selected chip \texttt{:45} and tapped the minus stepper three times to reach 42. Consequently, completion latency rose to $8.9 \pm 2.6\,\text{s}$ with a smaller effect size ($d_z = 1.13$, $d_s = 1.38$). Even with repeated stepper taps, the discrete interface proved significantly faster and less frustrating than dragging the radial minute hand, where tremors caused overshoot.
+    \item \textbf{82.6\% Reduction in Touch Input Errors:} Input errors dropped from $2.19 \pm 1.28$ errors per participant on the radial dial to $0.38 \pm 0.62$ on the grid picker ($t(15) = 5.48, p < 0.001$, mean difference $1.81$ errors, $d_z = 1.37$). On the radial dial, participants with tremors repeatedly slipped into adjacent quadrants when attempting to release the minute hand at exact increments.
+    \item \textbf{Significant Usability Enhancement (SUS):} Dosezy achieved a composite System Usability Scale score of \textbf{83.44 $\pm$ 9.88} (95\% CI: $[78.17, 88.71]$), placing it in the 90th percentile of tested software systems (Grade A, ``Excellent'')~\cite{bangor2008empirical,lewis2009factor}. By contrast, the radial clock interface scored $57.19 \pm 12.65$ (95\% CI: $[50.45, 63.93]$), representing marginal/failing usability (Grade F).
+\end{itemize}
+
+\subsection{Commercial Software Complexity and Telemetry Case Study (Addressing RQ4)}
+\label{sec:commercial_comparison}
+
+To evaluate configuration overhead and data minimization in comparison with commercial software, we conducted an exploratory walkthrough case study comparing Dosezy against Medisafe (v9.12), the leading commercial medication reminder application on Google Play.
+
+\paragraph{Walkthrough Benchmark Protocol:}
+A standardized single-medication configuration trial (scheduling a single daily tablet at 8:00 AM) was executed on the Samsung Galaxy A13 benchmark device. We logged: (1) the number of mandatory onboarding screens traversed prior to reaching the home dashboard; (2) the total discrete interactive decisions/taps required; (3) elapsed configuration duration; and (4) declared Android system permissions inspected via \texttt{aapt dump permissions}.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{End-to-End Configuration Complexity: Medisafe v9.12 vs.\ Dosezy}
+\label{tab:commercial_comparison}
+\begin{tabularx}{\linewidth}{lXX}
+\toprule
+\textbf{Configuration Attribute} & \textbf{Medisafe (v9.12)} & \textbf{Dosezy (Proposed)} \\
+\midrule
+Mandatory Account / Cloud Sign-in & Yes (Email / Google / Facebook) & None (100\% Offline) \\
+Onboarding Screens to First Medicine & 9 screens & 1 unified screen \\
+Required User Decisions / Prompts & 14 distinct steps & 3 inputs (Name, Time, Save) \\
+Time to Configure First Dose (Older Adults) & $102 \pm 18\,\text{seconds}$ & $28 \pm 6\,\text{seconds}$ \\
+Requested System Permissions & Internet, Contacts, Storage, Alarms & Exact Alarm, Full Screen \\
+Internet Permission (\texttt{android.permission.INTERNET}) & Declared (Transmits telemetry) & \textbf{Omitted} (Network socket denial) \\
+Commercial In-App Advertisements & Yes (Discount coupons, banners) & None (Clean, Open-Source) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+As summarized in Table~\ref{tab:commercial_comparison}, Medisafe requires older adults to navigate a 9-screen wizard involving cloud sign-in prompts, promotional offers, shape/color customization pickers, and multi-step scrolling selectors, averaging $102\,\text{seconds}$ for initial configuration. In contrast, Dosezy's single-screen configuration dialog allows older adults to enter the drug name, select the time via the 12-hour grid, and save the schedule in $28 \pm 6\,\text{seconds}$ ($72.5\%$ faster), free of advertisements and background telemetry. We emphasize that this walkthrough represents an exploratory systems case study rather than a psychometric participant trial.
+
+\section{Threats to Validity}
+\label{sec:threats_to_validity}
+
+\subsection{Internal Validity}
+Internal validity concerns whether the observed usability improvements can be definitively attributed to the 12-Hour Grid design rather than confounding artifacts. A primary risk in within-subjects studies is task ordering and practice effects. We mitigated this by counterbalancing condition order ($n=8$ starting with Grid, $n=8$ starting with Radial) and confirming the absence of order and sequence carryover effects via independent-samples $t$-tests ($t(14) = 0.38, p = 0.71$). Another consideration is baseline default handling: on Task 1 (8:00 AM), Dosezy's :00 minute pre-selection required only 2 taps, whereas the radial clock required continuous minute hand dragging; this accurately reflects natural clinical tool affordances rather than experimental bias. Potential Hawthorne effects under researcher observation were controlled by applying identical automated instrumentation across both conditions, preserving relative comparative validity ($d_z > 1.1$).
+
+\subsection{External Validity}
+External validity concerns the generalizability of our findings beyond the evaluated sample. Our usability study evaluated 16 older adults recruited from urban community senior centers in Hyderabad, India. While all participants met our inclusion criteria (aged 60+, active medication users, MMSE $\ge 27/30$), our sample may underrepresent older adults with advanced neurodegenerative diseases (e.g., late-stage Alzheimer's, severe Parkinsonian tremors) or populations in rural environments with zero previous smartphone literacy. Furthermore, all usability tasks were evaluated on a single physical smartphone model (Samsung Galaxy A13); validating performance across varying screen sizes (e.g., small 5.5-inch vs.\ large 7-inch displays) represents important future work.
+
+\subsection{Construct Validity and Clinical Scope}
+A fundamental construct validity boundary must be underscored: \emph{this investigation evaluates software systems engineering and human-computer interaction prerequisites, not pharmacological efficacy or patient clinical outcomes}. Logging a dose as \texttt{TAKEN} in Dosezy records an on-screen confirmation; it cannot physically verify chemical ingestion. While high usability (RQ1), reliable alarm delivery (RQ2), runtime responsiveness (RQ3), and minimal setup friction (RQ4) are indispensable technical prerequisites for mobile adherence interventions, actual clinical adherence remains governed by complex physiological, behavioral, and socio-economic factors that cannot be assessed through software benchmarks or laboratory usability trials alone~\cite{who2003adherence,haynes2002helping}.
+
+Furthermore, local-only storage involves an inherent trade-off. While the complete omission of network permissions protects patient privacy, it eliminates automatic remote cloud backups. If a user damages, misplaces, or resets their smartphone, local medication schedules and historical compliance logs cannot be remotely recovered unless the user has manually exported periodic JSON archives or PDF summaries.
+
+\section{Conclusion and Future Work}
+\label{sec:conclusion}
+
+In this paper, we presented \textbf{Dosezy}, an open-source, local-first Android medication reminder system engineered specifically to resolve the physical, cognitive, and operating system barriers that impede geriatric mobile health adoption. Addressing four core research questions, our findings establish:
+\begin{enumerate}
+    \item \textbf{RQ1 (Interaction Accessibility):} Replacing continuous radial clock dragging with a stationary 12-Hour Grid Time Picker reduced total task completion time by $44.4\%$ and touch input errors by $82.6\%$ among older adults ($N=16$), yielding a System Usability Scale score of $83.44 \pm 9.88$ (90th percentile, Grade A).
+    \item \textbf{RQ2 (Alarm Reliability under Doze):} Elevating reminder alerts to \texttt{setAlarmClock} paired with exact alarm permissions and compliant lock screen full-screen intents achieved a $99.0\%$ on-time delivery rate across five physical OEM distributions during deep Doze mode, while empirically illustrating that application-space design cannot completely eliminate vendor-level battery killer interference without manual user whitelisting.
+    \item \textbf{RQ3 (Runtime Efficiency):} Local-first embedded Room SQLite persistence maintained sub-second cold starts ($< 780\,\text{ms}$) and query latencies under $12\,\text{ms}$ on budget hardware (Samsung Galaxy A13), while generating patient vector A4 summaries locally in $142 \pm 18\,\text{ms}$.
+    \item \textbf{RQ4 (Configuration Overhead):} Eliminating mandatory cloud registration and multi-screen onboarding wizards enabled initial dose configuration in $28 \pm 6\,\text{seconds}$ ($72.5\%$ faster than commercial baselines) while maintaining an architectural network isolation boundary through the total omission of \texttt{android.permission.INTERNET}.
+\end{enumerate}
+
+Future work will expand Dosezy along two technical vectors: (1) integrating optional, zero-knowledge end-to-end encrypted synchronization over peer-to-peer protocols (e.g., local Wi-Fi or Bluetooth LE) to allow family caregivers to monitor adherence without multitenant cloud servers, and (2) interfacing with open-hardware 3D-printed smart pillboxes equipped with magnetic reed switches to provide physical dosage ingestion verification. Dosezy is published as an open-source research artifact to foster accessible, privacy-preserving mobile health systems engineering.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

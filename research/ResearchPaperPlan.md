@@ -64,8 +64,8 @@ For a budget of **₹0 – ₹5,000**, we target legitimate, DOAJ-indexed comput
 
 | Journal Name | Focus Area | Fee (APC) | Indexing | Review Time |
 | :--- | :--- | :--- | :--- | :--- |
+| **arXiv Preprint (cs.HC / cs.SE)** | Human-Computer Interaction & Software Engineering | **₹0 (Free / Open Access)** | arXiv, Google Scholar, DBLP | Immediate (~1–2 days) |
 | **e-Informatica Software Engineering Journal** | Software Engineering & Architecture | **₹0 (No-APC)** | DOAJ, Scopus | ~8–12 weeks |
-| **Computer Science** (AGH University) | Computer Science & Mobile Systems | **₹0 (No-APC)** | DOAJ, Scopus | ~6–10 weeks |
 | **Journal of Internet and Software Engineering** | Software Systems & HCI | **₹0 (No-APC)** | DOAJ | ~4–8 weeks |
 | **IEEE Conference Route (Alternative)** | Mobile Computing / IPRECON | ₹6,999 (Student) | IEEE Xplore, Scopus | ~4–6 weeks |
 
