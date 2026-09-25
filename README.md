@@ -22,6 +22,8 @@
 
 > <sub>💡 **Note:** Some stores (such as F-Droid, etc.) may take a few days (usually 2-5 days) to review and publish new releases. For immediate access to the latest updates, download directly from [GitHub Releases](https://github.com/saad2134/dosezy/releases). Also, if you sideload apps from GitHub, APKMirror etc., check out ObtainX. It handles all the updates automatically so you don't have to keep checking the sites manually: https://bikram-agarwal.github.io/obtainx/</sub>
 
+<br>
+
 <div align="center">
   <a href="https://f-droid.org/en/packages/com.saad2134.dosezy">
     <img width="197" height="59" alt="F-Droid" src="assets/badges/fdroid.png" />
@@ -113,6 +115,7 @@ Dosezy transforms daily medication management into a stress-free experience. Inp
 [![Bluesky](https://img.shields.io/badge/Bluesky-dosezy.attenomy.com-1e293b?style=flat&logo=bluesky&logoColor=white&labelColor=0285FF)](https://bsky.app/profile/dosezy.attenomy.com)
 [![YouTube](https://img.shields.io/badge/YouTube-%40dosezyapp-1e293b?style=flat&logo=youtube&logoColor=white&labelColor=ff0000)](https://www.youtube.com/@dosezyapp)
 [![Reddit](https://img.shields.io/badge/Reddit-r%2FDosezy-1e293b?style=flat&logo=reddit&logoColor=white&labelColor=ff4500)](https://www.reddit.com/r/Dosezy/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22957599.svg)](https://doi.org/10.5281/zenodo.22957599)
 
 </div>
 
