@@ -1,0 +1,45 @@
+{
+  "title": "Dosezy: A Local-First, Accessibility-Centric Android System for Medication Scheduling and Reliable Reminder Delivery",
+  "upload_type": "publication",
+  "publication_type": "preprint",
+  "description": "<p><strong>Dosezy</strong> is an open-source, local-first Android medication reminder system engineered specifically to resolve the physical, cognitive, and operating system barriers that impede geriatric mobile health adoption. Dosezy introduces a stationary 12-Hour Grid Time Picker featuring a 12-first layout and oversized $\\ge 56\\,\\text{dp}$ touch targets, enforces architectural network isolation via manifest privilege minimization through the total omission of <code>android.permission.INTERNET</code>, generates patient medication and adherence summary PDFs entirely on-device, and implements a multi-stage background scheduling pipeline combining <code>setAlarmClock</code> and exact alarm APIs with full-screen lock screen intent handling.</p><p>This preprint deposit contains the complete publication package: camera-ready manuscript (PDF and Word DOCX with native 2D equations), markdown source, BibTeX database, participant-level usability study dataset ($N=16$ older adults), physical multi-OEM Doze mode alarm benchmark dataset (100 physical alarms across 5 devices), and the automated Python reproduction suite.</p>",
+  "creators": [
+    {
+      "name": "Mohammad, Saaduddin",
+      "affiliation": "Department of Computer Science and Engineering, Methodist College of Engineering and Technology, Hyderabad, India",
+      "orcid": "0009-0008-7954-7696"
+    },
+    {
+      "name": "Khan, Md Rahif Uddin",
+      "affiliation": "Department of Computer Science and Engineering, Methodist College of Engineering and Technology, Hyderabad, India",
+      "orcid": "0009-0009-6219-4924"
+    },
+    {
+      "name": "Mohammed, Khwaja",
+      "affiliation": "Department of Computer Science and Engineering, Methodist College of Engineering and Technology, Hyderabad, India",
+      "orcid": "0009-0007-6312-6347"
+    }
+  ],
+  "access_right": "open",
+  "license": "cc-by-4.0",
+  "keywords": [
+    "Geriatric Accessibility",
+    "Human-Computer Interaction",
+    "Local-First Software",
+    "Medication Adherence",
+    "Android AlarmManager",
+    "Mobile Systems Engineering",
+    "Doze Mode",
+    "Fitts' Law",
+    "System Usability Scale"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/saad2134/dosezy",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ],
+  "language": "eng",
+  "version": "1.0.0"
+}
