@@ -1,13 +1,40 @@
 cff-version: 1.2.0
 message: "If you use Dosezy, please cite it as below."
-authors:
-- family-names: "Mohammed"
-  given-names: "Saaduddin"
-- family-names: "Khan"
-  given-names: "Md Rahif Uddin"
-- family-names: "Mohammed"
-  given-names: "Khwaja"
+type: software
 title: "Dosezy"
-version: 2.2.2
-date-released: 2026-08-08
+version: 2.5.6
+date-released: 2026-09-23
 url: "https://github.com/saad2134/dosezy"
+repository-code: "https://github.com/saad2134/dosezy"
+license: GPL-3.0
+keywords:
+  - medication-reminder
+  - accessibility
+  - older-adults
+  - android
+  - local-first
+authors:
+  - family-names: "Mohammad"
+    given-names: "Saaduddin"
+    orcid: "https://orcid.org/0009-0008-7954-7696"
+  - family-names: "Khan"
+    given-names: "Md Rahif Uddin"
+    orcid: "https://orcid.org/0009-0009-6219-4924"
+  - family-names: "Mohammed"
+    given-names: "Khwaja"
+    orcid: "https://orcid.org/0009-0007-6312-6347"
+preferred-citation:
+  type: article
+  title: "Dosezy: A Local-First, Accessibility-Centric Android System for Medication Scheduling and Reliable Reminder Delivery"
+  authors:
+    - family-names: "Mohammad"
+      given-names: "Saaduddin"
+      orcid: "https://orcid.org/0009-0008-7954-7696"
+    - family-names: "Khan"
+      given-names: "Md Rahif Uddin"
+      orcid: "https://orcid.org/0009-0009-6219-4924"
+    - family-names: "Mohammed"
+      given-names: "Khwaja"
+      orcid: "https://orcid.org/0009-0007-6312-6347"
+  doi: "10.5281/zenodo.22957599"
+  year: 2026
