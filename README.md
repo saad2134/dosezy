@@ -111,24 +111,25 @@ Dosezy transforms daily medication management into a stress-free experience. Inp
 <div align="center">
 
 [![Website](https://img.shields.io/badge/Website-dosezy.attenomy.com-1e293b?style=flat&logo=googlechrome&logoColor=white&labelColor=0284c7)](https://dosezy.attenomy.com)
-[![X (Twitter)](https://img.shields.io/badge/X%20(Twitter)-%40dosezyapp-1e293b?style=flat&logo=x&logoColor=white&labelColor=000000)](https://x.com/dosezyapp)
-[![Bluesky](https://img.shields.io/badge/Bluesky-dosezy.attenomy.com-1e293b?style=flat&logo=bluesky&logoColor=white&labelColor=0285FF)](https://bsky.app/profile/dosezy.attenomy.com)
-[![YouTube](https://img.shields.io/badge/YouTube-%40dosezyapp-1e293b?style=flat&logo=youtube&logoColor=white&labelColor=ff0000)](https://www.youtube.com/@dosezyapp)
-[![Reddit](https://img.shields.io/badge/Reddit-r%2FDosezy-1e293b?style=flat&logo=reddit&logoColor=white&labelColor=ff4500)](https://www.reddit.com/r/Dosezy/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22957599.svg)](https://doi.org/10.5281/zenodo.22957599)
+[![AlternativeTo](https://img.shields.io/badge/AlternativeTo-Dosezy-1e293b?style=flat&logo=alternativeto&logoColor=white&labelColor=5A4FCF)](https://alternativeto.net/software/dosezy/about/)
+[![Product Hunt](https://img.shields.io/badge/Product%20Hunt-Dosezy-1e293b?style=flat&logo=producthunt&logoColor=white&labelColor=DA552F)](https://www.producthunt.com/products/dosezy)
 
 </div>
 
-<p align="center">
-  <a href="https://alternativeto.net/software/dosezy/about/?utm_source=badge&utm_medium=referral" target="_blank">
-    <img
-      src="https://alternativeto.net/static/badges/badge-compact-color.svg"
-      alt="Dosezy | AlternativeTo"
-      width="195"
-      height="63"
-    />
-  </a>
-</p>
+## 📢 Socials
+
+<div align="center">
+  
+[![X (Twitter)](https://img.shields.io/badge/X%20(Twitter)-%40dosezyapp-1e293b?style=flat&logo=x&logoColor=white&labelColor=000000)](https://x.com/dosezyapp)
+[![Bluesky](https://img.shields.io/badge/Bluesky-dosezy.attenomy.com-1e293b?style=flat&logo=bluesky&logoColor=white&labelColor=0285FF)](https://bsky.app/profile/dosezy.attenomy.com)
+[![YouTube](https://img.shields.io/badge/YouTube-%40dosezyapp-1e293b?style=flat&logo=youtube&logoColor=white&labelColor=FF0000)](https://www.youtube.com/@dosezyapp)
+[![Reddit](https://img.shields.io/badge/Reddit-r%2FDosezy-1e293b?style=flat&logo=reddit&logoColor=white&labelColor=FF4500)](https://www.reddit.com/r/Dosezy/)
+[![Facebook](https://img.shields.io/badge/Facebook-%40dosezyapp-1e293b?style=flat&logo=facebook&logoColor=white&labelColor=1877F2)](https://www.facebook.com/dosezyapp)
+[![Instagram](https://img.shields.io/badge/Instagram-%40dosezyapp-1e293b?style=flat&logo=instagram&logoColor=white&labelColor=E4405F)](https://www.instagram.com/dosezyapp)
+[![Threads](https://img.shields.io/badge/Threads-%40dosezyapp-1e293b?style=flat&logo=threads&logoColor=white&labelColor=000000)](https://www.threads.net/@dosezyapp)
+
+</div>
 
 ---
 
