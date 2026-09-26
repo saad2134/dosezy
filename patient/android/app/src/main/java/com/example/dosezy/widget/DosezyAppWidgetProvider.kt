@@ -66,6 +66,7 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
 
             val dateFormat = SimpleDateFormat("EEE, MMM d", Locale.getDefault())
             views.setTextViewText(R.id.widget_date_text, dateFormat.format(System.currentTimeMillis()))
+            views.setTextViewText(R.id.widget_title_text, context.getString(R.string.app_name))
             
             // Push initial synchronous update so launcher immediately has a valid layout
             appWidgetManager.updateAppWidget(appWidgetId, views)
@@ -76,6 +77,13 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                     val users = db.userDao().getAllUsersDirect()
                     val user = users.find { it.isCurrentUser } ?: users.firstOrNull()
 
+                    val appName = context.getString(R.string.app_name)
+                    val titleText = if (user != null && user.fullName.isNotBlank()) {
+                        "$appName • ${user.fullName}"
+                    } else {
+                        appName
+                    }
+                    views.setTextViewText(R.id.widget_title_text, titleText)
                     views.setTextViewText(R.id.widget_date_text, dateFormat.format(System.currentTimeMillis()))
 
                     if (user == null) {
@@ -186,6 +194,7 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                 } catch (e: Exception) {
                     e.printStackTrace()
                     try {
+                        views.setTextViewText(R.id.widget_title_text, context.getString(R.string.app_name))
                         views.setViewVisibility(R.id.widget_item_1, View.GONE)
                         views.setViewVisibility(R.id.widget_item_2, View.GONE)
                         views.setViewVisibility(R.id.widget_item_3, View.GONE)

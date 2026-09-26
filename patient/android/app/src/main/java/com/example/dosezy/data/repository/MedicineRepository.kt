@@ -17,7 +17,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 class MedicineRepository @Inject constructor(
     private val database: DosezyDatabase,
     private val scheduleRepository: ScheduleRepository,
-    @ApplicationContext private val context: Context
+    @ApplicationContext val context: Context
 ) {
 
     companion object {
@@ -92,6 +92,9 @@ class MedicineRepository @Inject constructor(
                     oldMedicine.durationDays != medicine.durationDays
 
             if (scheduleChanged) {
+                // Cancel existing alarms for this medicine BEFORE modifying or deleting schedule entries
+                scheduleRepository.cancelAlarmsForMedicine(medicine.medicineId, this.context)
+
                 val startOfToday = LocalDate.now().atStartOfDay()
                 val startOfTodayEpochMillis = startOfToday.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
 
@@ -105,14 +108,14 @@ class MedicineRepository @Inject constructor(
                 database.scheduleDao().insertScheduleEntries(newEntries)
             }
         } else {
-            // Fallback if old medicine wasn't in DB
+            // Fallback if old medicine wasn't in DB: cancel existing alarms first
+            scheduleRepository.cancelAlarmsForMedicine(medicine.medicineId, this.context)
             val scheduleEntries = medicine.generateScheduleEntries(LocalDate.now(), 30)
             database.scheduleDao().deleteScheduleEntriesByMedicine(medicine.medicineId)
             database.scheduleDao().insertScheduleEntries(scheduleEntries)
         }
 
-        // Reschedule alarms
-        scheduleRepository.cancelAlarmsForMedicine(medicine.medicineId, this.context)
+        // Reschedule alarms for user (reconstructs grouped alarms for all active medications)
         scheduleRepository.rescheduleAllAlarms(medicine.userId, this.context)
 
         // Update home screen widget

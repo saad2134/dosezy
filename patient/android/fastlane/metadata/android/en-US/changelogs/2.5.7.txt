@@ -1,0 +1,2 @@
+• Fixed orphaned alarms when editing medication times with active dose safeguards (#87)
+• Home screen widget now shows the active profile name and updates on profile change

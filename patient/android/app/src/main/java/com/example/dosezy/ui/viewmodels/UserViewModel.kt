@@ -91,6 +91,11 @@ class UserViewModel @Inject constructor(
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         medicineNotificationManager.scheduleAlarmsForUser(updatedUser.userId)
                     }
+
+                    // Update home screen widget for the new current user
+                    try {
+                        com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(medicineRepository.context)
+                    } catch (_: Exception) {}
                 }
                 _isLoading.value = false
             } catch (e: Exception) {
@@ -127,6 +132,9 @@ class UserViewModel @Inject constructor(
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             medicineNotificationManager.scheduleAlarmsForUser(userToInsert.userId)
                         }
+                        try {
+                            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(medicineRepository.context)
+                        } catch (_: Exception) {}
                     }
                 }
                 _isLoading.value = false
@@ -143,6 +151,9 @@ class UserViewModel @Inject constructor(
             // Update current user state if this is the current user
             if (user.isCurrentUser) {
                 _currentUser.value = user
+                try {
+                    com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(medicineRepository.context)
+                } catch (_: Exception) {}
             }
         }
     }
@@ -181,6 +192,10 @@ class UserViewModel @Inject constructor(
                             onNextUserSelected?.invoke(null)
                         }
                     }
+
+                    try {
+                        com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(medicineRepository.context)
+                    } catch (_: Exception) {}
                 }
             } catch (e: Exception) {
                 android.util.Log.e("UserViewModel", "Error deleting user", e)

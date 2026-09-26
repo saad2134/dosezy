@@ -1,0 +1,48 @@
+<en-IN>
+• Fixed orphaned alarms when editing medication times with active dose safeguards (#87)
+• Home screen widget now shows the active profile name and updates on profile change
+</en-IN>
+<en-US>
+• Fixed orphaned alarms when editing medication times with active dose safeguards (#87)
+• Home screen widget now shows the active profile name and updates on profile change
+</en-US>
+<ar>
+• إصلاح المنبهات عند تعديل وقت الدواء مع حماية الجرعات النشطة (#87)
+• تعرض أداة الشاشة الرئيسية الآن اسم الملف الشخصي النشط وتتحدث فوراً
+</ar>
+<de-DE>
+• Fehler behoben, bei dem Alarme nach Dosiszeitänderung aktiv blieben, mit aktiven Schutzmaßnahmen (#87)
+• Startbildschirm-Widget zeigt jetzt den aktiven Profilnamen und aktualisiert sich sofort
+</de-DE>
+<es-419>
+• Corrección de alarmas huérfanas al editar horas de medicación y protección de dosis activas (#87)
+• El widget de pantalla de inicio muestra ahora el nombre del perfil activo y se actualiza al cambiar
+</es-419>
+<fr-FR>
+• Correction des alarmes orphelines lors de la modification des horaires et protection des doses actives (#87)
+• Le widget d'écran d'accueil affiche désormais le nom du profil actif et se met à jour instantanément
+</fr-FR>
+<hi-IN>
+• दवा का समय बदलने पर पुराने अलार्म की समस्या का समाधान और सक्रिय खुराक सुरक्षा (#87)
+• होम स्क्रीन विजेट अब सक्रिय प्रोफ़ाइल का नाम दिखाता है और बदलाव पर तुरंत अपडेट होता है
+</hi-IN>
+<it-IT>
+• Risolto il problema degli allarmi orfani alla modifica degli orari con salvaguardia delle dosi attive (#87)
+• Il widget della schermata home mostra ora il nome del profilo attivo e si aggiorna subito
+</it-IT>
+<ja-JP>
+• 服薬時間変更時に不要なアラームが残る問題を修正し、有効な服用アラームを保護 (#87)
+• ホーム画面ウィジェットにアクティブなプロファイル名が表示され、変更時に即座に更新されます
+</ja-JP>
+<pt-BR>
+• Correção de alarmes órfãos ao alterar horários de medicação com proteção de doses ativas (#87)
+• O widget da tela inicial agora exibe o nome do perfil ativo e atualiza ao alternar perfis
+</pt-BR>
+<ru-RU>
+• Исправлена ошибка зависания старых будильников при изменении времени приема с защитой активных доз (#87)
+• Виджет на главном экране теперь отображает имя активного профиля и мгновенно обновляется
+</ru-RU>
+<zh-CN>
+• 修复修改服药时间后旧警报残留的问题，并增强有效服药警报保护 (#87)
+• 主屏幕小部件现已显示当前活跃的档案名称，并在切换时即时更新
+</zh-CN>

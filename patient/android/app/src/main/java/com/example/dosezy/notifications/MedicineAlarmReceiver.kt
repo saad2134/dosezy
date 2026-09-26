@@ -85,59 +85,71 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    val entry = database.scheduleDao().getScheduleEntryById(entryId)
-                    if (entry != null && entry.status == com.example.dosezy.data.model.MedicationStatus.PENDING) {
-                        val user = database.userDao().getUserByIdDirect(entry.userId)
-                        val isNagging = naggingCount > 0
+                    val allEntryIds = entryIds ?: listOf(entryId)
+                    val validPendingEntries = allEntryIds.mapNotNull { id ->
+                        database.scheduleDao().getScheduleEntryById(id)
+                    }.filter { it.status == com.example.dosezy.data.model.MedicationStatus.PENDING }
 
-                        // Retrieve medicine dosage details for each entry in this alarm
-                        val allEntryIds = entryIds ?: listOf(entryId)
-                        val medicineDetails = allEntryIds.mapNotNull { id ->
-                            val e = database.scheduleDao().getScheduleEntryById(id) ?: return@mapNotNull null
-                            val m = database.medicineDao().getMedicineByIdDirect(e.medicineId) ?: return@mapNotNull null
-                            val dose = m.getDosageDisplay(e.scheduledDateTime.toLocalTime())
-                            Pair(m.medicationName, dose)
-                        }
+                    if (validPendingEntries.isEmpty()) {
+                        Log.d(TAG, "Ignoring alarm - no pending schedule entries found for entry IDs: $allEntryIds")
+                        return@launch
+                    }
 
-                        // Immediately trigger centralized alarm audio & vibration
-                        val sound = user?.alarmSound ?: com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT
-                        val customPath = user?.customAlarmSoundPath
-                        val duration = user?.alarmDurationSeconds ?: 0
+                    val primaryEntry = validPendingEntries.first()
+                    val user = database.userDao().getUserByIdDirect(primaryEntry.userId)
+                    val isNagging = naggingCount > 0
 
-                        AlarmAudioPlayer.play(
-                            context = context,
-                            sound = sound,
-                            customPath = customPath,
-                            autoSilenceSeconds = duration
+                    // Retrieve medicine dosage details for each valid pending entry
+                    val medicineDetails = validPendingEntries.mapNotNull { e ->
+                        val m = database.medicineDao().getMedicineByIdDirect(e.medicineId) ?: return@mapNotNull null
+                        val dose = m.getDosageDisplay(e.scheduledDateTime.toLocalTime())
+                        Pair(m.medicationName, dose)
+                    }
+
+                    val activeMedicineNames = ArrayList(validPendingEntries.mapNotNull { e ->
+                        database.medicineDao().getMedicineByIdDirect(e.medicineId)?.medicationName
+                    }.distinct())
+                    val effectiveMedicineName = if (activeMedicineNames.isNotEmpty()) activeMedicineNames.joinToString(", ") else medicineName
+                    val activeEntryIds = ArrayList(validPendingEntries.map { it.entryId })
+
+                    // Immediately trigger centralized alarm audio & vibration
+                    val sound = user?.alarmSound ?: com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT
+                    val customPath = user?.customAlarmSoundPath
+                    val duration = user?.alarmDurationSeconds ?: 0
+
+                    AlarmAudioPlayer.play(
+                        context = context,
+                        sound = sound,
+                        customPath = customPath,
+                        autoSilenceSeconds = duration
+                    )
+
+                    showNotification(
+                        context = context,
+                        entryId = primaryEntry.entryId,
+                        entryIds = activeEntryIds,
+                        medicineName = effectiveMedicineName,
+                        medicineNames = activeMedicineNames,
+                        medicineDetails = medicineDetails,
+                        scheduledTime = scheduledTime,
+                        isNagging = isNagging,
+                        naggingCount = naggingCount,
+                        maxNagging = user?.naggingMaxRepeats ?: 3,
+                        snoozeMinutes = user?.snoozeDuration ?: 10
+                    )
+
+                    // Schedule next follow-up nagging reminder if enabled and below limit
+                    if (user != null && user.naggingRemindersEnabled && naggingCount < user.naggingMaxRepeats) {
+                        val alarmScheduler = AlarmScheduler(context)
+                        alarmScheduler.scheduleNaggingReminder(
+                            entryId = primaryEntry.entryId,
+                            minutes = user.naggingIntervalMinutes,
+                            medicineName = effectiveMedicineName,
+                            naggingCount = naggingCount + 1,
+                            entryIds = activeEntryIds,
+                            medicineNames = activeMedicineNames,
+                            scheduledTime = scheduledTime
                         )
-
-                        showNotification(
-                            context = context,
-                            entryId = entryId,
-                            entryIds = entryIds,
-                            medicineName = medicineName,
-                            medicineNames = medicineNames,
-                            medicineDetails = medicineDetails,
-                            scheduledTime = scheduledTime,
-                            isNagging = isNagging,
-                            naggingCount = naggingCount,
-                            maxNagging = user?.naggingMaxRepeats ?: 3,
-                            snoozeMinutes = user?.snoozeDuration ?: 10
-                        )
-
-                        // Schedule next follow-up nagging reminder if enabled and below limit
-                        if (user != null && user.naggingRemindersEnabled && naggingCount < user.naggingMaxRepeats) {
-                            val alarmScheduler = AlarmScheduler(context)
-                            alarmScheduler.scheduleNaggingReminder(
-                                entryId = entryId,
-                                minutes = user.naggingIntervalMinutes,
-                                medicineName = medicineName,
-                                naggingCount = naggingCount + 1,
-                                entryIds = entryIds,
-                                medicineNames = medicineNames,
-                                scheduledTime = scheduledTime
-                            )
-                        }
                     }
                 } catch (ex: Exception) {
                     Log.e(TAG, "Error processing alarm in background", ex)
