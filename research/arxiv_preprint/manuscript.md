@@ -1,9 +1,8 @@
 # Dosezy: A Local-First, Accessibility-Centric Android System for Medication Scheduling and Reliable Reminder Delivery
 
-**Authors:** Saaduddin Mohammad, Md Rahif Uddin Khan, Khwaja Mohammed  
+**Authors:** Saaduddin Mohammad [ORCID:https://orcid.org/0009-0008-7954-7696], Md Rahif Uddin Khan [ORCID:https://orcid.org/0009-0009-6219-4924], Khwaja Mohammed [ORCID:https://orcid.org/0009-0007-6312-6347]  
 **Affiliation:** Department of Computer Science and Engineering, Methodist College of Engineering and Technology, Hyderabad, India  
 **Emails:** `160723733051@methodist.edu.in`, `160723733005@methodist.edu.in`, `160723733063@methodist.edu.in`  
-**ORCID:** [0009-0008-7954-7696](https://orcid.org/0009-0008-7954-7696) (S. Mohammad), [0009-0009-6219-4924](https://orcid.org/0009-0009-6219-4924) (M. R. U. Khan), [0009-0007-6312-6347](https://orcid.org/0009-0007-6312-6347) (K. Mohammed)  
 
 ---
 
