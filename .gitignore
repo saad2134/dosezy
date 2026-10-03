@@ -5,3 +5,16 @@ scratch/**
 **/scratch/**
 /scripts
 *.zip
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+.env
+.env.*
+!.env.example
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+*.tsbuildinfo

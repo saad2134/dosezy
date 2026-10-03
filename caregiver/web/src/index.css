@@ -1,0 +1,161 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Obsidian & Navy Palette matching Dosezy Android */
+  --color-obsidian-950: #030712;
+  --color-obsidian-900: #070b14;
+  --color-obsidian-850: #0a101d;
+  --color-obsidian-800: #0f172a;
+
+  /* Dosezy Android App Theme Blue Colors */
+  --color-brand-blue-dark: #0277bd;   /* Android LightBlue40 */
+  --color-brand-blue-light: #4fc3f7;  /* Android LightBlue80 */
+  --color-brand-blue-action: #2084e4; /* Android Action Button Blue */
+  --color-brand-sky: #0284c7;
+  --color-brand-cyan: #00d8ff;
+  --color-brand-teal: #03dac5;        /* Android Tertiary */
+  --color-brand-emerald: #10b981;
+  --color-brand-amber: #f59e0b;
+  --color-brand-crimson: #ef4444;
+
+  /* Glassmorphism & Borders */
+  --color-surface-glass: rgba(10, 16, 29, 0.75);
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
+  --color-border-glow: rgba(2, 132, 199, 0.35);
+
+  /* Shadows */
+  --shadow-blue-glow: 0 0 40px -10px rgba(2, 132, 199, 0.35);
+  --shadow-cyan-glow: 0 0 40px -10px rgba(79, 195, 247, 0.25);
+  --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+}
+
+.glass-card {
+  background: rgba(8, 12, 20, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease-in-out;
+}
+
+.glass-card:hover {
+  border-color: rgba(2, 132, 199, 0.3);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6), 0 0 25px -5px rgba(2, 132, 199, 0.2);
+}
+
+.ambient-glow-blue-primary {
+  position: absolute;
+  top: 0;
+  right: 15%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(2, 119, 189, 0.15) 0%, rgba(3, 7, 18, 0) 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-glow-blue-cyan {
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(79, 195, 247, 0.12) 0%, rgba(3, 7, 18, 0) 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Mobile Touch & Safe Area Ergonomics */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.safe-bottom {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+
+/* Custom smooth dark scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.15);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(2, 132, 199, 0.4);
+}
+
+/* Dosezy Light Mode Overrides (Matching patient/android LightColorScheme) */
+html.light body,
+html.light .bg-\[\#030712\] {
+  background-color: #f8f9fa !important;
+  color: #0f172a !important;
+}
+
+html.light .glass-card {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+  color: #0f172a !important;
+}
+
+html.light .glass-card:hover {
+  border-color: rgba(2, 119, 189, 0.35) !important;
+  box-shadow: 0 12px 35px rgba(2, 119, 189, 0.12) !important;
+}
+
+html.light .text-white {
+  color: #0f172a !important;
+}
+
+html.light .text-neutral-400 {
+  color: #64748b !important;
+}
+
+html.light .text-neutral-300 {
+  color: #475569 !important;
+}
+
+html.light .text-neutral-200 {
+  color: #334155 !important;
+}
+
+html.light .bg-white\/\[0\.04\],
+html.light .bg-white\/5 {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+html.light .bg-white\/\[0\.06\] {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: #0f172a !important;
+}
+
+html.light .border-white\/10 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+html.light .border-white\/15 {
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+html.light .bg-\[\#0a101d\] {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+html.light .ambient-glow-blue-primary {
+  background: radial-gradient(circle, rgba(2, 119, 189, 0.08) 0%, rgba(248, 249, 250, 0) 70%) !important;
+}
+
+html.light .ambient-glow-blue-cyan {
+  background: radial-gradient(circle, rgba(79, 195, 247, 0.08) 0%, rgba(248, 249, 250, 0) 70%) !important;
+}

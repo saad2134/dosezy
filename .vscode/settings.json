@@ -1,0 +1,26 @@
+{
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/.gradle/**": true,
+    "**/build/**": true,
+    "**/dist/**": true,
+    "**/.astro/**": true,
+    "**/.idea/**": true,
+    "patient/android/app/build/**": true,
+    "patient/android/.gradle/**": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.gradle": true,
+    "**/build": true,
+    "**/.astro": true
+  },
+  "typescript.tsserver.watchOptions": {
+    "watchFile": "useFsEvents",
+    "watchDirectory": "useFsEvents",
+    "fallbackPolling": "dynamicPriority"
+  }
+}

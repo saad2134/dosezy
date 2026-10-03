@@ -1,0 +1,32 @@
+﻿version: '3.8'
+
+services:
+  dosezy-server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: dosezy-sync-node
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - HOST=0.0.0.0
+      - DATABASE_URL=file:/data/dosezy.db
+      - NODE_ENV=production
+    volumes:
+      - dosezy-data:/data
+
+  dosezy-caregiver-web:
+    build:
+      context: ./caregiver/web
+      dockerfile: Dockerfile
+    container_name: dosezy-caregiver-web
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - dosezy-server
+
+volumes:
+  dosezy-data:
