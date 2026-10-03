@@ -563,6 +563,8 @@
     <string name="pref_alarm_duration_title">Duración del sonido de alarma</string>
     <string name="pref_alarm_duration_desc">Silenciar audio y vibración automáticamente tras un tiempo</string>
     <string name="alarm_duration_continuous">Continuo (hasta descartar)</string>
+    <string name="alarm_duration_once">Sonar una vez</string>
+    <string name="alarm_duration_15s">15 segundos</string>
     <string name="alarm_duration_30s">30 segundos</string>
     <string name="alarm_duration_1m">1 minuto</string>
     <string name="alarm_duration_2m">2 minutos</string>

@@ -39,7 +39,7 @@ data class User(
     val alarmSound: AlarmSound = AlarmSound.SYSTEM_DEFAULT,
     val customAlarmSoundPath: String? = null,
     val customAlarmSoundTitle: String? = null,
-    val alarmDurationSeconds: Int = 0, // 0 = Continuous, 30 = 30s, 60 = 1m, 120 = 2m, 300 = 5m
+    val alarmDurationSeconds: Int = 0, // 0 = Continuous, -1 = Once, 15 = 15s, 30 = 30s, 60 = 1m, 120 = 2m, 300 = 5m
     val allowDoseSkipping: Boolean = false,
     val allowCustomDoseTime: Boolean = false,
     val hideAddMedicineNavButton: Boolean = false,

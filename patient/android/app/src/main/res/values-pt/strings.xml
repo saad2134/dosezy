@@ -546,6 +546,8 @@ Deseja continuar?</string>
     <string name="pref_alarm_duration_title">Duração do toque do alarme</string>
     <string name="pref_alarm_duration_desc">Silenciar áudio e vibração automaticamente após um tempo definido</string>
     <string name="alarm_duration_continuous">Contínuo (até dispensar)</string>
+    <string name="alarm_duration_once">Tocar uma vez</string>
+    <string name="alarm_duration_15s">15 segundos</string>
     <string name="alarm_duration_30s">30 segundos</string>
     <string name="alarm_duration_1m">1 minuto</string>
     <string name="alarm_duration_2m">2 minutos</string>

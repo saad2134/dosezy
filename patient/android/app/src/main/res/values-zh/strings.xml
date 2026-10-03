@@ -563,6 +563,8 @@
     <string name="pref_alarm_duration_title">闹钟响铃时长</string>
     <string name="pref_alarm_duration_desc">在设定的时长后自动停止响铃与震动</string>
     <string name="alarm_duration_continuous">持续响铃（直到关闭）</string>
+    <string name="alarm_duration_once">响铃一次</string>
+    <string name="alarm_duration_15s">15 秒</string>
     <string name="alarm_duration_30s">30 秒</string>
     <string name="alarm_duration_1m">1 分钟</string>
     <string name="alarm_duration_2m">2 分钟</string>

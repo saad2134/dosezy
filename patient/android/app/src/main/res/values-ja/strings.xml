@@ -547,6 +547,8 @@
     <string name="pref_alarm_duration_title">アラームの鳴動時間</string>
     <string name="pref_alarm_duration_desc">設定した時間が経過すると自動で音と振動を停止します</string>
     <string name="alarm_duration_continuous">停止するまで鳴動</string>
+    <string name="alarm_duration_once">1回のみ鳴動</string>
+    <string name="alarm_duration_15s">15 秒</string>
     <string name="alarm_duration_30s">30 秒</string>
     <string name="alarm_duration_1m">1 分</string>
     <string name="alarm_duration_2m">2 分</string>

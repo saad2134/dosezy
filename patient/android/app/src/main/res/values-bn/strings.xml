@@ -547,6 +547,8 @@
     <string name="pref_alarm_duration_title">অ্যালার্ম বাজার সময়সীমা</string>
     <string name="pref_alarm_duration_desc">নির্দিষ্ট সময় পর স্বয়ংক্রিয়ভাবে শব্দ ও কম্পন বন্ধ করুন</string>
     <string name="alarm_duration_continuous">একটানা (বন্ধ না করা পর্যন্ত)</string>
+    <string name="alarm_duration_once">একবার বাজবে</string>
+    <string name="alarm_duration_15s">১৫ সেকেন্ড</string>
     <string name="alarm_duration_30s">৩০ সেকেন্ড</string>
     <string name="alarm_duration_1m">১ মিনিট</string>
     <string name="alarm_duration_2m">২ মিনিট</string>

@@ -256,6 +256,8 @@ fun PreferencesScreen(navController: NavController) {
                 // Alarm Ring Duration Preference
                 val currentDuration = currentUser?.alarmDurationSeconds ?: 0
                 val durationText = when (currentDuration) {
+                    -1 -> stringResource(R.string.alarm_duration_once)
+                    15 -> stringResource(R.string.alarm_duration_15s)
                     30 -> stringResource(R.string.alarm_duration_30s)
                     60 -> stringResource(R.string.alarm_duration_1m)
                     120 -> stringResource(R.string.alarm_duration_2m)
@@ -905,6 +907,8 @@ fun AlarmDurationSelectionDialog(
 ) {
     val options = listOf(
         0 to androidx.compose.ui.res.stringResource(R.string.alarm_duration_continuous),
+        -1 to androidx.compose.ui.res.stringResource(R.string.alarm_duration_once),
+        15 to androidx.compose.ui.res.stringResource(R.string.alarm_duration_15s),
         30 to androidx.compose.ui.res.stringResource(R.string.alarm_duration_30s),
         60 to androidx.compose.ui.res.stringResource(R.string.alarm_duration_1m),
         120 to androidx.compose.ui.res.stringResource(R.string.alarm_duration_2m),

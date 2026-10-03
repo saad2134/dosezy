@@ -137,7 +137,7 @@ class AlarmActivity : ComponentActivity() {
             lifecycleScope.launch(Dispatchers.IO) {
                 var targetSound: AlarmSound = AlarmSound.SYSTEM_DEFAULT
                 var customSoundPath: String? = null
-                var autoSilenceSeconds = 0
+                var autoSilenceSeconds: Int? = null
                 try {
                     if (entryId.isNotEmpty()) {
                         val entry = database.scheduleDao().getScheduleEntryById(entryId)
@@ -150,15 +150,15 @@ class AlarmActivity : ComponentActivity() {
                             }
                         }
                     }
-                    if (targetSound == AlarmSound.SYSTEM_DEFAULT && customSoundPath == null) {
+                    if (autoSilenceSeconds == null) {
                         val users = database.userDao().getAllUsersDirect()
                         val currentUser = users.find { it.isCurrentUser } ?: users.firstOrNull()
                         if (currentUser != null) {
-                            targetSound = currentUser.alarmSound
-                            customSoundPath = currentUser.customAlarmSoundPath
-                            if (autoSilenceSeconds == 0) {
-                                autoSilenceSeconds = currentUser.alarmDurationSeconds
+                            if (targetSound == AlarmSound.SYSTEM_DEFAULT && customSoundPath == null) {
+                                targetSound = currentUser.alarmSound
+                                customSoundPath = currentUser.customAlarmSoundPath
                             }
+                            autoSilenceSeconds = currentUser.alarmDurationSeconds
                         }
                     }
                 } catch (_: Exception) {}
@@ -167,7 +167,7 @@ class AlarmActivity : ComponentActivity() {
                     context = applicationContext,
                     sound = targetSound,
                     customPath = customSoundPath,
-                    autoSilenceSeconds = autoSilenceSeconds
+                    autoSilenceSeconds = autoSilenceSeconds ?: 0
                 )
             }
         }

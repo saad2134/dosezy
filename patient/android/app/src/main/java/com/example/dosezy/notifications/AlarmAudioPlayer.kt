@@ -57,9 +57,15 @@ object AlarmAudioPlayer {
 
         stop()
 
+        val shouldLoop = autoSilenceSeconds != -1
+
         try {
             val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
-            val lockDuration = if (autoSilenceSeconds > 0) (autoSilenceSeconds + 30) * 1000L else 10 * 60 * 1000L
+            val lockDuration = when {
+                autoSilenceSeconds > 0 -> (autoSilenceSeconds + 30) * 1000L
+                autoSilenceSeconds == -1 -> 60 * 1000L
+                else -> 10 * 60 * 1000L
+            }
             wakeLock = pm?.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Dosezy:AlarmAudioWakeLock")?.apply {
                 acquire(lockDuration)
             }
@@ -67,7 +73,7 @@ object AlarmAudioPlayer {
             Log.e(TAG, "Error acquiring audio wakelock", e)
         }
 
-        startVibration(context)
+        startVibration(context, repeat = shouldLoop)
 
         var playbackStarted = false
 
@@ -83,7 +89,14 @@ object AlarmAudioPlayer {
                             .build()
                     )
                     setDataSource(customPath)
-                    isLooping = true
+                    isLooping = shouldLoop
+                    if (!shouldLoop) {
+                        setOnCompletionListener {
+                            Log.d(TAG, "Single-play custom audio finished")
+                            stop()
+                            AlarmActivity.stopActiveAlarm()
+                        }
+                    }
                     prepare()
                     start()
                 }
@@ -110,7 +123,14 @@ object AlarmAudioPlayer {
                         )
                         setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
                         afd.close()
-                        isLooping = true
+                        isLooping = shouldLoop
+                        if (!shouldLoop) {
+                            setOnCompletionListener {
+                                Log.d(TAG, "Single-play raw audio finished")
+                                stop()
+                                AlarmActivity.stopActiveAlarm()
+                            }
+                        }
                         prepare()
                         start()
                     }
@@ -139,7 +159,14 @@ object AlarmAudioPlayer {
                                 .build()
                         )
                         setDataSource(context, alarmUri)
-                        isLooping = true
+                        isLooping = shouldLoop
+                        if (!shouldLoop) {
+                            setOnCompletionListener {
+                                Log.d(TAG, "Single-play fallback ringtone finished")
+                                stop()
+                                AlarmActivity.stopActiveAlarm()
+                            }
+                        }
                         prepare()
                         start()
                     }
@@ -155,7 +182,7 @@ object AlarmAudioPlayer {
                             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                             .build()
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                            isLooping = true
+                            isLooping = shouldLoop
                         }
                         play()
                     }
@@ -165,7 +192,19 @@ object AlarmAudioPlayer {
             }
         }
 
-        if (autoSilenceSeconds > 0) {
+        if (autoSilenceSeconds == -1) {
+            autoSilenceJob?.cancel()
+            autoSilenceJob = scope.launch {
+                var elapsed = 0L
+                while (isPlaying() && elapsed < 30_000L) {
+                    delay(500L)
+                    elapsed += 500L
+                }
+                Log.d(TAG, "Single-play alarm completed or timed out after $elapsed ms")
+                stop()
+                AlarmActivity.stopActiveAlarm()
+            }
+        } else if (autoSilenceSeconds > 0) {
             autoSilenceJob?.cancel()
             autoSilenceJob = scope.launch {
                 delay(autoSilenceSeconds * 1000L)
@@ -177,7 +216,7 @@ object AlarmAudioPlayer {
     }
 
     @Synchronized
-    fun startVibration(context: Context) {
+    fun startVibration(context: Context, repeat: Boolean = true) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 val vm = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
@@ -187,11 +226,12 @@ object AlarmAudioPlayer {
                 vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
             }
             val pattern = longArrayOf(0, 1000, 1000)
+            val repeatIndex = if (repeat) 0 else -1
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                vibrator?.vibrate(android.os.VibrationEffect.createWaveform(pattern, 0))
+                vibrator?.vibrate(android.os.VibrationEffect.createWaveform(pattern, repeatIndex))
             } else {
                 @Suppress("DEPRECATION")
-                vibrator?.vibrate(pattern, 0)
+                vibrator?.vibrate(pattern, repeatIndex)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error starting vibration", e)
