@@ -1,4 +1,4 @@
-Dosezy is an accessible, offline-first medication tracking and reminder app designed for stress-free prescription management. Input your medicines, dosages, and schedules, and Dosezy handles the rest—keeping your health on track with zero privacy compromises.
+Dosezy is an accessible, offline-first medication tracking and reminder app designed for stress-free prescription management. Input your medicines, dosages, and schedules, and Dosezy handles the rest, keeping your health on track with zero privacy compromises.
 
 ✨ KEY FEATURES:
 

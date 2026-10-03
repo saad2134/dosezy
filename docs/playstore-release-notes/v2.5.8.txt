@@ -1,24 +1,80 @@
 <en-IN>
+• Added "Ring Once" and "15 Seconds" alarm ring duration options
+• Fixed backup restore data preservation, schedule dosage syncing on edit, and PRN dose undo
+• Full 100% cross-locale translation alignment and data export parity
 </en-IN>
 <en-US>
+• Added "Ring Once" and "15 Seconds" alarm ring duration options
+• Fixed backup restore data preservation, schedule dosage syncing on edit, and PRN dose undo
+• Full 100% cross-locale translation alignment and data export parity
 </en-US>
 <ar>
+• إضافة خيارات مدة رنين المنبه "مرة واحدة" و"15 ثانية"
+• إصلاح فقدان البيانات عند استعادة النسخ الاحتياطي وحفظ ملاحظات الجرعات والتفضيلات
+• تحديث جرعات الجداول المستقبلية فوراً عند تعديل بيانات الدواء
+• إصلاح التراجع عن الجرعات عند الحاجة وحذفها بشكل صحيح
+• توافق تام بنسبة 100% للترجمات عبر جميع اللغات وتصدير البيانات
 </ar>
 <de-DE>
+• Neue Optionen für Alarmdauer: „Einmalig klingeln“ und „15 Sekunden“
+• Datenverlust bei Backup-Wiederherstellung behoben: Dosisnotizen und Einstellungen bleiben erhalten
+• Künftige Dosierungen werden nach Bearbeitung eines Medikaments sofort aktualisiert
+• Rückgängigmachen von Bedarf-Dosen (PRN) löscht Einträge nun sauber
+• Vollständige 100%ige Übersetzungs- und Export-Parität über alle Sprachen
 </de-DE>
 <es-419>
+• Nuevas opciones de duración de alarma: "Sonar una vez" y "15 segundos"
+• Corrección de pérdida de datos al restaurar copias de seguridad (notas y preferencias preservadas)
+• Las dosis de horarios futuros ahora se actualizan de inmediato al editar el medicamento
+• Corregido el deshacer dosis según necesidad (PRN) para eliminar entradas correctamente
+• Paridad total del 100% en traducciones y exportación de datos
 </es-419>
 <fr-FR>
+• Nouvelles durées de sonnerie d'alarme : « Sonner une fois » et « 15 secondes »
+• Correction de la perte de données lors de la restauration (notes de dose et préférences conservées)
+• Les dosages des horaires futurs sont mis à jour immédiatement après modification
+• Annuler une dose au besoin (PRN) supprime désormais l'entrée proprement
+• Parité totale à 100 % des traductions et des exports de données
 </fr-FR>
 <hi-IN>
+• अलार्म रिंग अवधि में "एक बार बजना" और "15 सेकंड" के नए विकल्प जोड़े गए
+• बैकअप रीस्टोर पर डेटा हानि ठीक की गई; खुराक नोट्स और प्राथमिकताएं सुरक्षित
+• दवा में बदलाव करने पर भविष्य के शेड्यूल की खुराक तुरंत अपडेट होगी
+• आवश्यकतानुसार (PRN) ली गई खुराक को पूर्ववत (Undo) करने पर एंट्री सही तरीके से हटेगी
+• सभी भाषाओं में अनुवाद और डेटा एक्सपोर्ट की 100% पूर्ण समानता
 </hi-IN>
 <it-IT>
+• Aggiunte opzioni per la durata della suoneria: "Suona una volta" e "15 secondi"
+• Risolta la perdita di dati nel ripristino backup: note e preferenze preservate
+• I dosaggi futuri si aggiornano subito dopo la modifica di un farmaco
+• Annullare una dose al bisogno (PRN) ora elimina correttamente la voce
+• Parità completa al 100% delle traduzioni e delle esportazioni dati
 </it-IT>
 <ja-JP>
+• アラーム鳴動時間に「1回のみ鳴動」と「15秒間」の選択肢を追加
+• バックアップ復元時のデータ消失を修正（服用メモや各種設定を保持）
+• 薬の変更時に将来の服薬スケジュールの用量が即時更新されるよう修正
+• 頓服（PRN）の服用取り消し（Undo）でエントリが正しく削除されるよう修正
+• 全12言語の翻訳とデータ出力の完全な整合性を達成
 </ja-JP>
 <pt-BR>
+• Novas opções de duração do alarme: "Tocar uma vez" e "15 segundos"
+• Correção de perda de dados ao restaurar backup (notas de dose e preferências preservadas)
+• Dosagens de horários futuros são atualizadas de imediato ao editar o medicamento
+• Desfazer doses sob demanda (PRN) agora remove as entradas corretamente
+• Paridade total de 100% nas traduções e exportações de dados
 </pt-BR>
 <ru-RU>
+• Добавлены варианты длительности сигнала: «Один раз» и «15 секунд»
+• Исправлена потеря данных при восстановлении бэкапа (сохраняются заметки и настройки)
+• Дозировки будущих приемов теперь обновляются сразу после изменения лекарства
+• Отмена доз «по необходимости» (PRN) теперь корректно удаляет запись
+• 100% паритет всех переводов и экспорта данных
 </ru-RU>
 <zh-CN>
+• 新增警报响铃时长选项：“响铃一次”与“15 秒”
+• 修复备份恢复时的数据丢失问题，完整保留服药备注与偏好设置
+• 修改药品信息后，未来的服药计划剂量立即同步更新
+• 修复撤销按需服药（PRN）记录时残留待服记录的问题
+• 实现全 12 种语言翻译与数据导出的 100% 完整一致性
 </zh-CN>

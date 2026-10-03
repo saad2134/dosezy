@@ -1,1 +1,3 @@
-• In development
+• Added "Ring Once" and "15 Seconds" alarm ring duration options
+• Fixed backup restore data preservation, schedule dosage syncing on edit, and PRN dose undo
+• Full 100% cross-locale translation alignment and data export parity
