@@ -375,8 +375,12 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         val previousEntry = database.scheduleDao().getScheduleEntryById(entryId)
         val wasTaken = previousEntry?.status == MedicationStatus.TAKEN_ON_TIME || previousEntry?.status == MedicationStatus.TAKEN_LATE
 
-        // 1. Revert status to PENDING and clear takenAt, skipReason, and doseNotes
-        database.scheduleDao().resetScheduleEntryToPending(entryId)
+        // 1. Revert status to PENDING or delete if it was an as-needed (PRN) dose
+        if (entryId.startsWith("PRN_")) {
+            database.scheduleDao().deleteScheduleEntry(entryId)
+        } else {
+            database.scheduleDao().resetScheduleEntryToPending(entryId)
+        }
 
         // 2. Revert stock auto-decrement only if previously taken
         if (wasTaken && previousEntry != null) {

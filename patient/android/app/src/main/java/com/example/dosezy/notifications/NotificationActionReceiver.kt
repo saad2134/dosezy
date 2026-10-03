@@ -17,41 +17,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
-import kotlinx.coroutines.flow.first
-
 @AndroidEntryPoint
 class NotificationActionReceiver : BroadcastReceiver() {
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun checkAndPostRefillNotification(context: Context, database: DosezyDatabase, medicineId: String) {
-        try {
-            val medicine = database.medicineDao().getMedicineByIdDirect(medicineId)
-            if (medicine != null && medicine.currentStock != null && medicine.refillThreshold != null) {
-                if (medicine.currentStock <= medicine.refillThreshold) {
-                    val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
-                    val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
-                    val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-                    val contentIntent = android.app.PendingIntent.getActivity(
-                        context,
-                        (medicineId + "_refill_topbar_click").hashCode(),
-                        Intent(context, com.example.dosezy.MainActivity::class.java).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                        },
-                        android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
-                    )
-                    val builder = androidx.core.app.NotificationCompat.Builder(context, MedicineAlarmReceiver.REFILL_CHANNEL_ID)
-                        .setSmallIcon(com.example.dosezy.R.drawable.loader_icon)
-                        .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
-                        .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, medicine.currentStock))
-                        .setPriority(androidx.core.app.NotificationCompat.PRIORITY_DEFAULT)
-                        .setContentIntent(contentIntent)
-                        .setAutoCancel(true)
-                    nManager.notify((medicineId + "_refill_topbar").hashCode(), builder.build())
-                }
-            }
-        } catch (_: Exception) {}
-    }
-
 
     @Inject
     lateinit var database: DosezyDatabase

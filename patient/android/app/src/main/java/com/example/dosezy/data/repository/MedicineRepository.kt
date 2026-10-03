@@ -87,6 +87,8 @@ class MedicineRepository @Inject constructor(
             val scheduleChanged = oldMedicine.scheduledTimes != medicine.scheduledTimes ||
                     oldMedicine.frequency != medicine.frequency ||
                     oldMedicine.timesPerDay != medicine.timesPerDay ||
+                    oldMedicine.dosage != medicine.dosage ||
+                    oldMedicine.customDosages != medicine.customDosages ||
                     oldMedicine.startDate != medicine.startDate ||
                     oldMedicine.endDate != medicine.endDate ||
                     oldMedicine.durationDays != medicine.durationDays

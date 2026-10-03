@@ -576,7 +576,13 @@ class BackupRestoreManager(
             alarmSound = try { AlarmSound.valueOf(json.get("alarmSound").asString) } catch (_: Exception) { AlarmSound.SYSTEM_DEFAULT },
             customAlarmSoundPath = json.get("customAlarmSoundPath")?.let { if (it.isJsonNull || it.asString.isBlank()) null else it.asString },
             customAlarmSoundTitle = json.get("customAlarmSoundTitle")?.let { if (it.isJsonNull || it.asString.isBlank()) null else it.asString },
-            alarmDurationSeconds = json.get("alarmDurationSeconds")?.asInt ?: 0
+            alarmDurationSeconds = json.get("alarmDurationSeconds")?.asInt ?: 0,
+            allowDoseSkipping = json.get("allowDoseSkipping")?.asBoolean ?: false,
+            allowCustomDoseTime = json.get("allowCustomDoseTime")?.asBoolean ?: false,
+            hideAddMedicineNavButton = json.get("hideAddMedicineNavButton")?.asBoolean ?: false,
+            allowDoseUndo = json.get("allowDoseUndo")?.asBoolean ?: false,
+            allowDoseNotes = json.get("allowDoseNotes")?.asBoolean ?: false,
+            promptDoseNotes = json.get("promptDoseNotes")?.asBoolean ?: false
         )
     }
 
@@ -661,7 +667,8 @@ class BackupRestoreManager(
                 status = try { MedicationStatus.valueOf(obj.get("status").asString) } catch (_: Exception) { MedicationStatus.PENDING },
                 takenAt = obj.get("takenAt")?.let { if (it.isJsonNull) null else try { LocalDateTime.parse(it.asString) } catch (_: Exception) { null } },
                 skipReason = obj.get("skipReason")?.let { if (it.isJsonNull) null else it.asString },
-                dosage = obj.get("dosage")?.let { if (it.isJsonNull) null else it.asDouble }
+                dosage = obj.get("dosage")?.let { if (it.isJsonNull) null else it.asDouble },
+                doseNotes = obj.get("doseNotes")?.let { if (it.isJsonNull) null else it.asString }
             )
             list.add(entry)
         }

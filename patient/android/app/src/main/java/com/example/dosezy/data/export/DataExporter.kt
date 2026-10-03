@@ -168,12 +168,29 @@ class DataExporter(
         userObj.put("age", user.age)
         userObj.put("gender", user.gender.name)
         userObj.put("contactNumber", user.contactNumber)
+        userObj.put("profilePicPath", user.profilePicPath ?: "")
+        userObj.put("isCurrentUser", user.isCurrentUser)
+        userObj.put("theme", user.theme.name)
+        userObj.put("timeFormat", user.timeFormat.name)
+        userObj.put("language", user.language.name)
+        userObj.put("considerLateAfter", user.considerLateAfter)
+        userObj.put("considerMissedAfter", user.considerMissedAfter)
+        userObj.put("snoozeDuration", user.snoozeDuration)
         userObj.put("allergies", user.allergies ?: "")
         userObj.put("medicalConditions", user.medicalConditions ?: "")
+        userObj.put("naggingRemindersEnabled", user.naggingRemindersEnabled)
+        userObj.put("naggingIntervalMinutes", user.naggingIntervalMinutes)
+        userObj.put("naggingMaxRepeats", user.naggingMaxRepeats)
         userObj.put("alarmSound", user.alarmSound.name)
         userObj.put("customAlarmSoundPath", user.customAlarmSoundPath ?: "")
         userObj.put("customAlarmSoundTitle", user.customAlarmSoundTitle ?: "")
         userObj.put("alarmDurationSeconds", user.alarmDurationSeconds)
+        userObj.put("allowDoseSkipping", user.allowDoseSkipping)
+        userObj.put("allowCustomDoseTime", user.allowCustomDoseTime)
+        userObj.put("hideAddMedicineNavButton", user.hideAddMedicineNavButton)
+        userObj.put("allowDoseUndo", user.allowDoseUndo)
+        userObj.put("allowDoseNotes", user.allowDoseNotes)
+        userObj.put("promptDoseNotes", user.promptDoseNotes)
         root.put("user", userObj)
 
         val medArray = JSONArray()
@@ -198,6 +215,13 @@ class DataExporter(
             mObj.put("endDate", med.endDate?.toString() ?: "")
             mObj.put("durationDays", med.durationDays)
             mObj.put("isArchived", med.isArchived)
+            med.customDosages?.let { cd ->
+                val cdObj = JSONObject()
+                cd.forEach { (timeStr, dosageVal) ->
+                    cdObj.put(timeStr, dosageVal)
+                }
+                mObj.put("customDosages", cdObj)
+            }
             medArray.put(mObj)
         }
         root.put("medicines", medArray)
@@ -211,6 +235,10 @@ class DataExporter(
             sObj.put("status", sch.status.name)
             sObj.put("skipReason", sch.skipReason ?: "")
             sObj.put("takenAt", sch.takenAt?.toString() ?: "")
+            if (sch.dosage != null) {
+                sObj.put("dosage", sch.dosage)
+            }
+            sObj.put("doseNotes", sch.doseNotes ?: "")
             schedArray.put(sObj)
         }
         root.put("schedules", schedArray)
@@ -501,7 +529,7 @@ class DataExporter(
 
         // Schedules Section
         csvBuilder.append("SCHEDULES\n")
-        csvBuilder.append("Entry ID,User ID,Medicine ID,Scheduled DateTime,Status,Skip Reason,Taken At\n")
+        csvBuilder.append("Entry ID,User ID,Medicine ID,Scheduled DateTime,Status,Skip Reason,Taken At,Dosage,Dose Notes\n")
         schedules.forEach { schedule ->
             csvBuilder.append(
                 "${escapeCsv(schedule.entryId)}," +
@@ -510,7 +538,9 @@ class DataExporter(
                 "${escapeCsv(schedule.scheduledDateTime)}," +
                 "${schedule.status}," +
                 "${escapeCsv(schedule.skipReason ?: "")}," +
-                "${escapeCsv(schedule.takenAt ?: "")}\n"
+                "${escapeCsv(schedule.takenAt ?: "")}," +
+                "${schedule.dosage ?: ""}," +
+                "${escapeCsv(schedule.doseNotes ?: "")}\n"
             )
         }
 
