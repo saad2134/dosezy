@@ -310,7 +310,7 @@
     <string name="backup_header_title">النسخ الاحتياطي والاستعادة</string>
     <string name="backup_header_sub">قم بتأمين بيانات أدويتك وسجل الالتزام.</string>
     <string name="backup_storage_note">ملفات النسخ الاحتياطي تكون بصيغة .zip مشفرة/مضغوطة وقابلة للنقل بأمان.</string>
-    <string name="backup_offline_badge">محلي بنسبة 100% وخاص</string>
+    <string name="backup_offline_badge" formatted="false">محلي بنسبة 100% وخاص</string>
     <string name="backup_cloud_title">خادم Dosezy السحابي</string>
     <string name="backup_cloud_sub">منصة المزامنة ورعاية المرضى المُدارة</string>
     <string name="backup_cloud_desc">منصة سحابية اختيارية لمشاركة البيانات مع العائلة، والمراقبة عن بُعد من قبل مقدمي الرعاية، والمزامنة التلقائية عبر أجهزة متعددة مع الحفاظ التام على الخصوصية.</string>
@@ -361,7 +361,7 @@
     <string name="backup_section_automatic">تلقائي</string>
     <string name="backup_section_manual">يدوي</string>
     <string name="backup_self_hosted_title">خادم خلفي مستضاف ذاتياً</string>
-    <string name="backup_self_hosted_sub">مفتوح المصدر وخاص بنسبة 100%</string>
+    <string name="backup_self_hosted_sub" formatted="false">مفتوح المصدر وخاص بنسبة 100%</string>
     <string name="backup_self_hosted_desc">اتصل مباشرة بخادم Dosezy الخاص بك للتمتع بالسيادة الكاملة على بياناتك، ولوحة تحكم الرعاية الأسرية، والتحكم الكامل في البنية التحتية.</string>
     <string name="backup_status_inspecting">جاري فحص حزمة النسخ الاحتياطي...</string>
     <string name="backup_status_no_profiles">لم يتم العثور على ملفات شخصية في النسخة الاحتياطية.</string>
@@ -372,7 +372,7 @@
     <string name="import_dialog_desc">حدد الملفات الشخصية التي تريد استيرادها وطريقة التعامل مع التعارضات.</string>
     <string name="import_existing_profile_badge">الملف الشخصي موجود بالفعل محلياً</string>
     <string name="import_no_profiles_found">لم يتم العثور على أي ملفات شخصية في الملف المحدد.</string>
-    <string name="import_profiles_found">تم العثور على %1$d ملف شخصي في الحزمة</string>
+    <string name="import_profiles_found">ملفات تعريف المرضى الموجودة في الأرشيف</string>
     <string name="import_strategy_create_new">إنشاء كجديد</string>
     <string name="import_strategy_create_new_desc">استيراد كملف شخصي منفصل جديد</string>
     <string name="import_strategy_label">إجراء حل التعارض:</string>
@@ -536,7 +536,7 @@
     <string name="about_star_github">نجمة على GitHub</string>
     <string name="about_star_github_desc">ادعم مشروعنا مفتوح المصدر عبر وضع نجمة على GitHub</string>
     <string name="about_support_dev_title">دعم التطوير</string>
-    <string name="about_support_dev_desc">تطبيق Dosezy مجاني 100% وخالٍ من الإعلانات تماماً. تبرعاتكم تساهم في استمرار التطوير!</string>
+    <string name="about_support_dev_desc" formatted="false">تطبيق Dosezy مجاني 100% وخالٍ من الإعلانات تماماً. تبرعاتكم تساهم في استمرار التطوير!</string>
     <string name="about_buymeacoffee">اشترِ لي قهوة (Buy Me a Coffee)</string>
     <string name="about_buymeacoffee_desc">ادعمنا بواسطة البطاقة المصرفية أو PayPal</string>
     <string name="about_crypto_donations">التبرع بالعملات المشفرة</string>
@@ -710,10 +710,10 @@
     <string name="about_developer_title">حول المطور</string>
     <string name="about_developer_name">Saad</string>
     <string name="about_developer_role">المنشئ والمطور الرئيسي</string>
-    <string name="about_developer_bio">صُمم بعناية ليكون تتبع الأدوية متاحاً وخاصاً ومستقلاً تماماً. بلا إعلانات، بلا تتبع، وبلا إنترنت 100%.</string>
+    <string name="about_developer_bio" formatted="false">صُمم بعناية ليكون تتبع الأدوية متاحاً وخاصاً ومستقلاً تماماً. بلا إعلانات، بلا تتبع، وبلا إنترنت 100%.</string>
     <string name="about_developer_github">الملف الشخصي على GitHub</string>
     <string name="about_features_title">لماذا دوزي؟</string>
-    <string name="about_feat_offline_title">100% بلا إنترنت وخاص</string>
+    <string name="about_feat_offline_title" formatted="false">100% بلا إنترنت وخاص</string>
     <string name="about_feat_offline_desc">تبقى جميع بياناتك على جهازك فقط دون أي اعتماد على السحابة وبلا متتبعات.</string>
     <string name="about_feat_smart_alarms_title">منبهات موثوقة ومناطق زمنية</string>
     <string name="about_feat_smart_alarms_desc">تنبيهات دقيقة توقظ جهازك وتتكيف تلقائياً عند السفر عبر المناطق الزمنية.</string>

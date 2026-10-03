@@ -310,7 +310,7 @@
     <string name="backup_header_title">Backup e Ripristino</string>
     <string name="backup_header_sub">Proteggi i tuoi farmaci, gli orari e la cronologia delle assunzioni.</string>
     <string name="backup_storage_note">I file di backup sono in formato .zip compresso e sono facilmente trasferibili.</string>
-    <string name="backup_offline_badge">100% Locale e Privato</string>
+    <string name="backup_offline_badge" formatted="false">100% Locale e Privato</string>
     <string name="backup_cloud_title">Server Cloud Dosezy</string>
     <string name="backup_cloud_sub">Piattaforma gestita per caregiver e sincronizzazione</string>
     <string name="backup_cloud_desc">Piattaforma cloud opzionale per la condivisione familiare in tempo reale, il monitoraggio remoto dei caregiver e la sincronizzazione multidispositivo.</string>
@@ -361,7 +361,7 @@ Vuoi continuare?</string>
     <string name="backup_section_automatic">AUTOMATICO</string>
     <string name="backup_section_manual">MANUALE</string>
     <string name="backup_self_hosted_title">Server backend self-hosted</string>
-    <string name="backup_self_hosted_sub">100% Open Source e privato</string>
+    <string name="backup_self_hosted_sub" formatted="false">100% Open Source e privato</string>
     <string name="backup_self_hosted_desc">Collegati direttamente alla tua istanza server Dosezy per la piena sovranità dei dati, dashboard per i caregiver e controllo privato dell\'infrastruttura.</string>
     <string name="backup_status_inspecting">Ispezione del pacchetto di backup in corso...</string>
     <string name="backup_status_no_profiles">Nessun profilo trovato nell\'archivio di backup.</string>
@@ -372,7 +372,7 @@ Vuoi continuare?</string>
     <string name="import_dialog_desc">Seleziona i profili da importare e come risolvere i conflitti.</string>
     <string name="import_existing_profile_badge">Il profilo esiste già localmente</string>
     <string name="import_no_profiles_found">Nessun profilo trovato nel file selezionato.</string>
-    <string name="import_profiles_found">%1$d profilo/i trovato/i nel pacchetto</string>
+    <string name="import_profiles_found">Profili paziente trovati nell\'archivio</string>
     <string name="import_strategy_create_new">Crea nuovo</string>
     <string name="import_strategy_create_new_desc">Importa come nuovo profilo separato</string>
     <string name="import_strategy_label">Azione di conflitto:</string>
@@ -536,7 +536,7 @@ Vuoi continuare?</string>
     <string name="about_star_github">Metti una stella su GitHub</string>
     <string name="about_star_github_desc">Supporta il nostro progetto open source mettendo una stella su GitHub</string>
     <string name="about_support_dev_title">Supporta lo sviluppo</string>
-    <string name="about_support_dev_desc">Dosezy è al 100% gratuito, privato e senza pubblicità. Le tue donazioni aiutano il progetto!</string>
+    <string name="about_support_dev_desc" formatted="false">Dosezy è al 100% gratuito, privato e senza pubblicità. Le tue donazioni aiutano il progetto!</string>
     <string name="about_buymeacoffee">Offrimi un caffè</string>
     <string name="about_buymeacoffee_desc">Supporta con carta o PayPal su BuyMeACoffee</string>
     <string name="about_crypto_donations">Donazioni in criptovalute</string>
@@ -710,10 +710,10 @@ Vuoi continuare?</string>
     <string name="about_developer_title">Informazioni sullo sviluppatore</string>
     <string name="about_developer_name">Saad</string>
     <string name="about_developer_role">Creatore e sviluppatore principale</string>
-    <string name="about_developer_bio">Creato con cura per rendere il monitoraggio dei farmaci accessibile, privato e indipendente. Zero pubblicità, zero traccianti, 100% offline.</string>
+    <string name="about_developer_bio" formatted="false">Creato con cura per rendere il monitoraggio dei farmaci accessibile, privato e indipendente. Zero pubblicità, zero traccianti, 100% offline.</string>
     <string name="about_developer_github">Profilo GitHub</string>
     <string name="about_features_title">Perché Dosezy?</string>
-    <string name="about_feat_offline_title">100% offline e privato</string>
+    <string name="about_feat_offline_title" formatted="false">100% offline e privato</string>
     <string name="about_feat_offline_desc">Tutti i dati rimangono sul tuo dispositivo senza dipendenza dal cloud o traccianti.</string>
     <string name="about_feat_smart_alarms_title">Sveglie affidabili e fusi orari</string>
     <string name="about_feat_smart_alarms_desc">Promemoria precisi che risvegliano il dispositivo e si adattano ai fusi orari.</string>

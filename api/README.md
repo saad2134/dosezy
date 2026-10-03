@@ -63,42 +63,29 @@ npx @openapitools/openapi-generator-cli generate \
 ```
 
 ### Does the Generated SDK Match the Dosezy Android App?
-**Yes! The OpenAPI specification aligns 95%+ directly with the Android Room database models.**
+**Yes! The OpenAPI specification aligns 100% directly with the Android Room database models.**
 
 #### Field-by-Field Mapping Matrix:
 
 | Domain Entity | Room DB Model (`com.example.dosezy.data.model`) | Generated Network DTO (`com.example.dosezy.network.models`) | Match Status |
 | :--- | :--- | :--- | :--- |
-| **User** | `userId`, `fullName`, `age`, `gender`, `contactNumber`, `profilePicPath`, `isCurrentUser` | `userId`, `fullName`, `age`, `gender`, `contactNumber`, `profilePicPath`, `isCurrentUser` | **100% Match** |
-| **Medicine** | `medicineId`, `userId`, `medicationName`, `dosage`, `dosageUnit`, `timesPerDay`, `frequency`, `scheduledTimes`, `imageUri` | `medicineId`, `userId`, `medicationName`, `dosage`, `dosageUnit`, `timesPerDay`, `frequencyPattern`, `scheduledTimes`, `imageUri` | **100% Match** |
-| **ScheduleEntry** | `entryId`, `userId`, `medicineId`, `scheduledDateTime`, `status`, `takenAt` | `entryId`, `userId`, `medicineId`, `scheduledDateTime`, `status`, `takenAt` | **100% Match** |
+| **User** | `userId`, `fullName`, `age`, `gender`, `contactNumber`, `profilePicPath`, `isCurrentUser`, `theme`, `timeFormat`, `language`, `considerLateAfter`, `considerMissedAfter`, `snoozeDuration`, `allergies`, `medicalConditions`, `naggingRemindersEnabled`, `naggingIntervalMinutes`, `naggingMaxRepeats`, `alarmSound`, `customAlarmSoundPath`, `customAlarmSoundTitle`, `alarmDurationSeconds`, `allowDoseSkipping`, `allowCustomDoseTime`, `hideAddMedicineNavButton`, `allowDoseUndo`, `allowDoseNotes`, `promptDoseNotes` | `userId`, `fullName`, `age`, `gender`, `contactNumber`, `profilePicPath`, `isCurrentUser`, `theme`, `timeFormat`, `language`, `considerLateAfter`, `considerMissedAfter`, `snoozeDuration`, `allergies`, `medicalConditions`, `naggingRemindersEnabled`, `naggingIntervalMinutes`, `naggingMaxRepeats`, `alarmSound`, `customAlarmSoundPath`, `customAlarmSoundTitle`, `alarmDurationSeconds`, `allowDoseSkipping`, `allowCustomDoseTime`, `hideAddMedicineNavButton`, `allowDoseUndo`, `allowDoseNotes`, `promptDoseNotes` | **100% Match** |
+| **Medicine** | `medicineId`, `userId`, `medicationName`, `dosage`, `dosageUnit`, `timesPerDay`, `frequency`, `scheduledTimes`, `imageUri`, `pillShape`, `pillColor`, `startDate`, `endDate`, `durationDays`, `isArchived`, `notes`, `currentStock`, `refillThreshold`, `autoDeductOnTake`, `customDosages` | `medicineId`, `userId`, `medicationName`, `dosage`, `dosageUnit`, `timesPerDay`, `frequency`, `scheduledTimes`, `imageUri`, `pillShape`, `pillColor`, `startDate`, `endDate`, `durationDays`, `isArchived`, `notes`, `currentStock`, `refillThreshold`, `autoDeductOnTake`, `customDosages` | **100% Match** |
+| **ScheduleEntry** | `entryId`, `userId`, `medicineId`, `scheduledDateTime`, `status`, `takenAt`, `skipReason`, `dosage`, `doseNotes` | `entryId`, `userId`, `medicineId`, `scheduledDateTime`, `status`, `takenAt`, `skipReason`, `dosage`, `doseNotes` | **100% Match** |
 
 ---
 
-## ❓ Why 95%+ Alignment Instead of 100%?
+## 🏛️ Architectural Parity & Integration Design
 
-The ~5% difference is **intentional architectural design** to protect **local privacy** and separate **local UI preferences** from **network data payloads**:
+### 1. 🛡️ Room SQLite Annotations vs. Clean Network DTOs
+- **Room Models (`com.example.dosezy.data.model`):** Contain local Android Room SQLite table annotations (`@Entity`, `@PrimaryKey`, `indices`, `foreignKeys`), TypeConverters, and local calculation helpers.
+- **Generated OpenAPI DTOs (`com.example.dosezy.network.models`):** Are lightweight, pure Kotlin data transfer objects annotated with `@SerializedName` specifically for JSON network serialization and cross-platform sync.
 
-### 1. 🛡️ Local UI Preferences Stay 100% Offline (Privacy by Design)
-In the Android app's local `User` entity (`User.kt`), Room stores local device preferences:
-- `theme` (System, Light, Dark)
-- `language` (System, English, Spanish, Hindi, etc.)
-- `snoozeDuration` (10 minutes)
-- `considerLateAfter` (3 hours)
-- `considerMissedAfter` (6 hours)
-
-**Why aren't these in the OpenAPI spec?**  
-How a user configures their phone's theme or language is a **device-specific UI preference**, not patient health data. A user might want Dark Mode on their phone and Light Mode on their caregiver web dashboard. Keeping local UI settings off the network payload respects user privacy and reduces sync payload size.
-
-### 2. 🏛️ Room SQLite Annotations vs. Clean Network DTOs
-- **Room Models (`com.example.dosezy.data.model`):** Contain Room SQLite table annotations (`@Entity`, `@PrimaryKey`, `indices`, `foreignKeys`), TypeConverters, and local helper methods like `generateScheduleEntries()`.
-- **Generated OpenAPI DTOs (`com.example.dosezy.network.models`):** Are lightweight, pure Kotlin data transfer objects annotated with `@SerializedName` specifically for JSON network serialization.
-
-### 3. 💊 Core Health & Medical Data is 100% Identical
-When it comes to actual **patient medical data**, the alignment is **100% identical**:
-- **Patient Profile Data:** `userId`, `fullName`, `age`, `gender`, `contactNumber`, `profilePicPath` ✅
-- **Medication Data:** `medicineId`, `userId`, `medicationName`, `dosage`, `dosageUnit`, `timesPerDay`, `scheduledTimes`, `imageUri` ✅
-- **Dose Schedule & History:** `entryId`, `userId`, `medicineId`, `scheduledDateTime`, `status`, `takenAt` ✅
+### 2. 💊 Complete Patient, Medication & Adherence History Parity
+Every field supported in the local SQLite database is fully represented in the OpenAPI schema:
+- **Patient Profile & Preferences:** Identity, contact info, clinical history (allergies/conditions), alarm audio/duration, and intake preference flags ✅
+- **Medication Definitions:** Full course timelines, finite day limits, shape/color visuals, inventory stock thresholds, and multi-slot custom dosages ✅
+- **Dose Schedule & History:** Timestamps, intake statuses, skip justifications, resolved slot dosages, and clinical meal/symptom notes ✅
 
 ---
 
@@ -116,7 +103,28 @@ fun User.toNetworkDto(): com.example.dosezy.network.models.User {
         gender = com.example.dosezy.network.models.Gender.valueOf(this.gender.name),
         contactNumber = this.contactNumber,
         profilePicPath = this.profilePicPath,
-        isCurrentUser = this.isCurrentUser
+        isCurrentUser = this.isCurrentUser,
+        theme = com.example.dosezy.network.models.Theme.valueOf(this.theme.name),
+        timeFormat = com.example.dosezy.network.models.TimeFormat.valueOf(this.timeFormat.name),
+        language = com.example.dosezy.network.models.Language.valueOf(this.language.name),
+        considerLateAfter = this.considerLateAfter,
+        considerMissedAfter = this.considerMissedAfter,
+        snoozeDuration = this.snoozeDuration,
+        allergies = this.allergies,
+        medicalConditions = this.medicalConditions,
+        naggingRemindersEnabled = this.naggingRemindersEnabled,
+        naggingIntervalMinutes = this.naggingIntervalMinutes,
+        naggingMaxRepeats = this.naggingMaxRepeats,
+        alarmSound = com.example.dosezy.network.models.AlarmSound.valueOf(this.alarmSound.name),
+        customAlarmSoundPath = this.customAlarmSoundPath,
+        customAlarmSoundTitle = this.customAlarmSoundTitle,
+        alarmDurationSeconds = this.alarmDurationSeconds,
+        allowDoseSkipping = this.allowDoseSkipping,
+        allowCustomDoseTime = this.allowCustomDoseTime,
+        hideAddMedicineNavButton = this.hideAddMedicineNavButton,
+        allowDoseUndo = this.allowDoseUndo,
+        allowDoseNotes = this.allowDoseNotes,
+        promptDoseNotes = this.promptDoseNotes
     )
 }
 
@@ -129,7 +137,28 @@ fun com.example.dosezy.network.models.User.toRoomEntity(): User {
         gender = Gender.valueOf(this.gender.name),
         contactNumber = this.contactNumber ?: "",
         profilePicPath = this.profilePicPath,
-        isCurrentUser = this.isCurrentUser ?: false
+        isCurrentUser = this.isCurrentUser ?: false,
+        theme = this.theme?.let { Theme.valueOf(it.name) } ?: Theme.SYSTEM,
+        timeFormat = this.timeFormat?.let { TimeFormat.valueOf(it.name) } ?: TimeFormat.HOUR_12,
+        language = this.language?.let { Language.valueOf(it.name) } ?: Language.SYSTEM,
+        considerLateAfter = this.considerLateAfter ?: 3,
+        considerMissedAfter = this.considerMissedAfter ?: 6,
+        snoozeDuration = this.snoozeDuration ?: 10,
+        allergies = this.allergies,
+        medicalConditions = this.medicalConditions,
+        naggingRemindersEnabled = this.naggingRemindersEnabled ?: false,
+        naggingIntervalMinutes = this.naggingIntervalMinutes ?: 5,
+        naggingMaxRepeats = this.naggingMaxRepeats ?: 3,
+        alarmSound = this.alarmSound?.let { AlarmSound.valueOf(it.name) } ?: AlarmSound.SYSTEM_DEFAULT,
+        customAlarmSoundPath = this.customAlarmSoundPath,
+        customAlarmSoundTitle = this.customAlarmSoundTitle,
+        alarmDurationSeconds = this.alarmDurationSeconds ?: 0,
+        allowDoseSkipping = this.allowDoseSkipping ?: false,
+        allowCustomDoseTime = this.allowCustomDoseTime ?: false,
+        hideAddMedicineNavButton = this.hideAddMedicineNavButton ?: false,
+        allowDoseUndo = this.allowDoseUndo ?: false,
+        allowDoseNotes = this.allowDoseNotes ?: false,
+        promptDoseNotes = this.promptDoseNotes ?: false
     )
 }
 ```

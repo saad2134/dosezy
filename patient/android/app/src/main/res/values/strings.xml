@@ -341,7 +341,7 @@
     <string name="backup_cloud_sub">Managed Caregiver &amp; Sync Platform</string>
     <string name="backup_cloud_desc">Optional managed cloud platform for real-time family sharing, caregiver remote monitoring, and automated multi-device synchronization without compromising data privacy.</string>
     <string name="backup_self_hosted_title">Self-Hosted Backend Server</string>
-    <string name="backup_self_hosted_sub">100% Open Source &amp; Private</string>
+    <string name="backup_self_hosted_sub" formatted="false">100% Open Source &amp; Private</string>
     <string name="backup_self_hosted_desc">Connect directly to your own self-hosted Dosezy server instance for complete data sovereignty, family caregiver dashboard, and private infrastructure control.</string>
     <string name="backup_export_title">Export Full Backup (.zip)</string>
     <string name="backup_export_sub">Create portable backup archive</string>
@@ -390,7 +390,7 @@
     <string name="backup_export_success_msg">Your backup file has been created and saved successfully:</string>
     <string name="backup_export_success_title">Export Completed</string>
     <string name="backup_header_sub">Safeguard your medication schedules, patient profiles, and adherence history.</string>
-    <string name="backup_offline_badge">100% Offline &amp; Private</string>
+    <string name="backup_offline_badge" formatted="false">100% Offline &amp; Private</string>
     <string name="backup_restore_confirm_btn">Restore</string>
     <string name="backup_restore_confirm_msg">This will replace the current database with the data from the backup file. This action cannot be undone.
 
@@ -574,7 +574,7 @@ Do you want to continue?</string>
     <string name="about_star_github">Star on GitHub</string>
     <string name="about_star_github_desc">Support our open-source project by giving a star on GitHub</string>
     <string name="about_support_dev_title">Support Development</string>
-    <string name="about_support_dev_desc">Dosezy is 100% free, private, and ad-free. Your donations keep the project thriving!</string>
+    <string name="about_support_dev_desc" formatted="false">Dosezy is 100% free, private, and ad-free. Your donations keep the project thriving!</string>
     <string name="about_buymeacoffee">Buy Me a Coffee</string>
     <string name="about_buymeacoffee_desc">Support via card or PayPal on BuyMeACoffee</string>
     <string name="about_crypto_donations">Cryptocurrency Donations</string>
@@ -738,10 +738,10 @@ Do you want to continue?</string>
     <string name="about_developer_title">About the Developer</string>
     <string name="about_developer_name">Saad</string>
     <string name="about_developer_role">Creator &amp; Lead Maintainer</string>
-    <string name="about_developer_bio">Built with care to keep medication tracking accessible, completely private, and independent. Zero ads, zero trackers, 100% offline-first.</string>
+    <string name="about_developer_bio" formatted="false">Built with care to keep medication tracking accessible, completely private, and independent. Zero ads, zero trackers, 100% offline-first.</string>
     <string name="about_developer_github">GitHub Profile</string>
     <string name="about_features_title">Why Dosezy?</string>
-    <string name="about_feat_offline_title">100% Offline &amp; Private</string>
+    <string name="about_feat_offline_title" formatted="false">100% Offline &amp; Private</string>
     <string name="about_feat_offline_desc">All data stays strictly on your device with zero cloud dependency and no trackers.</string>
     <string name="about_feat_smart_alarms_title">Reliable Alarms &amp; Timezones</string>
     <string name="about_feat_smart_alarms_desc">Exact reminders that wake your device and shift smoothly with you across time zones.</string>

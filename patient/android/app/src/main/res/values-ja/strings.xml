@@ -310,7 +310,7 @@
     <string name="backup_header_title">バックアップと復元</string>
     <string name="backup_header_sub">お薬のスケジュールと服薬履歴を安全に保護します。</string>
     <string name="backup_storage_note">バックアップファイルは.zip形式で圧縮され、安全に移動できます。</string>
-    <string name="backup_offline_badge">100% オフライン＆プライベート</string>
+    <string name="backup_offline_badge" formatted="false">100% オフライン＆プライベート</string>
     <string name="backup_cloud_title">Dosezy クラウドサーバー</string>
     <string name="backup_cloud_sub">マネージド介護・同期プラットフォーム</string>
     <string name="backup_cloud_desc">プライバシーを保護しながら、家族間リアルタイム共有、介護者によるリモート見守り、複数端末での自動同期を提供するクラウドプラットフォームです。</string>
@@ -361,7 +361,7 @@
     <string name="backup_section_automatic">自動</string>
     <string name="backup_section_manual">手動</string>
     <string name="backup_self_hosted_title">セルフホスト バックエンドサーバー</string>
-    <string name="backup_self_hosted_sub">100% オープンソース＆プライベート</string>
+    <string name="backup_self_hosted_sub" formatted="false">100% オープンソース＆プライベート</string>
     <string name="backup_self_hosted_desc">完全なデータ主権、家族向け介護ダッシュボード、プライベートインフラ制御のために、独自のDosezyサーバーに直接接続します。</string>
     <string name="backup_status_inspecting">バックアップパッケージを検査中...</string>
     <string name="backup_status_no_profiles">バックアップアーカイブ内にプロフィールが見つかりませんでした。</string>
@@ -372,7 +372,7 @@
     <string name="import_dialog_desc">インポートするプロフィールと競合時の処理方法を選択してください。</string>
     <string name="import_existing_profile_badge">同名のプロフィールが既に存在します</string>
     <string name="import_no_profiles_found">選択されたファイル内にプロフィールが見つかりませんでした。</string>
-    <string name="import_profiles_found">パッケージ内に %1$d 件のプロフィールが見つかりました</string>
+    <string name="import_profiles_found">アーカイブで見つかった患者プロフィール</string>
     <string name="import_strategy_create_new">新規作成</string>
     <string name="import_strategy_create_new_desc">別の新規プロフィールとしてインポート</string>
     <string name="import_strategy_label">競合時の処理:</string>
@@ -536,7 +536,7 @@
     <string name="about_star_github">GitHub でスターをつける</string>
     <string name="about_star_github_desc">GitHub でスターをつけてオープンソースプロジェクトを応援する</string>
     <string name="about_support_dev_title">開発を支援する</string>
-    <string name="about_support_dev_desc">Dosezy は完全無料、広告なし、プライバシー重視です。皆様のご支援が開発の原動力です！</string>
+    <string name="about_support_dev_desc" formatted="false">Dosezy は完全無料、広告なし、プライバシー重視です。皆様のご支援が開発の原動力です！</string>
     <string name="about_buymeacoffee">開発者にコーヒーをおごる</string>
     <string name="about_buymeacoffee_desc">クレジットカードや PayPal で手軽にご支援いただけます</string>
     <string name="about_crypto_donations">暗号資産（仮想通貨）でのご支援</string>
@@ -710,10 +710,10 @@
     <string name="about_developer_title">開発者について</string>
     <string name="about_developer_name">Saad</string>
     <string name="about_developer_role">開発者・主管理者</string>
-    <string name="about_developer_bio">服薬管理を手軽で完全にプライベート、かつ独立したものにするために丁寧に開発されました。広告なし、トラッカーなし、100%オフライン設計。</string>
+    <string name="about_developer_bio" formatted="false">服薬管理を手軽で完全にプライベート、かつ独立したものにするために丁寧に開発されました。広告なし、トラッカーなし、100%オフライン設計。</string>
     <string name="about_developer_github">GitHub プロフィール</string>
     <string name="about_features_title">Dosezy の特長</string>
-    <string name="about_feat_offline_title">100% オフライン＆プライベート</string>
+    <string name="about_feat_offline_title" formatted="false">100% オフライン＆プライベート</string>
     <string name="about_feat_offline_desc">すべてのデータはお手元の端末内にのみ保存され、クラウド送信や追跡は一切行われません。</string>
     <string name="about_feat_smart_alarms_title">確実なアラームとタイムゾーン対応</string>
     <string name="about_feat_smart_alarms_desc">端末を確実に鳴動させ、時差のある地域への移動時もスケジュールを自動調整します。</string>

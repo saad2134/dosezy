@@ -310,7 +310,7 @@
     <string name="backup_header_title">Резервное копирование и восстановление</string>
     <string name="backup_header_sub">Защитите свои лекарства, расписание и историю приёма.</string>
     <string name="backup_storage_note">Файлы резервных копий сохраняются в формате .zip и легко переносятся.</string>
-    <string name="backup_offline_badge">100% локально и конфиденциально</string>
+    <string name="backup_offline_badge" formatted="false">100% локально и конфиденциально</string>
     <string name="backup_cloud_title">Облачный сервер Dosezy</string>
     <string name="backup_cloud_sub">Управляемая платформа синхронизации и ухода</string>
     <string name="backup_cloud_desc">Опциональная облачная платформа для семейного доступа, удаленного контроля ухаживающими и автосинхронизации с полной конфиденциальностью.</string>
@@ -361,7 +361,7 @@
     <string name="backup_section_automatic">АВТОМАТИЧЕСКИ</string>
     <string name="backup_section_manual">ВРУЧНУЮ</string>
     <string name="backup_self_hosted_title">Собственный сервер бэкенда</string>
-    <string name="backup_self_hosted_sub">100% открытый исходный код и приватность</string>
+    <string name="backup_self_hosted_sub" formatted="false">100% открытый исходный код и приватность</string>
     <string name="backup_self_hosted_desc">Подключайтесь напрямую к собственному серверу Dosezy для полного суверенитета данных, панели ухода и независимого контроля.</string>
     <string name="backup_status_inspecting">Проверка архива резервной копии...</string>
     <string name="backup_status_no_profiles">В архиве резервной копии не найдено профилей.</string>
@@ -372,7 +372,7 @@
     <string name="import_dialog_desc">Выберите профили для импорта и стратегию разрешения конфликтов.</string>
     <string name="import_existing_profile_badge">Профиль уже существует локально</string>
     <string name="import_no_profiles_found">В выбранном файле не найдено профилей.</string>
-    <string name="import_profiles_found">В архиве найдено %1$d профилей</string>
+    <string name="import_profiles_found">Профили пациентов, найденные в архиве</string>
     <string name="import_strategy_create_new">Создать новый</string>
     <string name="import_strategy_create_new_desc">Импортировать как новый отдельный профиль</string>
     <string name="import_strategy_label">Действие при конфликте:</string>
@@ -536,7 +536,7 @@
     <string name="about_star_github">Поставить звезду на GitHub</string>
     <string name="about_star_github_desc">Поддержите наш проект с открытым исходным кодом звездой на GitHub</string>
     <string name="about_support_dev_title">Поддержать разработку</string>
-    <string name="about_support_dev_desc">Dosezy на 100% бесплатен, конфиденциален и без рекламы. Ваша поддержка помогает проекту развиваться!</string>
+    <string name="about_support_dev_desc" formatted="false">Dosezy на 100% бесплатен, конфиденциален и без рекламы. Ваша поддержка помогает проекту развиваться!</string>
     <string name="about_buymeacoffee">Купить кофе автору</string>
     <string name="about_buymeacoffee_desc">Поддержать картой или через PayPal на BuyMeACoffee</string>
     <string name="about_crypto_donations">Пожертвования в криптовалюте</string>
@@ -710,10 +710,10 @@
     <string name="about_developer_title">О разработчике</string>
     <string name="about_developer_name">Saad</string>
     <string name="about_developer_role">Создатель и главный разработчик</string>
-    <string name="about_developer_bio">Создано с заботой, чтобы приём лекарств был удобным, приватным и независимым. Без рекламы, без трекеров, 100% офлайн.</string>
+    <string name="about_developer_bio" formatted="false">Создано с заботой, чтобы приём лекарств был удобным, приватным и независимым. Без рекламы, без трекеров, 100% офлайн.</string>
     <string name="about_developer_github">Профиль на GitHub</string>
     <string name="about_features_title">Почему Dosezy?</string>
-    <string name="about_feat_offline_title">100% офлайн и конфиденциально</string>
+    <string name="about_feat_offline_title" formatted="false">100% офлайн и конфиденциально</string>
     <string name="about_feat_offline_desc">Все данные хранятся только на вашем устройстве без облаков и отслеживания.</string>
     <string name="about_feat_smart_alarms_title">Точные будильники и часовые пояса</string>
     <string name="about_feat_smart_alarms_desc">Надёжные сигналы, которые будят телефон и подстраиваются при смене часового пояса.</string>

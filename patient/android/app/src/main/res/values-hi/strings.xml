@@ -326,7 +326,7 @@
     <string name="backup_header_title">बैकअप और पुनर्स्थापना</string>
     <string name="backup_header_sub">अपनी दवाओं की सूची, समय सारणी और खुराक के इतिहास को सुरक्षित रखें।</string>
     <string name="backup_storage_note">बैकअप फाइलें .zip प्रारूप में संपीड़ित होती हैं और सुरक्षित रूप से स्थानांतरित की जा सकती हैं।</string>
-    <string name="backup_offline_badge">100% ऑफ़लाइन और निजी</string>
+    <string name="backup_offline_badge" formatted="false">100% ऑफ़लाइन और निजी</string>
     <string name="backup_cloud_title">डोज़ेज़ी क्लाउड सर्वर</string>
     <string name="backup_cloud_sub">प्रबंधित देखभालकर्ता और सिंक प्लेटफॉर्म</string>
     <string name="backup_cloud_desc">परिवार के साथ रीयल-टाइम साझाकरण, देखभालकर्ता रिमोट मॉनिटरिंग और पूर्ण गोपनीयता के साथ स्वचालित मल्टी-डिवाइस सिंक के लिए वैकल्पिक क्लाउड प्लेटफॉर्म।</string>
@@ -377,7 +377,7 @@
     <string name="backup_section_automatic">स्वचालित</string>
     <string name="backup_section_manual">मैन्युअल</string>
     <string name="backup_self_hosted_title">सेल्फ-होस्टेड बैकएंड सर्वर</string>
-    <string name="backup_self_hosted_sub">100% ओपन सोर्स और निजी</string>
+    <string name="backup_self_hosted_sub" formatted="false">100% ओपन सोर्स और निजी</string>
     <string name="backup_self_hosted_desc">संपूर्ण डेटा संप्रभुता, परिवार देखभालकर्ता डैशबोर्ड और निजी नियंत्रण के लिए अपने स्वयं के डोज़ेज़ी सर्वर से सीधे जुड़ें।</string>
     <string name="backup_status_inspecting">बैकअप पैकेज की जांच की जा रही है...</string>
     <string name="backup_status_no_profiles">बैकअप संग्रह में कोई प्रोफ़ाइल नहीं मिली।</string>
@@ -388,7 +388,7 @@
     <string name="import_dialog_desc">चुनें कि कौन से प्रोफ़ाइल आयात करने हैं और विरोधों को कैसे हल करना है।</string>
     <string name="import_existing_profile_badge">प्रोफ़ाइल पहले से मौजूद है</string>
     <string name="import_no_profiles_found">चयनित फ़ाइल में कोई प्रोफ़ाइल नहीं मिली।</string>
-    <string name="import_profiles_found">पैकेज में %1$d प्रोफ़ाइल मिलीं</string>
+    <string name="import_profiles_found">संग्रह में मिले मरीज़ों के प्रोफ़ाइल</string>
     <string name="import_strategy_create_new">नया बनाएं</string>
     <string name="import_strategy_create_new_desc">एक नए अलग प्रोफ़ाइल के रूप में आयात करें</string>
     <string name="import_strategy_label">विरोध समाधान कार्रवाई:</string>
@@ -552,7 +552,7 @@
     <string name="about_star_github">GitHub पर स्टार दें</string>
     <string name="about_star_github_desc">GitHub पर स्टार देकर हमारे ओपन-सोर्स प्रोजेक्ट का समर्थन करें</string>
     <string name="about_support_dev_title">विकास का समर्थन करें</string>
-    <string name="about_support_dev_desc">Dosezy पूरी तरह से मुफ़्त, सुरक्षित और विज्ञापन-मुक्त है। आपका दान प्रोजेक्ट को आगे बढ़ाने में मदद करता है!</string>
+    <string name="about_support_dev_desc" formatted="false">Dosezy पूरी तरह से मुफ़्त, सुरक्षित और विज्ञापन-मुक्त है। आपका दान प्रोजेक्ट को आगे बढ़ाने में मदद करता है!</string>
     <string name="about_buymeacoffee">Buy Me a Coffee पर सहयोग करें</string>
     <string name="about_buymeacoffee_desc">कार्ड या PayPal के ज़रिए BuyMeACoffee पर दान करें</string>
     <string name="about_crypto_donations">क्रिप्टोकरेंसी दान</string>
@@ -726,10 +726,10 @@
     <string name="about_developer_title">डेवलपर के बारे में</string>
     <string name="about_developer_name">Saad</string>
     <string name="about_developer_role">निर्माता और मुख्य अनुरक्षक</string>
-    <string name="about_developer_bio">दवा प्रबंधन को सुलभ, पूरी तरह से निजी और स्वतंत्र रखने के लिए समर्पित भाव से निर्मित। कोई विज्ञापन नहीं, कोई ट्रैकर नहीं, 100% ऑफ़लाइन।</string>
+    <string name="about_developer_bio" formatted="false">दवा प्रबंधन को सुलभ, पूरी तरह से निजी और स्वतंत्र रखने के लिए समर्पित भाव से निर्मित। कोई विज्ञापन नहीं, कोई ट्रैकर नहीं, 100% ऑफ़लाइन।</string>
     <string name="about_developer_github">GitHub प्रोफ़ाइल</string>
     <string name="about_features_title">Dosezy क्यों चुनें?</string>
-    <string name="about_feat_offline_title">100% ऑफ़लाइन और निजी</string>
+    <string name="about_feat_offline_title" formatted="false">100% ऑफ़लाइन और निजी</string>
     <string name="about_feat_offline_desc">सभी डेटा केवल आपके डिवाइस पर सुरक्षित रहता है, बिना किसी क्लाउड या ट्रैकर के।</string>
     <string name="about_feat_smart_alarms_title">विश्वसनीय अलार्म और समय क्षेत्र</string>
     <string name="about_feat_smart_alarms_desc">सटीक अलार्म जो डिवाइस को जगाते हैं और समय क्षेत्र बदलने पर खुद अनुकूलित होते हैं।</string>

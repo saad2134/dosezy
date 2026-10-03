@@ -59,7 +59,7 @@ paths:
                     example: ok
                   version:
                     type: string
-                    example: 2.3.0
+                    example: 2.5.8
                   timestamp:
                     type: string
                     format: date-time
@@ -515,7 +515,7 @@ components:
           description: Display title of custom alarm sound
         alarmDurationSeconds:
           type: integer
-          description: Alarm auto-silence duration in seconds (0=continuous, 30, 60, 120, 300)
+          description: Alarm auto-silence duration in seconds (-1=once, 0=continuous, 15, 30, 60, 120, 300)
           default: 0
           example: 0
         allowDoseSkipping:
@@ -536,6 +536,11 @@ components:
         allowDoseUndo:
           type: boolean
           description: Whether user can revert a recorded dose back to pending
+          default: false
+          example: false
+        allowDoseNotes:
+          type: boolean
+          description: Whether user is allowed to log optional symptom and meal notes with doses
           default: false
           example: false
         promptDoseNotes:
@@ -602,6 +607,7 @@ components:
           nullable: true
         alarmDurationSeconds:
           type: integer
+          description: Alarm auto-silence duration in seconds (-1=once, 0=continuous, 15, 30, 60, 120, 300)
         allowDoseSkipping:
           type: boolean
         allowCustomDoseTime:
@@ -609,6 +615,8 @@ components:
         hideAddMedicineNavButton:
           type: boolean
         allowDoseUndo:
+          type: boolean
+        allowDoseNotes:
           type: boolean
         promptDoseNotes:
           type: boolean

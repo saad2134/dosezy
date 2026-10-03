@@ -326,7 +326,7 @@
     <string name="backup_header_title">备份与恢复</string>
     <string name="backup_header_sub">安全保护您的药物、服药计划和依从性记录。</string>
     <string name="backup_storage_note">备份文件为.zip压缩包格式，可安全迁移与保存。</string>
-    <string name="backup_offline_badge">100% 本地与私密</string>
+    <string name="backup_offline_badge" formatted="false">100% 本地与私密</string>
     <string name="backup_cloud_title">Dosezy 云端服务器</string>
     <string name="backup_cloud_sub">托管式看护者与多端同步平台</string>
     <string name="backup_cloud_desc">可选的托管云平台，支持家庭实时共享、看护者远程监控以及多设备自动同步，同时确保绝对的数据隐私。</string>
@@ -377,7 +377,7 @@
     <string name="backup_section_automatic">自动</string>
     <string name="backup_section_manual">手动</string>
     <string name="backup_self_hosted_title">自建后端服务器</string>
-    <string name="backup_self_hosted_sub">100% 开源与私有化</string>
+    <string name="backup_self_hosted_sub" formatted="false">100% 开源与私有化</string>
     <string name="backup_self_hosted_desc">直接连接至您自行搭建的Dosezy服务实例，享有完全的数据自主权、家庭看护仪表盘及私有基础设施控制。</string>
     <string name="backup_status_inspecting">正在检查备份压缩包...</string>
     <string name="backup_status_no_profiles">备份文件中未找到任何档案。</string>
@@ -388,7 +388,7 @@
     <string name="import_dialog_desc">请选择要导入的档案以及冲突解决方式。</string>
     <string name="import_existing_profile_badge">本地已存在同名档案</string>
     <string name="import_no_profiles_found">所选文件中未找到任何档案。</string>
-    <string name="import_profiles_found">在备份包中找到 %1$d 个档案</string>
+    <string name="import_profiles_found">在备份中找到的患者档案</string>
     <string name="import_strategy_create_new">创建为新档案</string>
     <string name="import_strategy_create_new_desc">作为新的独立档案导入</string>
     <string name="import_strategy_label">冲突处理方式：</string>
@@ -552,7 +552,7 @@
     <string name="about_star_github">在 GitHub 上点亮 Star</string>
     <string name="about_star_github_desc">在 GitHub 上为我们的开源项目点亮 Star 予以支持</string>
     <string name="about_support_dev_title">支持独立开发</string>
-    <string name="about_support_dev_desc">Dosezy 完全免费、无广告、纯本地离线。您的赞助是支持持续维护的最大动力！</string>
+    <string name="about_support_dev_desc" formatted="false">Dosezy 完全免费、无广告、纯本地离线。您的赞助是支持持续维护的最大动力！</string>
     <string name="about_buymeacoffee">请开发者喝杯咖啡</string>
     <string name="about_buymeacoffee_desc">通过 BuyMeACoffee 使用银行卡或 PayPal 赞助</string>
     <string name="about_crypto_donations">加密货币捐赠</string>
@@ -726,10 +726,10 @@
     <string name="about_developer_title">关于开发者</string>
     <string name="about_developer_name">Saad</string>
     <string name="about_developer_role">创建者与主维护人</string>
-    <string name="about_developer_bio">精心打造，致力于让服药管理更简便、纯粹私密且完全独立。无广告、无追踪器、100% 离线运行。</string>
+    <string name="about_developer_bio" formatted="false">精心打造，致力于让服药管理更简便、纯粹私密且完全独立。无广告、无追踪器、100% 离线运行。</string>
     <string name="about_developer_github">GitHub 个人主页</string>
     <string name="about_features_title">为何选择 Dosezy？</string>
-    <string name="about_feat_offline_title">100% 离线与隐私安全</string>
+    <string name="about_feat_offline_title" formatted="false">100% 离线与隐私安全</string>
     <string name="about_feat_offline_desc">所有数据严格保存在您的设备本地，绝不依赖云端，零隐私追踪。</string>
     <string name="about_feat_smart_alarms_title">可靠响铃与时区自适应</string>
     <string name="about_feat_smart_alarms_desc">精准唤醒设备的提醒通知，跨时区旅行时服药时间自动平滑切换。</string>
