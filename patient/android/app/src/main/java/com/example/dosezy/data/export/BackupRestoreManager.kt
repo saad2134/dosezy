@@ -613,7 +613,8 @@ class BackupRestoreManager(
                 selectedDaysOfWeek = selectedDaysOfWeek,
                 selectedDaysOfMonth = selectedDaysOfMonth,
                 intervalHours = freqObj.get("intervalHours")?.let { if (it.isJsonNull) null else it.asInt },
-                intervalDays = freqObj.get("intervalDays")?.let { if (it.isJsonNull) null else it.asInt }
+                intervalDays = freqObj.get("intervalDays")?.let { if (it.isJsonNull) null else it.asInt },
+                intervalWeeks = freqObj.get("intervalWeeks")?.let { if (it.isJsonNull) null else it.asInt }
             )
 
             val pillShape = obj.get("pillShape")?.let { if (it.isJsonNull) null else try { PillShape.valueOf(it.asString) } catch (_: Exception) { null } } ?: PillShape.ROUND

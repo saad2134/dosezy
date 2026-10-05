@@ -204,6 +204,7 @@ class DataExporter(
             mObj.put("frequencyPattern", med.frequency.pattern.name)
             mObj.put("intervalHours", med.frequency.intervalHours)
             mObj.put("intervalDays", med.frequency.intervalDays)
+            mObj.put("intervalWeeks", med.frequency.intervalWeeks)
             mObj.put("scheduledTimes", JSONArray(med.scheduledTimes.map { it.toString() }))
             mObj.put("currentStock", med.currentStock)
             mObj.put("refillThreshold", med.refillThreshold)
@@ -501,7 +502,7 @@ class DataExporter(
 
         // Medicines Section
         csvBuilder.append("MEDICINES\n")
-        csvBuilder.append("Medicine ID,User ID,Medication Name,Dosage,Dosage Unit,Times Per Day,Frequency Pattern,Interval Hours,Interval Days,Scheduled Times,Pill Shape,Pill Color,Doctor Notes,Start Date,End Date,Duration Days,Stock,Image URI\n")
+        csvBuilder.append("Medicine ID,User ID,Medication Name,Dosage,Dosage Unit,Times Per Day,Frequency Pattern,Interval Hours,Interval Days,Interval Weeks,Scheduled Times,Pill Shape,Pill Color,Doctor Notes,Start Date,End Date,Duration Days,Stock,Image URI\n")
         medicines.forEach { medicine ->
             val scheduledTimesStr = medicine.scheduledTimes.joinToString(";") { it.toString() }
             csvBuilder.append(
@@ -514,6 +515,7 @@ class DataExporter(
                 "${medicine.frequency.pattern}," +
                 "${medicine.frequency.intervalHours ?: ""}," +
                 "${medicine.frequency.intervalDays ?: ""}," +
+                "${medicine.frequency.intervalWeeks ?: ""}," +
                 "${escapeCsv(scheduledTimesStr)}," +
                 "${escapeCsv(medicine.pillShape.name)}," +
                 "${escapeCsv(medicine.pillColor)}," +

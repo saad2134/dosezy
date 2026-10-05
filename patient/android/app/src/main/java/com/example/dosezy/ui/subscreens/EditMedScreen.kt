@@ -145,6 +145,7 @@ fun EditMedScreen(
     var durationDaysText by remember { mutableStateOf("") }
     var intervalHoursText by remember { mutableStateOf("4") }
     var intervalDaysText by remember { mutableStateOf("2") }
+    var intervalWeeksText by remember { mutableStateOf("2") }
 
     // Dropdown states
     var dosageUnitExpanded by remember { mutableStateOf(false) }
@@ -173,6 +174,7 @@ fun EditMedScreen(
             durationDaysText = medicineToEdit.durationDays?.toString() ?: ""
             intervalHoursText = medicineToEdit.frequency.intervalHours?.toString() ?: "4"
             intervalDaysText = medicineToEdit.frequency.intervalDays?.toString() ?: "2"
+            intervalWeeksText = medicineToEdit.frequency.intervalWeeks?.toString() ?: "2"
             hasDifferentDosages = medicineToEdit.customDosages != null && medicineToEdit.customDosages.isNotEmpty()
             perTimeDosages = medicineToEdit.customDosages?.entries?.associate { (k, v) ->
                 val normKey = k.normalizeArabicDigits()
@@ -645,6 +647,95 @@ fun EditMedScreen(
                                                 }
                                             }
                                         }
+                                    }
+                                }
+                            }
+
+                            if (selectedFrequency == FrequencyPattern.CUSTOM) {
+                                Spacer(modifier = Modifier.height(14.dp))
+                                OutlinedTextField(
+                                    value = intervalWeeksText,
+                                    onValueChange = { if (it.all { c -> c.isDigit() }) intervalWeeksText = it },
+                                    label = { Text(stringResource(R.string.custom_recurrence_interval_label)) },
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    shape = RoundedCornerShape(16.dp),
+                                    modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 56.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = Color(0xFF1193D4),
+                                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                                    )
+                                )
+
+                                Spacer(modifier = Modifier.height(14.dp))
+                                Text(
+                                    text = stringResource(R.string.form_select_days_week),
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                val daysOfWeekNames = listOf(
+                                    stringResource(R.string.day_mon),
+                                    stringResource(R.string.day_tue),
+                                    stringResource(R.string.day_wed),
+                                    stringResource(R.string.day_thu),
+                                    stringResource(R.string.day_fri),
+                                    stringResource(R.string.day_sat),
+                                    stringResource(R.string.day_sun)
+                                )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    daysOfWeekNames.forEachIndexed { index, name ->
+                                        val dayValue = index + 1
+                                        val isSelected = selectedDaysOfWeek.contains(dayValue)
+                                        Box(
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .heightIn(min = 48.dp)
+                                                .clip(RoundedCornerShape(8.dp))
+                                                .background(
+                                                    if (isSelected) MaterialTheme.colorScheme.primary 
+                                                    else MaterialTheme.colorScheme.surface
+                                                )
+                                                .clickable {
+                                                    selectedDaysOfWeek = if (isSelected) {
+                                                        selectedDaysOfWeek - dayValue
+                                                    } else {
+                                                        selectedDaysOfWeek + dayValue
+                                                    }
+                                                },
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                text = name,
+                                                color = if (isSelected) MaterialTheme.colorScheme.onPrimary 
+                                                        else MaterialTheme.colorScheme.onSurfaceVariant,
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 12.sp
+                                            )
+                                        }
+                                    }
+                                }
+
+                                val weeks = intervalWeeksText.toIntOrNull() ?: 1
+                                if (selectedDaysOfWeek.isNotEmpty()) {
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    val dayLabels = selectedDaysOfWeek.sorted().map { dayVal ->
+                                        daysOfWeekNames.getOrElse(dayVal - 1) { "" }
+                                    }.joinToString(", ")
+                                    androidx.compose.material3.Surface(
+                                        shape = RoundedCornerShape(12.dp),
+                                        color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.custom_recurrence_summary, weeks, dayLabels),
+                                            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                                        )
                                     }
                                 }
                             }
@@ -1190,7 +1281,7 @@ fun EditMedScreen(
                         selectedFrequency == FrequencyPattern.EVERY_X_DAYS ||
                         (selectedFrequency == FrequencyPattern.WEEKLY && selectedDaysOfWeek.isNotEmpty()) ||
                         (selectedFrequency == FrequencyPattern.MONTHLY && selectedDaysOfMonth.isNotEmpty()) ||
-                        selectedFrequency == FrequencyPattern.CUSTOM
+                        (selectedFrequency == FrequencyPattern.CUSTOM && selectedDaysOfWeek.isNotEmpty() && (intervalWeeksText.toIntOrNull() ?: 0) >= 1)
                     )
 
                     Button(
@@ -1201,6 +1292,7 @@ fun EditMedScreen(
                                     dosage.isBlank() -> context.getString(R.string.validation_enter_dosage)
                                     selectedFrequency == FrequencyPattern.WEEKLY && selectedDaysOfWeek.isEmpty() -> context.getString(R.string.validation_select_days_week)
                                     selectedFrequency == FrequencyPattern.MONTHLY && selectedDaysOfMonth.isEmpty() -> context.getString(R.string.validation_select_days_month)
+                                    selectedFrequency == FrequencyPattern.CUSTOM && selectedDaysOfWeek.isEmpty() -> context.getString(R.string.validation_select_custom_days)
                                     else -> context.getString(R.string.validation_enter_med_name)
                                 }
                                 android.widget.Toast.makeText(context, errorMsg, android.widget.Toast.LENGTH_SHORT).show()
@@ -1227,12 +1319,13 @@ fun EditMedScreen(
                                 timesPerDay = if (selectedFrequency == FrequencyPattern.AS_NEEDED) 0 else scheduledTimesList.size,
                                 frequency = com.example.dosezy.data.model.Frequency(
                                     pattern = selectedFrequency,
-                                    daysPerWeek = if (selectedFrequency == FrequencyPattern.WEEKLY) selectedDaysOfWeek.size else null,
+                                    daysPerWeek = if (selectedFrequency == FrequencyPattern.WEEKLY || selectedFrequency == FrequencyPattern.CUSTOM) selectedDaysOfWeek.size else null,
                                     daysPerMonth = if (selectedFrequency == FrequencyPattern.MONTHLY) selectedDaysOfMonth.size else null,
-                                    selectedDaysOfWeek = if (selectedFrequency == FrequencyPattern.WEEKLY) selectedDaysOfWeek else null,
+                                    selectedDaysOfWeek = if (selectedFrequency == FrequencyPattern.WEEKLY || selectedFrequency == FrequencyPattern.CUSTOM) selectedDaysOfWeek else null,
                                     selectedDaysOfMonth = if (selectedFrequency == FrequencyPattern.MONTHLY) selectedDaysOfMonth else null,
                                     intervalHours = if (selectedFrequency == FrequencyPattern.EVERY_X_HOURS) intervalHoursText.toIntOrNull() else null,
-                                    intervalDays = if (selectedFrequency == FrequencyPattern.EVERY_X_DAYS) intervalDaysText.toIntOrNull() else null
+                                    intervalDays = if (selectedFrequency == FrequencyPattern.EVERY_X_DAYS) intervalDaysText.toIntOrNull() else null,
+                                    intervalWeeks = if (selectedFrequency == FrequencyPattern.CUSTOM) (intervalWeeksText.toIntOrNull() ?: 1).coerceAtLeast(1) else null
                                 ),
                                 scheduledTimes = if (selectedFrequency == FrequencyPattern.AS_NEEDED) emptyList() else scheduledTimesList,
                                 imageUri = medicineImagePath,

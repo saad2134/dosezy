@@ -472,6 +472,10 @@ Möchten Sie fortfahren?</string>
     <string name="freq_every_days_format">Alle %1$d Tage</string>
     <string name="interval_hours_label">Stunden zwischen Dosen</string>
     <string name="interval_days_label">Tage zwischen Dosen</string>
+    <string name="freq_every_x_weeks_format">Alle %1$d Wochen</string>
+    <string name="custom_recurrence_interval_label">Wiederholen alle (Wochen)</string>
+    <string name="custom_recurrence_summary">Wiederholt sich alle %1$d Wochen am %2$s</string>
+    <string name="validation_select_custom_days">Bitte wählen Sie mindestens einen Tag für die benutzerdefinierte Wiederholung</string>
     <string name="btn_log_prn_dose">Dosis erfassen</string>
     <string name="prn_doses_taken_today">Heute erfasste Dosen: %1$d</string>
     <string name="prn_section_title">Bedarfsmedikation (PRN)</string>

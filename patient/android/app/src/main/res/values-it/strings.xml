@@ -472,6 +472,10 @@ Vuoi continuare?</string>
     <string name="freq_every_days_format">Ogni %1$d giorni</string>
     <string name="interval_hours_label">Ore tra le dosi</string>
     <string name="interval_days_label">Giorni tra le dosi</string>
+    <string name="freq_every_x_weeks_format">Ogni %1$d settimane</string>
+    <string name="custom_recurrence_interval_label">Ripeti ogni (settimane)</string>
+    <string name="custom_recurrence_summary">Si ripete ogni %1$d settimane il %2$s</string>
+    <string name="validation_select_custom_days">Seleziona almeno un giorno per la ricorrenza personalizzata</string>
     <string name="btn_log_prn_dose">Registra dose</string>
     <string name="prn_doses_taken_today">Dosi registrate oggi: %1$d</string>
     <string name="prn_section_title">Farmaci al bisogno (PRN)</string>

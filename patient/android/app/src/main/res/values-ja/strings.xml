@@ -472,6 +472,10 @@
     <string name="freq_every_days_format">%1$d 日ごと</string>
     <string name="interval_hours_label">服用間隔 (時間)</string>
     <string name="interval_days_label">服用間隔 (日数)</string>
+    <string name="freq_every_x_weeks_format">%1$d 週間ごと</string>
+    <string name="custom_recurrence_interval_label">繰り返しの間隔 (週数)</string>
+    <string name="custom_recurrence_summary">%1$d 週間ごとの %2$s に繰り返し</string>
+    <string name="validation_select_custom_days">カスタム繰り返しの曜日を少なくとも1つ選択してください</string>
     <string name="btn_log_prn_dose">服用を記録</string>
     <string name="prn_doses_taken_today">本日記録された服用数: %1$d</string>
     <string name="prn_section_title">頓服薬 (PRN)</string>

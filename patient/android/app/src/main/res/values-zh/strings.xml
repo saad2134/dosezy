@@ -488,6 +488,10 @@
     <string name="freq_every_days_format">每 %1$d 天</string>
     <string name="interval_hours_label">两次服药间隔小时</string>
     <string name="interval_days_label">两次服药间隔天数</string>
+    <string name="freq_every_x_weeks_format">每 %1$d 周</string>
+    <string name="custom_recurrence_interval_label">重复间隔 (周数)</string>
+    <string name="custom_recurrence_summary">每 %1$d 周在 %2$s 重复</string>
+    <string name="validation_select_custom_days">请至少选择自定义重复周期的某一天</string>
     <string name="btn_log_prn_dose">记录服药</string>
     <string name="prn_doses_taken_today">今日已记录：%1$d 次</string>
     <string name="prn_section_title">按需服用药品 (PRN)</string>

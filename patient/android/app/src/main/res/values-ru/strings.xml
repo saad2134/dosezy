@@ -472,6 +472,10 @@
     <string name="freq_every_days_format">Каждые %1$d дн</string>
     <string name="interval_hours_label">Интервал между приемами (часы)</string>
     <string name="interval_days_label">Интервал между приемами (дни)</string>
+    <string name="freq_every_x_weeks_format">Каждые %1$d нед</string>
+    <string name="custom_recurrence_interval_label">Интервал повторения (недели)</string>
+    <string name="custom_recurrence_summary">Повторяется каждые %1$d нед.: %2$s</string>
+    <string name="validation_select_custom_days">Выберите хотя бы один день для настраиваемого повторения</string>
     <string name="btn_log_prn_dose">Записать прием</string>
     <string name="prn_doses_taken_today">Приемов записано сегодня: %1$d</string>
     <string name="prn_section_title">Препараты по необходимости (PRN)</string>

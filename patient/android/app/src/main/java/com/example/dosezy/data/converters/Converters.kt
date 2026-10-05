@@ -128,6 +128,7 @@ class Converters {
             freq.daysPerMonth?.let { jsonObject.put("daysPerMonth", it) }
             freq.intervalHours?.let { jsonObject.put("intervalHours", it) }
             freq.intervalDays?.let { jsonObject.put("intervalDays", it) }
+            freq.intervalWeeks?.let { jsonObject.put("intervalWeeks", it) }
             freq.selectedDaysOfWeek?.let { days ->
                 val arr = JSONArray()
                 days.forEach { arr.put(it) }
@@ -158,6 +159,7 @@ class Converters {
                 val daysPerMonth = if (jsonObject.has("daysPerMonth") && !jsonObject.isNull("daysPerMonth")) jsonObject.getInt("daysPerMonth") else null
                 val intervalHours = if (jsonObject.has("intervalHours") && !jsonObject.isNull("intervalHours")) jsonObject.getInt("intervalHours") else null
                 val intervalDays = if (jsonObject.has("intervalDays") && !jsonObject.isNull("intervalDays")) jsonObject.getInt("intervalDays") else null
+                val intervalWeeks = if (jsonObject.has("intervalWeeks") && !jsonObject.isNull("intervalWeeks")) jsonObject.getInt("intervalWeeks") else null
                 val selectedDaysOfWeek = if (jsonObject.has("selectedDaysOfWeek") && !jsonObject.isNull("selectedDaysOfWeek")) {
                     val arr = jsonObject.getJSONArray("selectedDaysOfWeek")
                     (0 until arr.length()).map { arr.getInt(it) }
@@ -166,7 +168,7 @@ class Converters {
                     val arr = jsonObject.getJSONArray("selectedDaysOfMonth")
                     (0 until arr.length()).map { arr.getInt(it) }
                 } else null
-                Frequency(pattern, daysPerWeek, daysPerMonth, selectedDaysOfWeek, selectedDaysOfMonth, intervalHours, intervalDays)
+                Frequency(pattern, daysPerWeek, daysPerMonth, selectedDaysOfWeek, selectedDaysOfMonth, intervalHours, intervalDays, intervalWeeks)
             } catch (_: Exception) {
                 Frequency(FrequencyPattern.DAILY)
             }

@@ -507,6 +507,10 @@ Do you want to continue?</string>
     <string name="freq_every_days_format">Every %1$d days</string>
     <string name="interval_hours_label">Hours between doses</string>
     <string name="interval_days_label">Days between doses</string>
+    <string name="freq_every_x_weeks_format">Every %1$d weeks</string>
+    <string name="custom_recurrence_interval_label">Repeat every (weeks)</string>
+    <string name="custom_recurrence_summary">Repeats every %1$d weeks on %2$s</string>
+    <string name="validation_select_custom_days">Please select at least one day for custom recurrence</string>
     <string name="btn_log_prn_dose">Log Dose</string>
     <string name="prn_doses_taken_today">Doses logged today: %1$d</string>
     <string name="prn_section_title">As Needed (PRN) Medications</string>

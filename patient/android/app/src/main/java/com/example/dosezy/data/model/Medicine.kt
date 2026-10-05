@@ -136,7 +136,7 @@ data class Medicine(
      * Determines if the medicine should be taken on the given date based on frequency pattern
      */
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun shouldTakeOnDate(date: LocalDate): Boolean {
+    internal fun shouldTakeOnDate(date: LocalDate): Boolean {
         // Verify within finite course bounds
         if (startDate != null && date.isBefore(startDate)) return false
         if (endDate != null && date.isAfter(endDate)) return false
@@ -177,7 +177,26 @@ data class Medicine(
                     date.dayOfMonth <= daysPerMonth
                 }
             }
-            FrequencyPattern.CUSTOM -> true
+            FrequencyPattern.CUSTOM -> {
+                val intervalWks = (frequency.intervalWeeks ?: 1).coerceAtLeast(1)
+                val baseDate = startDate ?: LocalDate.of(2020, 1, 6) // Jan 6, 2020 was Monday
+                val baseMonday = baseDate.with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY))
+                val dateMonday = date.with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY))
+                val weeksDiff = java.time.temporal.ChronoUnit.WEEKS.between(baseMonday, dateMonday)
+                val isIntervalWeek = weeksDiff >= 0 && (weeksDiff % intervalWks == 0L)
+
+                val selectedDays = frequency.selectedDaysOfWeek
+                val isDayMatch = if (!selectedDays.isNullOrEmpty()) {
+                    date.dayOfWeek.value in selectedDays
+                } else {
+                    if (frequency.intervalWeeks != null && frequency.intervalWeeks > 1) {
+                        date.dayOfWeek == baseDate.dayOfWeek
+                    } else {
+                        true
+                    }
+                }
+                isIntervalWeek && isDayMatch
+            }
         }
     }
 
@@ -220,7 +239,26 @@ data class Medicine(
                 val days = frequency.daysPerMonth ?: 30
                 "$days times per month"
             }
-            FrequencyPattern.CUSTOM -> "Custom"
+            FrequencyPattern.CUSTOM -> {
+                val interval = frequency.intervalWeeks ?: 1
+                val days = frequency.selectedDaysOfWeek
+                val dayNames = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+                if (interval > 1 && !days.isNullOrEmpty()) {
+                    val formattedDays = days.sorted().mapNotNull { dayVal ->
+                        if (dayVal in 1..7) dayNames[dayVal - 1] else null
+                    }.joinToString(", ")
+                    "Every $interval weeks ($formattedDays)"
+                } else if (interval > 1) {
+                    "Every $interval weeks"
+                } else if (!days.isNullOrEmpty()) {
+                    val formattedDays = days.sorted().mapNotNull { dayVal ->
+                        if (dayVal in 1..7) dayNames[dayVal - 1] else null
+                    }.joinToString(", ")
+                    "Weekly ($formattedDays)"
+                } else {
+                    "Custom"
+                }
+            }
         }
     }
 
@@ -300,7 +338,17 @@ data class Medicine(
                 estimatedDays.coerceAtLeast(1.0)
             }
             FrequencyPattern.CUSTOM -> {
-                (timesPerDay.coerceAtLeast(1) * days).toDouble()
+                val interval = (frequency.intervalWeeks ?: 1).coerceAtLeast(1)
+                val selectedDays = frequency.selectedDaysOfWeek
+                if (!selectedDays.isNullOrEmpty()) {
+                    val totalDoseDays = kotlin.math.ceil((selectedDays.size.toDouble() / (7.0 * interval)) * days)
+                    totalDoseDays * timesPerDay.coerceAtLeast(1)
+                } else if (frequency.intervalWeeks != null && frequency.intervalWeeks > 1) {
+                    val totalDoseDays = kotlin.math.ceil((1.0 / (7.0 * interval)) * days)
+                    totalDoseDays * timesPerDay.coerceAtLeast(1)
+                } else {
+                    (timesPerDay.coerceAtLeast(1) * days).toDouble()
+                }
             }
         }
 
@@ -373,7 +421,8 @@ data class Frequency(
     val selectedDaysOfWeek: List<Int>? = null,  // 1=Mon, 2=Tue, ..., 7=Sun (ISO)
     val selectedDaysOfMonth: List<Int>? = null,  // 1-31
     val intervalHours: Int? = null,              // for EVERY_X_HOURS (e.g. 4, 6, 8, 12)
-    val intervalDays: Int? = null                // for EVERY_X_DAYS (e.g. 2, 3, 5)
+    val intervalDays: Int? = null,               // for EVERY_X_DAYS (e.g. 2, 3, 5)
+    val intervalWeeks: Int? = null               // for CUSTOM (e.g. 2 for every 2 weeks)
 )
 
 enum class FrequencyPattern {
@@ -420,7 +469,14 @@ fun Medicine.getLocalizedFrequencyDisplay(): String {
             val days = frequency.daysPerMonth ?: 30
             androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.times_per_month_format, days)
         }
-        FrequencyPattern.CUSTOM -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_custom)
+        FrequencyPattern.CUSTOM -> {
+            val interval = frequency.intervalWeeks ?: 1
+            if (interval > 1) {
+                androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_every_x_weeks_format, interval)
+            } else {
+                androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_custom)
+            }
+        }
     }
 }
 

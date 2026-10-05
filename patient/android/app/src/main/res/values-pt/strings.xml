@@ -471,6 +471,10 @@ Deseja continuar?</string>
     <string name="freq_every_days_format">A cada %1$d dias</string>
     <string name="interval_hours_label">Horas entre doses</string>
     <string name="interval_days_label">Dias entre doses</string>
+    <string name="freq_every_x_weeks_format">A cada %1$d semanas</string>
+    <string name="custom_recurrence_interval_label">Repetir a cada (semanas)</string>
+    <string name="custom_recurrence_summary">Repete a cada %1$d semanas em %2$s</string>
+    <string name="validation_select_custom_days">Selecione pelo menos um dia para a repetição personalizada</string>
     <string name="btn_log_prn_dose">Registar dose</string>
     <string name="prn_doses_taken_today">Doses registadas hoje: %1$d</string>
     <string name="prn_section_title">Medicamentos SOS / Conforme necessário</string>

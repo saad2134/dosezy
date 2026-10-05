@@ -59,7 +59,7 @@ paths:
                     example: ok
                   version:
                     type: string
-                    example: 2.5.8
+                    example: 2.5.9
                   timestamp:
                     type: string
                     format: date-time
@@ -406,6 +406,11 @@ components:
           type: integer
           nullable: true
           description: Day interval for EVERY_X_DAYS pattern
+          example: 2
+        intervalWeeks:
+          type: integer
+          nullable: true
+          description: Week interval for CUSTOM recurrence pattern (e.g. 2 for every 2 weeks)
           example: 2
 
     MedicationStatus:

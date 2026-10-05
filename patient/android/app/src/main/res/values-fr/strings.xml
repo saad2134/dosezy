@@ -472,6 +472,10 @@ Voulez-vous continuer ?</string>
     <string name="freq_every_days_format">Tous les %1$d jours</string>
     <string name="interval_hours_label">Heures entre les prises</string>
     <string name="interval_days_label">Jours entre les prises</string>
+    <string name="freq_every_x_weeks_format">Toutes les %1$d semaines</string>
+    <string name="custom_recurrence_interval_label">Répéter toutes les (semaines)</string>
+    <string name="custom_recurrence_summary">Répété toutes les %1$d semaines le %2$s</string>
+    <string name="validation_select_custom_days">Veuillez sélectionner au moins un jour pour la récurrence personnalisée</string>
     <string name="btn_log_prn_dose">Enregistrer la prise</string>
     <string name="prn_doses_taken_today">Prises enregistrées aujourd\'hui : %1$d</string>
     <string name="prn_section_title">Médicaments au besoin (PRN)</string>
