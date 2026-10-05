@@ -1,36 +1,60 @@
 <en-IN>
-<!-- WIP -->
+• Custom multi-week recurrence scheduling on selected days with inventory tracking
+• Locked portrait mode, normalized 412dp zoom, Android 15 edge-to-edge support, and keyboard dismissal
+• Fixed Eastern Arabic-Indic digit inputs and runtime localization on older Android versions
 </en-IN>
 <en-US>
-<!-- WIP -->
+• Custom multi-week recurrence scheduling on selected days with inventory tracking
+• Locked portrait mode, normalized 412dp zoom, Android 15 edge-to-edge support, and keyboard dismissal
+• Fixed Eastern Arabic-Indic digit inputs and runtime localization on older Android versions
 </en-US>
 <ar>
-<!-- WIP -->
+• جدولة تكرار مخصصة لعدة أسابيع في أيام محددة مع تتبع دقيق للمخزون
+• قفل الوضع العمودي، وتوحيد التكبير بقياس 412dp، ودعم أندرويد 15، وإغلاق لوحة المفاتيح
+• إصلاح إدخال الأرقام المشرقية وتعديل تبديل اللغات على إصدارات أندرويد القديمة
 </ar>
 <de-DE>
-<!-- WIP -->
+• Benutzerdefinierte Mehr-Wochen-Wiederholungen an gewählten Tagen mit Vorratsverwaltung
+• Feste Hochformat-Ausrichtung, normierter 412dp-Zoom, Android 15 Edge-to-Edge und Tastaturbehandlung
+• Korrektur für arabisch-indische Zifferneingaben und Sprachwechsel auf älteren Android-Versionen
 </de-DE>
 <es-419>
-<!-- WIP -->
+• Programación recurrente de varias semanas en días selectos con control de inventario
+• Modo vertical fijo, zoom normalizado a 412dp, soporte edge-to-edge en Android 15 y cierre de teclado
+• Corrección de entrada de números arábigo-índicos y cambio de idioma en versiones anteriores de Android
 </es-419>
 <fr-FR>
-<!-- WIP -->
+• Planification récurrente sur plusieurs semaines certains jours avec suivi des stocks
+• Mode portrait verrouillé, zoom normalisé à 412dp, support bord à bord Android 15 et fermeture du clavier
+• Correction de la saisie des chiffres arabo-indiens et du changement de langue sur anciens Android
 </fr-FR>
 <hi-IN>
-<!-- WIP -->
+• चुने गए दिनों पर कस्टम बहु-सप्ताह पुनरावृत्ति शेड्यूलिंग और स्टॉक ट्रैकिंग
+• पोर्ट्रेट मोड लॉक, 412dp बेसलाइन ज़ूम, एंड्रॉइड 15 एज-टू-एज सपोर्ट और कीबोर्ड सुधार
+• अरबी-भारतीय अंकों का सही इनपुट और पुराने एंड्रॉइड वर्जन पर भाषा चयन सुधार
 </hi-IN>
 <it-IT>
-<!-- WIP -->
+• Ricorrenza personalizzata ogni più settimane nei giorni selezionati con tracciamento scorte
+• Orientamento verticale fisso, zoom normalizzato a 412dp, supporto edge-to-edge Android 15 e tastiera
+• Corretto inserimento numeri arabo-indiani e cambio lingua sulle versioni precedenti di Android
 </it-IT>
 <ja-JP>
-<!-- WIP -->
+• 指定曜日での複数週ごとのカスタム服薬周期設定と在庫管理機能を追加
+• 縦画面表示の固定、412dp基準ズーム、Android 15全面表示対応、枠外タップでのキーボード非表示
+• アラビア・ペルシャ数字の入力補正および旧Androidバージョンでの言語切り替えを改善
 </ja-JP>
 <pt-BR>
-<!-- WIP -->
+• Recorrência personalizada de várias semanas em dias selecionados com controle de estoque
+• Modo retrato fixo, zoom normalizado para 412dp, suporte edge-to-edge no Android 15 e ajuste de teclado
+• Correção na entrada de números arábico-índicos e troca de idioma em versões anteriores do Android
 </pt-BR>
 <ru-RU>
-<!-- WIP -->
+• Настраиваемое повторение приема каждые несколько недель с учетом запаса лекарств
+• Фиксация портретного режима, масштаб 412dp, поддержка Android 15 Edge-to-Edge и скрытие клавиатуры
+• Исправлен ввод индо-арабских цифр и переключение языков на старых версиях Android
 </ru-RU>
 <zh-CN>
-<!-- WIP -->
+• 支持在指定星期自定义多周服药周期，并完善库存余量追踪
+• 全局锁定竖屏方向，统一 412dp 基准缩放，适配 Android 15 全面屏及软键盘收起
+• 优化东阿拉伯-印度数字输入解析，修复旧版 Android 系统的多语言切换
 </zh-CN>

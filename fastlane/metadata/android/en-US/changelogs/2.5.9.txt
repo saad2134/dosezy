@@ -1,1 +1,3 @@
-<!-- In development -->
+• Custom multi-week recurrence scheduling on selected days with inventory tracking
+• Locked portrait mode, normalized 412dp zoom, Android 15 edge-to-edge support, and keyboard dismissal
+• Fixed Eastern Arabic-Indic digit inputs and runtime localization on older Android versions
