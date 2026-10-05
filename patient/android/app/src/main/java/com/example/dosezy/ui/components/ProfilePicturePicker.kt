@@ -135,7 +135,7 @@ fun ProfilePicturePicker(
                 openCamera()
             } else {
                 // Permission denied
-                errorMessage = "Camera permission is required to take photos"
+                errorMessage = context.getString(R.string.camera_permission_required)
                 showError = true
             }
         }
@@ -485,7 +485,7 @@ fun MedicinePhotoVisualPicker(
         onResult = { isGranted ->
             if (isGranted) openCamera()
             else {
-                errorMessage = "Camera permission is required to take photos"
+                errorMessage = context.getString(R.string.camera_permission_required)
                 showError = true
             }
         }

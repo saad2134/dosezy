@@ -238,6 +238,7 @@
     <string name="image_picker_camera">Камера</string>
     <string name="image_picker_gallery">Галерея</string>
     <string name="image_picker_error_title">Ошибка</string>
+    <string name="camera_permission_required">Для съемки фотографий требуется разрешение на использование камеры.</string>
     <string name="image_picker_remove">Удалить изображение</string>
     <string name="delete_contact_title">Удалить контакт</string>
     <string name="delete_contact_desc">Вы уверены, что хотите удалить этот контакт?</string>

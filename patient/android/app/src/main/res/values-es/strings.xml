@@ -254,6 +254,7 @@
     <string name="image_picker_camera">Cámara</string>
     <string name="image_picker_gallery">Galería</string>
     <string name="image_picker_error_title">Error</string>
+    <string name="camera_permission_required">Se requiere permiso de cámara para tomar fotos.</string>
     <string name="image_picker_remove">Eliminar imagen</string>
     <string name="delete_contact_title">Eliminar contacto</string>
     <string name="delete_contact_desc">¿Está seguro de que desea eliminar este contacto?</string>

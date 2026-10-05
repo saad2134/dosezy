@@ -238,6 +238,7 @@
     <string name="image_picker_camera">ক্যামেরা</string>
     <string name="image_picker_gallery">গ্যালারি</string>
     <string name="image_picker_error_title">ত্রুটি</string>
+    <string name="camera_permission_required">ছবি তোলার জন্য ক্যামেরার অনুমতি প্রয়োজন।</string>
     <string name="image_picker_remove">ছবি সরান</string>
     <string name="delete_contact_title">যোগাযোগ মুছুন</string>
     <string name="delete_contact_desc">আপনি কি নিশ্চিত যে আপনি এই যোগাযোগটি মুছতে চান?</string>

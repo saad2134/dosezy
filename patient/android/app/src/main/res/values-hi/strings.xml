@@ -254,6 +254,7 @@
     <string name="image_picker_camera">कैमरा</string>
     <string name="image_picker_gallery">गैलरी</string>
     <string name="image_picker_error_title">त्रुटि</string>
+    <string name="camera_permission_required">फ़ोटो लेने के लिए कैमरे की अनुमति आवश्यक है।</string>
     <string name="image_picker_remove">तस्वीर हटाएं</string>
     <string name="delete_contact_title">संपर्क हटाएं</string>
     <string name="delete_contact_desc">क्या आप वाकई इस संपर्क को हटाना चाहते हैं?</string>

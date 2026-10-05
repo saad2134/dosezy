@@ -238,6 +238,7 @@
     <string name="image_picker_camera">الكاميرا</string>
     <string name="image_picker_gallery">المعرض</string>
     <string name="image_picker_error_title">خطأ</string>
+    <string name="camera_permission_required">مطلوب إذن الكاميرا لالتقاط الصور.</string>
     <string name="image_picker_remove">إزالة الصورة</string>
     <string name="delete_contact_title">حذف جهة الاتصال</string>
     <string name="delete_contact_desc">هل أنت متأكد من أنك تريد حذف جهة الاتصال هذه؟</string>
