@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Widget Colors (Dark Theme) -->
+    <color name="widget_background">#FF111822</color>
+    <color name="widget_border">#FF26364A</color>
+    <color name="widget_divider">#FF222C3A</color>
+    <color name="widget_title_text">#FFFFFFFF</color>
+    <color name="widget_date_bg">#FF1E2837</color>
+    <color name="widget_date_border">#FF334155</color>
+    <color name="widget_date_text">#FFCBD5E1</color>
+    <color name="widget_item_bg">#FF1B2432</color>
+    <color name="widget_item_border">#FF2D3B4E</color>
+    <color name="widget_item_name">#FFF8FAFC</color>
+    <color name="widget_item_dose">#FF94A3B8</color>
+    <color name="widget_time_bg">#FF0F2942</color>
+    <color name="widget_time_border">#FF1D4A75</color>
+    <color name="widget_time_text">#FF38BDF8</color>
+    <color name="widget_status_text">#FFE2E8F0</color>
+    <color name="widget_icon_medication">#FF38BDF8</color>
+</resources>
