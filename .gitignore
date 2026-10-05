@@ -18,3 +18,4 @@ dist/
 *.db-shm
 
 *.tsbuildinfo
+/.idea
