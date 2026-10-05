@@ -719,7 +719,7 @@ fun EditMedScreen(
                                     }
                                 }
 
-                                val weeks = intervalWeeksText.toIntOrNull() ?: 1
+                                val weeks = intervalWeeksText.normalizeArabicDigits().toIntOrNull() ?: 1
                                 if (selectedDaysOfWeek.isNotEmpty()) {
                                     Spacer(modifier = Modifier.height(12.dp))
                                     val dayLabels = selectedDaysOfWeek.sorted().map { dayVal ->
@@ -1281,7 +1281,7 @@ fun EditMedScreen(
                         selectedFrequency == FrequencyPattern.EVERY_X_DAYS ||
                         (selectedFrequency == FrequencyPattern.WEEKLY && selectedDaysOfWeek.isNotEmpty()) ||
                         (selectedFrequency == FrequencyPattern.MONTHLY && selectedDaysOfMonth.isNotEmpty()) ||
-                        (selectedFrequency == FrequencyPattern.CUSTOM && selectedDaysOfWeek.isNotEmpty() && (intervalWeeksText.toIntOrNull() ?: 0) >= 1)
+                        (selectedFrequency == FrequencyPattern.CUSTOM && selectedDaysOfWeek.isNotEmpty() && (intervalWeeksText.normalizeArabicDigits().toIntOrNull() ?: 0) >= 1)
                     )
 
                     Button(
@@ -1323,9 +1323,9 @@ fun EditMedScreen(
                                     daysPerMonth = if (selectedFrequency == FrequencyPattern.MONTHLY) selectedDaysOfMonth.size else null,
                                     selectedDaysOfWeek = if (selectedFrequency == FrequencyPattern.WEEKLY || selectedFrequency == FrequencyPattern.CUSTOM) selectedDaysOfWeek else null,
                                     selectedDaysOfMonth = if (selectedFrequency == FrequencyPattern.MONTHLY) selectedDaysOfMonth else null,
-                                    intervalHours = if (selectedFrequency == FrequencyPattern.EVERY_X_HOURS) intervalHoursText.toIntOrNull() else null,
-                                    intervalDays = if (selectedFrequency == FrequencyPattern.EVERY_X_DAYS) intervalDaysText.toIntOrNull() else null,
-                                    intervalWeeks = if (selectedFrequency == FrequencyPattern.CUSTOM) (intervalWeeksText.toIntOrNull() ?: 1).coerceAtLeast(1) else null
+                                    intervalHours = if (selectedFrequency == FrequencyPattern.EVERY_X_HOURS) intervalHoursText.normalizeArabicDigits().toIntOrNull() else null,
+                                    intervalDays = if (selectedFrequency == FrequencyPattern.EVERY_X_DAYS) intervalDaysText.normalizeArabicDigits().toIntOrNull() else null,
+                                    intervalWeeks = if (selectedFrequency == FrequencyPattern.CUSTOM) (intervalWeeksText.normalizeArabicDigits().toIntOrNull() ?: 1).coerceAtLeast(1) else null
                                 ),
                                 scheduledTimes = if (selectedFrequency == FrequencyPattern.AS_NEEDED) emptyList() else scheduledTimesList,
                                 imageUri = medicineImagePath,
