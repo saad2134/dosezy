@@ -82,8 +82,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
-        window.decorView.setBackgroundColor(android.graphics.Color.parseColor("#0F172A"))
         super.onCreate(savedInstanceState)
+        requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         // Safety fallback: if an uncaught locale/formatting error occurs, reset language to SYSTEM so app opens cleanly on next launch
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
@@ -106,9 +106,6 @@ class MainActivity : ComponentActivity() {
             defaultHandler?.uncaughtException(thread, throwable)
         }
 
-        if (resources.configuration.smallestScreenWidthDp < 600) {
-            requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        }
         setContent {
             val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
             val currentUser by userViewModel.currentUser.collectAsState()

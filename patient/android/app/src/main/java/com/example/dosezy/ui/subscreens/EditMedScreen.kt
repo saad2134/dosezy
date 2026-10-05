@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -198,6 +199,8 @@ fun EditMedScreen(
         com.example.dosezy.utils.LocaleHelper.getLocale(currentUser?.language ?: com.example.dosezy.data.model.Language.SYSTEM)
     }
 
+    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
@@ -224,6 +227,13 @@ fun EditMedScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
+                            .imePadding()
+                            .clickable(
+                                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                                indication = null
+                            ) {
+                                focusManager.clearFocus()
+                            }
                             .verticalScroll(rememberScrollState())
                             .background(MaterialTheme.colorScheme.background)
                     ) {

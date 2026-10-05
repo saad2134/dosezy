@@ -35,6 +35,8 @@
         <activity
             android:name=".SplashActivity"
             android:exported="true"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"
             android:theme="@style/Theme.AppStarting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -46,12 +48,18 @@
         <activity
             android:name=".MainActivity"
             android:exported="false"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
             android:theme="@style/Theme.Dosezy" />
 
         <!-- Full-Screen Alarm Activity for medicine reminders -->
         <activity
             android:name=".notifications.AlarmActivity"
             android:exported="false"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"
             android:showWhenLocked="true"
             android:turnScreenOn="true"
             android:showForAllUsers="true"

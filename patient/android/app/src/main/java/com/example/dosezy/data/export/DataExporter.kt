@@ -202,10 +202,23 @@ class DataExporter(
             mObj.put("dosageUnit", med.dosageUnit.name)
             mObj.put("timesPerDay", med.timesPerDay)
             mObj.put("frequencyPattern", med.frequency.pattern.name)
+            mObj.put("daysPerWeek", med.frequency.daysPerWeek)
+            mObj.put("daysPerMonth", med.frequency.daysPerMonth)
+            med.frequency.selectedDaysOfWeek?.let { days ->
+                val arr = JSONArray()
+                days.forEach { arr.put(it) }
+                mObj.put("selectedDaysOfWeek", arr)
+            }
+            med.frequency.selectedDaysOfMonth?.let { days ->
+                val arr = JSONArray()
+                days.forEach { arr.put(it) }
+                mObj.put("selectedDaysOfMonth", arr)
+            }
             mObj.put("intervalHours", med.frequency.intervalHours)
             mObj.put("intervalDays", med.frequency.intervalDays)
             mObj.put("intervalWeeks", med.frequency.intervalWeeks)
             mObj.put("scheduledTimes", JSONArray(med.scheduledTimes.map { it.toString() }))
+            mObj.put("imageUri", med.imageUri ?: "")
             mObj.put("currentStock", med.currentStock)
             mObj.put("refillThreshold", med.refillThreshold)
             mObj.put("autoDeductOnTake", med.autoDeductOnTake)
