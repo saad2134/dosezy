@@ -255,6 +255,7 @@
     <string name="image_picker_camera">相机</string>
     <string name="image_picker_gallery">相册</string>
     <string name="image_picker_error_title">错误</string>
+    <string name="camera_permission_required">拍摄照片需要相机权限。</string>
     <string name="image_picker_remove">删除图片</string>
     <string name="delete_contact_title">删除联系人</string>
     <string name="delete_contact_desc">您确定要删除此联系人吗？</string>

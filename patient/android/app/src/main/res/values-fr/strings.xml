@@ -238,6 +238,7 @@
     <string name="image_picker_camera">Appareil photo</string>
     <string name="image_picker_gallery">Galerie</string>
     <string name="image_picker_error_title">Erreur</string>
+    <string name="camera_permission_required">L\'autorisation de l\'appareil photo est requise pour prendre des photos.</string>
     <string name="image_picker_remove">Supprimer l\'image</string>
     <string name="delete_contact_title">Supprimer le contact</string>
     <string name="delete_contact_desc">Êtes-vous sûr de vouloir supprimer ce contact ?</string>

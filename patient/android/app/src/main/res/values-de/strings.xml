@@ -238,6 +238,7 @@
     <string name="image_picker_camera">Kamera</string>
     <string name="image_picker_gallery">Galerie</string>
     <string name="image_picker_error_title">Fehler</string>
+    <string name="camera_permission_required">Kameraberechtigung ist erforderlich, um Fotos aufzunehmen.</string>
     <string name="image_picker_remove">Bild entfernen</string>
     <string name="delete_contact_title">Kontakt löschen</string>
     <string name="delete_contact_desc">Sind Sie sicher, dass Sie diesen Kontakt löschen möchten?</string>

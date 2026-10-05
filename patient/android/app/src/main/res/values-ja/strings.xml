@@ -238,6 +238,7 @@
     <string name="image_picker_camera">カメラ</string>
     <string name="image_picker_gallery">ギャラリー</string>
     <string name="image_picker_error_title">エラー</string>
+    <string name="camera_permission_required">写真を撮影するにはカメラの権限が必要です。</string>
     <string name="image_picker_remove">画像を削除</string>
     <string name="delete_contact_title">連絡先の削除</string>
     <string name="delete_contact_desc">この連絡先を削除してもよろしいですか？</string>
