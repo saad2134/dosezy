@@ -533,7 +533,7 @@
     <string name="widget_configure_subtitle">चुनें कि यह विजेट आपकी होम स्क्रीन पर किस प्रोफ़ाइल की दवा सूची प्रदर्शित करेगा।</string>
     <string name="widget_configure_active_profile">सक्रिय ऐप प्रोफ़ाइल</string>
     <string name="widget_configure_active_profile_desc">ऐप में वर्तमान में सक्रिय प्रोफ़ाइल को स्वचालित रूप से फ़ॉलो करता है</string>
-    <string name="widget_configure_confirm">विजेट जोड़ें</string>
+    <string name="widget_configure_confirm">विजेट सहेजें</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">अलार्म टोन</string>
@@ -789,4 +789,5 @@
     <string name="btn_add_note">+ नोट जोड़ें</string>
     <string name="timings_and_dosages_title">समय और खुराक</string>
     <string name="stock_inventory_card_title">दवा स्टॉक और इन्वेंटरी</string>
+    <string name="widget_configure_auto_badge">ऑटो</string>
 </resources>

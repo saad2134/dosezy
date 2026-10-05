@@ -517,7 +517,7 @@ Vuoi continuare?</string>
     <string name="widget_configure_subtitle">Scegli il profilo di cui questo widget mostrerà la pianificazione dei farmaci nella schermata iniziale.</string>
     <string name="widget_configure_active_profile">Profilo attivo dell\'app</string>
     <string name="widget_configure_active_profile_desc">Segue dinamicamente il profilo attualmente attivo nell\'app</string>
-    <string name="widget_configure_confirm">Aggiungi widget</string>
+    <string name="widget_configure_confirm">Salva widget</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">Suono della sveglia</string>
@@ -773,4 +773,5 @@ Vuoi continuare?</string>
     <string name="btn_add_note">+ Aggiungi nota</string>
     <string name="timings_and_dosages_title">Orari e dosaggi</string>
     <string name="stock_inventory_card_title">Scorta e inventario farmaci</string>
+    <string name="widget_configure_auto_badge">Auto</string>
 </resources>

@@ -516,7 +516,7 @@ Deseja continuar?</string>
     <string name="widget_configure_subtitle">Escolha de qual perfil este widget exibirá os horários de medicação na tela inicial.</string>
     <string name="widget_configure_active_profile">Perfil ativo do app</string>
     <string name="widget_configure_active_profile_desc">Segue dinamicamente o perfil atualmente ativo no aplicativo</string>
-    <string name="widget_configure_confirm">Adicionar widget</string>
+    <string name="widget_configure_confirm">Salvar widget</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">Som do alarme</string>
@@ -772,4 +772,5 @@ Deseja continuar?</string>
     <string name="btn_add_note">+ Adicionar nota</string>
     <string name="timings_and_dosages_title">Horários e dosagens</string>
     <string name="stock_inventory_card_title">Estoque e inventário de medicamentos</string>
+    <string name="widget_configure_auto_badge">Automático</string>
 </resources>

@@ -517,7 +517,7 @@ Möchten Sie fortfahren?</string>
     <string name="widget_configure_subtitle">Wählen Sie, für welches Profil dieses Widget den Medikamentenplan auf dem Startbildschirm anzeigt.</string>
     <string name="widget_configure_active_profile">Aktives App-Profil</string>
     <string name="widget_configure_active_profile_desc">Folgt dynamisch dem aktuell in der App ausgewählten Profil</string>
-    <string name="widget_configure_confirm">Widget hinzufügen</string>
+    <string name="widget_configure_confirm">Widget speichern</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">Alarmton</string>
@@ -773,4 +773,5 @@ Möchten Sie fortfahren?</string>
     <string name="btn_add_note">+ Notiz hinzufügen</string>
     <string name="timings_and_dosages_title">Zeiten &amp; Dosierungen</string>
     <string name="stock_inventory_card_title">Medikamentenvorrat &amp; Bestand</string>
+    <string name="widget_configure_auto_badge">Auto</string>
 </resources>

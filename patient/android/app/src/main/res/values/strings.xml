@@ -555,7 +555,7 @@ Do you want to continue?</string>
     <string name="widget_configure_subtitle">Choose which profile\'s medication schedule this widget displays on your home screen.</string>
     <string name="widget_configure_active_profile">Active App Profile</string>
     <string name="widget_configure_active_profile_desc">Dynamically follows whichever profile is currently active in the app</string>
-    <string name="widget_configure_confirm">Add Widget</string>
+    <string name="widget_configure_confirm">Save Widget</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">Alarm Sound</string>
@@ -801,4 +801,5 @@ Do you want to continue?</string>
     <string name="btn_add_note">+ Add Note</string>
     <string name="timings_and_dosages_title">Timings &amp; Dosages</string>
     <string name="stock_inventory_card_title">Medicine Stock &amp; Inventory</string>
+    <string name="widget_configure_auto_badge">Auto</string>
 </resources>

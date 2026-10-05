@@ -25,14 +25,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -59,7 +60,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -173,28 +179,149 @@ private fun WidgetConfigureScreen(
         mutableStateOf(savedProfile)
     }
 
+    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+    val borderColor = if (isDark) Color(0xFF303235) else Color(0xFFD1D5DB)
+    val topShape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
+    val bottomShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        topBar = {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(topShape)
+                    .drawBehind {
+                        val strokeWidth = 1.dp.toPx()
+                        val r = 16.dp.toPx()
+                        val path = Path().apply {
+                            moveTo(0f, size.height - r)
+                            arcTo(
+                                Rect(0f, size.height - r * 2, r * 2, size.height),
+                                startAngleDegrees = 180f,
+                                sweepAngleDegrees = -90f,
+                                forceMoveTo = false
+                            )
+                            lineTo(size.width - r, size.height)
+                            arcTo(
+                                Rect(size.width - r * 2, size.height - r * 2, size.width, size.height),
+                                startAngleDegrees = 90f,
+                                sweepAngleDegrees = -90f,
+                                forceMoveTo = false
+                            )
+                            lineTo(size.width, size.height - r)
+                        }
+                        drawPath(path = path, color = borderColor, style = Stroke(width = strokeWidth))
+                    },
+                color = MaterialTheme.colorScheme.surface,
+                shadowElevation = 4.dp
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .windowInsetsTopHeight(WindowInsets.statusBars)
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Squircle Icon Frame
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Color(0xFF2084E4).copy(alpha = 0.12f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_widget_medication),
+                                contentDescription = null,
+                                tint = Color(0xFF2084E4),
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.widget_configure_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = stringResource(R.string.widget_configure_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+
+                        IconButton(onClick = onDismiss) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = stringResource(R.string.cancel),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            }
+        },
         bottomBar = {
             Surface(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(bottomShape)
+                    .drawBehind {
+                        val strokeWidth = 1.dp.toPx()
+                        val r = 16.dp.toPx()
+                        val path = Path().apply {
+                            moveTo(0f, r)
+                            arcTo(
+                                Rect(0f, 0f, r * 2, r * 2),
+                                startAngleDegrees = 180f,
+                                sweepAngleDegrees = 90f,
+                                forceMoveTo = false
+                            )
+                            lineTo(size.width - r, 0f)
+                            arcTo(
+                                Rect(size.width - r * 2, 0f, size.width, r * 2),
+                                startAngleDegrees = 270f,
+                                sweepAngleDegrees = 90f,
+                                forceMoveTo = false
+                            )
+                            lineTo(size.width, r)
+                        }
+                        drawPath(path = path, color = borderColor, style = Stroke(width = strokeWidth))
+                    },
                 color = MaterialTheme.colorScheme.surface,
-                tonalElevation = 3.dp,
                 shadowElevation = 8.dp
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 16.dp)
                         .navigationBarsPadding()
+                        .padding(horizontal = 20.dp, vertical = 14.dp)
                 ) {
                     Button(
                         onClick = { onProfileConfirmed(selectedProfileId) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp),
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2084E4))
                     ) {
                         Text(
@@ -208,70 +335,13 @@ private fun WidgetConfigureScreen(
             }
         }
     ) { innerPadding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .statusBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // Header Row
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFF2084E4).copy(alpha = 0.12f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_widget_medication),
-                            contentDescription = null,
-                            tint = Color(0xFF2084E4),
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                    Text(
-                        text = stringResource(R.string.widget_configure_title),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-
-                IconButton(onClick = onDismiss) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = stringResource(R.string.cancel),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            Text(
-                text = stringResource(R.string.widget_configure_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
                 // Option 1: Dynamic "Active Profile (Follows App)"
                 item {
                     val isSelected = selectedProfileId == DosezyWidgetPrefs.ACTIVE_PROFILE_ID
@@ -326,7 +396,7 @@ private fun WidgetConfigureScreen(
                                         color = Color(0xFF10B981).copy(alpha = 0.15f)
                                     ) {
                                         Text(
-                                            text = "Auto",
+                                            text = stringResource(R.string.widget_configure_auto_badge),
                                             style = MaterialTheme.typography.labelSmall,
                                             fontWeight = FontWeight.Bold,
                                             color = Color(0xFF10B981),
@@ -456,4 +526,3 @@ private fun WidgetConfigureScreen(
             }
         }
     }
-}

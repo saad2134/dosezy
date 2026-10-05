@@ -112,7 +112,7 @@ class DosezyRemoteViewsFactory(
                         WidgetItem(
                             entryId = entry.entryId,
                             timeLabel = formatTimeLabel(entry),
-                            medName = med?.medicationName ?: "Medicine",
+                            medName = med?.medicationName ?: context.getString(R.string.nav_medicines),
                             doseLabel = doseStr,
                             userId = user.userId
                         )

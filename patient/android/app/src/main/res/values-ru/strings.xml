@@ -517,7 +517,7 @@
     <string name="widget_configure_subtitle">Выберите, расписание лекарств какого профиля этот виджет будет отображать на главном экране.</string>
     <string name="widget_configure_active_profile">Активный профиль приложения</string>
     <string name="widget_configure_active_profile_desc">Динамически следует за текущим активным профилем в приложении</string>
-    <string name="widget_configure_confirm">Добавить виджет</string>
+    <string name="widget_configure_confirm">Сохранить виджет</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">Звук будильника</string>
@@ -773,4 +773,5 @@
     <string name="btn_add_note">+ Добавить заметку</string>
     <string name="timings_and_dosages_title">Время приема и дозировки</string>
     <string name="stock_inventory_card_title">Запас лекарств и учет</string>
+    <string name="widget_configure_auto_badge">Авто</string>
 </resources>

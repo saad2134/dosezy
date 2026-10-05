@@ -533,7 +533,7 @@
     <string name="widget_configure_subtitle">选择此小组件在主屏幕上显示的服药日程所属的个人资料。</string>
     <string name="widget_configure_active_profile">应用当前活跃档案</string>
     <string name="widget_configure_active_profile_desc">动态跟随应用中当前选中的个人档案</string>
-    <string name="widget_configure_confirm">添加小组件</string>
+    <string name="widget_configure_confirm">保存小部件</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">闹钟铃声</string>
@@ -789,4 +789,5 @@
     <string name="btn_add_note">+ 添加备注</string>
     <string name="timings_and_dosages_title">时间与剂量</string>
     <string name="stock_inventory_card_title">药品库存与清册</string>
+    <string name="widget_configure_auto_badge">自动</string>
 </resources>

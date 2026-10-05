@@ -533,7 +533,7 @@
     <string name="widget_configure_subtitle">Elige el horario de medicamentos de qué perfil mostrará este widget en tu pantalla de inicio.</string>
     <string name="widget_configure_active_profile">Perfil activo de la app</string>
     <string name="widget_configure_active_profile_desc">Sigue dinámicamente el perfil que esté activo en la aplicación</string>
-    <string name="widget_configure_confirm">Añadir widget</string>
+    <string name="widget_configure_confirm">Guardar widget</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">Sonido de alarma</string>
@@ -789,4 +789,5 @@
     <string name="btn_add_note">+ Añadir nota</string>
     <string name="timings_and_dosages_title">Horarios y dosis</string>
     <string name="stock_inventory_card_title">Stock e inventario de medicamentos</string>
+    <string name="widget_configure_auto_badge">Automático</string>
 </resources>

@@ -517,7 +517,7 @@
     <string name="widget_configure_subtitle">এই উইজেটটি আপনার হোম স্ক্রিনে কোন প্রোফাইলের ওষুধের সময়সূচী প্রদর্শন করবে তা বেছে নিন।</string>
     <string name="widget_configure_active_profile">সক্রিয় অ্যাপ প্রোফাইল</string>
     <string name="widget_configure_active_profile_desc">অ্যাপে বর্তমানে সক্রিয় প্রোফাইলটি স্বয়ংক্রিয়ভাবে অনুসরণ করে</string>
-    <string name="widget_configure_confirm">উইজেট যোগ করুন</string>
+    <string name="widget_configure_confirm">উইজেট সংরক্ষণ করুন</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">অ্যালার্মের সুর</string>
@@ -772,4 +772,5 @@
     <string name="btn_add_note">+ নোট যোগ করুন</string>
     <string name="timings_and_dosages_title">সময় এবং মাত্রা</string>
     <string name="stock_inventory_card_title">ওষুধের স্টক এবং ইনভেন্টরি</string>
+    <string name="widget_configure_auto_badge">স্বয়ংক্রিয়</string>
 </resources>
