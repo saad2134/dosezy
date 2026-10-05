@@ -433,7 +433,8 @@ components:
 
     FrequencyPattern:
       type: string
-      enum: [DAILY, WEEKLY, MONTHLY, AS_NEEDED, EVERY_X_HOURS, EVERY_X_DAYS, CUSTOM]
+      description: Recurrence cadence pattern for medication scheduling (DAILY, WEEKLY, MONTHLY, EVERY_X_HOURS, EVERY_X_DAYS, CUSTOM [Every X Weeks], AS_NEEDED [PRN])
+      enum: [DAILY, WEEKLY, MONTHLY, EVERY_X_HOURS, EVERY_X_DAYS, CUSTOM, AS_NEEDED]
 
     Frequency:
       type: object
@@ -639,6 +640,10 @@ components:
         profilePicPath:
           type: string
           nullable: true
+        isCurrentUser:
+          type: boolean
+          default: false
+          example: false
         theme:
           $ref: '#/components/schemas/Theme'
         timeFormat:
@@ -1039,6 +1044,20 @@ components:
         message:
           type: string
           example: The requested resource was not found.
+
+    # Semantic Cross-Schema Aliases
+    Medication:
+      $ref: '#/components/schemas/Medicine'
+      description: Canonical alias for Medicine schema
+    Schedule:
+      $ref: '#/components/schemas/Frequency'
+      description: Canonical alias for Frequency recurrence schema
+    DoseEvent:
+      $ref: '#/components/schemas/ScheduleEntry'
+      description: Canonical alias for ScheduleEntry dose event history schema
+    CaregiverConsent:
+      $ref: '#/components/schemas/PairingRequest'
+      description: Canonical alias for PairingRequest consent exchange schema
 
   securitySchemes:
     BearerAuth:

@@ -513,6 +513,11 @@
     <string name="widget_all_completed">সকল ডোজ সম্পন্ন হয়েছে! 🎉</string>
     <string name="widget_no_doses_today">আজকের জন্য কোনো ডোজ নির্ধারিত নেই</string>
     <string name="widget_next_dose_format">পরবর্তী: %1$s • %2$s</string>
+    <string name="widget_configure_title">উইজেট প্রোফাইল নির্বাচন করুন</string>
+    <string name="widget_configure_subtitle">এই উইজেটটি আপনার হোম স্ক্রিনে কোন প্রোফাইলের ওষুধের সময়সূচী প্রদর্শন করবে তা বেছে নিন।</string>
+    <string name="widget_configure_active_profile">সক্রিয় অ্যাপ প্রোফাইল</string>
+    <string name="widget_configure_active_profile_desc">অ্যাপে বর্তমানে সক্রিয় প্রোফাইলটি স্বয়ংক্রিয়ভাবে অনুসরণ করে</string>
+    <string name="widget_configure_confirm">উইজেট যোগ করুন</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">অ্যালার্মের সুর</string>
@@ -628,6 +633,9 @@
     <string name="validation_enter_name">অনুগ্রহ করে আপনার নাম লিখুন</string>
     <string name="validation_enter_valid_age">অনুগ্রহ করে একটি বৈধ বয়স লিখুন (১-১২০)</string>
     <string name="medication_added_success">ওষুধ সফলভাবে যোগ করা হয়েছে</string>
+    <string name="medication_updated_success">ওষুধ সফলভাবে আপডেট করা হয়েছে</string>
+    <string name="medication_archived_success">ওষুধ সফলভাবে বন্ধ করা হয়েছে</string>
+    <string name="medication_deleted_success">ওষুধ সফলভাবে মুছে ফেলা হয়েছে</string>
     <string name="status_pending">বিচারাধীন</string>
     <string name="pharmacy_order_title">ফার্মেসি রিফিল অর্ডার</string>
     <string name="pharmacy_order_desc">হোয়াটসঅ্যাপ বা ফার্মেসির জন্য ওষুধের অর্ডারের তালিকা তৈরি করুন</string>

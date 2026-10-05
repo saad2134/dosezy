@@ -529,6 +529,11 @@
     <string name="widget_all_completed">सभी खुराकें पूरी हुईं! 🎉</string>
     <string name="widget_no_doses_today">आज कोई खुराक निर्धारित नहीं है</string>
     <string name="widget_next_dose_format">अगली: %1$s • %2$s</string>
+    <string name="widget_configure_title">विजेट प्रोफ़ाइल चुनें</string>
+    <string name="widget_configure_subtitle">चुनें कि यह विजेट आपकी होम स्क्रीन पर किस प्रोफ़ाइल की दवा सूची प्रदर्शित करेगा।</string>
+    <string name="widget_configure_active_profile">सक्रिय ऐप प्रोफ़ाइल</string>
+    <string name="widget_configure_active_profile_desc">ऐप में वर्तमान में सक्रिय प्रोफ़ाइल को स्वचालित रूप से फ़ॉलो करता है</string>
+    <string name="widget_configure_confirm">विजेट जोड़ें</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">अलार्म टोन</string>
@@ -648,6 +653,9 @@
     <string name="validation_enter_name">कृपया अपना नाम दर्ज करें</string>
     <string name="validation_enter_valid_age">कृपया एक मान्य आयु दर्ज करें (1-120)</string>
     <string name="medication_added_success">दवा सफलतापूर्वक जोड़ी गई</string>
+    <string name="medication_updated_success">दवा सफलतापूर्वक अपडेट की गई</string>
+    <string name="medication_archived_success">दवा सफलतापूर्वक बंद कर दी गई</string>
+    <string name="medication_deleted_success">दवा सफलतापूर्वक हटा दी गई</string>
     <string name="status_pending">लंबित</string>
     <string name="pharmacy_order_title">फार्मेसी रीफ़िल ऑर्डर</string>
     <string name="pharmacy_order_desc">व्हाट्सएप या मेडिकल स्टोर के लिए दवाओं के ऑर्डर की सूची बनाएं</string>

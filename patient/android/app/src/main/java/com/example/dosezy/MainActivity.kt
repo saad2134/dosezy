@@ -9,6 +9,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -62,6 +63,8 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    private val userViewModel: UserViewModel by viewModels()
+
     override fun attachBaseContext(newBase: android.content.Context) {
         val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(newBase)
         val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(newBase, savedLanguage)
@@ -79,6 +82,15 @@ class MainActivity : ComponentActivity() {
             overrideConfiguration.setLayoutDirection(targetLocale)
         }
         super.applyOverrideConfiguration(overrideConfiguration)
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        val targetUserId = intent.getStringExtra("switch_to_user_id")
+        if (!targetUserId.isNullOrBlank()) {
+            userViewModel.setCurrentUserById(targetUserId)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -111,6 +123,13 @@ class MainActivity : ComponentActivity() {
             val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
             val currentUser by userViewModel.currentUser.collectAsState()
             val context = androidx.compose.ui.platform.LocalContext.current
+
+            LaunchedEffect(intent) {
+                val targetUserId = intent.getStringExtra("switch_to_user_id")
+                if (!targetUserId.isNullOrBlank()) {
+                    userViewModel.setCurrentUserById(targetUserId)
+                }
+            }
 
             // Read theme from SharedPreferences synchronously to prevent launch flash
             val prefs = remember { context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE) }

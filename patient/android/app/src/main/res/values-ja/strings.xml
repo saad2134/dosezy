@@ -513,6 +513,11 @@
     <string name="widget_all_completed">すべての服薬が完了しました！🎉</string>
     <string name="widget_no_doses_today">本日の予定はありません</string>
     <string name="widget_next_dose_format">次回: %1$s • %2$s</string>
+    <string name="widget_configure_title">ウィジェットのプロフィールを選択</string>
+    <string name="widget_configure_subtitle">このウィジェットをホーム画面でどのアカウントのお薬スケジュールに設定するか選択してください。</string>
+    <string name="widget_configure_active_profile">アクティブなアプリプロフィール</string>
+    <string name="widget_configure_active_profile_desc">アプリ内で現在選択されているプロフィールに自動追従します</string>
+    <string name="widget_configure_confirm">ウィジェットを追加</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">アラーム音</string>
@@ -632,6 +637,9 @@
     <string name="validation_enter_name">お名前を入力してください</string>
     <string name="validation_enter_valid_age">有効な年齢（1〜120）を入力してください</string>
     <string name="medication_added_success">お薬が正常に追加されました</string>
+    <string name="medication_updated_success">お薬が正常に更新されました</string>
+    <string name="medication_archived_success">お薬の服用を正常に中止しました</string>
+    <string name="medication_deleted_success">お薬が正常に削除されました</string>
     <string name="status_pending">保留中</string>
     <string name="pharmacy_order_title">薬局への注文リスト</string>
     <string name="pharmacy_order_desc">WhatsAppや薬局向けの医薬品注文リストを作成</string>

@@ -513,6 +513,11 @@ Möchten Sie fortfahren?</string>
     <string name="widget_all_completed">Alle Dosen abgeschlossen! 🎉</string>
     <string name="widget_no_doses_today">Heute keine Dosen geplant</string>
     <string name="widget_next_dose_format">Nächste: %1$s • %2$s</string>
+    <string name="widget_configure_title">Widget-Profil auswählen</string>
+    <string name="widget_configure_subtitle">Wählen Sie, für welches Profil dieses Widget den Medikamentenplan auf dem Startbildschirm anzeigt.</string>
+    <string name="widget_configure_active_profile">Aktives App-Profil</string>
+    <string name="widget_configure_active_profile_desc">Folgt dynamisch dem aktuell in der App ausgewählten Profil</string>
+    <string name="widget_configure_confirm">Widget hinzufügen</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">Alarmton</string>
@@ -632,6 +637,9 @@ Möchten Sie fortfahren?</string>
     <string name="validation_enter_name">Bitte geben Sie Ihren Namen ein</string>
     <string name="validation_enter_valid_age">Bitte geben Sie ein gültiges Alter ein (1-120)</string>
     <string name="medication_added_success">Medikament erfolgreich hinzugefügt</string>
+    <string name="medication_updated_success">Medikament erfolgreich aktualisiert</string>
+    <string name="medication_archived_success">Medikament erfolgreich abgesetzt</string>
+    <string name="medication_deleted_success">Medikament erfolgreich gelöscht</string>
     <string name="status_pending">Ausstehend</string>
     <string name="pharmacy_order_title">Apotheken-Nachbestellung</string>
     <string name="pharmacy_order_desc">Medikamenten-Bestellliste für WhatsApp oder Ihre Apotheke erstellen</string>

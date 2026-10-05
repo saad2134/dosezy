@@ -105,6 +105,15 @@ class UserViewModel @Inject constructor(
         }
     }
 
+    fun setCurrentUserById(userId: String) {
+        viewModelScope.launch {
+            val user = userRepository.getUserByIdSync(userId)
+            if (user != null) {
+                setCurrentUser(user)
+            }
+        }
+    }
+
     fun addUser(user: User) {
         viewModelScope.launch {
             _isLoading.value = true

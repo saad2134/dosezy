@@ -144,6 +144,14 @@ fun HomeScreen(
         }
     }
 
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    LaunchedEffect(navBackStackEntry) {
+        val msg = navBackStackEntry?.savedStateHandle?.remove<String>("snackbar_message")
+        if (!msg.isNullOrBlank()) {
+            snackbarHostState.showSnackbar(msg)
+        }
+    }
+
     // Check if all medications are completed (taken or skipped) and at least one was actually taken
     val allCompleted = todayEntries.isNotEmpty() && todayEntries.all {
         it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||

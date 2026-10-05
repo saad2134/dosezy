@@ -551,6 +551,11 @@ Do you want to continue?</string>
     <string name="widget_all_completed">All doses completed! 🎉</string>
     <string name="widget_no_doses_today">No doses scheduled today</string>
     <string name="widget_next_dose_format">Next: %1$s • %2$s</string>
+    <string name="widget_configure_title">Select Widget Profile</string>
+    <string name="widget_configure_subtitle">Choose which profile\'s medication schedule this widget displays on your home screen.</string>
+    <string name="widget_configure_active_profile">Active App Profile</string>
+    <string name="widget_configure_active_profile_desc">Dynamically follows whichever profile is currently active in the app</string>
+    <string name="widget_configure_confirm">Add Widget</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">Alarm Sound</string>
@@ -660,6 +665,9 @@ Do you want to continue?</string>
     <string name="validation_enter_name">Please enter your name</string>
     <string name="validation_enter_valid_age">Please enter a valid age (1-120)</string>
     <string name="medication_added_success">Medication added successfully</string>
+    <string name="medication_updated_success">Medication updated successfully</string>
+    <string name="medication_archived_success">Medication discontinued successfully</string>
+    <string name="medication_deleted_success">Medication deleted successfully</string>
     <string name="status_pending">Pending</string>
     <string name="pharmacy_order_title">Pharmacy Refill Order</string>
     <string name="pharmacy_order_desc">Generate a medicine order list for WhatsApp or your chemist</string>

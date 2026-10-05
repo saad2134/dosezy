@@ -513,6 +513,11 @@
     <string name="widget_all_completed">Все приемы выполнены! 🎉</string>
     <string name="widget_no_doses_today">На сегодня ничего не запланировано</string>
     <string name="widget_next_dose_format">Следующий: %1$s • %2$s</string>
+    <string name="widget_configure_title">Выберите профиль для виджета</string>
+    <string name="widget_configure_subtitle">Выберите, расписание лекарств какого профиля этот виджет будет отображать на главном экране.</string>
+    <string name="widget_configure_active_profile">Активный профиль приложения</string>
+    <string name="widget_configure_active_profile_desc">Динамически следует за текущим активным профилем в приложении</string>
+    <string name="widget_configure_confirm">Добавить виджет</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">Звук будильника</string>
@@ -632,6 +637,9 @@
     <string name="validation_enter_name">Пожалуйста, введите ваше имя</string>
     <string name="validation_enter_valid_age">Пожалуйста, введите корректный возраст (1-120)</string>
     <string name="medication_added_success">Лекарство успешно добавлено</string>
+    <string name="medication_updated_success">Лекарство успешно обновлено</string>
+    <string name="medication_archived_success">Прием лекарства успешно прекращен</string>
+    <string name="medication_deleted_success">Лекарство успешно удалено</string>
     <string name="status_pending">В ожидании</string>
     <string name="pharmacy_order_title">Заказ в аптеку</string>
     <string name="pharmacy_order_desc">Создать список лекарств для WhatsApp или аптеки</string>

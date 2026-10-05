@@ -529,6 +529,11 @@
     <string name="widget_all_completed">今日药物已全部完成！🎉</string>
     <string name="widget_no_doses_today">今日未安排任何药物</string>
     <string name="widget_next_dose_format">下一剂：%1$s • %2$s</string>
+    <string name="widget_configure_title">选择小组件配置文件</string>
+    <string name="widget_configure_subtitle">选择此小组件在主屏幕上显示的服药日程所属的个人资料。</string>
+    <string name="widget_configure_active_profile">应用当前活跃档案</string>
+    <string name="widget_configure_active_profile_desc">动态跟随应用中当前选中的个人档案</string>
+    <string name="widget_configure_confirm">添加小组件</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">闹钟铃声</string>
@@ -648,6 +653,9 @@
     <string name="validation_enter_name">请输入您的姓名</string>
     <string name="validation_enter_valid_age">请输入有效年龄（1-120）</string>
     <string name="medication_added_success">药物添加成功</string>
+    <string name="medication_updated_success">药物更新成功</string>
+    <string name="medication_archived_success">药物已成功停用</string>
+    <string name="medication_deleted_success">药物已成功删除</string>
     <string name="status_pending">待处理</string>
     <string name="pharmacy_order_title">药店补药清单</string>
     <string name="pharmacy_order_desc">生成适用于微信、WhatsApp 或药房的药品补购清单</string>

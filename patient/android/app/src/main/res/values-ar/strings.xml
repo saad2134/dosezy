@@ -513,6 +513,11 @@
     <string name="widget_all_completed">اكتملت جميع جرعات اليوم! 🎉</string>
     <string name="widget_no_doses_today">لا توجد جرعات مجدولة اليوم</string>
     <string name="widget_next_dose_format">التالي: %1$s • %2$s</string>
+    <string name="widget_configure_title">اختر ملف تعريف الأداة</string>
+    <string name="widget_configure_subtitle">اختر جدول أدوية أي ملف شخصي تعرضه هذه الأداة على شاشتك الرئيسية.</string>
+    <string name="widget_configure_active_profile">الملف الشخصي النشط</string>
+    <string name="widget_configure_active_profile_desc">يتبع تلقائيًا الملف الشخصي النشط حاليًا في التطبيق</string>
+    <string name="widget_configure_confirm">إضافة الأداة</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">نغمة المنبه</string>
@@ -632,6 +637,9 @@
     <string name="validation_enter_name">يرجى إدخال اسمك</string>
     <string name="validation_enter_valid_age">يرجى إدخال عمر صحيح (1-120)</string>
     <string name="medication_added_success">تمت إضافة الدواء بنجاح</string>
+    <string name="medication_updated_success">تم تحديث الدواء بنجاح</string>
+    <string name="medication_archived_success">تم إيقاف الدواء بنجاح</string>
+    <string name="medication_deleted_success">تم حذف الدواء بنجاح</string>
     <string name="status_pending">قيد الانتظار</string>
     <string name="pharmacy_order_title">طلب إعادة تعبئة الصيدلية</string>
     <string name="pharmacy_order_desc">إنشاء قائمة طلب الأدوية لواتساب أو الصيدلي</string>

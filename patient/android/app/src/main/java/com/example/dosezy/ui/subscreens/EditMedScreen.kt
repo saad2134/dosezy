@@ -805,6 +805,8 @@ fun EditMedScreen(
                                                                         .size(24.dp)
                                                                         .clip(androidx.compose.foundation.shape.CircleShape)
                                                                         .clickable {
+                                                                            val removedKey = String.format(java.util.Locale.US, "%02d:%02d", time.hour, time.minute)
+                                                                            perTimeDosages = perTimeDosages - removedKey
                                                                             scheduledTimesList = scheduledTimesList - time
                                                                             if (selectedTime == time && scheduledTimesList.isNotEmpty()) {
                                                                                 selectedTime = scheduledTimesList.first()
@@ -1445,7 +1447,8 @@ fun EditMedScreen(
                     val isDosageValid = if (hasDifferentDosages && scheduledTimesList.size > 1) {
                         scheduledTimesList.all { t ->
                             val key = String.format(java.util.Locale.US, "%02d:%02d", t.hour, t.minute)
-                            val d = perTimeDosages[key]?.normalizeArabicDigits()?.toDoubleOrNull()
+                            val valueStr = perTimeDosages[key] ?: (if (dosage.isNotBlank()) dosage else null)
+                            val d = valueStr?.normalizeArabicDigits()?.toDoubleOrNull()
                             d != null && d > 0.0
                         }
                     } else {
@@ -1482,7 +1485,8 @@ fun EditMedScreen(
 
                             val baseDose = if (hasDifferentDosages && scheduledTimesList.size > 1) {
                                 val firstKey = scheduledTimesList.firstOrNull()?.let { String.format(java.util.Locale.US, "%02d:%02d", it.hour, it.minute) }
-                                (firstKey?.let { perTimeDosages[it] })?.normalizeArabicDigits()?.toDoubleOrNull() ?: (dosage.normalizeArabicDigits().toDoubleOrNull() ?: 0.0)
+                                val firstVal = (firstKey?.let { perTimeDosages[it] }) ?: (if (dosage.isNotBlank()) dosage else null)
+                                firstVal?.normalizeArabicDigits()?.toDoubleOrNull() ?: (dosage.normalizeArabicDigits().toDoubleOrNull() ?: 0.0)
                             } else {
                                 dosage.normalizeArabicDigits().toDoubleOrNull() ?: 0.0
                             }
@@ -1490,7 +1494,7 @@ fun EditMedScreen(
                                 val map = mutableMapOf<String, Double>()
                                 scheduledTimesList.forEach { t ->
                                     val key = String.format(java.util.Locale.US, "%02d:%02d", t.hour, t.minute)
-                                    val entered = perTimeDosages[key]?.normalizeArabicDigits()?.toDoubleOrNull() ?: baseDose
+                                    val entered = (perTimeDosages[key] ?: (if (dosage.isNotBlank()) dosage else null))?.normalizeArabicDigits()?.toDoubleOrNull() ?: baseDose
                                     map[key] = entered
                                 }
                                 if (map.isNotEmpty()) map else null
@@ -1530,8 +1534,16 @@ fun EditMedScreen(
 
                             if (medicineToEdit != null) {
                                 medicineViewModel.updateMedicine(updatedMedicine)
+                                navController.previousBackStackEntry?.savedStateHandle?.set(
+                                    "snackbar_message",
+                                    context.getString(R.string.medication_updated_success)
+                                )
                             } else {
                                 medicineViewModel.addMedicine(updatedMedicine)
+                                navController.previousBackStackEntry?.savedStateHandle?.set(
+                                    "snackbar_message",
+                                    context.getString(R.string.medication_added_success)
+                                )
                             }
                             navController.popBackStack()
                         },
@@ -1597,10 +1609,26 @@ fun EditMedScreen(
                 val cleanTime = time.withSecond(0).withNano(0)
                 selectedTime = cleanTime
                 if (editingTimeIndex != null && editingTimeIndex!! in scheduledTimesList.indices) {
+                    val oldTime = scheduledTimesList[editingTimeIndex!!]
+                    val oldKey = String.format(java.util.Locale.US, "%02d:%02d", oldTime.hour, oldTime.minute)
+                    val newKey = String.format(java.util.Locale.US, "%02d:%02d", cleanTime.hour, cleanTime.minute)
+                    if (oldKey != newKey) {
+                        val existingVal = perTimeDosages[oldKey] ?: (if (dosage.isNotBlank()) dosage else "")
+                        val updated = perTimeDosages.toMutableMap()
+                        updated.remove(oldKey)
+                        if (existingVal.isNotBlank()) {
+                            updated[newKey] = existingVal
+                        }
+                        perTimeDosages = updated
+                    }
                     val mutable = scheduledTimesList.toMutableList()
                     mutable[editingTimeIndex!!] = cleanTime
                     scheduledTimesList = mutable.sorted().distinct()
                 } else if (!scheduledTimesList.contains(cleanTime)) {
+                    val newKey = String.format(java.util.Locale.US, "%02d:%02d", cleanTime.hour, cleanTime.minute)
+                    if (!perTimeDosages.containsKey(newKey) && dosage.isNotBlank()) {
+                        perTimeDosages = perTimeDosages + (newKey to dosage)
+                    }
                     scheduledTimesList = (scheduledTimesList + cleanTime).sorted()
                 }
                 selectedDosePreset = "Custom"
@@ -1641,6 +1669,10 @@ fun EditMedScreen(
                                 medicineToEdit?.let { med ->
                                     medicineViewModel.archiveMedicine(med)
                                     showDeleteDialog = false
+                                    navController.previousBackStackEntry?.savedStateHandle?.set(
+                                        "snackbar_message",
+                                        context.getString(R.string.medication_archived_success)
+                                    )
                                     navController.popBackStack()
                                 }
                             }
@@ -1726,6 +1758,10 @@ fun EditMedScreen(
                     onClick = {
                         medicineViewModel.deleteMedicinePermanently(med)
                         showPermanentDeleteConfirmDialog = false
+                        navController.previousBackStackEntry?.savedStateHandle?.set(
+                            "snackbar_message",
+                            context.getString(R.string.medication_deleted_success)
+                        )
                         navController.popBackStack()
                     },
                     enabled = deleteCountdown == 0,

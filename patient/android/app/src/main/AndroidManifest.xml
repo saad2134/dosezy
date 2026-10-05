@@ -101,6 +101,22 @@
                 android:resource="@xml/widget_dosezy_info" />
         </receiver>
 
+        <!-- Widget Configuration Activity -->
+        <activity
+            android:name=".widget.DosezyWidgetConfigureActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Dosezy">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <!-- Widget RemoteViewsService for Scrollable Medication List -->
+        <service
+            android:name=".widget.DosezyWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider;${applicationId}.fileprovider"

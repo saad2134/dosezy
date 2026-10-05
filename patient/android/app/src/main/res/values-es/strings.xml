@@ -529,6 +529,11 @@
     <string name="widget_all_completed">¡Todas las dosis completadas! 🎉</string>
     <string name="widget_no_doses_today">No hay dosis programadas para hoy</string>
     <string name="widget_next_dose_format">Siguiente: %1$s • %2$s</string>
+    <string name="widget_configure_title">Seleccionar perfil del widget</string>
+    <string name="widget_configure_subtitle">Elige el horario de medicamentos de qué perfil mostrará este widget en tu pantalla de inicio.</string>
+    <string name="widget_configure_active_profile">Perfil activo de la app</string>
+    <string name="widget_configure_active_profile_desc">Sigue dinámicamente el perfil que esté activo en la aplicación</string>
+    <string name="widget_configure_confirm">Añadir widget</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">Sonido de alarma</string>
@@ -648,6 +653,9 @@
     <string name="validation_enter_name">Por favor, introduce tu nombre</string>
     <string name="validation_enter_valid_age">Por favor, introduce una edad válida (1-120)</string>
     <string name="medication_added_success">Medicamento añadido con éxito</string>
+    <string name="medication_updated_success">Medicamento actualizado con éxito</string>
+    <string name="medication_archived_success">Medicamento suspendido con éxito</string>
+    <string name="medication_deleted_success">Medicamento eliminado con éxito</string>
     <string name="status_pending">Pendiente</string>
     <string name="pharmacy_order_title">Pedido de farmacia</string>
     <string name="pharmacy_order_desc">Generar lista de medicamentos para WhatsApp o su farmacia</string>

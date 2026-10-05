@@ -734,6 +734,10 @@ fun AddMedScreen(
                                                                     .clip(androidx.compose.foundation.shape.CircleShape)
                                                                     .clickable {
                                                                         scheduledTimesList = scheduledTimesList - time
+                                                                        val removedKey = String.format(java.util.Locale.US, "%02d:%02d", time.hour, time.minute)
+                                                                        val updated = perTimeDosages.toMutableMap()
+                                                                        updated.remove(removedKey)
+                                                                        perTimeDosages = updated
                                                                         if (selectedTime == time && scheduledTimesList.isNotEmpty()) {
                                                                             selectedTime = scheduledTimesList.first()
                                                                         }
@@ -1373,7 +1377,8 @@ fun AddMedScreen(
                 val isDosageValid = if (hasDifferentDosages && scheduledTimesList.size > 1) {
                     scheduledTimesList.all { t ->
                         val key = String.format(java.util.Locale.US, "%02d:%02d", t.hour, t.minute)
-                        val d = perTimeDosages[key]?.normalizeArabicDigits()?.toDoubleOrNull()
+                        val valueStr = perTimeDosages[key] ?: (if (dosage.isNotBlank()) dosage else null)
+                        val d = valueStr?.normalizeArabicDigits()?.toDoubleOrNull()
                         d != null && d > 0.0
                     }
                 } else {
@@ -1418,7 +1423,9 @@ fun AddMedScreen(
                             val map = mutableMapOf<String, Double>()
                             scheduledTimesList.forEach { t ->
                                 val key = String.format(java.util.Locale.US, "%02d:%02d", t.hour, t.minute)
-                                val entered = perTimeDosages[key]?.normalizeArabicDigits()?.toDoubleOrNull() ?: baseDose
+                                val entered = perTimeDosages[key]?.normalizeArabicDigits()?.toDoubleOrNull()
+                                    ?: (if (dosage.isNotBlank()) dosage.normalizeArabicDigits().toDoubleOrNull() else null)
+                                    ?: baseDose
                                 map[key] = entered
                             }
                             if (map.isNotEmpty()) map else null
@@ -1455,7 +1462,7 @@ fun AddMedScreen(
                             customDosages = finalCustomDosages
                         )
                         medicineViewModel.addMedicine(newMedicine)
-                        android.widget.Toast.makeText(context, context.getString(R.string.medication_added_success), android.widget.Toast.LENGTH_SHORT).show()
+                        navController.previousBackStackEntry?.savedStateHandle?.set("snackbar_message", context.getString(R.string.medication_added_success))
                         navController.popBackStack()
                     },
                     modifier = Modifier
@@ -1490,10 +1497,26 @@ fun AddMedScreen(
                 val cleanTime = time.withSecond(0).withNano(0)
                 selectedTime = cleanTime
                 if (editingTimeIndex != null && editingTimeIndex!! in scheduledTimesList.indices) {
+                    val oldTime = scheduledTimesList[editingTimeIndex!!]
+                    val oldKey = String.format(java.util.Locale.US, "%02d:%02d", oldTime.hour, oldTime.minute)
+                    val newKey = String.format(java.util.Locale.US, "%02d:%02d", cleanTime.hour, cleanTime.minute)
+                    if (oldKey != newKey) {
+                        val existingVal = perTimeDosages[oldKey] ?: (if (dosage.isNotBlank()) dosage else "")
+                        val updated = perTimeDosages.toMutableMap()
+                        updated.remove(oldKey)
+                        if (existingVal.isNotBlank()) {
+                            updated[newKey] = existingVal
+                        }
+                        perTimeDosages = updated
+                    }
                     val mutable = scheduledTimesList.toMutableList()
                     mutable[editingTimeIndex!!] = cleanTime
                     scheduledTimesList = mutable.sorted().distinct()
                 } else if (!scheduledTimesList.contains(cleanTime)) {
+                    val newKey = String.format(java.util.Locale.US, "%02d:%02d", cleanTime.hour, cleanTime.minute)
+                    if (!perTimeDosages.containsKey(newKey) && dosage.isNotBlank()) {
+                        perTimeDosages = perTimeDosages + (newKey to dosage)
+                    }
                     scheduledTimesList = (scheduledTimesList + cleanTime).sorted()
                 }
                 selectedDosePreset = "Custom"
