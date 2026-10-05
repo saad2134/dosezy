@@ -660,11 +660,25 @@ class BackupRestoreManager(
         val list = mutableListOf<ScheduleEntry>()
         for (elem in array) {
             val obj = elem.asJsonObject
+            val rawScheduledTime = obj.get("scheduledDateTime").asString
+            val parsedScheduledTime = try {
+                LocalDateTime.parse(rawScheduledTime)
+            } catch (_: Exception) {
+                try {
+                    java.time.OffsetDateTime.parse(rawScheduledTime).toLocalDateTime()
+                } catch (_: Exception) {
+                    try {
+                        java.time.Instant.parse(rawScheduledTime).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime()
+                    } catch (_: Exception) {
+                        LocalDateTime.now()
+                    }
+                }
+            }
             val entry = ScheduleEntry(
                 entryId = obj.get("entryId").asString,
                 userId = obj.get("userId").asString,
                 medicineId = obj.get("medicineId").asString,
-                scheduledDateTime = LocalDateTime.parse(obj.get("scheduledDateTime").asString),
+                scheduledDateTime = parsedScheduledTime,
                 status = try { MedicationStatus.valueOf(obj.get("status").asString) } catch (_: Exception) { MedicationStatus.PENDING },
                 takenAt = obj.get("takenAt")?.let { if (it.isJsonNull) null else try { LocalDateTime.parse(it.asString) } catch (_: Exception) { null } },
                 skipReason = obj.get("skipReason")?.let { if (it.isJsonNull) null else it.asString },

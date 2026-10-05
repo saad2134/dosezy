@@ -307,7 +307,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                         )
 
                         val builder = androidx.core.app.NotificationCompat.Builder(context, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
-                            .setSmallIcon(com.example.dosezy.R.drawable.loader_icon)
+                            .setSmallIcon(com.example.dosezy.R.drawable.ic_medicine_notification)
                             .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
                             .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, newStock))
                             .setPriority(androidx.core.app.NotificationCompat.PRIORITY_DEFAULT)
@@ -449,7 +449,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
                 )
                 val builder = androidx.core.app.NotificationCompat.Builder(context, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
-                    .setSmallIcon(com.example.dosezy.R.drawable.loader_icon)
+                    .setSmallIcon(com.example.dosezy.R.drawable.ic_medicine_notification)
                     .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
                     .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, newStock))
                     .setPriority(androidx.core.app.NotificationCompat.PRIORITY_DEFAULT)
