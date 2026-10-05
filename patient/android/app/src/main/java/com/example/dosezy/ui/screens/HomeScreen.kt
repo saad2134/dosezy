@@ -163,8 +163,8 @@ fun HomeScreen(
     val groupedEntries = remember(todayEntries, timeFormat, activeLocale) {
         todayEntries.groupBy { entry ->
             TimeFormatUtils.formatTime(entry.scheduleEntry.scheduledDateTime, timeFormat, activeLocale)
-        }.toList().sortedBy { (time, _) ->
-            TimeFormatUtils.parseTime(time, timeFormat)?.time ?: 0L
+        }.toList().sortedBy { (_, entries) ->
+            entries.firstOrNull()?.scheduleEntry?.scheduledDateTime
         }
     }
 

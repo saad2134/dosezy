@@ -41,6 +41,47 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         const val EXTRA_ENTRY_IDS = "entry_ids"
         const val EXTRA_MEDICINE_NAMES = "medicine_names"
         const val EXTRA_NAGGING_COUNT = "nagging_count"
+
+        fun createNotificationChannels(context: Context) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val notificationManager =
+                    context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+                // Remove legacy channels to avoid system audio caching conflicts
+                try {
+                    notificationManager.deleteNotificationChannel("dosezy_medicine_reminders_v2")
+                    notificationManager.deleteNotificationChannel("dosezy_medicine_reminders")
+                } catch (_: Exception) {}
+
+                val channel = NotificationChannel(
+                    CHANNEL_ID,
+                    context.getString(com.example.dosezy.R.string.notif_channel_name),
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply {
+                    description = context.getString(com.example.dosezy.R.string.notif_channel_desc)
+                    enableLights(true)
+                    enableVibration(false) // Managed directly by AlarmAudioPlayer
+                    setSound(null, null)  // Silent channel: eliminates duplicate system ringtone
+                    setBypassDnd(true)
+                    setShowBadge(true)
+                    lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
+                }
+
+                notificationManager.createNotificationChannel(channel)
+
+                val refillChannel = NotificationChannel(
+                    REFILL_CHANNEL_ID,
+                    context.getString(com.example.dosezy.R.string.notif_channel_refill_name),
+                    NotificationManager.IMPORTANCE_DEFAULT
+                ).apply {
+                    description = context.getString(com.example.dosezy.R.string.notif_channel_refill_desc)
+                    enableLights(true)
+                    enableVibration(true)
+                    setShowBadge(true)
+                }
+                notificationManager.createNotificationChannel(refillChannel)
+            }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -165,6 +206,11 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                         Log.e(TAG, "Error in fallback alarm/notification handling", fallbackEx)
                     }
                 } finally {
+                    try {
+                        if (wakeLock?.isHeld == true) {
+                            wakeLock.release()
+                        }
+                    } catch (_: Exception) {}
                     pendingResult.finish()
                 }
             }
@@ -187,7 +233,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
         val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
 
-        createNotificationChannel(localizedContext)
+        createNotificationChannels(localizedContext)
 
         val scheduledTimeStr = scheduledTime?.let {
             localizedContext.getString(R.string.notif_content_scheduled_format, it)
@@ -336,7 +382,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
         // Create silent notification: AlarmAudioPlayer is the single source of sound & vibration
         val notification = NotificationCompat.Builder(localizedContext, CHANNEL_ID)
-            .setSmallIcon(R.drawable.loader_icon)
+            .setSmallIcon(R.drawable.ic_medicine_notification)
             .setContentTitle(notificationTitle)
             .setContentText(notificationText)
             .setPriority(NotificationCompat.PRIORITY_MAX)
@@ -369,46 +415,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun createNotificationChannel(context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationManager =
-                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-            // Remove legacy channels to avoid system audio caching conflicts
-            try {
-                notificationManager.deleteNotificationChannel("dosezy_medicine_reminders_v2")
-                notificationManager.deleteNotificationChannel("dosezy_medicine_reminders")
-            } catch (_: Exception) {}
-
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                context.getString(com.example.dosezy.R.string.notif_channel_name),
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = context.getString(com.example.dosezy.R.string.notif_channel_desc)
-                enableLights(true)
-                enableVibration(false) // Managed directly by AlarmAudioPlayer
-                setSound(null, null)  // Silent channel: eliminates duplicate system ringtone
-                setBypassDnd(true)
-                setShowBadge(true)
-                lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
-            }
-
-            notificationManager.createNotificationChannel(channel)
-
-            val refillChannel = NotificationChannel(
-                REFILL_CHANNEL_ID,
-                context.getString(com.example.dosezy.R.string.notif_channel_refill_name),
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                description = context.getString(com.example.dosezy.R.string.notif_channel_refill_desc)
-                enableLights(true)
-                enableVibration(true)
-                setShowBadge(true)
-            }
-            notificationManager.createNotificationChannel(refillChannel)
-        }
-    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private suspend fun rescheduleAllAlarms(context: Context) {
