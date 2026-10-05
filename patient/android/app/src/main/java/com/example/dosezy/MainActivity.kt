@@ -12,6 +12,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -363,6 +364,7 @@ fun DosezyApp() {
     val showBottomBar = currentDestination?.route in listOf("home", "schedule", "medicines", "menu")
 
     androidx.compose.material3.Scaffold(
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
         bottomBar = {
             if (showBottomBar) {
                 CustomNavigationBar(
@@ -378,8 +380,7 @@ fun DosezyApp() {
             startDestination = "loading",
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding),
+                .padding(bottom = innerPadding.calculateBottomPadding()),
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None },
             popEnterTransition = { EnterTransition.None },
@@ -387,7 +388,9 @@ fun DosezyApp() {
         ) {
             // Main Screens
             composable("loading") {
-                com.example.dosezy.ui.components.HomeSkeletonView()
+                com.example.dosezy.ui.components.HomeSkeletonView(
+                    modifier = Modifier.statusBarsPadding()
+                )
             }
             composable("home") {
                 HomeScreen(

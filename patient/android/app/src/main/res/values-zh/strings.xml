@@ -778,4 +778,6 @@
     <string name="pref_allow_dose_notes_title">服药备注</string>
     <string name="pref_allow_dose_notes_desc">允许随服药记录备注、饮食情况或身体症状。</string>
     <string name="btn_add_note">+ 添加备注</string>
+    <string name="timings_and_dosages_title">时间与剂量</string>
+    <string name="stock_inventory_card_title">药品库存与清册</string>
 </resources>

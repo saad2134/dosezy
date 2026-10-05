@@ -6,6 +6,7 @@ import com.example.dosezy.data.model.FrequencyPattern
 import com.example.dosezy.data.model.Medicine
 import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.ScheduleEntry
+import com.example.dosezy.data.model.normalizeArabicDigits
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
@@ -691,5 +692,28 @@ class MedicineLogicTest {
         val formattedTime = "8:00 AM"
         val result = "${tomorrowLabel.trim()} $formattedTime"
         assertEquals("Tmrw 8:00 AM", result)
+    }
+
+    @Test
+    fun normalizeArabicDigits_convertsAllSupportedNumeralSystemsAndSeparators() {
+        // Arabic-Indic
+        assertEquals("12.5", "١٢.٥".normalizeArabicDigits())
+        assertEquals("12.5", "١٢٫٥".normalizeArabicDigits()) // Arabic decimal separator
+
+        // Eastern Arabic / Persian
+        assertEquals("12.5", "۱۲.۵".normalizeArabicDigits())
+        assertEquals("12.5", "۱۲٫۵".normalizeArabicDigits())
+
+        // Devanagari / Hindi
+        assertEquals("12.5", "१२.५".normalizeArabicDigits())
+        assertEquals("12.5", "१२,५".normalizeArabicDigits())
+
+        // Bengali
+        assertEquals("12.5", "১২.৫".normalizeArabicDigits())
+        assertEquals("12.5", "১২,৫".normalizeArabicDigits())
+
+        // European comma decimal separator
+        assertEquals("12.5", "12,5".normalizeArabicDigits())
+        assertEquals("100", "100".normalizeArabicDigits())
     }
 }

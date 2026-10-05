@@ -761,4 +761,6 @@ Deseja continuar?</string>
     <string name="pref_allow_dose_notes_title">Notas da dose</string>
     <string name="pref_allow_dose_notes_desc">Permitir o registo de notas, contexto das refeições ou sintomas com as doses.</string>
     <string name="btn_add_note">+ Adicionar nota</string>
+    <string name="timings_and_dosages_title">Horários e dosagens</string>
+    <string name="stock_inventory_card_title">Estoque e inventário de medicamentos</string>
 </resources>

@@ -228,7 +228,11 @@ object AlarmAudioPlayer {
             val pattern = longArrayOf(0, 1000, 1000)
             val repeatIndex = if (repeat) 0 else -1
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                vibrator?.vibrate(android.os.VibrationEffect.createWaveform(pattern, repeatIndex))
+                val audioAttributes = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+                vibrator?.vibrate(android.os.VibrationEffect.createWaveform(pattern, repeatIndex), audioAttributes)
             } else {
                 @Suppress("DEPRECATION")
                 vibrator?.vibrate(pattern, repeatIndex)

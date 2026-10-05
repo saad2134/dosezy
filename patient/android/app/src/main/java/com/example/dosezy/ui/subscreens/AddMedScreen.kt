@@ -26,9 +26,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.Medication
+import androidx.compose.material.icons.filled.Schedule
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import com.example.dosezy.ui.components.GridTimePickerDialog
@@ -165,182 +168,93 @@ fun AddMedScreen(
                     .padding(16.dp)
                     .background(MaterialTheme.colorScheme.background)
             ) {
-                // Medicine Image Selection
-                Text(
-                    text = stringResource(R.string.form_medicine_image),
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                // Medicine Image Selection with Pill Visual
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    MedicinePhotoVisualPicker(
-                        imagePath = medicineImagePath,
-                        pillShape = selectedPillShape,
-                        pillColor = selectedPillColor,
-                        onImageSelected = { path -> medicineImagePath = path },
-                        onVisualSelected = { shape, color ->
-                            selectedPillShape = shape
-                            selectedPillColor = color
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = if (medicineImagePath != null) stringResource(R.string.form_change_img) else stringResource(R.string.form_upload_img),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Medication Name
-                Text(
-                    text = stringResource(R.string.form_med_name),
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                OutlinedTextField(
-                    shape = RoundedCornerShape(16.dp),
-                    value = medicationName,
-                    onValueChange = { medicationName = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .defaultMinSize(minHeight = 56.dp),
-                    placeholder = {
-                        Text(
-                            stringResource(R.string.form_med_name_placeholder),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF1193D4),
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                        focusedLabelColor = Color(0xFF1193D4),
-                        unfocusedLabelColor = Color(0xFF6B7280),
-                        cursorColor = Color(0xFF1193D4)
-                    ),
-                    singleLine = true
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Dosage
-                Text(
-                    text = stringResource(R.string.form_dosage),
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                Row(
+                // --- Card 1: Medicine & Identification Card ---
+                androidx.compose.material3.Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    shape = RoundedCornerShape(20.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                 ) {
-                    OutlinedTextField(
-                        shape = RoundedCornerShape(16.dp),
-                        value = dosage,
-                        onValueChange = {
-                            if (it.all { char -> char.isDigit() || char == '.' }) {
-                                dosage = it
-                            }
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .defaultMinSize(minHeight = 56.dp),
-                        placeholder = {
-                            Text(
-                                "0",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(0xFF1193D4),
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                            focusedLabelColor = Color(0xFF1193D4),
-                            unfocusedLabelColor = Color(0xFF6B7280),
-                            cursorColor = Color(0xFF1193D4)
-                        ),
-                        singleLine = true
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    // Dosage Unit Dropdown
-                    Box(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        ExposedDropdownMenuBox(
-                            expanded = dosageUnitExpanded,
-                            onExpandedChange = { dosageUnitExpanded = !dosageUnitExpanded }
+                    Column(modifier = Modifier.padding(18.dp)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            OutlinedTextField(
-                                shape = RoundedCornerShape(16.dp),
-                                value = selectedDosageUnit.getLocalizedName(),
-                                onValueChange = {},
-                                readOnly = true,
-                                trailingIcon = {
-                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = dosageUnitExpanded)
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .defaultMinSize(minHeight = 56.dp)
-                                    .menuAnchor(),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = Color(0xFF1193D4),
-                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                                    focusedLabelColor = Color(0xFF1193D4),
-                                    unfocusedLabelColor = Color(0xFF6B7280)
-                                )
+                            Icon(
+                                imageVector = Icons.Default.Medication,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(22.dp)
+                            )
+                            Text(
+                                text = stringResource(R.string.form_med_name),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Medicine Image Selection with Pill Visual
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            MedicinePhotoVisualPicker(
+                                imagePath = medicineImagePath,
+                                pillShape = selectedPillShape,
+                                pillColor = selectedPillColor,
+                                onImageSelected = { path -> medicineImagePath = path },
+                                onVisualSelected = { shape, color ->
+                                    selectedPillShape = shape
+                                    selectedPillColor = color
+                                }
                             )
 
-                            ExposedDropdownMenu(
-                                expanded = dosageUnitExpanded,
-                                onDismissRequest = { dosageUnitExpanded = false },
-                                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-                            ) {
-                                DosageUnit.values().forEach { unit ->
-                                    DropdownMenuItem(
-                                        text = { Text(unit.getLocalizedName()) },
-                                        onClick = {
-                                            selectedDosageUnit = unit
-                                            dosageUnitExpanded = false
-                                        },
-                                        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-                                    )
-                                }
-                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Text(
+                                text = if (medicineImagePath != null) stringResource(R.string.form_change_img) else stringResource(R.string.form_upload_img),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        OutlinedTextField(
+                            shape = RoundedCornerShape(16.dp),
+                            value = medicationName,
+                            onValueChange = { medicationName = it },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .defaultMinSize(minHeight = 56.dp),
+                            placeholder = {
+                                Text(
+                                    stringResource(R.string.form_med_name_placeholder),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color(0xFF1193D4),
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                                focusedLabelColor = Color(0xFF1193D4),
+                                unfocusedLabelColor = Color(0xFF6B7280),
+                                cursorColor = Color(0xFF1193D4)
+                            ),
+                            singleLine = true
+                        )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 val activeLocale = remember(currentUser?.language) {
                     com.example.dosezy.utils.LocaleHelper.getLocale(currentUser?.language ?: com.example.dosezy.data.model.Language.SYSTEM)
                 }
 
-                // --- Unified Schedule & Dosing Times Card ---
+                // --- Card 2: Timings & Dosages Card ---
                 androidx.compose.material3.Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp),
@@ -359,7 +273,7 @@ fun AddMedScreen(
                                 modifier = Modifier.size(22.dp)
                             )
                             Text(
-                                text = stringResource(R.string.scheduled_dosing_times_title),
+                                text = stringResource(R.string.timings_and_dosages_title),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -797,8 +711,10 @@ fun AddMedScreen(
                                                         )
                                                         Text(
                                                             text = formatted,
-                                                            style = MaterialTheme.typography.bodyMedium,
-                                                            fontWeight = FontWeight.SemiBold,
+                                                            style = MaterialTheme.typography.bodyLarge.copy(
+                                                                fontSize = 16.sp,
+                                                                fontWeight = FontWeight.Bold
+                                                            ),
                                                             color = MaterialTheme.colorScheme.onSurface,
                                                             modifier = Modifier
                                                                 .weight(1f)
@@ -875,111 +791,209 @@ fun AddMedScreen(
                                     }
                                 }
                             }
+                        }
 
-                            // --- Variable Dosages Per Scheduled Time (Issue #82) ---
-                            if (scheduledTimesList.size > 1) {
-                                Spacer(modifier = Modifier.height(14.dp))
-                                Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-                                Spacer(modifier = Modifier.height(12.dp))
+                        // Single / Base Dosage & Dosage Unit at the bottom of Timings & Dosages card
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                        Spacer(modifier = Modifier.height(14.dp))
 
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                                        Text(
-                                            text = stringResource(R.string.med_different_dosages_toggle),
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = MaterialTheme.colorScheme.onSurface
-                                        )
-                                        Text(
-                                            text = stringResource(R.string.med_different_dosages_subtitle),
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
+                        Text(
+                            text = stringResource(R.string.form_dosage),
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.padding(bottom = 6.dp)
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            OutlinedTextField(
+                                shape = RoundedCornerShape(16.dp),
+                                value = dosage,
+                                onValueChange = {
+                                    if (it.all { char -> char.isDigit() || char == '.' || char == ',' || char == '\u066B' }) {
+                                        dosage = it
                                     }
-                                    Switch(
-                                        checked = hasDifferentDosages,
-                                        onCheckedChange = { isChecked ->
-                                            hasDifferentDosages = isChecked
-                                            if (isChecked) {
-                                                val updated = perTimeDosages.toMutableMap()
-                                                scheduledTimesList.forEach { t ->
-                                                    val key = String.format(java.util.Locale.US, "%02d:%02d", t.hour, t.minute)
-                                                    if (updated[key].isNullOrBlank()) {
-                                                        updated[key] = dosage
-                                                    }
-                                                }
-                                                perTimeDosages = updated
-                                            }
+                                },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .defaultMinSize(minHeight = 56.dp),
+                                placeholder = {
+                                    Text(
+                                        "0",
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(0xFF1193D4),
+                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                                    focusedLabelColor = Color(0xFF1193D4),
+                                    unfocusedLabelColor = Color(0xFF6B7280),
+                                    cursorColor = Color(0xFF1193D4)
+                                ),
+                                singleLine = true
+                            )
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            // Dosage Unit Dropdown
+                            Box(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                ExposedDropdownMenuBox(
+                                    expanded = dosageUnitExpanded,
+                                    onExpandedChange = { dosageUnitExpanded = !dosageUnitExpanded }
+                                ) {
+                                    OutlinedTextField(
+                                        shape = RoundedCornerShape(16.dp),
+                                        value = selectedDosageUnit.getLocalizedName(),
+                                        onValueChange = {},
+                                        readOnly = true,
+                                        trailingIcon = {
+                                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = dosageUnitExpanded)
+                                        },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .defaultMinSize(minHeight = 56.dp)
+                                            .menuAnchor(),
+                                        colors = OutlinedTextFieldDefaults.colors(
+                                            focusedBorderColor = Color(0xFF1193D4),
+                                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                                            focusedLabelColor = Color(0xFF1193D4),
+                                            unfocusedLabelColor = Color(0xFF6B7280)
+                                        )
+                                    )
+
+                                    ExposedDropdownMenu(
+                                        expanded = dosageUnitExpanded,
+                                        onDismissRequest = { dosageUnitExpanded = false },
+                                        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                                    ) {
+                                        DosageUnit.values().forEach { unit ->
+                                            DropdownMenuItem(
+                                                text = { Text(unit.getLocalizedName()) },
+                                                onClick = {
+                                                    selectedDosageUnit = unit
+                                                    dosageUnitExpanded = false
+                                                },
+                                                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                                            )
                                         }
+                                    }
+                                }
+                            }
+                        }
+
+                        // --- Seamless Variable Dosages Per Scheduled Time (Issue #82) ---
+                        if (selectedFrequency != FrequencyPattern.AS_NEEDED && scheduledTimesList.size > 1) {
+                            Spacer(modifier = Modifier.height(14.dp))
+                            Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+                                    Text(
+                                        text = stringResource(R.string.med_different_dosages_toggle),
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.med_different_dosages_subtitle),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
+                                Switch(
+                                    checked = hasDifferentDosages,
+                                    onCheckedChange = { isChecked ->
+                                        hasDifferentDosages = isChecked
+                                        if (isChecked) {
+                                            val updated = perTimeDosages.toMutableMap()
+                                            scheduledTimesList.forEach { t ->
+                                                val key = String.format(java.util.Locale.US, "%02d:%02d", t.hour, t.minute)
+                                                if (updated[key].isNullOrBlank()) {
+                                                    updated[key] = dosage
+                                                }
+                                            }
+                                            perTimeDosages = updated
+                                        }
+                                    }
+                                )
+                            }
 
-                                if (hasDifferentDosages) {
-                                    Spacer(modifier = Modifier.height(12.dp))
-                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                        scheduledTimesList.forEach { time ->
-                                            val key = String.format(java.util.Locale.US, "%02d:%02d", time.hour, time.minute)
-                                            val formattedTime = time.format(DateTimeFormatter.ofPattern("hh:mm a"))
+                            if (hasDifferentDosages) {
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    scheduledTimesList.forEach { time ->
+                                        val key = String.format(java.util.Locale.US, "%02d:%02d", time.hour, time.minute)
+                                        val formattedTime = com.example.dosezy.utils.TimeFormatUtils.formatLocalTime(
+                                            time,
+                                            currentUser?.timeFormat ?: TimeFormat.HOUR_12,
+                                            activeLocale
+                                        )
 
-                                            Surface(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                shape = RoundedCornerShape(12.dp),
-                                                color = MaterialTheme.colorScheme.surface,
-                                                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                                        Surface(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            shape = RoundedCornerShape(12.dp),
+                                            color = MaterialTheme.colorScheme.surface,
+                                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                                        ) {
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.SpaceBetween
                                             ) {
                                                 Row(
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .padding(horizontal = 12.dp, vertical = 8.dp),
                                                     verticalAlignment = Alignment.CenterVertically,
-                                                    horizontalArrangement = Arrangement.SpaceBetween
+                                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                                                 ) {
-                                                    Row(
-                                                        verticalAlignment = Alignment.CenterVertically,
-                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                                    ) {
-                                                        Icon(
-                                                            imageVector = Icons.Default.Schedule,
-                                                            contentDescription = null,
-                                                            tint = MaterialTheme.colorScheme.primary,
-                                                            modifier = Modifier.size(18.dp)
-                                                        )
-                                                        Text(
-                                                            text = formattedTime,
-                                                            style = MaterialTheme.typography.bodyMedium,
-                                                            fontWeight = FontWeight.SemiBold,
-                                                            color = MaterialTheme.colorScheme.onSurface
-                                                        )
-                                                    }
+                                                    Icon(
+                                                        imageVector = Icons.Default.Schedule,
+                                                        contentDescription = null,
+                                                        tint = MaterialTheme.colorScheme.primary,
+                                                        modifier = Modifier.size(18.dp)
+                                                    )
+                                                    Text(
+                                                        text = formattedTime,
+                                                        style = MaterialTheme.typography.bodyMedium,
+                                                        fontWeight = FontWeight.SemiBold,
+                                                        color = MaterialTheme.colorScheme.onSurface
+                                                    )
+                                                }
 
-                                                    Row(
-                                                        verticalAlignment = Alignment.CenterVertically,
-                                                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                                    ) {
-                                                        OutlinedTextField(
-                                                            value = perTimeDosages[key] ?: (if (dosage.isNotBlank()) dosage else ""),
-                                                            onValueChange = { newVal ->
-                                                                if (newVal.all { it.isDigit() || it == '.' || it == ',' || it == '\u066B' }) {
-                                                                    perTimeDosages = perTimeDosages + (key to newVal)
-                                                                }
-                                                            },
-                                                            modifier = Modifier.width(85.dp),
-                                                            textStyle = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                                                            singleLine = true,
-                                                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                                                            shape = RoundedCornerShape(10.dp)
-                                                        )
-                                                        Text(
-                                                            text = selectedDosageUnit.getLocalizedName(),
-                                                            style = MaterialTheme.typography.bodyMedium,
-                                                            fontWeight = FontWeight.Medium,
-                                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                        )
-                                                    }
+                                                Row(
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                                ) {
+                                                    OutlinedTextField(
+                                                        value = perTimeDosages[key] ?: (if (dosage.isNotBlank()) dosage else ""),
+                                                        onValueChange = { newVal ->
+                                                            if (newVal.all { it.isDigit() || it == '.' || it == ',' || it == '\u066B' }) {
+                                                                perTimeDosages = perTimeDosages + (key to newVal)
+                                                            }
+                                                        },
+                                                        modifier = Modifier.width(85.dp),
+                                                        textStyle = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                                        singleLine = true,
+                                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                                        shape = RoundedCornerShape(10.dp)
+                                                    )
+                                                    Text(
+                                                        text = selectedDosageUnit.getLocalizedName(),
+                                                        style = MaterialTheme.typography.bodyMedium,
+                                                        fontWeight = FontWeight.Medium,
+                                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                    )
                                                 }
                                             }
                                         }
@@ -992,7 +1006,7 @@ fun AddMedScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // --- v2.4.0 Prescription Duration & End Date Card ---
+                // --- Card 3: Prescription Duration & End Date Card ---
                 androidx.compose.material3.Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp),
@@ -1000,12 +1014,23 @@ fun AddMedScreen(
                     border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                 ) {
                     Column(modifier = Modifier.padding(18.dp)) {
-                        Text(
-                            text = stringResource(R.string.course_duration_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CalendarMonth,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(22.dp)
+                            )
+                            Text(
+                                text = stringResource(R.string.course_duration_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Row(
@@ -1118,7 +1143,7 @@ fun AddMedScreen(
                                 )
                             )
 
-                            val days = durationDaysText.toIntOrNull()
+                            val days = durationDaysText.normalizeArabicDigits().toIntOrNull()
                             if (days != null && days > 0) {
                                 val endDate = selectedStartDate.plusDays(days.toLong())
                                 Spacer(modifier = Modifier.height(6.dp))
@@ -1135,77 +1160,151 @@ fun AddMedScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // --- Medicine Stock & Inventory UI ---
-                Text(
-                    text = stringResource(R.string.stock_inventory_title),
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                Row(
+                // --- Card 4: Medicine Stock & Inventory ---
+                androidx.compose.material3.Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    shape = RoundedCornerShape(20.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                 ) {
-                    OutlinedTextField(
-                        value = currentStockText,
-                        onValueChange = { if (it.all { c -> c.isDigit() }) currentStockText = it },
-                        label = { Text(stringResource(R.string.stock_current)) },
-                        placeholder = { Text(stringResource(R.string.med_stock_current_placeholder)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier.weight(1f).defaultMinSize(minHeight = 56.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(0xFF1193D4),
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                        )
-                    )
-                    OutlinedTextField(
-                        value = refillThresholdText,
-                        onValueChange = { if (it.all { c -> c.isDigit() }) refillThresholdText = it },
-                        label = { Text(stringResource(R.string.stock_refill_threshold)) },
-                        placeholder = { Text(stringResource(R.string.med_stock_refill_placeholder)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier.weight(1f).defaultMinSize(minHeight = 56.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(0xFF1193D4),
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                        )
-                    )
+                    Column(modifier = Modifier.padding(18.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Inventory2,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                                Text(
+                                    text = stringResource(R.string.stock_inventory_card_title),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                            Surface(
+                                shape = RoundedCornerShape(6.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.optional),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            OutlinedTextField(
+                                value = currentStockText,
+                                onValueChange = { if (it.all { c -> c.isDigit() }) currentStockText = it },
+                                label = { Text(stringResource(R.string.stock_current)) },
+                                placeholder = { Text(stringResource(R.string.med_stock_current_placeholder)) },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.weight(1f).defaultMinSize(minHeight = 56.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(0xFF1193D4),
+                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                                )
+                            )
+                            OutlinedTextField(
+                                value = refillThresholdText,
+                                onValueChange = { if (it.all { c -> c.isDigit() }) refillThresholdText = it },
+                                label = { Text(stringResource(R.string.stock_refill_threshold)) },
+                                placeholder = { Text(stringResource(R.string.med_stock_refill_placeholder)) },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.weight(1f).defaultMinSize(minHeight = 56.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(0xFF1193D4),
+                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                                )
+                            )
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // --- v2.4.0 Doctor & Pharmacy Notes ---
-                Text(
-                    text = stringResource(R.string.med_notes_label),
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                OutlinedTextField(
-                    value = doctorNotes,
-                    onValueChange = { doctorNotes = it },
-                    placeholder = { Text(stringResource(R.string.med_notes_placeholder)) },
-                    shape = RoundedCornerShape(16.dp),
-                    minLines = 2,
-                    maxLines = 4,
+                // --- Card 5: Doctor & Pharmacy Notes ---
+                androidx.compose.material3.Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF1193D4),
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                    )
-                )
+                    shape = RoundedCornerShape(20.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                ) {
+                    Column(modifier = Modifier.padding(18.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.EditNote,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                                Text(
+                                    text = stringResource(R.string.med_notes_label),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                            Surface(
+                                shape = RoundedCornerShape(6.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.optional),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        OutlinedTextField(
+                            value = doctorNotes,
+                            onValueChange = { doctorNotes = it },
+                            placeholder = { Text(stringResource(R.string.med_notes_placeholder)) },
+                            shape = RoundedCornerShape(16.dp),
+                            minLines = 2,
+                            maxLines = 4,
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color(0xFF1193D4),
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                            )
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                val durationDaysInt = durationDaysText.toIntOrNull()
+                val durationDaysInt = durationDaysText.normalizeArabicDigits().toIntOrNull()
                 val calcStartDate = selectedStartDate
                 val calcEndDate = if (isFiniteCourse && durationDaysInt != null) {
                     selectedStartDate.plusDays((durationDaysInt - 1).toLong().coerceAtLeast(0L))
@@ -1236,9 +1335,9 @@ fun AddMedScreen(
                             return@Button
                         }
 
+                        val baseDose = dosage.normalizeArabicDigits().toDoubleOrNull() ?: 0.0
                         val finalCustomDosages: Map<String, Double>? = if (hasDifferentDosages && scheduledTimesList.size > 1) {
                             val map = mutableMapOf<String, Double>()
-                            val baseDose = dosage.normalizeArabicDigits().toDoubleOrNull() ?: 0.0
                             scheduledTimesList.forEach { t ->
                                 val key = String.format(java.util.Locale.US, "%02d:%02d", t.hour, t.minute)
                                 val entered = perTimeDosages[key]?.normalizeArabicDigits()?.toDoubleOrNull() ?: baseDose
@@ -1250,8 +1349,8 @@ fun AddMedScreen(
                         val newMedicine = Medicine(
                             medicineId = UUID.randomUUID().toString(),
                             userId = currentUser?.userId ?: "",
-                            medicationName = medicationName,
-                            dosage = dosage.toDoubleOrNull() ?: 0.0,
+                            medicationName = medicationName.trim(),
+                            dosage = baseDose,
                             dosageUnit = selectedDosageUnit,
                             timesPerDay = if (selectedFrequency == FrequencyPattern.AS_NEEDED) 0 else scheduledTimesList.size,
                             frequency = com.example.dosezy.data.model.Frequency(
@@ -1266,8 +1365,8 @@ fun AddMedScreen(
                             ),
                             scheduledTimes = if (selectedFrequency == FrequencyPattern.AS_NEEDED) emptyList() else scheduledTimesList,
                             imageUri = medicineImagePath,
-                            currentStock = currentStockText.toIntOrNull(),
-                            refillThreshold = refillThresholdText.toIntOrNull(),
+                            currentStock = currentStockText.normalizeArabicDigits().toIntOrNull(),
+                            refillThreshold = refillThresholdText.normalizeArabicDigits().toIntOrNull(),
                             autoDeductOnTake = true,
                             notes = doctorNotes.trim().ifBlank { null },
                             pillShape = selectedPillShape,

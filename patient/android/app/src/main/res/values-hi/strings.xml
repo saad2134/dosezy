@@ -778,4 +778,6 @@
     <string name="pref_allow_dose_notes_title">खुराक के नोट</string>
     <string name="pref_allow_dose_notes_desc">खुराक के साथ नोट, भोजन का विवरण या लक्षण दर्ज करने की अनुमति दें।</string>
     <string name="btn_add_note">+ नोट जोड़ें</string>
+    <string name="timings_and_dosages_title">समय और खुराक</string>
+    <string name="stock_inventory_card_title">दवा स्टॉक और इन्वेंटरी</string>
 </resources>

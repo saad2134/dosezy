@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import com.example.dosezy.R
 import com.example.dosezy.data.model.Medicine
+import com.example.dosezy.data.model.normalizeArabicDigits
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -101,14 +102,14 @@ fun QuickRefillDialog(
             }
         },
         confirmButton = {
+            val parsedQuantity = quantityText.normalizeArabicDigits().toIntOrNull() ?: 0
             Button(
                 onClick = {
-                    val added = quantityText.toIntOrNull() ?: 0
-                    if (added > 0) {
-                        onConfirmRefill(added)
+                    if (parsedQuantity > 0) {
+                        onConfirmRefill(parsedQuantity)
                     }
                 },
-                enabled = (quantityText.toIntOrNull() ?: 0) > 0,
+                enabled = parsedQuantity > 0,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1193D4))
             ) {
                 Text(stringResource(R.string.form_save))

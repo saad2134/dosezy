@@ -249,6 +249,9 @@ class ScheduleViewModel @Inject constructor(
                     _currentUserId.value?.let { currentUserId ->
                         loadScheduleForDate(currentUserId, _selectedDate.value)
                     }
+                    try {
+                        com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+                    } catch (_: Exception) {}
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error auto-marking missed medications", e)

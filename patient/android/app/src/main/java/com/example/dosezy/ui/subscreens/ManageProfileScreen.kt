@@ -67,6 +67,7 @@ import androidx.compose.ui.res.stringResource
 import com.example.dosezy.R
 import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.getLocalizedName
+import com.example.dosezy.data.model.normalizeArabicDigits
 import com.example.dosezy.ui.components.ManageProfileSkeletonView
 import com.example.dosezy.ui.components.ProfilePicturePicker
 import com.example.dosezy.ui.components.TopBar
@@ -358,9 +359,10 @@ fun ManageProfileScreen(navController: NavController) {
                     // Save Changes Button
                     Button(
                         onClick = {
+                            val parsedAge = age.normalizeArabicDigits().toIntOrNull() ?: 0
                             // Validate form
                             fullNameError = fullName.isBlank()
-                            ageError = age.isBlank()
+                            ageError = age.isBlank() || parsedAge <= 0
                             genderError = gender == null
 
                             if (!fullNameError && !ageError && !genderError) {
@@ -368,9 +370,9 @@ fun ManageProfileScreen(navController: NavController) {
                                     val updatedUser = user.copy(
                                         profilePicPath = profilePicPath,
                                         fullName = fullName.trim(),
-                                        age = age.toIntOrNull() ?: 0,
+                                        age = parsedAge,
                                         gender = gender!!,
-                                        contactNumber = contactNumber.trim(),
+                                        contactNumber = contactNumber.normalizeArabicDigits().trim(),
                                         allergies = allergies.trim().ifBlank { null },
                                         medicalConditions = medicalConditions.trim().ifBlank { null }
                                     )

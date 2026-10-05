@@ -762,4 +762,6 @@ Vuoi continuare?</string>
     <string name="pref_allow_dose_notes_title">Note sulla dose</string>
     <string name="pref_allow_dose_notes_desc">Consenti di registrare note, pasti o sintomi insieme alle dosi.</string>
     <string name="btn_add_note">+ Aggiungi nota</string>
+    <string name="timings_and_dosages_title">Orari e dosaggi</string>
+    <string name="stock_inventory_card_title">Scorta e inventario farmaci</string>
 </resources>

@@ -111,11 +111,15 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                     val todayPending = todayEntries.filter { it.status == MedicationStatus.PENDING }.sortedBy { it.scheduledDateTime }
                     val medicines = db.medicineDao().getMedicinesByUserDirect(user.userId).associateBy { it.medicineId }
 
+                    val totalToday = todayEntries.size
+                    val takenToday = todayEntries.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
+                    val skippedToday = todayEntries.count { it.status == MedicationStatus.SKIPPED }
+
                     val displayEntries: List<com.example.dosezy.data.model.ScheduleEntry>
                     if (todayPending.isNotEmpty()) {
                         displayEntries = todayPending
-                    } else if (todayEntries.isNotEmpty() && todayEntries.any { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE || it.status == MedicationStatus.SKIPPED }) {
-                        // All scheduled doses for today are completed
+                    } else if (todayEntries.isNotEmpty()) {
+                        // All scheduled doses for today have been addressed (taken, skipped, or missed)
                         displayEntries = emptyList()
                     } else {
                         // No pending doses today (e.g. future medicine starting tomorrow or later)
@@ -131,8 +135,18 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                         views.setViewVisibility(R.id.widget_item_3, View.GONE)
                         views.setViewVisibility(R.id.widget_status_message, View.VISIBLE)
 
-                        if (todayEntries.isNotEmpty() && todayEntries.any { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE || it.status == MedicationStatus.SKIPPED }) {
-                            views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_all_taken))
+                        if (todayEntries.isNotEmpty()) {
+                            when {
+                                takenToday == totalToday -> {
+                                    views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_all_taken))
+                                }
+                                takenToday + skippedToday == totalToday -> {
+                                    views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_all_completed))
+                                }
+                                else -> {
+                                    views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_taken_summary, takenToday, totalToday))
+                                }
+                            }
                         } else {
                             views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_no_meds))
                         }

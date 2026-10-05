@@ -482,6 +482,7 @@ fun Medicine.getLocalizedFrequencyDisplay(): String {
 
 /**
  * Normalizes Eastern Arabic-Indic numerals (\u0660-\u0669), Persian/Urdu numerals (\u06F0-\u06F9),
+ * Devanagari numerals (\u0966-\u096F), Bengali numerals (\u09E6-\u09EF),
  * and localized decimal separators (\u066B, comma) into standard ASCII numbers and periods.
  */
 fun String.normalizeArabicDigits(): String {
@@ -489,6 +490,8 @@ fun String.normalizeArabicDigits(): String {
         when (c) {
             in '\u0660'..'\u0669' -> '0' + (c - '\u0660')
             in '\u06F0'..'\u06F9' -> '0' + (c - '\u06F0')
+            in '\u0966'..'\u096F' -> '0' + (c - '\u0966')
+            in '\u09E6'..'\u09EF' -> '0' + (c - '\u09E6')
             '\u066B', ',' -> '.'
             else -> c
         }

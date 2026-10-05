@@ -4,8 +4,10 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,7 +31,7 @@ fun DebugScreen(
     val medicines by medicineViewModel.medicines.collectAsState()
     val scheduleWithMedicine by scheduleViewModel.scheduleWithMedicine.collectAsState()
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(modifier = Modifier.fillMaxSize().statusBarsPadding().padding(16.dp)) {
         Text("Debug Info", style = MaterialTheme.typography.headlineMedium)
 
         Text("Current User: ${currentUser?.fullName ?: "None"}")
