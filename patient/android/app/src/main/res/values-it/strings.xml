@@ -35,6 +35,7 @@
     <string name="form_med_name">Nome del Farmaco</string>
     <string name="form_med_name_placeholder">es. Amoxicillina</string>
     <string name="form_dosage">Dosaggio</string>
+    <string name="form_dosage_unit">Unità di dosaggio</string>
     <string name="form_dosage_placeholder">es. 500mg, 1 compressa</string>
     <string name="form_frequency">Frequenza</string>
     <string name="form_time">Orario</string>
@@ -47,7 +48,7 @@
     <string name="freq_daily">Giornaliero</string>
     <string name="freq_weekly">Settimanale</string>
     <string name="freq_monthly">Mensile</string>
-    <string name="freq_custom">Personalizzato</string>
+    <string name="freq_custom">Ogni X settimane</string>
     <string name="form_select_days_week">Seleziona i giorni della settimana</string>
     <string name="form_select_days_month">Seleziona i giorni del mese</string>
     <string name="day_mon">Lun</string>

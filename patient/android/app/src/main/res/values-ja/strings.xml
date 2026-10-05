@@ -35,6 +35,7 @@
     <string name="form_med_name">お薬の名前</string>
     <string name="form_med_name_placeholder">例: アモキシシリン</string>
     <string name="form_dosage">服用量</string>
+    <string name="form_dosage_unit">用量単位</string>
     <string name="form_dosage_placeholder">例: 500mg, 1錠</string>
     <string name="form_frequency">頻度</string>
     <string name="form_time">時間</string>
@@ -47,7 +48,7 @@
     <string name="freq_daily">毎日</string>
     <string name="freq_weekly">毎週</string>
     <string name="freq_monthly">毎月</string>
-    <string name="freq_custom">カスタム</string>
+    <string name="freq_custom">X 週間ごと</string>
     <string name="form_select_days_week">曜日を選択</string>
     <string name="form_select_days_month">日付を選択</string>
     <string name="day_mon">月</string>

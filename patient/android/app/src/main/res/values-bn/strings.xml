@@ -35,6 +35,7 @@
     <string name="form_med_name">ওষুধের নাম</string>
     <string name="form_med_name_placeholder">যেমন: অ্যাটোরভাস্ট্যাটিন</string>
     <string name="form_dosage">ডোজের মাত্রা</string>
+    <string name="form_dosage_unit">ডোজ ইউনিট</string>
     <string name="form_dosage_placeholder">যেমন: ৫০০ মিগ্রা, ১টি ট্যাবলেট</string>
     <string name="form_frequency">পুনরাবৃত্তি</string>
     <string name="form_time">সময়</string>
@@ -47,7 +48,7 @@
     <string name="freq_daily">প্রতিদিন</string>
     <string name="freq_weekly">সাপ্তাহিক</string>
     <string name="freq_monthly">মাসিক</string>
-    <string name="freq_custom">কাস্টম</string>
+    <string name="freq_custom">প্রতি X সপ্তাহ পর পর</string>
     <string name="form_select_days_week">সপ্তাহের দিন নির্বাচন করুন</string>
     <string name="form_select_days_month">মাসের দিন নির্বাচন করুন</string>
     <string name="day_mon">সোম</string>

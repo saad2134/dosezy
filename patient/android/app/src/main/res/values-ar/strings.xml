@@ -35,6 +35,7 @@
     <string name="form_med_name">اسم الدواء</string>
     <string name="form_med_name_placeholder">مثال: أموكسيسيلين</string>
     <string name="form_dosage">الجرعة</string>
+    <string name="form_dosage_unit">وحدة الجرعة</string>
     <string name="form_dosage_placeholder">مثال: 500 ملغ، قرص واحد</string>
     <string name="form_frequency">التكرار</string>
     <string name="form_time">الوقت</string>
@@ -47,7 +48,7 @@
     <string name="freq_daily">يوميًا</string>
     <string name="freq_weekly">أسبوعيًا</string>
     <string name="freq_monthly">شهريًا</string>
-    <string name="freq_custom">مخصص</string>
+    <string name="freq_custom">كل X أسابيع</string>
     <string name="form_select_days_week">حدد أيام الأسبوع</string>
     <string name="form_select_days_month">حدد أيام الشهر</string>
     <string name="day_mon">الإثنين</string>

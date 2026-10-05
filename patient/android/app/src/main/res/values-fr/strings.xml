@@ -35,6 +35,7 @@
     <string name="form_med_name">Nom du médicament</string>
     <string name="form_med_name_placeholder">ex. Amoxicilline</string>
     <string name="form_dosage">Dosage</string>
+    <string name="form_dosage_unit">Unité de dosage</string>
     <string name="form_dosage_placeholder">ex. 500mg, 1 comprimé</string>
     <string name="form_frequency">Fréquence</string>
     <string name="form_time">Heure</string>
@@ -47,7 +48,7 @@
     <string name="freq_daily">Quotidien</string>
     <string name="freq_weekly">Hebdomadaire</string>
     <string name="freq_monthly">Mensuel</string>
-    <string name="freq_custom">Personnalisé</string>
+    <string name="freq_custom">Toutes les X semaines</string>
     <string name="form_select_days_week">Sélectionner les jours de la semaine</string>
     <string name="form_select_days_month">Sélectionner les jours du mois</string>
     <string name="day_mon">Lun</string>

@@ -15,9 +15,9 @@
         android:gravity="center_vertical">
 
         <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/loader_icon"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_widget_medication"
             android:contentDescription="@string/app_name" />
 
         <TextView
@@ -37,16 +37,23 @@
             android:id="@+id/widget_date_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#94A3B8"
-            android:textSize="12sp" />
+            android:background="@drawable/widget_date_pill_background"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:textColor="#CBD5E1"
+            android:textSize="12sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
+    <!-- Subtle Modern Divider -->
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:background="#334155"
+        android:background="#222C3A"
         android:contentDescription="@null" />
 
     <!-- Content Area: List / Empty / All Taken -->
@@ -56,7 +63,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:gravity="center_vertical">
+        android:gravity="center">
 
         <!-- Item 1 -->
         <LinearLayout
@@ -65,27 +72,36 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:paddingTop="3dp"
-            android:paddingBottom="3dp"
+            android:background="@drawable/widget_item_background"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="7dp"
+            android:paddingBottom="7dp"
+            android:layout_marginBottom="5dp"
             android:visibility="gone">
 
             <TextView
                 android:id="@+id/widget_item_1_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@drawable/widget_time_pill_background"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
                 android:textColor="#38BDF8"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:minWidth="64dp" />
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/widget_item_1_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="6dp"
+                android:layout_marginStart="8dp"
                 android:textColor="#F8FAFC"
-                android:textSize="13sp"
+                android:textSize="14sp"
+                android:textStyle="bold"
                 android:maxLines="1"
                 android:ellipsize="end" />
 
@@ -93,8 +109,10 @@
                 android:id="@+id/widget_item_1_dose"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
                 android:textColor="#94A3B8"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <!-- Item 2 -->
@@ -104,27 +122,36 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:paddingTop="3dp"
-            android:paddingBottom="3dp"
+            android:background="@drawable/widget_item_background"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="7dp"
+            android:paddingBottom="7dp"
+            android:layout_marginBottom="5dp"
             android:visibility="gone">
 
             <TextView
                 android:id="@+id/widget_item_2_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@drawable/widget_time_pill_background"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
                 android:textColor="#38BDF8"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:minWidth="64dp" />
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/widget_item_2_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="6dp"
+                android:layout_marginStart="8dp"
                 android:textColor="#F8FAFC"
-                android:textSize="13sp"
+                android:textSize="14sp"
+                android:textStyle="bold"
                 android:maxLines="1"
                 android:ellipsize="end" />
 
@@ -132,8 +159,10 @@
                 android:id="@+id/widget_item_2_dose"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
                 android:textColor="#94A3B8"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <!-- Item 3 -->
@@ -143,27 +172,35 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:paddingTop="3dp"
-            android:paddingBottom="3dp"
+            android:background="@drawable/widget_item_background"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="7dp"
+            android:paddingBottom="7dp"
             android:visibility="gone">
 
             <TextView
                 android:id="@+id/widget_item_3_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@drawable/widget_time_pill_background"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
                 android:textColor="#38BDF8"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:minWidth="64dp" />
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/widget_item_3_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="6dp"
+                android:layout_marginStart="8dp"
                 android:textColor="#F8FAFC"
-                android:textSize="13sp"
+                android:textSize="14sp"
+                android:textStyle="bold"
                 android:maxLines="1"
                 android:ellipsize="end" />
 
@@ -171,20 +208,39 @@
                 android:id="@+id/widget_item_3_dose"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
                 android:textColor="#94A3B8"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Status message when empty / all taken -->
-        <TextView
-            android:id="@+id/widget_status_message"
+        <!-- Status state when empty / all taken -->
+        <LinearLayout
+            android:id="@+id/widget_status_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:gravity="center"
-            android:textColor="#CBD5E1"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:text="@string/widget_all_taken" />
+            android:padding="8dp">
+
+            <ImageView
+                android:id="@+id/widget_status_icon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_widget_check_circle"
+                android:contentDescription="@null"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:id="@+id/widget_status_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="#E2E8F0"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:text="@string/widget_all_taken" />
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

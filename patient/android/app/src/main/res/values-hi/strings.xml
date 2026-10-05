@@ -41,6 +41,7 @@
     <string name="form_med_name">दवा का नाम</string>
     <string name="form_med_name_placeholder">जैसे: अमोक्सिसिलिन</string>
     <string name="form_dosage">खुराक</string>
+    <string name="form_dosage_unit">खुराक इकाई</string>
     <string name="form_dosage_placeholder">जैसे: 500mg, 1 गोली</string>
     <string name="form_frequency">आवृत्ति</string>
     <string name="form_time">समय</string>
@@ -53,7 +54,7 @@
     <string name="freq_daily">दैनिक</string>
     <string name="freq_weekly">साप्ताहिक</string>
     <string name="freq_monthly">मासिक</string>
-    <string name="freq_custom">कस्टम</string>
+    <string name="freq_custom">हर X सप्ताह में</string>
     <string name="form_select_days_week">सप्ताह के दिन चुनें</string>
     <string name="form_select_days_month">महीने के दिन चुनें</string>
     <string name="day_mon">सोम</string>

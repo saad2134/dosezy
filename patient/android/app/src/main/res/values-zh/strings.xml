@@ -41,6 +41,7 @@
     <string name="form_med_name">药物名称</string>
     <string name="form_med_name_placeholder">例如：阿莫西林</string>
     <string name="form_dosage">剂量</string>
+    <string name="form_dosage_unit">剂量单位</string>
     <string name="form_dosage_placeholder">例如：500毫克，1片</string>
     <string name="form_frequency">频率</string>
     <string name="form_time">时间</string>
@@ -53,7 +54,7 @@
     <string name="freq_daily">每天</string>
     <string name="freq_weekly">每周</string>
     <string name="freq_monthly">每月</string>
-    <string name="freq_custom">自定义</string>
+    <string name="freq_custom">每 X 周</string>
     <string name="form_select_days_week">选择一周中的天数</string>
     <string name="form_select_days_month">选择一月中的日期</string>
     <string name="day_mon">周一</string>

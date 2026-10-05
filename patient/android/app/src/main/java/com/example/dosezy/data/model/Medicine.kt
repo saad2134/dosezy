@@ -426,7 +426,7 @@ data class Frequency(
 )
 
 enum class FrequencyPattern {
-    DAILY, WEEKLY, MONTHLY, CUSTOM, AS_NEEDED, EVERY_X_HOURS, EVERY_X_DAYS
+    DAILY, EVERY_X_HOURS, EVERY_X_DAYS, CUSTOM, WEEKLY, MONTHLY, AS_NEEDED
 }
 
 @androidx.compose.runtime.Composable

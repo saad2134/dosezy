@@ -133,25 +133,29 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                         views.setViewVisibility(R.id.widget_item_1, View.GONE)
                         views.setViewVisibility(R.id.widget_item_2, View.GONE)
                         views.setViewVisibility(R.id.widget_item_3, View.GONE)
-                        views.setViewVisibility(R.id.widget_status_message, View.VISIBLE)
+                        views.setViewVisibility(R.id.widget_status_container, View.VISIBLE)
 
                         if (todayEntries.isNotEmpty()) {
                             when {
                                 takenToday == totalToday -> {
+                                    views.setImageViewResource(R.id.widget_status_icon, R.drawable.ic_widget_check_circle)
                                     views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_all_taken))
                                 }
                                 takenToday + skippedToday == totalToday -> {
+                                    views.setImageViewResource(R.id.widget_status_icon, R.drawable.ic_widget_check_circle)
                                     views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_all_completed))
                                 }
                                 else -> {
+                                    views.setImageViewResource(R.id.widget_status_icon, R.drawable.ic_widget_medication)
                                     views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_taken_summary, takenToday, totalToday))
                                 }
                             }
                         } else {
+                            views.setImageViewResource(R.id.widget_status_icon, R.drawable.ic_widget_medication)
                             views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_no_meds))
                         }
                     } else {
-                        views.setViewVisibility(R.id.widget_status_message, View.GONE)
+                        views.setViewVisibility(R.id.widget_status_container, View.GONE)
 
                         val tomorrowLabel = context.getString(R.string.widget_tomorrow)
                         fun formatTimeLabel(entry: com.example.dosezy.data.model.ScheduleEntry): String {
@@ -212,7 +216,8 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                         views.setViewVisibility(R.id.widget_item_1, View.GONE)
                         views.setViewVisibility(R.id.widget_item_2, View.GONE)
                         views.setViewVisibility(R.id.widget_item_3, View.GONE)
-                        views.setViewVisibility(R.id.widget_status_message, View.VISIBLE)
+                        views.setViewVisibility(R.id.widget_status_container, View.VISIBLE)
+                        views.setImageViewResource(R.id.widget_status_icon, R.drawable.ic_widget_medication)
                         views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_no_meds))
                         appWidgetManager.updateAppWidget(appWidgetId, views)
                     } catch (_: Exception) {}

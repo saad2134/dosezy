@@ -35,6 +35,7 @@
     <string name="form_med_name">Название лекарства</string>
     <string name="form_med_name_placeholder">напр. Амоксициллин</string>
     <string name="form_dosage">Дозировка</string>
+    <string name="form_dosage_unit">Единица дозировки</string>
     <string name="form_dosage_placeholder">напр. 500 мг, 1 таблетка</string>
     <string name="form_frequency">Частота</string>
     <string name="form_time">Время</string>
@@ -47,7 +48,7 @@
     <string name="freq_daily">Ежедневно</string>
     <string name="freq_weekly">Еженедельно</string>
     <string name="freq_monthly">Ежемесячно</string>
-    <string name="freq_custom">Другое</string>
+    <string name="freq_custom">Каждые X недель</string>
     <string name="form_select_days_week">Выберите дни недели</string>
     <string name="form_select_days_month">Выберите дни месяца</string>
     <string name="day_mon">Пн</string>

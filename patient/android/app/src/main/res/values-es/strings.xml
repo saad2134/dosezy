@@ -41,6 +41,7 @@
     <string name="form_med_name">Nombre del medicamento</string>
     <string name="form_med_name_placeholder">ej. Amoxicilina</string>
     <string name="form_dosage">Dosis</string>
+    <string name="form_dosage_unit">Unidad de dosis</string>
     <string name="form_dosage_placeholder">ej. 500mg, 1 pastilla</string>
     <string name="form_frequency">Frecuencia</string>
     <string name="form_time">Hora</string>
@@ -53,7 +54,7 @@
     <string name="freq_daily">Diario</string>
     <string name="freq_weekly">Semanal</string>
     <string name="freq_monthly">Mensual</string>
-    <string name="freq_custom">Personalizado</string>
+    <string name="freq_custom">Cada X semanas</string>
     <string name="form_select_days_week">Seleccionar días de la semana</string>
     <string name="form_select_days_month">Seleccionar días del mes</string>
     <string name="day_mon">Lun</string>
