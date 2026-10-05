@@ -766,10 +766,11 @@ fun BackupRestoreScreen(
                                 val shareIntent = Intent(Intent.ACTION_SEND).apply {
                                     type = "application/zip"
                                     putExtra(Intent.EXTRA_STREAM, contentUri)
+                                    clipData = android.content.ClipData.newRawUri(null, contentUri)
                                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                 }
                                 val chooserIntent = Intent.createChooser(shareIntent, context.getString(R.string.export_share_file)).apply {
-                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                 }
                                 context.startActivity(chooserIntent)
                             } catch (e: Exception) {

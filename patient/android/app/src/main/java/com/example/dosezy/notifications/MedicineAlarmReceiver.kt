@@ -25,11 +25,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@AndroidEntryPoint
 class MedicineAlarmReceiver : BroadcastReceiver() {
 
-    @Inject
-    lateinit var database: DosezyDatabase
+    private lateinit var database: DosezyDatabase
 
     companion object {
         const val TAG = "MedicineAlarmReceiver"
@@ -86,6 +84,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onReceive(context: Context, intent: Intent?) {
+        database = DosezyDatabase.getInstance(context)
         val action = intent?.action
         if (action == Intent.ACTION_BOOT_COMPLETED ||
             action == "android.intent.action.QUICKBOOT_POWERON" ||

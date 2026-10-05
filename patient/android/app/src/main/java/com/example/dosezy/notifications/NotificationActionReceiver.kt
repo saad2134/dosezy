@@ -17,11 +17,9 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
-@AndroidEntryPoint
 class NotificationActionReceiver : BroadcastReceiver() {
 
-    @Inject
-    lateinit var database: DosezyDatabase
+    private lateinit var database: DosezyDatabase
 
     companion object {
         private const val TAG = "NotificationActionReceiver"
@@ -29,6 +27,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onReceive(context: Context, intent: Intent?) {
+        database = DosezyDatabase.getInstance(context)
         val action = intent?.action
         val entryId = intent?.getStringExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID)
         val entryIds = intent?.getStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS)

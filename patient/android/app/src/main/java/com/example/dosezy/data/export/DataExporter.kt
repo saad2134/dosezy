@@ -593,11 +593,12 @@ class DataExporter(
                 "zip" -> "application/zip"
                 else -> "*/*"
             }
+            clipData = android.content.ClipData.newRawUri(null, uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
 
         val chooserIntent = Intent.createChooser(shareIntent, "Share Export File").apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         context.startActivity(chooserIntent)
     }

@@ -33,11 +33,9 @@ class DosezyApplication : Application(), ImageLoaderFactory
         // Ensure all required notification channels exist from app startup
         com.example.dosezy.notifications.MedicineAlarmReceiver.createNotificationChannels(this)
 
-        // Schedule alarms for current user on app start
+        // Schedule alarms for all users on app start
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CoroutineScope(Dispatchers.IO).launch {
-                medicineNotificationManager.scheduleAllAlarmsForCurrentUser() // UPDATED
-            }
+            medicineNotificationManager.rescheduleAllAlarmsForAllUsers()
         }
     }
 

@@ -387,6 +387,7 @@ class BackupRestoreManager(
                             existingSchedules.forEach { entry ->
                                 alarmScheduler.cancelAlarm(entry.entryId)
                                 alarmScheduler.cancelSnooze(entry.entryId)
+                                alarmScheduler.cancelNagging(entry.entryId)
                                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
                             }
                         } catch (_: Exception) {}

@@ -125,6 +125,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         scheduleEntries.forEach { entry ->
             alarmScheduler.cancelAlarm(entry.entryId)
             alarmScheduler.cancelSnooze(entry.entryId)
+            alarmScheduler.cancelNagging(entry.entryId)
             alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
         }
         Log.d(TAG, "Cancelled alarms for medicine ID: $medicineId (${scheduleEntries.size} entries)")
@@ -145,6 +146,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             allEntries.forEach { entry ->
                 alarmScheduler.cancelAlarm(entry.entryId)
                 alarmScheduler.cancelSnooze(entry.entryId)
+                alarmScheduler.cancelNagging(entry.entryId)
                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
             }
 
