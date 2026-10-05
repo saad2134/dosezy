@@ -148,6 +148,12 @@ class DosezyWidgetConfigureActivity : ComponentActivity() {
     private fun confirmWidgetProfile(selectedUserId: String) {
         DosezyWidgetPrefs.saveWidgetProfile(this, appWidgetId, selectedUserId)
 
+        try {
+            val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+            val spTheme = prefs.getString("theme", "system") ?: "system"
+            DosezyWidgetPrefs.saveWidgetProfileTheme(this, selectedUserId, spTheme)
+        } catch (_: Exception) {}
+
         // Request widget manager update
         val appWidgetManager = AppWidgetManager.getInstance(this)
         DosezyAppWidgetProvider.updateWidget(this, appWidgetManager, appWidgetId)

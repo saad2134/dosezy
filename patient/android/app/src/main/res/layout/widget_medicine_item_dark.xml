@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:background="@drawable/widget_item_background_light"
+        android:background="@drawable/widget_item_background_dark"
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
         android:paddingTop="10dp"
@@ -23,12 +23,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:background="@drawable/widget_time_pill_background_light"
+            android:background="@drawable/widget_time_pill_background_dark"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:paddingTop="3dp"
             android:paddingBottom="3dp"
-            android:textColor="#0284C7"
+            android:textColor="#38BDF8"
             android:textSize="12sp"
             android:textStyle="bold" />
 
@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
-            android:textColor="#0F172A"
+            android:textColor="#F8FAFC"
             android:textSize="14sp"
             android:textStyle="bold"
             android:maxLines="1"
@@ -49,7 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
-            android:textColor="#64748B"
+            android:textColor="#94A3B8"
             android:textSize="12sp"
             android:textStyle="bold" />
     </LinearLayout>

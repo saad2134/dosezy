@@ -33,4 +33,16 @@ object DosezyWidgetPrefs {
             .remove(PREF_PREFIX_KEY + appWidgetId)
             .apply()
     }
+
+    fun saveWidgetProfileTheme(context: Context, userId: String, theme: String) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString("profile_theme_" + userId, theme)
+            .apply()
+    }
+
+    fun getWidgetProfileTheme(context: Context, userId: String): String? {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString("profile_theme_" + userId, null)
+    }
 }

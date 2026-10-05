@@ -52,6 +52,13 @@ class UserViewModel @Inject constructor(
                         // Find current user
                         val current = userList.firstOrNull { it.isCurrentUser }
                         _currentUser.value = current
+                        if (current != null) {
+                            try {
+                                val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                                prefs.edit().putString("theme", current.theme.name.lowercase()).apply()
+                                com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, current.userId, current.theme.name.lowercase())
+                            } catch (_: Exception) {}
+                        }
 
                         _isLoading.value = false
                     }
@@ -91,6 +98,12 @@ class UserViewModel @Inject constructor(
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         medicineNotificationManager.scheduleAlarmsForUser(updatedUser.userId)
                     }
+
+                    try {
+                        val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                        prefs.edit().putString("theme", updatedUser.theme.name.lowercase()).apply()
+                        com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, updatedUser.userId, updatedUser.theme.name.lowercase())
+                    } catch (_: Exception) {}
 
                     // Update home screen widget for the new current user
                     try {
@@ -142,6 +155,11 @@ class UserViewModel @Inject constructor(
                             medicineNotificationManager.scheduleAlarmsForUser(userToInsert.userId)
                         }
                         try {
+                            val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                            prefs.edit().putString("theme", userToInsert.theme.name.lowercase()).apply()
+                            com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, userToInsert.userId, userToInsert.theme.name.lowercase())
+                        } catch (_: Exception) {}
+                        try {
                             com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(medicineRepository.context)
                         } catch (_: Exception) {}
                     }
@@ -161,9 +179,14 @@ class UserViewModel @Inject constructor(
             if (user.isCurrentUser) {
                 _currentUser.value = user
                 try {
-                    com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(medicineRepository.context)
+                    val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                    prefs.edit().putString("theme", user.theme.name.lowercase()).apply()
                 } catch (_: Exception) {}
             }
+            try {
+                com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, user.userId, user.theme.name.lowercase())
+                com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(medicineRepository.context)
+            } catch (_: Exception) {}
         }
     }
 

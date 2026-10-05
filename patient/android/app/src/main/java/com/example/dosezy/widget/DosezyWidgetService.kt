@@ -30,13 +30,15 @@ class DosezyWidgetService : RemoteViewsService() {
             AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID
         )
-        return DosezyRemoteViewsFactory(applicationContext, appWidgetId)
+        val isDark = intent.getBooleanExtra("is_dark", false)
+        return DosezyRemoteViewsFactory(applicationContext, appWidgetId, isDark)
     }
 }
 
 class DosezyRemoteViewsFactory(
     private val context: Context,
-    private val appWidgetId: Int
+    private val appWidgetId: Int,
+    private var isDark: Boolean = false
 ) : RemoteViewsService.RemoteViewsFactory {
 
     data class WidgetItem(
@@ -54,15 +56,17 @@ class DosezyRemoteViewsFactory(
     override fun onDataSetChanged() {
         items.clear()
         try {
+            val targetUserId = DosezyWidgetPrefs.getWidgetProfile(context, appWidgetId)
+            isDark = DosezyAppWidgetProvider.isWidgetDark(context, targetUserId)
             kotlinx.coroutines.runBlocking {
-                val db = DosezyDatabase.getInstance(context)
-                val users = db.userDao().getAllUsersDirect()
-                val targetUserId = DosezyWidgetPrefs.getWidgetProfile(context, appWidgetId)
-                val user = if (targetUserId == DosezyWidgetPrefs.ACTIVE_PROFILE_ID) {
-                    users.find { it.isCurrentUser } ?: users.firstOrNull()
-                } else {
-                    users.find { it.userId == targetUserId } ?: users.find { it.isCurrentUser } ?: users.firstOrNull()
-                } ?: return@runBlocking
+                kotlinx.coroutines.withTimeoutOrNull(2500L) {
+                    val db = DosezyDatabase.getInstance(context)
+                    val users = db.userDao().getAllUsersDirect()
+                    val user = if (targetUserId == DosezyWidgetPrefs.ACTIVE_PROFILE_ID) {
+                        users.find { it.isCurrentUser } ?: users.firstOrNull()
+                    } else {
+                        users.find { it.userId == targetUserId } ?: users.find { it.isCurrentUser } ?: users.firstOrNull()
+                    } ?: return@withTimeoutOrNull
 
                 val is24Hour = user.timeFormat == TimeFormat.HOUR_24
                 val timePattern = if (is24Hour) "HH:mm" else "h:mm a"
@@ -119,6 +123,7 @@ class DosezyRemoteViewsFactory(
                     )
                 }
             }
+        }
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -134,7 +139,8 @@ class DosezyRemoteViewsFactory(
         if (position !in items.indices) return null
         val item = items[position]
 
-        val views = RemoteViews(context.packageName, R.layout.widget_medicine_item)
+        val layoutId = if (isDark) R.layout.widget_medicine_item_dark else R.layout.widget_medicine_item_light
+        val views = RemoteViews(context.packageName, layoutId)
         views.setTextViewText(R.id.widget_item_time, item.timeLabel)
         views.setTextViewText(R.id.widget_item_name, item.medName)
         views.setTextViewText(R.id.widget_item_dose, item.doseLabel)
@@ -150,7 +156,7 @@ class DosezyRemoteViewsFactory(
 
     override fun getLoadingView(): RemoteViews? = null
 
-    override fun getViewTypeCount(): Int = 1
+    override fun getViewTypeCount(): Int = 2
 
     override fun getItemId(position: Int): Long = position.toLong()
 
