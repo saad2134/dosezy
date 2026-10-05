@@ -67,6 +67,19 @@ class MainActivity : ComponentActivity() {
         super.attachBaseContext(localizedContext)
     }
 
+    override fun applyOverrideConfiguration(overrideConfiguration: android.content.res.Configuration?) {
+        if (overrideConfiguration != null) {
+            val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(this)
+            val targetLocale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLanguage)
+            overrideConfiguration.setLocale(targetLocale)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                overrideConfiguration.setLocales(android.os.LocaleList(targetLocale))
+            }
+            overrideConfiguration.setLayoutDirection(targetLocale)
+        }
+        super.applyOverrideConfiguration(overrideConfiguration)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         window.decorView.setBackgroundColor(android.graphics.Color.parseColor("#0F172A"))
@@ -134,9 +147,25 @@ class MainActivity : ComponentActivity() {
                 "light" -> false
                 else -> isSystemInDarkTheme()
             }
+
+            val localizedContext = remember(currentLang) {
+                com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, currentLang)
+            }
+            val localizedConfig = remember(currentLang) {
+                val config = android.content.res.Configuration(context.resources.configuration)
+                config.setLocale(currentLocale)
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    config.setLocales(android.os.LocaleList(currentLocale))
+                }
+                config.setLayoutDirection(currentLocale)
+                config
+            }
+
             androidx.compose.runtime.key(currentLang) {
                 androidx.compose.runtime.CompositionLocalProvider(
-                    androidx.compose.ui.platform.LocalLayoutDirection provides layoutDirection
+                    androidx.compose.ui.platform.LocalLayoutDirection provides layoutDirection,
+                    androidx.compose.ui.platform.LocalContext provides localizedContext,
+                    androidx.compose.ui.platform.LocalConfiguration provides localizedConfig
                 ) {
                     DosezyTheme(darkTheme = isDark) {
                         androidx.compose.material3.Surface(

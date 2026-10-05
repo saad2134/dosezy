@@ -99,6 +99,19 @@ class AlarmActivity : ComponentActivity() {
         super.attachBaseContext(localizedContext)
     }
 
+    override fun applyOverrideConfiguration(overrideConfiguration: android.content.res.Configuration?) {
+        if (overrideConfiguration != null) {
+            val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(this)
+            val targetLocale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLanguage)
+            overrideConfiguration.setLocale(targetLocale)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                overrideConfiguration.setLocales(android.os.LocaleList(targetLocale))
+            }
+            overrideConfiguration.setLayoutDirection(targetLocale)
+        }
+        super.applyOverrideConfiguration(overrideConfiguration)
+    }
+
     override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
@@ -214,30 +227,54 @@ class AlarmActivity : ComponentActivity() {
                 }
             }
 
+            val currentLang = user?.language ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+            val currentLocale = com.example.dosezy.utils.LocaleHelper.getLocale(currentLang)
+            val isRtl = currentLocale.language == "ar"
+            val layoutDirection = if (isRtl) androidx.compose.ui.unit.LayoutDirection.Rtl else androidx.compose.ui.unit.LayoutDirection.Ltr
+
+            val localizedContext = remember(currentLang) {
+                com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, currentLang)
+            }
+            val localizedConfig = remember(currentLang) {
+                val config = android.content.res.Configuration(context.resources.configuration)
+                config.setLocale(currentLocale)
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    config.setLocales(android.os.LocaleList(currentLocale))
+                }
+                config.setLayoutDirection(currentLocale)
+                config
+            }
+
             val currentEntryIds by activeEntryIdsState
             val currentMedName by activeMedicineNameState
             val currentSchedTime by activeScheduledTimeState
 
-            DosezyTheme(darkTheme = isDark) {
-                GroupedAlarmScreenContent(
-                    entryIds = currentEntryIds.filter { it.isNotEmpty() },
-                    initialMedicineName = currentMedName,
-                    initialScheduledTime = currentSchedTime,
-                    database = database,
-                    isDarkTheme = isDark,
-                    onDismiss = {
-                        currentEntryIds.forEach { id ->
-                            if (id.isNotEmpty()) {
-                                try {
-                                    val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-                                    notificationManager.cancel(id.hashCode())
-                                } catch (_: Exception) {}
+            androidx.compose.runtime.CompositionLocalProvider(
+                androidx.compose.ui.platform.LocalLayoutDirection provides layoutDirection,
+                androidx.compose.ui.platform.LocalContext provides localizedContext,
+                androidx.compose.ui.platform.LocalConfiguration provides localizedConfig
+            ) {
+                DosezyTheme(darkTheme = isDark) {
+                    GroupedAlarmScreenContent(
+                        entryIds = currentEntryIds.filter { it.isNotEmpty() },
+                        initialMedicineName = currentMedName,
+                        initialScheduledTime = currentSchedTime,
+                        database = database,
+                        isDarkTheme = isDark,
+                        onDismiss = {
+                            currentEntryIds.forEach { id ->
+                                if (id.isNotEmpty()) {
+                                    try {
+                                        val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                                        notificationManager.cancel(id.hashCode())
+                                    } catch (_: Exception) {}
+                                }
                             }
+                            stopAlarm()
+                            finish()
                         }
-                        stopAlarm()
-                        finish()
-                    }
-                )
+                    )
+                }
             }
         }
     }

@@ -118,6 +118,19 @@ object LocaleHelper {
             @Suppress("DEPRECATION")
             resources.updateConfiguration(config, resources.displayMetrics)
 
+            try {
+                @Suppress("DEPRECATION")
+                context.applicationContext.resources.updateConfiguration(config, context.applicationContext.resources.displayMetrics)
+            } catch (_: Throwable) {}
+
+            val activity = findActivity(context)
+            if (activity != null) {
+                try {
+                    @Suppress("DEPRECATION")
+                    activity.resources.updateConfiguration(config, activity.resources.displayMetrics)
+                } catch (_: Throwable) {}
+            }
+
             val languageTag = when (language) {
                 Language.SYSTEM -> ""
                 Language.ENGLISH -> "en"
@@ -143,7 +156,6 @@ object LocaleHelper {
             // On Android 13+ (API 33+), AppCompatDelegate / LocaleManager natively handles activity recreation.
             // Calling activity.recreate() on top of setApplicationLocales causes a double-destroy race condition that kicks the user out of the app.
             if (forceRecreate && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                val activity = context.findActivity()
                 if (activity != null && !activity.isFinishing && !activity.isDestroyed) {
                     android.os.Handler(android.os.Looper.getMainLooper()).post {
                         if (!activity.isFinishing && !activity.isDestroyed) {
@@ -164,8 +176,17 @@ object LocaleHelper {
         }
     }
 
+    fun getBaseContext(context: Context): Context {
+        var ctx = context
+        while (ctx is LocalizedContextWrapper) {
+            ctx = ctx.baseContext
+        }
+        return ctx
+    }
+
     fun updateContextLocale(context: Context, language: Language): Context {
         return try {
+            val base = getBaseContext(context)
             val locale = getLocale(language)
             if (language != Language.SYSTEM) {
                 Locale.setDefault(locale)
@@ -173,27 +194,41 @@ object LocaleHelper {
                 Locale.setDefault(getSystemDefaultLocale())
             }
 
-            val config = Configuration(context.resources.configuration)
+            val config = Configuration(base.resources.configuration)
             config.setLocale(locale)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 config.setLocales(LocaleList(locale))
             }
             config.setLayoutDirection(locale)
-            context.createConfigurationContext(config)
+            val configurationContext = base.createConfigurationContext(config)
+            LocalizedContextWrapper(base, configurationContext)
         } catch (e: Throwable) {
             android.util.Log.e("LocaleHelper", "Failed to updateContextLocale for $language", e)
             context
         }
     }
 
-    private fun Context.findActivity(): Activity? {
-        var currentContext = this
-        while (currentContext is ContextWrapper) {
+    fun findActivity(context: Context): Activity? {
+        var currentContext: Context? = context
+        while (currentContext != null) {
             if (currentContext is Activity) {
                 return currentContext
             }
-            currentContext = currentContext.baseContext
+            if (currentContext is ContextWrapper) {
+                currentContext = currentContext.baseContext
+            } else {
+                break
+            }
         }
         return null
     }
+}
+
+class LocalizedContextWrapper(
+    base: Context,
+    private val localizedContext: Context
+) : ContextWrapper(base) {
+    override fun getResources(): android.content.res.Resources = localizedContext.resources
+    override fun getAssets(): android.content.res.AssetManager = localizedContext.assets
+    override fun getApplicationContext(): Context = baseContext.applicationContext
 }

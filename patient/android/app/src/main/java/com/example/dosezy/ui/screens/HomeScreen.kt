@@ -97,8 +97,11 @@ fun HomeScreen(
     val todayEntries by scheduleViewModel.todayScheduleWithMedicine.collectAsState()
     val isTodayLoading by scheduleViewModel.isTodayLoading.collectAsState()
 
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val currentLang = currentUser?.language ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+    val activeLocale = remember(currentLang) { com.example.dosezy.utils.LocaleHelper.getLocale(currentLang) }
     // Get current day for subtitle
-    val dayOfWeek = DateUtils.getCurrentDayOfWeekLegacy()
+    val dayOfWeek = remember(activeLocale) { DateUtils.getCurrentDayOfWeekLegacy(activeLocale) }
 
     // State for real-time updates
     var currentTime by remember { mutableStateOf(java.time.LocalDateTime.now()) }
@@ -111,7 +114,6 @@ fun HomeScreen(
     var noteEditEntry by remember { mutableStateOf<ScheduleWithMedicine?>(null) }
     val snackbarHostState = remember { androidx.compose.material3.SnackbarHostState() }
     val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
-    val context = androidx.compose.ui.platform.LocalContext.current
 
     // Auto-refresh every minute for real-time updates and run immediately on load
     LaunchedEffect(currentUser) {
@@ -158,9 +160,6 @@ fun HomeScreen(
 
     // Group entries by time
     val timeFormat = currentUser?.timeFormat ?: TimeFormat.HOUR_12
-    val activeLocale = remember(currentUser?.language) {
-        com.example.dosezy.utils.LocaleHelper.getLocale(currentUser?.language ?: com.example.dosezy.data.model.Language.SYSTEM)
-    }
     val groupedEntries = remember(todayEntries, timeFormat, activeLocale) {
         todayEntries.groupBy { entry ->
             TimeFormatUtils.formatTime(entry.scheduleEntry.scheduledDateTime, timeFormat, activeLocale)
