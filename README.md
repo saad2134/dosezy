@@ -343,7 +343,7 @@ dosezy/
 <img src="https://github.com/user-attachments/assets/213a3fc0-b737-4df2-9c70-693a7f6d7467" alt="Dosezy Icon" title="Dosezy" style="width:500px;">
 
 ## 🔰 Banner
-<img width="1280" height="640" alt="New Project" src="https://github.com/user-attachments/assets/d2331448-fc78-41a0-920d-e0e5d8e171e2" />
+<img width="1280" height="640" alt="New Project" src="assets/thumbnail_16x9_1920x1080.png" />
 
 ---
 
