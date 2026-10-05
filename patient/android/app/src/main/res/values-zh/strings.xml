@@ -512,7 +512,7 @@
     <string name="hours_limit_hint">若间隔超过 24 小时，请使用“每 X 天”。</string>
 
     <string name="pref_nagging_title">持续跟进提醒 (Nagging)</string>
-    <string name="pref_nagging_desc">若计划剂量未确认服用，将重复发送提醒</string>
+    <string name="pref_nagging_desc">重复提醒直到标记为已服用。</string>
     <string name="pref_nagging_interval">提醒间隔时间</string>
     <string name="pref_nagging_max_repeats">最大重复次数</string>
     <string name="pref_nagging_repeats_format">%1$d 次</string>
@@ -627,7 +627,7 @@
     <string name="backup_export_failed">导出失败：%1$s</string>
 
     <string name="pref_allow_skip_title">允许跳过服药</string>
-    <string name="pref_allow_skip_desc">开启因临床原因跳过服药的选项</string>
+    <string name="pref_allow_skip_desc">记录原因后跳过计划剂量。</string>
     <string name="home_action_skip">跳过</string>
     <string name="home_action_skipped">已跳过</string>
     <string name="home_dose_skipped">已跳过 %s 的服药</string>
@@ -720,7 +720,7 @@
 
     <!-- Manual Dose Recording Strings -->
     <string name="pref_manually_record_dose_time_title">手动记录服药时间</string>
-    <string name="pref_manually_record_dose_time_desc">记录服药时询问实际服药时间。</string>
+    <string name="pref_manually_record_dose_time_desc">记录实际服药时间。</string>
     <string name="record_dose_time_title">记录服药时间</string>
     <string name="record_dose_time_subtitle">您什么时候服用了 %1$s？</string>
     <string name="record_dose_time_just_now">刚刚 (%1$s)</string>
@@ -734,7 +734,7 @@
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">隐藏底部导航添加按钮</string>
-    <string name="pref_hide_add_nav_button_desc">隐藏底部导航栏中央的“+”按钮。可在“药物”页面的用药列表下方直接添加新药物。</string>
+    <string name="pref_hide_add_nav_button_desc">隐藏底部导航栏的“+”按钮。</string>
 
     <!-- About Screen Expansion -->
     <string name="about_developer_title">关于开发者</string>
@@ -772,9 +772,9 @@
     <string name="dialog_low_storage_action">清理空间</string>
     <string name="dialog_low_storage_dismiss">忽略</string>
     <string name="pref_allow_undo_title">允许撤销服药记录</string>
-    <string name="pref_allow_undo_desc">允许将已记录的服药状态恢复为待服。撤销前需确认。</string>
+    <string name="pref_allow_undo_desc">将已服用的剂量恢复为待处理。</string>
     <string name="pref_prompt_dose_notes_title">服药时提示输入备注</string>
-    <string name="pref_prompt_dose_notes_desc">每次标记已服药时，提示记录备注、饮食情况或身体症状。</string>
+    <string name="pref_prompt_dose_notes_desc">记录剂量时提示输入备注。</string>
     <string name="dialog_undo_dose_title">撤销此服药？</string>
     <string name="dialog_undo_dose_msg">确定要将 %1$s 恢复为待服状态吗？已扣减的库存将被恢复。</string>
     <string name="dialog_dose_note_title">服药备注</string>
@@ -785,9 +785,10 @@
     <string name="btn_edit_note">修改备注</string>
     <string name="dialog_edit_note_title">编辑服药备注</string>
     <string name="pref_allow_dose_notes_title">服药备注</string>
-    <string name="pref_allow_dose_notes_desc">允许随服药记录备注、饮食情况或身体症状。</string>
+    <string name="pref_allow_dose_notes_desc">记录备注、饮食或症状。</string>
     <string name="btn_add_note">+ 添加备注</string>
     <string name="timings_and_dosages_title">时间与剂量</string>
     <string name="stock_inventory_card_title">药品库存与清册</string>
     <string name="widget_configure_auto_badge">自动</string>
+    <string name="dialog_validation_title">提示</string>
 </resources>

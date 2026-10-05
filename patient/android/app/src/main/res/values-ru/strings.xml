@@ -496,7 +496,7 @@
     <string name="hours_limit_hint">Для интервалов более 24 часов выберите «Каждые X дней».</string>
 
     <string name="pref_nagging_title">Настойчивые повторные напоминания</string>
-    <string name="pref_nagging_desc">Повторять напоминания, если прием не был подтвержден</string>
+    <string name="pref_nagging_desc">Напоминать повторно, пока прием не будет отмечен.</string>
     <string name="pref_nagging_interval">Интервал напоминаний</string>
     <string name="pref_nagging_max_repeats">Максимум повторений</string>
     <string name="pref_nagging_repeats_format">%1$d раз</string>
@@ -611,7 +611,7 @@
     <string name="backup_export_failed">Ошибка экспорта: %1$s</string>
 
     <string name="pref_allow_skip_title">Разрешить пропуск дозы</string>
-    <string name="pref_allow_skip_desc">Включить возможность пропуска дозы с указанием клинической причины</string>
+    <string name="pref_allow_skip_desc">Пропуск запланированных доз с указанием причины.</string>
     <string name="home_action_skip">Пропустить</string>
     <string name="home_action_skipped">Пропущено</string>
     <string name="home_dose_skipped">Доза пропущена для %s</string>
@@ -704,7 +704,7 @@
 
     <!-- Manual Dose Recording Strings -->
     <string name="pref_manually_record_dose_time_title">Записывать время приема вручную</string>
-    <string name="pref_manually_record_dose_time_desc">Запрашивать фактическое время приема лекарства при записи дозы.</string>
+    <string name="pref_manually_record_dose_time_desc">Запись фактического времени приема дозы.</string>
     <string name="record_dose_time_title">Время приема дозы</string>
     <string name="record_dose_time_subtitle">Когда вы приняли %1$s?</string>
     <string name="record_dose_time_just_now">Только что (%1$s)</string>
@@ -718,7 +718,7 @@
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">Скрыть центральную кнопку добавления</string>
-    <string name="pref_hide_add_nav_button_desc">Скрывает кнопку «+» на панели навигации. Кнопка «Добавить лекарство» появится на вкладке «Лекарства» под списком.</string>
+    <string name="pref_hide_add_nav_button_desc">Скрыть кнопку «+» на нижней панели навигации.</string>
 
     <!-- About Screen Expansion -->
     <string name="about_developer_title">О разработчике</string>
@@ -756,9 +756,9 @@
     <string name="dialog_low_storage_action">Освободить место</string>
     <string name="dialog_low_storage_dismiss">Закрыть</string>
     <string name="pref_allow_undo_title">Разрешить отмену приема дозы</string>
-    <string name="pref_allow_undo_desc">Позволяет вернуть принятую дозу в статус ожидания. Требует подтверждения.</string>
+    <string name="pref_allow_undo_desc">Возврат принятых доз в статус ожидающих.</string>
     <string name="pref_prompt_dose_notes_title">Запрашивать заметку при приеме дозы</string>
-    <string name="pref_prompt_dose_notes_desc">Предлагать добавить заметку, прием пищи или симптомы при каждой отметке о приеме дозы.</string>
+    <string name="pref_prompt_dose_notes_desc">Запрос заметки при подтверждении приема.</string>
     <string name="dialog_undo_dose_title">Отменить прием дозы?</string>
     <string name="dialog_undo_dose_msg">Вы уверены, что хотите вернуть %1$s в статус ожидания? Списанный остаток восстановится.</string>
     <string name="dialog_dose_note_title">Заметка к дозе</string>
@@ -769,9 +769,10 @@
     <string name="btn_edit_note">Изменить заметку</string>
     <string name="dialog_edit_note_title">Редактировать заметку к дозе</string>
     <string name="pref_allow_dose_notes_title">Заметки к дозам</string>
-    <string name="pref_allow_dose_notes_desc">Разрешить запись заметок, приемов пищи или симптомов вместе с дозами.</string>
+    <string name="pref_allow_dose_notes_desc">Запись заметок, приема пищи или симптомов.</string>
     <string name="btn_add_note">+ Добавить заметку</string>
     <string name="timings_and_dosages_title">Время приема и дозировки</string>
     <string name="stock_inventory_card_title">Запас лекарств и учет</string>
     <string name="widget_configure_auto_badge">Авто</string>
+    <string name="dialog_validation_title">Внимание</string>
 </resources>

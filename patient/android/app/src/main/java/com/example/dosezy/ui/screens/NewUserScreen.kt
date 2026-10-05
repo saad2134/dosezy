@@ -128,6 +128,7 @@ fun NewUserScreen(
     var inspectionResult by remember { mutableStateOf<ZipInspectionResult?>(null) }
     var isImporting by remember { mutableStateOf(false) }
     var loadingMessage by remember { mutableStateOf<String?>(null) }
+    var validationErrorMessage by remember { mutableStateOf<String?>(null) }
 
     val importLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
@@ -184,7 +185,7 @@ fun NewUserScreen(
                             }
                         }
                     } else {
-                        Toast.makeText(context, context.getString(R.string.validation_enter_name), Toast.LENGTH_SHORT).show()
+                        validationErrorMessage = context.getString(R.string.validation_enter_name)
                     }
                 }
             )
@@ -320,6 +321,13 @@ fun NewUserScreen(
                 }
             }
         }
+    }
+
+    if (validationErrorMessage != null) {
+        com.example.dosezy.ui.components.ValidationAlertDialog(
+            message = validationErrorMessage!!,
+            onDismiss = { validationErrorMessage = null }
+        )
     }
 }
 

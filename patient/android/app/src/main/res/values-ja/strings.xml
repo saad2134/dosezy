@@ -496,7 +496,7 @@
     <string name="hours_limit_hint">24時間以上の間隔には「X日ごと」をご利用ください。</string>
 
     <string name="pref_nagging_title">リマインド再通知 (Nagging)</string>
-    <string name="pref_nagging_desc">予定された薬が服用完了されない場合、繰り返し通知します</string>
+    <string name="pref_nagging_desc">服用が記録されるまで繰り返し通知します。</string>
     <string name="pref_nagging_interval">再通知間隔</string>
     <string name="pref_nagging_max_repeats">最大再通知回数</string>
     <string name="pref_nagging_repeats_format">%1$d 回</string>
@@ -611,7 +611,7 @@
     <string name="backup_export_failed">エクスポートに失敗しました: %1$s</string>
 
     <string name="pref_allow_skip_title">服薬のスキップを許可</string>
-    <string name="pref_allow_skip_desc">理由を選択して服薬をスキップできるオプションを有効化</string>
+    <string name="pref_allow_skip_desc">理由を記録して予定の服用をスキップします。</string>
     <string name="home_action_skip">スキップ</string>
     <string name="home_action_skipped">スキップ済み</string>
     <string name="home_dose_skipped">%sの服薬をスキップしました</string>
@@ -704,7 +704,7 @@
 
     <!-- Manual Dose Recording Strings -->
     <string name="pref_manually_record_dose_time_title">服薬時間を手動で記録</string>
-    <string name="pref_manually_record_dose_time_desc">服薬を記録する際に、実際に薬を服用した時間を尋ねます。</string>
+    <string name="pref_manually_record_dose_time_desc">実際に服用した正確な時刻を記録します。</string>
     <string name="record_dose_time_title">服薬時間を記録</string>
     <string name="record_dose_time_subtitle">%1$sをいつ服用しましたか？</string>
     <string name="record_dose_time_just_now">今すぐ (%1$s)</string>
@@ -718,7 +718,7 @@
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">中央の追加ボタンを非表示</string>
-    <string name="pref_hide_add_nav_button_desc">ナビゲーションバーの「+」ボタンを非表示にします。お薬タブの一覧の下部に「お薬を追加」ボタンが表示されます。</string>
+    <string name="pref_hide_add_nav_button_desc">下部ナビゲーションバーの「+」ボタンを非表示にします。</string>
 
     <!-- About Screen Expansion -->
     <string name="about_developer_title">開発者について</string>
@@ -756,9 +756,9 @@
     <string name="dialog_low_storage_action">空き容量を増やす</string>
     <string name="dialog_low_storage_dismiss">閉じる</string>
     <string name="pref_allow_undo_title">服薬の取り消しを許可</string>
-    <string name="pref_allow_undo_desc">記録された服薬を保留中に戻すことを許可します。取り消す前に確認が必要です。</string>
+    <string name="pref_allow_undo_desc">服用済みの記録を未完了に戻します。</string>
     <string name="pref_prompt_dose_notes_title">服薬時にメモ入力を促す</string>
-    <string name="pref_prompt_dose_notes_desc">服薬記録のたびに、メモ、食事の状況、または症状の記録を促します。</string>
+    <string name="pref_prompt_dose_notes_desc">服用記録時にメモの入力を確認します。</string>
     <string name="dialog_undo_dose_title">服薬を取り消しますか？</string>
     <string name="dialog_undo_dose_msg">%1$s を保留中に戻してもよろしいですか？差し引かれた在庫は復元されます。</string>
     <string name="dialog_dose_note_title">服薬メモ</string>
@@ -769,9 +769,10 @@
     <string name="btn_edit_note">メモを編集</string>
     <string name="dialog_edit_note_title">服薬メモの編集</string>
     <string name="pref_allow_dose_notes_title">服薬メモ</string>
-    <string name="pref_allow_dose_notes_desc">服薬時にメモ、食事の状況、または症状を記録できるようにします。</string>
+    <string name="pref_allow_dose_notes_desc">メモ、食事、体調などを記録します。</string>
     <string name="btn_add_note">+ メモを追加</string>
     <string name="timings_and_dosages_title">服用時間と投与量</string>
     <string name="stock_inventory_card_title">薬の在庫と管理</string>
     <string name="widget_configure_auto_badge">自動</string>
+    <string name="dialog_validation_title">お知らせ</string>
 </resources>

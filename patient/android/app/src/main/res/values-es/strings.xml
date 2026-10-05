@@ -512,7 +512,7 @@
     <string name="hours_limit_hint">Para intervalos mayores a 24 horas, use \'Cada X días\'.</string>
 
     <string name="pref_nagging_title">Recordatorios de insistencia (Nagging)</string>
-    <string name="pref_nagging_desc">Recordar repetidamente si una dosis programada no se marca como tomada</string>
+    <string name="pref_nagging_desc">Recordar repetidamente hasta marcar como tomada.</string>
     <string name="pref_nagging_interval">Intervalo de insistencia</string>
     <string name="pref_nagging_max_repeats">Repeticiones máximas</string>
     <string name="pref_nagging_repeats_format">%1$d veces</string>
@@ -627,7 +627,7 @@
     <string name="backup_export_failed">Error al exportar: %1$s</string>
 
     <string name="pref_allow_skip_title">Permitir omitir dosis</string>
-    <string name="pref_allow_skip_desc">Habilita la opción de omitir una dosis con un motivo clínico</string>
+    <string name="pref_allow_skip_desc">Omitir dosis programadas con un motivo.</string>
     <string name="home_action_skip">Omitir</string>
     <string name="home_action_skipped">Omitida</string>
     <string name="home_dose_skipped">Dosis omitida para %s</string>
@@ -720,7 +720,7 @@
 
     <!-- Manual Dose Recording Strings -->
     <string name="pref_manually_record_dose_time_title">Registrar hora de dosis manualmente</string>
-    <string name="pref_manually_record_dose_time_desc">Preguntar la hora real en que tomó el medicamento al registrar dosis.</string>
+    <string name="pref_manually_record_dose_time_desc">Registrar la hora real en que se tomó la dosis.</string>
     <string name="record_dose_time_title">Registrar hora de dosis</string>
     <string name="record_dose_time_subtitle">¿Cuándo tomó %1$s?</string>
     <string name="record_dose_time_just_now">Justo ahora (%1$s)</string>
@@ -734,7 +734,7 @@
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">Ocultar botón central de agregar</string>
-    <string name="pref_hide_add_nav_button_desc">Oculta el botón \'+\' de la barra de navegación. Aparecerá un botón \'Agregar medicamento\' en la pestaña Medicamentos debajo de su lista.</string>
+    <string name="pref_hide_add_nav_button_desc">Ocultar el botón \'+\' de la barra de navegación inferior.</string>
 
     <!-- About Screen Expansion -->
     <string name="about_developer_title">Sobre el desarrollador</string>
@@ -772,9 +772,9 @@
     <string name="dialog_low_storage_action">Liberar espacio</string>
     <string name="dialog_low_storage_dismiss">Descartar</string>
     <string name="pref_allow_undo_title">Permitir deshacer dosis</string>
-    <string name="pref_allow_undo_desc">Permite revertir dosis registradas a pendientes. Requiere confirmación.</string>
+    <string name="pref_allow_undo_desc">Revertir dosis tomadas a pendientes.</string>
     <string name="pref_prompt_dose_notes_title">Preguntar por nota al tomar dosis</string>
-    <string name="pref_prompt_dose_notes_desc">Solicitar una nota, comida o síntoma cada vez que se marque una dosis como tomada.</string>
+    <string name="pref_prompt_dose_notes_desc">Solicitar una nota al registrar cada dosis.</string>
     <string name="dialog_undo_dose_title">¿Deshacer dosis?</string>
     <string name="dialog_undo_dose_msg">¿Seguro que deseas revertir %1$s a pendiente? Se restaurará cualquier stock descontado.</string>
     <string name="dialog_dose_note_title">Nota de la dosis</string>
@@ -785,9 +785,10 @@
     <string name="btn_edit_note">Editar nota</string>
     <string name="dialog_edit_note_title">Editar nota de la dosis</string>
     <string name="pref_allow_dose_notes_title">Notas de dosis</string>
-    <string name="pref_allow_dose_notes_desc">Permitir registrar notas, comidas o síntomas junto con las dosis.</string>
+    <string name="pref_allow_dose_notes_desc">Registrar notas, comidas o síntomas.</string>
     <string name="btn_add_note">+ Añadir nota</string>
     <string name="timings_and_dosages_title">Horarios y dosis</string>
     <string name="stock_inventory_card_title">Stock e inventario de medicamentos</string>
     <string name="widget_configure_auto_badge">Automático</string>
+    <string name="dialog_validation_title">Aviso</string>
 </resources>

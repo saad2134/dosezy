@@ -533,7 +533,7 @@ Do you want to continue?</string>
 
     <!-- Follow-Up / Nagging Reminders (#49) -->
     <string name="pref_nagging_title">Follow-Up (Nagging) Reminders</string>
-    <string name="pref_nagging_desc">Repeatedly remind you if a scheduled dose is not marked as taken</string>
+    <string name="pref_nagging_desc">Repeatedly remind until marked as taken.</string>
     <string name="pref_nagging_interval">Nagging Interval</string>
     <string name="pref_nagging_max_repeats">Max Repeat Reminders</string>
     <string name="pref_nagging_repeats_format">%1$d times</string>
@@ -639,7 +639,7 @@ Do you want to continue?</string>
     <string name="backup_export_failed">Export failed: %1$s</string>
 
     <string name="pref_allow_skip_title">Allow Dose Skipping</string>
-    <string name="pref_allow_skip_desc">Enable an option to skip a scheduled dose with a clinical reason</string>
+    <string name="pref_allow_skip_desc">Skip scheduled doses with a reason.</string>
     <string name="home_action_skip">Skip</string>
     <string name="home_action_skipped">Skipped</string>
     <string name="home_dose_skipped">Dose skipped for %s</string>
@@ -732,7 +732,7 @@ Do you want to continue?</string>
 
     <!-- Manual Dose Recording Strings -->
     <string name="pref_manually_record_dose_time_title">Manually Record Dose Time</string>
-    <string name="pref_manually_record_dose_time_desc">Prompt for the actual time you took the medication when recording doses.</string>
+    <string name="pref_manually_record_dose_time_desc">Log the actual time a dose was taken.</string>
     <string name="record_dose_time_title">Record Dose Time</string>
     <string name="record_dose_time_subtitle">When did you take %1$s?</string>
     <string name="record_dose_time_just_now">Just now (%1$s)</string>
@@ -746,7 +746,7 @@ Do you want to continue?</string>
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">Hide Navigation Add Button</string>
-    <string name="pref_hide_add_nav_button_desc">Hides the \'+\' button from the bottom navigation bar. An \'Add Medicine\' button will be available in the Medicines tab below your medications.</string>
+    <string name="pref_hide_add_nav_button_desc">Hide \'+\' button from bottom navigation bar.</string>
 
     <!-- About Screen Expansion -->
     <string name="about_developer_title">About the Developer</string>
@@ -784,9 +784,9 @@ Do you want to continue?</string>
     <string name="dialog_low_storage_action">Free Up Space</string>
     <string name="dialog_low_storage_dismiss">Dismiss</string>
     <string name="pref_allow_undo_title">Allow Dose Undo</string>
-    <string name="pref_allow_undo_desc">Allow reverting recorded doses back to pending. Requires confirmation before undoing.</string>
+    <string name="pref_allow_undo_desc">Revert taken doses back to pending.</string>
     <string name="pref_prompt_dose_notes_title">Prompt on Dose Taken</string>
-    <string name="pref_prompt_dose_notes_desc">Prompt to record a note, meal context, or symptom whenever a dose is marked as taken.</string>
+    <string name="pref_prompt_dose_notes_desc">Prompt for notes when recording doses.</string>
     <string name="dialog_undo_dose_title">Undo Dose?</string>
     <string name="dialog_undo_dose_msg">Are you sure you want to revert %1$s back to pending? Any deducted inventory stock will be restored.</string>
     <string name="dialog_dose_note_title">Dose Note</string>
@@ -797,9 +797,10 @@ Do you want to continue?</string>
     <string name="btn_edit_note">Edit Note</string>
     <string name="dialog_edit_note_title">Edit Dose Note</string>
     <string name="pref_allow_dose_notes_title">Dose Notes</string>
-    <string name="pref_allow_dose_notes_desc">Allow recording notes, meal context, or symptoms with doses.</string>
+    <string name="pref_allow_dose_notes_desc">Record notes, meals, or symptoms.</string>
     <string name="btn_add_note">+ Add Note</string>
     <string name="timings_and_dosages_title">Timings &amp; Dosages</string>
     <string name="stock_inventory_card_title">Medicine Stock &amp; Inventory</string>
     <string name="widget_configure_auto_badge">Auto</string>
+    <string name="dialog_validation_title">Notice</string>
 </resources>

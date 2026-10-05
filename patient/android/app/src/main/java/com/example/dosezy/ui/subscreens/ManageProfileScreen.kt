@@ -105,6 +105,7 @@ fun ManageProfileScreen(navController: NavController) {
     var fullNameError by remember { mutableStateOf(false) }
     var ageError by remember { mutableStateOf(false) }
     var genderError by remember { mutableStateOf(false) }
+    var validationErrorMessage by remember { mutableStateOf<String?>(null) }
 
     // Skeleton loader state
     var isDataLoaded by remember { mutableStateOf(false) }
@@ -381,6 +382,12 @@ fun ManageProfileScreen(navController: NavController) {
                                     android.widget.Toast.makeText(context, updatedSuccessStr, android.widget.Toast.LENGTH_SHORT).show()
                                     navController.popBackStack()
                                 }
+                            } else {
+                                validationErrorMessage = when {
+                                    fullNameError -> context.getString(R.string.validation_enter_name)
+                                    ageError -> context.getString(R.string.validation_enter_valid_age)
+                                    else -> context.getString(R.string.profile_gender_required)
+                                }
                             }
                         },
                         modifier = Modifier
@@ -482,9 +489,7 @@ fun ManageProfileScreen(navController: NavController) {
                                 userViewModel.deleteUser(user)
                                 navController.popBackStack()
                             } else {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar(cannotDeleteMsg)
-                                }
+                                validationErrorMessage = cannotDeleteMsg
                             }
                         }
                         showDeleteDialog = false
@@ -515,6 +520,13 @@ fun ManageProfileScreen(navController: NavController) {
                     Text(stringResource(R.string.cancel))
                 }
             }
+        )
+    }
+
+    if (validationErrorMessage != null) {
+        com.example.dosezy.ui.components.ValidationAlertDialog(
+            message = validationErrorMessage!!,
+            onDismiss = { validationErrorMessage = null }
         )
     }
 

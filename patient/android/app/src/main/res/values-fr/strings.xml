@@ -496,7 +496,7 @@ Voulez-vous continuer ?</string>
     <string name="hours_limit_hint">Pour les intervalles de plus de 24h, utilisez \'Tous les X jours\'.</string>
 
     <string name="pref_nagging_title">Rappels de relance (Insistance)</string>
-    <string name="pref_nagging_desc">Rappeler de façon répétée si une dose programmée n\'est pas confirmée</string>
+    <string name="pref_nagging_desc">Rappeler de façon répétée jusqu\'à confirmation de prise.</string>
     <string name="pref_nagging_interval">Intervalle de relance</string>
     <string name="pref_nagging_max_repeats">Nombre max de répétitions</string>
     <string name="pref_nagging_repeats_format">%1$d fois</string>
@@ -611,7 +611,7 @@ Voulez-vous continuer ?</string>
     <string name="backup_export_failed">Échec de l\'exportation : %1$s</string>
 
     <string name="pref_allow_skip_title">Autoriser le saut de dose</string>
-    <string name="pref_allow_skip_desc">Activer une option pour sauter une dose avec un motif clinique</string>
+    <string name="pref_allow_skip_desc">Sauter des doses programmées avec un motif.</string>
     <string name="home_action_skip">Sauter</string>
     <string name="home_action_skipped">Sautée</string>
     <string name="home_dose_skipped">Dose sautée pour %s</string>
@@ -704,7 +704,7 @@ Voulez-vous continuer ?</string>
 
     <!-- Manual Dose Recording Strings -->
     <string name="pref_manually_record_dose_time_title">Enregistrer l\'heure de prise manuellement</string>
-    <string name="pref_manually_record_dose_time_desc">Demander l\'heure réelle de prise du médicament lors de l\'enregistrement.</string>
+    <string name="pref_manually_record_dose_time_desc">Enregistrer l\'heure réelle de prise de la dose.</string>
     <string name="record_dose_time_title">Enregistrer l\'heure de prise</string>
     <string name="record_dose_time_subtitle">Quand avez-vous pris %1$s ?</string>
     <string name="record_dose_time_just_now">À l\'instant (%1$s)</string>
@@ -718,7 +718,7 @@ Voulez-vous continuer ?</string>
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">Masquer le bouton central Ajouter</string>
-    <string name="pref_hide_add_nav_button_desc">Masque le bouton \'+\' de la barre de navigation. Un bouton \'Ajouter un médicament\' sera disponible dans l\'onglet Médicaments sous votre liste.</string>
+    <string name="pref_hide_add_nav_button_desc">Masquer le bouton \'+\' de la barre de navigation inférieure.</string>
 
     <!-- About Screen Expansion -->
     <string name="about_developer_title">À propos du développeur</string>
@@ -756,9 +756,9 @@ Voulez-vous continuer ?</string>
     <string name="dialog_low_storage_action">Libérer de l\'espace</string>
     <string name="dialog_low_storage_dismiss">Ignorer</string>
     <string name="pref_allow_undo_title">Autoriser l\'annulation de dose</string>
-    <string name="pref_allow_undo_desc">Permet de rétablir les doses enregistrées en attente. Nécessite une confirmation.</string>
+    <string name="pref_allow_undo_desc">Rétablir les doses prises en attente.</string>
     <string name="pref_prompt_dose_notes_title">Demander une note lors de la prise</string>
-    <string name="pref_prompt_dose_notes_desc">Demander une note, repas ou symptôme chaque fois qu\'une dose est marquée comme prise.</string>
+    <string name="pref_prompt_dose_notes_desc">Demander une note lors de l\'enregistrement d\'une dose.</string>
     <string name="dialog_undo_dose_title">Annuler la dose ?</string>
     <string name="dialog_undo_dose_msg">Voulez-vous vraiment rétablir %1$s en attente ? Le stock déduit sera restauré.</string>
     <string name="dialog_dose_note_title">Note de dose</string>
@@ -769,9 +769,10 @@ Voulez-vous continuer ?</string>
     <string name="btn_edit_note">Modifier la note</string>
     <string name="dialog_edit_note_title">Modifier la note de dose</string>
     <string name="pref_allow_dose_notes_title">Notes de dose</string>
-    <string name="pref_allow_dose_notes_desc">Permettre d\'enregistrer des notes, le contexte des repas ou les symptômes avec les doses.</string>
+    <string name="pref_allow_dose_notes_desc">Enregistrer des notes, repas ou symptômes.</string>
     <string name="btn_add_note">+ Ajouter une note</string>
     <string name="timings_and_dosages_title">Horaires et dosages</string>
     <string name="stock_inventory_card_title">Stock et inventaire des médicaments</string>
     <string name="widget_configure_auto_badge">Auto</string>
+    <string name="dialog_validation_title">Remarque</string>
 </resources>

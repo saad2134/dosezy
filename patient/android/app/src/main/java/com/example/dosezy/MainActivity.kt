@@ -56,6 +56,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.dosezy.data.model.Theme
 import com.example.dosezy.ui.theme.DosezyTheme
 import com.example.dosezy.ui.viewmodels.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -133,14 +134,26 @@ class MainActivity : ComponentActivity() {
 
             // Read theme from SharedPreferences synchronously to prevent launch flash
             val prefs = remember { context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE) }
-            var spTheme by remember { mutableStateOf(prefs.getString("theme", "system")) }
+            val systemInDark = isSystemInDarkTheme()
+
+            // Dynamically resolve theme directly from reactive currentUser state
+            val currentTheme = currentUser?.theme ?: when (prefs.getString("theme", "system")) {
+                "dark" -> Theme.DARK
+                "light" -> Theme.LIGHT
+                else -> Theme.SYSTEM
+            }
+
+            val isDark = when (currentTheme) {
+                Theme.DARK -> true
+                Theme.LIGHT -> false
+                Theme.SYSTEM -> systemInDark
+            }
 
             LaunchedEffect(currentUser?.theme) {
                 currentUser?.theme?.let { theme ->
                     val themeStr = theme.name.lowercase()
                     if (prefs.getString("theme", "system") != themeStr) {
                         prefs.edit().putString("theme", themeStr).apply()
-                        spTheme = themeStr
                     }
                 }
             }
@@ -158,12 +171,6 @@ class MainActivity : ComponentActivity() {
             val currentLocale = com.example.dosezy.utils.LocaleHelper.getLocale(currentLang)
             val isRtl = currentLocale.language == "ar"
             val layoutDirection = if (isRtl) androidx.compose.ui.unit.LayoutDirection.Rtl else androidx.compose.ui.unit.LayoutDirection.Ltr
-
-            val isDark = when (spTheme) {
-                "dark" -> true
-                "light" -> false
-                else -> isSystemInDarkTheme()
-            }
 
             val localizedContext = remember(currentLang) {
                 com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, currentLang)

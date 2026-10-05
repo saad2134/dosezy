@@ -159,6 +159,7 @@ fun EditMedScreen(
     var dosageUnitExpanded by remember { mutableStateOf(false) }
     var frequencyExpanded by remember { mutableStateOf(false) }
     var isDataLoaded by remember { mutableStateOf(false) }
+    var validationErrorMessage by remember { mutableStateOf<String?>(null) }
 
     // Load existing medicine data when screen loads or medicine changes
     LaunchedEffect(medicineToEdit) {
@@ -1477,9 +1478,7 @@ fun EditMedScreen(
                                     selectedFrequency == FrequencyPattern.CUSTOM && selectedDaysOfWeek.isEmpty() -> context.getString(R.string.validation_select_custom_days)
                                     else -> context.getString(R.string.validation_enter_med_name)
                                 }
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar(errorMsg)
-                                }
+                                validationErrorMessage = errorMsg
                                 return@Button
                             }
 
@@ -1785,6 +1784,13 @@ fun EditMedScreen(
                     Text(stringResource(R.string.cancel))
                 }
             }
+        )
+    }
+
+    if (validationErrorMessage != null) {
+        com.example.dosezy.ui.components.ValidationAlertDialog(
+            message = validationErrorMessage!!,
+            onDismiss = { validationErrorMessage = null }
         )
     }
 }

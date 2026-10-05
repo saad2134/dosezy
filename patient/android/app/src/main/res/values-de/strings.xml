@@ -496,7 +496,7 @@ Möchten Sie fortfahren?</string>
     <string name="hours_limit_hint">Für Intervalle über 24 Stunden nutzen Sie \'Alle X Tage\'.</string>
 
     <string name="pref_nagging_title">Hartnäckige Nachfass-Erinnerungen</string>
-    <string name="pref_nagging_desc">Wiederholt erinnern, falls geplante Dosis nicht als eingenommen markiert ist</string>
+    <string name="pref_nagging_desc">Wiederholt erinnern, bis als eingenommen markiert.</string>
     <string name="pref_nagging_interval">Erinnerungsintervall</string>
     <string name="pref_nagging_max_repeats">Max. Wiederholungen</string>
     <string name="pref_nagging_repeats_format">%1$d-mal</string>
@@ -611,7 +611,7 @@ Möchten Sie fortfahren?</string>
     <string name="backup_export_failed">Export fehlgeschlagen: %1$s</string>
 
     <string name="pref_allow_skip_title">Dosis-Überspringen erlauben</string>
-    <string name="pref_allow_skip_desc">Option aktivieren, um eine Dosis mit klinischem Grund zu überspringen</string>
+    <string name="pref_allow_skip_desc">Geplante Dosen mit Begründung übersringen.</string>
     <string name="home_action_skip">Überspringen</string>
     <string name="home_action_skipped">Übersprungen</string>
     <string name="home_dose_skipped">Dosis übersprungen für %s</string>
@@ -704,7 +704,7 @@ Möchten Sie fortfahren?</string>
 
     <!-- Manual Dose Recording Strings -->
     <string name="pref_manually_record_dose_time_title">Dosiszeit manuell erfassen</string>
-    <string name="pref_manually_record_dose_time_desc">Beim Erfassen von Dosen nach dem tatsächlichen Einnahmezeitpunkt fragen.</string>
+    <string name="pref_manually_record_dose_time_desc">Tatsächlichen Einnahmezeitpunkt erfassen.</string>
     <string name="record_dose_time_title">Dosiszeit erfassen</string>
     <string name="record_dose_time_subtitle">Wann haben Sie %1$s eingenommen?</string>
     <string name="record_dose_time_just_now">Gerade eben (%1$s)</string>
@@ -718,7 +718,7 @@ Möchten Sie fortfahren?</string>
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">Mittlere Hinzufügen-Taste ausblenden</string>
-    <string name="pref_hide_add_nav_button_desc">Blendet die „+“-Taste in der Navigationsleiste aus. Eine Schaltfläche „Medikament hinzufügen“ wird im Medikamente-Tab unter Ihrer Liste angezeigt.</string>
+    <string name="pref_hide_add_nav_button_desc">„+“-Taste in der unteren Navigationsleiste ausblenden.</string>
 
     <!-- About Screen Expansion -->
     <string name="about_developer_title">Über den Entwickler</string>
@@ -756,9 +756,9 @@ Möchten Sie fortfahren?</string>
     <string name="dialog_low_storage_action">Speicher freigeben</string>
     <string name="dialog_low_storage_dismiss">Schließen</string>
     <string name="pref_allow_undo_title">Dosis-Rückgängigmachen erlauben</string>
-    <string name="pref_allow_undo_desc">Erlaubt das Zurücksetzen erfasster Dosen auf ausstehend. Erfordert Bestätigung.</string>
+    <string name="pref_allow_undo_desc">Eingenommene Dosen wieder auf ausstehend zurücksetzen.</string>
     <string name="pref_prompt_dose_notes_title">Bei Dosisaufnahme nach Notiz fragen</string>
-    <string name="pref_prompt_dose_notes_desc">Aufforderung zur Eingabe einer Notiz, Mahlzeit oder Symptome bei jeder Dosiserfassung.</string>
+    <string name="pref_prompt_dose_notes_desc">Bei Einnahme nach einer Notiz fragen.</string>
     <string name="dialog_undo_dose_title">Dosis rückgängig machen?</string>
     <string name="dialog_undo_dose_msg">Möchten Sie %1$s wirklich auf ausstehend zurücksetzen? Abgezogener Lagerbestand wird wiederhergestellt.</string>
     <string name="dialog_dose_note_title">Dosis-Notiz</string>
@@ -769,9 +769,10 @@ Möchten Sie fortfahren?</string>
     <string name="btn_edit_note">Notiz bearbeiten</string>
     <string name="dialog_edit_note_title">Dosis-Notiz bearbeiten</string>
     <string name="pref_allow_dose_notes_title">Dosis-Notizen</string>
-    <string name="pref_allow_dose_notes_desc">Erlaubt das Aufzeichnen von Notizen, Mahlzeiten oder Symptomen zu Dosen.</string>
+    <string name="pref_allow_dose_notes_desc">Notizen, Mahlzeiten oder Symptome erfassen.</string>
     <string name="btn_add_note">+ Notiz hinzufügen</string>
     <string name="timings_and_dosages_title">Zeiten &amp; Dosierungen</string>
     <string name="stock_inventory_card_title">Medikamentenvorrat &amp; Bestand</string>
     <string name="widget_configure_auto_badge">Auto</string>
+    <string name="dialog_validation_title">Hinweis</string>
 </resources>

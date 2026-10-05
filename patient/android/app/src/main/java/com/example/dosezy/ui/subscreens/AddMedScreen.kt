@@ -142,6 +142,7 @@ fun AddMedScreen(
     // Dropdown states
     var dosageUnitExpanded by remember { mutableStateOf(false) }
     var frequencyExpanded by remember { mutableStateOf(false) }
+    var validationErrorMessage by remember { mutableStateOf<String?>(null) }
 
     val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -1407,9 +1408,7 @@ fun AddMedScreen(
                                 selectedFrequency == FrequencyPattern.CUSTOM && selectedDaysOfWeek.isEmpty() -> context.getString(R.string.validation_select_custom_days)
                                 else -> context.getString(R.string.validation_enter_med_name)
                             }
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar(errorMsg)
-                            }
+                            validationErrorMessage = errorMsg
                             return@Button
                         }
 
@@ -1524,6 +1523,13 @@ fun AddMedScreen(
                 showTimePicker = false
             },
             onDismiss = { showTimePicker = false }
+        )
+    }
+
+    if (validationErrorMessage != null) {
+        com.example.dosezy.ui.components.ValidationAlertDialog(
+            message = validationErrorMessage!!,
+            onDismiss = { validationErrorMessage = null }
         )
     }
 }
