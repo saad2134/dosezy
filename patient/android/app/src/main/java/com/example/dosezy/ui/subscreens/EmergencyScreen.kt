@@ -1,18 +1,22 @@
 package com.example.dosezy.ui.subscreens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -518,18 +522,28 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        androidx.compose.material3.IconButton(onClick = { contactIndexToDelete = index }) {
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(Color(0xFFEF4444).copy(alpha = 0.12f))
+                                .border(1.dp, Color(0xFFEF4444).copy(alpha = 0.28f), RoundedCornerShape(10.dp))
+                                .clickable { contactIndexToDelete = index },
+                            contentAlignment = Alignment.Center
+                        ) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = "Remove",
-                                tint = Color(0xFFEF4444)
+                                tint = Color(0xFFEF4444),
+                                modifier = Modifier.size(18.dp)
                             )
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp).navigationBarsPadding())
+            Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 

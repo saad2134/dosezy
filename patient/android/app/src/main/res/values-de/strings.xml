@@ -454,7 +454,7 @@ Möchten Sie fortfahren?</string>
     <string name="pill_shape_drops">Tropfen</string>
     <string name="pill_shape_patch">Pflaster</string>
 
-    <string name="med_notes_label">Arzt- / Apothekenhinweise &amp; Warnungen</string>
+    <string name="med_notes_label">Arzthinweise &amp; Warnungen</string>
     <string name="med_notes_placeholder">z. B. Zu den Mahlzeiten, Keine Grapefruit, Rezept #12345</string>
 
     <string name="course_duration_title">Behandlungsdauer</string>

@@ -38,6 +38,7 @@ object DosezyWidgetPrefs {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
             .putString("profile_theme_" + userId, theme)
+            .putString("profile_theme_" + ACTIVE_PROFILE_ID, theme)
             .apply()
     }
 

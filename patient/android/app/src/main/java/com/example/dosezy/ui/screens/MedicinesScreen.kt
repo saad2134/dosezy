@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.luminance
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.shape.CircleShape
@@ -563,15 +564,20 @@ fun ArchivedMedicineItem(
 
             Spacer(modifier = Modifier.width(4.dp))
 
-            // Permanent Delete Button
-            IconButton(
-                onClick = onDeletePermanently,
-                modifier = Modifier.size(34.dp)
+            // Permanent Delete Button with Squircle Frame
+            Box(
+                modifier = Modifier
+                    .size(34.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color(0xFFDC2626).copy(alpha = 0.12f))
+                    .border(1.dp, Color(0xFFDC2626).copy(alpha = 0.28f), RoundedCornerShape(10.dp))
+                    .clickable(onClick = onDeletePermanently),
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = stringResource(com.example.dosezy.R.string.btn_delete_permanently),
-                    tint = Color(0xFFDC2626).copy(alpha = 0.7f),
+                    tint = Color(0xFFDC2626),
                     modifier = Modifier.size(18.dp)
                 )
             }

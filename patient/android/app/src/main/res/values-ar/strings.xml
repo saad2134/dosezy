@@ -454,7 +454,7 @@
     <string name="pill_shape_drops">قطرات</string>
     <string name="pill_shape_patch">لاصقة</string>
 
-    <string name="med_notes_label">ملاحظات الطبيب / الصيدلية والتحذيرات</string>
+    <string name="med_notes_label">ملاحظات الطبيب والتحذيرات</string>
     <string name="med_notes_placeholder">مثال: يؤخذ مع الطعام، تجنب الجريب فروت، وصفة رقم 12345</string>
 
     <string name="course_duration_title">مدة العلاج</string>

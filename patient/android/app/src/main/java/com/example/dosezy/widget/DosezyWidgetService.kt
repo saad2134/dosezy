@@ -158,7 +158,7 @@ class DosezyRemoteViewsFactory(
 
     override fun getViewTypeCount(): Int = 2
 
-    override fun getItemId(position: Int): Long = position.toLong()
+    override fun getItemId(position: Int): Long = (position + if (isDark) 10000 else 0).toLong()
 
-    override fun hasStableIds(): Boolean = true
+    override fun hasStableIds(): Boolean = false
 }

@@ -454,7 +454,7 @@
     <string name="pill_shape_drops">Капли</string>
     <string name="pill_shape_patch">Пластырь</string>
 
-    <string name="med_notes_label">Указания врача / аптеки и предостережения</string>
+    <string name="med_notes_label">Указания врача и предостережения</string>
     <string name="med_notes_placeholder">напр. Принимать во время еды, Избегать грейпфрута, Рецепт #12345</string>
 
     <string name="course_duration_title">Длительность курса</string>

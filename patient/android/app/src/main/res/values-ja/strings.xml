@@ -454,7 +454,7 @@
     <string name="pill_shape_drops">点眼・点滴 (Drops)</string>
     <string name="pill_shape_patch">貼付剤・湿布 (Patch)</string>
 
-    <string name="med_notes_label">医師・薬剤師の指示・注意事項</string>
+    <string name="med_notes_label">医師の指示・注意事項</string>
     <string name="med_notes_placeholder">例：食後服用、グレープフルーツ禁止、処方箋 #12345</string>
 
     <string name="course_duration_title">服薬期間</string>

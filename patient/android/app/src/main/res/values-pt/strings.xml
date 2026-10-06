@@ -453,7 +453,7 @@ Deseja continuar?</string>
     <string name="pill_shape_drops">Gotas</string>
     <string name="pill_shape_patch">Adesivo (Patch)</string>
 
-    <string name="med_notes_label">Notas do médico / farmácia e advertências</string>
+    <string name="med_notes_label">Notas do médico e advertências</string>
     <string name="med_notes_placeholder">ex.: Tomar com alimentos, Evitar toranja, Receita #12345</string>
 
     <string name="course_duration_title">Duração do tratamento</string>

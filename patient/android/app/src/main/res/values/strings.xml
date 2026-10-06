@@ -486,8 +486,8 @@ Do you want to continue?</string>
     <string name="pill_shape_drops">Drops</string>
     <string name="pill_shape_patch">Patch</string>
 
-    <!-- Doctor & Pharmacy Notes (#46) -->
-    <string name="med_notes_label">Doctor / Pharmacy Notes &amp; Warnings</string>
+    <!-- Doctor Notes (#46) -->
+    <string name="med_notes_label">Doctor Notes &amp; Warnings</string>
     <string name="med_notes_placeholder">e.g. Take with food, Avoid grapefruit, Rx ref #12345</string>
 
     <!-- Prescription End Dates & Finite Courses (#43) -->

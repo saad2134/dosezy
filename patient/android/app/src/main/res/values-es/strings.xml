@@ -470,7 +470,7 @@
     <string name="pill_shape_drops">Gotas</string>
     <string name="pill_shape_patch">Parche</string>
 
-    <string name="med_notes_label">Notas del médico / farmacia y advertencias</string>
+    <string name="med_notes_label">Notas del médico y advertencias</string>
     <string name="med_notes_placeholder">ej. Tomar con comida, Evitar pomelo, Receta #12345</string>
 
     <string name="course_duration_title">Duración del tratamiento</string>

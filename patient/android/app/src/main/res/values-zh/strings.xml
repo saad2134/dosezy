@@ -470,7 +470,7 @@
     <string name="pill_shape_drops">滴剂 (Drops)</string>
     <string name="pill_shape_patch">贴剂 (Patch)</string>
 
-    <string name="med_notes_label">医生 / 药剂师嘱咐及特别警告</string>
+    <string name="med_notes_label">医生嘱咐及特别警告</string>
     <string name="med_notes_placeholder">例如：饭后服用、忌食西柚、处方号 #12345</string>
 
     <string name="course_duration_title">用药疗程周期</string>

@@ -454,7 +454,7 @@
     <string name="pill_shape_drops">ড্রপস (Drops)</string>
     <string name="pill_shape_patch">প্যাচ (Patch)</string>
 
-    <string name="med_notes_label">ডাক্তার / ফার্মেসির নির্দেশনা ও সতর্কতা</string>
+    <string name="med_notes_label">ডাক্তারের নির্দেশনা ও সতর্কতা</string>
     <string name="med_notes_placeholder">যেমনঃ ভরা পেটে সেব্য, বাতাবি লেবু পরিহার করুন, প্রেসক্রিপশন #12345</string>
 
     <string name="course_duration_title">চিকিৎসার সময়কাল</string>
