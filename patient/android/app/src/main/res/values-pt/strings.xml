@@ -585,6 +585,7 @@ Deseja continuar?</string>
     <string name="alarm_take_medicine">TOMAR MEDICAMENTO</string>
     <string name="alarm_snooze_format">ADIAR (%d MIN)</string>
     <string name="notif_action_snooze_format">Adiar (%d min)</string>
+    <string name="alarm_snoozed_toast">Alarme adiado por %d minutos</string>
     <string name="alarm_stock_remaining">Estoque: %d unidades restantes</string>
     <string name="home_action_take">Tomar</string>
     <string name="home_action_taken">Tomado</string>

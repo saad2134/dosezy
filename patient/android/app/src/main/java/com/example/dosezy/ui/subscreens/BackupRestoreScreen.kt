@@ -79,7 +79,7 @@ import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.utils.sharedUserViewModel
 import kotlinx.coroutines.launch
 
-@RequiresApi(Build.VERSION_CODES.O)
+// Guard: Keep available on API 24+; BackupRestoreManager uses canonicalPath for full Android 7.0+ compatibility
 @Composable
 fun BackupRestoreScreen(
     navController: NavController

@@ -370,10 +370,11 @@ private fun saveImageToInternalStorage(context: Context, uri: Uri, oldPath: Stri
     // Delete old profile picture if it exists to prevent storage leak
     if (!oldPath.isNullOrEmpty()) {
         try {
-            val oldFile = File(oldPath)
-            if (oldFile.exists() && oldFile.parentFile?.absolutePath == context.filesDir.absolutePath) {
+            val cleanPath = oldPath.removePrefix("file://")
+            val oldFile = File(cleanPath)
+            if (oldFile.exists() && (oldFile.parentFile?.canonicalPath == context.filesDir.canonicalPath || oldFile.canonicalPath.startsWith(context.filesDir.canonicalPath + File.separator))) {
                 val deleted = oldFile.delete()
-                Log.d("ProfilePicturePicker", "Deleted old image: $oldPath, success=$deleted")
+                Log.d("ProfilePicturePicker", "Deleted old image: $cleanPath, success=$deleted")
             }
         } catch (e: Exception) {
             Log.e("ProfilePicturePicker", "Failed to delete old image: ${e.message}")

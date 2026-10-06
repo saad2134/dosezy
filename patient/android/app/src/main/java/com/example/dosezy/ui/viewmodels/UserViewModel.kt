@@ -200,7 +200,34 @@ class UserViewModel @Inject constructor(
                         medicineNotificationManager.cancelAllAlarmsForUser(user.userId)
                     }
 
-                    // Delete the user from DB
+                    // Delete user's profile picture from internal storage if it exists
+                    user.profilePicPath?.let { path ->
+                        try {
+                            val cleanPath = path.removePrefix("file://")
+                            val file = java.io.File(cleanPath)
+                            val filesDir = medicineRepository.context.filesDir
+                            if (file.exists() && (file.parentFile?.canonicalPath == filesDir.canonicalPath || file.canonicalPath.startsWith(filesDir.canonicalPath + java.io.File.separator))) {
+                                file.delete()
+                            }
+                        } catch (_: Exception) {}
+                    }
+
+                    // Clean up associated medicine images before database cascade deletion
+                    try {
+                        val meds = medicineRepository.getMedicinesByUserDirect(user.userId)
+                        val filesDir = medicineRepository.context.filesDir
+                        meds.forEach { med ->
+                            med.imageUri?.let { uriStr ->
+                                val cleanPath = uriStr.removePrefix("file://")
+                                val file = java.io.File(cleanPath)
+                                if (file.exists() && (file.parentFile?.canonicalPath == filesDir.canonicalPath || file.canonicalPath.startsWith(filesDir.canonicalPath + java.io.File.separator))) {
+                                    file.delete()
+                                }
+                            }
+                        }
+                    } catch (_: Exception) {}
+
+                    // Delete the user from DB (cascades to medicines & schedules)
                     userRepository.deleteUser(user)
 
                     // Fetch remaining users directly from DB

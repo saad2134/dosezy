@@ -582,6 +582,7 @@
     <string name="alarm_take_medicine">ঔষধ গ্রহণ করুন</string>
     <string name="alarm_snooze_format">স্নুজ (%d মিনিট)</string>
     <string name="notif_action_snooze_format">স্নুজ (%d মিনিট)</string>
+    <string name="alarm_snoozed_toast">অ্যালার্ম %d মিনিটের জন্য স্নুজ করা হয়েছে</string>
     <string name="alarm_stock_remaining">মজুদ: %d ইউনিট বাকি</string>
     <string name="home_action_take">নিন</string>
     <string name="home_action_taken">নেওয়া হয়েছে</string>

@@ -586,6 +586,7 @@ Möchten Sie fortfahren?</string>
     <string name="alarm_take_medicine">MEDIKAMENT EINNEHMEN</string>
     <string name="alarm_snooze_format">SCHLUMMERN (%d MIN)</string>
     <string name="notif_action_snooze_format">Schlummern (%d Min.)</string>
+    <string name="alarm_snoozed_toast">Erinnerung für %d Minuten geschlummert</string>
     <string name="alarm_stock_remaining">Vorrat: %d Einheiten verbleibend</string>
     <string name="home_action_take">Einnehmen</string>
     <string name="home_action_taken">Eingenommen</string>

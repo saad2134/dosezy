@@ -586,6 +586,7 @@
     <string name="alarm_take_medicine">薬を服用</string>
     <string name="alarm_snooze_format">スヌーズ (%d分)</string>
     <string name="notif_action_snooze_format">スヌーズ (%d分)</string>
+    <string name="alarm_snoozed_toast">アラームを%d分間スヌーズしました</string>
     <string name="alarm_stock_remaining">在庫: 残り %d 錠</string>
     <string name="home_action_take">服用</string>
     <string name="home_action_taken">服用済み</string>

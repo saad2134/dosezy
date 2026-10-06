@@ -11,6 +11,7 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import android.view.KeyEvent
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -342,6 +343,14 @@ fun GroupedAlarmScreenContent(
     val snoozeMinutes = user?.snoozeDuration ?: 10
 
     val snoozeAction = {
+        // Guard: Notify user that alarm is snoozed so back press or dismissal does not leave user uncertain
+        try {
+            Toast.makeText(
+                context,
+                context.getString(R.string.alarm_snoozed_toast, snoozeMinutes),
+                Toast.LENGTH_SHORT
+            ).show()
+        } catch (_: Exception) {}
         coroutineScope.launch {
             withContext(Dispatchers.IO) {
                 val alarmScheduler = AlarmScheduler(context)
@@ -365,7 +374,7 @@ fun GroupedAlarmScreenContent(
         }
     }
 
-    // Intercept hardware/system back gesture to safely trigger personalized snooze
+    // Guard: Intercept hardware/system back gesture to safely trigger personalized snooze with alert feedback
     BackHandler {
         snoozeAction()
     }
@@ -506,6 +515,22 @@ fun GroupedAlarmScreenContent(
                     }
                 }
 
+                // Guard: Format scheduled time or current time instead of fallback string to prevent duplicate "MEDICATION REMINDER" title
+                val displayTime = remember(initialScheduledTime, medicinesList, user) {
+                    if (initialScheduledTime.isNotBlank()) {
+                        initialScheduledTime
+                    } else {
+                        val firstDt = medicinesList.firstOrNull()?.first?.scheduledDateTime
+                        val tf = user?.timeFormat ?: com.example.dosezy.data.model.TimeFormat.HOUR_12
+                        if (firstDt != null) {
+                            com.example.dosezy.utils.TimeFormatUtils.formatTime(firstDt, tf)
+                        } else {
+                            val now = java.time.LocalTime.now()
+                            com.example.dosezy.utils.TimeFormatUtils.formatLocalTime(now, tf)
+                        }
+                    }
+                }
+
                 Text(
                     text = if (medicinesList.size > 1) stringResource(R.string.alarm_medication_reminder_multi, medicinesList.size) else stringResource(R.string.alarm_medication_reminder),
                     style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
@@ -525,7 +550,7 @@ fun GroupedAlarmScreenContent(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = initialScheduledTime.ifEmpty { stringResource(R.string.alarm_medication_reminder) },
+                        text = displayTime,
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 26.sp

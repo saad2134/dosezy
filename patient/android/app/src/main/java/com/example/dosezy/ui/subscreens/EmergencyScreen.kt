@@ -800,12 +800,17 @@ fun EmergencyServiceCard(
 
 
 
-// Utility function for opening phone dialer
+// Guard: Strip spaces/hyphens and use Uri.fromParts to prevent dialer number truncation and scheme parsing crashes across Android versions
+internal fun createDialIntent(phoneNumber: String): android.content.Intent {
+    val cleaned = phoneNumber.replace(Regex("[^0-9+*#]"), "")
+    return android.content.Intent(android.content.Intent.ACTION_DIAL).apply {
+        data = android.net.Uri.fromParts("tel", cleaned, null)
+    }
+}
+
 private fun openPhone(context: android.content.Context, phoneNumber: String) {
     try {
-        val intent = android.content.Intent(android.content.Intent.ACTION_DIAL).apply {
-            data = android.net.Uri.parse("tel:$phoneNumber")
-        }
+        val intent = createDialIntent(phoneNumber)
         context.startActivity(intent)
     } catch (e: Exception) {
         android.widget.Toast.makeText(context, context.getString(R.string.err_cannot_make_call), android.widget.Toast.LENGTH_SHORT).show()

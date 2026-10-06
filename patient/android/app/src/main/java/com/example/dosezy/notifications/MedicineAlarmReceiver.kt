@@ -91,7 +91,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             action == "android.intent.action.LOCKED_BOOT_COMPLETED" ||
             action == Intent.ACTION_REBOOT ||
             action == Intent.ACTION_TIMEZONE_CHANGED ||
-            action == Intent.ACTION_TIME_CHANGED) {
+            action == Intent.ACTION_TIME_CHANGED ||
+            action == Intent.ACTION_DATE_CHANGED) {
             
             Log.d(TAG, "Received system broadcast action: $action - rescheduling all alarms")
             val pendingResult = goAsync()

@@ -40,6 +40,10 @@ class MedicineRepository @Inject constructor(
     suspend fun getMedicinesByUserSync(userId: String): List<Medicine> =
         database.medicineDao().getActiveMedicinesByUser(userId).first()
 
+    // Get all medicines (active + archived) directly for cleanup / export
+    suspend fun getMedicinesByUserDirect(userId: String): List<Medicine> =
+        database.medicineDao().getMedicinesByUserDirect(userId)
+
     @RequiresApi(Build.VERSION_CODES.O)
     @Suppress("UNUSED_PARAMETER")
     suspend fun insertMedicine(medicine: Medicine, context: Context? = null) {
@@ -167,6 +171,19 @@ class MedicineRepository @Inject constructor(
         database.scheduleDao().deleteScheduleEntriesByMedicine(medicine.medicineId)
         // Then delete the medicine
         database.medicineDao().deleteMedicine(medicine)
+
+        // Guard: Delete internal storage medicine photo and verify canonicalPath to prevent storage leaks and path traversal
+        medicine.imageUri?.let { uriStr ->
+            try {
+                val cleanPath = uriStr.removePrefix("file://")
+                val file = java.io.File(cleanPath)
+                val filesDir = this.context.filesDir
+                if (file.exists() && (file.parentFile?.canonicalPath == filesDir.canonicalPath || file.canonicalPath.startsWith(filesDir.canonicalPath + java.io.File.separator))) {
+                    file.delete()
+                }
+            } catch (_: Exception) {}
+        }
+
         // Reschedule remaining active alarms for user to preserve sibling medicines
         scheduleRepository.rescheduleAllAlarms(medicine.userId, this.context)
 
@@ -184,21 +201,9 @@ class MedicineRepository @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun deleteMedicine(medicineId: String) {
         val med = database.medicineDao().getMedicineByIdDirect(medicineId)
-        val userId = med?.userId
-        // Cancel alarms first
-        scheduleRepository.cancelAlarmsForMedicine(medicineId, this.context)
-        // Delete schedule entries first
-        database.scheduleDao().deleteScheduleEntriesByMedicine(medicineId)
-        // Then delete the medicine using the new method
-        database.medicineDao().deleteMedicineById(medicineId)
-        if (userId != null) {
-            scheduleRepository.rescheduleAllAlarms(userId, this.context)
+        if (med != null) {
+            deleteMedicinePermanently(med)
         }
-
-        // Update home screen widget
-        try {
-            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(this.context)
-        } catch (_: Exception) {}
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

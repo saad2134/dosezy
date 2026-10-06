@@ -174,7 +174,6 @@ class BackupRestoreManager(
         return@withContext zipFile
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun inspectBackupZip(uri: Uri): ZipInspectionResult = withContext(Dispatchers.IO) {
         try {
             val inputStream = context.contentResolver.openInputStream(uri)
@@ -183,7 +182,8 @@ class BackupRestoreManager(
             val tempDir = File(context.cacheDir, "dosezy_inspect_${System.currentTimeMillis()}")
             tempDir.mkdirs()
 
-            val normalizedTempPath = tempDir.toPath().normalize()
+            // Guard: Android 7.0/7.1 (API 24/25) lacks File.toPath(); use canonicalPath to prevent crash and Zip Slip vulnerabilities
+            val canonicalTempDir = tempDir.canonicalPath
             ZipInputStream(BufferedInputStream(inputStream)).use { zis ->
                 var entry = zis.nextEntry
                 while (entry != null) {
@@ -193,7 +193,8 @@ class BackupRestoreManager(
                     }
 
                     val destFile = File(tempDir, entryName)
-                    if (!destFile.toPath().normalize().startsWith(normalizedTempPath)) {
+                    val canonicalDest = destFile.canonicalPath
+                    if (!canonicalDest.startsWith(canonicalTempDir + File.separator) && canonicalDest != canonicalTempDir) {
                         throw SecurityException("Invalid backup archive: path traversal detected for entry '$entryName'.")
                     }
                     if (entry.isDirectory) {

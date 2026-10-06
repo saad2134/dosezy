@@ -145,7 +145,8 @@ fun AnalyticsScreen(navController: NavController) {
     }
 
     fun computeAdherence(range: AdherenceRange, label: String): RangeAdherenceData {
-        val entries = getRangeEntries(range)
+        // Guard: Exclude ad-hoc PRN doses (entryId starting with PRN_) from scheduled adherence calculation to prevent skewing compliance rates
+        val entries = getRangeEntries(range).filter { !it.entryId.startsWith("PRN_") }
         val total = entries.size
         val taken = entries.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
         val missed = entries.count { it.status == MedicationStatus.MISSED }
@@ -165,8 +166,8 @@ fun AnalyticsScreen(navController: NavController) {
 
     val selectedData = rangeDataList.find { it.range == selectedRange } ?: rangeDataList.last()
 
-    // Global overall stats for breakdown grid (constrained to past & today)
-    val pastAndTodayEntries = scheduleEntries.filter { it.scheduledDateTime.toLocalDate() <= today }
+    // Global overall stats for breakdown grid (constrained to past & today scheduled entries)
+    val pastAndTodayEntries = scheduleEntries.filter { it.scheduledDateTime.toLocalDate() <= today && !it.entryId.startsWith("PRN_") }
     val totalEntries = pastAndTodayEntries.size
     val takenOnTime = pastAndTodayEntries.count { it.status == MedicationStatus.TAKEN_ON_TIME }
     val takenLate = pastAndTodayEntries.count { it.status == MedicationStatus.TAKEN_LATE }
@@ -187,7 +188,7 @@ fun AnalyticsScreen(navController: NavController) {
     // Past 7 days calculation for mini bar chart
     val past7Days = (6 downTo 0).map { daysAgo ->
         val date = today.minusDays(daysAgo.toLong())
-        val dayEntries = scheduleEntries.filter { it.scheduledDateTime.toLocalDate() == date }
+        val dayEntries = scheduleEntries.filter { it.scheduledDateTime.toLocalDate() == date && !it.entryId.startsWith("PRN_") }
         val dayTaken = dayEntries.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
         val dayMissed = dayEntries.count { it.status == MedicationStatus.MISSED }
         val dayDecided = dayTaken + dayMissed

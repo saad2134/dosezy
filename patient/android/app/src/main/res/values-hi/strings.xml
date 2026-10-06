@@ -602,6 +602,7 @@
     <string name="alarm_take_medicine">दवा लें</string>
     <string name="alarm_snooze_format">स्नूज़ (%d मिनट)</string>
     <string name="notif_action_snooze_format">स्नूज़ (%d मिनट)</string>
+    <string name="alarm_snoozed_toast">अलार्म %d मिनट के लिए स्नूज़ किया गया</string>
     <string name="alarm_stock_remaining">स्टॉक: %d दवाएं शेष</string>
     <string name="home_action_take">लें</string>
     <string name="home_action_taken">ले ली</string>

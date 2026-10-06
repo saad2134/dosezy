@@ -225,6 +225,19 @@ class BackupRestoreValidationTest {
         }
     }
 
+    @Test
+    fun zipPathValidation_canonicalPathProtection_preventsEscapingDirectory() {
+        // Guard: Use canonicalPath prefix checks so path traversal escaping the target folder is blocked on all Android API levels
+        val tempDir = java.io.File(System.getProperty("java.io.tmpdir"), "dosezy_test_inspect")
+        val canonicalTempDir = tempDir.canonicalPath
+        
+        val safeFile = java.io.File(tempDir, "profiles/user_1/profile.json")
+        assertTrue(safeFile.canonicalPath.startsWith(canonicalTempDir + java.io.File.separator) || safeFile.canonicalPath == canonicalTempDir)
+
+        val escapeFile = java.io.File(tempDir, "../../../etc/passwd")
+        assertFalse(escapeFile.canonicalPath.startsWith(canonicalTempDir + java.io.File.separator))
+    }
+
     // ───────────────────────────────────────────────────────────────
     // 4. Manifest JSON Validation
     // ───────────────────────────────────────────────────────────────

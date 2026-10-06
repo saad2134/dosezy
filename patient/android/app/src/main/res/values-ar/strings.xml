@@ -586,6 +586,7 @@
     <string name="alarm_take_medicine">تناول الدواء</string>
     <string name="alarm_snooze_format">تأجيل (%d دقيقة)</string>
     <string name="notif_action_snooze_format">تأجيل (%d د)</string>
+    <string name="alarm_snoozed_toast">تم تأجيل التنبيه لمدة %d دقيقة</string>
     <string name="alarm_stock_remaining">المخزون المتبقي: %d وحدة</string>
     <string name="home_action_take">تناول</string>
     <string name="home_action_taken">تم التناول</string>

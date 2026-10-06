@@ -71,7 +71,12 @@ class AlarmScheduler(private val context: Context) {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val triggerTime = cleanDateTime.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000
+        val triggerTime = cleanDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val now = System.currentTimeMillis()
+        if (triggerTime <= now) {
+            Log.d(TAG, "Skipping past alarm trigger for $cleanDateTime (triggerTime=$triggerTime, now=$now)")
+            return
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
             val showIntent = PendingIntent.getActivity(
@@ -118,11 +123,16 @@ class AlarmScheduler(private val context: Context) {
         val primaryId = entryIds.first()
         val medNameSummary = if (medicineNames.isNotEmpty()) medicineNames.joinToString(", ") else "Medicine"
 
+        val triggerTime = System.currentTimeMillis() + (minutes * 60 * 1000)
+        val snoozeTimeFormatted = java.text.SimpleDateFormat("hh:mm a", java.util.Locale.getDefault()).format(java.util.Date(triggerTime))
+
         val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
             putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, primaryId)
             putStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS, ArrayList(entryIds))
             putExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME, medNameSummary)
             putStringArrayListExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAMES, ArrayList(medicineNames))
+            // Guard: Pass formatted snooze time to avoid blank time extra and double reminder title in AlarmActivity
+            putExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME, snoozeTimeFormatted)
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
@@ -131,8 +141,6 @@ class AlarmScheduler(private val context: Context) {
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-
-        val triggerTime = System.currentTimeMillis() + (minutes * 60 * 1000)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
             val showIntent = PendingIntent.getActivity(
@@ -166,7 +174,7 @@ class AlarmScheduler(private val context: Context) {
         Log.d(TAG, "Scheduled grouped snooze for ${entryIds.size} entries in $minutes minutes (primaryId=$primaryId)")
     }
 
-    fun cancelAlarm(entryId: String) {
+    fun cancelAlarm(entryId: String, userId: String? = null, scheduledDateTime: LocalDateTime? = null) {
         val intent = Intent(context, MedicineAlarmReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(
             context,
@@ -176,7 +184,21 @@ class AlarmScheduler(private val context: Context) {
         )
 
         alarmManager.cancel(pendingIntent)
+        pendingIntent.cancel()
         Log.d(TAG, "Cancelled alarm for entry: $entryId")
+
+        if (userId != null && scheduledDateTime != null) {
+            cancelSlotAlarm(userId, scheduledDateTime)
+        } else {
+            val parsed = com.example.dosezy.data.repository.ScheduleRepository.parseDateTimeFromEntryId(entryId)
+            if (parsed != null && userId != null) {
+                cancelSlotAlarm(userId, parsed)
+            }
+        }
+    }
+
+    fun cancelAlarm(entry: ScheduleEntry) {
+        cancelAlarm(entry.entryId, entry.userId, entry.scheduledDateTime)
     }
 
     fun cancelSlotAlarm(userId: String, scheduledDateTime: LocalDateTime) {

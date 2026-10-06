@@ -93,7 +93,9 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     // If no entries exist, or the latest entry is less than 15 days in the future,
                     // auto-generate/append next 30 days of schedules
                     if (latestEntry == null || latestEntry.scheduledDateTime.isBefore(LocalDateTime.now().plusDays(15))) {
-                        val startGenerateFrom = latestEntry?.scheduledDateTime?.toLocalDate()?.plusDays(1) ?: LocalDate.now()
+                        val today = LocalDate.now()
+                        val latestDate = latestEntry?.scheduledDateTime?.toLocalDate()
+                        val startGenerateFrom = if (latestDate == null || latestDate.isBefore(today)) today else latestDate.plusDays(1)
                         val newEntries = medicine.generateScheduleEntries(startGenerateFrom, 30)
                         if (newEntries.isNotEmpty()) {
                             database.scheduleDao().insertScheduleEntries(newEntries)
@@ -150,13 +152,13 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
             }
 
-            // Schedule grouped alarms for pending future entries within the 7-day window
+            // Schedule grouped alarms for strictly future pending entries within the 7-day window
             var scheduledCount = 0
-            val limitTime = LocalDateTime.now().plusDays(7)
-            val nowMinus2 = LocalDateTime.now().minusMinutes(2)
+            val now = LocalDateTime.now()
+            val limitTime = now.plusDays(7)
             val pendingEntries = allEntries.filter { 
                 it.status == MedicationStatus.PENDING &&
-                it.scheduledDateTime.isAfter(nowMinus2) &&
+                it.scheduledDateTime.isAfter(now) &&
                 it.scheduledDateTime.isBefore(limitTime)
             }
 
@@ -293,8 +295,10 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     database.medicineDao().updateMedicine(updatedMedicine)
                     Log.d(TAG, "Decremented stock for ${medicine.medicationName}: ${medicine.currentStock} -> $newStock (deducted $deductAmount)")
 
-                    // Trigger refill warning notification if stock is below threshold
-                    if (context != null && medicine.refillThreshold != null && newStock <= medicine.refillThreshold) {
+                    // Trigger refill warning notification when crossing threshold boundary or running out
+                    val threshold = medicine.refillThreshold
+                    val shouldNotifyRefill = threshold != null && ((medicine.currentStock > threshold && newStock <= threshold) || (medicine.currentStock > 0 && newStock == 0))
+                    if (context != null && shouldNotifyRefill) {
                         val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
                         val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
                         val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
@@ -438,7 +442,9 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             val updatedMedicine = medicine.copy(currentStock = newStock)
             database.medicineDao().updateMedicine(updatedMedicine)
 
-            if (context != null && medicine.refillThreshold != null && newStock <= medicine.refillThreshold) {
+            val threshold = medicine.refillThreshold
+            val shouldNotifyRefill = threshold != null && ((medicine.currentStock > threshold && newStock <= threshold) || (medicine.currentStock > 0 && newStock == 0))
+            if (context != null && shouldNotifyRefill) {
                 val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
                 val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
                 val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager

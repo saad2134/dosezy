@@ -602,6 +602,7 @@
     <string name="alarm_take_medicine">TOMAR MEDICAMENTO</string>
     <string name="alarm_snooze_format">POSPONER (%d MIN)</string>
     <string name="notif_action_snooze_format">Posponer (%d min)</string>
+    <string name="alarm_snoozed_toast">Alarma pospuesta por %d minutos</string>
     <string name="alarm_stock_remaining">Existencias: %d unidades restantes</string>
     <string name="home_action_take">Tomar</string>
     <string name="home_action_taken">Tomado</string>

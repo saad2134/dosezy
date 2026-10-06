@@ -614,6 +614,7 @@ Do you want to continue?</string>
     <string name="alarm_take_medicine">TAKE MEDICINE</string>
     <string name="alarm_snooze_format">SNOOZE (%d MIN)</string>
     <string name="notif_action_snooze_format">Snooze (%d min)</string>
+    <string name="alarm_snoozed_toast">Alarm snoozed for %d minutes</string>
     <string name="alarm_stock_remaining">Stock: %d units remaining</string>
     <string name="home_action_take">Take</string>
     <string name="home_action_taken">Taken</string>
