@@ -311,7 +311,7 @@ class MedicineLogicTest {
     // Mirror the getDateStatusColor logic as a pure function for testing
     private enum class StatusColor { RED, AMBER, GREEN, GRAY_SKIPPED, GRAY_PENDING, TRANSPARENT }
 
-    private fun computeStatusColor(entries: List<ScheduleEntry>): StatusColor {
+    private fun computeStatusColor(entries: List<ScheduleEntry>, missedAfterHours: Int = 6): StatusColor {
         if (entries.isEmpty()) return StatusColor.TRANSPARENT
         val hasMissed = entries.any { it.status == MedicationStatus.MISSED }
         val hasLate = entries.any { it.status == MedicationStatus.TAKEN_LATE }
@@ -322,8 +322,11 @@ class MedicineLogicTest {
             it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE
         }
         val allSkipped = entries.all { it.status == MedicationStatus.SKIPPED }
+        val now = LocalDateTime.now()
         val hasPastPending = entries.any {
-            it.status == MedicationStatus.PENDING && it.scheduledDateTime.isBefore(LocalDateTime.now().minusMinutes(1))
+            it.status == MedicationStatus.PENDING &&
+                    now.isAfter(it.scheduledDateTime) &&
+                    com.example.dosezy.utils.TimeCalculationUtils.isMissed(it.scheduledDateTime, now, missedAfterHours)
         }
         return when {
             hasMissed || hasPastPending -> StatusColor.RED
@@ -406,12 +409,25 @@ class MedicineLogicTest {
     }
 
     @Test
-    fun calendarStatus_pendingPast_red() {
-        // Entry scheduled 2 hours ago still PENDING → overdue → red
-        val entries = listOf(
-            entry(MedicationStatus.PENDING, hoursAgo = 2)
+    fun calendarStatus_pendingRecentPast_grayPending() {
+        // Guard test: Entry scheduled 10 minutes ago (within 6h missed window) still PENDING → neutral gray, NOT red!
+        val entry10MinAgo = ScheduleEntry(
+            entryId = "e_${System.nanoTime()}",
+            userId = "usr_1",
+            medicineId = "med_1",
+            scheduledDateTime = LocalDateTime.now().minusMinutes(10),
+            status = MedicationStatus.PENDING
         )
-        assertEquals(StatusColor.RED, computeStatusColor(entries))
+        assertEquals(StatusColor.GRAY_PENDING, computeStatusColor(listOf(entry10MinAgo), missedAfterHours = 6))
+    }
+
+    @Test
+    fun calendarStatus_pendingPastMissedThreshold_red() {
+        // Entry scheduled 7 hours ago (past 6h missed window) still PENDING → overdue/missed → red
+        val entries = listOf(
+            entry(MedicationStatus.PENDING, hoursAgo = 7)
+        )
+        assertEquals(StatusColor.RED, computeStatusColor(entries, missedAfterHours = 6))
     }
 
     @Test

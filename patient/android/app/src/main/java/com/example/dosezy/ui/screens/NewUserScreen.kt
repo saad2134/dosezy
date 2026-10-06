@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -114,7 +115,6 @@ fun NewUserScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val users by userViewModel.users.collectAsState()
-    val currentUser by userViewModel.currentUser.collectAsState()
 
     val database = remember { DosezyDatabase.getInstance(context) }
     val scheduleRepository = remember { ScheduleRepository(database) }
@@ -128,7 +128,6 @@ fun NewUserScreen(
     var inspectionResult by remember { mutableStateOf<ZipInspectionResult?>(null) }
     var isImporting by remember { mutableStateOf(false) }
     var loadingMessage by remember { mutableStateOf<String?>(null) }
-    var validationErrorMessage by remember { mutableStateOf<String?>(null) }
 
     val importLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
@@ -174,9 +173,8 @@ fun NewUserScreen(
                 onShowExistingProfiles = { showExistingProfiles = true },
                 isProfileSetupValid = isProfileSetupValid,
                 onCompleteProfileSetup = {
-                    completeProfileSetup()
                     if (isProfileSetupValid) {
-                        // Handle navigation immediately after completion
+                        completeProfileSetup()
                         if (isCreatingNewProfile) {
                             navController.popBackStack("switch_profile", false)
                         } else {
@@ -184,8 +182,6 @@ fun NewUserScreen(
                                 popUpTo("newuser/1") { inclusive = true }
                             }
                         }
-                    } else {
-                        validationErrorMessage = context.getString(R.string.validation_enter_name)
                     }
                 }
             )
@@ -321,13 +317,6 @@ fun NewUserScreen(
                 }
             }
         }
-    }
-
-    if (validationErrorMessage != null) {
-        com.example.dosezy.ui.components.ValidationAlertDialog(
-            message = validationErrorMessage!!,
-            onDismiss = { validationErrorMessage = null }
-        )
     }
 }
 
@@ -889,7 +878,9 @@ fun NewUserBottomBar(
         shadowElevation = 8.dp
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .navigationBarsPadding()
+                .padding(16.dp)
         ) {
             when (currentFrame) {
                 1 -> {
@@ -1006,16 +997,15 @@ fun NewUserBottomBar(
 
                         Button(
                             onClick = onCompleteProfileSetup,
+                            enabled = isProfileSetupValid,
                             modifier = Modifier
                                 .weight(1f)
                                 .height(56.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (isProfileSetupValid) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                                }
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
+                                disabledContentColor = Color.White.copy(alpha = 0.6f)
                             )
                         ) {
                             Text(
@@ -1123,9 +1113,10 @@ fun ProfileItem(user: User, onClick: () -> Unit, modifier: Modifier = Modifier) 
             ) {
                 // Profile picture with fallback
                 if (!user.profilePicPath.isNullOrEmpty()) {
+                    val modelData = remember(user.profilePicPath) { com.example.dosezy.utils.ImageUtils.resolveImageModel(user.profilePicPath) }
                     AsyncImage(
                         model = ImageRequest.Builder(context)
-                            .data(File(user.profilePicPath))
+                            .data(modelData)
                             .crossfade(true)
                             .build(),
                         contentDescription = stringResource(R.string.profile_picture_desc),

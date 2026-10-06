@@ -87,11 +87,6 @@ class DosezyWidgetConfigureActivity : ComponentActivity() {
 
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 
-    override fun attachBaseContext(newBase: Context) {
-        val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(newBase)
-        val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(newBase, savedLanguage)
-        super.attachBaseContext(localizedContext)
-    }
 
     override fun applyOverrideConfiguration(overrideConfiguration: android.content.res.Configuration?) {
         if (overrideConfiguration != null) {
@@ -463,9 +458,10 @@ private fun WidgetConfigureScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 if (!user.profilePicPath.isNullOrEmpty()) {
+                                    val modelData = remember(user.profilePicPath) { com.example.dosezy.utils.ImageUtils.resolveImageModel(user.profilePicPath) }
                                     AsyncImage(
                                         model = ImageRequest.Builder(context)
-                                            .data(File(user.profilePicPath))
+                                            .data(modelData)
                                             .crossfade(true)
                                             .build(),
                                         contentDescription = user.fullName,

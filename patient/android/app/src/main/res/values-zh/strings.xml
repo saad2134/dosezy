@@ -245,7 +245,7 @@
 
 
     <string name="home_all_good">一切安好！</string>
-    <string name="home_all_good_desc">今天无需服药。如果您需要添加更多，请点击下方的加号按钮开始。</string>
+    <string name="home_all_good_desc">今天无需服药。</string>
     <string name="no_profiles_found">未找到个人资料</string>
     <string name="status_taken">已服用</string>
 
@@ -470,7 +470,7 @@
     <string name="pill_shape_drops">滴剂 (Drops)</string>
     <string name="pill_shape_patch">贴剂 (Patch)</string>
 
-    <string name="med_notes_label">医生 / 药剂师嘱咐及特别警告</string>
+    <string name="med_notes_label">医生嘱咐及特别警告</string>
     <string name="med_notes_placeholder">例如：饭后服用、忌食西柚、处方号 #12345</string>
 
     <string name="course_duration_title">用药疗程周期</string>
@@ -602,6 +602,7 @@
     <string name="alarm_take_medicine">立即服药</string>
     <string name="alarm_snooze_format">稍后提醒 (%d 分钟)</string>
     <string name="notif_action_snooze_format">稍后提醒 (%d 分钟)</string>
+    <string name="alarm_snoozed_toast">提醒已推迟 %d 分钟</string>
     <string name="alarm_stock_remaining">库存：剩余 %d 剂</string>
     <string name="home_action_take">服用</string>
     <string name="home_action_taken">已服</string>

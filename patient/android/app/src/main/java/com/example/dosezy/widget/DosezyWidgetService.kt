@@ -15,13 +15,12 @@ import com.example.dosezy.data.DosezyDatabase
 import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.data.model.TimeFormat
-import java.text.SimpleDateFormat
+import com.example.dosezy.utils.LocaleHelper
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
-import java.util.Date
 import java.util.Locale
 
 class DosezyWidgetService : RemoteViewsService() {
@@ -68,12 +67,13 @@ class DosezyRemoteViewsFactory(
                         users.find { it.userId == targetUserId } ?: users.find { it.isCurrentUser } ?: users.firstOrNull()
                     } ?: return@withTimeoutOrNull
 
+                // Guard: Use user's selected locale and DateTimeFormatter directly to prevent timezone drift and incorrect language formatting on home widget
+                val targetLocale = LocaleHelper.getLocale(user.language)
                 val is24Hour = user.timeFormat == TimeFormat.HOUR_24
                 val timePattern = if (is24Hour) "HH:mm" else "h:mm a"
-                val userTimeFormat = SimpleDateFormat(timePattern, Locale.getDefault())
+                val userTimeFormatter = DateTimeFormatter.ofPattern(timePattern, targetLocale)
 
                 val today = LocalDate.now()
-                val zoneId = ZoneId.systemDefault()
                 val zoneUtc = ZoneOffset.UTC
                 val startOfDay = today.atStartOfDay(zoneUtc).toInstant().toEpochMilli()
                 val endOfDay = today.plusDays(1).atStartOfDay(zoneUtc).toInstant().toEpochMilli() - 1
@@ -98,13 +98,13 @@ class DosezyRemoteViewsFactory(
                 val tomorrowLabel = context.getString(R.string.widget_tomorrow)
                 fun formatTimeLabel(entry: ScheduleEntry): String {
                     val itemDate = entry.scheduledDateTime.toLocalDate()
-                    val dateObj = Date.from(entry.scheduledDateTime.atZone(zoneId).toInstant())
+                    val formattedTime = entry.scheduledDateTime.format(userTimeFormatter)
                     return when (itemDate) {
-                        today -> userTimeFormat.format(dateObj)
-                        today.plusDays(1) -> "${tomorrowLabel.trim()} " + userTimeFormat.format(dateObj)
+                        today -> formattedTime
+                        today.plusDays(1) -> "${tomorrowLabel.trim()} $formattedTime"
                         else -> {
-                            val dayName = itemDate.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-                            "$dayName " + userTimeFormat.format(dateObj)
+                            val dayName = itemDate.dayOfWeek.getDisplayName(TextStyle.SHORT, targetLocale)
+                            "$dayName $formattedTime"
                         }
                     }
                 }
@@ -158,7 +158,7 @@ class DosezyRemoteViewsFactory(
 
     override fun getViewTypeCount(): Int = 2
 
-    override fun getItemId(position: Int): Long = position.toLong()
+    override fun getItemId(position: Int): Long = (position + if (isDark) 10000 else 0).toLong()
 
-    override fun hasStableIds(): Boolean = true
+    override fun hasStableIds(): Boolean = false
 }

@@ -148,7 +148,7 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                     val serviceIntent = Intent(context, DosezyWidgetService::class.java).apply {
                         putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
                         putExtra("is_dark", isDark)
-                        data = Uri.parse("dosezy://widget/service/$appWidgetId?dark=$isDark")
+                        data = Uri.parse("dosezy://widget/service/$appWidgetId?dark=$isDark&ts=${System.currentTimeMillis()}")
                     }
                     views.setRemoteAdapter(R.id.widget_medicine_list, serviceIntent)
                     views.setEmptyView(R.id.widget_medicine_list, R.id.widget_status_container)

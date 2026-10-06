@@ -228,7 +228,7 @@
 
 
     <string name="home_all_good">すべて順調です！</string>
-    <string name="home_all_good_desc">今日服用する必要のある薬はありません。追加する場合は、下のプラスボタンをタップして開始してください。</string>
+    <string name="home_all_good_desc">今日服用する必要のある薬はありません。</string>
     <string name="no_profiles_found">プロフィールが見つかりません</string>
     <string name="status_taken">服用済み</string>
 
@@ -454,7 +454,7 @@
     <string name="pill_shape_drops">点眼・点滴 (Drops)</string>
     <string name="pill_shape_patch">貼付剤・湿布 (Patch)</string>
 
-    <string name="med_notes_label">医師・薬剤師の指示・注意事項</string>
+    <string name="med_notes_label">医師の指示・注意事項</string>
     <string name="med_notes_placeholder">例：食後服用、グレープフルーツ禁止、処方箋 #12345</string>
 
     <string name="course_duration_title">服薬期間</string>
@@ -586,6 +586,7 @@
     <string name="alarm_take_medicine">薬を服用</string>
     <string name="alarm_snooze_format">スヌーズ (%d分)</string>
     <string name="notif_action_snooze_format">スヌーズ (%d分)</string>
+    <string name="alarm_snoozed_toast">アラームを%d分間スヌーズしました</string>
     <string name="alarm_stock_remaining">在庫: 残り %d 錠</string>
     <string name="home_action_take">服用</string>
     <string name="home_action_taken">服用済み</string>

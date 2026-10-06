@@ -228,7 +228,7 @@
 
 
     <string name="home_all_good">كل شيء جيد!</string>
-    <string name="home_all_good_desc">لا توجد أدوية يجب تناولها اليوم. إذا كنت بحاجة إلى إضافة المزيد، فابدأ بالنقر فوق زر علامة الزائد أدناه.</string>
+    <string name="home_all_good_desc">لا توجد أدوية يجب تناولها اليوم.</string>
     <string name="no_profiles_found">لم يتم العثور على ملفات شخصية</string>
     <string name="status_taken">تم تناوله</string>
 
@@ -454,7 +454,7 @@
     <string name="pill_shape_drops">قطرات</string>
     <string name="pill_shape_patch">لاصقة</string>
 
-    <string name="med_notes_label">ملاحظات الطبيب / الصيدلية والتحذيرات</string>
+    <string name="med_notes_label">ملاحظات الطبيب والتحذيرات</string>
     <string name="med_notes_placeholder">مثال: يؤخذ مع الطعام، تجنب الجريب فروت، وصفة رقم 12345</string>
 
     <string name="course_duration_title">مدة العلاج</string>
@@ -586,6 +586,7 @@
     <string name="alarm_take_medicine">تناول الدواء</string>
     <string name="alarm_snooze_format">تأجيل (%d دقيقة)</string>
     <string name="notif_action_snooze_format">تأجيل (%d د)</string>
+    <string name="alarm_snoozed_toast">تم تأجيل التنبيه لمدة %d دقيقة</string>
     <string name="alarm_stock_remaining">المخزون المتبقي: %d وحدة</string>
     <string name="home_action_take">تناول</string>
     <string name="home_action_taken">تم التناول</string>

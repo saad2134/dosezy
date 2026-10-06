@@ -253,7 +253,7 @@
 
 
     <string name="home_all_good">All Good!</string>
-    <string name="home_all_good_desc">No medications need to be taken today. If you need to add more, get started by tapping the plus button below.</string>
+    <string name="home_all_good_desc">No medications need to be taken today</string>
     <string name="no_profiles_found">No profiles found</string>
     <string name="status_taken">Taken</string>
 
@@ -486,8 +486,8 @@ Do you want to continue?</string>
     <string name="pill_shape_drops">Drops</string>
     <string name="pill_shape_patch">Patch</string>
 
-    <!-- Doctor & Pharmacy Notes (#46) -->
-    <string name="med_notes_label">Doctor / Pharmacy Notes &amp; Warnings</string>
+    <!-- Doctor Notes (#46) -->
+    <string name="med_notes_label">Doctor Notes &amp; Warnings</string>
     <string name="med_notes_placeholder">e.g. Take with food, Avoid grapefruit, Rx ref #12345</string>
 
     <!-- Prescription End Dates & Finite Courses (#43) -->
@@ -614,6 +614,7 @@ Do you want to continue?</string>
     <string name="alarm_take_medicine">TAKE MEDICINE</string>
     <string name="alarm_snooze_format">SNOOZE (%d MIN)</string>
     <string name="notif_action_snooze_format">Snooze (%d min)</string>
+    <string name="alarm_snoozed_toast">Alarm snoozed for %d minutes</string>
     <string name="alarm_stock_remaining">Stock: %d units remaining</string>
     <string name="home_action_take">Take</string>
     <string name="home_action_taken">Taken</string>

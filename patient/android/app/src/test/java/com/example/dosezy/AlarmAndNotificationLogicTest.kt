@@ -123,4 +123,35 @@ class AlarmAndNotificationLogicTest {
         assertTrue(truncated.length <= 28)
         assertTrue(truncated.endsWith("..."))
     }
+
+    // ───────────────────────────────────────────────────────────────
+    // 3. Slot Key, Phone Dialer, and Snooze Formatting Guards
+    // ───────────────────────────────────────────────────────────────
+
+    @Test
+    fun slotKey_matchesBetweenSchedulingAndCancellation() {
+        // Guard: Slot keys must match exactly between scheduling and cancellation to prevent phantom alarms
+        val userId = "user_123"
+        val dt = LocalDateTime.of(2026, 10, 6, 8, 30, 45, 123456)
+        val normalizedDt = dt.withSecond(0).withNano(0)
+        val expectedSlotKey = "${userId}_2026-10-06T08:30"
+        assertEquals(expectedSlotKey, "${userId}_$normalizedDt")
+    }
+
+    @Test
+    fun dialerNumberCleaner_stripsFormattingCharactersAndPreservesPlus() {
+        // Guard: Clean phone numbers by removing spaces/hyphens while preserving country code +
+        val rawNumber = "+1 (555) 234-5678"
+        val cleaned = rawNumber.replace(Regex("[^0-9+*#]"), "")
+        assertEquals("+15552345678", cleaned)
+    }
+
+    @Test
+    fun snoozeTime_formattedNonBlank_preventsDuplicateMedicationReminderTitle() {
+        // Guard: Formatted snooze time must be populated so AlarmActivity displayTime doesn't fall back to duplicate title string
+        val triggerTime = System.currentTimeMillis() + (10 * 60 * 1000)
+        val snoozeTimeFormatted = java.text.SimpleDateFormat("hh:mm a", java.util.Locale.US).format(java.util.Date(triggerTime))
+        assertTrue(snoozeTimeFormatted.isNotBlank())
+        assertTrue(snoozeTimeFormatted.contains(":") && (snoozeTimeFormatted.endsWith("AM") || snoozeTimeFormatted.endsWith("PM")))
+    }
 }

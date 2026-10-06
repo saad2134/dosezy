@@ -122,7 +122,6 @@ object AlarmAudioPlayer {
                                 .build()
                         )
                         setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
-                        afd.close()
                         isLooping = shouldLoop
                         if (!shouldLoop) {
                             setOnCompletionListener {
@@ -134,6 +133,8 @@ object AlarmAudioPlayer {
                         prepare()
                         start()
                     }
+                    // Guard: Close AssetFileDescriptor only AFTER prepare() to prevent Bad file descriptor status=0x1 failure in MediaPlayer native layer
+                    try { afd.close() } catch (_: Exception) {}
                     playbackStarted = true
                 }
             } catch (e: Exception) {
@@ -173,6 +174,9 @@ object AlarmAudioPlayer {
                     started = true
                 } catch (e: Exception) {
                     Log.w(TAG, "MediaPlayer failed for default ringtone URI, falling back to RingtoneManager", e)
+                    // Guard: Release and nullify failed MediaPlayer instance to prevent leaking native audio sink and hardware decoders upon RingtoneManager fallback
+                    try { mediaPlayer?.release() } catch (_: Exception) {}
+                    mediaPlayer = null
                 }
 
                 if (!started) {
@@ -247,12 +251,15 @@ object AlarmAudioPlayer {
         autoSilenceJob?.cancel()
         autoSilenceJob = null
 
-        try {
-            mediaPlayer?.let {
-                if (it.isPlaying) it.stop()
-                it.release()
-            }
-        } catch (_: Exception) {}
+        // Guard: Catch and release MediaPlayer independently so an IllegalStateException during isPlaying or stop does not leak native mediaserver decoders
+        mediaPlayer?.let { player ->
+            try {
+                if (player.isPlaying) player.stop()
+            } catch (_: Exception) {}
+            try {
+                player.release()
+            } catch (_: Exception) {}
+        }
         mediaPlayer = null
 
         try {

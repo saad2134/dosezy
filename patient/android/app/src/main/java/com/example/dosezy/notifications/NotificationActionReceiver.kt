@@ -25,7 +25,6 @@ class NotificationActionReceiver : BroadcastReceiver() {
         private const val TAG = "NotificationActionReceiver"
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onReceive(context: Context, intent: Intent?) {
         database = DosezyDatabase.getInstance(context)
         val action = intent?.action
@@ -45,7 +44,6 @@ class NotificationActionReceiver : BroadcastReceiver() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private suspend fun handleAction(context: Context, action: String?, allIds: List<String>, primaryEntryId: String) {
         val scheduleRepository = ScheduleRepository(database)
 
@@ -56,6 +54,10 @@ class NotificationActionReceiver : BroadcastReceiver() {
         val alarmScheduler = AlarmScheduler(context)
         allIds.forEach { id ->
             alarmScheduler.cancelNagging(id)
+            if (action == "TAKEN_ACTION") {
+                // Guard: Cancel snooze alarm so taking medication prevents delayed phantom snooze triggers
+                alarmScheduler.cancelSnooze(id)
+            }
         }
 
         // Cancel notification for both Taken and Snooze actions
@@ -68,10 +70,21 @@ class NotificationActionReceiver : BroadcastReceiver() {
 
         when (action) {
             "TAKEN_ACTION" -> {
-                val takenAt = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                val now = LocalDateTime.now()
+                val takenAt = now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
                 allIds.forEach { id ->
-                    Log.d(TAG, "Marking medicine as taken for entry: $id")
-                    scheduleRepository.recordDoseTaken(id, "TAKEN_ON_TIME", takenAt, context)
+                    val entry = database.scheduleDao().getScheduleEntryById(id)
+                    val user = entry?.let { database.userDao().getUserByIdDirect(it.userId) }
+                    val lateAfter = user?.considerLateAfter ?: 3
+                    val missedAfter = user?.considerMissedAfter ?: 6
+                    // Guard: Use isTakenLate so doses taken past missedAfter are recorded as TAKEN_LATE rather than TAKEN_ON_TIME
+                    val status = if (entry != null && com.example.dosezy.utils.TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, lateAfter)) {
+                        "TAKEN_LATE"
+                    } else {
+                        "TAKEN_ON_TIME"
+                    }
+                    Log.d(TAG, "Marking medicine as taken ($status) for entry: $id")
+                    scheduleRepository.recordDoseTaken(id, status, takenAt, context)
                 }
                 Log.d(TAG, "Marked ${allIds.size} medicines as taken and processed")
             }
@@ -87,8 +100,12 @@ class NotificationActionReceiver : BroadcastReceiver() {
                     med?.medicationName
                 }
 
-                alarmScheduler.scheduleGroupedSnooze(allIds, snoozeMinutes, medicineNames)
+                // Guard: Pass user's timeFormat so snoozed alarm time matches user's 12h/24h preference
+                alarmScheduler.scheduleGroupedSnooze(allIds, snoozeMinutes, medicineNames, timeFormat = user?.timeFormat)
                 Log.d(TAG, "Medicine reminder snoozed for $snoozeMinutes minutes for ${allIds.size} entries")
+                try {
+                    com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+                } catch (_: Exception) {}
             }
             else -> {
                 Log.w(TAG, "Unknown action received: $action for entry: $primaryEntryId")

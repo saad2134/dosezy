@@ -228,7 +228,7 @@
 
 
     <string name="home_all_good">Alles gut!</string>
-    <string name="home_all_good_desc">Heute müssen keine Medikamente eingenommen werden. Wenn Sie weitere hinzufügen möchten, tippen Sie unten auf das Plus-Symbol.</string>
+    <string name="home_all_good_desc">Heute müssen keine Medikamente eingenommen werden.</string>
     <string name="no_profiles_found">Keine Profile gefunden</string>
     <string name="status_taken">Eingenommen</string>
 
@@ -454,7 +454,7 @@ Möchten Sie fortfahren?</string>
     <string name="pill_shape_drops">Tropfen</string>
     <string name="pill_shape_patch">Pflaster</string>
 
-    <string name="med_notes_label">Arzt- / Apothekenhinweise &amp; Warnungen</string>
+    <string name="med_notes_label">Arzthinweise &amp; Warnungen</string>
     <string name="med_notes_placeholder">z. B. Zu den Mahlzeiten, Keine Grapefruit, Rezept #12345</string>
 
     <string name="course_duration_title">Behandlungsdauer</string>
@@ -586,6 +586,7 @@ Möchten Sie fortfahren?</string>
     <string name="alarm_take_medicine">MEDIKAMENT EINNEHMEN</string>
     <string name="alarm_snooze_format">SCHLUMMERN (%d MIN)</string>
     <string name="notif_action_snooze_format">Schlummern (%d Min.)</string>
+    <string name="alarm_snoozed_toast">Erinnerung für %d Minuten geschlummert</string>
     <string name="alarm_stock_remaining">Vorrat: %d Einheiten verbleibend</string>
     <string name="home_action_take">Einnehmen</string>
     <string name="home_action_taken">Eingenommen</string>

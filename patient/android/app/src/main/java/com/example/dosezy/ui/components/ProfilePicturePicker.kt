@@ -180,9 +180,10 @@ fun ProfilePicturePicker(
     ) {
         // Profile Image or Placeholder
         if (!profilePicPath.isNullOrEmpty()) {
+            val modelData = remember(profilePicPath) { com.example.dosezy.utils.ImageUtils.resolveImageModel(profilePicPath) }
             AsyncImage(
                 model = ImageRequest.Builder(context)
-                    .data(File(profilePicPath))
+                    .data(modelData)
                     .crossfade(true)
                     .build(),
                 contentDescription = "Profile Picture",
@@ -370,10 +371,11 @@ private fun saveImageToInternalStorage(context: Context, uri: Uri, oldPath: Stri
     // Delete old profile picture if it exists to prevent storage leak
     if (!oldPath.isNullOrEmpty()) {
         try {
-            val oldFile = File(oldPath)
-            if (oldFile.exists() && oldFile.parentFile?.absolutePath == context.filesDir.absolutePath) {
+            val cleanPath = oldPath.removePrefix("file://")
+            val oldFile = File(cleanPath)
+            if (oldFile.exists() && (oldFile.parentFile?.canonicalPath == context.filesDir.canonicalPath || oldFile.canonicalPath.startsWith(context.filesDir.canonicalPath + File.separator))) {
                 val deleted = oldFile.delete()
-                Log.d("ProfilePicturePicker", "Deleted old image: $oldPath, success=$deleted")
+                Log.d("ProfilePicturePicker", "Deleted old image: $cleanPath, success=$deleted")
             }
         } catch (e: Exception) {
             Log.e("ProfilePicturePicker", "Failed to delete old image: ${e.message}")
@@ -403,10 +405,12 @@ private fun saveImageToInternalStorage(context: Context, uri: Uri, oldPath: Stri
 
 private fun deleteOldImage(path: String) {
     try {
-        val file = File(path)
+        // Guard: Strip file:// prefix so File() can locate the file on disk without FileNotFoundException
+        val cleanPath = path.removePrefix("file://")
+        val file = File(cleanPath)
         if (file.exists()) {
             val deleted = file.delete()
-            Log.d("ProfilePicturePicker", "Deleted image: $path, success=$deleted")
+            Log.d("ProfilePicturePicker", "Deleted image: $cleanPath, success=$deleted")
         }
     } catch (e: Exception) {
         Log.e("ProfilePicturePicker", "Failed to delete old image: ${e.message}")
@@ -518,9 +522,10 @@ fun MedicinePhotoVisualPicker(
                 contentAlignment = Alignment.Center
             ) {
                 if (!imagePath.isNullOrEmpty()) {
+                    val modelData = remember(imagePath) { com.example.dosezy.utils.ImageUtils.resolveImageModel(imagePath) }
                     AsyncImage(
                         model = ImageRequest.Builder(context)
-                            .data(File(imagePath))
+                            .data(modelData)
                             .crossfade(true)
                             .build(),
                         contentDescription = "Medicine Image",

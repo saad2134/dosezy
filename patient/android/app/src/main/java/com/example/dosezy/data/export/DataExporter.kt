@@ -29,9 +29,13 @@ import java.util.zip.ZipOutputStream
 class DataExporter(
     private val context: Context,
     private val userRepository: UserRepository,
-    val medicineRepository: MedicineRepository,
+    private val medicineRepository: MedicineRepository,
     private val scheduleRepository: ScheduleRepository
 ) {
+
+    suspend fun getActiveMedicinesForUser(userId: String): List<Medicine> {
+        return medicineRepository.getMedicinesByUserSync(userId).filter { !it.isArchived }
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun exportUserData(userId: String?, format: ExportFormat): File = withContext(Dispatchers.IO) {
@@ -60,14 +64,21 @@ class DataExporter(
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun exportAllUsersToCsv(): File = exportUserData(null, ExportFormat.CSV)
 
+    // Guard: Strip directory separators and illegal filesystem characters to prevent FileNotFoundException or invalid paths
+    private fun sanitizeFileName(name: String): String {
+        return name.trim().replace(Regex("[^a-zA-Z0-9._-]"), "_")
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun exportUserToCsv(userId: String): File = withContext(Dispatchers.IO) {
         val user = userRepository.getUserByIdSync(userId) ?: throw Exception("User not found")
-        val medicines = medicineRepository.getMedicinesByUserSync(userId)
+        // Guard: Use getMedicinesByUserDirect to include archived/discontinued medicines and prevent broken foreign key references in historical exports
+        val medicines = medicineRepository.getMedicinesByUserDirect(userId)
         val schedules = scheduleRepository.getSchedulesByUserSync(userId)
 
         val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
-        val fileName = "dosezy_export_${user.fullName.replace(" ", "_")}_$timestamp.csv"
+        val safeName = sanitizeFileName(user.fullName)
+        val fileName = "dosezy_export_${safeName}_$timestamp.csv"
 
         val csvContent = buildCsvContent(user, medicines, schedules)
         return@withContext saveExportToFile(csvContent, fileName)
@@ -76,11 +87,13 @@ class DataExporter(
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun exportUserToJson(userId: String): File = withContext(Dispatchers.IO) {
         val user = userRepository.getUserByIdSync(userId) ?: throw Exception("User not found")
-        val medicines = medicineRepository.getMedicinesByUserSync(userId)
+        // Guard: Use getMedicinesByUserDirect to include archived/discontinued medicines and prevent broken foreign key references in historical exports
+        val medicines = medicineRepository.getMedicinesByUserDirect(userId)
         val schedules = scheduleRepository.getSchedulesByUserSync(userId)
 
         val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
-        val fileName = "dosezy_export_${user.fullName.replace(" ", "_")}_$timestamp.json"
+        val safeName = sanitizeFileName(user.fullName)
+        val fileName = "dosezy_export_${safeName}_$timestamp.json"
 
         val jsonContent = buildJsonContent(user, medicines, schedules)
         return@withContext saveExportToFile(jsonContent, fileName)
@@ -89,14 +102,18 @@ class DataExporter(
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun exportUserToPdf(userId: String): File = withContext(Dispatchers.IO) {
         val user = userRepository.getUserByIdSync(userId) ?: throw Exception("User not found")
-        val medicines = medicineRepository.getMedicinesByUserSync(userId)
+        // Guard: Use getMedicinesByUserDirect to include archived/discontinued medicines and prevent "Unknown" labels in historical reports
+        val medicines = medicineRepository.getMedicinesByUserDirect(userId)
         val schedules = scheduleRepository.getSchedulesByUserSync(userId)
 
         val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
-        val fileName = "dosezy_report_${user.fullName.replace(" ", "_")}_$timestamp.pdf"
+        val safeName = sanitizeFileName(user.fullName)
+        val fileName = "dosezy_report_${safeName}_$timestamp.pdf"
 
         val pdfDoc = buildPdfDocument(user, medicines, schedules)
-        val file = File(context.getExternalFilesDir(null), fileName)
+        // Guard: Use getExportDirectory() fallback to filesDir when externalFilesDir is null/unmounted to prevent NPE
+        val exportDir = getExportDirectory()
+        val file = File(exportDir, fileName)
         FileOutputStream(file).use { out ->
             pdfDoc.writeTo(out)
         }
@@ -107,29 +124,34 @@ class DataExporter(
     @RequiresApi(Build.VERSION_CODES.O)
     private suspend fun createUsersZipFormatted(users: List<User>, format: ExportFormat): File = withContext(Dispatchers.IO) {
         val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
-        val zipFile = File(context.getExternalFilesDir(null), "dosezy_export_$timestamp.zip")
+        // Guard: Use getExportDirectory() fallback to filesDir when externalFilesDir is null/unmounted to prevent NPE
+        val exportDir = getExportDirectory()
+        val zipFile = File(exportDir, "dosezy_export_$timestamp.zip")
 
         FileOutputStream(zipFile).use { fileOutputStream ->
             ZipOutputStream(fileOutputStream).use { zipOutputStream ->
                 users.forEach { user ->
                     try {
-                        val medicines = medicineRepository.getMedicinesByUserSync(user.userId)
+                        // Guard: Use getMedicinesByUserDirect to include archived/discontinued medicines
+                        val medicines = medicineRepository.getMedicinesByUserDirect(user.userId)
                         val schedules = scheduleRepository.getSchedulesByUserSync(user.userId)
 
-                        val userFolder = user.fullName.replace(" ", "_")
+                        val userFolder = sanitizeFileName(user.fullName)
                         when (format) {
                             ExportFormat.CSV -> {
                                 val content = buildCsvContent(user, medicines, schedules)
                                 val entry = ZipEntry("$userFolder/medication_data.csv")
                                 zipOutputStream.putNextEntry(entry)
-                                zipOutputStream.write(content.toByteArray())
+                                // Guard: Explicitly specify UTF-8 charset to prevent corrupted non-ASCII characters in zip exports on devices with non-UTF-8 default charsets
+                                zipOutputStream.write(content.toByteArray(Charsets.UTF_8))
                                 zipOutputStream.closeEntry()
                             }
                             ExportFormat.JSON -> {
                                 val content = buildJsonContent(user, medicines, schedules)
                                 val entry = ZipEntry("$userFolder/medication_data.json")
                                 zipOutputStream.putNextEntry(entry)
-                                zipOutputStream.write(content.toByteArray())
+                                // Guard: Explicitly specify UTF-8 charset to prevent corrupted non-ASCII characters in zip exports on devices with non-UTF-8 default charsets
+                                zipOutputStream.write(content.toByteArray(Charsets.UTF_8))
                                 zipOutputStream.closeEntry()
                             }
                             ExportFormat.PDF -> {
@@ -156,7 +178,7 @@ class DataExporter(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun buildJsonContent(user: User, medicines: List<Medicine>, schedules: List<ScheduleEntry>): String {
+    internal fun buildJsonContent(user: User, medicines: List<Medicine>, schedules: List<ScheduleEntry>): String {
         val root = JSONObject()
         root.put("appName", "Dosezy")
         root.put("appVersion", com.example.dosezy.BuildConfig.VERSION_NAME)
@@ -197,6 +219,8 @@ class DataExporter(
         medicines.forEach { med ->
             val mObj = JSONObject()
             mObj.put("medicineId", med.medicineId)
+            // Guard: Explicitly serialize userId for medicine to retain profile relational integrity in export backups
+            mObj.put("userId", med.userId)
             mObj.put("medicationName", med.medicationName)
             mObj.put("dosage", med.dosage)
             mObj.put("dosageUnit", med.dosageUnit.name)
@@ -244,15 +268,18 @@ class DataExporter(
         schedules.forEach { sch ->
             val sObj = JSONObject()
             sObj.put("entryId", sch.entryId)
+            // Guard: Explicitly serialize userId on schedule entry so deserialization and external backups preserve user profile linkage
+            sObj.put("userId", sch.userId)
             sObj.put("medicineId", sch.medicineId)
             sObj.put("scheduledDateTime", sch.scheduledDateTime.toString())
             sObj.put("status", sch.status.name)
-            sObj.put("skipReason", sch.skipReason ?: "")
-            sObj.put("takenAt", sch.takenAt?.toString() ?: "")
+            // Guard: Omit null fields rather than writing empty strings to prevent ambiguous import semantics (null vs explicitly-cleared)
+            sch.skipReason?.let { sObj.put("skipReason", it) }
+            sch.takenAt?.let { sObj.put("takenAt", it.toString()) }
             if (sch.dosage != null) {
                 sObj.put("dosage", sch.dosage)
             }
-            sObj.put("doseNotes", sch.doseNotes ?: "")
+            sch.doseNotes?.let { sObj.put("doseNotes", it) }
             schedArray.put(sObj)
         }
         root.put("schedules", schedArray)
@@ -359,12 +386,27 @@ class DataExporter(
         y += 20f
 
         // Analytics & Adherence Summary Section (Calculated from past decided doses)
-        val totalCount = schedules.size
-        val takenOnTimeCount = schedules.count { it.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_ON_TIME }
-        val takenLateCount = schedules.count { it.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_LATE }
-        val skippedCount = schedules.count { it.status == com.example.dosezy.data.model.MedicationStatus.SKIPPED }
-        val missedCount = schedules.count { it.status == com.example.dosezy.data.model.MedicationStatus.MISSED }
-        val pendingCount = schedules.count { it.status == com.example.dosezy.data.model.MedicationStatus.PENDING }
+        val evalNow = LocalDateTime.now()
+        val evalToday = java.time.LocalDate.now()
+        val missedAfterHours = user.considerMissedAfter
+
+        // Guard: Dynamically evaluate stale PENDING entries past considerMissedAfter as MISSED, matching AnalyticsViewModel logic to prevent adherence inflation in exported reports
+        fun isEntryMissed(entry: ScheduleEntry): Boolean =
+            entry.status == com.example.dosezy.data.model.MedicationStatus.MISSED ||
+            (entry.status == com.example.dosezy.data.model.MedicationStatus.PENDING && evalNow.isAfter(entry.scheduledDateTime) &&
+                java.time.Duration.between(entry.scheduledDateTime, evalNow).toHours() >= missedAfterHours.toLong())
+
+        // Guard: Exclude PRN ad-hoc doses and future entries from adherence calculation to match in-app analytics
+        val adherenceEntries = schedules.filter {
+            !it.entryId.startsWith("PRN_") && it.scheduledDateTime.toLocalDate() <= evalToday
+        }
+
+        val totalCount = adherenceEntries.size
+        val takenOnTimeCount = adherenceEntries.count { it.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_ON_TIME }
+        val takenLateCount = adherenceEntries.count { it.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_LATE }
+        val skippedCount = adherenceEntries.count { it.status == com.example.dosezy.data.model.MedicationStatus.SKIPPED }
+        val missedCount = adherenceEntries.count { isEntryMissed(it) }
+        val pendingCount = adherenceEntries.count { it.status == com.example.dosezy.data.model.MedicationStatus.PENDING && !isEntryMissed(it) }
 
         val takenTotal = takenOnTimeCount + takenLateCount
         val decidedCount = takenTotal + missedCount
@@ -490,81 +532,90 @@ class DataExporter(
         return pdfDocument
     }
 
-    private fun escapeCsv(value: Any?): String {
-        val str = value?.toString() ?: ""
-        return "\"${str.replace("\"", "\"\"")}\""
-    }
-
-    private fun buildCsvContent(user: User, medicines: List<Medicine>, schedules: List<ScheduleEntry>): String {
-        val csvBuilder = StringBuilder()
-
-        // User Information Section
-        csvBuilder.append("USER INFORMATION\n")
-        csvBuilder.append("User ID,Full Name,Age,Gender,Contact Number,Allergies,Medical Conditions,Profile Picture Path,Is Current User\n")
-        csvBuilder.append(
-            "${escapeCsv(user.userId)}," +
-            "${escapeCsv(user.fullName)}," +
-            "${user.age}," +
-            "${user.gender}," +
-            "${escapeCsv(user.contactNumber)}," +
-            "${escapeCsv(user.allergies ?: "")}," +
-            "${escapeCsv(user.medicalConditions ?: "")}," +
-            "${escapeCsv(user.profilePicPath ?: "")}," +
-            "${user.isCurrentUser}\n\n"
-        )
-
-        // Medicines Section
-        csvBuilder.append("MEDICINES\n")
-        csvBuilder.append("Medicine ID,User ID,Medication Name,Dosage,Dosage Unit,Times Per Day,Frequency Pattern,Interval Hours,Interval Days,Interval Weeks,Scheduled Times,Pill Shape,Pill Color,Doctor Notes,Start Date,End Date,Duration Days,Stock,Image URI\n")
-        medicines.forEach { medicine ->
-            val scheduledTimesStr = medicine.scheduledTimes.joinToString(";") { it.toString() }
-            csvBuilder.append(
-                "${escapeCsv(medicine.medicineId)}," +
-                "${escapeCsv(medicine.userId)}," +
-                "${escapeCsv(medicine.medicationName)}," +
-                "${medicine.dosage}," +
-                "${medicine.dosageUnit}," +
-                "${medicine.timesPerDay}," +
-                "${medicine.frequency.pattern}," +
-                "${medicine.frequency.intervalHours ?: ""}," +
-                "${medicine.frequency.intervalDays ?: ""}," +
-                "${medicine.frequency.intervalWeeks ?: ""}," +
-                "${escapeCsv(scheduledTimesStr)}," +
-                "${escapeCsv(medicine.pillShape.name)}," +
-                "${escapeCsv(medicine.pillColor)}," +
-                "${escapeCsv(medicine.notes ?: "")}," +
-                "${escapeCsv(medicine.startDate ?: "")}," +
-                "${escapeCsv(medicine.endDate ?: "")}," +
-                "${medicine.durationDays ?: ""}," +
-                "${medicine.currentStock ?: ""}," +
-                "${escapeCsv(medicine.imageUri ?: "")}\n"
-            )
-        }
-        csvBuilder.append("\n")
-
-        // Schedules Section
-        csvBuilder.append("SCHEDULES\n")
-        csvBuilder.append("Entry ID,User ID,Medicine ID,Scheduled DateTime,Status,Skip Reason,Taken At,Dosage,Dose Notes\n")
-        schedules.forEach { schedule ->
-            csvBuilder.append(
-                "${escapeCsv(schedule.entryId)}," +
-                "${escapeCsv(schedule.userId)}," +
-                "${escapeCsv(schedule.medicineId)}," +
-                "${escapeCsv(schedule.scheduledDateTime)}," +
-                "${schedule.status}," +
-                "${escapeCsv(schedule.skipReason ?: "")}," +
-                "${escapeCsv(schedule.takenAt ?: "")}," +
-                "${schedule.dosage ?: ""}," +
-                "${escapeCsv(schedule.doseNotes ?: "")}\n"
-            )
+    companion object {
+        internal fun escapeCsv(value: Any?): String {
+            val str = value?.toString() ?: ""
+            return "\"${str.replace("\"", "\"\"")}\""
         }
 
-        return csvBuilder.toString()
+        internal fun buildCsvContent(user: User, medicines: List<Medicine>, schedules: List<ScheduleEntry>): String {
+            val csvBuilder = StringBuilder()
+
+            // User Information Section
+            csvBuilder.append("USER INFORMATION\n")
+            csvBuilder.append("User ID,Full Name,Age,Gender,Contact Number,Allergies,Medical Conditions,Profile Picture Path,Is Current User\n")
+            csvBuilder.append(
+                "${escapeCsv(user.userId)}," +
+                "${escapeCsv(user.fullName)}," +
+                "${user.age}," +
+                "${user.gender}," +
+                "${escapeCsv(user.contactNumber)}," +
+                "${escapeCsv(user.allergies ?: "")}," +
+                "${escapeCsv(user.medicalConditions ?: "")}," +
+                "${escapeCsv(user.profilePicPath ?: "")}," +
+                "${user.isCurrentUser}\n\n"
+            )
+
+            // Medicines Section
+            csvBuilder.append("MEDICINES\n")
+            // Guard: Include Refill Threshold, Auto Deduct Stock, Is Archived, and Custom Dosages to preserve inventory metadata in CSV exports
+            csvBuilder.append("Medicine ID,User ID,Medication Name,Dosage,Dosage Unit,Times Per Day,Frequency Pattern,Interval Hours,Interval Days,Interval Weeks,Scheduled Times,Pill Shape,Pill Color,Doctor Notes,Start Date,End Date,Duration Days,Stock,Refill Threshold,Auto Deduct Stock,Is Archived,Custom Dosages,Image URI\n")
+            medicines.forEach { medicine ->
+                val scheduledTimesStr = medicine.scheduledTimes.joinToString(";") { it.toString() }
+                val customDosagesStr = medicine.customDosages?.entries?.joinToString(";") { "${it.key}:${it.value}" } ?: ""
+                csvBuilder.append(
+                    "${escapeCsv(medicine.medicineId)}," +
+                    "${escapeCsv(medicine.userId)}," +
+                    "${escapeCsv(medicine.medicationName)}," +
+                    "${medicine.dosage}," +
+                    "${medicine.dosageUnit}," +
+                    "${medicine.timesPerDay}," +
+                    "${medicine.frequency.pattern}," +
+                    "${medicine.frequency.intervalHours ?: ""}," +
+                    "${medicine.frequency.intervalDays ?: ""}," +
+                    "${medicine.frequency.intervalWeeks ?: ""}," +
+                    "${escapeCsv(scheduledTimesStr)}," +
+                    "${escapeCsv(medicine.pillShape.name)}," +
+                    "${escapeCsv(medicine.pillColor)}," +
+                    "${escapeCsv(medicine.notes ?: "")}," +
+                    "${escapeCsv(medicine.startDate ?: "")}," +
+                    "${escapeCsv(medicine.endDate ?: "")}," +
+                    "${medicine.durationDays ?: ""}," +
+                    "${medicine.currentStock ?: ""}," +
+                    "${medicine.refillThreshold ?: ""}," +
+                    "${medicine.autoDeductOnTake}," +
+                    "${medicine.isArchived}," +
+                    "${escapeCsv(customDosagesStr)}," +
+                    "${escapeCsv(medicine.imageUri ?: "")}\n"
+                )
+            }
+            csvBuilder.append("\n")
+
+            // Schedules Section
+            csvBuilder.append("SCHEDULES\n")
+            csvBuilder.append("Entry ID,User ID,Medicine ID,Scheduled DateTime,Status,Skip Reason,Taken At,Dosage,Dose Notes\n")
+            schedules.forEach { schedule ->
+                csvBuilder.append(
+                    "${escapeCsv(schedule.entryId)}," +
+                    "${escapeCsv(schedule.userId)}," +
+                    "${escapeCsv(schedule.medicineId)}," +
+                    "${escapeCsv(schedule.scheduledDateTime)}," +
+                    "${schedule.status}," +
+                    "${escapeCsv(schedule.skipReason ?: "")}," +
+                    "${escapeCsv(schedule.takenAt ?: "")}," +
+                    "${schedule.dosage ?: ""}," +
+                    "${escapeCsv(schedule.doseNotes ?: "")}\n"
+                )
+            }
+
+            return csvBuilder.toString()
+        }
     }
 
     suspend fun saveExportToFile(content: String, fileName: String): File {
         return withContext(Dispatchers.IO) {
-            val file = File(context.getExternalFilesDir(null), fileName)
+            // Guard: Use getExportDirectory() fallback to filesDir when externalFilesDir is null/unmounted to prevent NPE
+            val file = File(getExportDirectory(), fileName)
             file.writeText(content)
             file
         }

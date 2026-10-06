@@ -179,10 +179,10 @@ fun HomeScreen(
     val executeTakeDose: (String, java.time.LocalDateTime, String?) -> Unit = { entryId, resolvedDateTime, note ->
         val medName = todayEntries.find { it.scheduleEntry.entryId == entryId }?.medicine?.medicationName ?: ""
         val lateAfter = currentUser?.considerLateAfter ?: 3
-        val missedAfter = currentUser?.considerMissedAfter ?: 6
         val targetScheduleEntry = todayEntries.find { it.scheduleEntry.entryId == entryId }?.scheduleEntry
+        // Guard: Use isTakenLate so overdue doses past missedAfter are correctly recorded as TAKEN_LATE instead of reverting to on-time
         val isLate = if (targetScheduleEntry != null) {
-            TimeCalculationUtils.isLate(targetScheduleEntry.scheduledDateTime, resolvedDateTime, lateAfter, missedAfter)
+            TimeCalculationUtils.isTakenLate(targetScheduleEntry.scheduledDateTime, resolvedDateTime, lateAfter)
         } else false
 
         val takenAt = resolvedDateTime.toString()
@@ -772,9 +772,10 @@ private fun MedicationCard(
         else -> MaterialTheme.colorScheme.onPrimary
     }
 
+    // Guard: Support undo for missed doses when allowDoseUndo is true, or retroactive recording when allowCustomDoseTime is true
     val enabled = when {
         isTaken || isSkipped -> currentUser?.allowDoseUndo == true
-        isMissed -> currentUser?.allowCustomDoseTime == true
+        isMissed -> currentUser?.allowDoseUndo == true || currentUser?.allowCustomDoseTime == true
         else -> true
     }
 
@@ -928,6 +929,14 @@ private fun MedicationCard(
                                     onUndo(entry.entryId)
                                 }
                             }
+                            isMissed -> {
+                                // Guard: If allowDoseUndo is enabled, prioritize undoing missed status back to pending; otherwise fallback to custom dose recording
+                                if (currentUser?.allowDoseUndo == true) {
+                                    onUndo(entry.entryId)
+                                } else if (currentUser?.allowCustomDoseTime == true) {
+                                    onMarkAsTaken(entry.entryId)
+                                }
+                            }
                             isLate -> onMarkAsLate(entry.entryId)
                             else -> onMarkAsTaken(entry.entryId)
                         }
@@ -1076,7 +1085,8 @@ private fun AllGoodBanner() {
                 )
                 Text(
                     text = androidx.compose.ui.res.stringResource(R.string.home_all_good_desc),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

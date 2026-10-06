@@ -1,6 +1,5 @@
 package com.example.dosezy.ui.viewmodels
 
-import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dosezy.data.model.User
@@ -20,9 +19,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
-    val userRepository: UserRepository,
-    val medicineRepository: MedicineRepository,
-    val scheduleRepository: ScheduleRepository,
+    private val userRepository: UserRepository,
+    private val medicineRepository: MedicineRepository,
+    private val scheduleRepository: ScheduleRepository,
     private val medicineNotificationManager: MedicineNotificationManager
 ) : ViewModel() {
 
@@ -50,7 +49,13 @@ class UserViewModel @Inject constructor(
                         _users.value = userList
 
                         // Find current user
-                        val current = userList.firstOrNull { it.isCurrentUser }
+                        var current = userList.firstOrNull { it.isCurrentUser }
+                        // Guard: Auto-promote first profile if profiles exist but none has isCurrentUser=true (e.g. after selective restore or migration) to ensure an active profile always exists
+                        if (current == null && userList.isNotEmpty()) {
+                            val promoted = userList.first().copy(isCurrentUser = true)
+                            userRepository.updateUser(promoted)
+                            current = promoted
+                        }
                         _currentUser.value = current
                         if (current != null) {
                             try {
@@ -94,10 +99,8 @@ class UserViewModel @Inject constructor(
                         _currentUser.value = updatedUser
                     }
 
-                    // Schedule alarms for the new current user
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        medicineNotificationManager.scheduleAlarmsForUser(updatedUser.userId)
-                    }
+                    // Guard: Core library desugaring supports API 24+; schedule alarms across all supported OS versions
+                    medicineNotificationManager.scheduleAlarmsForUser(updatedUser.userId)
 
                     try {
                         val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
@@ -151,9 +154,8 @@ class UserViewModel @Inject constructor(
                         withContext(Dispatchers.Main) {
                             _currentUser.value = userToInsert
                         }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            medicineNotificationManager.scheduleAlarmsForUser(userToInsert.userId)
-                        }
+                        // Guard: Core library desugaring supports API 24+; schedule alarms for new profile across all supported OS versions
+                        medicineNotificationManager.scheduleAlarmsForUser(userToInsert.userId)
                         try {
                             val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
                             prefs.edit().putString("theme", userToInsert.theme.name.lowercase()).apply()
@@ -195,13 +197,48 @@ class UserViewModel @Inject constructor(
             _isLoading.value = true
             try {
                 withContext(Dispatchers.IO) {
-                    // Cancel alarms for the deleted user
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        medicineNotificationManager.cancelAllAlarmsForUser(user.userId)
+                    // Guard: Cancel alarms across all supported versions (API 24+) to prevent orphaned alarms ringing after user deletion
+                    medicineNotificationManager.cancelAllAlarmsForUser(user.userId)
+
+                    // Delete user's profile picture from internal storage if it exists
+                    user.profilePicPath?.let { path ->
+                        try {
+                            val cleanPath = path.removePrefix("file://")
+                            val file = java.io.File(cleanPath)
+                            val filesDir = medicineRepository.context.filesDir
+                            if (file.exists() && (file.parentFile?.canonicalPath == filesDir.canonicalPath || file.canonicalPath.startsWith(filesDir.canonicalPath + java.io.File.separator))) {
+                                file.delete()
+                            }
+                        } catch (_: Exception) {}
                     }
 
-                    // Delete the user from DB
+                    // Clean up associated medicine images before database cascade deletion
+                    try {
+                        val meds = medicineRepository.getMedicinesByUserDirect(user.userId)
+                        val filesDir = medicineRepository.context.filesDir
+                        meds.forEach { med ->
+                            med.imageUri?.let { uriStr ->
+                                val cleanPath = uriStr.removePrefix("file://")
+                                val file = java.io.File(cleanPath)
+                                if (file.exists() && (file.parentFile?.canonicalPath == filesDir.canonicalPath || file.canonicalPath.startsWith(filesDir.canonicalPath + java.io.File.separator))) {
+                                    file.delete()
+                                }
+                            }
+                        }
+                    } catch (_: Exception) {}
+
+                    // Delete the user from DB (cascades to medicines & schedules)
                     userRepository.deleteUser(user)
+
+                    // Guard: Scrub orphaned emergency contacts and widget profile preferences for the deleted profile to prevent SharedPreferences leakage
+                    try {
+                        val emPrefs = medicineRepository.context.getSharedPreferences("emergency_contacts", android.content.Context.MODE_PRIVATE)
+                        emPrefs.edit().remove("contacts_json_${user.userId}").apply()
+                    } catch (_: Exception) {}
+
+                    try {
+                        com.example.dosezy.widget.DosezyWidgetPrefs.deleteWidgetProfileTheme(medicineRepository.context, user.userId)
+                    } catch (_: Exception) {}
 
                     // Fetch remaining users directly from DB
                     val remainingUsers = userRepository.getAllUsersList().filter { it.userId != user.userId }
@@ -215,9 +252,8 @@ class UserViewModel @Inject constructor(
                             onNextUserSelected?.invoke(nextUser)
                         }
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            medicineNotificationManager.scheduleAlarmsForUser(nextUser.userId)
-                        }
+                        // Guard: Core library desugaring supports API 24+; schedule alarms for next active profile across all OS versions
+                        medicineNotificationManager.scheduleAlarmsForUser(nextUser.userId)
                     } else if (remainingUsers.isEmpty()) {
                         withContext(Dispatchers.Main) {
                             _currentUser.value = null
@@ -235,5 +271,14 @@ class UserViewModel @Inject constructor(
                 _isLoading.value = false
             }
         }
+    }
+
+    fun createDataExporter(context: android.content.Context): com.example.dosezy.data.export.DataExporter {
+        return com.example.dosezy.data.export.DataExporter(
+            context = context,
+            userRepository = userRepository,
+            medicineRepository = medicineRepository,
+            scheduleRepository = scheduleRepository
+        )
     }
 }

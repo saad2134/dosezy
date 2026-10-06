@@ -64,3 +64,22 @@ fun sharedMedicineViewModel(): MedicineViewModel {
         hiltViewModel()
     }
 }
+
+@Composable
+fun sharedAnalyticsViewModel(): com.example.dosezy.ui.viewmodels.AnalyticsViewModel {
+    val context = LocalContext.current
+    val activity = remember(context) {
+        var c = context
+        while (c is ContextWrapper) {
+            if (c is ComponentActivity) break
+            c = c.baseContext
+        }
+        c as? ComponentActivity
+    }
+    return if (activity != null) {
+        hiltViewModel(activity)
+    } else {
+        hiltViewModel()
+    }
+}
+

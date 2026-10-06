@@ -228,7 +228,7 @@
 
 
     <string name="home_all_good">Все отлично!</string>
-    <string name="home_all_good_desc">Сегодня принимать лекарства не нужно. Если хотите добавить еще, нажмите на кнопку с плюсом внизу.</string>
+    <string name="home_all_good_desc">Сегодня принимать лекарства не нужно.</string>
     <string name="no_profiles_found">Профили не найдены</string>
     <string name="status_taken">Принято</string>
 
@@ -454,7 +454,7 @@
     <string name="pill_shape_drops">Капли</string>
     <string name="pill_shape_patch">Пластырь</string>
 
-    <string name="med_notes_label">Указания врача / аптеки и предостережения</string>
+    <string name="med_notes_label">Указания врача и предостережения</string>
     <string name="med_notes_placeholder">напр. Принимать во время еды, Избегать грейпфрута, Рецепт #12345</string>
 
     <string name="course_duration_title">Длительность курса</string>
@@ -586,6 +586,7 @@
     <string name="alarm_take_medicine">ПРИНЯТЬ ЛЕКАРСТВО</string>
     <string name="alarm_snooze_format">ОТЛОЖИТЬ (%d МИН)</string>
     <string name="notif_action_snooze_format">Отложить (%d мин)</string>
+    <string name="alarm_snoozed_toast">Напоминание отложено на %d минут</string>
     <string name="alarm_stock_remaining">Запас: осталось %d ед.</string>
     <string name="home_action_take">Принять</string>
     <string name="home_action_taken">Принято</string>

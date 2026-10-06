@@ -228,7 +228,7 @@
 
 
     <string name="home_all_good">সব ঠিক আছে!</string>
-    <string name="home_all_good_desc">আজ কোনো ওষুধ খাওয়ার প্রয়োজন নেই। আপনি যদি আরও যোগ করতে চান, তবে নিচের প্লাস বোতামটি ট্যাপ করে শুরু করুন।</string>
+    <string name="home_all_good_desc">আজ কোনো ওষুধ খাওয়ার প্রয়োজন নেই।</string>
     <string name="no_profiles_found">কোনো প্রোফাইল পাওয়া যায়নি</string>
     <string name="status_taken">গৃহীত</string>
 
@@ -454,7 +454,7 @@
     <string name="pill_shape_drops">ড্রপস (Drops)</string>
     <string name="pill_shape_patch">প্যাচ (Patch)</string>
 
-    <string name="med_notes_label">ডাক্তার / ফার্মেসির নির্দেশনা ও সতর্কতা</string>
+    <string name="med_notes_label">ডাক্তারের নির্দেশনা ও সতর্কতা</string>
     <string name="med_notes_placeholder">যেমনঃ ভরা পেটে সেব্য, বাতাবি লেবু পরিহার করুন, প্রেসক্রিপশন #12345</string>
 
     <string name="course_duration_title">চিকিৎসার সময়কাল</string>
@@ -582,6 +582,7 @@
     <string name="alarm_take_medicine">ঔষধ গ্রহণ করুন</string>
     <string name="alarm_snooze_format">স্নুজ (%d মিনিট)</string>
     <string name="notif_action_snooze_format">স্নুজ (%d মিনিট)</string>
+    <string name="alarm_snoozed_toast">অ্যালার্ম %d মিনিটের জন্য স্নুজ করা হয়েছে</string>
     <string name="alarm_stock_remaining">মজুদ: %d ইউনিট বাকি</string>
     <string name="home_action_take">নিন</string>
     <string name="home_action_taken">নেওয়া হয়েছে</string>

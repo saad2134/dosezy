@@ -106,14 +106,9 @@ fun MenuScreen(navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    // Initialize DataExporter using the repositories from UserViewModel
-    val dataExporter = remember {
-        DataExporter(
-            context = context,
-            userRepository = userViewModel.userRepository,
-            medicineRepository = userViewModel.medicineRepository,
-            scheduleRepository = userViewModel.scheduleRepository
-        )
+    // Initialize DataExporter using encapsulated helper from UserViewModel
+    val dataExporter = remember(context) {
+        userViewModel.createDataExporter(context)
     }
 
     fun startExport(
@@ -599,9 +594,10 @@ fun ProfileImage(
             .clip(RoundedCornerShape(16.dp))
     ) {
         if (currentUser?.profilePicPath != null) {
+            val modelData = remember(currentUser.profilePicPath) { com.example.dosezy.utils.ImageUtils.resolveImageModel(currentUser.profilePicPath) }
             AsyncImage(
                 model = ImageRequest.Builder(context)
-                    .data(File(currentUser.profilePicPath))
+                    .data(modelData)
                     .crossfade(true)
                     .build(),
                 contentDescription = "Profile Picture",

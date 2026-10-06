@@ -82,7 +82,6 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onReceive(context: Context, intent: Intent?) {
         database = DosezyDatabase.getInstance(context)
         val action = intent?.action
@@ -91,7 +90,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             action == "android.intent.action.LOCKED_BOOT_COMPLETED" ||
             action == Intent.ACTION_REBOOT ||
             action == Intent.ACTION_TIMEZONE_CHANGED ||
-            action == Intent.ACTION_TIME_CHANGED) {
+            action == Intent.ACTION_TIME_CHANGED ||
+            action == Intent.ACTION_DATE_CHANGED) {
             
             Log.d(TAG, "Received system broadcast action: $action - rescheduling all alarms")
             val pendingResult = goAsync()
@@ -164,6 +164,20 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                         autoSilenceSeconds = duration
                     )
 
+                    val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+                    val currentLocale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLanguage)
+
+                    // Guard: Core library desugaring enables java.time on API 24+; format scheduled time with user's preferred 12h/24h mode and locale across all supported OS versions
+                    val formattedScheduledTime = if (user != null) {
+                        try {
+                            com.example.dosezy.utils.TimeFormatUtils.formatTime(primaryEntry.scheduledDateTime, user.timeFormat, currentLocale)
+                        } catch (_: Exception) {
+                            scheduledTime
+                        }
+                    } else {
+                        scheduledTime
+                    }
+
                     showNotification(
                         context = context,
                         entryId = primaryEntry.entryId,
@@ -171,7 +185,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                         medicineName = effectiveMedicineName,
                         medicineNames = activeMedicineNames,
                         medicineDetails = medicineDetails,
-                        scheduledTime = scheduledTime,
+                        scheduledTime = formattedScheduledTime,
                         isNagging = isNagging,
                         naggingCount = naggingCount,
                         maxNagging = user?.naggingMaxRepeats ?: 3,
@@ -188,7 +202,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                             naggingCount = naggingCount + 1,
                             entryIds = activeEntryIds,
                             medicineNames = activeMedicineNames,
-                            scheduledTime = scheduledTime
+                            scheduledTime = formattedScheduledTime
                         )
                     }
                 } catch (ex: Exception) {
@@ -253,9 +267,9 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             medicineName
         }
 
-        // Create intent for opening the app
+        // Guard: Use SINGLE_TOP/CLEAR_TOP so clicking the notification delivers to onNewIntent or launches MainActivity with schedule route
         val mainIntent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra("fragment", "schedule")
         }
 
@@ -390,7 +404,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             .setFullScreenIntent(fullScreenPendingIntent, true)
             .setAutoCancel(true)
             .setSilent(true)
-            .setContentIntent(fullScreenPendingIntent)
+            .setContentIntent(pendingIntent)
             .addAction(
                 getNotificationIcon(context, Icons.Filled.Check),
                 localizedContext.getString(R.string.home_action_taken),
@@ -416,7 +430,6 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private suspend fun rescheduleAllAlarms(context: Context) {
         val userRepository = UserRepository(database)
         val scheduleRepository = ScheduleRepository(database)

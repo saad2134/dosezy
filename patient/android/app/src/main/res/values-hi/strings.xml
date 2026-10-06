@@ -244,7 +244,7 @@
 
 
     <string name="home_all_good">सब ठीक है!</string>
-    <string name="home_all_good_desc">आज कोई दवा लेने की आवश्यकता नहीं है। यदि आपको और जोड़ने की आवश्यकता है, तो नीचे दिए गए प्लस बटन को दबाकर प्रारंभ करें।</string>
+    <string name="home_all_good_desc">आज कोई दवा लेने की आवश्यकता नहीं है।</string>
     <string name="no_profiles_found">कोई प्रोफ़ाइल नहीं मिली</string>
     <string name="status_taken">लिया गया</string>
 
@@ -470,7 +470,7 @@
     <string name="pill_shape_drops">ड्रॉप्स (Drops)</string>
     <string name="pill_shape_patch">पैच (Patch)</string>
 
-    <string name="med_notes_label">डॉक्टर / फार्मेसी नोट्स और विशेष चेतावनी</string>
+    <string name="med_notes_label">डॉक्टर नोट्स और विशेष चेतावनी</string>
     <string name="med_notes_placeholder">उदा. भोजन के साथ लें, चकोतरा से बचें, प्रिस्क्रिप्शन #12345</string>
 
     <string name="course_duration_title">उपचार की अवधि</string>
@@ -602,6 +602,7 @@
     <string name="alarm_take_medicine">दवा लें</string>
     <string name="alarm_snooze_format">स्नूज़ (%d मिनट)</string>
     <string name="notif_action_snooze_format">स्नूज़ (%d मिनट)</string>
+    <string name="alarm_snoozed_toast">अलार्म %d मिनट के लिए स्नूज़ किया गया</string>
     <string name="alarm_stock_remaining">स्टॉक: %d दवाएं शेष</string>
     <string name="home_action_take">लें</string>
     <string name="home_action_taken">ले ली</string>

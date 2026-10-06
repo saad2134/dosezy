@@ -228,7 +228,7 @@
 
 
     <string name="home_all_good">Tutto bene!</string>
-    <string name="home_all_good_desc">Nessun farmaco da assumere oggi. Se devi aggiungerne altri, inizia toccando il pulsante più in basso.</string>
+    <string name="home_all_good_desc">Nessun farmaco da assumere oggi.</string>
     <string name="no_profiles_found">Nessun profilo trovato</string>
     <string name="status_taken">Assunto</string>
 
@@ -454,7 +454,7 @@ Vuoi continuare?</string>
     <string name="pill_shape_drops">Gocce</string>
     <string name="pill_shape_patch">Cerotto</string>
 
-    <string name="med_notes_label">Note del medico / farmacia e avvertenze</string>
+    <string name="med_notes_label">Note del medico e avvertenze</string>
     <string name="med_notes_placeholder">es. Assumere a stomaco pieno, Evitare pompelmo, Ricetta #12345</string>
 
     <string name="course_duration_title">Durata del trattamento</string>
@@ -586,6 +586,7 @@ Vuoi continuare?</string>
     <string name="alarm_take_medicine">PRENDI FARMACO</string>
     <string name="alarm_snooze_format">POSTICIPA (%d MIN)</string>
     <string name="notif_action_snooze_format">Posticipa (%d min)</string>
+    <string name="alarm_snoozed_toast">Promemoria posticipato di %d minuti</string>
     <string name="alarm_stock_remaining">Scorta: %d unità rimanenti</string>
     <string name="home_action_take">Prendi</string>
     <string name="home_action_taken">Preso</string>

@@ -227,7 +227,7 @@
 
 
     <string name="home_all_good">Tudo bem!</string>
-    <string name="home_all_good_desc">Não há medicamentos para tomar hoje. Se precisar de adicionar mais, comece tocando no botão mais abaixo.</string>
+    <string name="home_all_good_desc">Não há medicamentos para tomar hoje.</string>
     <string name="no_profiles_found">Nenhum perfil encontrado</string>
     <string name="status_taken">Tomado</string>
 
@@ -453,7 +453,7 @@ Deseja continuar?</string>
     <string name="pill_shape_drops">Gotas</string>
     <string name="pill_shape_patch">Adesivo (Patch)</string>
 
-    <string name="med_notes_label">Notas do médico / farmácia e advertências</string>
+    <string name="med_notes_label">Notas do médico e advertências</string>
     <string name="med_notes_placeholder">ex.: Tomar com alimentos, Evitar toranja, Receita #12345</string>
 
     <string name="course_duration_title">Duração do tratamento</string>
@@ -585,6 +585,7 @@ Deseja continuar?</string>
     <string name="alarm_take_medicine">TOMAR MEDICAMENTO</string>
     <string name="alarm_snooze_format">ADIAR (%d MIN)</string>
     <string name="notif_action_snooze_format">Adiar (%d min)</string>
+    <string name="alarm_snoozed_toast">Alarme adiado por %d minutos</string>
     <string name="alarm_stock_remaining">Estoque: %d unidades restantes</string>
     <string name="home_action_take">Tomar</string>
     <string name="home_action_taken">Tomado</string>

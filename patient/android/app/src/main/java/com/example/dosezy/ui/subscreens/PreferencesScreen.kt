@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.lazy.LazyColumn
@@ -73,6 +75,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.DisposableEffect
@@ -174,10 +177,11 @@ fun PreferencesScreen(navController: NavController) {
             }
 
             item {
-                Card(
+                Surface(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 0.dp,
+                    shadowElevation = 2.dp,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 6.dp)
@@ -288,10 +292,11 @@ fun PreferencesScreen(navController: NavController) {
 
             // Follow-up / Nagging Reminders Switch & Settings
             item {
-                Card(
+                Surface(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 0.dp,
+                    shadowElevation = 2.dp,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 6.dp)
@@ -434,10 +439,11 @@ fun PreferencesScreen(navController: NavController) {
 
             // Allow Dose Skipping Switch & Card
             item {
-                Card(
+                Surface(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 0.dp,
+                    shadowElevation = 2.dp,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 6.dp)
@@ -488,10 +494,11 @@ fun PreferencesScreen(navController: NavController) {
 
             // Manually Record Dose Time Switch & Card
             item {
-                Card(
+                Surface(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 0.dp,
+                    shadowElevation = 2.dp,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 6.dp)
@@ -542,10 +549,11 @@ fun PreferencesScreen(navController: NavController) {
 
             // Allow Dose Undo Switch & Card
             item {
-                Card(
+                Surface(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 0.dp,
+                    shadowElevation = 2.dp,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 6.dp)
@@ -596,10 +604,11 @@ fun PreferencesScreen(navController: NavController) {
 
             // Dose Notes Switch & Card
             item {
-                Card(
+                Surface(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 0.dp,
+                    shadowElevation = 2.dp,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 6.dp)
@@ -745,7 +754,8 @@ fun PreferencesScreen(navController: NavController) {
             }
 
             item {
-                Spacer(modifier = Modifier.height(32.dp).navigationBarsPadding())
+                Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
 
@@ -1018,13 +1028,14 @@ fun AlarmSoundSelectionDialog(
                             setAudioStreamType(android.media.AudioManager.STREAM_ALARM)
                         }
                         setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
-                        afd.close()
                         setOnCompletionListener {
                             previewingSound = null
                         }
                         prepare()
                         start()
                     }
+                    // Guard: Close AssetFileDescriptor only AFTER prepare() to prevent Bad file descriptor status=0x1 failure in MediaPlayer native layer
+                    try { afd.close() } catch (_: Exception) {}
                     mediaPlayer = mp
                 }
             } else {

@@ -93,7 +93,9 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     // If no entries exist, or the latest entry is less than 15 days in the future,
                     // auto-generate/append next 30 days of schedules
                     if (latestEntry == null || latestEntry.scheduledDateTime.isBefore(LocalDateTime.now().plusDays(15))) {
-                        val startGenerateFrom = latestEntry?.scheduledDateTime?.toLocalDate()?.plusDays(1) ?: LocalDate.now()
+                        val today = LocalDate.now()
+                        val latestDate = latestEntry?.scheduledDateTime?.toLocalDate()
+                        val startGenerateFrom = if (latestDate == null || latestDate.isBefore(today)) today else latestDate.plusDays(1)
                         val newEntries = medicine.generateScheduleEntries(startGenerateFrom, 30)
                         if (newEntries.isNotEmpty()) {
                             database.scheduleDao().insertScheduleEntries(newEntries)
@@ -122,13 +124,21 @@ class ScheduleRepository(private val database: DosezyDatabase) {
     suspend fun cancelAlarmsForMedicine(medicineId: String, context: Context) {
         val alarmScheduler = AlarmScheduler(context)
         val scheduleEntries = database.scheduleDao().getScheduleEntriesByMedicine(medicineId)
-        scheduleEntries.forEach { entry ->
+        val now = LocalDateTime.now()
+        val activeWindowStart = now.minusHours(24)
+        val activeWindowEnd = now.plusDays(8)
+        // Guard: Only cancel alarms within the active window; looping over months of past history triggers thousands of redundant Binder IPC calls
+        val entriesToCancel = scheduleEntries.filter { entry ->
+            entry.scheduledDateTime.isAfter(activeWindowStart) &&
+            entry.scheduledDateTime.isBefore(activeWindowEnd)
+        }
+        entriesToCancel.forEach { entry ->
             alarmScheduler.cancelAlarm(entry.entryId)
             alarmScheduler.cancelSnooze(entry.entryId)
             alarmScheduler.cancelNagging(entry.entryId)
             alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
         }
-        Log.d(TAG, "Cancelled alarms for medicine ID: $medicineId (${scheduleEntries.size} entries)")
+        Log.d(TAG, "Cancelled active alarms for medicine ID: $medicineId (${entriesToCancel.size} active entries)")
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -142,23 +152,33 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             // Get all schedule entries for the user
             val allEntries = database.scheduleDao().getAllScheduleEntries(userId)
 
-            // Cancel all existing alarms first
-            allEntries.forEach { entry ->
+            val now = LocalDateTime.now()
+            val limitTime = now.plusDays(7)
+            val activeWindowStart = now.minusHours(24)
+            val activeWindowEnd = limitTime.plusDays(1)
+
+            // Guard: Only cancel alarms within the active window; looping over months of past history triggers thousands of redundant Binder IPC calls
+            val entriesToCancel = allEntries.filter { entry ->
+                entry.scheduledDateTime.isAfter(activeWindowStart) &&
+                entry.scheduledDateTime.isBefore(activeWindowEnd)
+            }
+            entriesToCancel.forEach { entry ->
                 alarmScheduler.cancelAlarm(entry.entryId)
                 alarmScheduler.cancelSnooze(entry.entryId)
                 alarmScheduler.cancelNagging(entry.entryId)
                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
             }
 
-            // Schedule grouped alarms for pending future entries within the 7-day window
+            // Schedule grouped alarms for strictly future pending entries within the 7-day window
             var scheduledCount = 0
-            val limitTime = LocalDateTime.now().plusDays(7)
-            val nowMinus2 = LocalDateTime.now().minusMinutes(2)
             val pendingEntries = allEntries.filter { 
                 it.status == MedicationStatus.PENDING &&
-                it.scheduledDateTime.isAfter(nowMinus2) &&
+                it.scheduledDateTime.isAfter(now) &&
                 it.scheduledDateTime.isBefore(limitTime)
             }
+
+            val user = database.userDao().getUserByIdDirect(userId)
+            val userTimeFormat = user?.timeFormat
 
             // Group entries by exact scheduled time slot
             val groupedByTime = pendingEntries.groupBy { it.scheduledDateTime.withSecond(0).withNano(0) }
@@ -172,7 +192,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 if (entriesWithNames.isNotEmpty()) {
                     val entriesList = entriesWithNames.map { it.first }
                     val namesList = entriesWithNames.map { it.second }
-                    alarmScheduler.scheduleGroupedMedicineAlarm(slotDateTime, entriesList, namesList)
+                    // Guard: Pass user's timeFormat so scheduled alarm intent contains user's preferred 12h/24h time string
+                    alarmScheduler.scheduleGroupedMedicineAlarm(slotDateTime, entriesList, namesList, timeFormat = userTimeFormat)
                     scheduledCount += entriesWithNames.size
                 }
             }
@@ -199,6 +220,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 it.status == MedicationStatus.PENDING &&
                 it.scheduledDateTime.isAfter(LocalDateTime.now())
             }
+            val user = database.userDao().getUserByIdDirect(userId)
+            val userTimeFormat = user?.timeFormat
             val groupedByTime = pendingEntries.groupBy { it.scheduledDateTime.withSecond(0).withNano(0) }
             groupedByTime.forEach { (slotDateTime, entriesInSlot) ->
                 val entriesWithNames = entriesInSlot.mapNotNull { entry ->
@@ -208,7 +231,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 if (entriesWithNames.isNotEmpty()) {
                     val entriesList = entriesWithNames.map { it.first }
                     val namesList = entriesWithNames.map { it.second }
-                    alarmScheduler.scheduleGroupedMedicineAlarm(slotDateTime, entriesList, namesList)
+                    // Guard: Pass user's timeFormat so scheduled alarm intent contains user's preferred 12h/24h time string
+                    alarmScheduler.scheduleGroupedMedicineAlarm(slotDateTime, entriesList, namesList, timeFormat = userTimeFormat)
                     scheduledCount += entriesWithNames.size
                 }
             }
@@ -293,8 +317,10 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     database.medicineDao().updateMedicine(updatedMedicine)
                     Log.d(TAG, "Decremented stock for ${medicine.medicationName}: ${medicine.currentStock} -> $newStock (deducted $deductAmount)")
 
-                    // Trigger refill warning notification if stock is below threshold
-                    if (context != null && medicine.refillThreshold != null && newStock <= medicine.refillThreshold) {
+                    // Trigger refill warning notification when crossing threshold boundary or running out
+                    val threshold = medicine.refillThreshold
+                    val shouldNotifyRefill = threshold != null && ((medicine.currentStock > threshold && newStock <= threshold) || (medicine.currentStock > 0 && newStock == 0))
+                    if (context != null && shouldNotifyRefill) {
                         val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
                         val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
                         val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
@@ -323,11 +349,17 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             }
         }
 
-        // 4. Cancel active notification for this entry and update widgets
+        // 4. Cancel active notification for this entry, disarm snooze/nagging alarms, and update widgets
         if (context != null) {
             try {
                 val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
                 nManager.cancel(entryId.hashCode())
+            } catch (_: Exception) {}
+            try {
+                // Guard: Cancel armed snooze and nagging alarms so taking in-app prevents phantom alarms from ringing later
+                val alarmScheduler = com.example.dosezy.notifications.AlarmScheduler(context)
+                alarmScheduler.cancelSnooze(entryId)
+                alarmScheduler.cancelNagging(entryId)
             } catch (_: Exception) {}
             try {
                 com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
@@ -359,11 +391,45 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         // 2. Stop any active alarm sound / popup
         com.example.dosezy.notifications.AlarmActivity.stopActiveAlarm()
 
-        // 3. Cancel active notification for this entry and update widgets
+        // 3. Cancel active notification for this entry, disarm snooze/nagging alarms, and update widgets
         if (context != null) {
             try {
                 val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
                 nManager.cancel(entryId.hashCode())
+            } catch (_: Exception) {}
+            try {
+                // Guard: Cancel armed snooze and nagging alarms so skipping in-app prevents phantom alarms from ringing later
+                val alarmScheduler = com.example.dosezy.notifications.AlarmScheduler(context)
+                alarmScheduler.cancelSnooze(entryId)
+                alarmScheduler.cancelNagging(entryId)
+            } catch (_: Exception) {}
+            try {
+                com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+            } catch (_: Exception) {}
+        }
+    }
+
+    suspend fun recordDoseMissed(
+        entryId: String,
+        context: Context? = null
+    ) {
+        // 1. Update schedule entry status in database
+        database.scheduleDao().updateMedicationStatus(entryId, "MISSED", null as Long?)
+
+        // 2. Stop any active alarm sound / popup
+        com.example.dosezy.notifications.AlarmActivity.stopActiveAlarm()
+
+        // 3. Cancel active notification for this entry, disarm snooze/nagging alarms, and update widgets
+        if (context != null) {
+            try {
+                val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                nManager.cancel(entryId.hashCode())
+            } catch (_: Exception) {}
+            try {
+                // Guard: Cancel armed snooze and nagging alarms so marking missed in-app prevents phantom alarms from ringing later
+                val alarmScheduler = com.example.dosezy.notifications.AlarmScheduler(context)
+                alarmScheduler.cancelSnooze(entryId)
+                alarmScheduler.cancelNagging(entryId)
             } catch (_: Exception) {}
             try {
                 com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
@@ -402,6 +468,14 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
         // 3. Update app widgets
         if (context != null) {
+            // Guard: Reschedule alarms for upcoming doses so undoing a mistakenly marked dose restores future AlarmManager reminders
+            if (previousEntry != null && previousEntry.scheduledDateTime.isAfter(LocalDateTime.now())) {
+                try {
+                    rescheduleAllAlarms(previousEntry.userId, context)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error rescheduling alarms on undoDoseTaken", e)
+                }
+            }
             try {
                 com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
             } catch (_: Exception) {}
@@ -431,20 +505,23 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         )
         database.scheduleDao().insertScheduleEntry(entry)
 
-        // Decrement stock if enabled
-        if (medicine.currentStock != null && medicine.autoDeductOnTake) {
-            val deductAmount = medicine.getStockDeductionAmount()
-            val newStock = (medicine.currentStock - deductAmount).coerceAtLeast(0)
-            val updatedMedicine = medicine.copy(currentStock = newStock)
+        // Guard: Query fresh entity from Room and pass slot time to getStockDeductionAmount to prevent stale UI stock overwrites and symmetry drift with undoDoseTaken
+        val freshMedicine = database.medicineDao().getMedicineByIdDirect(medicine.medicineId) ?: medicine
+        if (freshMedicine.currentStock != null && freshMedicine.autoDeductOnTake) {
+            val deductAmount = freshMedicine.getStockDeductionAmount(dateTime.toLocalTime())
+            val newStock = (freshMedicine.currentStock - deductAmount).coerceAtLeast(0)
+            val updatedMedicine = freshMedicine.copy(currentStock = newStock)
             database.medicineDao().updateMedicine(updatedMedicine)
 
-            if (context != null && medicine.refillThreshold != null && newStock <= medicine.refillThreshold) {
+            val threshold = freshMedicine.refillThreshold
+            val shouldNotifyRefill = threshold != null && ((freshMedicine.currentStock > threshold && newStock <= threshold) || (freshMedicine.currentStock > 0 && newStock == 0))
+            if (context != null && shouldNotifyRefill) {
                 val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
                 val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
                 val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
                 val contentIntent = android.app.PendingIntent.getActivity(
                     context,
-                    (medicine.medicineId + "_refill_click").hashCode(),
+                    (freshMedicine.medicineId + "_refill_click").hashCode(),
                     Intent(context, com.example.dosezy.MainActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                     },
@@ -452,12 +529,12 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 )
                 val builder = androidx.core.app.NotificationCompat.Builder(context, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
                     .setSmallIcon(com.example.dosezy.R.drawable.ic_medicine_notification)
-                    .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
+                    .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, freshMedicine.medicationName))
                     .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, newStock))
                     .setPriority(androidx.core.app.NotificationCompat.PRIORITY_DEFAULT)
                     .setContentIntent(contentIntent)
                     .setAutoCancel(true)
-                nManager.notify((medicine.medicineId + "_refill").hashCode(), builder.build())
+                nManager.notify((freshMedicine.medicineId + "_refill").hashCode(), builder.build())
             }
         }
 

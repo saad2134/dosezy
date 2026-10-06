@@ -228,7 +228,7 @@
 
 
     <string name="home_all_good">Tout va bien!</string>
-    <string name="home_all_good_desc">Aucun médicament à prendre aujourd\'hui. Si vous devez en ajouter d\'autres, commencez par appuyer sur le bouton plus ci-dessous.</string>
+    <string name="home_all_good_desc">Aucun médicament à prendre aujourd\'hui.</string>
     <string name="no_profiles_found">Aucun profil trouvé</string>
     <string name="status_taken">Pris</string>
 
@@ -454,7 +454,7 @@ Voulez-vous continuer ?</string>
     <string name="pill_shape_drops">Gouttes</string>
     <string name="pill_shape_patch">Patch</string>
 
-    <string name="med_notes_label">Notes du médecin / pharmacien et avertissements</string>
+    <string name="med_notes_label">Notes du médecin et avertissements</string>
     <string name="med_notes_placeholder">ex. Prendre au cours du repas, Éviter le pamplemousse, Ordonnance #12345</string>
 
     <string name="course_duration_title">Durée du traitement</string>
@@ -586,6 +586,7 @@ Voulez-vous continuer ?</string>
     <string name="alarm_take_medicine">PRENDRE LE MÉDICAMENT</string>
     <string name="alarm_snooze_format">RAPPEL DANS (%d MIN)</string>
     <string name="notif_action_snooze_format">Rappel (%d min)</string>
+    <string name="alarm_snoozed_toast">Rappel reporté de %d minutes</string>
     <string name="alarm_stock_remaining">Stock : %d unités restantes</string>
     <string name="home_action_take">Prendre</string>
     <string name="home_action_taken">Pris</string>

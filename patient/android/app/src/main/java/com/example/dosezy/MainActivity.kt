@@ -66,11 +66,6 @@ class MainActivity : ComponentActivity() {
 
     private val userViewModel: UserViewModel by viewModels()
 
-    override fun attachBaseContext(newBase: android.content.Context) {
-        val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(newBase)
-        val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(newBase, savedLanguage)
-        super.attachBaseContext(localizedContext)
-    }
 
     override fun applyOverrideConfiguration(overrideConfiguration: android.content.res.Configuration?) {
         if (overrideConfiguration != null) {
@@ -85,6 +80,8 @@ class MainActivity : ComponentActivity() {
         super.applyOverrideConfiguration(overrideConfiguration)
     }
 
+    private val pendingRouteState = androidx.compose.runtime.mutableStateOf<String?>(null)
+
     override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
@@ -92,12 +89,23 @@ class MainActivity : ComponentActivity() {
         if (!targetUserId.isNullOrBlank()) {
             userViewModel.setCurrentUserById(targetUserId)
         }
+        // Guard: Route to schedule screen when tapped notification specifies fragment=schedule
+        val targetFragment = intent.getStringExtra("fragment")
+        if (targetFragment == "schedule") {
+            pendingRouteState.value = "schedule"
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+        // Guard: Parse initial launch intent extras to route directly to schedule screen on cold start
+        val targetFragment = intent.getStringExtra("fragment")
+        if (targetFragment == "schedule") {
+            pendingRouteState.value = "schedule"
+        }
 
         // Safety fallback: if an uncaught locale/formatting error occurs, reset language to SYSTEM so app opens cleanly on next launch
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
@@ -172,9 +180,6 @@ class MainActivity : ComponentActivity() {
             val isRtl = currentLocale.language == "ar"
             val layoutDirection = if (isRtl) androidx.compose.ui.unit.LayoutDirection.Rtl else androidx.compose.ui.unit.LayoutDirection.Ltr
 
-            val localizedContext = remember(currentLang) {
-                com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, currentLang)
-            }
             val localizedConfig = remember(currentLang) {
                 val config = android.content.res.Configuration(context.resources.configuration)
                 config.setLocale(currentLocale)
@@ -188,7 +193,6 @@ class MainActivity : ComponentActivity() {
             androidx.compose.runtime.key(currentLang) {
                 androidx.compose.runtime.CompositionLocalProvider(
                     androidx.compose.ui.platform.LocalLayoutDirection provides layoutDirection,
-                    androidx.compose.ui.platform.LocalContext provides localizedContext,
                     androidx.compose.ui.platform.LocalConfiguration provides localizedConfig
                 ) {
                     DosezyTheme(darkTheme = isDark) {
@@ -196,7 +200,10 @@ class MainActivity : ComponentActivity() {
                             modifier = androidx.compose.ui.Modifier.fillMaxSize(),
                             color = MaterialTheme.colorScheme.background
                         ) {
-                            DosezyApp()
+                            DosezyApp(
+                                pendingRouteState = pendingRouteState,
+                                onRouteConsumed = { pendingRouteState.value = null }
+                            )
                         }
                     }
                 }
@@ -207,11 +214,19 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
-fun DosezyApp() {
+fun DosezyApp(
+    pendingRouteState: androidx.compose.runtime.State<String?> = androidx.compose.runtime.mutableStateOf(null),
+    onRouteConsumed: () -> Unit = {}
+) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination
     val context = androidx.compose.ui.platform.LocalContext.current
+
+    val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
+    val users by userViewModel.users.collectAsState()
+    val currentUser by userViewModel.currentUser.collectAsState()
+    val isViewModelLoading by userViewModel.isLoading.collectAsState()
 
     val permissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
@@ -223,22 +238,24 @@ fun DosezyApp() {
     var showOverlayPrompt by remember { mutableStateOf(false) }
     var showLowStorageDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(currentUser) {
         if (com.example.dosezy.utils.StorageUtils.isStorageCriticallyLow(context)) {
             showLowStorageDialog = true
         }
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         }
-        val batteryDismissed = prefs.getBoolean("battery_prompt_dismissed", false)
-        if (!batteryDismissed && !com.example.dosezy.utils.NotificationUtils.isIgnoringBatteryOptimizations(context)) {
-            kotlinx.coroutines.delay(1200)
-            showBatteryPrompt = true
-        } else if (!com.example.dosezy.utils.NotificationUtils.canDrawOverlays(context)) {
-            val dismissed = prefs.getBoolean("overlay_prompt_dismissed", false)
-            if (!dismissed) {
+        if (currentUser != null) {
+            val batteryDismissed = prefs.getBoolean("battery_prompt_dismissed", false)
+            if (!batteryDismissed && !com.example.dosezy.utils.NotificationUtils.isIgnoringBatteryOptimizations(context)) {
                 kotlinx.coroutines.delay(1200)
-                showOverlayPrompt = true
+                showBatteryPrompt = true
+            } else if (!com.example.dosezy.utils.NotificationUtils.canDrawOverlays(context)) {
+                val dismissed = prefs.getBoolean("overlay_prompt_dismissed", false)
+                if (!dismissed) {
+                    kotlinx.coroutines.delay(1200)
+                    showOverlayPrompt = true
+                }
             }
         }
     }
@@ -344,10 +361,6 @@ fun DosezyApp() {
         )
     }
 
-    val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
-    val users by userViewModel.users.collectAsState()
-    val currentUser by userViewModel.currentUser.collectAsState()
-    val isViewModelLoading by userViewModel.isLoading.collectAsState()
 
     var isInitialized by remember { mutableStateOf(false) }
 
@@ -360,9 +373,24 @@ fun DosezyApp() {
                     popUpTo("loading") { inclusive = true }
                 }
             } else {
-                navController.navigate("home") {
+                val startRoute = if (pendingRouteState.value == "schedule") "schedule" else "home"
+                if (pendingRouteState.value != null) {
+                    onRouteConsumed()
+                }
+                navController.navigate(startRoute) {
                     popUpTo("loading") { inclusive = true }
                 }
+            }
+        }
+    }
+
+    // Guard: Navigate to schedule screen dynamically when notification is tapped while MainActivity is in foreground
+    LaunchedEffect(pendingRouteState.value) {
+        val target = pendingRouteState.value
+        if (target != null && isInitialized && currentUser != null) {
+            onRouteConsumed()
+            navController.navigate(target) {
+                launchSingleTop = true
             }
         }
     }
@@ -378,7 +406,11 @@ fun DosezyApp() {
                         popUpTo("loading") { inclusive = true }
                     }
                 } else {
-                    navController.navigate("home") {
+                    val startRoute = if (pendingRouteState.value == "schedule") "schedule" else "home"
+                    if (pendingRouteState.value != null) {
+                        onRouteConsumed()
+                    }
+                    navController.navigate(startRoute) {
                         popUpTo("loading") { inclusive = true }
                     }
                 }
