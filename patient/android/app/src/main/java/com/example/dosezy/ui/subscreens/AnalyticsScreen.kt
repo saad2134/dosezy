@@ -304,7 +304,8 @@ fun UnifiedAdherenceCard(
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Horizontal Segmented Time Range Selector Pills (All Tab at far right)
+            // Horizontal Segmented Time Range Selector Pills (All Tab at far right):
+            // Note: ALL shows sub-ring breakdown charts across all ranges/dosages, whereas TOTAL displays a single ring chart for all-time adherence.
             val sortedTabs = remember(rangeDataList) {
                 rangeDataList.filter { it.range != AdherenceRange.ALL } + rangeDataList.filter { it.range == AdherenceRange.ALL }
             }

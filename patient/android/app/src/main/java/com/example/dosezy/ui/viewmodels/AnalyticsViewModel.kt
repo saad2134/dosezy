@@ -32,6 +32,7 @@ import java.time.format.TextStyle
 import java.util.Locale
 import javax.inject.Inject
 
+// Note: Intentional design distinction: ALL displays sub-ring charts breakdown across individual ranges/dosages, whereas TOTAL displays a single consolidated progress ring for all-time adherence.
 enum class AdherenceRange(val stringResId: Int) {
     ALL(R.string.range_all),
     LAST_7_DAYS(R.string.range_7_days),
