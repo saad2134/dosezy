@@ -505,22 +505,23 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         )
         database.scheduleDao().insertScheduleEntry(entry)
 
-        // Decrement stock if enabled
-        if (medicine.currentStock != null && medicine.autoDeductOnTake) {
-            val deductAmount = medicine.getStockDeductionAmount()
-            val newStock = (medicine.currentStock - deductAmount).coerceAtLeast(0)
-            val updatedMedicine = medicine.copy(currentStock = newStock)
+        // Guard: Query fresh entity from Room and pass slot time to getStockDeductionAmount to prevent stale UI stock overwrites and symmetry drift with undoDoseTaken
+        val freshMedicine = database.medicineDao().getMedicineByIdDirect(medicine.medicineId) ?: medicine
+        if (freshMedicine.currentStock != null && freshMedicine.autoDeductOnTake) {
+            val deductAmount = freshMedicine.getStockDeductionAmount(dateTime.toLocalTime())
+            val newStock = (freshMedicine.currentStock - deductAmount).coerceAtLeast(0)
+            val updatedMedicine = freshMedicine.copy(currentStock = newStock)
             database.medicineDao().updateMedicine(updatedMedicine)
 
-            val threshold = medicine.refillThreshold
-            val shouldNotifyRefill = threshold != null && ((medicine.currentStock > threshold && newStock <= threshold) || (medicine.currentStock > 0 && newStock == 0))
+            val threshold = freshMedicine.refillThreshold
+            val shouldNotifyRefill = threshold != null && ((freshMedicine.currentStock > threshold && newStock <= threshold) || (freshMedicine.currentStock > 0 && newStock == 0))
             if (context != null && shouldNotifyRefill) {
                 val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
                 val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
                 val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
                 val contentIntent = android.app.PendingIntent.getActivity(
                     context,
-                    (medicine.medicineId + "_refill_click").hashCode(),
+                    (freshMedicine.medicineId + "_refill_click").hashCode(),
                     Intent(context, com.example.dosezy.MainActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                     },
@@ -528,12 +529,12 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 )
                 val builder = androidx.core.app.NotificationCompat.Builder(context, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
                     .setSmallIcon(com.example.dosezy.R.drawable.ic_medicine_notification)
-                    .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
+                    .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, freshMedicine.medicationName))
                     .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, newStock))
                     .setPriority(androidx.core.app.NotificationCompat.PRIORITY_DEFAULT)
                     .setContentIntent(contentIntent)
                     .setAutoCancel(true)
-                nManager.notify((medicine.medicineId + "_refill").hashCode(), builder.build())
+                nManager.notify((freshMedicine.medicineId + "_refill").hashCode(), builder.build())
             }
         }
 

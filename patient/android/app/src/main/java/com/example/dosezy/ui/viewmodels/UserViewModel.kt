@@ -1,6 +1,5 @@
 package com.example.dosezy.ui.viewmodels
 
-import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dosezy.data.model.User
@@ -100,10 +99,8 @@ class UserViewModel @Inject constructor(
                         _currentUser.value = updatedUser
                     }
 
-                    // Schedule alarms for the new current user
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        medicineNotificationManager.scheduleAlarmsForUser(updatedUser.userId)
-                    }
+                    // Guard: Core library desugaring supports API 24+; schedule alarms across all supported OS versions
+                    medicineNotificationManager.scheduleAlarmsForUser(updatedUser.userId)
 
                     try {
                         val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
@@ -157,9 +154,8 @@ class UserViewModel @Inject constructor(
                         withContext(Dispatchers.Main) {
                             _currentUser.value = userToInsert
                         }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            medicineNotificationManager.scheduleAlarmsForUser(userToInsert.userId)
-                        }
+                        // Guard: Core library desugaring supports API 24+; schedule alarms for new profile across all supported OS versions
+                        medicineNotificationManager.scheduleAlarmsForUser(userToInsert.userId)
                         try {
                             val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
                             prefs.edit().putString("theme", userToInsert.theme.name.lowercase()).apply()
@@ -201,10 +197,8 @@ class UserViewModel @Inject constructor(
             _isLoading.value = true
             try {
                 withContext(Dispatchers.IO) {
-                    // Cancel alarms for the deleted user
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        medicineNotificationManager.cancelAllAlarmsForUser(user.userId)
-                    }
+                    // Guard: Cancel alarms across all supported versions (API 24+) to prevent orphaned alarms ringing after user deletion
+                    medicineNotificationManager.cancelAllAlarmsForUser(user.userId)
 
                     // Delete user's profile picture from internal storage if it exists
                     user.profilePicPath?.let { path ->
@@ -258,9 +252,8 @@ class UserViewModel @Inject constructor(
                             onNextUserSelected?.invoke(nextUser)
                         }
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            medicineNotificationManager.scheduleAlarmsForUser(nextUser.userId)
-                        }
+                        // Guard: Core library desugaring supports API 24+; schedule alarms for next active profile across all OS versions
+                        medicineNotificationManager.scheduleAlarmsForUser(nextUser.userId)
                     } else if (remainingUsers.isEmpty()) {
                         withContext(Dispatchers.Main) {
                             _currentUser.value = null

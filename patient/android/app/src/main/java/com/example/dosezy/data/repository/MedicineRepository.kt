@@ -58,11 +58,9 @@ class MedicineRepository @Inject constructor(
         val scheduleEntries = medicine.generateScheduleEntries(LocalDate.now(), 30)
         Log.d(TAG, "Generated ${scheduleEntries.size} schedule entries")
 
-        scheduleEntries.forEach { entry ->
-            database.scheduleDao().insertScheduleEntry(entry)
-            Log.d(TAG, "Inserted schedule entry for: ${entry.scheduledDateTime}")
-        }
-        Log.d(TAG, "All schedule entries inserted")
+        // Guard: Batch insert schedule entries in a single Room transaction to eliminate 120+ sequential SQLite fsync operations and UI frame drops
+        database.scheduleDao().insertScheduleEntries(scheduleEntries)
+        Log.d(TAG, "All ${scheduleEntries.size} schedule entries inserted in batch")
 
         // SCHEDULE ALARMS IMMEDIATELY
         scheduleRepository.rescheduleAllAlarms(medicine.userId, this.context)

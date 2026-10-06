@@ -2,9 +2,7 @@
 package com.example.dosezy.notifications
 
 import android.content.Context
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import com.example.dosezy.data.DosezyDatabase
 import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.repository.ScheduleRepository
@@ -32,7 +30,7 @@ class MedicineNotificationManager @Inject constructor(
         private const val TAG = "MedicineNotificationManager"
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    // Guard: Core library desugaring enables java.time on API 24+; allow alarm scheduling across all supported OS versions
     fun scheduleAllAlarmsForCurrentUser() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -51,7 +49,7 @@ class MedicineNotificationManager @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    // Guard: Core library desugaring enables java.time on API 24+; allow alarm scheduling across all supported OS versions
     fun scheduleAlarmsForUser(userId: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -86,7 +84,7 @@ class MedicineNotificationManager @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    // Guard: Core library desugaring enables java.time on API 24+; allow alarm rescheduling on startup across all supported OS versions
     fun rescheduleAllAlarmsForAllUsers() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -103,7 +101,6 @@ class MedicineNotificationManager @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun checkAlarmStatus(userId: String, callback: (scheduledCount: Int, totalCount: Int) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -123,7 +120,6 @@ class MedicineNotificationManager @Inject constructor(
 
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun scheduleAlarmsForMedicine(medicineId: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -135,7 +131,6 @@ class MedicineNotificationManager @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun cancelAlarmsForMedicine(medicineId: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -147,7 +142,6 @@ class MedicineNotificationManager @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun getScheduledAlarmCount(userId: String, callback: (count: Int) -> Unit) {
         checkAlarmStatus(userId) { scheduled, total ->
             callback(scheduled)

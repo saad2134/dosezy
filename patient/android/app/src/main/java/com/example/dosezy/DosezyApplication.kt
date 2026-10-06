@@ -33,10 +33,8 @@ class DosezyApplication : Application(), ImageLoaderFactory
         // Ensure all required notification channels exist from app startup
         com.example.dosezy.notifications.MedicineAlarmReceiver.createNotificationChannels(this)
 
-        // Schedule alarms for all users on app start
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            medicineNotificationManager.rescheduleAllAlarmsForAllUsers()
-        }
+        // Guard: Core library desugaring enables java.time on API 24+; reschedule alarms on app startup across all supported versions to prevent silent alarm loss
+        medicineNotificationManager.rescheduleAllAlarmsForAllUsers()
     }
 
     override fun newImageLoader(): ImageLoader {
