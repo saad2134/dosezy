@@ -57,6 +57,9 @@
   <a href="https://play.google.com/store/apps/details?id=com.saad2134.dosezy">
     <img width="197" height="59" alt="Google Play" src="assets/badges/google-play.png" />
   </a>
+  <a href="#">
+    <img width="197" height="59" alt="App Store" src="assets/badges/app-store.png" />
+  </a>
   <!-- 
   <a href="">
     <img width="197" height="59" alt="Galaxy Store" src="assets/badges/galaxy-store.png" />
