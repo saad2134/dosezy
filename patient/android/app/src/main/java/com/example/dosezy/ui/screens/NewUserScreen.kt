@@ -258,7 +258,9 @@ fun NewUserScreen(
                                     val updatedUsers = database.userDao().getAllUsersDirect()
                                     if (updatedUsers.isNotEmpty()) {
                                         withContext(Dispatchers.Main) {
-                                            userViewModel.setCurrentUser(updatedUsers.first())
+                                            // Guard: Prioritize profile with isCurrentUser=true (or first) to prevent landing on an unintended dependent profile
+                                            val targetUser = updatedUsers.find { it.isCurrentUser } ?: updatedUsers.first()
+                                            userViewModel.setCurrentUser(targetUser)
                                             navController.navigate("home") {
                                                 popUpTo("newuser/1") { inclusive = true }
                                             }

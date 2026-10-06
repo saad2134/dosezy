@@ -252,6 +252,13 @@ class UserViewModel @Inject constructor(
                             onNextUserSelected?.invoke(nextUser)
                         }
 
+                        // Guard: Synchronize app theme and widget preferences for promoted active profile to prevent theme lock on deleted profile
+                        try {
+                            val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                            prefs.edit().putString("theme", nextUser.theme.name.lowercase()).apply()
+                            com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, nextUser.userId, nextUser.theme.name.lowercase())
+                        } catch (_: Exception) {}
+
                         // Guard: Core library desugaring supports API 24+; schedule alarms for next active profile across all OS versions
                         medicineNotificationManager.scheduleAlarmsForUser(nextUser.userId)
                     } else if (remainingUsers.isEmpty()) {
@@ -259,6 +266,11 @@ class UserViewModel @Inject constructor(
                             _currentUser.value = null
                             onNextUserSelected?.invoke(null)
                         }
+                        // Guard: Clean up app theme back to system default when no user profiles remain
+                        try {
+                            val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                            prefs.edit().putString("theme", "system").apply()
+                        } catch (_: Exception) {}
                     }
 
                     try {

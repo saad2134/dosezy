@@ -241,6 +241,26 @@ class DataExporter(
             mObj.put("intervalHours", med.frequency.intervalHours)
             mObj.put("intervalDays", med.frequency.intervalDays)
             mObj.put("intervalWeeks", med.frequency.intervalWeeks)
+
+            // Guard: Serialize nested frequency object alongside top-level keys for dual compatibility with Gson and BackupRestoreManager
+            val freqObj = JSONObject()
+            freqObj.put("pattern", med.frequency.pattern.name)
+            freqObj.put("daysPerWeek", med.frequency.daysPerWeek)
+            freqObj.put("daysPerMonth", med.frequency.daysPerMonth)
+            med.frequency.selectedDaysOfWeek?.let { days ->
+                val arr = JSONArray()
+                days.forEach { arr.put(it) }
+                freqObj.put("selectedDaysOfWeek", arr)
+            }
+            med.frequency.selectedDaysOfMonth?.let { days ->
+                val arr = JSONArray()
+                days.forEach { arr.put(it) }
+                freqObj.put("selectedDaysOfMonth", arr)
+            }
+            freqObj.put("intervalHours", med.frequency.intervalHours)
+            freqObj.put("intervalDays", med.frequency.intervalDays)
+            freqObj.put("intervalWeeks", med.frequency.intervalWeeks)
+            mObj.put("frequency", freqObj)
             mObj.put("scheduledTimes", JSONArray(med.scheduledTimes.map { it.toString() }))
             mObj.put("imageUri", med.imageUri ?: "")
             mObj.put("currentStock", med.currentStock)

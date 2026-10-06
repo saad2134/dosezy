@@ -675,7 +675,7 @@ class BackupRestoreManager(
                 try { LocalTime.parse(it.asString) } catch (_: Exception) { null }
             }
 
-            // Guard: Defensively parse frequency object and fallback to DAILY if missing, malformed, or null to prevent inspection crashes on legacy or corrupted backups
+            // Guard: Defensively parse frequency object (nested or flattened from DataExporter/legacy backups) to prevent resetting non-daily schedules to DAILY
             val freqObj = if (obj.has("frequency") && !obj.get("frequency").isJsonNull && obj.get("frequency").isJsonObject) {
                 obj.getAsJsonObject("frequency")
             } else null
@@ -697,6 +697,26 @@ class BackupRestoreManager(
                     intervalHours = freqObj.get("intervalHours")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
                     intervalDays = freqObj.get("intervalDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
                     intervalWeeks = freqObj.get("intervalWeeks")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()
+                )
+            } else if (obj.has("frequencyPattern") || obj.has("pattern")) {
+                // Guard: Support flattened frequency attributes from DataExporter exports and legacy backups to prevent silent schedule corruption
+                val rawPattern = (obj.get("frequencyPattern") ?: obj.get("pattern"))?.takeUnless { it.isJsonNull }?.asString ?: "DAILY"
+                val freqPattern = try {
+                    FrequencyPattern.valueOf(rawPattern)
+                } catch (_: Exception) {
+                    FrequencyPattern.DAILY
+                }
+                val selectedDaysOfWeek = obj.getAsJsonArray("selectedDaysOfWeek")?.mapNotNull { if (it.isJsonNull) null else runCatching { it.asInt }.getOrNull() }
+                val selectedDaysOfMonth = obj.getAsJsonArray("selectedDaysOfMonth")?.mapNotNull { if (it.isJsonNull) null else runCatching { it.asInt }.getOrNull() }
+                Frequency(
+                    pattern = freqPattern,
+                    daysPerWeek = obj.get("daysPerWeek")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    daysPerMonth = obj.get("daysPerMonth")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    selectedDaysOfWeek = selectedDaysOfWeek,
+                    selectedDaysOfMonth = selectedDaysOfMonth,
+                    intervalHours = obj.get("intervalHours")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    intervalDays = obj.get("intervalDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    intervalWeeks = obj.get("intervalWeeks")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()
                 )
             } else {
                 Frequency(FrequencyPattern.DAILY)
