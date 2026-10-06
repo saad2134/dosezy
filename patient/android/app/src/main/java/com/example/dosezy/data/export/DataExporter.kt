@@ -142,14 +142,16 @@ class DataExporter(
                                 val content = buildCsvContent(user, medicines, schedules)
                                 val entry = ZipEntry("$userFolder/medication_data.csv")
                                 zipOutputStream.putNextEntry(entry)
-                                zipOutputStream.write(content.toByteArray())
+                                // Guard: Explicitly specify UTF-8 charset to prevent corrupted non-ASCII characters in zip exports on devices with non-UTF-8 default charsets
+                                zipOutputStream.write(content.toByteArray(Charsets.UTF_8))
                                 zipOutputStream.closeEntry()
                             }
                             ExportFormat.JSON -> {
                                 val content = buildJsonContent(user, medicines, schedules)
                                 val entry = ZipEntry("$userFolder/medication_data.json")
                                 zipOutputStream.putNextEntry(entry)
-                                zipOutputStream.write(content.toByteArray())
+                                // Guard: Explicitly specify UTF-8 charset to prevent corrupted non-ASCII characters in zip exports on devices with non-UTF-8 default charsets
+                                zipOutputStream.write(content.toByteArray(Charsets.UTF_8))
                                 zipOutputStream.closeEntry()
                             }
                             ExportFormat.PDF -> {

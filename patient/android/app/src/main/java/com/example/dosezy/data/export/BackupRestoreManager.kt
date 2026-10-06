@@ -125,8 +125,10 @@ class BackupRestoreManager(
                 zos.closeEntry()
 
                 // Avatar image asset if available
+                // Guard: Remove file:// URI prefix from profilePicPath so File(cleanPath).exists() accurately resolves avatar files and avoids silently omitting avatars from backups
                 user.profilePicPath?.let { picPath ->
-                    val picFile = File(picPath)
+                    val cleanPath = picPath.removePrefix("file://")
+                    val picFile = File(cleanPath)
                     if (picFile.exists()) {
                         zos.putNextEntry(ZipEntry("$profileDir/avatar.jpg"))
                         picFile.inputStream().use { it.copyTo(zos) }
@@ -403,17 +405,19 @@ class BackupRestoreManager(
                         val shouldBeCurrent = existingLocalUser?.isCurrentUser ?: (totalProfiles == 0)
 
                         // Clear old records for this profile
+                        val existingLocalMeds = database.medicineDao().getMedicinesByUserDirect(targetUserId)
                         database.scheduleDao().deleteScheduleByUser(targetUserId)
                         database.medicineDao().deleteMedicinesByUser(targetUserId)
 
                         val avatarFile = File(pDir, "avatar.jpg")
+                        // Guard: If backup archive lacks an avatar asset, fall back to existing local user's avatar if valid, or null to prevent storing dead file paths from previous devices
                         val finalPicPath = if (avatarFile.exists()) {
                             val userAssetsDir = File(context.filesDir, "profiles/$targetUserId")
                             userAssetsDir.mkdirs()
                             val targetAvatar = File(userAssetsDir, "avatar.jpg")
                             avatarFile.copyTo(targetAvatar, overwrite = true)
                             targetAvatar.absolutePath
-                        } else originalUser.profilePicPath
+                        } else existingLocalUser?.profilePicPath?.takeIf { File(it.removePrefix("file://")).exists() }
 
                         val restoredUser = originalUser.copy(
                             userId = targetUserId,
@@ -426,13 +430,14 @@ class BackupRestoreManager(
 
                         for (med in medicines) {
                             val medAssetFile = File(pDir, "assets/${med.medicineId}.jpg")
+                            // Guard: Fall back to existing local medicine image if valid, or null to avoid storing dead file paths from previous devices
                             val finalImageUri = if (medAssetFile.exists()) {
                                 val medAssetsDir = File(context.filesDir, "medicines/${med.medicineId}")
                                 medAssetsDir.mkdirs()
                                 val targetMedAsset = File(medAssetsDir, "image.jpg")
                                 medAssetFile.copyTo(targetMedAsset, overwrite = true)
                                 targetMedAsset.absolutePath
-                            } else med.imageUri
+                            } else existingLocalMeds.firstOrNull { it.medicineId == med.medicineId }?.imageUri?.takeIf { File(it.removePrefix("file://")).exists() }
 
                             val restoredMed = med.copy(userId = targetUserId, imageUri = finalImageUri)
                             database.medicineDao().insertMedicine(restoredMed)

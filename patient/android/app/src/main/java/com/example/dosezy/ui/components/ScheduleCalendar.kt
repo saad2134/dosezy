@@ -63,6 +63,15 @@ fun ScheduleCalendar(
     modifier: Modifier = Modifier
 ) {
     var currentMonth by remember { mutableStateOf(YearMonth.from(selectedDate)) }
+
+    // Guard: Synchronize currentMonth when selectedDate changes externally (e.g. "Jump to Today" or quick date picker) to prevent stale month display
+    androidx.compose.runtime.LaunchedEffect(selectedDate) {
+        val targetMonth = YearMonth.from(selectedDate)
+        if (currentMonth != targetMonth) {
+            currentMonth = targetMonth
+        }
+    }
+
     val userViewModel: com.example.dosezy.ui.viewmodels.UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
     val currentUser by userViewModel.currentUser.collectAsState()
     val targetLocale = remember(currentUser?.language) {
@@ -188,6 +197,11 @@ private fun CalendarGrid(
     val daysInMonth = currentMonth.lengthOfMonth()
     val startOffset = (firstDayOfMonth.dayOfWeek.value - firstDayOfWeek.value + 7) % 7
 
+    // Guard: Pre-group schedule entries by LocalDate once per schedule list update to avoid O(N * 42) filter iterations across all calendar cells on every recomposition frame
+    val entriesByDate = remember(scheduleEntries) {
+        scheduleEntries.groupBy { it.scheduledDateTime.toLocalDate() }
+    }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -209,11 +223,8 @@ private fun CalendarGrid(
                         null
                     }
 
-
                     val dayEntries = date?.let { currentDate ->
-                        scheduleEntries.filter { entry ->
-                            entry.scheduledDateTime.toLocalDate() == currentDate
-                        }
+                        entriesByDate[currentDate] ?: emptyList()
                     } ?: emptyList()
 
                     val statusColor = getDateStatusColor(dayEntries, missedAfterHours)

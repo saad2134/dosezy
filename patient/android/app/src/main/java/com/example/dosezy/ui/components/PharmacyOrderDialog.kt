@@ -66,6 +66,7 @@ import com.example.dosezy.R
 import com.example.dosezy.data.export.DataExporter
 import com.example.dosezy.data.model.Medicine
 import com.example.dosezy.data.model.User
+import com.example.dosezy.data.model.getLocalizedName
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -122,23 +123,38 @@ fun PharmacyOrderDialog(
         if (onlyLowStock) lowStockMedicines else activeMedicines
     }
 
-    val selectedMedicineIds = remember(displayedMedicines) {
+    // Guard: Retain user selections across filter toggles and profile changes by not reinitializing selectedMedicineIds on displayedMedicines change
+    val selectedMedicineIds = remember {
         mutableStateListOf<String>().apply {
             addAll(displayedMedicines.map { it.medicineId })
         }
     }
+    val knownMedicineIds = remember { mutableSetOf<String>().apply { addAll(displayedMedicines.map { it.medicineId }) } }
+
+    androidx.compose.runtime.LaunchedEffect(displayedMedicines) {
+        displayedMedicines.forEach { med ->
+            if (knownMedicineIds.add(med.medicineId)) {
+                if (med.medicineId !in selectedMedicineIds) {
+                    selectedMedicineIds.add(med.medicineId)
+                }
+            }
+        }
+    }
 
     val customQuantities = remember { mutableStateMapOf<String, Int>() }
+    val userEditedMedicineIds = remember { mutableSetOf<String>() }
 
     // Calculate default quantity for a medicine given supply days
     fun calculateDefaultQty(med: Medicine, days: Int): Int {
         return med.calculateRefillQuantity(days)
     }
 
-    // Initialize/update quantities whenever displayedMedicines or supplyDays changes
+    // Guard: Only initialize default quantities for medicines not manually adjusted by the user to preserve stepper edits across filter and profile changes
     androidx.compose.runtime.LaunchedEffect(displayedMedicines, supplyDays) {
         displayedMedicines.forEach { med ->
-            customQuantities[med.medicineId] = calculateDefaultQty(med, supplyDays)
+            if (med.medicineId !in userEditedMedicineIds) {
+                customQuantities[med.medicineId] = calculateDefaultQty(med, supplyDays)
+            }
         }
     }
 
@@ -434,7 +450,7 @@ fun PharmacyOrderDialog(
                 // Medicine Selection Checklist
                 if (displayedMedicines.isNotEmpty()) {
                     Text(
-                        text = stringResource(R.string.pharmacy_order_medicines_include, selectedMedicineIds.size, displayedMedicines.size),
+                        text = stringResource(R.string.pharmacy_order_medicines_include, selectedMedicinesList.size, displayedMedicines.size),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -513,8 +529,9 @@ fun PharmacyOrderDialog(
                                             )
                                             if (includeDosageInOrder && med.dosage > 0) {
                                                 val dStr = if (med.dosage % 1.0 == 0.0) "${med.dosage.toInt()}" else "${med.dosage}"
+                                                // Guard: Use localized dosage unit name instead of raw enum name to avoid hardcoded English strings in localized environments
                                                 Text(
-                                                    text = " ($dStr ${med.dosageUnit.name.lowercase()})",
+                                                    text = " ($dStr ${med.dosageUnit.getLocalizedName()})",
                                                     style = MaterialTheme.typography.bodySmall,
                                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                                     maxLines = 1,
@@ -523,16 +540,11 @@ fun PharmacyOrderDialog(
                                             }
                                         }
                                         if (includeStockInOrder && med.currentStock != null) {
+                                            // Guard: Use localized unit strings instead of hardcoded English words to ensure full localization coverage
                                             val stockUnitStr = if (isDrop) {
-                                                if (med.currentStock > 1) "drops" else "drop"
+                                                if (med.currentStock > 1) stringResource(R.string.unit_bottles) else stringResource(R.string.unit_bottle)
                                             } else {
-                                                when (med.dosageUnit) {
-                                                    com.example.dosezy.data.model.DosageUnit.TABLET -> if (med.currentStock > 1) "tablets" else "tablet"
-                                                    com.example.dosezy.data.model.DosageUnit.CAPSULE -> if (med.currentStock > 1) "capsules" else "capsule"
-                                                    com.example.dosezy.data.model.DosageUnit.DROP -> if (med.currentStock > 1) "drops" else "drop"
-                                                    com.example.dosezy.data.model.DosageUnit.ML -> "ml"
-                                                    com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG -> if (med.currentStock > 1) "units" else "unit"
-                                                }
+                                                med.dosageUnit.getLocalizedName()
                                             }
                                             Text(
                                                 text = stringResource(R.string.pharmacy_order_current_stock, med.currentStock, stockUnitStr),
@@ -558,6 +570,7 @@ fun PharmacyOrderDialog(
                                                     .background(MaterialTheme.colorScheme.surfaceVariant)
                                                     .clickable {
                                                         if (currentQty > 1) {
+                                                            userEditedMedicineIds.add(med.medicineId)
                                                             customQuantities[med.medicineId] = currentQty - 1
                                                         }
                                                     },
@@ -588,6 +601,7 @@ fun PharmacyOrderDialog(
                                                     .clip(RoundedCornerShape(6.dp))
                                                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
                                                     .clickable {
+                                                        userEditedMedicineIds.add(med.medicineId)
                                                         customQuantities[med.medicineId] = currentQty + 1
                                                     },
                                                 contentAlignment = Alignment.Center
