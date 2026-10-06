@@ -20,9 +20,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
-    val userRepository: UserRepository,
-    val medicineRepository: MedicineRepository,
-    val scheduleRepository: ScheduleRepository,
+    private val userRepository: UserRepository,
+    private val medicineRepository: MedicineRepository,
+    private val scheduleRepository: ScheduleRepository,
     private val medicineNotificationManager: MedicineNotificationManager
 ) : ViewModel() {
 
@@ -278,5 +278,14 @@ class UserViewModel @Inject constructor(
                 _isLoading.value = false
             }
         }
+    }
+
+    fun createDataExporter(context: android.content.Context): com.example.dosezy.data.export.DataExporter {
+        return com.example.dosezy.data.export.DataExporter(
+            context = context,
+            userRepository = userRepository,
+            medicineRepository = medicineRepository,
+            scheduleRepository = scheduleRepository
+        )
     }
 }

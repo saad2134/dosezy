@@ -228,7 +228,7 @@
 
 
     <string name="home_all_good">すべて順調です！</string>
-    <string name="home_all_good_desc">今日服用する必要のある薬はありません。追加する場合は、下のプラスボタンをタップして開始してください。</string>
+    <string name="home_all_good_desc">今日服用する必要のある薬はありません。</string>
     <string name="no_profiles_found">プロフィールが見つかりません</string>
     <string name="status_taken">服用済み</string>
 

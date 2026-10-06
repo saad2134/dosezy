@@ -106,7 +106,6 @@ fun ManageProfileScreen(navController: NavController) {
     var fullNameError by remember { mutableStateOf(false) }
     var ageError by remember { mutableStateOf(false) }
     var genderError by remember { mutableStateOf(false) }
-    var validationErrorMessage by remember { mutableStateOf<String?>(null) }
 
     // Skeleton loader state
     var isDataLoaded by remember { mutableStateOf(false) }
@@ -358,16 +357,13 @@ fun ManageProfileScreen(navController: NavController) {
 
                     val updatedSuccessStr = stringResource(R.string.profile_updated_success)
 
+                    val parsedAge = age.normalizeArabicDigits().toIntOrNull() ?: 0
+                    val isFormValid = fullName.isNotBlank() && parsedAge > 0 && gender != null
+
                     // Save Changes Button
                     Button(
                         onClick = {
-                            val parsedAge = age.normalizeArabicDigits().toIntOrNull() ?: 0
-                            // Validate form
-                            fullNameError = fullName.isBlank()
-                            ageError = age.isBlank() || parsedAge <= 0
-                            genderError = gender == null
-
-                            if (!fullNameError && !ageError && !genderError) {
+                            if (isFormValid) {
                                 currentUser?.let { user ->
                                     val updatedUser = user.copy(
                                         profilePicPath = profilePicPath,
@@ -382,20 +378,17 @@ fun ManageProfileScreen(navController: NavController) {
                                     android.widget.Toast.makeText(context, updatedSuccessStr, android.widget.Toast.LENGTH_SHORT).show()
                                     navController.popBackStack()
                                 }
-                            } else {
-                                validationErrorMessage = when {
-                                    fullNameError -> context.getString(R.string.validation_enter_name)
-                                    ageError -> context.getString(R.string.validation_enter_valid_age)
-                                    else -> context.getString(R.string.profile_gender_required)
-                                }
                             }
                         },
+                        enabled = isFormValid,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
+                            disabledContentColor = Color.White.copy(alpha = 0.6f)
                         )
                     ) {
                         Text(
@@ -490,7 +483,7 @@ fun ManageProfileScreen(navController: NavController) {
                                 userViewModel.deleteUser(user)
                                 navController.popBackStack()
                             } else {
-                                validationErrorMessage = cannotDeleteMsg
+                                android.widget.Toast.makeText(context, cannotDeleteMsg, android.widget.Toast.LENGTH_SHORT).show()
                             }
                         }
                         showDeleteDialog = false
@@ -521,13 +514,6 @@ fun ManageProfileScreen(navController: NavController) {
                     Text(stringResource(R.string.cancel))
                 }
             }
-        )
-    }
-
-    if (validationErrorMessage != null) {
-        com.example.dosezy.ui.components.ValidationAlertDialog(
-            message = validationErrorMessage!!,
-            onDismiss = { validationErrorMessage = null }
         )
     }
 

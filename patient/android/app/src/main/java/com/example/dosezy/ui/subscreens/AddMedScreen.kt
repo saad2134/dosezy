@@ -1,120 +1,83 @@
 package com.example.dosezy.ui.subscreens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.EditNote
-import androidx.compose.material.icons.filled.Inventory2
-import androidx.compose.material.icons.filled.Medication
-import androidx.compose.material.icons.filled.Schedule
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import com.example.dosezy.ui.components.GridTimePickerDialog
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import com.example.dosezy.ui.components.TopBar
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import com.example.dosezy.R
-import kotlin.OptIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import com.example.dosezy.ui.components.MedicinePhotoVisualPicker
-import com.example.dosezy.ui.components.ProfilePicturePicker
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.dosezy.R
 import com.example.dosezy.data.model.DosageUnit
 import com.example.dosezy.data.model.FrequencyPattern
 import com.example.dosezy.data.model.Medicine
 import com.example.dosezy.data.model.PillShape
-import com.example.dosezy.data.model.TimeFormat
-import com.example.dosezy.data.model.getLocalizedName
 import com.example.dosezy.data.model.normalizeArabicDigits
-import com.example.dosezy.ui.components.PillColorSelector
-import com.example.dosezy.ui.components.PillShapeSelector
-import com.example.dosezy.ui.theme.DosezyTheme
+import com.example.dosezy.ui.components.GridTimePickerDialog
+import com.example.dosezy.ui.components.MedicineCourseDurationCard
+import com.example.dosezy.ui.components.MedicineIdentificationCard
+import com.example.dosezy.ui.components.MedicineNotesCard
+import com.example.dosezy.ui.components.MedicineStockInventoryCard
+import com.example.dosezy.ui.components.MedicineTimingsAndDosagesCard
+import com.example.dosezy.ui.components.TopBar
+import com.example.dosezy.ui.components.isMedicineFormValid
 import com.example.dosezy.ui.viewmodels.MedicineViewModel
 import com.example.dosezy.ui.viewmodels.UserViewModel
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.UUID
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddMedScreen(
     navController: NavController,
-    medicineViewModel: MedicineViewModel = com.example.dosezy.utils.sharedMedicineViewModel(),
+    medicineViewModel: MedicineViewModel = hiltViewModel(),
     userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
 ) {
     val currentUser by userViewModel.currentUser.collectAsState()
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
 
-    // Form state
-    val defaultInitialTime = remember { LocalTime.now().plusMinutes(30).withSecond(0).withNano(0) }
+    val defaultInitialTime = remember {
+        val now = LocalTime.now()
+        LocalTime.of(now.hour, 0).plusHours(1)
+    }
+
+    var selectedTime by remember { mutableStateOf(defaultInitialTime) }
     var medicationName by remember { mutableStateOf("") }
     var dosage by remember { mutableStateOf("") }
     var selectedDosageUnit by remember { mutableStateOf(DosageUnit.MG) }
-    var selectedTime by remember { mutableStateOf(defaultInitialTime) }
     var selectedFrequency by remember { mutableStateOf(FrequencyPattern.DAILY) }
     var medicineImagePath by remember { mutableStateOf<String?>(null) }
     var showTimePicker by remember { mutableStateOf(false) }
@@ -130,7 +93,7 @@ fun AddMedScreen(
     var currentStockText by remember { mutableStateOf("") }
     var refillThresholdText by remember { mutableStateOf("") }
 
-    // v2.4.0 New States: Pill Visual, Notes, Course Duration & Interval
+    // Pill Visual, Notes, Course Duration & Interval
     var selectedPillShape by remember { mutableStateOf(PillShape.ROUND) }
     var selectedPillColor by remember { mutableStateOf("#1193D4") }
     var doctorNotes by remember { mutableStateOf("") }
@@ -141,14 +104,8 @@ fun AddMedScreen(
     var intervalDaysText by remember { mutableStateOf("2") }
     var intervalWeeksText by remember { mutableStateOf("2") }
 
-    // Dropdown states
-    var dosageUnitExpanded by remember { mutableStateOf(false) }
-    var frequencyExpanded by remember { mutableStateOf(false) }
-    var validationErrorMessage by remember { mutableStateOf<String?>(null) }
-
     val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -179,1203 +136,94 @@ fun AddMedScreen(
                     .background(MaterialTheme.colorScheme.background)
             ) {
                 // --- Card 1: Medicine & Identification Card ---
-                androidx.compose.material3.Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-                ) {
-                    Column(modifier = Modifier.padding(18.dp)) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Medication,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(22.dp)
-                            )
-                            Text(
-                                text = stringResource(R.string.form_med_name),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Medicine Image Selection with Pill Visual
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            MedicinePhotoVisualPicker(
-                                imagePath = medicineImagePath,
-                                pillShape = selectedPillShape,
-                                pillColor = selectedPillColor,
-                                onImageSelected = { path -> medicineImagePath = path },
-                                onVisualSelected = { shape, color ->
-                                    selectedPillShape = shape
-                                    selectedPillColor = color
-                                }
-                            )
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            Text(
-                                text = if (medicineImagePath != null) stringResource(R.string.form_change_img) else stringResource(R.string.form_upload_img),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        OutlinedTextField(
-                            shape = RoundedCornerShape(16.dp),
-                            value = medicationName,
-                            onValueChange = { medicationName = it },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .defaultMinSize(minHeight = 56.dp),
-                            placeholder = {
-                                Text(
-                                    stringResource(R.string.form_med_name_placeholder),
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            },
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFF1193D4),
-                                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                                focusedLabelColor = Color(0xFF1193D4),
-                                unfocusedLabelColor = Color(0xFF6B7280),
-                                cursorColor = Color(0xFF1193D4)
-                            ),
-                            singleLine = true
-                        )
-                    }
-                }
+                MedicineIdentificationCard(
+                    medicineImagePath = medicineImagePath,
+                    selectedPillShape = selectedPillShape,
+                    selectedPillColor = selectedPillColor,
+                    medicationName = medicationName,
+                    onImageSelected = { path -> medicineImagePath = path },
+                    onVisualSelected = { shape, color ->
+                        selectedPillShape = shape
+                        selectedPillColor = color
+                    },
+                    onMedicationNameChange = { medicationName = it }
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
-
-                val activeLocale = remember(currentUser?.language) {
-                    com.example.dosezy.utils.LocaleHelper.getLocale(currentUser?.language ?: com.example.dosezy.data.model.Language.SYSTEM)
-                }
 
                 // --- Card 2: Timings & Dosages Card ---
-                androidx.compose.material3.Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-                ) {
-                    Column(modifier = Modifier.padding(18.dp)) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Schedule,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(22.dp)
-                            )
-                            Text(
-                                text = stringResource(R.string.timings_and_dosages_title),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // 1. Frequency Dropdown
-                        Text(
-                            text = stringResource(R.string.form_frequency),
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(bottom = 6.dp)
-                        )
-
-                        ExposedDropdownMenuBox(
-                            expanded = frequencyExpanded,
-                            onExpandedChange = { frequencyExpanded = !frequencyExpanded }
-                        ) {
-                            OutlinedTextField(
-                                shape = RoundedCornerShape(16.dp),
-                                value = selectedFrequency.getLocalizedName(),
-                                onValueChange = {},
-                                readOnly = true,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .defaultMinSize(minHeight = 56.dp)
-                                    .menuAnchor(),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = Color(0xFF1193D4),
-                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                                ),
-                                trailingIcon = {
-                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = frequencyExpanded)
-                                }
-                            )
-
-                            ExposedDropdownMenu(
-                                expanded = frequencyExpanded,
-                                onDismissRequest = { frequencyExpanded = false },
-                                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-                            ) {
-                                FrequencyPattern.values().forEach { frequency ->
-                                    DropdownMenuItem(
-                                        text = { Text(frequency.getLocalizedName()) },
-                                        onClick = {
-                                            selectedFrequency = frequency
-                                            frequencyExpanded = false
-                                        },
-                                        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-                                    )
-                                }
-                            }
-                        }
-
-                        // Specific frequency configurations
-                        if (selectedFrequency == FrequencyPattern.AS_NEEDED) {
-                            Spacer(modifier = Modifier.height(12.dp))
-                            androidx.compose.material3.Surface(
-                                shape = RoundedCornerShape(12.dp),
-                                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.freq_as_needed_desc),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier.padding(12.dp)
-                                )
-                            }
-                        }
-
-                        if (selectedFrequency == FrequencyPattern.EVERY_X_HOURS) {
-                            Spacer(modifier = Modifier.height(14.dp))
-                            OutlinedTextField(
-                                value = intervalHoursText,
-                                onValueChange = { if (it.all { c -> c.isDigit() }) intervalHoursText = it },
-                                label = { Text(stringResource(R.string.interval_hours_label)) },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 56.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = Color(0xFF1193D4),
-                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                                )
-                            )
-                            val hrs = intervalHoursText.toIntOrNull()
-                            if (hrs != null && hrs > 24) {
-                                Spacer(modifier = Modifier.height(6.dp))
-                                Text(
-                                    text = stringResource(R.string.hours_limit_hint),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = Color(0xFFF59E0B),
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
-                        }
-
-                        if (selectedFrequency == FrequencyPattern.EVERY_X_DAYS) {
-                            Spacer(modifier = Modifier.height(14.dp))
-                            OutlinedTextField(
-                                value = intervalDaysText,
-                                onValueChange = { if (it.all { c -> c.isDigit() }) intervalDaysText = it },
-                                label = { Text(stringResource(R.string.interval_days_label)) },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 56.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = Color(0xFF1193D4),
-                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                                )
-                            )
-                        }
-
-                        if (selectedFrequency == FrequencyPattern.WEEKLY) {
-                            Spacer(modifier = Modifier.height(14.dp))
-                            Text(
-                                text = stringResource(R.string.form_select_days_week),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            
-                            val daysOfWeekNames = listOf(
-                                stringResource(R.string.day_mon),
-                                stringResource(R.string.day_tue),
-                                stringResource(R.string.day_wed),
-                                stringResource(R.string.day_thu),
-                                stringResource(R.string.day_fri),
-                                stringResource(R.string.day_sat),
-                                stringResource(R.string.day_sun)
-                            )
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                daysOfWeekNames.forEachIndexed { index, name ->
-                                    val dayValue = index + 1
-                                    val isSelected = selectedDaysOfWeek.contains(dayValue)
-                                    Box(
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .heightIn(min = 48.dp)
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .background(
-                                                if (isSelected) MaterialTheme.colorScheme.primary 
-                                                else MaterialTheme.colorScheme.surface
-                                            )
-                                            .clickable {
-                                                selectedDaysOfWeek = if (isSelected) {
-                                                    selectedDaysOfWeek - dayValue
-                                                } else {
-                                                    selectedDaysOfWeek + dayValue
-                                                }
-                                            },
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = name,
-                                            color = if (isSelected) MaterialTheme.colorScheme.onPrimary 
-                                                    else MaterialTheme.colorScheme.onSurfaceVariant,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 12.sp
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        if (selectedFrequency == FrequencyPattern.MONTHLY) {
-                            Spacer(modifier = Modifier.height(14.dp))
-                            Text(
-                                text = stringResource(R.string.form_select_days_month),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            
-                            Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(6.dp)
-                            ) {
-                                val chunkedDays = (1..31).chunked(7)
-                                chunkedDays.forEach { rowDays ->
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                    ) {
-                                        rowDays.forEach { day ->
-                                            val isSelected = selectedDaysOfMonth.contains(day)
-                                            Box(
-                                                modifier = Modifier
-                                                    .weight(1f)
-                                                    .heightIn(min = 48.dp)
-                                                    .clip(RoundedCornerShape(8.dp))
-                                                    .background(
-                                                        if (isSelected) MaterialTheme.colorScheme.primary 
-                                                        else MaterialTheme.colorScheme.surface
-                                                    )
-                                                    .clickable {
-                                                        selectedDaysOfMonth = if (isSelected) {
-                                                            selectedDaysOfMonth - day
-                                                        } else {
-                                                            selectedDaysOfMonth + day
-                                                        }
-                                                    },
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Text(
-                                                    text = day.toString(),
-                                                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary 
-                                                            else MaterialTheme.colorScheme.onSurfaceVariant,
-                                                    fontSize = 12.sp,
-                                                    fontWeight = FontWeight.Medium
-                                                )
-                                            }
-                                        }
-                                        if (rowDays.size < 7) {
-                                            repeat(7 - rowDays.size) {
-                                                Spacer(modifier = Modifier.weight(1f))
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        if (selectedFrequency == FrequencyPattern.CUSTOM) {
-                            Spacer(modifier = Modifier.height(14.dp))
-                            OutlinedTextField(
-                                value = intervalWeeksText,
-                                onValueChange = { if (it.all { c -> c.isDigit() }) intervalWeeksText = it },
-                                label = { Text(stringResource(R.string.custom_recurrence_interval_label)) },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 56.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = Color(0xFF1193D4),
-                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                                )
-                            )
-
-                            Spacer(modifier = Modifier.height(14.dp))
-                            Text(
-                                text = stringResource(R.string.form_select_days_week),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            val daysOfWeekNames = listOf(
-                                stringResource(R.string.day_mon),
-                                stringResource(R.string.day_tue),
-                                stringResource(R.string.day_wed),
-                                stringResource(R.string.day_thu),
-                                stringResource(R.string.day_fri),
-                                stringResource(R.string.day_sat),
-                                stringResource(R.string.day_sun)
-                            )
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                daysOfWeekNames.forEachIndexed { index, name ->
-                                    val dayValue = index + 1
-                                    val isSelected = selectedDaysOfWeek.contains(dayValue)
-                                    Box(
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .heightIn(min = 48.dp)
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .background(
-                                                if (isSelected) MaterialTheme.colorScheme.primary 
-                                                else MaterialTheme.colorScheme.surface
-                                            )
-                                            .clickable {
-                                                selectedDaysOfWeek = if (isSelected) {
-                                                    selectedDaysOfWeek - dayValue
-                                                } else {
-                                                    selectedDaysOfWeek + dayValue
-                                                }
-                                            },
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = name,
-                                            color = if (isSelected) MaterialTheme.colorScheme.onPrimary 
-                                                    else MaterialTheme.colorScheme.onSurfaceVariant,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 12.sp
-                                        )
-                                    }
-                                }
-                            }
-
-                            val weeks = intervalWeeksText.normalizeArabicDigits().toIntOrNull() ?: 1
-                            if (selectedDaysOfWeek.isNotEmpty()) {
-                                Spacer(modifier = Modifier.height(12.dp))
-                                val dayLabels = selectedDaysOfWeek.sorted().map { dayVal ->
-                                    daysOfWeekNames.getOrElse(dayVal - 1) { "" }
-                                }.joinToString(", ")
-                                androidx.compose.material3.Surface(
-                                    shape = RoundedCornerShape(12.dp),
-                                    color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.custom_recurrence_summary, weeks, dayLabels),
-                                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
-                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-                                    )
-                                }
-                            }
-                        }
-
-                        // Presets and custom times (only for scheduled frequencies, not AS_NEEDED)
-                        if (selectedFrequency != FrequencyPattern.AS_NEEDED) {
-                            Spacer(modifier = Modifier.height(18.dp))
-
-                            // 2. Dosing Presets (1x, 2x, 3x, 4x) - only for DAILY
-                            if (selectedFrequency == FrequencyPattern.DAILY) {
-                                Text(
-                                    text = stringResource(R.string.daily_frequency_presets_title),
-                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier.padding(bottom = 6.dp)
-                                )
-                                val presets = listOf(
-                                    "1x" to listOf(defaultInitialTime),
-                                    "2x" to listOf(defaultInitialTime, defaultInitialTime.plusHours(12)).sorted(),
-                                    "3x" to listOf(defaultInitialTime, defaultInitialTime.plusHours(6), defaultInitialTime.plusHours(12)).sorted(),
-                                    "4x" to listOf(defaultInitialTime, defaultInitialTime.plusHours(4), defaultInitialTime.plusHours(8), defaultInitialTime.plusHours(12)).sorted()
-                                )
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    presets.forEach { (label, times) ->
-                                        val isSelected = selectedDosePreset == label
-                                        Surface(
-                                            modifier = Modifier
-                                                .weight(1f)
-                                                .heightIn(min = 48.dp)
-                                                .clip(RoundedCornerShape(12.dp))
-                                                .clickable {
-                                                    selectedDosePreset = label
-                                                    scheduledTimesList = times
-                                                    selectedTime = times.first()
-                                                },
-                                            color = if (isSelected) Color(0xFF1193D4) else MaterialTheme.colorScheme.surface,
-                                            border = androidx.compose.foundation.BorderStroke(
-                                                1.dp,
-                                                if (isSelected) Color(0xFF1193D4) else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                                            ),
-                                            shape = RoundedCornerShape(12.dp)
-                                        ) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .padding(vertical = 12.dp),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Text(
-                                                    text = label,
-                                                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
-                                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                                    fontSize = 15.sp
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(14.dp))
-                            }
-
-                            // 3. Custom Dosing Times Chips - 2-items-per-row expanded layout
-                            Text(
-                                text = stringResource(R.string.scheduled_dosing_times_title),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                                color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(bottom = 6.dp)
-                            )
-                            val totalItems = scheduledTimesList.size + 1
-                            val rowCount = (totalItems + 1) / 2
-                            Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                for (rowIdx in 0 until rowCount) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        for (colIdx in 0..1) {
-                                            val itemIndex = rowIdx * 2 + colIdx
-                                            if (itemIndex < scheduledTimesList.size) {
-                                                val time = scheduledTimesList[itemIndex]
-                                                val formatted = com.example.dosezy.utils.TimeFormatUtils.formatLocalTime(
-                                                    time,
-                                                    currentUser?.timeFormat ?: TimeFormat.HOUR_12,
-                                                    activeLocale
-                                                )
-                                                val isSelected = selectedTime == time
-                                                Surface(
-                                                    modifier = Modifier
-                                                        .weight(1f)
-                                                        .heightIn(min = 48.dp)
-                                                        .clip(RoundedCornerShape(12.dp))
-                                                        .clickable {
-                                                            selectedTime = time
-                                                            editingTimeIndex = itemIndex
-                                                            showTimePicker = true
-                                                        },
-                                                    color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else MaterialTheme.colorScheme.surface,
-                                                    border = androidx.compose.foundation.BorderStroke(
-                                                        1.dp,
-                                                        if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                                                    ),
-                                                    shape = RoundedCornerShape(12.dp)
-                                                ) {
-                                                    Row(
-                                                        modifier = Modifier
-                                                            .fillMaxWidth()
-                                                            .padding(horizontal = 10.dp, vertical = 10.dp),
-                                                        verticalAlignment = Alignment.CenterVertically
-                                                    ) {
-                                                        Icon(
-                                                            imageVector = Icons.Default.Schedule,
-                                                            contentDescription = null,
-                                                            tint = MaterialTheme.colorScheme.primary,
-                                                            modifier = Modifier.size(18.dp)
-                                                        )
-                                                        Text(
-                                                            text = formatted,
-                                                            style = MaterialTheme.typography.bodyLarge.copy(
-                                                                fontSize = 16.sp,
-                                                                fontWeight = FontWeight.Bold
-                                                            ),
-                                                            color = MaterialTheme.colorScheme.onSurface,
-                                                            modifier = Modifier
-                                                                .weight(1f)
-                                                                .padding(horizontal = 6.dp)
-                                                        )
-                                                        if (scheduledTimesList.size > 1) {
-                                                            Box(
-                                                                modifier = Modifier
-                                                                    .size(24.dp)
-                                                                    .clip(androidx.compose.foundation.shape.CircleShape)
-                                                                    .clickable {
-                                                                        scheduledTimesList = scheduledTimesList - time
-                                                                        val removedKey = String.format(java.util.Locale.US, "%02d:%02d", time.hour, time.minute)
-                                                                        val updated = perTimeDosages.toMutableMap()
-                                                                        updated.remove(removedKey)
-                                                                        perTimeDosages = updated
-                                                                        if (selectedTime == time && scheduledTimesList.isNotEmpty()) {
-                                                                            selectedTime = scheduledTimesList.first()
-                                                                        }
-                                                                        selectedDosePreset = "Custom"
-                                                                    },
-                                                                contentAlignment = Alignment.Center
-                                                            ) {
-                                                                Icon(
-                                                                    imageVector = Icons.Default.Close,
-                                                                    contentDescription = stringResource(R.string.med_time_remove_cd),
-                                                                    modifier = Modifier.size(16.dp),
-                                                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                                                )
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            } else if (itemIndex == scheduledTimesList.size) {
-                                                // + Add Time Button
-                                                Surface(
-                                                    modifier = Modifier
-                                                        .weight(1f)
-                                                        .heightIn(min = 48.dp)
-                                                        .clip(RoundedCornerShape(12.dp))
-                                                        .clickable {
-                                                            editingTimeIndex = null
-                                                            showTimePicker = true
-                                                        },
-                                                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                                                    border = androidx.compose.foundation.BorderStroke(
-                                                        1.dp,
-                                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                                                    ),
-                                                    shape = RoundedCornerShape(12.dp)
-                                                ) {
-                                                    Row(
-                                                        modifier = Modifier
-                                                            .fillMaxWidth()
-                                                            .padding(horizontal = 10.dp, vertical = 10.dp),
-                                                        horizontalArrangement = Arrangement.Center,
-                                                        verticalAlignment = Alignment.CenterVertically
-                                                    ) {
-                                                        Icon(
-                                                            imageVector = Icons.Default.Add,
-                                                            contentDescription = null,
-                                                            tint = MaterialTheme.colorScheme.primary,
-                                                            modifier = Modifier.size(18.dp)
-                                                        )
-                                                        Spacer(modifier = Modifier.width(4.dp))
-                                                        Text(
-                                                            text = stringResource(R.string.med_time_add_btn),
-                                                            style = MaterialTheme.typography.bodyMedium,
-                                                            fontWeight = FontWeight.SemiBold,
-                                                            color = MaterialTheme.colorScheme.primary
-                                                        )
-                                                    }
-                                                }
-                                            } else {
-                                                Spacer(modifier = Modifier.weight(1f))
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // Seamless Variable Dosages Toggle Per Scheduled Time (Issue #82)
-                        if (selectedFrequency != FrequencyPattern.AS_NEEDED && scheduledTimesList.size > 1) {
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-                            Spacer(modifier = Modifier.height(14.dp))
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                                    Text(
-                                        text = stringResource(R.string.med_different_dosages_toggle),
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.med_different_dosages_subtitle),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Switch(
-                                    checked = hasDifferentDosages,
-                                    onCheckedChange = { isChecked ->
-                                        hasDifferentDosages = isChecked
-                                        if (isChecked) {
-                                            val updated = perTimeDosages.toMutableMap()
-                                            val defaultDose = if (dosage.isNotBlank()) dosage else ""
-                                            scheduledTimesList.forEach { t ->
-                                                val key = String.format(java.util.Locale.US, "%02d:%02d", t.hour, t.minute)
-                                                if (updated[key].isNullOrBlank()) {
-                                                    updated[key] = defaultDose
-                                                }
-                                            }
-                                            perTimeDosages = updated
-                                        }
-                                    }
-                                )
-                            }
-                        }
-
-                        // Single / Base Dosage & Dosage Unit at the bottom of Timings & Dosages card
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-                        Spacer(modifier = Modifier.height(14.dp))
-
-                        if (!hasDifferentDosages || scheduledTimesList.size <= 1) {
-                            Text(
-                                text = stringResource(R.string.form_dosage),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                                color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(bottom = 6.dp)
-                            )
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                OutlinedTextField(
-                                    shape = RoundedCornerShape(16.dp),
-                                    value = dosage,
-                                    onValueChange = {
-                                        if (it.all { char -> char.isDigit() || char == '.' || char == ',' || char == '\u066B' }) {
-                                            dosage = it
-                                        }
-                                    },
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .defaultMinSize(minHeight = 56.dp),
-                                    placeholder = {
-                                        Text(
-                                            "0",
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    },
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = Color(0xFF1193D4),
-                                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                                        focusedLabelColor = Color(0xFF1193D4),
-                                        unfocusedLabelColor = Color(0xFF6B7280),
-                                        cursorColor = Color(0xFF1193D4)
-                                    ),
-                                    singleLine = true
-                                )
-
-                                Spacer(modifier = Modifier.width(8.dp))
-
-                                // Dosage Unit Dropdown
-                                Box(
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    ExposedDropdownMenuBox(
-                                        expanded = dosageUnitExpanded,
-                                        onExpandedChange = { dosageUnitExpanded = !dosageUnitExpanded }
-                                    ) {
-                                        OutlinedTextField(
-                                            shape = RoundedCornerShape(16.dp),
-                                            value = selectedDosageUnit.getLocalizedName(),
-                                            onValueChange = {},
-                                            readOnly = true,
-                                            trailingIcon = {
-                                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = dosageUnitExpanded)
-                                            },
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .defaultMinSize(minHeight = 56.dp)
-                                                .menuAnchor(),
-                                            colors = OutlinedTextFieldDefaults.colors(
-                                                focusedBorderColor = Color(0xFF1193D4),
-                                                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                                                focusedLabelColor = Color(0xFF1193D4),
-                                                unfocusedLabelColor = Color(0xFF6B7280)
-                                            )
-                                        )
-
-                                        ExposedDropdownMenu(
-                                            expanded = dosageUnitExpanded,
-                                            onDismissRequest = { dosageUnitExpanded = false },
-                                            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-                                        ) {
-                                            DosageUnit.values().forEach { unit ->
-                                                DropdownMenuItem(
-                                                    text = { Text(unit.getLocalizedName()) },
-                                                    onClick = {
-                                                        selectedDosageUnit = unit
-                                                        dosageUnitExpanded = false
-                                                    },
-                                                    modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        } else {
-                            // When different dosages is enabled, Main dosage input disappears!
-                            // Only Dosage Unit is displayed so user can configure the unit.
-                            Text(
-                                text = stringResource(R.string.form_dosage_unit),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                                color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(bottom = 6.dp)
-                            )
-
-                            ExposedDropdownMenuBox(
-                                expanded = dosageUnitExpanded,
-                                onExpandedChange = { dosageUnitExpanded = !dosageUnitExpanded }
-                            ) {
-                                OutlinedTextField(
-                                    shape = RoundedCornerShape(16.dp),
-                                    value = selectedDosageUnit.getLocalizedName(),
-                                    onValueChange = {},
-                                    readOnly = true,
-                                    trailingIcon = {
-                                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = dosageUnitExpanded)
-                                    },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .defaultMinSize(minHeight = 56.dp)
-                                        .menuAnchor(),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = Color(0xFF1193D4),
-                                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                                        focusedLabelColor = Color(0xFF1193D4),
-                                        unfocusedLabelColor = Color(0xFF6B7280)
-                                    )
-                                )
-
-                                ExposedDropdownMenu(
-                                    expanded = dosageUnitExpanded,
-                                    onDismissRequest = { dosageUnitExpanded = false },
-                                    modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-                                ) {
-                                    DosageUnit.values().forEach { unit ->
-                                        DropdownMenuItem(
-                                            text = { Text(unit.getLocalizedName()) },
-                                            onClick = {
-                                                selectedDosageUnit = unit
-                                                dosageUnitExpanded = false
-                                            },
-                                            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-                                        )
-                                    }
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.height(14.dp))
-
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                scheduledTimesList.forEach { time ->
-                                    val key = String.format(java.util.Locale.US, "%02d:%02d", time.hour, time.minute)
-                                    val formattedTime = com.example.dosezy.utils.TimeFormatUtils.formatLocalTime(
-                                        time,
-                                        currentUser?.timeFormat ?: TimeFormat.HOUR_12,
-                                        activeLocale
-                                    )
-
-                                    Surface(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        shape = RoundedCornerShape(12.dp),
-                                        color = MaterialTheme.colorScheme.surface,
-                                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-                                    ) {
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 12.dp, vertical = 8.dp),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.SpaceBetween
-                                        ) {
-                                            Row(
-                                                verticalAlignment = Alignment.CenterVertically,
-                                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                            ) {
-                                                Icon(
-                                                    imageVector = Icons.Default.Schedule,
-                                                    contentDescription = null,
-                                                    tint = MaterialTheme.colorScheme.primary,
-                                                    modifier = Modifier.size(18.dp)
-                                                )
-                                                Text(
-                                                    text = formattedTime,
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    fontWeight = FontWeight.SemiBold,
-                                                    color = MaterialTheme.colorScheme.onSurface
-                                                )
-                                            }
-
-                                            Row(
-                                                verticalAlignment = Alignment.CenterVertically,
-                                                horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                            ) {
-                                                OutlinedTextField(
-                                                    value = perTimeDosages[key] ?: (if (dosage.isNotBlank()) dosage else ""),
-                                                    onValueChange = { newVal ->
-                                                        if (newVal.all { it.isDigit() || it == '.' || it == ',' || it == '\u066B' }) {
-                                                            perTimeDosages = perTimeDosages + (key to newVal)
-                                                        }
-                                                    },
-                                                    modifier = Modifier.width(85.dp),
-                                                    textStyle = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                                                    singleLine = true,
-                                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                                                    shape = RoundedCornerShape(10.dp)
-                                                )
-                                                Text(
-                                                    text = selectedDosageUnit.getLocalizedName(),
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    fontWeight = FontWeight.Medium,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                MedicineTimingsAndDosagesCard(
+                    selectedFrequency = selectedFrequency,
+                    onFrequencyChange = { selectedFrequency = it },
+                    intervalHoursText = intervalHoursText,
+                    onIntervalHoursChange = { intervalHoursText = it },
+                    intervalDaysText = intervalDaysText,
+                    onIntervalDaysChange = { intervalDaysText = it },
+                    intervalWeeksText = intervalWeeksText,
+                    onIntervalWeeksChange = { intervalWeeksText = it },
+                    selectedDaysOfWeek = selectedDaysOfWeek,
+                    onDaysOfWeekChange = { selectedDaysOfWeek = it },
+                    selectedDaysOfMonth = selectedDaysOfMonth,
+                    onDaysOfMonthChange = { selectedDaysOfMonth = it },
+                    scheduledTimesList = scheduledTimesList,
+                    onScheduledTimesChange = { scheduledTimesList = it },
+                    selectedDosePreset = selectedDosePreset,
+                    onDosePresetChange = { selectedDosePreset = it },
+                    hasDifferentDosages = hasDifferentDosages,
+                    onHasDifferentDosagesChange = { hasDifferentDosages = it },
+                    perTimeDosages = perTimeDosages,
+                    onPerTimeDosagesChange = { perTimeDosages = it },
+                    dosage = dosage,
+                    onDosageChange = { dosage = it },
+                    selectedDosageUnit = selectedDosageUnit,
+                    onDosageUnitChange = { selectedDosageUnit = it },
+                    timeFormat = currentUser?.timeFormat ?: com.example.dosezy.data.model.TimeFormat.HOUR_12,
+                    defaultInitialTime = defaultInitialTime,
+                    onOpenTimePicker = { index, time ->
+                        editingTimeIndex = index
+                        selectedTime = time
+                        showTimePicker = true
                     }
-                }
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // --- Card 3: Prescription Duration & End Date Card ---
-                androidx.compose.material3.Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-                ) {
-                    Column(modifier = Modifier.padding(18.dp)) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.CalendarMonth,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(22.dp)
-                            )
-                            Text(
-                                text = stringResource(R.string.course_duration_title),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            Surface(
-                                shape = RoundedCornerShape(14.dp),
-                                color = if (!isFiniteCourse) Color(0xFF1193D4) else MaterialTheme.colorScheme.surfaceVariant,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(44.dp)
-                                    .clickable { isFiniteCourse = false }
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Text(
-                                        text = stringResource(R.string.course_ongoing),
-                                        color = if (!isFiniteCourse) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 14.sp
-                                    )
-                                }
-                            }
-
-                            Surface(
-                                shape = RoundedCornerShape(14.dp),
-                                color = if (isFiniteCourse) Color(0xFF1193D4) else MaterialTheme.colorScheme.surfaceVariant,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(44.dp)
-                                    .clickable { isFiniteCourse = true }
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Text(
-                                        text = stringResource(R.string.course_finite),
-                                        color = if (isFiniteCourse) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 14.sp
-                                    )
-                                }
-                            }
-                        }
-
-                        // Start Date Picker Row (placed before course duration for logical workflow)
-                        val dateFormatter = remember { DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM) }
-                        Spacer(modifier = Modifier.height(14.dp))
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    android.app.DatePickerDialog(
-                                        context,
-                                        { _, y, m, d ->
-                                            selectedStartDate = LocalDate.of(y, m + 1, d)
-                                        },
-                                        selectedStartDate.year,
-                                        selectedStartDate.monthValue - 1,
-                                        selectedStartDate.dayOfMonth
-                                    ).show()
-                                }
-                                .padding(vertical = 4.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = stringResource(R.string.med_start_date_label),
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Surface(
-                                shape = RoundedCornerShape(8.dp),
-                                color = MaterialTheme.colorScheme.surfaceVariant,
-                                modifier = Modifier.padding(2.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.CalendarMonth,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(16.dp),
-                                        tint = Color(0xFF1193D4)
-                                    )
-                                    Text(
-                                        text = selectedStartDate.format(dateFormatter),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                }
-                            }
-                        }
-
-                        if (isFiniteCourse) {
-                            Spacer(modifier = Modifier.height(12.dp))
-                            OutlinedTextField(
-                                value = durationDaysText,
-                                onValueChange = { if (it.all { c -> c.isDigit() }) durationDaysText = it },
-                                label = { Text(stringResource(R.string.course_duration_days_label)) },
-                                placeholder = { Text(stringResource(R.string.course_duration_days_placeholder)) },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 56.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = Color(0xFF1193D4),
-                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                                )
-                            )
-
-                            val days = durationDaysText.normalizeArabicDigits().toIntOrNull()
-                            if (days != null && days > 0) {
-                                val endDate = selectedStartDate.plusDays(days.toLong())
-                                Spacer(modifier = Modifier.height(6.dp))
-                                Text(
-                                    text = stringResource(R.string.course_end_date_label, endDate.toString()),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // --- Card 4: Medicine Stock & Inventory ---
-                androidx.compose.material3.Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-                ) {
-                    Column(modifier = Modifier.padding(18.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Inventory2,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(22.dp)
-                                )
-                                Text(
-                                    text = stringResource(R.string.stock_inventory_card_title),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                            Surface(
-                                shape = RoundedCornerShape(6.dp),
-                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.optional),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            OutlinedTextField(
-                                value = currentStockText,
-                                onValueChange = { if (it.all { c -> c.isDigit() }) currentStockText = it },
-                                label = { Text(stringResource(R.string.stock_current)) },
-                                placeholder = { Text(stringResource(R.string.med_stock_current_placeholder)) },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier.weight(1f).defaultMinSize(minHeight = 56.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = Color(0xFF1193D4),
-                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                                )
-                            )
-                            OutlinedTextField(
-                                value = refillThresholdText,
-                                onValueChange = { if (it.all { c -> c.isDigit() }) refillThresholdText = it },
-                                label = { Text(stringResource(R.string.stock_refill_threshold)) },
-                                placeholder = { Text(stringResource(R.string.med_stock_refill_placeholder)) },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier.weight(1f).defaultMinSize(minHeight = 56.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = Color(0xFF1193D4),
-                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                                )
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // --- Card 5: Doctor & Pharmacy Notes ---
-                androidx.compose.material3.Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-                ) {
-                    Column(modifier = Modifier.padding(18.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.EditNote,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(22.dp)
-                                )
-                                Text(
-                                    text = stringResource(R.string.med_notes_label),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                            Surface(
-                                shape = RoundedCornerShape(6.dp),
-                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.optional),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        OutlinedTextField(
-                            value = doctorNotes,
-                            onValueChange = { doctorNotes = it },
-                            placeholder = { Text(stringResource(R.string.med_notes_placeholder)) },
-                            shape = RoundedCornerShape(16.dp),
-                            minLines = 2,
-                            maxLines = 4,
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFF1193D4),
-                                unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                            )
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
+                // --- Card 3: Course Duration Card ---
                 val durationDaysInt = durationDaysText.normalizeArabicDigits().toIntOrNull()
                 val calcStartDate = selectedStartDate
                 val calcEndDate = if (isFiniteCourse && durationDaysInt != null) {
                     selectedStartDate.plusDays((durationDaysInt - 1).toLong().coerceAtLeast(0L))
                 } else null
+
+                MedicineCourseDurationCard(
+                    isFiniteCourse = isFiniteCourse,
+                    onIsFiniteCourseChange = { isFiniteCourse = it },
+                    selectedStartDate = selectedStartDate,
+                    onStartDateChange = { selectedStartDate = it },
+                    durationDaysText = durationDaysText,
+                    onDurationDaysChange = { durationDaysText = it },
+                    calculatedEndDate = calcEndDate
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // --- Card 4: Inventory & Stock Tracking Card ---
+                MedicineStockInventoryCard(
+                    currentStockText = currentStockText,
+                    onCurrentStockChange = { currentStockText = it },
+                    refillThresholdText = refillThresholdText,
+                    onRefillThresholdChange = { refillThresholdText = it }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // --- Card 5: Doctor / Pharmacist Notes Card ---
+                MedicineNotesCard(
+                    doctorNotes = doctorNotes,
+                    onDoctorNotesChange = { doctorNotes = it }
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
 
                 val isDosageValid = if (hasDifferentDosages && scheduledTimesList.size > 1) {
                     scheduledTimesList.all { t ->
@@ -1389,30 +237,18 @@ fun AddMedScreen(
                     d != null && d > 0.0
                 }
 
-                val isFormValid = medicationName.isNotBlank() && isDosageValid && (
-                    selectedFrequency == FrequencyPattern.DAILY ||
-                    selectedFrequency == FrequencyPattern.AS_NEEDED ||
-                    selectedFrequency == FrequencyPattern.EVERY_X_HOURS ||
-                    selectedFrequency == FrequencyPattern.EVERY_X_DAYS ||
-                    (selectedFrequency == FrequencyPattern.WEEKLY && selectedDaysOfWeek.isNotEmpty()) ||
-                    (selectedFrequency == FrequencyPattern.MONTHLY && selectedDaysOfMonth.isNotEmpty()) ||
-                    (selectedFrequency == FrequencyPattern.CUSTOM && selectedDaysOfWeek.isNotEmpty() && (intervalWeeksText.normalizeArabicDigits().toIntOrNull() ?: 0) >= 1)
+                val isFormValid = isMedicineFormValid(
+                    medicationName = medicationName,
+                    isDosageValid = isDosageValid,
+                    selectedFrequency = selectedFrequency,
+                    selectedDaysOfWeek = selectedDaysOfWeek,
+                    selectedDaysOfMonth = selectedDaysOfMonth,
+                    intervalWeeksText = intervalWeeksText
                 )
 
                 Button(
                     onClick = {
-                        if (!isFormValid) {
-                            val errorMsg = when {
-                                medicationName.isBlank() -> context.getString(R.string.validation_enter_med_name)
-                                !isDosageValid -> context.getString(R.string.validation_enter_dosage)
-                                selectedFrequency == FrequencyPattern.WEEKLY && selectedDaysOfWeek.isEmpty() -> context.getString(R.string.validation_select_days_week)
-                                selectedFrequency == FrequencyPattern.MONTHLY && selectedDaysOfMonth.isEmpty() -> context.getString(R.string.validation_select_days_month)
-                                selectedFrequency == FrequencyPattern.CUSTOM && selectedDaysOfWeek.isEmpty() -> context.getString(R.string.validation_select_custom_days)
-                                else -> context.getString(R.string.validation_enter_med_name)
-                            }
-                            validationErrorMessage = errorMsg
-                            return@Button
-                        }
+                        if (!isFormValid) return@Button
 
                         val baseDose = if (hasDifferentDosages && scheduledTimesList.size > 1) {
                             val firstKey = scheduledTimesList.firstOrNull()?.let { String.format(java.util.Locale.US, "%02d:%02d", it.hour, it.minute) }
@@ -1466,13 +302,16 @@ fun AddMedScreen(
                         navController.previousBackStackEntry?.savedStateHandle?.set("snackbar_message", context.getString(R.string.medication_added_success))
                         navController.popBackStack()
                     },
+                    enabled = isFormValid,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isFormValid) Color(0xFF2084E4) else Color(0xFF2084E4).copy(alpha = 0.6f),
-                        contentColor = Color.White
+                        containerColor = Color(0xFF2084E4),
+                        contentColor = Color.White,
+                        disabledContainerColor = Color(0xFF2084E4).copy(alpha = 0.35f),
+                        disabledContentColor = Color.White.copy(alpha = 0.6f)
                     )
                 ) {
                     Text(
@@ -1527,32 +366,5 @@ fun AddMedScreen(
             },
             onDismiss = { showTimePicker = false }
         )
-    }
-
-    if (validationErrorMessage != null) {
-        com.example.dosezy.ui.components.ValidationAlertDialog(
-            message = validationErrorMessage!!,
-            onDismiss = { validationErrorMessage = null }
-        )
-    }
-}
-
-// Extension properties
-private val DosageUnit.displayName: String
-    get() = when (this) {
-        DosageUnit.MG -> "mg"
-        DosageUnit.MCG -> "mcg"
-        DosageUnit.ML -> "ml"
-        DosageUnit.DROP -> "drop"
-        DosageUnit.TABLET -> "tablet"
-        DosageUnit.CAPSULE -> "capsule"
-    }
-
-
-@Preview(showBackground = true)
-@Composable
-fun AddMedScreenPreview() {
-    DosezyTheme {
-        AddMedScreen(navController = androidx.navigation.compose.rememberNavController())
     }
 }

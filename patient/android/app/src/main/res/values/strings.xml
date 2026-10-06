@@ -253,7 +253,7 @@
 
 
     <string name="home_all_good">All Good!</string>
-    <string name="home_all_good_desc">No medications need to be taken today. If you need to add more, get started by tapping the plus button below.</string>
+    <string name="home_all_good_desc">No medications need to be taken today</string>
     <string name="no_profiles_found">No profiles found</string>
     <string name="status_taken">Taken</string>
 

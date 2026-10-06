@@ -244,7 +244,7 @@
 
 
     <string name="home_all_good">¡Todo bien!</string>
-    <string name="home_all_good_desc">No es necesario tomar medicamentos hoy. Si necesita agregar más, comience tocando el botón más de abajo.</string>
+    <string name="home_all_good_desc">No es necesario tomar medicamentos hoy.</string>
     <string name="no_profiles_found">No se encontraron perfiles</string>
     <string name="status_taken">Tomado</string>
 

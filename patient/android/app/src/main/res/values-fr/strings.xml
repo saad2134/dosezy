@@ -228,7 +228,7 @@
 
 
     <string name="home_all_good">Tout va bien!</string>
-    <string name="home_all_good_desc">Aucun médicament à prendre aujourd\'hui. Si vous devez en ajouter d\'autres, commencez par appuyer sur le bouton plus ci-dessous.</string>
+    <string name="home_all_good_desc">Aucun médicament à prendre aujourd\'hui.</string>
     <string name="no_profiles_found">Aucun profil trouvé</string>
     <string name="status_taken">Pris</string>
 

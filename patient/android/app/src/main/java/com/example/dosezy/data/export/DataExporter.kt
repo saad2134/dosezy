@@ -29,9 +29,13 @@ import java.util.zip.ZipOutputStream
 class DataExporter(
     private val context: Context,
     private val userRepository: UserRepository,
-    val medicineRepository: MedicineRepository,
+    private val medicineRepository: MedicineRepository,
     private val scheduleRepository: ScheduleRepository
 ) {
+
+    suspend fun getActiveMedicinesForUser(userId: String): List<Medicine> {
+        return medicineRepository.getMedicinesByUserSync(userId).filter { !it.isArchived }
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun exportUserData(userId: String?, format: ExportFormat): File = withContext(Dispatchers.IO) {

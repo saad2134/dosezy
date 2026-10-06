@@ -106,14 +106,9 @@ fun MenuScreen(navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    // Initialize DataExporter using the repositories from UserViewModel
-    val dataExporter = remember {
-        DataExporter(
-            context = context,
-            userRepository = userViewModel.userRepository,
-            medicineRepository = userViewModel.medicineRepository,
-            scheduleRepository = userViewModel.scheduleRepository
-        )
+    // Initialize DataExporter using encapsulated helper from UserViewModel
+    val dataExporter = remember(context) {
+        userViewModel.createDataExporter(context)
     }
 
     fun startExport(

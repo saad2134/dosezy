@@ -179,7 +179,6 @@ fun HomeScreen(
     val executeTakeDose: (String, java.time.LocalDateTime, String?) -> Unit = { entryId, resolvedDateTime, note ->
         val medName = todayEntries.find { it.scheduleEntry.entryId == entryId }?.medicine?.medicationName ?: ""
         val lateAfter = currentUser?.considerLateAfter ?: 3
-        val missedAfter = currentUser?.considerMissedAfter ?: 6
         val targetScheduleEntry = todayEntries.find { it.scheduleEntry.entryId == entryId }?.scheduleEntry
         // Guard: Use isTakenLate so overdue doses past missedAfter are correctly recorded as TAKEN_LATE instead of reverting to on-time
         val isLate = if (targetScheduleEntry != null) {
@@ -1077,7 +1076,8 @@ private fun AllGoodBanner() {
                 )
                 Text(
                     text = androidx.compose.ui.res.stringResource(R.string.home_all_good_desc),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

@@ -227,7 +227,7 @@
 
 
     <string name="home_all_good">Tudo bem!</string>
-    <string name="home_all_good_desc">Não há medicamentos para tomar hoje. Se precisar de adicionar mais, comece tocando no botão mais abaixo.</string>
+    <string name="home_all_good_desc">Não há medicamentos para tomar hoje.</string>
     <string name="no_profiles_found">Nenhum perfil encontrado</string>
     <string name="status_taken">Tomado</string>
 

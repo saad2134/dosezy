@@ -228,7 +228,7 @@
 
 
     <string name="home_all_good">সব ঠিক আছে!</string>
-    <string name="home_all_good_desc">আজ কোনো ওষুধ খাওয়ার প্রয়োজন নেই। আপনি যদি আরও যোগ করতে চান, তবে নিচের প্লাস বোতামটি ট্যাপ করে শুরু করুন।</string>
+    <string name="home_all_good_desc">আজ কোনো ওষুধ খাওয়ার প্রয়োজন নেই।</string>
     <string name="no_profiles_found">কোনো প্রোফাইল পাওয়া যায়নি</string>
     <string name="status_taken">গৃহীত</string>
 

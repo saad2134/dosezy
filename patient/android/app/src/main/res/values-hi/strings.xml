@@ -244,7 +244,7 @@
 
 
     <string name="home_all_good">सब ठीक है!</string>
-    <string name="home_all_good_desc">आज कोई दवा लेने की आवश्यकता नहीं है। यदि आपको और जोड़ने की आवश्यकता है, तो नीचे दिए गए प्लस बटन को दबाकर प्रारंभ करें।</string>
+    <string name="home_all_good_desc">आज कोई दवा लेने की आवश्यकता नहीं है।</string>
     <string name="no_profiles_found">कोई प्रोफ़ाइल नहीं मिली</string>
     <string name="status_taken">लिया गया</string>
 

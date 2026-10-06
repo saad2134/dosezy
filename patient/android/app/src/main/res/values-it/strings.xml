@@ -228,7 +228,7 @@
 
 
     <string name="home_all_good">Tutto bene!</string>
-    <string name="home_all_good_desc">Nessun farmaco da assumere oggi. Se devi aggiungerne altri, inizia toccando il pulsante più in basso.</string>
+    <string name="home_all_good_desc">Nessun farmaco da assumere oggi.</string>
     <string name="no_profiles_found">Nessun profilo trovato</string>
     <string name="status_taken">Assunto</string>
 

@@ -228,7 +228,7 @@
 
 
     <string name="home_all_good">كل شيء جيد!</string>
-    <string name="home_all_good_desc">لا توجد أدوية يجب تناولها اليوم. إذا كنت بحاجة إلى إضافة المزيد، فابدأ بالنقر فوق زر علامة الزائد أدناه.</string>
+    <string name="home_all_good_desc">لا توجد أدوية يجب تناولها اليوم.</string>
     <string name="no_profiles_found">لم يتم العثور على ملفات شخصية</string>
     <string name="status_taken">تم تناوله</string>
 

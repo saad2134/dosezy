@@ -228,7 +228,7 @@
 
 
     <string name="home_all_good">Alles gut!</string>
-    <string name="home_all_good_desc">Heute müssen keine Medikamente eingenommen werden. Wenn Sie weitere hinzufügen möchten, tippen Sie unten auf das Plus-Symbol.</string>
+    <string name="home_all_good_desc">Heute müssen keine Medikamente eingenommen werden.</string>
     <string name="no_profiles_found">Keine Profile gefunden</string>
     <string name="status_taken">Eingenommen</string>
 

@@ -92,7 +92,7 @@ fun PharmacyOrderDialog(
                 map[uid] = medicines.filter { !it.isArchived }
             } else {
                 try {
-                    map[uid] = dataExporter.medicineRepository.getMedicinesByUserSync(uid).filter { !it.isArchived }
+                    map[uid] = dataExporter.getActiveMedicinesForUser(uid)
                 } catch (e: Exception) {
                     map[uid] = emptyList()
                 }
