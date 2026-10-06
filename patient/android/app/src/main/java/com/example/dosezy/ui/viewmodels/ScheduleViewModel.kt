@@ -201,7 +201,8 @@ class ScheduleViewModel @Inject constructor(
 
     fun markAsMissed(entryId: String) {
         viewModelScope.launch {
-            scheduleRepository.updateMedicationStatus(entryId, "MISSED", null as Long?)
+            // Guard: Use recordDoseMissed to dismiss notification, disarm snooze/nagging alarms, and update app widgets
+            scheduleRepository.recordDoseMissed(entryId, context)
             currentCalendarUserId = null
             // Refresh the schedule after updating status
             _currentUserId.value?.let { userId ->
@@ -239,7 +240,8 @@ class ScheduleViewModel @Inject constructor(
                         missedAfterHours
                     )
                     if (isMissed) {
-                        scheduleRepository.updateMedicationStatus(entry.entryId, "MISSED", null as Long?)
+                        // Guard: Use recordDoseMissed to clear notification shade and disarm Doze wakeups via AlarmManager
+                        scheduleRepository.recordDoseMissed(entry.entryId, context)
                         hasUpdated = true
                     }
                 }

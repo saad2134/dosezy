@@ -178,7 +178,7 @@ class DataExporter(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun buildJsonContent(user: User, medicines: List<Medicine>, schedules: List<ScheduleEntry>): String {
+    internal fun buildJsonContent(user: User, medicines: List<Medicine>, schedules: List<ScheduleEntry>): String {
         val root = JSONObject()
         root.put("appName", "Dosezy")
         root.put("appVersion", com.example.dosezy.BuildConfig.VERSION_NAME)
@@ -219,6 +219,8 @@ class DataExporter(
         medicines.forEach { med ->
             val mObj = JSONObject()
             mObj.put("medicineId", med.medicineId)
+            // Guard: Explicitly serialize userId for medicine to retain profile relational integrity in export backups
+            mObj.put("userId", med.userId)
             mObj.put("medicationName", med.medicationName)
             mObj.put("dosage", med.dosage)
             mObj.put("dosageUnit", med.dosageUnit.name)
@@ -266,6 +268,8 @@ class DataExporter(
         schedules.forEach { sch ->
             val sObj = JSONObject()
             sObj.put("entryId", sch.entryId)
+            // Guard: Explicitly serialize userId on schedule entry so deserialization and external backups preserve user profile linkage
+            sObj.put("userId", sch.userId)
             sObj.put("medicineId", sch.medicineId)
             sObj.put("scheduledDateTime", sch.scheduledDateTime.toString())
             sObj.put("status", sch.status.name)

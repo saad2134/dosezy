@@ -409,6 +409,34 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         }
     }
 
+    suspend fun recordDoseMissed(
+        entryId: String,
+        context: Context? = null
+    ) {
+        // 1. Update schedule entry status in database
+        database.scheduleDao().updateMedicationStatus(entryId, "MISSED", null as Long?)
+
+        // 2. Stop any active alarm sound / popup
+        com.example.dosezy.notifications.AlarmActivity.stopActiveAlarm()
+
+        // 3. Cancel active notification for this entry, disarm snooze/nagging alarms, and update widgets
+        if (context != null) {
+            try {
+                val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                nManager.cancel(entryId.hashCode())
+            } catch (_: Exception) {}
+            try {
+                // Guard: Cancel armed snooze and nagging alarms so marking missed in-app prevents phantom alarms from ringing later
+                val alarmScheduler = com.example.dosezy.notifications.AlarmScheduler(context)
+                alarmScheduler.cancelSnooze(entryId)
+                alarmScheduler.cancelNagging(entryId)
+            } catch (_: Exception) {}
+            try {
+                com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+            } catch (_: Exception) {}
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun undoDoseTaken(entryId: String, context: Context? = null) {
         // Inspect previous status to only restore stock if it was actually taken

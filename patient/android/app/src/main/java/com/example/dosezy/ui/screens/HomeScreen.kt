@@ -772,9 +772,10 @@ private fun MedicationCard(
         else -> MaterialTheme.colorScheme.onPrimary
     }
 
+    // Guard: Support undo for missed doses when allowDoseUndo is true, or retroactive recording when allowCustomDoseTime is true
     val enabled = when {
         isTaken || isSkipped -> currentUser?.allowDoseUndo == true
-        isMissed -> currentUser?.allowCustomDoseTime == true
+        isMissed -> currentUser?.allowDoseUndo == true || currentUser?.allowCustomDoseTime == true
         else -> true
     }
 
@@ -926,6 +927,14 @@ private fun MedicationCard(
                             isTaken || isSkipped -> {
                                 if (currentUser?.allowDoseUndo == true) {
                                     onUndo(entry.entryId)
+                                }
+                            }
+                            isMissed -> {
+                                // Guard: If allowDoseUndo is enabled, prioritize undoing missed status back to pending; otherwise fallback to custom dose recording
+                                if (currentUser?.allowDoseUndo == true) {
+                                    onUndo(entry.entryId)
+                                } else if (currentUser?.allowCustomDoseTime == true) {
+                                    onMarkAsTaken(entry.entryId)
                                 }
                             }
                             isLate -> onMarkAsLate(entry.entryId)
