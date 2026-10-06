@@ -41,6 +41,7 @@
     <string name="form_med_name">Nombre del medicamento</string>
     <string name="form_med_name_placeholder">ej. Amoxicilina</string>
     <string name="form_dosage">Dosis</string>
+    <string name="form_dosage_unit">Unidad de dosis</string>
     <string name="form_dosage_placeholder">ej. 500mg, 1 pastilla</string>
     <string name="form_frequency">Frecuencia</string>
     <string name="form_time">Hora</string>
@@ -53,7 +54,7 @@
     <string name="freq_daily">Diario</string>
     <string name="freq_weekly">Semanal</string>
     <string name="freq_monthly">Mensual</string>
-    <string name="freq_custom">Personalizado</string>
+    <string name="freq_custom">Cada X semanas</string>
     <string name="form_select_days_week">Seleccionar días de la semana</string>
     <string name="form_select_days_month">Seleccionar días del mes</string>
     <string name="day_mon">Lun</string>
@@ -243,7 +244,7 @@
 
 
     <string name="home_all_good">¡Todo bien!</string>
-    <string name="home_all_good_desc">No es necesario tomar medicamentos hoy. Si necesita agregar más, comience tocando el botón más de abajo.</string>
+    <string name="home_all_good_desc">No es necesario tomar medicamentos hoy.</string>
     <string name="no_profiles_found">No se encontraron perfiles</string>
     <string name="status_taken">Tomado</string>
 
@@ -254,6 +255,7 @@
     <string name="image_picker_camera">Cámara</string>
     <string name="image_picker_gallery">Galería</string>
     <string name="image_picker_error_title">Error</string>
+    <string name="camera_permission_required">Se requiere permiso de cámara para tomar fotos.</string>
     <string name="image_picker_remove">Eliminar imagen</string>
     <string name="delete_contact_title">Eliminar contacto</string>
     <string name="delete_contact_desc">¿Está seguro de que desea eliminar este contacto?</string>
@@ -468,7 +470,7 @@
     <string name="pill_shape_drops">Gotas</string>
     <string name="pill_shape_patch">Parche</string>
 
-    <string name="med_notes_label">Notas del médico / farmacia y advertencias</string>
+    <string name="med_notes_label">Notas del médico y advertencias</string>
     <string name="med_notes_placeholder">ej. Tomar con comida, Evitar pomelo, Receta #12345</string>
 
     <string name="course_duration_title">Duración del tratamiento</string>
@@ -488,6 +490,10 @@
     <string name="freq_every_days_format">Cada %1$d días</string>
     <string name="interval_hours_label">Horas entre dosis</string>
     <string name="interval_days_label">Días entre dosis</string>
+    <string name="freq_every_x_weeks_format">Cada %1$d semanas</string>
+    <string name="custom_recurrence_interval_label">Repetir cada (semanas)</string>
+    <string name="custom_recurrence_summary">Se repite cada %1$d semanas los %2$s</string>
+    <string name="validation_select_custom_days">Seleccione al menos un día para la frecuencia personalizada</string>
     <string name="btn_log_prn_dose">Registrar dosis</string>
     <string name="prn_doses_taken_today">Dosis registradas hoy: %1$d</string>
     <string name="prn_section_title">Medicamentos a demanda (PRN)</string>
@@ -506,7 +512,7 @@
     <string name="hours_limit_hint">Para intervalos mayores a 24 horas, use \'Cada X días\'.</string>
 
     <string name="pref_nagging_title">Recordatorios de insistencia (Nagging)</string>
-    <string name="pref_nagging_desc">Recordar repetidamente si una dosis programada no se marca como tomada</string>
+    <string name="pref_nagging_desc">Recordar repetidamente hasta marcar como tomada.</string>
     <string name="pref_nagging_interval">Intervalo de insistencia</string>
     <string name="pref_nagging_max_repeats">Repeticiones máximas</string>
     <string name="pref_nagging_repeats_format">%1$d veces</string>
@@ -523,6 +529,11 @@
     <string name="widget_all_completed">¡Todas las dosis completadas! 🎉</string>
     <string name="widget_no_doses_today">No hay dosis programadas para hoy</string>
     <string name="widget_next_dose_format">Siguiente: %1$s • %2$s</string>
+    <string name="widget_configure_title">Seleccionar perfil del widget</string>
+    <string name="widget_configure_subtitle">Elige el horario de medicamentos de qué perfil mostrará este widget en tu pantalla de inicio.</string>
+    <string name="widget_configure_active_profile">Perfil activo de la app</string>
+    <string name="widget_configure_active_profile_desc">Sigue dinámicamente el perfil que esté activo en la aplicación</string>
+    <string name="widget_configure_confirm">Guardar widget</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">Sonido de alarma</string>
@@ -591,6 +602,7 @@
     <string name="alarm_take_medicine">TOMAR MEDICAMENTO</string>
     <string name="alarm_snooze_format">POSPONER (%d MIN)</string>
     <string name="notif_action_snooze_format">Posponer (%d min)</string>
+    <string name="alarm_snoozed_toast">Alarma pospuesta por %d minutos</string>
     <string name="alarm_stock_remaining">Existencias: %d unidades restantes</string>
     <string name="home_action_take">Tomar</string>
     <string name="home_action_taken">Tomado</string>
@@ -616,7 +628,7 @@
     <string name="backup_export_failed">Error al exportar: %1$s</string>
 
     <string name="pref_allow_skip_title">Permitir omitir dosis</string>
-    <string name="pref_allow_skip_desc">Habilita la opción de omitir una dosis con un motivo clínico</string>
+    <string name="pref_allow_skip_desc">Omitir dosis programadas con un motivo.</string>
     <string name="home_action_skip">Omitir</string>
     <string name="home_action_skipped">Omitida</string>
     <string name="home_dose_skipped">Dosis omitida para %s</string>
@@ -642,6 +654,9 @@
     <string name="validation_enter_name">Por favor, introduce tu nombre</string>
     <string name="validation_enter_valid_age">Por favor, introduce una edad válida (1-120)</string>
     <string name="medication_added_success">Medicamento añadido con éxito</string>
+    <string name="medication_updated_success">Medicamento actualizado con éxito</string>
+    <string name="medication_archived_success">Medicamento suspendido con éxito</string>
+    <string name="medication_deleted_success">Medicamento eliminado con éxito</string>
     <string name="status_pending">Pendiente</string>
     <string name="pharmacy_order_title">Pedido de farmacia</string>
     <string name="pharmacy_order_desc">Generar lista de medicamentos para WhatsApp o su farmacia</string>
@@ -706,7 +721,7 @@
 
     <!-- Manual Dose Recording Strings -->
     <string name="pref_manually_record_dose_time_title">Registrar hora de dosis manualmente</string>
-    <string name="pref_manually_record_dose_time_desc">Preguntar la hora real en que tomó el medicamento al registrar dosis.</string>
+    <string name="pref_manually_record_dose_time_desc">Registrar la hora real en que se tomó la dosis.</string>
     <string name="record_dose_time_title">Registrar hora de dosis</string>
     <string name="record_dose_time_subtitle">¿Cuándo tomó %1$s?</string>
     <string name="record_dose_time_just_now">Justo ahora (%1$s)</string>
@@ -720,7 +735,7 @@
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">Ocultar botón central de agregar</string>
-    <string name="pref_hide_add_nav_button_desc">Oculta el botón \'+\' de la barra de navegación. Aparecerá un botón \'Agregar medicamento\' en la pestaña Medicamentos debajo de su lista.</string>
+    <string name="pref_hide_add_nav_button_desc">Ocultar el botón \'+\' de la barra de navegación inferior.</string>
 
     <!-- About Screen Expansion -->
     <string name="about_developer_title">Sobre el desarrollador</string>
@@ -758,9 +773,9 @@
     <string name="dialog_low_storage_action">Liberar espacio</string>
     <string name="dialog_low_storage_dismiss">Descartar</string>
     <string name="pref_allow_undo_title">Permitir deshacer dosis</string>
-    <string name="pref_allow_undo_desc">Permite revertir dosis registradas a pendientes. Requiere confirmación.</string>
+    <string name="pref_allow_undo_desc">Revertir dosis tomadas a pendientes.</string>
     <string name="pref_prompt_dose_notes_title">Preguntar por nota al tomar dosis</string>
-    <string name="pref_prompt_dose_notes_desc">Solicitar una nota, comida o síntoma cada vez que se marque una dosis como tomada.</string>
+    <string name="pref_prompt_dose_notes_desc">Solicitar una nota al registrar cada dosis.</string>
     <string name="dialog_undo_dose_title">¿Deshacer dosis?</string>
     <string name="dialog_undo_dose_msg">¿Seguro que deseas revertir %1$s a pendiente? Se restaurará cualquier stock descontado.</string>
     <string name="dialog_dose_note_title">Nota de la dosis</string>
@@ -771,6 +786,10 @@
     <string name="btn_edit_note">Editar nota</string>
     <string name="dialog_edit_note_title">Editar nota de la dosis</string>
     <string name="pref_allow_dose_notes_title">Notas de dosis</string>
-    <string name="pref_allow_dose_notes_desc">Permitir registrar notas, comidas o síntomas junto con las dosis.</string>
+    <string name="pref_allow_dose_notes_desc">Registrar notas, comidas o síntomas.</string>
     <string name="btn_add_note">+ Añadir nota</string>
+    <string name="timings_and_dosages_title">Horarios y dosis</string>
+    <string name="stock_inventory_card_title">Stock e inventario de medicamentos</string>
+    <string name="widget_configure_auto_badge">Automático</string>
+    <string name="dialog_validation_title">Aviso</string>
 </resources>

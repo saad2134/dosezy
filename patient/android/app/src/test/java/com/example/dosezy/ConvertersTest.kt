@@ -219,6 +219,23 @@ class ConvertersTest {
     }
 
     @Test
+    fun frequency_customEveryXWeeksRoundTrips() {
+        val freq = Frequency(
+            pattern = FrequencyPattern.CUSTOM,
+            intervalWeeks = 2,
+            selectedDaysOfWeek = listOf(1, 3, 5),
+            daysPerWeek = 3
+        )
+        val json = converters.fromFrequency(freq)
+        val restored = converters.toFrequency(json)
+        assertNotNull(restored)
+        assertEquals(FrequencyPattern.CUSTOM, restored!!.pattern)
+        assertEquals(2, restored.intervalWeeks)
+        assertEquals(listOf(1, 3, 5), restored.selectedDaysOfWeek)
+        assertEquals(3, restored.daysPerWeek)
+    }
+
+    @Test
     fun frequency_nullRoundTrips() {
         assertNull(converters.fromFrequency(null))
         assertNull(converters.toFrequency(null))

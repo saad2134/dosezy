@@ -94,6 +94,9 @@ Every field supported in the local SQLite database is fully represented in the O
 Use simple extension functions to bridge Room entities and Generated Network DTOs cleanly:
 
 ```kotlin
+// ==========================================
+// 1. User Mappers
+// ==========================================
 // Convert Room DB User entity to Network DTO for sync push
 fun User.toNetworkDto(): com.example.dosezy.network.models.User {
     return com.example.dosezy.network.models.User(
@@ -159,6 +162,127 @@ fun com.example.dosezy.network.models.User.toRoomEntity(): User {
         allowDoseUndo = this.allowDoseUndo ?: false,
         allowDoseNotes = this.allowDoseNotes ?: false,
         promptDoseNotes = this.promptDoseNotes ?: false
+    )
+}
+
+// ==========================================
+// 2. Frequency Mappers
+// ==========================================
+// Convert Room DB Frequency entity to Network DTO
+fun Frequency.toNetworkDto(): com.example.dosezy.network.models.Frequency {
+    return com.example.dosezy.network.models.Frequency(
+        pattern = com.example.dosezy.network.models.FrequencyPattern.valueOf(this.pattern.name),
+        daysPerWeek = this.daysPerWeek,
+        daysPerMonth = this.daysPerMonth,
+        selectedDaysOfWeek = this.selectedDaysOfWeek,
+        selectedDaysOfMonth = this.selectedDaysOfMonth,
+        intervalHours = this.intervalHours,
+        intervalDays = this.intervalDays,
+        intervalWeeks = this.intervalWeeks
+    )
+}
+
+// Convert Network DTO back to Room DB Frequency entity
+fun com.example.dosezy.network.models.Frequency.toRoomEntity(): Frequency {
+    return Frequency(
+        pattern = FrequencyPattern.valueOf(this.pattern.name),
+        daysPerWeek = this.daysPerWeek,
+        daysPerMonth = this.daysPerMonth,
+        selectedDaysOfWeek = this.selectedDaysOfWeek,
+        selectedDaysOfMonth = this.selectedDaysOfMonth,
+        intervalHours = this.intervalHours,
+        intervalDays = this.intervalDays,
+        intervalWeeks = this.intervalWeeks
+    )
+}
+
+// ==========================================
+// 3. Medicine Mappers
+// ==========================================
+// Convert Room DB Medicine entity to Network DTO for sync push
+fun Medicine.toNetworkDto(): com.example.dosezy.network.models.Medicine {
+    return com.example.dosezy.network.models.Medicine(
+        medicineId = this.medicineId,
+        userId = this.userId,
+        medicationName = this.medicationName,
+        dosage = this.dosage,
+        dosageUnit = com.example.dosezy.network.models.DosageUnit.valueOf(this.dosageUnit.name),
+        timesPerDay = this.timesPerDay,
+        frequency = this.frequency.toNetworkDto(),
+        scheduledTimes = this.scheduledTimes.map { it.toString() },
+        imageUri = this.imageUri,
+        currentStock = this.currentStock,
+        refillThreshold = this.refillThreshold,
+        autoDeductOnTake = this.autoDeductOnTake,
+        notes = this.notes,
+        pillShape = com.example.dosezy.network.models.PillShape.valueOf(this.pillShape.name),
+        pillColor = this.pillColor,
+        startDate = this.startDate?.toString(),
+        endDate = this.endDate?.toString(),
+        durationDays = this.durationDays,
+        isArchived = this.isArchived,
+        customDosages = this.customDosages
+    )
+}
+
+// Convert Network DTO back to Room DB Medicine entity upon sync pull
+fun com.example.dosezy.network.models.Medicine.toRoomEntity(): Medicine {
+    return Medicine(
+        medicineId = this.medicineId,
+        userId = this.userId,
+        medicationName = this.medicationName,
+        dosage = this.dosage,
+        dosageUnit = DosageUnit.valueOf(this.dosageUnit.name),
+        timesPerDay = this.timesPerDay,
+        frequency = this.frequency.toRoomEntity(),
+        scheduledTimes = this.scheduledTimes.mapNotNull {
+            try { LocalTime.parse(it) } catch (_: Exception) { null }
+        },
+        imageUri = this.imageUri,
+        currentStock = this.currentStock,
+        refillThreshold = this.refillThreshold,
+        autoDeductOnTake = this.autoDeductOnTake ?: true,
+        notes = this.notes,
+        pillShape = this.pillShape?.let { PillShape.valueOf(it.name) } ?: PillShape.ROUND,
+        pillColor = this.pillColor ?: "#1193D4",
+        startDate = this.startDate?.let { try { LocalDate.parse(it) } catch (_: Exception) { null } },
+        endDate = this.endDate?.let { try { LocalDate.parse(it) } catch (_: Exception) { null } },
+        durationDays = this.durationDays,
+        isArchived = this.isArchived ?: false,
+        customDosages = this.customDosages
+    )
+}
+
+// ==========================================
+// 4. ScheduleEntry Mappers
+// ==========================================
+// Convert Room DB ScheduleEntry entity to Network DTO for sync push
+fun ScheduleEntry.toNetworkDto(): com.example.dosezy.network.models.ScheduleEntry {
+    return com.example.dosezy.network.models.ScheduleEntry(
+        entryId = this.entryId,
+        userId = this.userId,
+        medicineId = this.medicineId,
+        scheduledDateTime = this.scheduledDateTime.toString(),
+        status = com.example.dosezy.network.models.MedicationStatus.valueOf(this.status.name),
+        takenAt = this.takenAt?.toString(),
+        skipReason = this.skipReason,
+        dosage = this.dosage,
+        doseNotes = this.doseNotes
+    )
+}
+
+// Convert Network DTO back to Room DB ScheduleEntry entity upon sync pull
+fun com.example.dosezy.network.models.ScheduleEntry.toRoomEntity(): ScheduleEntry {
+    return ScheduleEntry(
+        entryId = this.entryId,
+        userId = this.userId,
+        medicineId = this.medicineId,
+        scheduledDateTime = LocalDateTime.parse(this.scheduledDateTime),
+        status = MedicationStatus.valueOf(this.status.name),
+        takenAt = this.takenAt?.let { try { LocalDateTime.parse(it) } catch (_: Exception) { null } },
+        skipReason = this.skipReason,
+        dosage = this.dosage,
+        doseNotes = this.doseNotes
     )
 }
 ```

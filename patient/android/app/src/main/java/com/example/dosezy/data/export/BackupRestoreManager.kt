@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.room.withTransaction
 import com.example.dosezy.data.DosezyDatabase
 import com.example.dosezy.data.model.*
 import com.example.dosezy.data.repository.ScheduleRepository
@@ -125,8 +126,10 @@ class BackupRestoreManager(
                 zos.closeEntry()
 
                 // Avatar image asset if available
+                // Guard: Remove file:// URI prefix from profilePicPath so File(cleanPath).exists() accurately resolves avatar files and avoids silently omitting avatars from backups
                 user.profilePicPath?.let { picPath ->
-                    val picFile = File(picPath)
+                    val cleanPath = picPath.removePrefix("file://")
+                    val picFile = File(cleanPath)
                     if (picFile.exists()) {
                         zos.putNextEntry(ZipEntry("$profileDir/avatar.jpg"))
                         picFile.inputStream().use { it.copyTo(zos) }
@@ -174,16 +177,18 @@ class BackupRestoreManager(
         return@withContext zipFile
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun inspectBackupZip(uri: Uri): ZipInspectionResult = withContext(Dispatchers.IO) {
+        var tempDir: File? = null
         try {
             val inputStream = context.contentResolver.openInputStream(uri)
                 ?: return@withContext ZipInspectionResult(false, message = "Could not open backup file.")
 
-            val tempDir = File(context.cacheDir, "dosezy_inspect_${System.currentTimeMillis()}")
-            tempDir.mkdirs()
+            val inspectDir = File(context.cacheDir, "dosezy_inspect_${System.currentTimeMillis()}")
+            inspectDir.mkdirs()
+            tempDir = inspectDir
 
-            val normalizedTempPath = tempDir.toPath().normalize()
+            // Guard: Android 7.0/7.1 (API 24/25) lacks File.toPath(); use canonicalPath to prevent crash and Zip Slip vulnerabilities
+            val canonicalTempDir = inspectDir.canonicalPath
             ZipInputStream(BufferedInputStream(inputStream)).use { zis ->
                 var entry = zis.nextEntry
                 while (entry != null) {
@@ -193,7 +198,8 @@ class BackupRestoreManager(
                     }
 
                     val destFile = File(tempDir, entryName)
-                    if (!destFile.toPath().normalize().startsWith(normalizedTempPath)) {
+                    val canonicalDest = destFile.canonicalPath
+                    if (!canonicalDest.startsWith(canonicalTempDir + File.separator) && canonicalDest != canonicalTempDir) {
                         throw SecurityException("Invalid backup archive: path traversal detected for entry '$entryName'.")
                     }
                     if (entry.isDirectory) {
@@ -227,7 +233,12 @@ class BackupRestoreManager(
                 val profileJsonFile = File(pDir, "profile.json")
                 if (!profileJsonFile.exists()) continue
 
-                val user = parseUserFromJson(profileJsonFile.readText(Charsets.UTF_8))
+                // Guard: Defensively parse individual profile JSON to prevent a single corrupt profile folder from crashing inspection for remaining valid profiles
+                val user = try {
+                    parseUserFromJson(profileJsonFile.readText(Charsets.UTF_8))
+                } catch (_: Exception) {
+                    continue
+                }
                 val medicinesFile = File(pDir, "medicines.json")
                 val medicines = if (medicinesFile.exists()) parseMedicinesFromJson(medicinesFile.readText(Charsets.UTF_8)) else emptyList()
 
@@ -271,6 +282,8 @@ class BackupRestoreManager(
             )
         } catch (e: Exception) {
             e.printStackTrace()
+            // Guard: Clean up temporary extraction folder on corrupt or interrupted backup inspection to prevent disk cache leakage
+            try { tempDir?.deleteRecursively() } catch (_: Exception) {}
             return@withContext ZipInspectionResult(false, message = "Inspection failed: ${e.localizedMessage}")
         }
     }
@@ -295,7 +308,12 @@ class BackupRestoreManager(
                 val profileJsonFile = File(pDir, "profile.json")
                 if (!profileJsonFile.exists()) continue
 
-                val originalUser = parseUserFromJson(profileJsonFile.readText(Charsets.UTF_8))
+                // Guard: Defensively parse profile JSON to prevent corrupted profile folder from crashing selective restore batch
+                val originalUser = try {
+                    parseUserFromJson(profileJsonFile.readText(Charsets.UTF_8))
+                } catch (_: Exception) {
+                    continue
+                }
                 val medicines = if (File(pDir, "medicines.json").exists()) {
                     parseMedicinesFromJson(File(pDir, "medicines.json").readText(Charsets.UTF_8))
                 } else emptyList()
@@ -324,11 +342,9 @@ class BackupRestoreManager(
                             profilePicPath = finalPicPath,
                             isCurrentUser = (existingUsers.isEmpty() && totalProfiles == 0)
                         )
-                        database.userDao().insertUser(newUser)
-                        if (firstRestoredUserId == null) firstRestoredUserId = newUserId
-                        totalProfiles++
 
                         val medIdMap = mutableMapOf<String, String>()
+                        val newMedicines = mutableListOf<Medicine>()
                         for (med in medicines) {
                             val newMedId = UUID.randomUUID().toString()
                             medIdMap[med.medicineId] = newMedId
@@ -347,8 +363,7 @@ class BackupRestoreManager(
                                 userId = newUserId,
                                 imageUri = finalImageUri
                             )
-                            database.medicineDao().insertMedicine(newMed)
-                            totalMedicines++
+                            newMedicines.add(newMed)
                         }
 
                         val newSchedules = schedules.mapNotNull { sch ->
@@ -359,10 +374,22 @@ class BackupRestoreManager(
                                 medicineId = newMedId
                             )
                         }
-                        if (newSchedules.isNotEmpty()) {
-                            database.scheduleDao().insertScheduleEntries(newSchedules)
-                            totalSchedules += newSchedules.size
+
+                        // Guard: Execute database inserts within an atomic Room transaction to ensure partial restore state cannot be persisted if an error occurs
+                        database.withTransaction {
+                            database.userDao().insertUser(newUser)
+                            for (med in newMedicines) {
+                                database.medicineDao().insertMedicine(med)
+                            }
+                            if (newSchedules.isNotEmpty()) {
+                                database.scheduleDao().insertScheduleEntries(newSchedules)
+                            }
                         }
+
+                        if (firstRestoredUserId == null) firstRestoredUserId = newUserId
+                        totalProfiles++
+                        totalMedicines += newMedicines.size
+                        totalSchedules += newSchedules.size
 
                         scheduleRepository.reconcileLegacyScheduleEntries(newUserId, context)
                         scheduleRepository.rescheduleAllAlarms(newUserId, context)
@@ -387,48 +414,82 @@ class BackupRestoreManager(
                             existingSchedules.forEach { entry ->
                                 alarmScheduler.cancelAlarm(entry.entryId)
                                 alarmScheduler.cancelSnooze(entry.entryId)
+                                alarmScheduler.cancelNagging(entry.entryId)
                                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
                             }
                         } catch (_: Exception) {}
 
-                        // Clear old records for this profile
-                        database.scheduleDao().deleteScheduleByUser(targetUserId)
-                        database.medicineDao().deleteMedicinesByUser(targetUserId)
+                        val localUsers = database.userDao().getAllUsersDirect()
+                        val existingLocalUser = localUsers.firstOrNull { it.userId == targetUserId }
+                        // Guard: Preserve existing local user's active status (or promote if this is the sole/first profile) to prevent wiping the active session on overwrite restore
+                        val shouldBeCurrent = existingLocalUser?.isCurrentUser ?: (totalProfiles == 0)
+                        val existingLocalMeds = database.medicineDao().getMedicinesByUserDirect(targetUserId)
 
                         val avatarFile = File(pDir, "avatar.jpg")
+                        // Guard: If backup archive lacks an avatar asset, fall back to existing local user's avatar if valid, or null to prevent storing dead file paths from previous devices
                         val finalPicPath = if (avatarFile.exists()) {
                             val userAssetsDir = File(context.filesDir, "profiles/$targetUserId")
                             userAssetsDir.mkdirs()
                             val targetAvatar = File(userAssetsDir, "avatar.jpg")
                             avatarFile.copyTo(targetAvatar, overwrite = true)
                             targetAvatar.absolutePath
-                        } else originalUser.profilePicPath
+                        } else existingLocalUser?.profilePicPath?.takeIf { File(it.removePrefix("file://")).exists() }
 
-                        val restoredUser = originalUser.copy(userId = targetUserId, profilePicPath = finalPicPath)
-                        database.userDao().insertUser(restoredUser)
-                        if (firstRestoredUserId == null) firstRestoredUserId = targetUserId
-                        totalProfiles++
+                        val restoredUser = originalUser.copy(
+                            userId = targetUserId,
+                            profilePicPath = finalPicPath,
+                            isCurrentUser = shouldBeCurrent
+                        )
 
+                        val medIdMap = mutableMapOf<String, String>()
+                        val restoredMedicines = mutableListOf<Medicine>()
                         for (med in medicines) {
+                            // Guard: Generate new unique medicineId in OVERWRITE to prevent ID collisions with other profiles on the target device
+                            val newMedId = UUID.randomUUID().toString()
+                            medIdMap[med.medicineId] = newMedId
+
                             val medAssetFile = File(pDir, "assets/${med.medicineId}.jpg")
+                            // Guard: Fall back to existing local medicine image if valid, or null to avoid storing dead file paths from previous devices
                             val finalImageUri = if (medAssetFile.exists()) {
-                                val medAssetsDir = File(context.filesDir, "medicines/${med.medicineId}")
+                                val medAssetsDir = File(context.filesDir, "medicines/$newMedId")
                                 medAssetsDir.mkdirs()
                                 val targetMedAsset = File(medAssetsDir, "image.jpg")
                                 medAssetFile.copyTo(targetMedAsset, overwrite = true)
                                 targetMedAsset.absolutePath
-                            } else med.imageUri
+                            } else existingLocalMeds.firstOrNull { it.medicationName.trim().equals(med.medicationName.trim(), ignoreCase = true) }?.imageUri?.takeIf { File(it.removePrefix("file://")).exists() }
 
-                            val restoredMed = med.copy(userId = targetUserId, imageUri = finalImageUri)
-                            database.medicineDao().insertMedicine(restoredMed)
-                            totalMedicines++
+                            val restoredMed = med.copy(medicineId = newMedId, userId = targetUserId, imageUri = finalImageUri)
+                            restoredMedicines.add(restoredMed)
                         }
 
-                        val restoredSchedules = schedules.map { it.copy(userId = targetUserId) }
-                        if (restoredSchedules.isNotEmpty()) {
-                            database.scheduleDao().insertScheduleEntries(restoredSchedules)
-                            totalSchedules += restoredSchedules.size
+                        // Guard: Map schedule entries to remapped medicine IDs, generate fresh entryIds, and filter out orphaned schedules referencing missing medicines to prevent ForeignKey constraint failures
+                        val restoredSchedules = schedules.mapNotNull { sch ->
+                            val mappedMedId = medIdMap[sch.medicineId] ?: return@mapNotNull null
+                            sch.copy(
+                                entryId = UUID.randomUUID().toString(),
+                                userId = targetUserId,
+                                medicineId = mappedMedId
+                            )
                         }
+
+                        // Guard: Execute clear and restore within an atomic Room transaction so that if any failure occurs midway, previous profile data is rolled back rather than permanently lost
+                        database.withTransaction {
+                            database.scheduleDao().deleteScheduleByUser(targetUserId)
+                            database.medicineDao().deleteMedicinesByUser(targetUserId)
+
+                            database.userDao().insertUser(restoredUser)
+                            for (med in restoredMedicines) {
+                                database.medicineDao().insertMedicine(med)
+                            }
+                            if (restoredSchedules.isNotEmpty()) {
+                                database.scheduleDao().insertScheduleEntries(restoredSchedules)
+                            }
+                        }
+
+                        if (firstRestoredUserId == null) firstRestoredUserId = targetUserId
+                        totalProfiles++
+                        totalMedicines += restoredMedicines.size
+                        totalSchedules += restoredSchedules.size
 
                         scheduleRepository.reconcileLegacyScheduleEntries(targetUserId, context)
                         scheduleRepository.rescheduleAllAlarms(targetUserId, context)
@@ -449,6 +510,7 @@ class BackupRestoreManager(
                         if (firstRestoredUserId == null) firstRestoredUserId = targetUserId
 
                         val medIdMap = mutableMapOf<String, String>()
+                        val newMedsToInsert = mutableListOf<Medicine>()
                         for (med in medicines) {
                             val match = existingMeds.firstOrNull { it.medicationName.trim().equals(med.medicationName.trim(), ignoreCase = true) }
                             if (match != null) {
@@ -463,7 +525,8 @@ class BackupRestoreManager(
                                     medAssetsDir.mkdirs()
                                     val targetMedAsset = File(medAssetsDir, "image.jpg")
                                     medAssetFile.copyTo(targetMedAsset, overwrite = true)
-                                    "file://${targetMedAsset.absolutePath}"
+                                    // Guard: Save canonical absolutePath without file:// scheme to ensure consistent image loading across Coil and file pickers
+                                    targetMedAsset.absolutePath
                                 } else null
 
                                 val newMed = med.copy(
@@ -471,8 +534,7 @@ class BackupRestoreManager(
                                     userId = targetUserId,
                                     imageUri = finalImageUri
                                 )
-                                database.medicineDao().insertMedicine(newMed)
-                                totalMedicines++
+                                newMedsToInsert.add(newMed)
                             }
                         }
 
@@ -495,10 +557,18 @@ class BackupRestoreManager(
                             }
                         }
 
-                        if (mergedSchedules.isNotEmpty()) {
-                            database.scheduleDao().insertScheduleEntries(mergedSchedules)
-                            totalSchedules += mergedSchedules.size
+                        // Guard: Execute MERGE inserts within an atomic Room transaction to ensure database consistency on failure
+                        database.withTransaction {
+                            for (newMed in newMedsToInsert) {
+                                database.medicineDao().insertMedicine(newMed)
+                            }
+                            if (mergedSchedules.isNotEmpty()) {
+                                database.scheduleDao().insertScheduleEntries(mergedSchedules)
+                            }
                         }
+
+                        totalMedicines += newMedsToInsert.size
+                        totalSchedules += mergedSchedules.size
 
                         scheduleRepository.reconcileLegacyScheduleEntries(targetUserId, context)
                         scheduleRepository.rescheduleAllAlarms(targetUserId, context)
@@ -552,123 +622,177 @@ class BackupRestoreManager(
         return@withContext executeSelectiveRestore(inspect.tempDir, defaultDecisions)
     }
 
-    private fun parseUserFromJson(jsonStr: String): User {
+    internal fun parseUserFromJson(jsonStr: String): User {
         val json = JsonParser.parseString(jsonStr).asJsonObject
+        // Guard: Defensively parse user enums and fields to prevent NullPointerException or IllegalArgumentException from aborting backup restore
+        val genderVal = json.get("gender")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { Gender.valueOf(it) }.getOrNull() } ?: Gender.DO_NOT_SPECIFY
+        val themeVal = json.get("theme")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { Theme.valueOf(it) }.getOrNull() } ?: Theme.SYSTEM
+        val timeFormatVal = json.get("timeFormat")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { TimeFormat.valueOf(it) }.getOrNull() } ?: TimeFormat.HOUR_12
+        val languageVal = json.get("language")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { Language.valueOf(it) }.getOrNull() } ?: Language.SYSTEM
+        val alarmSoundVal = json.get("alarmSound")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { AlarmSound.valueOf(it) }.getOrNull() } ?: AlarmSound.SYSTEM_DEFAULT
+
         return User(
-            userId = json.get("userId")?.asString ?: UUID.randomUUID().toString(),
-            fullName = json.get("fullName")?.asString ?: "Restored User",
-            age = json.get("age")?.asInt ?: 30,
-            gender = try { Gender.valueOf(json.get("gender").asString) } catch (_: Exception) { Gender.DO_NOT_SPECIFY },
-            contactNumber = json.get("contactNumber")?.asString ?: "",
+            userId = json.get("userId")?.takeUnless { it.isJsonNull }?.asString ?: UUID.randomUUID().toString(),
+            fullName = json.get("fullName")?.takeUnless { it.isJsonNull }?.asString ?: "Restored User",
+            age = json.get("age")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 30,
+            gender = genderVal,
+            contactNumber = json.get("contactNumber")?.takeUnless { it.isJsonNull }?.asString ?: "",
             profilePicPath = json.get("profilePicPath")?.let { if (it.isJsonNull) null else it.asString },
-            isCurrentUser = json.get("isCurrentUser")?.asBoolean ?: false,
-            theme = try { Theme.valueOf(json.get("theme").asString) } catch (_: Exception) { Theme.SYSTEM },
-            timeFormat = try { TimeFormat.valueOf(json.get("timeFormat").asString) } catch (_: Exception) { TimeFormat.HOUR_12 },
-            language = try { Language.valueOf(json.get("language").asString) } catch (_: Exception) { Language.SYSTEM },
-            considerLateAfter = json.get("considerLateAfter")?.asInt ?: 3,
-            considerMissedAfter = json.get("considerMissedAfter")?.asInt ?: 6,
-            snoozeDuration = json.get("snoozeDuration")?.asInt ?: 10,
+            isCurrentUser = json.get("isCurrentUser")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+            theme = themeVal,
+            timeFormat = timeFormatVal,
+            language = languageVal,
+            considerLateAfter = json.get("considerLateAfter")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 3,
+            considerMissedAfter = json.get("considerMissedAfter")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 6,
+            snoozeDuration = json.get("snoozeDuration")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 10,
             allergies = json.get("allergies")?.let { if (it.isJsonNull) null else it.asString },
             medicalConditions = json.get("medicalConditions")?.let { if (it.isJsonNull) null else it.asString },
-            naggingRemindersEnabled = json.get("naggingRemindersEnabled")?.asBoolean ?: false,
-            naggingIntervalMinutes = json.get("naggingIntervalMinutes")?.asInt ?: 5,
-            naggingMaxRepeats = json.get("naggingMaxRepeats")?.asInt ?: 3,
-            alarmSound = try { AlarmSound.valueOf(json.get("alarmSound").asString) } catch (_: Exception) { AlarmSound.SYSTEM_DEFAULT },
+            naggingRemindersEnabled = json.get("naggingRemindersEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+            naggingIntervalMinutes = json.get("naggingIntervalMinutes")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 5,
+            naggingMaxRepeats = json.get("naggingMaxRepeats")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 3,
+            alarmSound = alarmSoundVal,
             customAlarmSoundPath = json.get("customAlarmSoundPath")?.let { if (it.isJsonNull || it.asString.isBlank()) null else it.asString },
             customAlarmSoundTitle = json.get("customAlarmSoundTitle")?.let { if (it.isJsonNull || it.asString.isBlank()) null else it.asString },
-            alarmDurationSeconds = json.get("alarmDurationSeconds")?.asInt ?: 0,
-            allowDoseSkipping = json.get("allowDoseSkipping")?.asBoolean ?: false,
-            allowCustomDoseTime = json.get("allowCustomDoseTime")?.asBoolean ?: false,
-            hideAddMedicineNavButton = json.get("hideAddMedicineNavButton")?.asBoolean ?: false,
-            allowDoseUndo = json.get("allowDoseUndo")?.asBoolean ?: false,
-            allowDoseNotes = json.get("allowDoseNotes")?.asBoolean ?: false,
-            promptDoseNotes = json.get("promptDoseNotes")?.asBoolean ?: false
+            alarmDurationSeconds = json.get("alarmDurationSeconds")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 0,
+            allowDoseSkipping = json.get("allowDoseSkipping")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+            allowCustomDoseTime = json.get("allowCustomDoseTime")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+            hideAddMedicineNavButton = json.get("hideAddMedicineNavButton")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+            allowDoseUndo = json.get("allowDoseUndo")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+            allowDoseNotes = json.get("allowDoseNotes")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+            promptDoseNotes = json.get("promptDoseNotes")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false
         )
     }
 
-    private fun parseMedicinesFromJson(jsonStr: String): List<Medicine> {
-        val array = JsonParser.parseString(jsonStr).asJsonArray
+    internal fun parseMedicinesFromJson(jsonStr: String): List<Medicine> {
+        val array = try { JsonParser.parseString(jsonStr).asJsonArray } catch (_: Exception) { return emptyList() }
         val list = mutableListOf<Medicine>()
         for (elem in array) {
-            val obj = elem.asJsonObject
-            val timesArray = obj.getAsJsonArray("scheduledTimes") ?: JsonArray()
+            val obj = try { elem.asJsonObject } catch (_: Exception) { continue }
+            val timesArray = if (obj.has("scheduledTimes") && !obj.get("scheduledTimes").isJsonNull && obj.get("scheduledTimes").isJsonArray) {
+                obj.getAsJsonArray("scheduledTimes")
+            } else JsonArray()
             val timesList = timesArray.mapNotNull {
                 try { LocalTime.parse(it.asString) } catch (_: Exception) { null }
             }
 
-            val freqObj = obj.getAsJsonObject("frequency")
-            val freqPattern = try {
-                FrequencyPattern.valueOf(freqObj.get("pattern").asString)
-            } catch (_: Exception) {
-                FrequencyPattern.DAILY
+            // Guard: Defensively parse frequency object and fallback to DAILY if missing, malformed, or null to prevent inspection crashes on legacy or corrupted backups
+            val freqObj = if (obj.has("frequency") && !obj.get("frequency").isJsonNull && obj.get("frequency").isJsonObject) {
+                obj.getAsJsonObject("frequency")
+            } else null
+
+            val frequency = if (freqObj != null) {
+                val freqPattern = try {
+                    FrequencyPattern.valueOf(freqObj.get("pattern")?.takeUnless { it.isJsonNull }?.asString ?: "DAILY")
+                } catch (_: Exception) {
+                    FrequencyPattern.DAILY
+                }
+                val selectedDaysOfWeek = freqObj.getAsJsonArray("selectedDaysOfWeek")?.mapNotNull { if (it.isJsonNull) null else runCatching { it.asInt }.getOrNull() }
+                val selectedDaysOfMonth = freqObj.getAsJsonArray("selectedDaysOfMonth")?.mapNotNull { if (it.isJsonNull) null else runCatching { it.asInt }.getOrNull() }
+                Frequency(
+                    pattern = freqPattern,
+                    daysPerWeek = freqObj.get("daysPerWeek")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    daysPerMonth = freqObj.get("daysPerMonth")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    selectedDaysOfWeek = selectedDaysOfWeek,
+                    selectedDaysOfMonth = selectedDaysOfMonth,
+                    intervalHours = freqObj.get("intervalHours")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    intervalDays = freqObj.get("intervalDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    intervalWeeks = freqObj.get("intervalWeeks")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()
+                )
+            } else {
+                Frequency(FrequencyPattern.DAILY)
             }
 
-            val selectedDaysOfWeek = freqObj.getAsJsonArray("selectedDaysOfWeek")?.mapNotNull { it.asInt }
-            val selectedDaysOfMonth = freqObj.getAsJsonArray("selectedDaysOfMonth")?.mapNotNull { it.asInt }
+            val pillShape = obj.get("pillShape")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { PillShape.valueOf(it) }.getOrNull() } ?: PillShape.ROUND
+            val pillColor = obj.get("pillColor")?.takeUnless { it.isJsonNull }?.asString ?: "#1193D4"
+            val startDate = obj.get("startDate")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+            val endDate = obj.get("endDate")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
 
-            val frequency = Frequency(
-                pattern = freqPattern,
-                daysPerWeek = freqObj.get("daysPerWeek")?.let { if (it.isJsonNull) null else it.asInt },
-                daysPerMonth = freqObj.get("daysPerMonth")?.let { if (it.isJsonNull) null else it.asInt },
-                selectedDaysOfWeek = selectedDaysOfWeek,
-                selectedDaysOfMonth = selectedDaysOfMonth,
-                intervalHours = freqObj.get("intervalHours")?.let { if (it.isJsonNull) null else it.asInt },
-                intervalDays = freqObj.get("intervalDays")?.let { if (it.isJsonNull) null else it.asInt }
-            )
-
-            val pillShape = obj.get("pillShape")?.let { if (it.isJsonNull) null else try { PillShape.valueOf(it.asString) } catch (_: Exception) { null } } ?: PillShape.ROUND
-            val pillColor = obj.get("pillColor")?.let { if (it.isJsonNull) null else it.asString } ?: "#1193D4"
-            val startDate = obj.get("startDate")?.let { if (it.isJsonNull) null else try { LocalDate.parse(it.asString) } catch (_: Exception) { null } }
-            val endDate = obj.get("endDate")?.let { if (it.isJsonNull) null else try { LocalDate.parse(it.asString) } catch (_: Exception) { null } }
+            // Guard: Safe-extract required primitives with sane defaults to prevent NullPointerException from aborting archive inspection
+            val medName = obj.get("medicationName")?.takeUnless { it.isJsonNull }?.asString ?: "Unknown Medication"
+            val medId = obj.get("medicineId")?.takeUnless { it.isJsonNull }?.asString ?: UUID.randomUUID().toString()
+            val uId = obj.get("userId")?.takeUnless { it.isJsonNull }?.asString ?: ""
+            val dosageVal = obj.get("dosage")?.takeUnless { it.isJsonNull }?.runCatching { asDouble }?.getOrNull() ?: 1.0
+            val dosageUnitVal = obj.get("dosageUnit")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { DosageUnit.valueOf(it) }.getOrNull() } ?: DosageUnit.TABLET
+            val timesPerDayVal = obj.get("timesPerDay")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 1
 
             val med = Medicine(
-                medicineId = obj.get("medicineId").asString,
-                userId = obj.get("userId").asString,
-                medicationName = obj.get("medicationName").asString,
-                dosage = obj.get("dosage").asDouble,
-                dosageUnit = try { DosageUnit.valueOf(obj.get("dosageUnit").asString) } catch (_: Exception) { DosageUnit.TABLET },
-                timesPerDay = obj.get("timesPerDay").asInt,
+                medicineId = medId,
+                userId = uId,
+                medicationName = medName,
+                dosage = dosageVal,
+                dosageUnit = dosageUnitVal,
+                timesPerDay = timesPerDayVal,
                 frequency = frequency,
                 scheduledTimes = timesList,
-                imageUri = obj.get("imageUri")?.let { if (it.isJsonNull) null else it.asString },
-                currentStock = obj.get("currentStock")?.let { if (it.isJsonNull) null else it.asInt },
-                refillThreshold = obj.get("refillThreshold")?.let { if (it.isJsonNull) null else it.asInt },
-                autoDeductOnTake = obj.get("autoDeductOnTake")?.asBoolean ?: true,
+                imageUri = obj.get("imageUri")?.takeUnless { it.isJsonNull }?.asString,
+                currentStock = obj.get("currentStock")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                refillThreshold = obj.get("refillThreshold")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                autoDeductOnTake = obj.get("autoDeductOnTake")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: true,
                 pillShape = pillShape,
                 pillColor = pillColor,
-                notes = obj.get("notes")?.let { if (it.isJsonNull) null else it.asString },
+                notes = obj.get("notes")?.takeUnless { it.isJsonNull }?.asString,
                 startDate = startDate,
                 endDate = endDate,
-                durationDays = obj.get("durationDays")?.let { if (it.isJsonNull) null else it.asInt },
-                isArchived = obj.get("isArchived")?.asBoolean ?: false,
-                customDosages = obj.getAsJsonObject("customDosages")?.let { cObj ->
+                durationDays = obj.get("durationDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                isArchived = obj.get("isArchived")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+                customDosages = if (obj.has("customDosages") && !obj.get("customDosages").isJsonNull && obj.get("customDosages").isJsonObject) {
+                    val cObj = obj.getAsJsonObject("customDosages")
                     val map = mutableMapOf<String, Double>()
                     cObj.entrySet().forEach { (k, v) ->
                         try { map[k] = v.asDouble } catch (_: Exception) {}
                     }
                     if (map.isNotEmpty()) map else null
-                }
+                } else null
             )
             list.add(med)
         }
         return list
     }
 
-    private fun parseSchedulesFromJson(jsonStr: String): List<ScheduleEntry> {
-        val array = JsonParser.parseString(jsonStr).asJsonArray
+    internal fun parseSchedulesFromJson(jsonStr: String): List<ScheduleEntry> {
+        val array = try { JsonParser.parseString(jsonStr).asJsonArray } catch (_: Exception) { return emptyList() }
         val list = mutableListOf<ScheduleEntry>()
         for (elem in array) {
-            val obj = elem.asJsonObject
+            val obj = try { elem.asJsonObject } catch (_: Exception) { continue }
+            // Guard: Safe-extract scheduledDateTime and skip entry if missing or invalid to prevent unhandled NPE aborting zip inspection
+            val rawScheduledTime = obj.get("scheduledDateTime")?.takeUnless { it.isJsonNull }?.asString ?: continue
+            // Guard: Handle epoch-millis formatted timestamps from older versions or external tools before ISO parsing to prevent silent data corruption via LocalDateTime.now() fallback
+            val parsedScheduledTime = rawScheduledTime.toLongOrNull()?.let {
+                java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime()
+            } ?: try {
+                LocalDateTime.parse(rawScheduledTime)
+            } catch (_: Exception) {
+                try {
+                    java.time.OffsetDateTime.parse(rawScheduledTime).toLocalDateTime()
+                } catch (_: Exception) {
+                    try {
+                        java.time.Instant.parse(rawScheduledTime).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime()
+                    } catch (_: Exception) {
+                        LocalDateTime.now()
+                    }
+                }
+            }
+
+            val entryIdVal = obj.get("entryId")?.takeUnless { it.isJsonNull }?.asString ?: UUID.randomUUID().toString()
+            val userIdVal = obj.get("userId")?.takeUnless { it.isJsonNull }?.asString ?: ""
+            val medicineIdVal = obj.get("medicineId")?.takeUnless { it.isJsonNull }?.asString ?: continue
+            val statusVal = obj.get("status")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { MedicationStatus.valueOf(it) }.getOrNull() } ?: MedicationStatus.PENDING
+
             val entry = ScheduleEntry(
-                entryId = obj.get("entryId").asString,
-                userId = obj.get("userId").asString,
-                medicineId = obj.get("medicineId").asString,
-                scheduledDateTime = LocalDateTime.parse(obj.get("scheduledDateTime").asString),
-                status = try { MedicationStatus.valueOf(obj.get("status").asString) } catch (_: Exception) { MedicationStatus.PENDING },
-                takenAt = obj.get("takenAt")?.let { if (it.isJsonNull) null else try { LocalDateTime.parse(it.asString) } catch (_: Exception) { null } },
-                skipReason = obj.get("skipReason")?.let { if (it.isJsonNull) null else it.asString },
-                dosage = obj.get("dosage")?.let { if (it.isJsonNull) null else it.asDouble },
-                doseNotes = obj.get("doseNotes")?.let { if (it.isJsonNull) null else it.asString }
+                entryId = entryIdVal,
+                userId = userIdVal,
+                medicineId = medicineIdVal,
+                scheduledDateTime = parsedScheduledTime,
+                status = statusVal,
+                // Guard: Handle epoch-millis formatted takenAt from older versions or external tools to prevent silent null-ification
+                takenAt = obj.get("takenAt")?.takeUnless { it.isJsonNull }?.asString?.let { raw ->
+                    raw.toLongOrNull()?.let { millis ->
+                        java.time.Instant.ofEpochMilli(millis).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime()
+                    } ?: runCatching { LocalDateTime.parse(raw) }.getOrNull()
+                },
+                skipReason = obj.get("skipReason")?.takeUnless { it.isJsonNull }?.asString,
+                dosage = obj.get("dosage")?.takeUnless { it.isJsonNull }?.runCatching { asDouble }?.getOrNull(),
+                doseNotes = obj.get("doseNotes")?.takeUnless { it.isJsonNull }?.asString
             )
             list.add(entry)
         }

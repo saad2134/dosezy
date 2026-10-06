@@ -10,7 +10,7 @@ info:
     - **Documentation:** `https://docs.dosezy.app`
     - **Patient Web App:** `https://patient.dosezy.app`
     - **Caregiver Portal:** `https://caregiver.dosezy.app`
-  version: 1.0.0
+  version: 2.5.9
   contact:
     name: Dosezy Maintainers
     email: reach.saad@outlook.com
@@ -19,11 +19,14 @@ info:
     name: MIT License
     url: https://opensource.org/licenses/MIT
 
+security:
+  - BearerAuth: []
+
 servers:
   - url: https://api.dosezy.app
     description: Official Hosted Cloud Production Server
-  - url: http://localhost:8080
-    description: Self-Hosted Local Server Core
+  - url: https://api.stage.dosezy.app
+    description: Staging Environment Server
 
 tags:
   - name: Health & System
@@ -42,6 +45,7 @@ tags:
 paths:
   /health:
     get:
+      security: []
       tags:
         - Health & System
       summary: Get server health and status
@@ -59,11 +63,25 @@ paths:
                     example: ok
                   version:
                     type: string
-                    example: 2.5.8
+                    example: 2.5.9
                   timestamp:
                     type: string
                     format: date-time
                     example: '2026-09-03T18:45:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable or in maintenance mode
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /v1/users:
     get:
@@ -80,6 +98,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
     post:
       tags:
         - User Profiles
@@ -98,6 +118,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
 
   /v1/users/{userId}:
     parameters:
@@ -138,6 +160,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
     delete:
       tags:
         - User Profiles
@@ -146,6 +172,8 @@ paths:
       responses:
         '204':
           description: Profile deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
 
   /v1/users/{userId}/medicines:
     parameters:
@@ -168,6 +196,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Medicine'
+        '404':
+          $ref: '#/components/responses/NotFound'
     post:
       tags:
         - Medicines
@@ -186,6 +216,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Medicine'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
   /v1/medicines/{medicineId}:
     parameters:
@@ -201,10 +235,13 @@ paths:
       operationId: getMedicineById
       responses:
         '200':
+          description: Medicine details
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Medicine'
+        '404':
+          $ref: '#/components/responses/NotFound'
     put:
       tags:
         - Medicines
@@ -218,10 +255,15 @@ paths:
               $ref: '#/components/schemas/MedicineInput'
       responses:
         '200':
+          description: Medicine updated successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Medicine'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
     delete:
       tags:
         - Medicines
@@ -230,6 +272,8 @@ paths:
       responses:
         '204':
           description: Medicine deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
 
   /v1/users/{userId}/schedules:
     parameters:
@@ -263,12 +307,15 @@ paths:
             $ref: '#/components/schemas/MedicationStatus'
       responses:
         '200':
+          description: List of dose schedule history entries
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/ScheduleEntry'
+        '404':
+          $ref: '#/components/responses/NotFound'
     post:
       tags:
         - Schedule Logs
@@ -282,10 +329,15 @@ paths:
               $ref: '#/components/schemas/ScheduleEntryInput'
       responses:
         '201':
+          description: Dose action logged successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScheduleEntry'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
   /v1/sync:
     post:
@@ -307,6 +359,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SyncPullResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
 
   /v1/caregiver/pair:
     post:
@@ -322,10 +376,13 @@ paths:
               $ref: '#/components/schemas/PairingRequest'
       responses:
         '200':
+          description: Pairing code generated or redeemed successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PairingResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
 
   /v1/caregiver/patients:
     get:
@@ -335,12 +392,19 @@ paths:
       operationId: listMonitoredPatients
       responses:
         '200':
+          description: List of monitored patients and adherence metrics
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/CaregiverPatientSummary'
+        '401':
+          description: Unauthorized caregiver access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   schemas:
@@ -351,14 +415,17 @@ components:
     Theme:
       type: string
       enum: [LIGHT, DARK, SYSTEM]
+      default: SYSTEM
 
     TimeFormat:
       type: string
       enum: [HOUR_12, HOUR_24]
+      default: HOUR_12
 
     Language:
       type: string
       enum: [SYSTEM, ENGLISH, SPANISH, HINDI, CHINESE, PORTUGUESE, ARABIC, FRENCH, GERMAN, JAPANESE, RUSSIAN, ITALIAN, BENGALI]
+      default: SYSTEM
 
     DosageUnit:
       type: string
@@ -366,7 +433,8 @@ components:
 
     FrequencyPattern:
       type: string
-      enum: [DAILY, WEEKLY, MONTHLY, AS_NEEDED, EVERY_X_HOURS, EVERY_X_DAYS, CUSTOM]
+      description: Recurrence cadence pattern for medication scheduling (DAILY, WEEKLY, MONTHLY, EVERY_X_HOURS, EVERY_X_DAYS, CUSTOM [Every X Weeks], AS_NEEDED [PRN])
+      enum: [DAILY, WEEKLY, MONTHLY, EVERY_X_HOURS, EVERY_X_DAYS, CUSTOM, AS_NEEDED]
 
     Frequency:
       type: object
@@ -406,6 +474,11 @@ components:
           type: integer
           nullable: true
           description: Day interval for EVERY_X_DAYS pattern
+          example: 2
+        intervalWeeks:
+          type: integer
+          nullable: true
+          description: Week interval for CUSTOM recurrence pattern (e.g. 2 for every 2 weeks)
           example: 2
 
     MedicationStatus:
@@ -455,13 +528,10 @@ components:
           example: true
         theme:
           $ref: '#/components/schemas/Theme'
-          default: SYSTEM
         timeFormat:
           $ref: '#/components/schemas/TimeFormat'
-          default: HOUR_12
         language:
           $ref: '#/components/schemas/Language'
-          default: SYSTEM
         considerLateAfter:
           type: integer
           description: Hours after scheduled time to consider dose late (options 1-3)
@@ -504,7 +574,6 @@ components:
           example: 3
         alarmSound:
           $ref: '#/components/schemas/AlarmSound'
-          default: SYSTEM_DEFAULT
         customAlarmSoundPath:
           type: string
           nullable: true
@@ -571,6 +640,10 @@ components:
         profilePicPath:
           type: string
           nullable: true
+        isCurrentUser:
+          type: boolean
+          default: false
+          example: false
         theme:
           $ref: '#/components/schemas/Theme'
         timeFormat:
@@ -972,9 +1045,37 @@ components:
           type: string
           example: The requested resource was not found.
 
+    # Semantic Cross-Schema Aliases
+    Medication:
+      $ref: '#/components/schemas/Medicine'
+      description: Canonical alias for Medicine schema
+    Schedule:
+      $ref: '#/components/schemas/Frequency'
+      description: Canonical alias for Frequency recurrence schema
+    DoseEvent:
+      $ref: '#/components/schemas/ScheduleEntry'
+      description: Canonical alias for ScheduleEntry dose event history schema
+    CaregiverConsent:
+      $ref: '#/components/schemas/PairingRequest'
+      description: Canonical alias for PairingRequest consent exchange schema
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Optional JWT bearer token for cloud-authenticated sync and caregiver access
+
   responses:
     NotFound:
       description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    BadRequest:
+      description: Invalid request parameters or body validation error
       content:
         application/json:
           schema:

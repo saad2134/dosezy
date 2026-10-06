@@ -1,18 +1,23 @@
 package com.example.dosezy.ui.subscreens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -196,7 +201,8 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
         if (saved == null && prefs.contains("contacts_json")) {
             saved = prefs.getString("contacts_json", null)
             if (saved != null) {
-                prefs.edit().putString(userKey, saved).apply()
+                // Guard: Remove legacy un-namespaced key upon migration to prevent newly created profiles from inheriting another user's contacts
+                prefs.edit().putString(userKey, saved).remove("contacts_json").apply()
             }
         }
         val list = androidx.compose.runtime.mutableStateListOf<Pair<String, String>>()
@@ -243,52 +249,57 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
                     .padding(bottom = 16.dp),
                 shape = RoundedCornerShape(18.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFEF4444).copy(alpha = 0.3f))
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFEF4444).copy(alpha = 0.35f))
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.padding(18.dp)) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(32.dp)
+                                .size(36.dp)
                                 .clip(CircleShape)
                                 .background(Color(0xFFEF4444).copy(alpha = 0.15f)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("🚨", fontSize = 16.sp)
+                            Text("🚨", fontSize = 18.sp)
                         }
                         Text(
                             text = stringResource(com.example.dosezy.R.string.emergency_medical_profile),
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(14.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = "${user.fullName} (${user.age})",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         if (user.contactNumber.isNotBlank()) {
                             Text(
                                 text = user.contactNumber,
-                                style = MaterialTheme.typography.bodySmall,
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 16.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     // Allergies
                     Row(
@@ -297,19 +308,21 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
                     ) {
                         Text(
                             text = "${stringResource(com.example.dosezy.R.string.profile_allergies)}: ",
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
                             color = Color(0xFFEF4444)
                         )
                         Text(
                             text = if (!user.allergies.isNullOrBlank()) user.allergies else stringResource(com.example.dosezy.R.string.emergency_no_allergies),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodyLarge,
                             fontWeight = if (!user.allergies.isNullOrBlank()) FontWeight.SemiBold else FontWeight.Normal,
+                            fontSize = 16.sp,
                             color = if (!user.allergies.isNullOrBlank()) Color(0xFFEF4444) else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     // Medical Conditions
                     Row(
@@ -318,14 +331,17 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
                     ) {
                         Text(
                             text = "${stringResource(com.example.dosezy.R.string.profile_medical_conditions)}: ",
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
                             color = MaterialTheme.colorScheme.primary
                         )
                         Text(
                             text = if (!user.medicalConditions.isNullOrBlank()) user.medicalConditions else stringResource(com.example.dosezy.R.string.emergency_no_conditions),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
@@ -517,17 +533,29 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        androidx.compose.material3.IconButton(onClick = { contactIndexToDelete = index }) {
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(Color(0xFFEF4444).copy(alpha = 0.12f))
+                                .border(1.dp, Color(0xFFEF4444).copy(alpha = 0.28f), RoundedCornerShape(10.dp))
+                                .clickable { contactIndexToDelete = index },
+                            contentAlignment = Alignment.Center
+                        ) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = "Remove",
-                                tint = Color(0xFFEF4444)
+                                tint = Color(0xFFEF4444),
+                                modifier = Modifier.size(18.dp)
                             )
                         }
                     }
                 }
             }
         }
+
+        Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+        Spacer(modifier = Modifier.height(32.dp))
     }
 
     // Add Contact Dialog
@@ -773,12 +801,17 @@ fun EmergencyServiceCard(
 
 
 
-// Utility function for opening phone dialer
+// Guard: Strip spaces/hyphens and use Uri.fromParts to prevent dialer number truncation and scheme parsing crashes across Android versions
+internal fun createDialIntent(phoneNumber: String): android.content.Intent {
+    val cleaned = phoneNumber.replace(Regex("[^0-9+*#]"), "")
+    return android.content.Intent(android.content.Intent.ACTION_DIAL).apply {
+        data = android.net.Uri.fromParts("tel", cleaned, null)
+    }
+}
+
 private fun openPhone(context: android.content.Context, phoneNumber: String) {
     try {
-        val intent = android.content.Intent(android.content.Intent.ACTION_DIAL).apply {
-            data = android.net.Uri.parse("tel:$phoneNumber")
-        }
+        val intent = createDialIntent(phoneNumber)
         context.startActivity(intent)
     } catch (e: Exception) {
         android.widget.Toast.makeText(context, context.getString(R.string.err_cannot_make_call), android.widget.Toast.LENGTH_SHORT).show()

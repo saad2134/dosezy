@@ -113,6 +113,28 @@ class AdherenceAndAnalyticsTest {
         assertEquals(0, computeAdherenceRate(entries))
     }
 
+    @Test
+    fun adherenceRate_prnAsNeededDoses_doNotSkewPrescriptionAdherence() {
+        // Guard: Ad-hoc PRN doses must not mask missed scheduled prescription doses
+        val scheduledEntries = listOf(
+            entry(0, MedicationStatus.MISSED)
+        )
+        val prnEntries = (1..5).map { i ->
+            ScheduleEntry(
+                entryId = "PRN_med_${System.currentTimeMillis()}_$i",
+                userId = "usr_1",
+                medicineId = "med_prn",
+                scheduledDateTime = LocalDateTime.now(),
+                status = MedicationStatus.TAKEN_ON_TIME,
+                takenAt = LocalDateTime.now()
+            )
+        }
+        val allEntries = scheduledEntries + prnEntries
+        // AnalyticsScreen filters out PRN entries
+        val prescriptionEntries = allEntries.filter { !it.entryId.startsWith("PRN_") }
+        assertEquals(0, computeAdherenceRate(prescriptionEntries))
+    }
+
     // ───────────────────────────────────────────────────────────────
     // 2. Date Range Boundaries
     // ───────────────────────────────────────────────────────────────

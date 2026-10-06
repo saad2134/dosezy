@@ -2,9 +2,7 @@
 package com.example.dosezy.notifications
 
 import android.content.Context
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import com.example.dosezy.data.DosezyDatabase
 import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.repository.ScheduleRepository
@@ -32,7 +30,7 @@ class MedicineNotificationManager @Inject constructor(
         private const val TAG = "MedicineNotificationManager"
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    // Guard: Core library desugaring enables java.time on API 24+; allow alarm scheduling across all supported OS versions
     fun scheduleAllAlarmsForCurrentUser() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -51,7 +49,7 @@ class MedicineNotificationManager @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    // Guard: Core library desugaring enables java.time on API 24+; allow alarm scheduling across all supported OS versions
     fun scheduleAlarmsForUser(userId: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -66,18 +64,27 @@ class MedicineNotificationManager @Inject constructor(
     suspend fun cancelAllAlarmsForUser(userId: String) = withContext(Dispatchers.IO) {
         try {
             val allEntries = scheduleRepository.getSchedulesByUserSync(userId)
-            allEntries.forEach { entry ->
+            val now = java.time.LocalDateTime.now()
+            val activeWindowStart = now.minusHours(24)
+            val activeWindowEnd = now.plusDays(8)
+            // Guard: Only cancel alarms within the active window; looping over months of past history triggers thousands of redundant Binder IPC calls
+            val entriesToCancel = allEntries.filter { entry ->
+                entry.scheduledDateTime.isAfter(activeWindowStart) &&
+                entry.scheduledDateTime.isBefore(activeWindowEnd)
+            }
+            entriesToCancel.forEach { entry ->
                 alarmScheduler.cancelAlarm(entry.entryId)
                 alarmScheduler.cancelSnooze(entry.entryId)
+                alarmScheduler.cancelNagging(entry.entryId)
                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
             }
-            Log.d(TAG, "Cancelled all alarms for user: $userId (${allEntries.size} entries)")
+            Log.d(TAG, "Cancelled active window alarms for user: $userId (${entriesToCancel.size} active entries)")
         } catch (e: Exception) {
             Log.e(TAG, "Error cancelling alarms for user: $userId", e)
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    // Guard: Core library desugaring enables java.time on API 24+; allow alarm rescheduling on startup across all supported OS versions
     fun rescheduleAllAlarmsForAllUsers() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -94,7 +101,6 @@ class MedicineNotificationManager @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun checkAlarmStatus(userId: String, callback: (scheduledCount: Int, totalCount: Int) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -114,7 +120,6 @@ class MedicineNotificationManager @Inject constructor(
 
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun scheduleAlarmsForMedicine(medicineId: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -126,7 +131,6 @@ class MedicineNotificationManager @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun cancelAlarmsForMedicine(medicineId: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -138,7 +142,6 @@ class MedicineNotificationManager @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun getScheduledAlarmCount(userId: String, callback: (count: Int) -> Unit) {
         checkAlarmStatus(userId) { scheduled, total ->
             callback(scheduled)

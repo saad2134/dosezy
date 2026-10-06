@@ -97,8 +97,11 @@ fun HomeScreen(
     val todayEntries by scheduleViewModel.todayScheduleWithMedicine.collectAsState()
     val isTodayLoading by scheduleViewModel.isTodayLoading.collectAsState()
 
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val currentLang = currentUser?.language ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+    val activeLocale = remember(currentLang) { com.example.dosezy.utils.LocaleHelper.getLocale(currentLang) }
     // Get current day for subtitle
-    val dayOfWeek = DateUtils.getCurrentDayOfWeekLegacy()
+    val dayOfWeek = remember(activeLocale) { DateUtils.getCurrentDayOfWeekLegacy(activeLocale) }
 
     // State for real-time updates
     var currentTime by remember { mutableStateOf(java.time.LocalDateTime.now()) }
@@ -111,7 +114,6 @@ fun HomeScreen(
     var noteEditEntry by remember { mutableStateOf<ScheduleWithMedicine?>(null) }
     val snackbarHostState = remember { androidx.compose.material3.SnackbarHostState() }
     val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
-    val context = androidx.compose.ui.platform.LocalContext.current
 
     // Auto-refresh every minute for real-time updates and run immediately on load
     LaunchedEffect(currentUser) {
@@ -142,6 +144,14 @@ fun HomeScreen(
         }
     }
 
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    LaunchedEffect(navBackStackEntry) {
+        val msg = navBackStackEntry?.savedStateHandle?.remove<String>("snackbar_message")
+        if (!msg.isNullOrBlank()) {
+            snackbarHostState.showSnackbar(msg)
+        }
+    }
+
     // Check if all medications are completed (taken or skipped) and at least one was actually taken
     val allCompleted = todayEntries.isNotEmpty() && todayEntries.all {
         it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
@@ -158,24 +168,21 @@ fun HomeScreen(
 
     // Group entries by time
     val timeFormat = currentUser?.timeFormat ?: TimeFormat.HOUR_12
-    val activeLocale = remember(currentUser?.language) {
-        com.example.dosezy.utils.LocaleHelper.getLocale(currentUser?.language ?: com.example.dosezy.data.model.Language.SYSTEM)
-    }
     val groupedEntries = remember(todayEntries, timeFormat, activeLocale) {
         todayEntries.groupBy { entry ->
             TimeFormatUtils.formatTime(entry.scheduleEntry.scheduledDateTime, timeFormat, activeLocale)
-        }.toList().sortedBy { (time, _) ->
-            TimeFormatUtils.parseTime(time, timeFormat)?.time ?: 0L
+        }.toList().sortedBy { (_, entries) ->
+            entries.firstOrNull()?.scheduleEntry?.scheduledDateTime
         }
     }
 
     val executeTakeDose: (String, java.time.LocalDateTime, String?) -> Unit = { entryId, resolvedDateTime, note ->
         val medName = todayEntries.find { it.scheduleEntry.entryId == entryId }?.medicine?.medicationName ?: ""
         val lateAfter = currentUser?.considerLateAfter ?: 3
-        val missedAfter = currentUser?.considerMissedAfter ?: 6
         val targetScheduleEntry = todayEntries.find { it.scheduleEntry.entryId == entryId }?.scheduleEntry
+        // Guard: Use isTakenLate so overdue doses past missedAfter are correctly recorded as TAKEN_LATE instead of reverting to on-time
         val isLate = if (targetScheduleEntry != null) {
-            TimeCalculationUtils.isLate(targetScheduleEntry.scheduledDateTime, resolvedDateTime, lateAfter, missedAfter)
+            TimeCalculationUtils.isTakenLate(targetScheduleEntry.scheduledDateTime, resolvedDateTime, lateAfter)
         } else false
 
         val takenAt = resolvedDateTime.toString()
@@ -765,9 +772,10 @@ private fun MedicationCard(
         else -> MaterialTheme.colorScheme.onPrimary
     }
 
+    // Guard: Support undo for missed doses when allowDoseUndo is true, or retroactive recording when allowCustomDoseTime is true
     val enabled = when {
         isTaken || isSkipped -> currentUser?.allowDoseUndo == true
-        isMissed -> currentUser?.allowCustomDoseTime == true
+        isMissed -> currentUser?.allowDoseUndo == true || currentUser?.allowCustomDoseTime == true
         else -> true
     }
 
@@ -921,6 +929,14 @@ private fun MedicationCard(
                                     onUndo(entry.entryId)
                                 }
                             }
+                            isMissed -> {
+                                // Guard: If allowDoseUndo is enabled, prioritize undoing missed status back to pending; otherwise fallback to custom dose recording
+                                if (currentUser?.allowDoseUndo == true) {
+                                    onUndo(entry.entryId)
+                                } else if (currentUser?.allowCustomDoseTime == true) {
+                                    onMarkAsTaken(entry.entryId)
+                                }
+                            }
                             isLate -> onMarkAsLate(entry.entryId)
                             else -> onMarkAsTaken(entry.entryId)
                         }
@@ -1069,7 +1085,8 @@ private fun AllGoodBanner() {
                 )
                 Text(
                     text = androidx.compose.ui.res.stringResource(R.string.home_all_good_desc),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

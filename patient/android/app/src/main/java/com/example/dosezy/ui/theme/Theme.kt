@@ -23,8 +23,8 @@ fun DosezyTheme(
     val configuration = LocalConfiguration.current
     val currentDensity = LocalDensity.current
 
-    // Reference width of standard mobile displays (380dp)
-    val baselineWidthDp = 380f
+    // Reference width of standard mobile displays (412dp - Pixel / Galaxy standard)
+    val baselineWidthDp = 412f
     val currentWidthDp = configuration.screenWidthDp.toFloat()
 
     // Proportionally scale down for narrower screens or high display zoom, never zoom in > 1.0
@@ -45,7 +45,6 @@ fun DosezyTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as? Activity)?.window
-            window?.statusBarColor = colorScheme.background.toArgb()
             window?.let {
                 val insetsController = WindowCompat.getInsetsController(it, view)
                 insetsController.isAppearanceLightStatusBars = !darkTheme

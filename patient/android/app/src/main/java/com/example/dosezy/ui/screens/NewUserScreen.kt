@@ -27,6 +27,7 @@ import com.example.dosezy.ui.components.ProfileImportDialog
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,8 +37,12 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -110,7 +115,6 @@ fun NewUserScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val users by userViewModel.users.collectAsState()
-    val currentUser by userViewModel.currentUser.collectAsState()
 
     val database = remember { DosezyDatabase.getInstance(context) }
     val scheduleRepository = remember { ScheduleRepository(database) }
@@ -169,9 +173,8 @@ fun NewUserScreen(
                 onShowExistingProfiles = { showExistingProfiles = true },
                 isProfileSetupValid = isProfileSetupValid,
                 onCompleteProfileSetup = {
-                    completeProfileSetup()
                     if (isProfileSetupValid) {
-                        // Handle navigation immediately after completion
+                        completeProfileSetup()
                         if (isCreatingNewProfile) {
                             navController.popBackStack("switch_profile", false)
                         } else {
@@ -179,8 +182,6 @@ fun NewUserScreen(
                                 popUpTo("newuser/1") { inclusive = true }
                             }
                         }
-                    } else {
-                        Toast.makeText(context, context.getString(R.string.validation_enter_name), Toast.LENGTH_SHORT).show()
                     }
                 }
             )
@@ -190,6 +191,7 @@ fun NewUserScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .statusBarsPadding()
                 .background(MaterialTheme.colorScheme.background)
         ) {
             when (currentFrame) {
@@ -485,11 +487,19 @@ fun ProfileSetupPage(
         fullName.isNotBlank() && age.isNotBlank() && gender != null
     }
 
+    val focusManager = LocalFocusManager.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
+                focusManager.clearFocus()
+            }
             .verticalScroll(rememberScrollState())
+            .padding(24.dp)
     ) {
         // Progress Indicators
         Row(
@@ -861,12 +871,16 @@ fun NewUserBottomBar(
     onCompleteProfileSetup: () -> Unit = {}
 ) {
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .imePadding(),
         color = MaterialTheme.colorScheme.surface,
         shadowElevation = 8.dp
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .navigationBarsPadding()
+                .padding(16.dp)
         ) {
             when (currentFrame) {
                 1 -> {
@@ -983,16 +997,15 @@ fun NewUserBottomBar(
 
                         Button(
                             onClick = onCompleteProfileSetup,
+                            enabled = isProfileSetupValid,
                             modifier = Modifier
                                 .weight(1f)
                                 .height(56.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (isProfileSetupValid) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                                }
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
+                                disabledContentColor = Color.White.copy(alpha = 0.6f)
                             )
                         ) {
                             Text(
@@ -1100,9 +1113,10 @@ fun ProfileItem(user: User, onClick: () -> Unit, modifier: Modifier = Modifier) 
             ) {
                 // Profile picture with fallback
                 if (!user.profilePicPath.isNullOrEmpty()) {
+                    val modelData = remember(user.profilePicPath) { com.example.dosezy.utils.ImageUtils.resolveImageModel(user.profilePicPath) }
                     AsyncImage(
                         model = ImageRequest.Builder(context)
-                            .data(File(user.profilePicPath))
+                            .data(modelData)
                             .crossfade(true)
                             .build(),
                         contentDescription = stringResource(R.string.profile_picture_desc),

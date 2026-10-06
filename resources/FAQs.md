@@ -189,6 +189,13 @@ Dosezy includes an intelligent **Profile Import Dialog** with granular conflict 
 3. Tap **Export** and share it via WhatsApp, email, or print it directly for your appointment.
 4. You can also export a **CSV** spreadsheet or **JSON Backup** for digital record-keeping.
 
+### Can I add a Dosezy widget to my Android home screen?
+Yes! Dosezy includes an interactive home screen widget:
+1. Long-press any empty space on your Android home screen and tap **Widgets**.
+2. Locate **Dosezy** and drag it onto your screen.
+3. Select whether the widget should follow your **Active App Profile** dynamically or lock onto a **Specific Family Member Profile** (such as a parent or child).
+4. The widget displays the day's scheduled medicines, dosage details, and intake times in a scrollable list. Tapping the widget opens Dosezy and automatically selects that profile.
+
 ---
 
 ### Need further assistance?

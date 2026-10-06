@@ -41,6 +41,7 @@
     <string name="form_med_name">药物名称</string>
     <string name="form_med_name_placeholder">例如：阿莫西林</string>
     <string name="form_dosage">剂量</string>
+    <string name="form_dosage_unit">剂量单位</string>
     <string name="form_dosage_placeholder">例如：500毫克，1片</string>
     <string name="form_frequency">频率</string>
     <string name="form_time">时间</string>
@@ -53,7 +54,7 @@
     <string name="freq_daily">每天</string>
     <string name="freq_weekly">每周</string>
     <string name="freq_monthly">每月</string>
-    <string name="freq_custom">自定义</string>
+    <string name="freq_custom">每 X 周</string>
     <string name="form_select_days_week">选择一周中的天数</string>
     <string name="form_select_days_month">选择一月中的日期</string>
     <string name="day_mon">周一</string>
@@ -244,7 +245,7 @@
 
 
     <string name="home_all_good">一切安好！</string>
-    <string name="home_all_good_desc">今天无需服药。如果您需要添加更多，请点击下方的加号按钮开始。</string>
+    <string name="home_all_good_desc">今天无需服药。</string>
     <string name="no_profiles_found">未找到个人资料</string>
     <string name="status_taken">已服用</string>
 
@@ -255,6 +256,7 @@
     <string name="image_picker_camera">相机</string>
     <string name="image_picker_gallery">相册</string>
     <string name="image_picker_error_title">错误</string>
+    <string name="camera_permission_required">拍摄照片需要相机权限。</string>
     <string name="image_picker_remove">删除图片</string>
     <string name="delete_contact_title">删除联系人</string>
     <string name="delete_contact_desc">您确定要删除此联系人吗？</string>
@@ -468,7 +470,7 @@
     <string name="pill_shape_drops">滴剂 (Drops)</string>
     <string name="pill_shape_patch">贴剂 (Patch)</string>
 
-    <string name="med_notes_label">医生 / 药剂师嘱咐及特别警告</string>
+    <string name="med_notes_label">医生嘱咐及特别警告</string>
     <string name="med_notes_placeholder">例如：饭后服用、忌食西柚、处方号 #12345</string>
 
     <string name="course_duration_title">用药疗程周期</string>
@@ -488,6 +490,10 @@
     <string name="freq_every_days_format">每 %1$d 天</string>
     <string name="interval_hours_label">两次服药间隔小时</string>
     <string name="interval_days_label">两次服药间隔天数</string>
+    <string name="freq_every_x_weeks_format">每 %1$d 周</string>
+    <string name="custom_recurrence_interval_label">重复间隔 (周数)</string>
+    <string name="custom_recurrence_summary">每 %1$d 周在 %2$s 重复</string>
+    <string name="validation_select_custom_days">请至少选择自定义重复周期的某一天</string>
     <string name="btn_log_prn_dose">记录服药</string>
     <string name="prn_doses_taken_today">今日已记录：%1$d 次</string>
     <string name="prn_section_title">按需服用药品 (PRN)</string>
@@ -506,7 +512,7 @@
     <string name="hours_limit_hint">若间隔超过 24 小时，请使用“每 X 天”。</string>
 
     <string name="pref_nagging_title">持续跟进提醒 (Nagging)</string>
-    <string name="pref_nagging_desc">若计划剂量未确认服用，将重复发送提醒</string>
+    <string name="pref_nagging_desc">重复提醒直到标记为已服用。</string>
     <string name="pref_nagging_interval">提醒间隔时间</string>
     <string name="pref_nagging_max_repeats">最大重复次数</string>
     <string name="pref_nagging_repeats_format">%1$d 次</string>
@@ -523,6 +529,11 @@
     <string name="widget_all_completed">今日药物已全部完成！🎉</string>
     <string name="widget_no_doses_today">今日未安排任何药物</string>
     <string name="widget_next_dose_format">下一剂：%1$s • %2$s</string>
+    <string name="widget_configure_title">选择小组件配置文件</string>
+    <string name="widget_configure_subtitle">选择此小组件在主屏幕上显示的服药日程所属的个人资料。</string>
+    <string name="widget_configure_active_profile">应用当前活跃档案</string>
+    <string name="widget_configure_active_profile_desc">动态跟随应用中当前选中的个人档案</string>
+    <string name="widget_configure_confirm">保存小部件</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">闹钟铃声</string>
@@ -591,6 +602,7 @@
     <string name="alarm_take_medicine">立即服药</string>
     <string name="alarm_snooze_format">稍后提醒 (%d 分钟)</string>
     <string name="notif_action_snooze_format">稍后提醒 (%d 分钟)</string>
+    <string name="alarm_snoozed_toast">提醒已推迟 %d 分钟</string>
     <string name="alarm_stock_remaining">库存：剩余 %d 剂</string>
     <string name="home_action_take">服用</string>
     <string name="home_action_taken">已服</string>
@@ -616,7 +628,7 @@
     <string name="backup_export_failed">导出失败：%1$s</string>
 
     <string name="pref_allow_skip_title">允许跳过服药</string>
-    <string name="pref_allow_skip_desc">开启因临床原因跳过服药的选项</string>
+    <string name="pref_allow_skip_desc">记录原因后跳过计划剂量。</string>
     <string name="home_action_skip">跳过</string>
     <string name="home_action_skipped">已跳过</string>
     <string name="home_dose_skipped">已跳过 %s 的服药</string>
@@ -642,6 +654,9 @@
     <string name="validation_enter_name">请输入您的姓名</string>
     <string name="validation_enter_valid_age">请输入有效年龄（1-120）</string>
     <string name="medication_added_success">药物添加成功</string>
+    <string name="medication_updated_success">药物更新成功</string>
+    <string name="medication_archived_success">药物已成功停用</string>
+    <string name="medication_deleted_success">药物已成功删除</string>
     <string name="status_pending">待处理</string>
     <string name="pharmacy_order_title">药店补药清单</string>
     <string name="pharmacy_order_desc">生成适用于微信、WhatsApp 或药房的药品补购清单</string>
@@ -706,7 +721,7 @@
 
     <!-- Manual Dose Recording Strings -->
     <string name="pref_manually_record_dose_time_title">手动记录服药时间</string>
-    <string name="pref_manually_record_dose_time_desc">记录服药时询问实际服药时间。</string>
+    <string name="pref_manually_record_dose_time_desc">记录实际服药时间。</string>
     <string name="record_dose_time_title">记录服药时间</string>
     <string name="record_dose_time_subtitle">您什么时候服用了 %1$s？</string>
     <string name="record_dose_time_just_now">刚刚 (%1$s)</string>
@@ -720,7 +735,7 @@
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">隐藏底部导航添加按钮</string>
-    <string name="pref_hide_add_nav_button_desc">隐藏底部导航栏中央的“+”按钮。可在“药物”页面的用药列表下方直接添加新药物。</string>
+    <string name="pref_hide_add_nav_button_desc">隐藏底部导航栏的“+”按钮。</string>
 
     <!-- About Screen Expansion -->
     <string name="about_developer_title">关于开发者</string>
@@ -758,9 +773,9 @@
     <string name="dialog_low_storage_action">清理空间</string>
     <string name="dialog_low_storage_dismiss">忽略</string>
     <string name="pref_allow_undo_title">允许撤销服药记录</string>
-    <string name="pref_allow_undo_desc">允许将已记录的服药状态恢复为待服。撤销前需确认。</string>
+    <string name="pref_allow_undo_desc">将已服用的剂量恢复为待处理。</string>
     <string name="pref_prompt_dose_notes_title">服药时提示输入备注</string>
-    <string name="pref_prompt_dose_notes_desc">每次标记已服药时，提示记录备注、饮食情况或身体症状。</string>
+    <string name="pref_prompt_dose_notes_desc">记录剂量时提示输入备注。</string>
     <string name="dialog_undo_dose_title">撤销此服药？</string>
     <string name="dialog_undo_dose_msg">确定要将 %1$s 恢复为待服状态吗？已扣减的库存将被恢复。</string>
     <string name="dialog_dose_note_title">服药备注</string>
@@ -771,6 +786,10 @@
     <string name="btn_edit_note">修改备注</string>
     <string name="dialog_edit_note_title">编辑服药备注</string>
     <string name="pref_allow_dose_notes_title">服药备注</string>
-    <string name="pref_allow_dose_notes_desc">允许随服药记录备注、饮食情况或身体症状。</string>
+    <string name="pref_allow_dose_notes_desc">记录备注、饮食或症状。</string>
     <string name="btn_add_note">+ 添加备注</string>
+    <string name="timings_and_dosages_title">时间与剂量</string>
+    <string name="stock_inventory_card_title">药品库存与清册</string>
+    <string name="widget_configure_auto_badge">自动</string>
+    <string name="dialog_validation_title">提示</string>
 </resources>

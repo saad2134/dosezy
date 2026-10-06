@@ -1,0 +1,60 @@
+<en-IN>
+• Custom multi-week recurrence scheduling on selected weekdays with automated refill tracking
+• Interactive scrollable home-screen widget with family profile configuration and quick profile switching
+• Locked portrait mode, normalized 412dp zoom, Android 15 edge-to-edge support, and dosage editing fixes
+</en-IN>
+<en-US>
+• Custom multi-week recurrence scheduling on selected weekdays with automated refill tracking
+• Interactive scrollable home-screen widget with family profile configuration and quick profile switching
+• Locked portrait mode, normalized 412dp zoom, Android 15 edge-to-edge support, and dosage editing fixes
+</en-US>
+<ar>
+• جدولة تكرار مخصصة لعدة أسابيع في أيام محددة مع تتبع تلقائي لإعادة تعبئة المخزون
+• أداة شاشة رئيسية تفاعلية وقابلة للتمرير مع إمكانية تحديد الملف الشخصي والتبديل السريع
+• قفل الوضع العمودي، وتوحيد التكبير بقياس 412dp، ودعم أندرويد 15، وإصلاح تعديل الجرعات
+</ar>
+<de-DE>
+• Benutzerdefinierte Mehr-Wochen-Wiederholungen an ausgewählten Wochentagen mit Vorratsverwaltung
+• Interaktives, scrollbares Startbildschirm-Widget mit Profilauswahl und schnellem Profilwechsel
+• Feste Hochformat-Ausrichtung, normierter 412dp-Zoom, Android 15 Edge-to-Edge und Dosierungs-Fixes
+</de-DE>
+<es-419>
+• Programación recurrente de varias semanas en días seleccionados con control automático de inventario
+• Widget de inicio desplazable e interactivo con configuración de perfiles familiares y cambio rápido
+• Modo vertical fijo, zoom normalizado a 412dp, soporte edge-to-edge en Android 15 y mejoras en dosis
+</es-419>
+<fr-FR>
+• Planification récurrente sur plusieurs semaines certains jours avec suivi automatique des stocks
+• Widget interactif et défilant sur l'écran d'accueil avec configuration de profil et changement rapide
+• Mode portrait verrouillé, zoom normalisé à 412dp, support bord à bord Android 15 et correctifs de dosage
+</fr-FR>
+<hi-IN>
+• चुने गए दिनों पर कस्टम बहु-सप्ताह पुनरावृत्ति शेड्यूलिंग और स्वचालित स्टॉक ट्रैकिंग
+• परिवार प्रोफाइल चयन और त्वरित प्रोफाइल स्विचिंग के साथ स्क्रॉल करने योग्य होम-स्क्रीन विजेट
+• पोर्ट्रेट मोड लॉक, 412dp बेसलाइन ज़ूम, एंड्रॉइड 15 एज-टू-एज सपोर्ट और खुराक संपादन सुधार
+</hi-IN>
+<it-IT>
+• Ricorrenza personalizzata ogni più settimane nei giorni selezionati con monitoraggio scorte
+• Widget interattivo e scorrevole per la schermata iniziale con selezione profilo e cambio rapido
+• Orientamento verticale fisso, zoom normalizzato a 412dp, supporto edge-to-edge Android 15 e fix dosaggio
+</it-IT>
+<ja-JP>
+• 指定曜日での複数週ごとのカスタム服薬周期設定と自動在庫補充トラッキングを追加
+• 家族プロファイル設定とワンタップ切り替えに対応したスクロール可能なホーム画面ウィジェット
+• 縦画面固定、412dp基準ズーム、Android 15全面表示対応、および用量編集の不具合修正
+</ja-JP>
+<pt-BR>
+• Recorrência personalizada de várias semanas em dias selecionados com controle de estoque
+• Widget interativo e rolável na tela inicial com configuração de perfil familiar e troca rápida
+• Modo retrato fixo, zoom normalizado para 412dp, suporte edge-to-edge no Android 15 e ajustes de dosagem
+</pt-BR>
+<ru-RU>
+• Настраиваемое повторение приема каждые несколько недель с контролем запаса лекарств
+• Интективный прокручиваемый виджет для главного экрана с выбором профиля и быстрым переключением
+• Фиксация портретного режима, масштаб 412dp, поддержка Android 15 Edge-to-Edge и исправление дозировок
+</ru-RU>
+<zh-CN>
+• 支持在指定星期自定义多周服药周期，并提供自动化库存余量与补药追踪
+• 全新可滚动的交互式主屏幕小部件，支持家庭成员配置与一键快速切换个人资料
+• 全局锁定竖屏显示，统一 412dp 基准缩放，全面适配 Android 15 并修复剂量编辑问题
+</zh-CN>

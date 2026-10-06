@@ -35,6 +35,7 @@
     <string name="form_med_name">اسم الدواء</string>
     <string name="form_med_name_placeholder">مثال: أموكسيسيلين</string>
     <string name="form_dosage">الجرعة</string>
+    <string name="form_dosage_unit">وحدة الجرعة</string>
     <string name="form_dosage_placeholder">مثال: 500 ملغ، قرص واحد</string>
     <string name="form_frequency">التكرار</string>
     <string name="form_time">الوقت</string>
@@ -47,7 +48,7 @@
     <string name="freq_daily">يوميًا</string>
     <string name="freq_weekly">أسبوعيًا</string>
     <string name="freq_monthly">شهريًا</string>
-    <string name="freq_custom">مخصص</string>
+    <string name="freq_custom">كل X أسابيع</string>
     <string name="form_select_days_week">حدد أيام الأسبوع</string>
     <string name="form_select_days_month">حدد أيام الشهر</string>
     <string name="day_mon">الإثنين</string>
@@ -227,7 +228,7 @@
 
 
     <string name="home_all_good">كل شيء جيد!</string>
-    <string name="home_all_good_desc">لا توجد أدوية يجب تناولها اليوم. إذا كنت بحاجة إلى إضافة المزيد، فابدأ بالنقر فوق زر علامة الزائد أدناه.</string>
+    <string name="home_all_good_desc">لا توجد أدوية يجب تناولها اليوم.</string>
     <string name="no_profiles_found">لم يتم العثور على ملفات شخصية</string>
     <string name="status_taken">تم تناوله</string>
 
@@ -238,6 +239,7 @@
     <string name="image_picker_camera">الكاميرا</string>
     <string name="image_picker_gallery">المعرض</string>
     <string name="image_picker_error_title">خطأ</string>
+    <string name="camera_permission_required">مطلوب إذن الكاميرا لالتقاط الصور.</string>
     <string name="image_picker_remove">إزالة الصورة</string>
     <string name="delete_contact_title">حذف جهة الاتصال</string>
     <string name="delete_contact_desc">هل أنت متأكد من أنك تريد حذف جهة الاتصال هذه؟</string>
@@ -452,7 +454,7 @@
     <string name="pill_shape_drops">قطرات</string>
     <string name="pill_shape_patch">لاصقة</string>
 
-    <string name="med_notes_label">ملاحظات الطبيب / الصيدلية والتحذيرات</string>
+    <string name="med_notes_label">ملاحظات الطبيب والتحذيرات</string>
     <string name="med_notes_placeholder">مثال: يؤخذ مع الطعام، تجنب الجريب فروت، وصفة رقم 12345</string>
 
     <string name="course_duration_title">مدة العلاج</string>
@@ -472,6 +474,10 @@
     <string name="freq_every_days_format">كل %1$d أيام</string>
     <string name="interval_hours_label">عدد الساعات بين الجرعات</string>
     <string name="interval_days_label">عدد الأيام بين الجرعات</string>
+    <string name="freq_every_x_weeks_format">كل %1$d أسابيع</string>
+    <string name="custom_recurrence_interval_label">التكرار كل (بالأسابيع)</string>
+    <string name="custom_recurrence_summary">يتكرر كل %1$d أسابيع في أيام %2$s</string>
+    <string name="validation_select_custom_days">يرجى تحديد يوم واحد على الأقل للتكرار المخصص</string>
     <string name="btn_log_prn_dose">تسجيل جرعة</string>
     <string name="prn_doses_taken_today">الجرعات المسجلة اليوم: %1$d</string>
     <string name="prn_section_title">أدوية تؤخذ عند الحاجة (PRN)</string>
@@ -490,7 +496,7 @@
     <string name="hours_limit_hint">للفترات التي تزيد عن 24 ساعة، يُفضل استخدام \"كل X أيام\".</string>
 
     <string name="pref_nagging_title">تنبيهات المتابعة المتكررة (Nagging)</string>
-    <string name="pref_nagging_desc">التذكير المتكرر في حال عدم تأكيد تناول الجرعة المجدولة</string>
+    <string name="pref_nagging_desc">تذكير متكرر حتى يتم تسجيل تناول الجرعة.</string>
     <string name="pref_nagging_interval">فترة تكرار التنبيه</string>
     <string name="pref_nagging_max_repeats">الحد الأقصى للتكرار</string>
     <string name="pref_nagging_repeats_format">%1$d مرات</string>
@@ -507,6 +513,11 @@
     <string name="widget_all_completed">اكتملت جميع جرعات اليوم! 🎉</string>
     <string name="widget_no_doses_today">لا توجد جرعات مجدولة اليوم</string>
     <string name="widget_next_dose_format">التالي: %1$s • %2$s</string>
+    <string name="widget_configure_title">اختر ملف تعريف الأداة</string>
+    <string name="widget_configure_subtitle">اختر جدول أدوية أي ملف شخصي تعرضه هذه الأداة على شاشتك الرئيسية.</string>
+    <string name="widget_configure_active_profile">الملف الشخصي النشط</string>
+    <string name="widget_configure_active_profile_desc">يتبع تلقائيًا الملف الشخصي النشط حاليًا في التطبيق</string>
+    <string name="widget_configure_confirm">حفظ الأداة</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">نغمة المنبه</string>
@@ -575,6 +586,7 @@
     <string name="alarm_take_medicine">تناول الدواء</string>
     <string name="alarm_snooze_format">تأجيل (%d دقيقة)</string>
     <string name="notif_action_snooze_format">تأجيل (%d د)</string>
+    <string name="alarm_snoozed_toast">تم تأجيل التنبيه لمدة %d دقيقة</string>
     <string name="alarm_stock_remaining">المخزون المتبقي: %d وحدة</string>
     <string name="home_action_take">تناول</string>
     <string name="home_action_taken">تم التناول</string>
@@ -600,7 +612,7 @@
     <string name="backup_export_failed">فشل التصدير: %1$s</string>
 
     <string name="pref_allow_skip_title">السماح بتخطي الجرعة</string>
-    <string name="pref_allow_skip_desc">تفعيل خيار لتخطي الجرعة المقررة مع تحديد سبب طبي</string>
+    <string name="pref_allow_skip_desc">تخطي الجرعات المجدولة مع ذكر السبب.</string>
     <string name="home_action_skip">تخطي</string>
     <string name="home_action_skipped">تم التخطي</string>
     <string name="home_dose_skipped">تم تخطي جرعة %s</string>
@@ -626,6 +638,9 @@
     <string name="validation_enter_name">يرجى إدخال اسمك</string>
     <string name="validation_enter_valid_age">يرجى إدخال عمر صحيح (1-120)</string>
     <string name="medication_added_success">تمت إضافة الدواء بنجاح</string>
+    <string name="medication_updated_success">تم تحديث الدواء بنجاح</string>
+    <string name="medication_archived_success">تم إيقاف الدواء بنجاح</string>
+    <string name="medication_deleted_success">تم حذف الدواء بنجاح</string>
     <string name="status_pending">قيد الانتظار</string>
     <string name="pharmacy_order_title">طلب إعادة تعبئة الصيدلية</string>
     <string name="pharmacy_order_desc">إنشاء قائمة طلب الأدوية لواتساب أو الصيدلي</string>
@@ -690,7 +705,7 @@
 
     <!-- Manual Dose Recording Strings -->
     <string name="pref_manually_record_dose_time_title">تسجيل وقت الجرعة يدويًا</string>
-    <string name="pref_manually_record_dose_time_desc">السؤال عن الوقت الفعلي لتناول الدواء عند تسجيل الجرعات.</string>
+    <string name="pref_manually_record_dose_time_desc">تسجيل الوقت الفعلي لتناول الجرعة.</string>
     <string name="record_dose_time_title">تسجيل وقت الجرعة</string>
     <string name="record_dose_time_subtitle">متى تناولت %1$s؟</string>
     <string name="record_dose_time_just_now">الآن (%1$s)</string>
@@ -704,7 +719,7 @@
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">إخفاء زر الإضافة من شريط التنقل</string>
-    <string name="pref_hide_add_nav_button_desc">يخفي زر \'+\' الأوسط من شريط التنقل. سيكون زر \'إضافة دواء\' متاحاً في تبويب الأدوية أسفل قائمتك.</string>
+    <string name="pref_hide_add_nav_button_desc">إخفاء زر \'+\' من شريط التنقل السفلي.</string>
 
     <!-- About Screen Expansion -->
     <string name="about_developer_title">حول المطور</string>
@@ -742,9 +757,9 @@
     <string name="dialog_low_storage_action">إخلاء مساحة</string>
     <string name="dialog_low_storage_dismiss">تجاهل</string>
     <string name="pref_allow_undo_title">السماح بالتراجع عن الجرعة</string>
-    <string name="pref_allow_undo_desc">السماح بإعادة الجرعات المسجلة إلى معلقة. يتطلب تأكيداً قبل التراجع.</string>
+    <string name="pref_allow_undo_desc">إعادة الجرعات المتناولة إلى قيد الانتظار.</string>
     <string name="pref_prompt_dose_notes_title">المطالبة بملاحظة عند تناول الجرعة</string>
-    <string name="pref_prompt_dose_notes_desc">المطالبة بتسجيل ملاحظة أو سياق وجبة أو أعراض كلما تم تحديد جرعة على أنها تم تناولها.</string>
+    <string name="pref_prompt_dose_notes_desc">طلب تسجيل ملاحظة عند تأكيد أخذ الجرعة.</string>
     <string name="dialog_undo_dose_title">التراجع عن الجرعة؟</string>
     <string name="dialog_undo_dose_msg">هل أنت متأكد من رغبتك في إعادة %1$s إلى معلق؟ ستتم استعادة أي مخزون مخصوم.</string>
     <string name="dialog_dose_note_title">ملاحظة الجرعة</string>
@@ -755,6 +770,10 @@
     <string name="btn_edit_note">تعديل الملاحظة</string>
     <string name="dialog_edit_note_title">تعديل ملاحظة الجرعة</string>
     <string name="pref_allow_dose_notes_title">ملاحظات الجرعة</string>
-    <string name="pref_allow_dose_notes_desc">السماح بتسجيل الملاحظات أو سياق الوجبات أو الأعراض مع الجرعات.</string>
+    <string name="pref_allow_dose_notes_desc">تسجيل ملاحظات أو وجبات أو أعراض.</string>
     <string name="btn_add_note">+ إضافة ملاحظة</string>
+    <string name="timings_and_dosages_title">المواعيد والجرعات</string>
+    <string name="stock_inventory_card_title">مخزون الأدوية والجرد</string>
+    <string name="widget_configure_auto_badge">تلقائي</string>
+    <string name="dialog_validation_title">تنبيه</string>
 </resources>

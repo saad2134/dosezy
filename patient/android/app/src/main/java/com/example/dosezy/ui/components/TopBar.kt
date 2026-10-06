@@ -7,11 +7,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -92,6 +95,11 @@ fun TopBar(
                 drawPath(path = path, color = borderColor, style = Stroke(width = strokeWidth))
             }
     ) {
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .windowInsetsTopHeight(WindowInsets.statusBars)
+        )
         if (showBackButton) {
             // Single-row sleek header for subscreens (Preferences, Emergency, Analytics, Backup, etc.)
             Row(
@@ -267,9 +275,10 @@ private fun ProfilePicture(
             .clickable(onClick = onClick)
     ) {
         if (currentUser?.profilePicPath != null) {
+            val modelData = remember(currentUser.profilePicPath) { com.example.dosezy.utils.ImageUtils.resolveImageModel(currentUser.profilePicPath) }
             AsyncImage(
                 model = ImageRequest.Builder(context)
-                    .data(File(currentUser.profilePicPath))
+                    .data(modelData)
                     .crossfade(true)
                     .build(),
                 contentDescription = "Profile Picture",

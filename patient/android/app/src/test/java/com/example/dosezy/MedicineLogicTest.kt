@@ -6,6 +6,7 @@ import com.example.dosezy.data.model.FrequencyPattern
 import com.example.dosezy.data.model.Medicine
 import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.ScheduleEntry
+import com.example.dosezy.data.model.normalizeArabicDigits
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
@@ -310,7 +311,7 @@ class MedicineLogicTest {
     // Mirror the getDateStatusColor logic as a pure function for testing
     private enum class StatusColor { RED, AMBER, GREEN, GRAY_SKIPPED, GRAY_PENDING, TRANSPARENT }
 
-    private fun computeStatusColor(entries: List<ScheduleEntry>): StatusColor {
+    private fun computeStatusColor(entries: List<ScheduleEntry>, missedAfterHours: Int = 6): StatusColor {
         if (entries.isEmpty()) return StatusColor.TRANSPARENT
         val hasMissed = entries.any { it.status == MedicationStatus.MISSED }
         val hasLate = entries.any { it.status == MedicationStatus.TAKEN_LATE }
@@ -321,8 +322,11 @@ class MedicineLogicTest {
             it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE
         }
         val allSkipped = entries.all { it.status == MedicationStatus.SKIPPED }
+        val now = LocalDateTime.now()
         val hasPastPending = entries.any {
-            it.status == MedicationStatus.PENDING && it.scheduledDateTime.isBefore(LocalDateTime.now().minusMinutes(1))
+            it.status == MedicationStatus.PENDING &&
+                    now.isAfter(it.scheduledDateTime) &&
+                    com.example.dosezy.utils.TimeCalculationUtils.isMissed(it.scheduledDateTime, now, missedAfterHours)
         }
         return when {
             hasMissed || hasPastPending -> StatusColor.RED
@@ -405,12 +409,25 @@ class MedicineLogicTest {
     }
 
     @Test
-    fun calendarStatus_pendingPast_red() {
-        // Entry scheduled 2 hours ago still PENDING → overdue → red
-        val entries = listOf(
-            entry(MedicationStatus.PENDING, hoursAgo = 2)
+    fun calendarStatus_pendingRecentPast_grayPending() {
+        // Guard test: Entry scheduled 10 minutes ago (within 6h missed window) still PENDING → neutral gray, NOT red!
+        val entry10MinAgo = ScheduleEntry(
+            entryId = "e_${System.nanoTime()}",
+            userId = "usr_1",
+            medicineId = "med_1",
+            scheduledDateTime = LocalDateTime.now().minusMinutes(10),
+            status = MedicationStatus.PENDING
         )
-        assertEquals(StatusColor.RED, computeStatusColor(entries))
+        assertEquals(StatusColor.GRAY_PENDING, computeStatusColor(listOf(entry10MinAgo), missedAfterHours = 6))
+    }
+
+    @Test
+    fun calendarStatus_pendingPastMissedThreshold_red() {
+        // Entry scheduled 7 hours ago (past 6h missed window) still PENDING → overdue/missed → red
+        val entries = listOf(
+            entry(MedicationStatus.PENDING, hoursAgo = 7)
+        )
+        assertEquals(StatusColor.RED, computeStatusColor(entries, missedAfterHours = 6))
     }
 
     @Test
@@ -691,5 +708,28 @@ class MedicineLogicTest {
         val formattedTime = "8:00 AM"
         val result = "${tomorrowLabel.trim()} $formattedTime"
         assertEquals("Tmrw 8:00 AM", result)
+    }
+
+    @Test
+    fun normalizeArabicDigits_convertsAllSupportedNumeralSystemsAndSeparators() {
+        // Arabic-Indic
+        assertEquals("12.5", "١٢.٥".normalizeArabicDigits())
+        assertEquals("12.5", "١٢٫٥".normalizeArabicDigits()) // Arabic decimal separator
+
+        // Eastern Arabic / Persian
+        assertEquals("12.5", "۱۲.۵".normalizeArabicDigits())
+        assertEquals("12.5", "۱۲٫۵".normalizeArabicDigits())
+
+        // Devanagari / Hindi
+        assertEquals("12.5", "१२.५".normalizeArabicDigits())
+        assertEquals("12.5", "१२,५".normalizeArabicDigits())
+
+        // Bengali
+        assertEquals("12.5", "১২.৫".normalizeArabicDigits())
+        assertEquals("12.5", "১২,৫".normalizeArabicDigits())
+
+        // European comma decimal separator
+        assertEquals("12.5", "12,5".normalizeArabicDigits())
+        assertEquals("100", "100".normalizeArabicDigits())
     }
 }

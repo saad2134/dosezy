@@ -71,8 +71,9 @@ fun GridTimePickerDialog(
         if (h == 0) 12 else h
     }
 
-    val activeLocale = remember {
-        LocaleHelper.getLocale(Language.SYSTEM)
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val activeLocale = remember(context) {
+        LocaleHelper.getCurrentLocale(context)
     }
     val displayString = TimeFormatUtils.formatLocalTime(selectedTimeState, timeFormat, activeLocale)
 
@@ -86,8 +87,8 @@ fun GridTimePickerDialog(
                 modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
                 Text(
-                    text = "Selected: $displayString",
-                    style = MaterialTheme.typography.titleMedium,
+                    text = displayString,
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(bottom = 12.dp)
@@ -237,7 +238,8 @@ fun GridTimePickerDialog(
                         FilterChip(
                             selected = isSelected,
                             onClick = { selectedTimeState = selectedTimeState.withMinute(min) },
-                            label = { Text(":$min", fontWeight = FontWeight.Bold) },
+                            // Guard: Zero-pad minute notation (:00 instead of :0) for standard digital clock formatting
+                            label = { Text(String.format(":%02d", min), fontWeight = FontWeight.Bold) },
                             modifier = Modifier.weight(1f)
                         )
                     }

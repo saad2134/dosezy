@@ -117,6 +117,34 @@ class DataExportFormattingTest {
         assertTrue(row.startsWith("\"Aspirin, Buffered\",81.0,MG,2x Daily,2,40,"))
     }
 
+    @Test
+    fun dataExporter_buildCsvContent_includesAllInventoryAndSlotDosageColumns() {
+        val user = com.example.dosezy.data.model.User(
+            userId = "usr_100",
+            fullName = "John Doe",
+            age = 45,
+            gender = com.example.dosezy.data.model.Gender.MALE,
+            contactNumber = "+1234567890"
+        )
+        val med = sampleMed(
+            name = "Metformin XR",
+            dosage = 500.0,
+            unit = DosageUnit.MG,
+            stock = 60
+        ).copy(
+            refillThreshold = 10,
+            autoDeductOnTake = true,
+            isArchived = false,
+            customDosages = mapOf("08:00" to 2.0, "20:00" to 1.0)
+        )
+        val csv = com.example.dosezy.data.export.DataExporter.buildCsvContent(user, listOf(med), emptyList())
+
+        // Verify CSV contains inventory columns in MEDICINES section
+        assertTrue(csv.contains("Refill Threshold,Auto Deduct Stock,Is Archived,Custom Dosages"))
+        // Verify serialized inventory values in the data row
+        assertTrue(csv.contains(",60,10,true,false,\"08:00:2.0;20:00:1.0\""))
+    }
+
     // ───────────────────────────────────────────────────────────────
     // 3. Export History Sorting (Most Recent First)
     // ───────────────────────────────────────────────────────────────

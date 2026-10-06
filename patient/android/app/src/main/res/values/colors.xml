@@ -6,4 +6,22 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Widget Colors (Light Theme) -->
+    <color name="widget_background">#FFFFFFFF</color>
+    <color name="widget_border">#FFE2E8F0</color>
+    <color name="widget_divider">#FFE2E8F0</color>
+    <color name="widget_title_text">#FF0F172A</color>
+    <color name="widget_date_bg">#FFF1F5F9</color>
+    <color name="widget_date_border">#FFE2E8F0</color>
+    <color name="widget_date_text">#FF475569</color>
+    <color name="widget_item_bg">#FFF8FAFC</color>
+    <color name="widget_item_border">#FFE2E8F0</color>
+    <color name="widget_item_name">#FF0F172A</color>
+    <color name="widget_item_dose">#FF64748B</color>
+    <color name="widget_time_bg">#FFE0F2FE</color>
+    <color name="widget_time_border">#FFBAE6FD</color>
+    <color name="widget_time_text">#FF0284C7</color>
+    <color name="widget_status_text">#FF334155</color>
+    <color name="widget_icon_medication">#FF0284C7</color>
 </resources>

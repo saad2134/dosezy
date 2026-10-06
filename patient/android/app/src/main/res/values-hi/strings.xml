@@ -41,6 +41,7 @@
     <string name="form_med_name">दवा का नाम</string>
     <string name="form_med_name_placeholder">जैसे: अमोक्सिसिलिन</string>
     <string name="form_dosage">खुराक</string>
+    <string name="form_dosage_unit">खुराक इकाई</string>
     <string name="form_dosage_placeholder">जैसे: 500mg, 1 गोली</string>
     <string name="form_frequency">आवृत्ति</string>
     <string name="form_time">समय</string>
@@ -53,7 +54,7 @@
     <string name="freq_daily">दैनिक</string>
     <string name="freq_weekly">साप्ताहिक</string>
     <string name="freq_monthly">मासिक</string>
-    <string name="freq_custom">कस्टम</string>
+    <string name="freq_custom">हर X सप्ताह में</string>
     <string name="form_select_days_week">सप्ताह के दिन चुनें</string>
     <string name="form_select_days_month">महीने के दिन चुनें</string>
     <string name="day_mon">सोम</string>
@@ -243,7 +244,7 @@
 
 
     <string name="home_all_good">सब ठीक है!</string>
-    <string name="home_all_good_desc">आज कोई दवा लेने की आवश्यकता नहीं है। यदि आपको और जोड़ने की आवश्यकता है, तो नीचे दिए गए प्लस बटन को दबाकर प्रारंभ करें।</string>
+    <string name="home_all_good_desc">आज कोई दवा लेने की आवश्यकता नहीं है।</string>
     <string name="no_profiles_found">कोई प्रोफ़ाइल नहीं मिली</string>
     <string name="status_taken">लिया गया</string>
 
@@ -254,6 +255,7 @@
     <string name="image_picker_camera">कैमरा</string>
     <string name="image_picker_gallery">गैलरी</string>
     <string name="image_picker_error_title">त्रुटि</string>
+    <string name="camera_permission_required">फ़ोटो लेने के लिए कैमरे की अनुमति आवश्यक है।</string>
     <string name="image_picker_remove">तस्वीर हटाएं</string>
     <string name="delete_contact_title">संपर्क हटाएं</string>
     <string name="delete_contact_desc">क्या आप वाकई इस संपर्क को हटाना चाहते हैं?</string>
@@ -468,7 +470,7 @@
     <string name="pill_shape_drops">ड्रॉप्स (Drops)</string>
     <string name="pill_shape_patch">पैच (Patch)</string>
 
-    <string name="med_notes_label">डॉक्टर / फार्मेसी नोट्स और विशेष चेतावनी</string>
+    <string name="med_notes_label">डॉक्टर नोट्स और विशेष चेतावनी</string>
     <string name="med_notes_placeholder">उदा. भोजन के साथ लें, चकोतरा से बचें, प्रिस्क्रिप्शन #12345</string>
 
     <string name="course_duration_title">उपचार की अवधि</string>
@@ -488,6 +490,10 @@
     <string name="freq_every_days_format">प्रत्येक %1$d दिनों में</string>
     <string name="interval_hours_label">खुराक के बीच के घंटे</string>
     <string name="interval_days_label">खुराक के बीच के दिन</string>
+    <string name="freq_every_x_weeks_format">प्रत्येक %1$d सप्ताह में</string>
+    <string name="custom_recurrence_interval_label">दोहराव अंतराल (सप्ताह)</string>
+    <string name="custom_recurrence_summary">प्रत्येक %1$d सप्ताह में %2$s को दोहराया जाएगा</string>
+    <string name="validation_select_custom_days">कस्टम पुनरावृत्ति के लिए कृपया कम से कम एक दिन चुनें</string>
     <string name="btn_log_prn_dose">खुराक दर्ज करें</string>
     <string name="prn_doses_taken_today">आज दर्ज खुराकें: %1$d</string>
     <string name="prn_section_title">ज़रूरत पड़ने पर दवाएं (PRN)</string>
@@ -506,7 +512,7 @@
     <string name="hours_limit_hint">24 घंटे से अधिक के अंतराल के लिए \'हर X दिन\' चुनें।</string>
 
     <string name="pref_nagging_title">अनुवर्ती (नैगिंग) रिमाइंडर</string>
-    <string name="pref_nagging_desc">यदि खुराक नहीं ली गई है तो बार-बार याद दिलाएं</string>
+    <string name="pref_nagging_desc">दवा लेने तक बार-बार याद दिलाएं।</string>
     <string name="pref_nagging_interval">रिमाइंडर अंतराल</string>
     <string name="pref_nagging_max_repeats">अधिकतम दोहराव</string>
     <string name="pref_nagging_repeats_format">%1$d बार</string>
@@ -523,6 +529,11 @@
     <string name="widget_all_completed">सभी खुराकें पूरी हुईं! 🎉</string>
     <string name="widget_no_doses_today">आज कोई खुराक निर्धारित नहीं है</string>
     <string name="widget_next_dose_format">अगली: %1$s • %2$s</string>
+    <string name="widget_configure_title">विजेट प्रोफ़ाइल चुनें</string>
+    <string name="widget_configure_subtitle">चुनें कि यह विजेट आपकी होम स्क्रीन पर किस प्रोफ़ाइल की दवा सूची प्रदर्शित करेगा।</string>
+    <string name="widget_configure_active_profile">सक्रिय ऐप प्रोफ़ाइल</string>
+    <string name="widget_configure_active_profile_desc">ऐप में वर्तमान में सक्रिय प्रोफ़ाइल को स्वचालित रूप से फ़ॉलो करता है</string>
+    <string name="widget_configure_confirm">विजेट सहेजें</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">अलार्म टोन</string>
@@ -591,6 +602,7 @@
     <string name="alarm_take_medicine">दवा लें</string>
     <string name="alarm_snooze_format">स्नूज़ (%d मिनट)</string>
     <string name="notif_action_snooze_format">स्नूज़ (%d मिनट)</string>
+    <string name="alarm_snoozed_toast">अलार्म %d मिनट के लिए स्नूज़ किया गया</string>
     <string name="alarm_stock_remaining">स्टॉक: %d दवाएं शेष</string>
     <string name="home_action_take">लें</string>
     <string name="home_action_taken">ले ली</string>
@@ -616,7 +628,7 @@
     <string name="backup_export_failed">निर्यात विफल: %1$s</string>
 
     <string name="pref_allow_skip_title">खुराक छोड़ने की अनुमति दें</string>
-    <string name="pref_allow_skip_desc">चिकित्सीय कारण के साथ खुराक छोड़ने का विकल्प सक्षम करें</string>
+    <string name="pref_allow_skip_desc">कारण बताकर निर्धारित खुराक छोड़ें।</string>
     <string name="home_action_skip">छोड़ें</string>
     <string name="home_action_skipped">छोड़ दिया</string>
     <string name="home_dose_skipped">%s के लिए खुराक छोड़ दी गई</string>
@@ -642,6 +654,9 @@
     <string name="validation_enter_name">कृपया अपना नाम दर्ज करें</string>
     <string name="validation_enter_valid_age">कृपया एक मान्य आयु दर्ज करें (1-120)</string>
     <string name="medication_added_success">दवा सफलतापूर्वक जोड़ी गई</string>
+    <string name="medication_updated_success">दवा सफलतापूर्वक अपडेट की गई</string>
+    <string name="medication_archived_success">दवा सफलतापूर्वक बंद कर दी गई</string>
+    <string name="medication_deleted_success">दवा सफलतापूर्वक हटा दी गई</string>
     <string name="status_pending">लंबित</string>
     <string name="pharmacy_order_title">फार्मेसी रीफ़िल ऑर्डर</string>
     <string name="pharmacy_order_desc">व्हाट्सएप या मेडिकल स्टोर के लिए दवाओं के ऑर्डर की सूची बनाएं</string>
@@ -706,7 +721,7 @@
 
     <!-- Manual Dose Recording Strings -->
     <string name="pref_manually_record_dose_time_title">खुराक का समय मैन्युअल रूप से दर्ज करें</string>
-    <string name="pref_manually_record_dose_time_desc">खुराक दर्ज करते समय दवा लेने का वास्तविक समय पूछें।</string>
+    <string name="pref_manually_record_dose_time_desc">खुराक लेने का वास्तविक समय दर्ज करें।</string>
     <string name="record_dose_time_title">खुराक का समय दर्ज करें</string>
     <string name="record_dose_time_subtitle">आपने %1$s कब ली?</string>
     <string name="record_dose_time_just_now">अभी-अभी (%1$s)</string>
@@ -720,7 +735,7 @@
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">नेविगेशन जोड़ें बटन छिपाएं</string>
-    <string name="pref_hide_add_nav_button_desc">निचले नेविगेशन बार से \'+\' बटन छिपाता है। दवाएं टैब में आपकी सूची के नीचे \'दवा जोड़ें\' बटन उपलब्ध रहेगा।</string>
+    <string name="pref_hide_add_nav_button_desc">निचले नेविगेशन बार से \'+\' बटन छिपाएं।</string>
 
     <!-- About Screen Expansion -->
     <string name="about_developer_title">डेवलपर के बारे में</string>
@@ -758,9 +773,9 @@
     <string name="dialog_low_storage_action">स्पेस खाली करें</string>
     <string name="dialog_low_storage_dismiss">खारिज करें</string>
     <string name="pref_allow_undo_title">खुराक पूर्ववत करने की अनुमति दें</string>
-    <string name="pref_allow_undo_desc">दर्ज खुराक को वापस लंबित में बदलने की अनुमति दें। पुष्टि आवश्यक है।</string>
+    <string name="pref_allow_undo_desc">ली गई खुराक को वापस लंबित में बदलें।</string>
     <string name="pref_prompt_dose_notes_title">खुराक लेने पर नोट के लिए पूछें</string>
-    <string name="pref_prompt_dose_notes_desc">हर बार खुराक लेने पर कोई नोट, भोजन का विवरण या लक्षण दर्ज करने के लिए पूछें।</string>
+    <string name="pref_prompt_dose_notes_desc">खुराक दर्ज करते समय नोट के लिए पूछें।</string>
     <string name="dialog_undo_dose_title">खुराक पूर्ववत करें?</string>
     <string name="dialog_undo_dose_msg">क्या आप वाकई %1$s को वापस लंबित में बदलना चाहते हैं? स्टॉक वापस जुड़ जाएगा।</string>
     <string name="dialog_dose_note_title">खुराक नोट</string>
@@ -771,6 +786,10 @@
     <string name="btn_edit_note">नोट बदलें</string>
     <string name="dialog_edit_note_title">खुराक नोट संपादित करें</string>
     <string name="pref_allow_dose_notes_title">खुराक के नोट</string>
-    <string name="pref_allow_dose_notes_desc">खुराक के साथ नोट, भोजन का विवरण या लक्षण दर्ज करने की अनुमति दें।</string>
+    <string name="pref_allow_dose_notes_desc">नोट्स, भोजन या लक्षण दर्ज करें।</string>
     <string name="btn_add_note">+ नोट जोड़ें</string>
+    <string name="timings_and_dosages_title">समय और खुराक</string>
+    <string name="stock_inventory_card_title">दवा स्टॉक और इन्वेंटरी</string>
+    <string name="widget_configure_auto_badge">ऑटो</string>
+    <string name="dialog_validation_title">सूचना</string>
 </resources>

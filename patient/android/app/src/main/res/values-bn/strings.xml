@@ -35,6 +35,7 @@
     <string name="form_med_name">ওষুধের নাম</string>
     <string name="form_med_name_placeholder">যেমন: অ্যাটোরভাস্ট্যাটিন</string>
     <string name="form_dosage">ডোজের মাত্রা</string>
+    <string name="form_dosage_unit">ডোজ ইউনিট</string>
     <string name="form_dosage_placeholder">যেমন: ৫০০ মিগ্রা, ১টি ট্যাবলেট</string>
     <string name="form_frequency">পুনরাবৃত্তি</string>
     <string name="form_time">সময়</string>
@@ -47,7 +48,7 @@
     <string name="freq_daily">প্রতিদিন</string>
     <string name="freq_weekly">সাপ্তাহিক</string>
     <string name="freq_monthly">মাসিক</string>
-    <string name="freq_custom">কাস্টম</string>
+    <string name="freq_custom">প্রতি X সপ্তাহ পর পর</string>
     <string name="form_select_days_week">সপ্তাহের দিন নির্বাচন করুন</string>
     <string name="form_select_days_month">মাসের দিন নির্বাচন করুন</string>
     <string name="day_mon">সোম</string>
@@ -227,7 +228,7 @@
 
 
     <string name="home_all_good">সব ঠিক আছে!</string>
-    <string name="home_all_good_desc">আজ কোনো ওষুধ খাওয়ার প্রয়োজন নেই। আপনি যদি আরও যোগ করতে চান, তবে নিচের প্লাস বোতামটি ট্যাপ করে শুরু করুন।</string>
+    <string name="home_all_good_desc">আজ কোনো ওষুধ খাওয়ার প্রয়োজন নেই।</string>
     <string name="no_profiles_found">কোনো প্রোফাইল পাওয়া যায়নি</string>
     <string name="status_taken">গৃহীত</string>
 
@@ -238,6 +239,7 @@
     <string name="image_picker_camera">ক্যামেরা</string>
     <string name="image_picker_gallery">গ্যালারি</string>
     <string name="image_picker_error_title">ত্রুটি</string>
+    <string name="camera_permission_required">ছবি তোলার জন্য ক্যামেরার অনুমতি প্রয়োজন।</string>
     <string name="image_picker_remove">ছবি সরান</string>
     <string name="delete_contact_title">যোগাযোগ মুছুন</string>
     <string name="delete_contact_desc">আপনি কি নিশ্চিত যে আপনি এই যোগাযোগটি মুছতে চান?</string>
@@ -452,7 +454,7 @@
     <string name="pill_shape_drops">ড্রপস (Drops)</string>
     <string name="pill_shape_patch">প্যাচ (Patch)</string>
 
-    <string name="med_notes_label">ডাক্তার / ফার্মেসির নির্দেশনা ও সতর্কতা</string>
+    <string name="med_notes_label">ডাক্তারের নির্দেশনা ও সতর্কতা</string>
     <string name="med_notes_placeholder">যেমনঃ ভরা পেটে সেব্য, বাতাবি লেবু পরিহার করুন, প্রেসক্রিপশন #12345</string>
 
     <string name="course_duration_title">চিকিৎসার সময়কাল</string>
@@ -472,6 +474,10 @@
     <string name="freq_every_days_format">প্রতি %1$d দিন পর পর</string>
     <string name="interval_hours_label">ডোজের মধ্যবর্তী ঘণ্টা</string>
     <string name="interval_days_label">ডোজের মধ্যবর্তী দিন</string>
+    <string name="freq_every_x_weeks_format">প্রতি %1$d সপ্তাহ পর পর</string>
+    <string name="custom_recurrence_interval_label">পুনরাবৃত্তি প্রতি (সপ্তাহে)</string>
+    <string name="custom_recurrence_summary">প্রতি %1$d সপ্তাহ পর পর %2$s বারে পুনরাবৃত্তি হবে</string>
+    <string name="validation_select_custom_days">কাস্টম পুনরাবৃত্তির জন্য অনুগ্রহ করে কমপক্ষে একটি দিন নির্বাচন করুন</string>
     <string name="btn_log_prn_dose">ডোজ লগ করুন</string>
     <string name="prn_doses_taken_today">আজকে রেকর্ডকৃত ডোজ: %1$d</string>
     <string name="prn_section_title">প্রয়োজনভিত্তিক ওষুধ (PRN)</string>
@@ -490,7 +496,7 @@
     <string name="hours_limit_hint">২৪ ঘণ্টার বেশি ব্যবধানের জন্য \'প্রতি X দিন\' ব্যবহার করুন।</string>
 
     <string name="pref_nagging_title">পুনরাবৃত্তিমূলক তাগিদ রিমাইন্ডার (Nagging)</string>
-    <string name="pref_nagging_desc">নির্ধারিত ডোজ গ্রহণ সম্পন্ন না করা পর্যন্ত বারবার স্মরণ করিয়ে দিন</string>
+    <string name="pref_nagging_desc">গ্রহণ করা চিহ্নিত না হওয়া পর্যন্ত বারবার মনে করিয়ে দিন।</string>
     <string name="pref_nagging_interval">তাগিদের ব্যবধান</string>
     <string name="pref_nagging_max_repeats">সর্বোচ্চ পুনরাবৃত্তি</string>
     <string name="pref_nagging_repeats_format">%1$d বার</string>
@@ -507,6 +513,11 @@
     <string name="widget_all_completed">সকল ডোজ সম্পন্ন হয়েছে! 🎉</string>
     <string name="widget_no_doses_today">আজকের জন্য কোনো ডোজ নির্ধারিত নেই</string>
     <string name="widget_next_dose_format">পরবর্তী: %1$s • %2$s</string>
+    <string name="widget_configure_title">উইজেট প্রোফাইল নির্বাচন করুন</string>
+    <string name="widget_configure_subtitle">এই উইজেটটি আপনার হোম স্ক্রিনে কোন প্রোফাইলের ওষুধের সময়সূচী প্রদর্শন করবে তা বেছে নিন।</string>
+    <string name="widget_configure_active_profile">সক্রিয় অ্যাপ প্রোফাইল</string>
+    <string name="widget_configure_active_profile_desc">অ্যাপে বর্তমানে সক্রিয় প্রোফাইলটি স্বয়ংক্রিয়ভাবে অনুসরণ করে</string>
+    <string name="widget_configure_confirm">উইজেট সংরক্ষণ করুন</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">অ্যালার্মের সুর</string>
@@ -571,6 +582,7 @@
     <string name="alarm_take_medicine">ঔষধ গ্রহণ করুন</string>
     <string name="alarm_snooze_format">স্নুজ (%d মিনিট)</string>
     <string name="notif_action_snooze_format">স্নুজ (%d মিনিট)</string>
+    <string name="alarm_snoozed_toast">অ্যালার্ম %d মিনিটের জন্য স্নুজ করা হয়েছে</string>
     <string name="alarm_stock_remaining">মজুদ: %d ইউনিট বাকি</string>
     <string name="home_action_take">নিন</string>
     <string name="home_action_taken">নেওয়া হয়েছে</string>
@@ -596,7 +608,7 @@
     <string name="backup_export_failed">রপ্তানি ব্যর্থ হয়েছে: %1$s</string>
 
     <string name="pref_allow_skip_title">ডোজ বাদ দেওয়ার অনুমতি দিন</string>
-    <string name="pref_allow_skip_desc">চিকিৎসাগত কারণসহ ডোজ বাদ দেওয়ার বিকল্প চালু করুন</string>
+    <string name="pref_allow_skip_desc">কারণ উল্লেখ করে নির্ধারিত ডোজ বাদ দিন।</string>
     <string name="home_action_skip">বাদ দিন</string>
     <string name="home_action_skipped">বাদ দেওয়া হয়েছে</string>
     <string name="home_dose_skipped">%s এর জন্য ডোজ বাদ দেওয়া হয়েছে</string>
@@ -622,6 +634,9 @@
     <string name="validation_enter_name">অনুগ্রহ করে আপনার নাম লিখুন</string>
     <string name="validation_enter_valid_age">অনুগ্রহ করে একটি বৈধ বয়স লিখুন (১-১২০)</string>
     <string name="medication_added_success">ওষুধ সফলভাবে যোগ করা হয়েছে</string>
+    <string name="medication_updated_success">ওষুধ সফলভাবে আপডেট করা হয়েছে</string>
+    <string name="medication_archived_success">ওষুধ সফলভাবে বন্ধ করা হয়েছে</string>
+    <string name="medication_deleted_success">ওষুধ সফলভাবে মুছে ফেলা হয়েছে</string>
     <string name="status_pending">বিচারাধীন</string>
     <string name="pharmacy_order_title">ফার্মেসি রিফিল অর্ডার</string>
     <string name="pharmacy_order_desc">হোয়াটসঅ্যাপ বা ফার্মেসির জন্য ওষুধের অর্ডারের তালিকা তৈরি করুন</string>
@@ -686,7 +701,7 @@
 
     <!-- Manual Dose Recording Strings -->
     <string name="pref_manually_record_dose_time_title">ম্যানুয়ালি ডোজ সময় রেকর্ড করুন</string>
-    <string name="pref_manually_record_dose_time_desc">ডোজ রেকর্ড করার সময় আপনি ওষুধ খাওয়ার সঠিক সময় জানতে চাইবে।</string>
+    <string name="pref_manually_record_dose_time_desc">ডোজ গ্রহণের সঠিক সময় রেকর্ড করুন।</string>
     <string name="record_dose_time_title">ডোজ সময় রেকর্ড করুন</string>
     <string name="record_dose_time_subtitle">আপনি কখন %1$s গ্রহণ করেছেন?</string>
     <string name="record_dose_time_just_now">এইমাত্র (%1$s)</string>
@@ -700,7 +715,7 @@
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">নেভিগেশন যোগ বাটন লুকান</string>
-    <string name="pref_hide_add_nav_button_desc">নিচের নেভিগেশন বার থেকে \'+\' বাটনটি লুকায়। ওষুধ ট্যাবের তালিকায় নিচে \'ওষুধ যোগ করুন\' বাটন উপলব্ধ থাকবে।</string>
+    <string name="pref_hide_add_nav_button_desc">নিচের নেভিগেশন বার থেকে \'+\' বোতাম লুকান।</string>
 
     <!-- About Screen Expansion -->
     <string name="about_developer_title">ডেভেলপার সম্পর্কে</string>
@@ -741,9 +756,9 @@
     <string name="dialog_low_storage_action">স্থান খালি করুন</string>
     <string name="dialog_low_storage_dismiss">বাতিল করুন</string>
     <string name="pref_allow_undo_title">ডোজ আনডু করার অনুমতি দিন</string>
-    <string name="pref_allow_undo_desc">রেকর্ড করা ডোজকে পুনরায় পেন্ডিং অবস্থায় ফেরানোর অনুমতি দিন। নিশ্চিতকরণ প্রয়োজন।</string>
+    <string name="pref_allow_undo_desc">গৃহীত ডোজ পুনরায় অপেক্ষামাণ হিসেবে ফিরিয়ে নিন।</string>
     <string name="pref_prompt_dose_notes_title">ডোজ নেওয়ার সময় নোটের প্রম্পট দিন</string>
-    <string name="pref_prompt_dose_notes_desc">যেকোনো ডোজ গৃহীত হিসেবে চিহ্নিত করার সময় নোট বা উপসর্গের বিবরণ দেওয়ার প্রম্পট দিন।</string>
+    <string name="pref_prompt_dose_notes_desc">ডোজ গ্রহণের সময় নোট লেখার অনুরোধ করুন।</string>
     <string name="dialog_undo_dose_title">ডোজ আনডু করবেন?</string>
     <string name="dialog_undo_dose_msg">আপনি কি নিশ্চিত যে আপনি %1$s কে পুনরায় পেন্ডিং অবস্থায় ফিরিয়ে নিতে চান? বাদ দেওয়া স্টক পুনরায় যোগ হবে।</string>
     <string name="dialog_dose_note_title">ডোজ নোট</string>
@@ -754,6 +769,10 @@
     <string name="btn_edit_note">নোট সম্পাদনা</string>
     <string name="dialog_edit_note_title">ডোজ নোট সম্পাদনা করুন</string>
     <string name="pref_allow_dose_notes_title">ডোজ নোট</string>
-    <string name="pref_allow_dose_notes_desc">ডোজের সাথে নোট, খাবারের প্রসঙ্গ বা লক্ষণ লিপিবদ্ধ করার অনুমতি দিন।</string>
+    <string name="pref_allow_dose_notes_desc">নোট, খাবার বা লক্ষণ রেকর্ড করুন।</string>
     <string name="btn_add_note">+ নোট যোগ করুন</string>
+    <string name="timings_and_dosages_title">সময় এবং মাত্রা</string>
+    <string name="stock_inventory_card_title">ওষুধের স্টক এবং ইনভেন্টরি</string>
+    <string name="widget_configure_auto_badge">স্বয়ংক্রিয়</string>
+    <string name="dialog_validation_title">বিজ্ঞপ্তি</string>
 </resources>

@@ -13,7 +13,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -71,6 +75,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.DisposableEffect
@@ -134,13 +139,11 @@ fun PreferencesScreen(navController: NavController) {
                 // Theme Preference
                 PreferenceItem(
                     title = androidx.compose.ui.res.stringResource(R.string.pref_theme),
-                    currentValue = currentUser?.theme?.let {
-                        when (it) {
-                            Theme.LIGHT -> androidx.compose.ui.res.stringResource(R.string.theme_light)
-                            Theme.DARK -> androidx.compose.ui.res.stringResource(R.string.theme_dark)
-                            Theme.SYSTEM -> androidx.compose.ui.res.stringResource(R.string.theme_system)
-                        }
-                    } ?: androidx.compose.ui.res.stringResource(R.string.theme_system),
+                    currentValue = when (currentUser?.theme ?: Theme.SYSTEM) {
+                        Theme.SYSTEM -> androidx.compose.ui.res.stringResource(R.string.theme_system)
+                        Theme.LIGHT -> androidx.compose.ui.res.stringResource(R.string.theme_light)
+                        Theme.DARK -> androidx.compose.ui.res.stringResource(R.string.theme_dark)
+                    },
                     iconName = "palette",
                     onClick = { showThemeDialog = true }
                 )
@@ -174,12 +177,14 @@ fun PreferencesScreen(navController: NavController) {
             }
 
             item {
-                Card(
+                Surface(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 0.dp,
+                    shadowElevation = 2.dp,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .padding(horizontal = 16.dp, vertical = 6.dp)
                 ) {
                     Row(
                         modifier = Modifier
@@ -196,18 +201,19 @@ fun PreferencesScreen(navController: NavController) {
                             Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(36.dp)
                             )
                             Column {
                                 Text(
                                     text = stringResource(R.string.pref_hide_add_nav_button_title),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
                                     text = stringResource(R.string.pref_hide_add_nav_button_desc),
-                                    style = MaterialTheme.typography.bodySmall,
+                                    fontSize = 14.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
@@ -286,12 +292,14 @@ fun PreferencesScreen(navController: NavController) {
 
             // Follow-up / Nagging Reminders Switch & Settings
             item {
-                Card(
+                Surface(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 0.dp,
+                    shadowElevation = 2.dp,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .padding(horizontal = 16.dp, vertical = 6.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Row(
@@ -307,18 +315,19 @@ fun PreferencesScreen(navController: NavController) {
                                 Icon(
                                     imageVector = Icons.Default.Repeat,
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(36.dp)
                                 )
                                 Column {
                                     Text(
                                         text = stringResource(R.string.pref_nagging_title),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.onSurface
                                     )
                                     Text(
                                         text = stringResource(R.string.pref_nagging_desc),
-                                        style = MaterialTheme.typography.bodySmall,
+                                        fontSize = 14.sp,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
@@ -430,12 +439,14 @@ fun PreferencesScreen(navController: NavController) {
 
             // Allow Dose Skipping Switch & Card
             item {
-                Card(
+                Surface(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 0.dp,
+                    shadowElevation = 2.dp,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .padding(horizontal = 16.dp, vertical = 6.dp)
                 ) {
                     Row(
                         modifier = Modifier
@@ -452,18 +463,19 @@ fun PreferencesScreen(navController: NavController) {
                             Icon(
                                 imageVector = Icons.Default.FastForward,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(36.dp)
                             )
                             Column {
                                 Text(
                                     text = stringResource(R.string.pref_allow_skip_title),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
                                     text = stringResource(R.string.pref_allow_skip_desc),
-                                    style = MaterialTheme.typography.bodySmall,
+                                    fontSize = 14.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
@@ -482,12 +494,14 @@ fun PreferencesScreen(navController: NavController) {
 
             // Manually Record Dose Time Switch & Card
             item {
-                Card(
+                Surface(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 0.dp,
+                    shadowElevation = 2.dp,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .padding(horizontal = 16.dp, vertical = 6.dp)
                 ) {
                     Row(
                         modifier = Modifier
@@ -504,18 +518,19 @@ fun PreferencesScreen(navController: NavController) {
                             Icon(
                                 imageVector = Icons.Default.Schedule,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(36.dp)
                             )
                             Column {
                                 Text(
                                     text = stringResource(R.string.pref_manually_record_dose_time_title),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
                                     text = stringResource(R.string.pref_manually_record_dose_time_desc),
-                                    style = MaterialTheme.typography.bodySmall,
+                                    fontSize = 14.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
@@ -534,12 +549,14 @@ fun PreferencesScreen(navController: NavController) {
 
             // Allow Dose Undo Switch & Card
             item {
-                Card(
+                Surface(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 0.dp,
+                    shadowElevation = 2.dp,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .padding(horizontal = 16.dp, vertical = 6.dp)
                 ) {
                     Row(
                         modifier = Modifier
@@ -556,18 +573,19 @@ fun PreferencesScreen(navController: NavController) {
                             Icon(
                                 imageVector = Icons.Default.Undo,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(36.dp)
                             )
                             Column {
                                 Text(
                                     text = stringResource(R.string.pref_allow_undo_title),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
                                     text = stringResource(R.string.pref_allow_undo_desc),
-                                    style = MaterialTheme.typography.bodySmall,
+                                    fontSize = 14.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
@@ -586,12 +604,14 @@ fun PreferencesScreen(navController: NavController) {
 
             // Dose Notes Switch & Card
             item {
-                Card(
+                Surface(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 0.dp,
+                    shadowElevation = 2.dp,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .padding(horizontal = 16.dp, vertical = 6.dp)
                 ) {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         // Master Switch: Allow Dose Notes
@@ -610,18 +630,19 @@ fun PreferencesScreen(navController: NavController) {
                                 Icon(
                                     imageVector = Icons.Default.EditNote,
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(36.dp)
                                 )
                                 Column {
                                     Text(
                                         text = stringResource(R.string.pref_allow_dose_notes_title),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.onSurface
                                     )
                                     Text(
                                         text = stringResource(R.string.pref_allow_dose_notes_desc),
-                                        style = MaterialTheme.typography.bodySmall,
+                                        fontSize = 14.sp,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
@@ -663,18 +684,18 @@ fun PreferencesScreen(navController: NavController) {
                                         imageVector = Icons.Default.Schedule,
                                         contentDescription = null,
                                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
-                                        modifier = Modifier.size(22.dp)
+                                        modifier = Modifier.size(24.dp)
                                     )
                                     Column {
                                         Text(
                                             text = stringResource(R.string.pref_prompt_dose_notes_title),
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.Medium,
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.SemiBold,
                                             color = MaterialTheme.colorScheme.onSurface
                                         )
                                         Text(
                                             text = stringResource(R.string.pref_prompt_dose_notes_desc),
-                                            style = MaterialTheme.typography.bodySmall,
+                                            fontSize = 13.sp,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
@@ -730,6 +751,11 @@ fun PreferencesScreen(navController: NavController) {
                     iconName = "schedule",
                     onClick = { showTimeFormatDialog = true }
                 )
+            }
+
+            item {
+                Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
 
@@ -1002,13 +1028,14 @@ fun AlarmSoundSelectionDialog(
                             setAudioStreamType(android.media.AudioManager.STREAM_ALARM)
                         }
                         setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
-                        afd.close()
                         setOnCompletionListener {
                             previewingSound = null
                         }
                         prepare()
                         start()
                     }
+                    // Guard: Close AssetFileDescriptor only AFTER prepare() to prevent Bad file descriptor status=0x1 failure in MediaPlayer native layer
+                    try { afd.close() } catch (_: Exception) {}
                     mediaPlayer = mp
                 }
             } else {
@@ -1205,9 +1232,9 @@ fun ThemeSelectionDialog(
     com.example.dosezy.ui.components.SelectionDialog(
         title = androidx.compose.ui.res.stringResource(R.string.pref_select_theme),
         options = listOf(
+            androidx.compose.ui.res.stringResource(R.string.theme_system) to Theme.SYSTEM,
             androidx.compose.ui.res.stringResource(R.string.theme_light) to Theme.LIGHT,
-            androidx.compose.ui.res.stringResource(R.string.theme_dark) to Theme.DARK,
-            androidx.compose.ui.res.stringResource(R.string.theme_system) to Theme.SYSTEM
+            androidx.compose.ui.res.stringResource(R.string.theme_dark) to Theme.DARK
         ),
         currentSelection = currentTheme,
         onOptionSelected = onThemeSelected,

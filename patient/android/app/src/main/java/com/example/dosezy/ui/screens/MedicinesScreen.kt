@@ -10,7 +10,9 @@ import androidx.compose.ui.graphics.luminance
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Box
@@ -21,7 +23,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -48,12 +55,16 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,6 +79,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.ui.res.stringResource
 import com.example.dosezy.R
 import coil.compose.rememberAsyncImagePainter
@@ -82,9 +94,9 @@ import com.example.dosezy.ui.viewmodels.UserViewModel
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.TextButton
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.draw.alpha
+import kotlinx.coroutines.launch
 
 @Composable
 fun MedicinesScreen(
@@ -107,12 +119,29 @@ fun MedicinesScreen(
     var medicineToRefill by remember { mutableStateOf<Medicine?>(null) }
     var medicineToPermanentlyDelete by remember { mutableStateOf<Medicine?>(null) }
 
-    // light theme
-    Surface(
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    LaunchedEffect(navBackStackEntry) {
+        val msg = navBackStackEntry?.savedStateHandle?.remove<String>("snackbar_message")
+        if (!msg.isNullOrBlank()) {
+            snackbarHostState.showSnackbar(msg)
+        }
+    }
+
+    Scaffold(
         modifier = Modifier.fillMaxSize(),
-    ) {
+        containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        snackbarHost = { com.example.dosezy.ui.components.DosezySnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
         Column(
-            modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             TopBar(
                 navController = navController,
@@ -156,6 +185,11 @@ fun MedicinesScreen(
             onConfirmRefill = { added ->
                 val newStock = (medToRefill.currentStock ?: 0) + added
                 medicineViewModel.updateMedicine(medToRefill.copy(currentStock = newStock))
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(
+                        context.getString(R.string.quick_refill_success, medToRefill.medicationName, newStock)
+                    )
+                }
                 medicineToRefill = null
             },
             onDismiss = { medicineToRefill = null }
@@ -237,22 +271,32 @@ fun MedicinesContent(
         else medicines.filter { it.medicationName.contains(searchQuery.trim(), ignoreCase = true) }
     }
 
+    val focusManager = LocalFocusManager.current
+
     if (medicines.isEmpty() && archivedMedicines.isEmpty()) {
         EmptyMedicinesState(onAddMedicineClick = onAddMedicineClick)
     } else {
+        val hasSearchBar = medicines.size >= 2 || searchQuery.isNotBlank()
         LazyColumn(
-            modifier = modifier,
-            contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp)
+            modifier = modifier
+                .imePadding()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {
+                    focusManager.clearFocus()
+                },
+            contentPadding = PaddingValues(start = 16.dp, top = if (hasSearchBar) 0.dp else 8.dp, end = 16.dp, bottom = 16.dp)
         ) {
             // Search bar for medications roster
-            if (medicines.size >= 2 || searchQuery.isNotBlank()) {
+            if (hasSearchBar) {
                 item {
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 8.dp),
+                            .padding(top = 8.dp, bottom = 8.dp),
                         placeholder = {
                             Text(
                                 text = stringResource(R.string.search_medicines_hint),
@@ -278,6 +322,8 @@ fun MedicinesContent(
                             }
                         },
                         singleLine = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                        keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() }),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -518,15 +564,20 @@ fun ArchivedMedicineItem(
 
             Spacer(modifier = Modifier.width(4.dp))
 
-            // Permanent Delete Button
-            IconButton(
-                onClick = onDeletePermanently,
-                modifier = Modifier.size(34.dp)
+            // Permanent Delete Button with Squircle Frame
+            Box(
+                modifier = Modifier
+                    .size(34.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color(0xFFDC2626).copy(alpha = 0.12f))
+                    .border(1.dp, Color(0xFFDC2626).copy(alpha = 0.28f), RoundedCornerShape(10.dp))
+                    .clickable(onClick = onDeletePermanently),
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = stringResource(com.example.dosezy.R.string.btn_delete_permanently),
-                    tint = Color(0xFFDC2626).copy(alpha = 0.7f),
+                    tint = Color(0xFFDC2626),
                     modifier = Modifier.size(18.dp)
                 )
             }

@@ -11,9 +11,11 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import android.view.KeyEvent
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -53,6 +55,7 @@ import com.example.dosezy.data.model.User
 import com.example.dosezy.data.model.getLocalizedName
 import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.ui.theme.DosezyTheme
+import com.example.dosezy.utils.TimeCalculationUtils
 import com.example.dosezy.utils.TimeFormatUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -93,10 +96,18 @@ class AlarmActivity : ComponentActivity() {
     private val activeMedicineNameState = mutableStateOf("Medication")
     private val activeScheduledTimeState = mutableStateOf("")
 
-    override fun attachBaseContext(newBase: android.content.Context) {
-        val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(newBase)
-        val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(newBase, savedLanguage)
-        super.attachBaseContext(localizedContext)
+
+    override fun applyOverrideConfiguration(overrideConfiguration: android.content.res.Configuration?) {
+        if (overrideConfiguration != null) {
+            val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(this)
+            val targetLocale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLanguage)
+            overrideConfiguration.setLocale(targetLocale)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                overrideConfiguration.setLocales(android.os.LocaleList(targetLocale))
+            }
+            overrideConfiguration.setLayoutDirection(targetLocale)
+        }
+        super.applyOverrideConfiguration(overrideConfiguration)
     }
 
     override fun onNewIntent(intent: android.content.Intent) {
@@ -117,7 +128,9 @@ class AlarmActivity : ComponentActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         activeInstance = java.lang.ref.WeakReference(this)
 
         // Turn screen on and unlock keyguard
@@ -214,30 +227,54 @@ class AlarmActivity : ComponentActivity() {
                 }
             }
 
+            val currentLang = user?.language ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+            val currentLocale = com.example.dosezy.utils.LocaleHelper.getLocale(currentLang)
+            val isRtl = currentLocale.language == "ar"
+            val layoutDirection = if (isRtl) androidx.compose.ui.unit.LayoutDirection.Rtl else androidx.compose.ui.unit.LayoutDirection.Ltr
+
+            val localizedContext = remember(currentLang) {
+                com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, currentLang)
+            }
+            val localizedConfig = remember(currentLang) {
+                val config = android.content.res.Configuration(context.resources.configuration)
+                config.setLocale(currentLocale)
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    config.setLocales(android.os.LocaleList(currentLocale))
+                }
+                config.setLayoutDirection(currentLocale)
+                config
+            }
+
             val currentEntryIds by activeEntryIdsState
             val currentMedName by activeMedicineNameState
             val currentSchedTime by activeScheduledTimeState
 
-            DosezyTheme(darkTheme = isDark) {
-                GroupedAlarmScreenContent(
-                    entryIds = currentEntryIds.filter { it.isNotEmpty() },
-                    initialMedicineName = currentMedName,
-                    initialScheduledTime = currentSchedTime,
-                    database = database,
-                    isDarkTheme = isDark,
-                    onDismiss = {
-                        currentEntryIds.forEach { id ->
-                            if (id.isNotEmpty()) {
-                                try {
-                                    val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-                                    notificationManager.cancel(id.hashCode())
-                                } catch (_: Exception) {}
+            androidx.compose.runtime.CompositionLocalProvider(
+                androidx.compose.ui.platform.LocalLayoutDirection provides layoutDirection,
+                androidx.compose.ui.platform.LocalContext provides localizedContext,
+                androidx.compose.ui.platform.LocalConfiguration provides localizedConfig
+            ) {
+                DosezyTheme(darkTheme = isDark) {
+                    GroupedAlarmScreenContent(
+                        entryIds = currentEntryIds.filter { it.isNotEmpty() },
+                        initialMedicineName = currentMedName,
+                        initialScheduledTime = currentSchedTime,
+                        database = database,
+                        isDarkTheme = isDark,
+                        onDismiss = {
+                            currentEntryIds.forEach { id ->
+                                if (id.isNotEmpty()) {
+                                    try {
+                                        val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                                        notificationManager.cancel(id.hashCode())
+                                    } catch (_: Exception) {}
+                                }
                             }
+                            stopAlarm()
+                            finish()
                         }
-                        stopAlarm()
-                        finish()
-                    }
-                )
+                    )
+                }
             }
         }
     }
@@ -307,6 +344,14 @@ fun GroupedAlarmScreenContent(
     val snoozeMinutes = user?.snoozeDuration ?: 10
 
     val snoozeAction = {
+        // Guard: Notify user that alarm is snoozed so back press or dismissal does not leave user uncertain
+        try {
+            Toast.makeText(
+                context,
+                context.getString(R.string.alarm_snoozed_toast, snoozeMinutes),
+                Toast.LENGTH_SHORT
+            ).show()
+        } catch (_: Exception) {}
         coroutineScope.launch {
             withContext(Dispatchers.IO) {
                 val alarmScheduler = AlarmScheduler(context)
@@ -321,16 +366,16 @@ fun GroupedAlarmScreenContent(
                 if (medicinesList.isNotEmpty()) {
                     val ids = medicinesList.map { it.first.entryId }
                     val names = medicinesList.map { it.second.medicationName }
-                    alarmScheduler.scheduleGroupedSnooze(ids, snoozeMinutes, names)
+                    alarmScheduler.scheduleGroupedSnooze(ids, snoozeMinutes, names, timeFormat = user?.timeFormat)
                 } else if (entryIds.isNotEmpty()) {
-                    alarmScheduler.scheduleGroupedSnooze(entryIds, snoozeMinutes, listOf(initialMedicineName))
+                    alarmScheduler.scheduleGroupedSnooze(entryIds, snoozeMinutes, listOf(initialMedicineName), timeFormat = user?.timeFormat)
                 }
             }
             onDismiss()
         }
     }
 
-    // Intercept hardware/system back gesture to safely trigger personalized snooze
+    // Guard: Intercept hardware/system back gesture to safely trigger personalized snooze with alert feedback
     BackHandler {
         snoozeAction()
     }
@@ -456,18 +501,45 @@ fun GroupedAlarmScreenContent(
                                 ),
                                 color = MaterialTheme.colorScheme.onSurface
                             )
-                            val ageStr = user?.let { "${it.age} yrs" } ?: ""
-                            val genderStr = user?.gender?.getLocalizedName() ?: ""
-                            val detailsStr = listOf(ageStr, genderStr).filter { it.isNotEmpty() }.joinToString(" • ")
+                            // Guard: Use localized strings for age, gender, and profile fallback rather than hardcoded English " yrs" and "Medication Profile"
+                            val currentUser = user
+                            val detailsStr = when {
+                                currentUser != null && currentUser.age > 0 && currentUser.gender != null -> {
+                                    stringResource(R.string.profile_age_gender_format, currentUser.age, currentUser.gender.getLocalizedName())
+                                }
+                                currentUser != null && currentUser.age > 0 -> {
+                                    stringResource(R.string.years_format, currentUser.age)
+                                }
+                                currentUser != null && currentUser.gender != null -> {
+                                    currentUser.gender.getLocalizedName()
+                                }
+                                else -> ""
+                            }
 
                             Text(
-                                text = if (detailsStr.isNotEmpty()) detailsStr else "Medication Profile",
+                                text = if (detailsStr.isNotEmpty()) detailsStr else stringResource(R.string.profile),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = Color(0xFF1193D4),
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 13.sp
                             )
                         }
+                    }
+                }
+
+                // Guard: Format scheduled time prioritizing loaded entry time with user's preferred 12h/24h format and active locale
+                val displayTime = remember(initialScheduledTime, medicinesList, user) {
+                    val firstDt = medicinesList.firstOrNull()?.first?.scheduledDateTime
+                    val tf = user?.timeFormat ?: com.example.dosezy.data.model.TimeFormat.HOUR_12
+                    val savedLang = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+                    val activeLocale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLang)
+                    if (firstDt != null) {
+                        com.example.dosezy.utils.TimeFormatUtils.formatTime(firstDt, tf, activeLocale)
+                    } else if (initialScheduledTime.isNotBlank()) {
+                        initialScheduledTime
+                    } else {
+                        val now = java.time.LocalTime.now()
+                        com.example.dosezy.utils.TimeFormatUtils.formatLocalTime(now, tf, activeLocale)
                     }
                 }
 
@@ -490,7 +562,7 @@ fun GroupedAlarmScreenContent(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = initialScheduledTime.ifEmpty { stringResource(R.string.alarm_medication_reminder) },
+                        text = displayTime,
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 26.sp
@@ -651,16 +723,37 @@ fun GroupedAlarmScreenContent(
                                     entryIds
                                 }
                                 allIds.forEach { id ->
+                                    // Guard: Cancel both nagging and snooze alarms upfront for all cohort IDs to prevent delayed phantom snooze triggers
                                     alarmScheduler.cancelNagging(id)
+                                    alarmScheduler.cancelSnooze(id)
                                 }
-                                val nowStr = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                                val now = LocalDateTime.now()
+                                val nowStr = now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                                val lateAfter = user?.considerLateAfter ?: 3
+                                val missedAfter = user?.considerMissedAfter ?: 6
                                 if (medicinesList.isNotEmpty()) {
                                     medicinesList.forEach { (entry, _) ->
-                                        scheduleRepository.recordDoseTaken(entry.entryId, "TAKEN_ON_TIME", nowStr, context)
+                                        // Guard: Use isTakenLate so delayed/snoozed or overdue doses past missedAfter are correctly recorded as TAKEN_LATE
+                                        val status = if (TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, lateAfter)) {
+                                            "TAKEN_LATE"
+                                        } else {
+                                            "TAKEN_ON_TIME"
+                                        }
+                                        scheduleRepository.recordDoseTaken(entry.entryId, status, nowStr, context)
                                     }
                                 } else if (entryIds.isNotEmpty()) {
                                     entryIds.forEach { id ->
-                                        scheduleRepository.recordDoseTaken(id, "TAKEN_ON_TIME", nowStr, context)
+                                        val entry = database.scheduleDao().getScheduleEntryById(id)
+                                        val entryUser = entry?.let { database.userDao().getUserByIdDirect(it.userId) } ?: user
+                                        val entryLateAfter = entryUser?.considerLateAfter ?: 3
+                                        val entryMissedAfter = entryUser?.considerMissedAfter ?: 6
+                                        // Guard: Use isTakenLate so delayed/snoozed or overdue doses past missedAfter are correctly recorded as TAKEN_LATE
+                                        val status = if (entry != null && TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, entryLateAfter)) {
+                                            "TAKEN_LATE"
+                                        } else {
+                                            "TAKEN_ON_TIME"
+                                        }
+                                        scheduleRepository.recordDoseTaken(id, status, nowStr, context)
                                     }
                                 }
                             }
@@ -747,7 +840,9 @@ fun GroupedAlarmScreenContent(
                             entryIds
                         }
                         allIds.forEach { id ->
+                            // Guard: Cancel both nagging and snooze alarms upfront for all cohort IDs to prevent delayed phantom snooze triggers when skipped
                             alarmScheduler.cancelNagging(id)
+                            alarmScheduler.cancelSnooze(id)
                         }
                         if (medicinesList.isNotEmpty()) {
                             medicinesList.forEach { (entry, _) ->

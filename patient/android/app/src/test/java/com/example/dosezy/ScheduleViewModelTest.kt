@@ -212,16 +212,15 @@ class ScheduleViewModelTest {
     }
 
     @Test
-    fun markAsMissed_callsUpdateMedicationStatus() = runTest {
+    fun markAsMissed_callsRecordDoseMissed() = runTest {
         val viewModel = createViewModel()
 
         viewModel.markAsMissed("entry_1")
 
         coVerify {
-            scheduleRepository.updateMedicationStatus(
+            scheduleRepository.recordDoseMissed(
                 entryId = "entry_1",
-                status = "MISSED",
-                takenAtMillis = null as Long?
+                context = context
             )
         }
     }

@@ -10,6 +10,7 @@ import com.example.dosezy.data.model.Medicine
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -40,6 +41,10 @@ class MedicineRepository @Inject constructor(
     suspend fun getMedicinesByUserSync(userId: String): List<Medicine> =
         database.medicineDao().getActiveMedicinesByUser(userId).first()
 
+    // Get all medicines (active + archived) directly for cleanup / export
+    suspend fun getMedicinesByUserDirect(userId: String): List<Medicine> =
+        database.medicineDao().getMedicinesByUserDirect(userId)
+
     @RequiresApi(Build.VERSION_CODES.O)
     @Suppress("UNUSED_PARAMETER")
     suspend fun insertMedicine(medicine: Medicine, context: Context? = null) {
@@ -53,11 +58,9 @@ class MedicineRepository @Inject constructor(
         val scheduleEntries = medicine.generateScheduleEntries(LocalDate.now(), 30)
         Log.d(TAG, "Generated ${scheduleEntries.size} schedule entries")
 
-        scheduleEntries.forEach { entry ->
-            database.scheduleDao().insertScheduleEntry(entry)
-            Log.d(TAG, "Inserted schedule entry for: ${entry.scheduledDateTime}")
-        }
-        Log.d(TAG, "All schedule entries inserted")
+        // Guard: Batch insert schedule entries in a single Room transaction to eliminate 120+ sequential SQLite fsync operations and UI frame drops
+        database.scheduleDao().insertScheduleEntries(scheduleEntries)
+        Log.d(TAG, "All ${scheduleEntries.size} schedule entries inserted in batch")
 
         // SCHEDULE ALARMS IMMEDIATELY
         scheduleRepository.rescheduleAllAlarms(medicine.userId, this.context)
@@ -97,11 +100,12 @@ class MedicineRepository @Inject constructor(
                 // Cancel existing alarms for this medicine BEFORE modifying or deleting schedule entries
                 scheduleRepository.cancelAlarmsForMedicine(medicine.medicineId, this.context)
 
-                val startOfToday = LocalDate.now().atStartOfDay()
-                val startOfTodayEpochMillis = startOfToday.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+                // Guard: Align deletion cutoff with generateScheduleEntries (now - 15m) so untaken doses from earlier today are not deleted and lost from adherence history
+                val cutoff = LocalDateTime.now().minusMinutes(15)
+                val cutoffEpochMillis = cutoff.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
 
-                // Delete all untaken schedule entries from start of today onwards for this medicine
-                database.scheduleDao().deleteUntakenScheduleEntriesFrom(medicine.medicineId, startOfTodayEpochMillis)
+                // Delete untaken schedule entries from cutoff onwards for this medicine
+                database.scheduleDao().deleteUntakenScheduleEntriesFrom(medicine.medicineId, cutoffEpochMillis)
 
                 // Generate new schedule entries starting from today for 30 days
                 val newEntries = medicine.generateScheduleEntries(LocalDate.now(), 30)
@@ -167,6 +171,19 @@ class MedicineRepository @Inject constructor(
         database.scheduleDao().deleteScheduleEntriesByMedicine(medicine.medicineId)
         // Then delete the medicine
         database.medicineDao().deleteMedicine(medicine)
+
+        // Guard: Delete internal storage medicine photo and verify canonicalPath to prevent storage leaks and path traversal
+        medicine.imageUri?.let { uriStr ->
+            try {
+                val cleanPath = uriStr.removePrefix("file://")
+                val file = java.io.File(cleanPath)
+                val filesDir = this.context.filesDir
+                if (file.exists() && (file.parentFile?.canonicalPath == filesDir.canonicalPath || file.canonicalPath.startsWith(filesDir.canonicalPath + java.io.File.separator))) {
+                    file.delete()
+                }
+            } catch (_: Exception) {}
+        }
+
         // Reschedule remaining active alarms for user to preserve sibling medicines
         scheduleRepository.rescheduleAllAlarms(medicine.userId, this.context)
 
@@ -184,21 +201,9 @@ class MedicineRepository @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun deleteMedicine(medicineId: String) {
         val med = database.medicineDao().getMedicineByIdDirect(medicineId)
-        val userId = med?.userId
-        // Cancel alarms first
-        scheduleRepository.cancelAlarmsForMedicine(medicineId, this.context)
-        // Delete schedule entries first
-        database.scheduleDao().deleteScheduleEntriesByMedicine(medicineId)
-        // Then delete the medicine using the new method
-        database.medicineDao().deleteMedicineById(medicineId)
-        if (userId != null) {
-            scheduleRepository.rescheduleAllAlarms(userId, this.context)
+        if (med != null) {
+            deleteMedicinePermanently(med)
         }
-
-        // Update home screen widget
-        try {
-            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(this.context)
-        } catch (_: Exception) {}
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

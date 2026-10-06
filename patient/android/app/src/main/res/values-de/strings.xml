@@ -35,6 +35,7 @@
     <string name="form_med_name">Medikamentenname</string>
     <string name="form_med_name_placeholder">z.B. Amoxicillin</string>
     <string name="form_dosage">Dosierung</string>
+    <string name="form_dosage_unit">Dosiereinheit</string>
     <string name="form_dosage_placeholder">z.B. 500mg, 1 Tablette</string>
     <string name="form_frequency">Häufigkeit</string>
     <string name="form_time">Uhrzeit</string>
@@ -47,7 +48,7 @@
     <string name="freq_daily">Täglich</string>
     <string name="freq_weekly">Wöchentlich</string>
     <string name="freq_monthly">Monatlich</string>
-    <string name="freq_custom">Benutzerdefiniert</string>
+    <string name="freq_custom">Alle X Wochen</string>
     <string name="form_select_days_week">Wochentage auswählen</string>
     <string name="form_select_days_month">Monatstage auswählen</string>
     <string name="day_mon">Mo</string>
@@ -227,7 +228,7 @@
 
 
     <string name="home_all_good">Alles gut!</string>
-    <string name="home_all_good_desc">Heute müssen keine Medikamente eingenommen werden. Wenn Sie weitere hinzufügen möchten, tippen Sie unten auf das Plus-Symbol.</string>
+    <string name="home_all_good_desc">Heute müssen keine Medikamente eingenommen werden.</string>
     <string name="no_profiles_found">Keine Profile gefunden</string>
     <string name="status_taken">Eingenommen</string>
 
@@ -238,6 +239,7 @@
     <string name="image_picker_camera">Kamera</string>
     <string name="image_picker_gallery">Galerie</string>
     <string name="image_picker_error_title">Fehler</string>
+    <string name="camera_permission_required">Kameraberechtigung ist erforderlich, um Fotos aufzunehmen.</string>
     <string name="image_picker_remove">Bild entfernen</string>
     <string name="delete_contact_title">Kontakt löschen</string>
     <string name="delete_contact_desc">Sind Sie sicher, dass Sie diesen Kontakt löschen möchten?</string>
@@ -452,7 +454,7 @@ Möchten Sie fortfahren?</string>
     <string name="pill_shape_drops">Tropfen</string>
     <string name="pill_shape_patch">Pflaster</string>
 
-    <string name="med_notes_label">Arzt- / Apothekenhinweise &amp; Warnungen</string>
+    <string name="med_notes_label">Arzthinweise &amp; Warnungen</string>
     <string name="med_notes_placeholder">z. B. Zu den Mahlzeiten, Keine Grapefruit, Rezept #12345</string>
 
     <string name="course_duration_title">Behandlungsdauer</string>
@@ -472,6 +474,10 @@ Möchten Sie fortfahren?</string>
     <string name="freq_every_days_format">Alle %1$d Tage</string>
     <string name="interval_hours_label">Stunden zwischen Dosen</string>
     <string name="interval_days_label">Tage zwischen Dosen</string>
+    <string name="freq_every_x_weeks_format">Alle %1$d Wochen</string>
+    <string name="custom_recurrence_interval_label">Wiederholen alle (Wochen)</string>
+    <string name="custom_recurrence_summary">Wiederholt sich alle %1$d Wochen am %2$s</string>
+    <string name="validation_select_custom_days">Bitte wählen Sie mindestens einen Tag für die benutzerdefinierte Wiederholung</string>
     <string name="btn_log_prn_dose">Dosis erfassen</string>
     <string name="prn_doses_taken_today">Heute erfasste Dosen: %1$d</string>
     <string name="prn_section_title">Bedarfsmedikation (PRN)</string>
@@ -490,7 +496,7 @@ Möchten Sie fortfahren?</string>
     <string name="hours_limit_hint">Für Intervalle über 24 Stunden nutzen Sie \'Alle X Tage\'.</string>
 
     <string name="pref_nagging_title">Hartnäckige Nachfass-Erinnerungen</string>
-    <string name="pref_nagging_desc">Wiederholt erinnern, falls geplante Dosis nicht als eingenommen markiert ist</string>
+    <string name="pref_nagging_desc">Wiederholt erinnern, bis als eingenommen markiert.</string>
     <string name="pref_nagging_interval">Erinnerungsintervall</string>
     <string name="pref_nagging_max_repeats">Max. Wiederholungen</string>
     <string name="pref_nagging_repeats_format">%1$d-mal</string>
@@ -507,6 +513,11 @@ Möchten Sie fortfahren?</string>
     <string name="widget_all_completed">Alle Dosen abgeschlossen! 🎉</string>
     <string name="widget_no_doses_today">Heute keine Dosen geplant</string>
     <string name="widget_next_dose_format">Nächste: %1$s • %2$s</string>
+    <string name="widget_configure_title">Widget-Profil auswählen</string>
+    <string name="widget_configure_subtitle">Wählen Sie, für welches Profil dieses Widget den Medikamentenplan auf dem Startbildschirm anzeigt.</string>
+    <string name="widget_configure_active_profile">Aktives App-Profil</string>
+    <string name="widget_configure_active_profile_desc">Folgt dynamisch dem aktuell in der App ausgewählten Profil</string>
+    <string name="widget_configure_confirm">Widget speichern</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">Alarmton</string>
@@ -575,6 +586,7 @@ Möchten Sie fortfahren?</string>
     <string name="alarm_take_medicine">MEDIKAMENT EINNEHMEN</string>
     <string name="alarm_snooze_format">SCHLUMMERN (%d MIN)</string>
     <string name="notif_action_snooze_format">Schlummern (%d Min.)</string>
+    <string name="alarm_snoozed_toast">Erinnerung für %d Minuten geschlummert</string>
     <string name="alarm_stock_remaining">Vorrat: %d Einheiten verbleibend</string>
     <string name="home_action_take">Einnehmen</string>
     <string name="home_action_taken">Eingenommen</string>
@@ -600,7 +612,7 @@ Möchten Sie fortfahren?</string>
     <string name="backup_export_failed">Export fehlgeschlagen: %1$s</string>
 
     <string name="pref_allow_skip_title">Dosis-Überspringen erlauben</string>
-    <string name="pref_allow_skip_desc">Option aktivieren, um eine Dosis mit klinischem Grund zu überspringen</string>
+    <string name="pref_allow_skip_desc">Geplante Dosen mit Begründung übersringen.</string>
     <string name="home_action_skip">Überspringen</string>
     <string name="home_action_skipped">Übersprungen</string>
     <string name="home_dose_skipped">Dosis übersprungen für %s</string>
@@ -626,6 +638,9 @@ Möchten Sie fortfahren?</string>
     <string name="validation_enter_name">Bitte geben Sie Ihren Namen ein</string>
     <string name="validation_enter_valid_age">Bitte geben Sie ein gültiges Alter ein (1-120)</string>
     <string name="medication_added_success">Medikament erfolgreich hinzugefügt</string>
+    <string name="medication_updated_success">Medikament erfolgreich aktualisiert</string>
+    <string name="medication_archived_success">Medikament erfolgreich abgesetzt</string>
+    <string name="medication_deleted_success">Medikament erfolgreich gelöscht</string>
     <string name="status_pending">Ausstehend</string>
     <string name="pharmacy_order_title">Apotheken-Nachbestellung</string>
     <string name="pharmacy_order_desc">Medikamenten-Bestellliste für WhatsApp oder Ihre Apotheke erstellen</string>
@@ -690,7 +705,7 @@ Möchten Sie fortfahren?</string>
 
     <!-- Manual Dose Recording Strings -->
     <string name="pref_manually_record_dose_time_title">Dosiszeit manuell erfassen</string>
-    <string name="pref_manually_record_dose_time_desc">Beim Erfassen von Dosen nach dem tatsächlichen Einnahmezeitpunkt fragen.</string>
+    <string name="pref_manually_record_dose_time_desc">Tatsächlichen Einnahmezeitpunkt erfassen.</string>
     <string name="record_dose_time_title">Dosiszeit erfassen</string>
     <string name="record_dose_time_subtitle">Wann haben Sie %1$s eingenommen?</string>
     <string name="record_dose_time_just_now">Gerade eben (%1$s)</string>
@@ -704,7 +719,7 @@ Möchten Sie fortfahren?</string>
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">Mittlere Hinzufügen-Taste ausblenden</string>
-    <string name="pref_hide_add_nav_button_desc">Blendet die „+“-Taste in der Navigationsleiste aus. Eine Schaltfläche „Medikament hinzufügen“ wird im Medikamente-Tab unter Ihrer Liste angezeigt.</string>
+    <string name="pref_hide_add_nav_button_desc">„+“-Taste in der unteren Navigationsleiste ausblenden.</string>
 
     <!-- About Screen Expansion -->
     <string name="about_developer_title">Über den Entwickler</string>
@@ -742,9 +757,9 @@ Möchten Sie fortfahren?</string>
     <string name="dialog_low_storage_action">Speicher freigeben</string>
     <string name="dialog_low_storage_dismiss">Schließen</string>
     <string name="pref_allow_undo_title">Dosis-Rückgängigmachen erlauben</string>
-    <string name="pref_allow_undo_desc">Erlaubt das Zurücksetzen erfasster Dosen auf ausstehend. Erfordert Bestätigung.</string>
+    <string name="pref_allow_undo_desc">Eingenommene Dosen wieder auf ausstehend zurücksetzen.</string>
     <string name="pref_prompt_dose_notes_title">Bei Dosisaufnahme nach Notiz fragen</string>
-    <string name="pref_prompt_dose_notes_desc">Aufforderung zur Eingabe einer Notiz, Mahlzeit oder Symptome bei jeder Dosiserfassung.</string>
+    <string name="pref_prompt_dose_notes_desc">Bei Einnahme nach einer Notiz fragen.</string>
     <string name="dialog_undo_dose_title">Dosis rückgängig machen?</string>
     <string name="dialog_undo_dose_msg">Möchten Sie %1$s wirklich auf ausstehend zurücksetzen? Abgezogener Lagerbestand wird wiederhergestellt.</string>
     <string name="dialog_dose_note_title">Dosis-Notiz</string>
@@ -755,6 +770,10 @@ Möchten Sie fortfahren?</string>
     <string name="btn_edit_note">Notiz bearbeiten</string>
     <string name="dialog_edit_note_title">Dosis-Notiz bearbeiten</string>
     <string name="pref_allow_dose_notes_title">Dosis-Notizen</string>
-    <string name="pref_allow_dose_notes_desc">Erlaubt das Aufzeichnen von Notizen, Mahlzeiten oder Symptomen zu Dosen.</string>
+    <string name="pref_allow_dose_notes_desc">Notizen, Mahlzeiten oder Symptome erfassen.</string>
     <string name="btn_add_note">+ Notiz hinzufügen</string>
+    <string name="timings_and_dosages_title">Zeiten &amp; Dosierungen</string>
+    <string name="stock_inventory_card_title">Medikamentenvorrat &amp; Bestand</string>
+    <string name="widget_configure_auto_badge">Auto</string>
+    <string name="dialog_validation_title">Hinweis</string>
 </resources>

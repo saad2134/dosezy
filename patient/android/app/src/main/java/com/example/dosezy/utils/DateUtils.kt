@@ -9,15 +9,15 @@ import java.util.Locale
 
 object DateUtils {
     @RequiresApi(Build.VERSION_CODES.O)
-    fun getCurrentDayOfWeek(): String {
-        return SimpleDateFormat("EEEE", Locale.getDefault()).format(Date())
+    fun getCurrentDayOfWeek(locale: Locale = Locale.getDefault()): String {
+        return SimpleDateFormat("EEEE", locale).format(Date())
     }
 
-    fun getCurrentDayOfWeekLegacy(): String {
-        return SimpleDateFormat("EEEE", Locale.getDefault()).format(Date())
+    fun getCurrentDayOfWeekLegacy(locale: Locale = Locale.getDefault()): String {
+        return SimpleDateFormat("EEEE", locale).format(Date())
     }
 
-    fun formatTimeLegacy(date: Date): String {
-        return SimpleDateFormat("h:mm a", Locale.getDefault()).format(date)
+    fun formatTimeLegacy(date: Date, locale: Locale = Locale.getDefault()): String {
+        return SimpleDateFormat("h:mm a", locale).format(date)
     }
 }

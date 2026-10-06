@@ -35,6 +35,7 @@
     <string name="form_med_name">お薬の名前</string>
     <string name="form_med_name_placeholder">例: アモキシシリン</string>
     <string name="form_dosage">服用量</string>
+    <string name="form_dosage_unit">用量単位</string>
     <string name="form_dosage_placeholder">例: 500mg, 1錠</string>
     <string name="form_frequency">頻度</string>
     <string name="form_time">時間</string>
@@ -47,7 +48,7 @@
     <string name="freq_daily">毎日</string>
     <string name="freq_weekly">毎週</string>
     <string name="freq_monthly">毎月</string>
-    <string name="freq_custom">カスタム</string>
+    <string name="freq_custom">X 週間ごと</string>
     <string name="form_select_days_week">曜日を選択</string>
     <string name="form_select_days_month">日付を選択</string>
     <string name="day_mon">月</string>
@@ -227,7 +228,7 @@
 
 
     <string name="home_all_good">すべて順調です！</string>
-    <string name="home_all_good_desc">今日服用する必要のある薬はありません。追加する場合は、下のプラスボタンをタップして開始してください。</string>
+    <string name="home_all_good_desc">今日服用する必要のある薬はありません。</string>
     <string name="no_profiles_found">プロフィールが見つかりません</string>
     <string name="status_taken">服用済み</string>
 
@@ -238,6 +239,7 @@
     <string name="image_picker_camera">カメラ</string>
     <string name="image_picker_gallery">ギャラリー</string>
     <string name="image_picker_error_title">エラー</string>
+    <string name="camera_permission_required">写真を撮影するにはカメラの権限が必要です。</string>
     <string name="image_picker_remove">画像を削除</string>
     <string name="delete_contact_title">連絡先の削除</string>
     <string name="delete_contact_desc">この連絡先を削除してもよろしいですか？</string>
@@ -452,7 +454,7 @@
     <string name="pill_shape_drops">点眼・点滴 (Drops)</string>
     <string name="pill_shape_patch">貼付剤・湿布 (Patch)</string>
 
-    <string name="med_notes_label">医師・薬剤師の指示・注意事項</string>
+    <string name="med_notes_label">医師の指示・注意事項</string>
     <string name="med_notes_placeholder">例：食後服用、グレープフルーツ禁止、処方箋 #12345</string>
 
     <string name="course_duration_title">服薬期間</string>
@@ -472,6 +474,10 @@
     <string name="freq_every_days_format">%1$d 日ごと</string>
     <string name="interval_hours_label">服用間隔 (時間)</string>
     <string name="interval_days_label">服用間隔 (日数)</string>
+    <string name="freq_every_x_weeks_format">%1$d 週間ごと</string>
+    <string name="custom_recurrence_interval_label">繰り返しの間隔 (週数)</string>
+    <string name="custom_recurrence_summary">%1$d 週間ごとの %2$s に繰り返し</string>
+    <string name="validation_select_custom_days">カスタム繰り返しの曜日を少なくとも1つ選択してください</string>
     <string name="btn_log_prn_dose">服用を記録</string>
     <string name="prn_doses_taken_today">本日記録された服用数: %1$d</string>
     <string name="prn_section_title">頓服薬 (PRN)</string>
@@ -490,7 +496,7 @@
     <string name="hours_limit_hint">24時間以上の間隔には「X日ごと」をご利用ください。</string>
 
     <string name="pref_nagging_title">リマインド再通知 (Nagging)</string>
-    <string name="pref_nagging_desc">予定された薬が服用完了されない場合、繰り返し通知します</string>
+    <string name="pref_nagging_desc">服用が記録されるまで繰り返し通知します。</string>
     <string name="pref_nagging_interval">再通知間隔</string>
     <string name="pref_nagging_max_repeats">最大再通知回数</string>
     <string name="pref_nagging_repeats_format">%1$d 回</string>
@@ -507,6 +513,11 @@
     <string name="widget_all_completed">すべての服薬が完了しました！🎉</string>
     <string name="widget_no_doses_today">本日の予定はありません</string>
     <string name="widget_next_dose_format">次回: %1$s • %2$s</string>
+    <string name="widget_configure_title">ウィジェットのプロフィールを選択</string>
+    <string name="widget_configure_subtitle">このウィジェットをホーム画面でどのアカウントのお薬スケジュールに設定するか選択してください。</string>
+    <string name="widget_configure_active_profile">アクティブなアプリプロフィール</string>
+    <string name="widget_configure_active_profile_desc">アプリ内で現在選択されているプロフィールに自動追従します</string>
+    <string name="widget_configure_confirm">ウィジェットを保存</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">アラーム音</string>
@@ -575,6 +586,7 @@
     <string name="alarm_take_medicine">薬を服用</string>
     <string name="alarm_snooze_format">スヌーズ (%d分)</string>
     <string name="notif_action_snooze_format">スヌーズ (%d分)</string>
+    <string name="alarm_snoozed_toast">アラームを%d分間スヌーズしました</string>
     <string name="alarm_stock_remaining">在庫: 残り %d 錠</string>
     <string name="home_action_take">服用</string>
     <string name="home_action_taken">服用済み</string>
@@ -600,7 +612,7 @@
     <string name="backup_export_failed">エクスポートに失敗しました: %1$s</string>
 
     <string name="pref_allow_skip_title">服薬のスキップを許可</string>
-    <string name="pref_allow_skip_desc">理由を選択して服薬をスキップできるオプションを有効化</string>
+    <string name="pref_allow_skip_desc">理由を記録して予定の服用をスキップします。</string>
     <string name="home_action_skip">スキップ</string>
     <string name="home_action_skipped">スキップ済み</string>
     <string name="home_dose_skipped">%sの服薬をスキップしました</string>
@@ -626,6 +638,9 @@
     <string name="validation_enter_name">お名前を入力してください</string>
     <string name="validation_enter_valid_age">有効な年齢（1〜120）を入力してください</string>
     <string name="medication_added_success">お薬が正常に追加されました</string>
+    <string name="medication_updated_success">お薬が正常に更新されました</string>
+    <string name="medication_archived_success">お薬の服用を正常に中止しました</string>
+    <string name="medication_deleted_success">お薬が正常に削除されました</string>
     <string name="status_pending">保留中</string>
     <string name="pharmacy_order_title">薬局への注文リスト</string>
     <string name="pharmacy_order_desc">WhatsAppや薬局向けの医薬品注文リストを作成</string>
@@ -690,7 +705,7 @@
 
     <!-- Manual Dose Recording Strings -->
     <string name="pref_manually_record_dose_time_title">服薬時間を手動で記録</string>
-    <string name="pref_manually_record_dose_time_desc">服薬を記録する際に、実際に薬を服用した時間を尋ねます。</string>
+    <string name="pref_manually_record_dose_time_desc">実際に服用した正確な時刻を記録します。</string>
     <string name="record_dose_time_title">服薬時間を記録</string>
     <string name="record_dose_time_subtitle">%1$sをいつ服用しましたか？</string>
     <string name="record_dose_time_just_now">今すぐ (%1$s)</string>
@@ -704,7 +719,7 @@
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">中央の追加ボタンを非表示</string>
-    <string name="pref_hide_add_nav_button_desc">ナビゲーションバーの「+」ボタンを非表示にします。お薬タブの一覧の下部に「お薬を追加」ボタンが表示されます。</string>
+    <string name="pref_hide_add_nav_button_desc">下部ナビゲーションバーの「+」ボタンを非表示にします。</string>
 
     <!-- About Screen Expansion -->
     <string name="about_developer_title">開発者について</string>
@@ -742,9 +757,9 @@
     <string name="dialog_low_storage_action">空き容量を増やす</string>
     <string name="dialog_low_storage_dismiss">閉じる</string>
     <string name="pref_allow_undo_title">服薬の取り消しを許可</string>
-    <string name="pref_allow_undo_desc">記録された服薬を保留中に戻すことを許可します。取り消す前に確認が必要です。</string>
+    <string name="pref_allow_undo_desc">服用済みの記録を未完了に戻します。</string>
     <string name="pref_prompt_dose_notes_title">服薬時にメモ入力を促す</string>
-    <string name="pref_prompt_dose_notes_desc">服薬記録のたびに、メモ、食事の状況、または症状の記録を促します。</string>
+    <string name="pref_prompt_dose_notes_desc">服用記録時にメモの入力を確認します。</string>
     <string name="dialog_undo_dose_title">服薬を取り消しますか？</string>
     <string name="dialog_undo_dose_msg">%1$s を保留中に戻してもよろしいですか？差し引かれた在庫は復元されます。</string>
     <string name="dialog_dose_note_title">服薬メモ</string>
@@ -755,6 +770,10 @@
     <string name="btn_edit_note">メモを編集</string>
     <string name="dialog_edit_note_title">服薬メモの編集</string>
     <string name="pref_allow_dose_notes_title">服薬メモ</string>
-    <string name="pref_allow_dose_notes_desc">服薬時にメモ、食事の状況、または症状を記録できるようにします。</string>
+    <string name="pref_allow_dose_notes_desc">メモ、食事、体調などを記録します。</string>
     <string name="btn_add_note">+ メモを追加</string>
+    <string name="timings_and_dosages_title">服用時間と投与量</string>
+    <string name="stock_inventory_card_title">薬の在庫と管理</string>
+    <string name="widget_configure_auto_badge">自動</string>
+    <string name="dialog_validation_title">お知らせ</string>
 </resources>

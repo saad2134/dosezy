@@ -127,6 +127,34 @@ class TimeAndFormattingTest {
         assertFalse(TimeCalculationUtils.isLate(scheduled, currentPastMissed, lateAfterHours = 3, missedAfterHours = 6))
     }
 
+    @Test
+    fun isTakenLate_beforeThreshold_returnsFalse() {
+        val scheduled = LocalDateTime.of(2026, 9, 21, 8, 0)
+        val current = LocalDateTime.of(2026, 9, 21, 9, 30) // 1.5h later
+        assertFalse(TimeCalculationUtils.isTakenLate(scheduled, current, lateAfterHours = 3))
+    }
+
+    @Test
+    fun isTakenLate_atLateThreshold_returnsTrue() {
+        val scheduled = LocalDateTime.of(2026, 9, 21, 8, 0)
+        val current = LocalDateTime.of(2026, 9, 21, 11, 0) // Exactly 3h later
+        assertTrue(TimeCalculationUtils.isTakenLate(scheduled, current, lateAfterHours = 3))
+    }
+
+    @Test
+    fun isTakenLate_pastMissedThreshold_remainsTruePreventingStatusInversion() {
+        val scheduled = LocalDateTime.of(2026, 9, 21, 8, 0)
+        val current = LocalDateTime.of(2026, 9, 21, 16, 0) // 8h later (exceeds missedAfter threshold)
+        assertTrue(TimeCalculationUtils.isTakenLate(scheduled, current, lateAfterHours = 3))
+    }
+
+    @Test
+    fun isTakenLate_nextDayOverdue_returnsTrue() {
+        val scheduled = LocalDateTime.of(2026, 9, 21, 8, 0)
+        val current = LocalDateTime.of(2026, 9, 22, 8, 0) // 24h later
+        assertTrue(TimeCalculationUtils.isTakenLate(scheduled, current, lateAfterHours = 3))
+    }
+
     // ───────────────────────────────────────────────────────────────
     // 3. TimeCalculationUtils.isMissed
     // ───────────────────────────────────────────────────────────────

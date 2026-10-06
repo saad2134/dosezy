@@ -6,4 +6,6 @@
     android:initialLayout="@layout/widget_dosezy"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen"
+    android:configure="com.example.dosezy.widget.DosezyWidgetConfigureActivity"
+    android:widgetFeatures="reconfigurable"
     android:previewImage="@mipmap/ic_launcher" />

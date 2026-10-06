@@ -36,7 +36,8 @@ This guide provides a complete, step-by-step walkthrough of all features in Dose
 13. [Managing Multiple Family Profiles & Deletion Safeguards](#13-managing-multiple-family-profiles--deletion-safeguards)
 14. [Full ZIP Backup, Selective Restore & Conflict Resolution](#14-full-zip-backup-selective-restore--conflict-resolution)
 15. [Doctor PDF Reports & CSV Adherence Logs](#15-doctor-pdf-reports--csv-adherence-logs)
-16. [Help, Support & Checking for Updates](#16-help-support--checking-for-updates)
+16. [Home Screen Widget & Profile Binding](#16-home-screen-widget--profile-binding)
+17. [Help, Support, About Dosezy & Updates](#17-help-support-about-dosezy--updates)
 
 ---
 
@@ -394,7 +395,28 @@ Export health records for doctor visits or personal analysis:
 
 ---
 
-## 16. Help, Support, About Dosezy & Updates
+## 16. Home Screen Widget & Profile Binding
+
+Dosezy includes an interactive home screen widget that lets you review your daily medication schedule at a glance without opening the app:
+
+### Adding the Widget to Your Home Screen:
+1. Long-press any empty space on your Android home screen and select **Widgets**.
+2. Scroll to **Dosezy** and drag the widget onto your home screen.
+3. The **Widget Profile Selection** configuration screen will automatically appear.
+
+### Choosing a Widget Profile:
+- **Active App Profile (Dynamic)**: The widget automatically displays the medication schedule of whichever patient profile is currently selected inside the app.
+- **Specific Family Member Profile**: Lock the widget to a specific family member (e.g., Mom, Dad, Child). The profile name is prominently displayed in the header (`Dosezy • Dad`), allowing family caregivers to place distinct widgets side-by-side for different members of the household.
+
+### Widget Features & Interaction:
+- **Smooth Vertical Scrolling**: When multiple medications are scheduled throughout the day, scroll vertically directly on the widget to view all upcoming doses.
+- **Real-Time Dose Status**: Displays medicine name, scheduled intake time (with 12-hour or 24-hour formatting), and prescribed dose.
+- **Completed & Empty States**: When all doses for the day are taken, the widget displays a clean checkmark confirmation.
+- **One-Tap App Navigation & Profile Switching**: Tap anywhere on the widget or on a specific medicine row to launch Dosezy. If the widget is configured for a specific family member, Dosezy immediately switches to that family member's profile upon opening.
+
+---
+
+## 17. Help, Support, About Dosezy & Updates
 
 Under the **More** section in **Menu**:
 - **Help & Support**: Step-by-step guides, FAQs, and developer contact.

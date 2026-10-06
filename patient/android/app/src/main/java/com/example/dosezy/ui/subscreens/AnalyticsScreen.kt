@@ -21,6 +21,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -49,10 +52,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -66,136 +66,34 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dosezy.R
-import com.example.dosezy.data.model.MedicationStatus
-import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.ui.components.TopBar
-import com.example.dosezy.ui.viewmodels.UserViewModel
+import com.example.dosezy.ui.viewmodels.AdherenceRange
+import com.example.dosezy.ui.viewmodels.AnalyticsViewModel
+import com.example.dosezy.ui.viewmodels.DayStat
+import com.example.dosezy.ui.viewmodels.RangeAdherenceData
+import com.example.dosezy.utils.sharedAnalyticsViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 
-enum class AdherenceRange(val stringResId: Int) {
-    ALL(R.string.range_all),
-    LAST_7_DAYS(R.string.range_7_days),
-    LAST_30_DAYS(R.string.range_30_days),
-    SIX_MONTHS(R.string.range_6_months),
-    TWELVE_MONTHS(R.string.range_12_months),
-    TOTAL(R.string.range_total)
-}
-
-data class RangeAdherenceData(
-    val range: AdherenceRange,
-    val label: String,
-    val takenCount: Int,
-    val decidedCount: Int,
-    val totalEntries: Int,
-    val rate: Int
-)
-
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AnalyticsScreen(navController: NavController) {
-    val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
-    val currentUser by userViewModel.currentUser.collectAsState()
-    val targetLocale = remember(currentUser?.language) {
-        com.example.dosezy.utils.LocaleHelper.getLocale(currentUser?.language ?: com.example.dosezy.data.model.Language.SYSTEM)
-    }
+fun AnalyticsScreen(
+    navController: NavController,
+    analyticsViewModel: AnalyticsViewModel = sharedAnalyticsViewModel()
+) {
+    val uiState by analyticsViewModel.uiState.collectAsState()
+    val currentUser = uiState.currentUser
+    val selectedData = uiState.selectedData
+    val breakdown = uiState.breakdown
 
-    // Fetch all schedule entries for current user
-    val scheduleEntriesNullable by produceState<List<ScheduleEntry>?>(initialValue = null, key1 = currentUser?.userId) {
-        currentUser?.userId?.let { uid ->
-            userViewModel.scheduleRepository.getScheduleForUser(uid).collect { list ->
-                value = list
-            }
-        } ?: run {
-            value = emptyList()
-        }
-    }
-    val scheduleEntries = scheduleEntriesNullable ?: emptyList()
-
-    val today = LocalDate.now()
-    var selectedRange by remember { mutableStateOf(AdherenceRange.TOTAL) }
-
-    fun getRangeEntries(range: AdherenceRange): List<ScheduleEntry> {
-        return when (range) {
-            AdherenceRange.LAST_7_DAYS -> scheduleEntries.filter { 
-                val d = it.scheduledDateTime.toLocalDate()
-                d >= today.minusDays(7) && d <= today 
-            }
-            AdherenceRange.LAST_30_DAYS -> scheduleEntries.filter { 
-                val d = it.scheduledDateTime.toLocalDate()
-                d >= today.minusDays(30) && d <= today 
-            }
-            AdherenceRange.SIX_MONTHS -> scheduleEntries.filter { 
-                val d = it.scheduledDateTime.toLocalDate()
-                d >= today.minusMonths(6) && d <= today 
-            }
-            AdherenceRange.TWELVE_MONTHS -> scheduleEntries.filter { 
-                val d = it.scheduledDateTime.toLocalDate()
-                d >= today.minusMonths(12) && d <= today 
-            }
-            AdherenceRange.TOTAL -> scheduleEntries.filter { it.scheduledDateTime.toLocalDate() <= today }
-            AdherenceRange.ALL -> scheduleEntries.filter { it.scheduledDateTime.toLocalDate() <= today }
-        }
-    }
-
-    fun computeAdherence(range: AdherenceRange, label: String): RangeAdherenceData {
-        val entries = getRangeEntries(range)
-        val total = entries.size
-        val taken = entries.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
-        val missed = entries.count { it.status == MedicationStatus.MISSED }
-        val decided = taken + missed
-        val rate = if (decided > 0) ((taken.toDouble() / decided.toDouble()) * 100).toInt() else 0
-        return RangeAdherenceData(range, label, taken, decided, total, rate)
-    }
-
-    val rangeDataList = listOf(
-        computeAdherence(AdherenceRange.ALL, stringResource(R.string.range_all)),
-        computeAdherence(AdherenceRange.LAST_7_DAYS, stringResource(R.string.range_7_days)),
-        computeAdherence(AdherenceRange.LAST_30_DAYS, stringResource(R.string.range_30_days)),
-        computeAdherence(AdherenceRange.SIX_MONTHS, stringResource(R.string.range_6_months)),
-        computeAdherence(AdherenceRange.TWELVE_MONTHS, stringResource(R.string.range_12_months)),
-        computeAdherence(AdherenceRange.TOTAL, stringResource(R.string.range_total))
-    )
-
-    val selectedData = rangeDataList.find { it.range == selectedRange } ?: rangeDataList.last()
-
-    // Global overall stats for breakdown grid (constrained to past & today)
-    val pastAndTodayEntries = scheduleEntries.filter { it.scheduledDateTime.toLocalDate() <= today }
-    val totalEntries = pastAndTodayEntries.size
-    val takenOnTime = pastAndTodayEntries.count { it.status == MedicationStatus.TAKEN_ON_TIME }
-    val takenLate = pastAndTodayEntries.count { it.status == MedicationStatus.TAKEN_LATE }
-    val missed = pastAndTodayEntries.count { it.status == MedicationStatus.MISSED }
-    val skipped = pastAndTodayEntries.count { it.status == MedicationStatus.SKIPPED }
-    val totalTaken = takenOnTime + takenLate
-    val totalDecided = totalTaken + missed
-
-    // Earliest recorded entry date or today
-    val earliestDate = scheduleEntries.minByOrNull { it.scheduledDateTime }?.scheduledDateTime?.toLocalDate()
-    val sinceString = if (earliestDate != null) {
+    val sinceString = if (uiState.earliestDate != null) {
         val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
-        stringResource(R.string.analytics_using_since, earliestDate.format(formatter))
+        stringResource(R.string.analytics_using_since, uiState.earliestDate!!.format(formatter))
     } else {
         stringResource(R.string.analytics_using_today)
-    }
-
-    // Past 7 days calculation for mini bar chart
-    val past7Days = (6 downTo 0).map { daysAgo ->
-        val date = today.minusDays(daysAgo.toLong())
-        val dayEntries = scheduleEntries.filter { it.scheduledDateTime.toLocalDate() == date }
-        val dayTaken = dayEntries.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
-        val dayMissed = dayEntries.count { it.status == MedicationStatus.MISSED }
-        val dayDecided = dayTaken + dayMissed
-        val dayRate = if (dayDecided > 0) ((dayTaken.toDouble() / dayDecided.toDouble()) * 100).toInt() else 0
-        DayStat(
-            date = date,
-            dayLabel = date.dayOfWeek.getDisplayName(java.time.format.TextStyle.SHORT, targetLocale).uppercase(targetLocale),
-            total = dayEntries.size,
-            taken = dayTaken,
-            rate = dayRate
-        )
     }
 
     Scaffold(
@@ -210,7 +108,7 @@ fun AnalyticsScreen(navController: NavController) {
             )
         }
     ) { paddingValues ->
-        if (scheduleEntriesNullable == null) {
+        if (uiState.isLoading) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -223,7 +121,7 @@ fun AnalyticsScreen(navController: NavController) {
                     strokeWidth = 3.dp
                 )
             }
-        } else if (totalEntries == 0) {
+        } else if (uiState.isEmpty) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -282,99 +180,100 @@ fun AnalyticsScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(4.dp))
                 }
 
-            // 1. Unified Adherence Card combining main progress ring, range selector, and at-a-glance period breakdown
-            item {
-                UnifiedAdherenceCard(
-                    rangeDataList = rangeDataList,
-                    selectedRange = selectedRange,
-                    selectedData = selectedData,
-                    sinceText = sinceString,
-                    onSelectRange = { range -> selectedRange = range }
-                )
-            }
-
-            // 3. 2x2 Metric Breakdown Grid
-            item {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        StatCard(
-                            modifier = Modifier.weight(1f),
-                            title = stringResource(R.string.analytics_taken_on_time),
-                            value = "$takenOnTime",
-                            subtitle = if (totalDecided > 0) "${((takenOnTime.toDouble() / totalDecided) * 100).toInt()}%" else "0%",
-                            icon = Icons.Default.CheckCircle,
-                            color = Color(0xFF10B981),
-                            bgColor = Color(0xFF10B981).copy(alpha = 0.12f)
-                        )
-                        StatCard(
-                            modifier = Modifier.weight(1f),
-                            title = stringResource(R.string.analytics_taken_late),
-                            value = "$takenLate",
-                            subtitle = if (totalDecided > 0) "${((takenLate.toDouble() / totalDecided) * 100).toInt()}%" else "0%",
-                            icon = Icons.Default.HourglassTop,
-                            color = Color(0xFFF59E0B),
-                            bgColor = Color(0xFFF59E0B).copy(alpha = 0.12f)
-                        )
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        StatCard(
-                            modifier = Modifier.weight(1f),
-                            title = stringResource(R.string.analytics_missed_doses),
-                            value = "$missed",
-                            subtitle = if (totalDecided > 0) "${((missed.toDouble() / totalDecided) * 100).toInt()}%" else "0%",
-                            icon = Icons.Default.AlarmOff,
-                            color = Color(0xFFEF4444),
-                            bgColor = Color(0xFFEF4444).copy(alpha = 0.12f)
-                        )
-                        StatCard(
-                            modifier = Modifier.weight(1f),
-                            title = stringResource(R.string.analytics_skipped_doses),
-                            value = "$skipped",
-                            subtitle = if (totalEntries > 0) "${((skipped.toDouble() / totalEntries) * 100).toInt()}%" else "0%",
-                            icon = Icons.Default.Schedule,
-                            color = Color(0xFF6B7280),
-                            bgColor = Color(0xFF6B7280).copy(alpha = 0.12f)
-                        )
-                    }
-
-                    StatCard(
-                        modifier = Modifier.fillMaxWidth(),
-                        title = stringResource(R.string.analytics_total_doses),
-                        value = "$totalEntries",
-                        subtitle = stringResource(R.string.status_taken) + ": $totalTaken",
-                        icon = Icons.Default.Medication,
-                        color = Color(0xFF0277BD),
-                        bgColor = Color(0xFF0277BD).copy(alpha = 0.12f)
+                // 1. Unified Adherence Card combining main progress ring, range selector, and at-a-glance period breakdown
+                item {
+                    UnifiedAdherenceCard(
+                        rangeDataList = uiState.rangeDataList,
+                        selectedRange = uiState.selectedRange,
+                        selectedData = selectedData,
+                        sinceText = sinceString,
+                        onSelectRange = { range -> analyticsViewModel.selectRange(range) }
                     )
                 }
-            }
 
-            // 4. Weekly Adherence Trend Visual
-            item {
-                WeeklyTrendCard(past7Days = past7Days)
-            }
+                // 3. 2x2 Metric Breakdown Grid
+                item {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            StatCard(
+                                modifier = Modifier.weight(1f),
+                                title = stringResource(R.string.analytics_taken_on_time),
+                                value = "${breakdown.takenOnTime}",
+                                subtitle = if (breakdown.totalDecided > 0) "${((breakdown.takenOnTime.toDouble() / breakdown.totalDecided) * 100).toInt()}%" else "0%",
+                                icon = Icons.Default.CheckCircle,
+                                color = Color(0xFF10B981),
+                                bgColor = Color(0xFF10B981).copy(alpha = 0.12f)
+                            )
+                            StatCard(
+                                modifier = Modifier.weight(1f),
+                                title = stringResource(R.string.analytics_taken_late),
+                                value = "${breakdown.takenLate}",
+                                subtitle = if (breakdown.totalDecided > 0) "${((breakdown.takenLate.toDouble() / breakdown.totalDecided) * 100).toInt()}%" else "0%",
+                                icon = Icons.Default.HourglassTop,
+                                color = Color(0xFFF59E0B),
+                                bgColor = Color(0xFFF59E0B).copy(alpha = 0.12f)
+                            )
+                        }
 
-            // 5. Personalized Insights Banner
-            item {
-                InsightCard(
-                    adherenceRate = selectedData.rate,
-                    totalEntries = totalEntries
-                )
-            }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            StatCard(
+                                modifier = Modifier.weight(1f),
+                                title = stringResource(R.string.analytics_missed_doses),
+                                value = "${breakdown.missed}",
+                                subtitle = if (breakdown.totalDecided > 0) "${((breakdown.missed.toDouble() / breakdown.totalDecided) * 100).toInt()}%" else "0%",
+                                icon = Icons.Default.AlarmOff,
+                                color = Color(0xFFEF4444),
+                                bgColor = Color(0xFFEF4444).copy(alpha = 0.12f)
+                            )
+                            StatCard(
+                                modifier = Modifier.weight(1f),
+                                title = stringResource(R.string.analytics_skipped_doses),
+                                value = "${breakdown.skipped}",
+                                subtitle = if (breakdown.totalEntries > 0) "${((breakdown.skipped.toDouble() / breakdown.totalEntries) * 100).toInt()}%" else "0%",
+                                icon = Icons.Default.Schedule,
+                                color = Color(0xFF6B7280),
+                                bgColor = Color(0xFF6B7280).copy(alpha = 0.12f)
+                            )
+                        }
 
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
+                        StatCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            title = stringResource(R.string.analytics_total_doses),
+                            value = "${breakdown.totalEntries}",
+                            subtitle = stringResource(R.string.status_taken) + ": ${breakdown.totalTaken}",
+                            icon = Icons.Default.Medication,
+                            color = Color(0xFF0277BD),
+                            bgColor = Color(0xFF0277BD).copy(alpha = 0.12f)
+                        )
+                    }
+                }
+
+                // 4. Weekly Adherence Trend Visual
+                item {
+                    WeeklyTrendCard(past7Days = uiState.past7Days)
+                }
+
+                // 5. Personalized Insights Banner
+                item {
+                    InsightCard(
+                        adherenceRate = selectedData.rate,
+                        totalEntries = breakdown.totalEntries
+                    )
+                }
+
+                item {
+                    Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+                    Spacer(modifier = Modifier.height(32.dp))
+                }
             }
         }
     }
-}
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -405,7 +304,8 @@ fun UnifiedAdherenceCard(
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Horizontal Segmented Time Range Selector Pills (All Tab at far right)
+            // Horizontal Segmented Time Range Selector Pills (All Tab at far right):
+            // Note: ALL shows sub-ring breakdown charts across all ranges/dosages, whereas TOTAL displays a single ring chart for all-time adherence.
             val sortedTabs = remember(rangeDataList) {
                 rangeDataList.filter { it.range != AdherenceRange.ALL } + rangeDataList.filter { it.range == AdherenceRange.ALL }
             }
@@ -425,7 +325,7 @@ fun UnifiedAdherenceCard(
                         color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                     ) {
                         Text(
-                            text = rData.label,
+                            text = stringResource(rData.range.stringResId),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                             color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -482,7 +382,7 @@ fun UnifiedAdherenceCard(
                                         verticalArrangement = Arrangement.Center
                                     ) {
                                         Text(
-                                            text = rData.label,
+                                            text = stringResource(rData.range.stringResId),
                                             style = MaterialTheme.typography.labelSmall,
                                             fontWeight = FontWeight.Bold,
                                             color = MaterialTheme.colorScheme.onSurface,
@@ -568,7 +468,7 @@ fun UnifiedAdherenceCard(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = selectedData.label + " " + stringResource(R.string.analytics_adherence_rate),
+                    text = stringResource(selectedData.range.stringResId) + " " + stringResource(R.string.analytics_adherence_rate),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -669,14 +569,6 @@ fun StatCard(
         }
     }
 }
-
-data class DayStat(
-    val date: LocalDate,
-    val dayLabel: String,
-    val total: Int,
-    val taken: Int,
-    val rate: Int
-)
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

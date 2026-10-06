@@ -35,6 +35,7 @@
     <string name="form_med_name">Название лекарства</string>
     <string name="form_med_name_placeholder">напр. Амоксициллин</string>
     <string name="form_dosage">Дозировка</string>
+    <string name="form_dosage_unit">Единица дозировки</string>
     <string name="form_dosage_placeholder">напр. 500 мг, 1 таблетка</string>
     <string name="form_frequency">Частота</string>
     <string name="form_time">Время</string>
@@ -47,7 +48,7 @@
     <string name="freq_daily">Ежедневно</string>
     <string name="freq_weekly">Еженедельно</string>
     <string name="freq_monthly">Ежемесячно</string>
-    <string name="freq_custom">Другое</string>
+    <string name="freq_custom">Каждые X недель</string>
     <string name="form_select_days_week">Выберите дни недели</string>
     <string name="form_select_days_month">Выберите дни месяца</string>
     <string name="day_mon">Пн</string>
@@ -227,7 +228,7 @@
 
 
     <string name="home_all_good">Все отлично!</string>
-    <string name="home_all_good_desc">Сегодня принимать лекарства не нужно. Если хотите добавить еще, нажмите на кнопку с плюсом внизу.</string>
+    <string name="home_all_good_desc">Сегодня принимать лекарства не нужно.</string>
     <string name="no_profiles_found">Профили не найдены</string>
     <string name="status_taken">Принято</string>
 
@@ -238,6 +239,7 @@
     <string name="image_picker_camera">Камера</string>
     <string name="image_picker_gallery">Галерея</string>
     <string name="image_picker_error_title">Ошибка</string>
+    <string name="camera_permission_required">Для съемки фотографий требуется разрешение на использование камеры.</string>
     <string name="image_picker_remove">Удалить изображение</string>
     <string name="delete_contact_title">Удалить контакт</string>
     <string name="delete_contact_desc">Вы уверены, что хотите удалить этот контакт?</string>
@@ -452,7 +454,7 @@
     <string name="pill_shape_drops">Капли</string>
     <string name="pill_shape_patch">Пластырь</string>
 
-    <string name="med_notes_label">Указания врача / аптеки и предостережения</string>
+    <string name="med_notes_label">Указания врача и предостережения</string>
     <string name="med_notes_placeholder">напр. Принимать во время еды, Избегать грейпфрута, Рецепт #12345</string>
 
     <string name="course_duration_title">Длительность курса</string>
@@ -472,6 +474,10 @@
     <string name="freq_every_days_format">Каждые %1$d дн</string>
     <string name="interval_hours_label">Интервал между приемами (часы)</string>
     <string name="interval_days_label">Интервал между приемами (дни)</string>
+    <string name="freq_every_x_weeks_format">Каждые %1$d нед</string>
+    <string name="custom_recurrence_interval_label">Интервал повторения (недели)</string>
+    <string name="custom_recurrence_summary">Повторяется каждые %1$d нед.: %2$s</string>
+    <string name="validation_select_custom_days">Выберите хотя бы один день для настраиваемого повторения</string>
     <string name="btn_log_prn_dose">Записать прием</string>
     <string name="prn_doses_taken_today">Приемов записано сегодня: %1$d</string>
     <string name="prn_section_title">Препараты по необходимости (PRN)</string>
@@ -490,7 +496,7 @@
     <string name="hours_limit_hint">Для интервалов более 24 часов выберите «Каждые X дней».</string>
 
     <string name="pref_nagging_title">Настойчивые повторные напоминания</string>
-    <string name="pref_nagging_desc">Повторять напоминания, если прием не был подтвержден</string>
+    <string name="pref_nagging_desc">Напоминать повторно, пока прием не будет отмечен.</string>
     <string name="pref_nagging_interval">Интервал напоминаний</string>
     <string name="pref_nagging_max_repeats">Максимум повторений</string>
     <string name="pref_nagging_repeats_format">%1$d раз</string>
@@ -507,6 +513,11 @@
     <string name="widget_all_completed">Все приемы выполнены! 🎉</string>
     <string name="widget_no_doses_today">На сегодня ничего не запланировано</string>
     <string name="widget_next_dose_format">Следующий: %1$s • %2$s</string>
+    <string name="widget_configure_title">Выберите профиль для виджета</string>
+    <string name="widget_configure_subtitle">Выберите, расписание лекарств какого профиля этот виджет будет отображать на главном экране.</string>
+    <string name="widget_configure_active_profile">Активный профиль приложения</string>
+    <string name="widget_configure_active_profile_desc">Динамически следует за текущим активным профилем в приложении</string>
+    <string name="widget_configure_confirm">Сохранить виджет</string>
 
     <!-- Custom Alarm Sounds -->
     <string name="pref_alarm_sound">Звук будильника</string>
@@ -575,6 +586,7 @@
     <string name="alarm_take_medicine">ПРИНЯТЬ ЛЕКАРСТВО</string>
     <string name="alarm_snooze_format">ОТЛОЖИТЬ (%d МИН)</string>
     <string name="notif_action_snooze_format">Отложить (%d мин)</string>
+    <string name="alarm_snoozed_toast">Напоминание отложено на %d минут</string>
     <string name="alarm_stock_remaining">Запас: осталось %d ед.</string>
     <string name="home_action_take">Принять</string>
     <string name="home_action_taken">Принято</string>
@@ -600,7 +612,7 @@
     <string name="backup_export_failed">Ошибка экспорта: %1$s</string>
 
     <string name="pref_allow_skip_title">Разрешить пропуск дозы</string>
-    <string name="pref_allow_skip_desc">Включить возможность пропуска дозы с указанием клинической причины</string>
+    <string name="pref_allow_skip_desc">Пропуск запланированных доз с указанием причины.</string>
     <string name="home_action_skip">Пропустить</string>
     <string name="home_action_skipped">Пропущено</string>
     <string name="home_dose_skipped">Доза пропущена для %s</string>
@@ -626,6 +638,9 @@
     <string name="validation_enter_name">Пожалуйста, введите ваше имя</string>
     <string name="validation_enter_valid_age">Пожалуйста, введите корректный возраст (1-120)</string>
     <string name="medication_added_success">Лекарство успешно добавлено</string>
+    <string name="medication_updated_success">Лекарство успешно обновлено</string>
+    <string name="medication_archived_success">Прием лекарства успешно прекращен</string>
+    <string name="medication_deleted_success">Лекарство успешно удалено</string>
     <string name="status_pending">В ожидании</string>
     <string name="pharmacy_order_title">Заказ в аптеку</string>
     <string name="pharmacy_order_desc">Создать список лекарств для WhatsApp или аптеки</string>
@@ -690,7 +705,7 @@
 
     <!-- Manual Dose Recording Strings -->
     <string name="pref_manually_record_dose_time_title">Записывать время приема вручную</string>
-    <string name="pref_manually_record_dose_time_desc">Запрашивать фактическое время приема лекарства при записи дозы.</string>
+    <string name="pref_manually_record_dose_time_desc">Запись фактического времени приема дозы.</string>
     <string name="record_dose_time_title">Время приема дозы</string>
     <string name="record_dose_time_subtitle">Когда вы приняли %1$s?</string>
     <string name="record_dose_time_just_now">Только что (%1$s)</string>
@@ -704,7 +719,7 @@
 
     <!-- Hide Navigation Add Button Preference -->
     <string name="pref_hide_add_nav_button_title">Скрыть центральную кнопку добавления</string>
-    <string name="pref_hide_add_nav_button_desc">Скрывает кнопку «+» на панели навигации. Кнопка «Добавить лекарство» появится на вкладке «Лекарства» под списком.</string>
+    <string name="pref_hide_add_nav_button_desc">Скрыть кнопку «+» на нижней панели навигации.</string>
 
     <!-- About Screen Expansion -->
     <string name="about_developer_title">О разработчике</string>
@@ -742,9 +757,9 @@
     <string name="dialog_low_storage_action">Освободить место</string>
     <string name="dialog_low_storage_dismiss">Закрыть</string>
     <string name="pref_allow_undo_title">Разрешить отмену приема дозы</string>
-    <string name="pref_allow_undo_desc">Позволяет вернуть принятую дозу в статус ожидания. Требует подтверждения.</string>
+    <string name="pref_allow_undo_desc">Возврат принятых доз в статус ожидающих.</string>
     <string name="pref_prompt_dose_notes_title">Запрашивать заметку при приеме дозы</string>
-    <string name="pref_prompt_dose_notes_desc">Предлагать добавить заметку, прием пищи или симптомы при каждой отметке о приеме дозы.</string>
+    <string name="pref_prompt_dose_notes_desc">Запрос заметки при подтверждении приема.</string>
     <string name="dialog_undo_dose_title">Отменить прием дозы?</string>
     <string name="dialog_undo_dose_msg">Вы уверены, что хотите вернуть %1$s в статус ожидания? Списанный остаток восстановится.</string>
     <string name="dialog_dose_note_title">Заметка к дозе</string>
@@ -755,6 +770,10 @@
     <string name="btn_edit_note">Изменить заметку</string>
     <string name="dialog_edit_note_title">Редактировать заметку к дозе</string>
     <string name="pref_allow_dose_notes_title">Заметки к дозам</string>
-    <string name="pref_allow_dose_notes_desc">Разрешить запись заметок, приемов пищи или симптомов вместе с дозами.</string>
+    <string name="pref_allow_dose_notes_desc">Запись заметок, приема пищи или симптомов.</string>
     <string name="btn_add_note">+ Добавить заметку</string>
+    <string name="timings_and_dosages_title">Время приема и дозировки</string>
+    <string name="stock_inventory_card_title">Запас лекарств и учет</string>
+    <string name="widget_configure_auto_badge">Авто</string>
+    <string name="dialog_validation_title">Внимание</string>
 </resources>

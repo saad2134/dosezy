@@ -34,12 +34,23 @@ object TimeCalculationUtils {
         return hours >= lateAfterHours.toLong() && hours < missedAfterHours.toLong()
     }
 
+    // Guard: Any dose taken >= lateAfterHours is late; do not cap with missedAfterHours to prevent overdue doses paradoxically recording as TAKEN_ON_TIME
+    fun isTakenLate(scheduledTime: LocalDateTime, currentTime: LocalDateTime, lateAfterHours: Int): Boolean {
+        val duration = Duration.between(scheduledTime, currentTime)
+        return duration.toHours() >= lateAfterHours.toLong()
+    }
+
     fun isMissed(scheduledTime: LocalDateTime, currentTime: LocalDateTime, missedAfterHours: Int): Boolean {
         val duration = Duration.between(scheduledTime, currentTime)
         return duration.toHours() >= missedAfterHours.toLong()
     }
 
-    fun getStatus(scheduledTime: LocalDateTime, currentTime: LocalDateTime, lateAfterHours: Int, missedAfterHours: Int): MedicationStatus {
+    fun getStatus(
+        scheduledTime: LocalDateTime,
+        currentTime: LocalDateTime,
+        @Suppress("UNUSED_PARAMETER") lateAfterHours: Int,
+        missedAfterHours: Int
+    ): MedicationStatus {
         return when {
             currentTime.isBefore(scheduledTime) -> MedicationStatus.PENDING
             isMissed(scheduledTime, currentTime, missedAfterHours) -> MedicationStatus.MISSED

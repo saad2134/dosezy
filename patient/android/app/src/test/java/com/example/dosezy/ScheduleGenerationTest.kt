@@ -339,4 +339,91 @@ class ScheduleGenerationTest {
             entries.map { it.scheduledDateTime.toLocalTime() }
         )
     }
+
+    // ───────────────────────────────────────────────────────────────
+    // 7. CUSTOM multi-week frequency
+    // ───────────────────────────────────────────────────────────────
+
+    @Test
+    fun customRecurrence_everyTwoWeeks_alternatingWeeksMatchingSelectedDays() {
+        val startMonday = LocalDate.of(2026, 10, 5) // Monday
+        val m = med(
+            Frequency(
+                pattern = FrequencyPattern.CUSTOM,
+                intervalWeeks = 2,
+                selectedDaysOfWeek = listOf(DayOfWeek.MONDAY.value, DayOfWeek.THURSDAY.value)
+            ),
+            start = startMonday
+        )
+
+        // Week 0: Oct 5 (Mon) to Oct 11 (Sun) -> ACTIVE
+        assertTrue(m.shouldTakeOnDate(LocalDate.of(2026, 10, 5)))  // Mon -> take
+        assertFalse(m.shouldTakeOnDate(LocalDate.of(2026, 10, 6))) // Tue -> no
+        assertTrue(m.shouldTakeOnDate(LocalDate.of(2026, 10, 8)))  // Thu -> take
+        assertFalse(m.shouldTakeOnDate(LocalDate.of(2026, 10, 9))) // Fri -> no
+
+        // Week 1: Oct 12 (Mon) to Oct 18 (Sun) -> OFF WEEK
+        assertFalse(m.shouldTakeOnDate(LocalDate.of(2026, 10, 12))) // Mon -> off
+        assertFalse(m.shouldTakeOnDate(LocalDate.of(2026, 10, 15))) // Thu -> off
+
+        // Week 2: Oct 19 (Mon) to Oct 25 (Sun) -> ACTIVE
+        assertTrue(m.shouldTakeOnDate(LocalDate.of(2026, 10, 19)))  // Mon -> take
+        assertTrue(m.shouldTakeOnDate(LocalDate.of(2026, 10, 22)))  // Thu -> take
+
+        // Week 3: Oct 26 (Mon) to Nov 1 (Sun) -> OFF WEEK
+        assertFalse(m.shouldTakeOnDate(LocalDate.of(2026, 10, 26))) // Mon -> off
+    }
+
+    @Test
+    fun customRecurrence_midweekStartDate_anchorsWeek0ToStartWeekMonday() {
+        val startWednesday = LocalDate.of(2026, 10, 7) // Wednesday
+        val m = med(
+            Frequency(
+                pattern = FrequencyPattern.CUSTOM,
+                intervalWeeks = 2,
+                selectedDaysOfWeek = listOf(DayOfWeek.FRIDAY.value)
+            ),
+            start = startWednesday
+        )
+
+        // Week 0 Friday: Oct 9 -> ACTIVE
+        assertTrue(m.shouldTakeOnDate(LocalDate.of(2026, 10, 9)))
+
+        // Week 1 Friday: Oct 16 -> OFF
+        assertFalse(m.shouldTakeOnDate(LocalDate.of(2026, 10, 16)))
+
+        // Week 2 Friday: Oct 23 -> ACTIVE
+        assertTrue(m.shouldTakeOnDate(LocalDate.of(2026, 10, 23)))
+    }
+
+    @Test
+    fun customRecurrence_generateScheduleEntries_generatesSlotsForSelectedDaysOnly() {
+        val startMonday = LocalDate.of(2026, 11, 2) // Future Monday
+        val m = med(
+            Frequency(
+                pattern = FrequencyPattern.CUSTOM,
+                intervalWeeks = 2,
+                selectedDaysOfWeek = listOf(DayOfWeek.MONDAY.value, DayOfWeek.WEDNESDAY.value)
+            ),
+            times = listOf(LocalTime.of(8, 0)),
+            start = startMonday
+        )
+
+        // Span 14 days (15 days total: Nov 2 to Nov 16 inclusive)
+        val entries = m.generateScheduleEntries(startDateRange = startMonday, days = 14)
+        // Week 0: Nov 2 (Mon), Nov 4 (Wed)
+        // Week 1: None
+        // Week 2: Nov 16 (Mon)
+        // Total = 3 entries
+        assertEquals(3, entries.size)
+        val dates = entries.map { it.scheduledDateTime.toLocalDate() }
+        assertEquals(
+            listOf(
+                LocalDate.of(2026, 11, 2),
+                LocalDate.of(2026, 11, 4),
+                LocalDate.of(2026, 11, 16)
+            ),
+            dates
+        )
+    }
 }

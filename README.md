@@ -9,7 +9,7 @@
 
 <div align="center">
 
-[![Android Patient App](https://img.shields.io/badge/Android%20Patient-v2.5.8%20Released-1e293b?style=flat&logo=android&logoColor=white&labelColor=2ea44f)](https://github.com/saad2134/dosezy/releases)
+[![Android Patient App](https://img.shields.io/badge/Android%20Patient-v2.5.9%20Released-1e293b?style=flat&logo=android&logoColor=white&labelColor=2ea44f)](https://github.com/saad2134/dosezy/releases)
 [![iOS Patient App](https://img.shields.io/badge/iOS%20Patient-Planned-1e293b?style=flat&logo=apple&logoColor=white&labelColor=007aff)](https://github.com/saad2134/dosezy)
 [![Server Node](https://img.shields.io/badge/Server%20Node-In%20Dev-1e293b?style=flat&logo=fastify&logoColor=white&labelColor=8b5cf6)](https://github.com/saad2134/dosezy)
 [![Caregiver Web](https://img.shields.io/badge/Caregiver%20Web-In%20Dev-1e293b?style=flat&logo=astro&logoColor=white&labelColor=f59e0b)](https://github.com/saad2134/dosezy)
@@ -56,6 +56,9 @@
 <div align="center">
   <a href="https://play.google.com/store/apps/details?id=com.saad2134.dosezy">
     <img width="197" height="59" alt="Google Play" src="assets/badges/google-play.png" />
+  </a>
+  <a href="#">
+    <img width="197" height="59" alt="App Store" src="assets/badges/app-store.png" />
   </a>
   <!-- 
   <a href="">
@@ -137,7 +140,7 @@ Dosezy transforms daily medication management into a stress-free experience. Inp
 
 | Module | Platform | Status | Min / Target | Tech Stack |
 | :--- | :--- | :--- | :--- | :--- |
-| **📱 Patient App** | Android | Released (v2.5.7) | Android 7.0+ (API 24+) | Kotlin, Jetpack Compose, Room |
+| **📱 Patient App** | Android | Released (v2.5.9) | Android 7.0+ (API 24+) | Kotlin, Jetpack Compose, Room |
 | **🍎 Patient App** | iOS | Planned | iOS 16+ | Swift, SwiftUI, SwiftData |
 | **☁️ Server Node** | Server / API | In Development | Docker / Self-Host | Node.js, Fastify, TypeScript, SQLite/Postgres |
 | **🩺 Caregiver Portal** | Web | In Development | Modern Browsers | Astro, TypeScript, Tailwind |
@@ -255,7 +258,7 @@ dosezy/
       <td><strong>Local-First Android Client & Schema Parity</strong></td>
       <td>Core Adherence & Ecosystem Parity</td>
       <td>Jetpack Compose UI, 12 native localizations, Room offline database v15, time zone travel, manual dose recording, per-dose symptom notes, dose undo confirmation, pharmacy refill orders with smart bottle supplies, full-screen alarms, emergency dialer, shared OpenAPI 3.0 contract.</td>
-      <td align="center">🟢 Released (v2.5.7)</td>
+      <td align="center">🟢 Released (v2.5.9)</td>
     </tr>
     <tr>
       <td><strong>v3.0 – v3.9</strong></td>
@@ -343,7 +346,7 @@ dosezy/
 <img src="https://github.com/user-attachments/assets/213a3fc0-b737-4df2-9c70-693a7f6d7467" alt="Dosezy Icon" title="Dosezy" style="width:500px;">
 
 ## 🔰 Banner
-<img width="1280" height="640" alt="New Project" src="https://github.com/user-attachments/assets/d2331448-fc78-41a0-920d-e0e5d8e171e2" />
+<img width="1280" height="640" alt="New Project" src="assets/thumbnail_16x9_1920x1080.png" />
 
 ---
 

@@ -1,0 +1,3 @@
+• Custom multi-week recurrence scheduling on selected weekdays with automated refill tracking
+• Interactive scrollable home-screen widget with family profile configuration and quick profile switching
+• Locked portrait mode, normalized 412dp zoom, Android 15 edge-to-edge support, and dosage editing fixes

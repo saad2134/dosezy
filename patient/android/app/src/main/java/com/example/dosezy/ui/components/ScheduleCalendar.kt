@@ -63,6 +63,15 @@ fun ScheduleCalendar(
     modifier: Modifier = Modifier
 ) {
     var currentMonth by remember { mutableStateOf(YearMonth.from(selectedDate)) }
+
+    // Guard: Synchronize currentMonth when selectedDate changes externally (e.g. "Jump to Today" or quick date picker) to prevent stale month display
+    androidx.compose.runtime.LaunchedEffect(selectedDate) {
+        val targetMonth = YearMonth.from(selectedDate)
+        if (currentMonth != targetMonth) {
+            currentMonth = targetMonth
+        }
+    }
+
     val userViewModel: com.example.dosezy.ui.viewmodels.UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
     val currentUser by userViewModel.currentUser.collectAsState()
     val targetLocale = remember(currentUser?.language) {
@@ -92,6 +101,7 @@ fun ScheduleCalendar(
             currentMonth = currentMonth,
             selectedDate = selectedDate,
             scheduleEntries = scheduleEntries,
+            missedAfterHours = currentUser?.considerMissedAfter ?: 6,
             firstDayOfWeek = firstDayOfWeek,
             onDateSelected = { date ->
                 onDateSelected(date)
@@ -179,12 +189,18 @@ private fun CalendarGrid(
     selectedDate: LocalDate,
     scheduleEntries: List<ScheduleEntry>,
     onDateSelected: (LocalDate) -> Unit,
+    missedAfterHours: Int = 6,
     firstDayOfWeek: java.time.DayOfWeek = java.time.temporal.WeekFields.of(java.util.Locale.getDefault()).firstDayOfWeek,
     modifier: Modifier = Modifier
 ) {
     val firstDayOfMonth = currentMonth.atDay(1)
     val daysInMonth = currentMonth.lengthOfMonth()
     val startOffset = (firstDayOfMonth.dayOfWeek.value - firstDayOfWeek.value + 7) % 7
+
+    // Guard: Pre-group schedule entries by LocalDate once per schedule list update to avoid O(N * 42) filter iterations across all calendar cells on every recomposition frame
+    val entriesByDate = remember(scheduleEntries) {
+        scheduleEntries.groupBy { it.scheduledDateTime.toLocalDate() }
+    }
 
     Column(
         modifier = modifier
@@ -207,14 +223,11 @@ private fun CalendarGrid(
                         null
                     }
 
-
                     val dayEntries = date?.let { currentDate ->
-                        scheduleEntries.filter { entry ->
-                            entry.scheduledDateTime.toLocalDate() == currentDate
-                        }
+                        entriesByDate[currentDate] ?: emptyList()
                     } ?: emptyList()
 
-                    val statusColor = getDateStatusColor(dayEntries)
+                    val statusColor = getDateStatusColor(dayEntries, missedAfterHours)
 
                     Box(
                         modifier = Modifier
@@ -293,7 +306,7 @@ private fun CalendarDay(
     }
 }
 
-private fun getDateStatusColor(entries: List<ScheduleEntry>): Color {
+private fun getDateStatusColor(entries: List<ScheduleEntry>, missedAfterHours: Int = 6): Color {
     if (entries.isEmpty()) return Color.Transparent
 
     val hasMissed = entries.any { it.status == MedicationStatus.MISSED }
@@ -306,9 +319,12 @@ private fun getDateStatusColor(entries: List<ScheduleEntry>): Color {
     }
     val allSkipped = entries.all { it.status == MedicationStatus.SKIPPED }
 
-    // Dynamic check: Overdue pending doses in the past should show as red (missed)
+    // Guard: Only flag pending doses as missed (red) after considerMissedAfter threshold; prevents 1-minute-old pending doses from turning the calendar day red
+    val now = java.time.LocalDateTime.now()
     val hasPastPending = entries.any {
-        it.status == MedicationStatus.PENDING && it.scheduledDateTime.isBefore(java.time.LocalDateTime.now().minusMinutes(1))
+        it.status == MedicationStatus.PENDING &&
+                now.isAfter(it.scheduledDateTime) &&
+                TimeCalculationUtils.isMissed(it.scheduledDateTime, now, missedAfterHours)
     }
 
     return when {

@@ -5,6 +5,8 @@ import androidx.compose.animation.core.tween
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,14 +15,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
@@ -63,6 +70,7 @@ import androidx.compose.ui.res.stringResource
 import com.example.dosezy.R
 import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.getLocalizedName
+import com.example.dosezy.data.model.normalizeArabicDigits
 import com.example.dosezy.ui.components.ManageProfileSkeletonView
 import com.example.dosezy.ui.components.ProfilePicturePicker
 import com.example.dosezy.ui.components.TopBar
@@ -78,8 +86,8 @@ fun ManageProfileScreen(navController: NavController) {
     val isLoading by userViewModel.isLoading.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
     val context = androidx.compose.ui.platform.LocalContext.current
+    val focusManager = LocalFocusManager.current
 
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showSuccessMessage by remember { mutableStateOf(false) }
@@ -147,6 +155,13 @@ fun ManageProfileScreen(navController: NavController) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
+                        .imePadding()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            focusManager.clearFocus()
+                        }
                         .verticalScroll(rememberScrollState())
                         .padding(24.dp)
                 ) {
@@ -341,24 +356,21 @@ fun ManageProfileScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(32.dp))
 
                     val updatedSuccessStr = stringResource(R.string.profile_updated_success)
-                    val cannotDeleteStr = stringResource(R.string.profile_cannot_delete_only)
+
+                    val parsedAge = age.normalizeArabicDigits().toIntOrNull() ?: 0
+                    val isFormValid = fullName.isNotBlank() && parsedAge > 0 && gender != null
 
                     // Save Changes Button
                     Button(
                         onClick = {
-                            // Validate form
-                            fullNameError = fullName.isBlank()
-                            ageError = age.isBlank()
-                            genderError = gender == null
-
-                            if (!fullNameError && !ageError && !genderError) {
+                            if (isFormValid) {
                                 currentUser?.let { user ->
                                     val updatedUser = user.copy(
                                         profilePicPath = profilePicPath,
                                         fullName = fullName.trim(),
-                                        age = age.toIntOrNull() ?: 0,
+                                        age = parsedAge,
                                         gender = gender!!,
-                                        contactNumber = contactNumber.trim(),
+                                        contactNumber = contactNumber.normalizeArabicDigits().trim(),
                                         allergies = allergies.trim().ifBlank { null },
                                         medicalConditions = medicalConditions.trim().ifBlank { null }
                                     )
@@ -368,12 +380,15 @@ fun ManageProfileScreen(navController: NavController) {
                                 }
                             }
                         },
+                        enabled = isFormValid,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
+                            disabledContentColor = Color.White.copy(alpha = 0.6f)
                         )
                     ) {
                         Text(
@@ -434,6 +449,9 @@ fun ManageProfileScreen(navController: NavController) {
                             }
                         }
                     }
+
+                    Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+                    Spacer(modifier = Modifier.height(32.dp))
                 }
             }
             }
@@ -465,9 +483,7 @@ fun ManageProfileScreen(navController: NavController) {
                                 userViewModel.deleteUser(user)
                                 navController.popBackStack()
                             } else {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar(cannotDeleteMsg)
-                                }
+                                android.widget.Toast.makeText(context, cannotDeleteMsg, android.widget.Toast.LENGTH_SHORT).show()
                             }
                         }
                         showDeleteDialog = false

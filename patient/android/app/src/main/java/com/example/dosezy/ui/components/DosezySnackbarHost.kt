@@ -1,5 +1,8 @@
 package com.example.dosezy.ui.components
 
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Snackbar
@@ -24,6 +27,9 @@ fun DosezySnackbarHost(
     SnackbarHost(
         hostState = hostState,
         modifier = modifier
+            .navigationBarsPadding()
+            .imePadding()
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) { data ->
         Snackbar(
             snackbarData = data,

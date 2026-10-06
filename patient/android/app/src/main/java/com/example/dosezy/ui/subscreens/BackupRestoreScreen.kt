@@ -24,6 +24,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -75,7 +79,7 @@ import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.utils.sharedUserViewModel
 import kotlinx.coroutines.launch
 
-@RequiresApi(Build.VERSION_CODES.O)
+// Guard: Keep available on API 24+; BackupRestoreManager uses canonicalPath for full Android 7.0+ compatibility
 @Composable
 fun BackupRestoreScreen(
     navController: NavController
@@ -123,7 +127,6 @@ fun BackupRestoreScreen(
     }
 
     // Color definitions linked dynamically to current MaterialTheme
-    val cardBg = if (isDark) Color(0xFF1E2228) else Color.White
     val subCardBg = if (isDark) Color(0xFF15181E) else Color(0xFFF8FAFC)
     val bannerBg = if (isDark) Color(0xFF1193D4).copy(alpha = 0.18f) else Color(0xFF1193D4).copy(alpha = 0.10f)
     val textPrimary = MaterialTheme.colorScheme.onSurface
@@ -638,6 +641,10 @@ fun BackupRestoreScreen(
                         )
                     }
                 }
+
+                Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+                Spacer(modifier = Modifier.height(32.dp))
+
             if (inspectionResult != null) {
                 ProfileImportDialog(
                     inspectionResult = inspectionResult!!,
@@ -766,10 +773,11 @@ fun BackupRestoreScreen(
                                 val shareIntent = Intent(Intent.ACTION_SEND).apply {
                                     type = "application/zip"
                                     putExtra(Intent.EXTRA_STREAM, contentUri)
+                                    clipData = android.content.ClipData.newRawUri(null, contentUri)
                                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                 }
                                 val chooserIntent = Intent.createChooser(shareIntent, context.getString(R.string.export_share_file)).apply {
-                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                 }
                                 context.startActivity(chooserIntent)
                             } catch (e: Exception) {

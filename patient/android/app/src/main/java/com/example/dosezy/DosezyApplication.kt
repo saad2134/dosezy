@@ -30,12 +30,11 @@ class DosezyApplication : Application(), ImageLoaderFactory
             Log.e("DosezyApp", "Error during initialization", e)
         }
 
-        // Schedule alarms for current user on app start
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CoroutineScope(Dispatchers.IO).launch {
-                medicineNotificationManager.scheduleAllAlarmsForCurrentUser() // UPDATED
-            }
-        }
+        // Ensure all required notification channels exist from app startup
+        com.example.dosezy.notifications.MedicineAlarmReceiver.createNotificationChannels(this)
+
+        // Guard: Core library desugaring enables java.time on API 24+; reschedule alarms on app startup across all supported versions to prevent silent alarm loss
+        medicineNotificationManager.rescheduleAllAlarmsForAllUsers()
     }
 
     override fun newImageLoader(): ImageLoader {
