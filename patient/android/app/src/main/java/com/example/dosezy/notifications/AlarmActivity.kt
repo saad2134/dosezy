@@ -723,7 +723,9 @@ fun GroupedAlarmScreenContent(
                                     entryIds
                                 }
                                 allIds.forEach { id ->
+                                    // Guard: Cancel both nagging and snooze alarms upfront for all cohort IDs to prevent delayed phantom snooze triggers
                                     alarmScheduler.cancelNagging(id)
+                                    alarmScheduler.cancelSnooze(id)
                                 }
                                 val now = LocalDateTime.now()
                                 val nowStr = now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
@@ -838,7 +840,9 @@ fun GroupedAlarmScreenContent(
                             entryIds
                         }
                         allIds.forEach { id ->
+                            // Guard: Cancel both nagging and snooze alarms upfront for all cohort IDs to prevent delayed phantom snooze triggers when skipped
                             alarmScheduler.cancelNagging(id)
+                            alarmScheduler.cancelSnooze(id)
                         }
                         if (medicinesList.isNotEmpty()) {
                             medicinesList.forEach { (entry, _) ->

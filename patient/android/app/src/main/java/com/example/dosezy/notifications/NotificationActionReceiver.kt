@@ -25,7 +25,6 @@ class NotificationActionReceiver : BroadcastReceiver() {
         private const val TAG = "NotificationActionReceiver"
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onReceive(context: Context, intent: Intent?) {
         database = DosezyDatabase.getInstance(context)
         val action = intent?.action
@@ -45,7 +44,6 @@ class NotificationActionReceiver : BroadcastReceiver() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private suspend fun handleAction(context: Context, action: String?, allIds: List<String>, primaryEntryId: String) {
         val scheduleRepository = ScheduleRepository(database)
 

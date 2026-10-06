@@ -1,7 +1,5 @@
 package com.example.dosezy.utils
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.example.dosezy.data.model.TimeFormat
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -9,7 +7,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
-@RequiresApi(Build.VERSION_CODES.O)
+// Guard: Core library desugaring enables java.time on API 24+; do not restrict to Android O (API 26+) so Android 7.0/7.1 devices format time correctly
 object TimeFormatUtils {
 
     fun formatTime(localDateTime: LocalDateTime, timeFormat: TimeFormat, locale: Locale = Locale.getDefault()): String {

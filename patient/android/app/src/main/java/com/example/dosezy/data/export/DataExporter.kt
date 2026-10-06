@@ -516,76 +516,84 @@ class DataExporter(
         return pdfDocument
     }
 
-    private fun escapeCsv(value: Any?): String {
-        val str = value?.toString() ?: ""
-        return "\"${str.replace("\"", "\"\"")}\""
-    }
-
-    private fun buildCsvContent(user: User, medicines: List<Medicine>, schedules: List<ScheduleEntry>): String {
-        val csvBuilder = StringBuilder()
-
-        // User Information Section
-        csvBuilder.append("USER INFORMATION\n")
-        csvBuilder.append("User ID,Full Name,Age,Gender,Contact Number,Allergies,Medical Conditions,Profile Picture Path,Is Current User\n")
-        csvBuilder.append(
-            "${escapeCsv(user.userId)}," +
-            "${escapeCsv(user.fullName)}," +
-            "${user.age}," +
-            "${user.gender}," +
-            "${escapeCsv(user.contactNumber)}," +
-            "${escapeCsv(user.allergies ?: "")}," +
-            "${escapeCsv(user.medicalConditions ?: "")}," +
-            "${escapeCsv(user.profilePicPath ?: "")}," +
-            "${user.isCurrentUser}\n\n"
-        )
-
-        // Medicines Section
-        csvBuilder.append("MEDICINES\n")
-        csvBuilder.append("Medicine ID,User ID,Medication Name,Dosage,Dosage Unit,Times Per Day,Frequency Pattern,Interval Hours,Interval Days,Interval Weeks,Scheduled Times,Pill Shape,Pill Color,Doctor Notes,Start Date,End Date,Duration Days,Stock,Image URI\n")
-        medicines.forEach { medicine ->
-            val scheduledTimesStr = medicine.scheduledTimes.joinToString(";") { it.toString() }
-            csvBuilder.append(
-                "${escapeCsv(medicine.medicineId)}," +
-                "${escapeCsv(medicine.userId)}," +
-                "${escapeCsv(medicine.medicationName)}," +
-                "${medicine.dosage}," +
-                "${medicine.dosageUnit}," +
-                "${medicine.timesPerDay}," +
-                "${medicine.frequency.pattern}," +
-                "${medicine.frequency.intervalHours ?: ""}," +
-                "${medicine.frequency.intervalDays ?: ""}," +
-                "${medicine.frequency.intervalWeeks ?: ""}," +
-                "${escapeCsv(scheduledTimesStr)}," +
-                "${escapeCsv(medicine.pillShape.name)}," +
-                "${escapeCsv(medicine.pillColor)}," +
-                "${escapeCsv(medicine.notes ?: "")}," +
-                "${escapeCsv(medicine.startDate ?: "")}," +
-                "${escapeCsv(medicine.endDate ?: "")}," +
-                "${medicine.durationDays ?: ""}," +
-                "${medicine.currentStock ?: ""}," +
-                "${escapeCsv(medicine.imageUri ?: "")}\n"
-            )
-        }
-        csvBuilder.append("\n")
-
-        // Schedules Section
-        csvBuilder.append("SCHEDULES\n")
-        csvBuilder.append("Entry ID,User ID,Medicine ID,Scheduled DateTime,Status,Skip Reason,Taken At,Dosage,Dose Notes\n")
-        schedules.forEach { schedule ->
-            csvBuilder.append(
-                "${escapeCsv(schedule.entryId)}," +
-                "${escapeCsv(schedule.userId)}," +
-                "${escapeCsv(schedule.medicineId)}," +
-                "${escapeCsv(schedule.scheduledDateTime)}," +
-                "${schedule.status}," +
-                "${escapeCsv(schedule.skipReason ?: "")}," +
-                "${escapeCsv(schedule.takenAt ?: "")}," +
-                "${schedule.dosage ?: ""}," +
-                "${escapeCsv(schedule.doseNotes ?: "")}\n"
-            )
+    companion object {
+        internal fun escapeCsv(value: Any?): String {
+            val str = value?.toString() ?: ""
+            return "\"${str.replace("\"", "\"\"")}\""
         }
 
-        return csvBuilder.toString()
+        internal fun buildCsvContent(user: User, medicines: List<Medicine>, schedules: List<ScheduleEntry>): String {
+            val csvBuilder = StringBuilder()
+
+            // User Information Section
+            csvBuilder.append("USER INFORMATION\n")
+            csvBuilder.append("User ID,Full Name,Age,Gender,Contact Number,Allergies,Medical Conditions,Profile Picture Path,Is Current User\n")
+            csvBuilder.append(
+                "${escapeCsv(user.userId)}," +
+                "${escapeCsv(user.fullName)}," +
+                "${user.age}," +
+                "${user.gender}," +
+                "${escapeCsv(user.contactNumber)}," +
+                "${escapeCsv(user.allergies ?: "")}," +
+                "${escapeCsv(user.medicalConditions ?: "")}," +
+                "${escapeCsv(user.profilePicPath ?: "")}," +
+                "${user.isCurrentUser}\n\n"
+            )
+
+            // Medicines Section
+            csvBuilder.append("MEDICINES\n")
+            // Guard: Include Refill Threshold, Auto Deduct Stock, Is Archived, and Custom Dosages to preserve inventory metadata in CSV exports
+            csvBuilder.append("Medicine ID,User ID,Medication Name,Dosage,Dosage Unit,Times Per Day,Frequency Pattern,Interval Hours,Interval Days,Interval Weeks,Scheduled Times,Pill Shape,Pill Color,Doctor Notes,Start Date,End Date,Duration Days,Stock,Refill Threshold,Auto Deduct Stock,Is Archived,Custom Dosages,Image URI\n")
+            medicines.forEach { medicine ->
+                val scheduledTimesStr = medicine.scheduledTimes.joinToString(";") { it.toString() }
+                val customDosagesStr = medicine.customDosages?.entries?.joinToString(";") { "${it.key}:${it.value}" } ?: ""
+                csvBuilder.append(
+                    "${escapeCsv(medicine.medicineId)}," +
+                    "${escapeCsv(medicine.userId)}," +
+                    "${escapeCsv(medicine.medicationName)}," +
+                    "${medicine.dosage}," +
+                    "${medicine.dosageUnit}," +
+                    "${medicine.timesPerDay}," +
+                    "${medicine.frequency.pattern}," +
+                    "${medicine.frequency.intervalHours ?: ""}," +
+                    "${medicine.frequency.intervalDays ?: ""}," +
+                    "${medicine.frequency.intervalWeeks ?: ""}," +
+                    "${escapeCsv(scheduledTimesStr)}," +
+                    "${escapeCsv(medicine.pillShape.name)}," +
+                    "${escapeCsv(medicine.pillColor)}," +
+                    "${escapeCsv(medicine.notes ?: "")}," +
+                    "${escapeCsv(medicine.startDate ?: "")}," +
+                    "${escapeCsv(medicine.endDate ?: "")}," +
+                    "${medicine.durationDays ?: ""}," +
+                    "${medicine.currentStock ?: ""}," +
+                    "${medicine.refillThreshold ?: ""}," +
+                    "${medicine.autoDeductOnTake}," +
+                    "${medicine.isArchived}," +
+                    "${escapeCsv(customDosagesStr)}," +
+                    "${escapeCsv(medicine.imageUri ?: "")}\n"
+                )
+            }
+            csvBuilder.append("\n")
+
+            // Schedules Section
+            csvBuilder.append("SCHEDULES\n")
+            csvBuilder.append("Entry ID,User ID,Medicine ID,Scheduled DateTime,Status,Skip Reason,Taken At,Dosage,Dose Notes\n")
+            schedules.forEach { schedule ->
+                csvBuilder.append(
+                    "${escapeCsv(schedule.entryId)}," +
+                    "${escapeCsv(schedule.userId)}," +
+                    "${escapeCsv(schedule.medicineId)}," +
+                    "${escapeCsv(schedule.scheduledDateTime)}," +
+                    "${schedule.status}," +
+                    "${escapeCsv(schedule.skipReason ?: "")}," +
+                    "${escapeCsv(schedule.takenAt ?: "")}," +
+                    "${schedule.dosage ?: ""}," +
+                    "${escapeCsv(schedule.doseNotes ?: "")}\n"
+                )
+            }
+
+            return csvBuilder.toString()
+        }
     }
 
     suspend fun saveExportToFile(content: String, fileName: String): File {

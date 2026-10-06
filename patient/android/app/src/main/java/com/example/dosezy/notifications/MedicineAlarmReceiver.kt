@@ -82,7 +82,6 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onReceive(context: Context, intent: Intent?) {
         database = DosezyDatabase.getInstance(context)
         val action = intent?.action
@@ -168,8 +167,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                     val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
                     val currentLocale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLanguage)
 
-                    // Guard: Resolve user's preferred 12h/24h time format and locale from DB rather than hardcoded 12h string, preventing AM/PM desync
-                    val formattedScheduledTime = if (user != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    // Guard: Core library desugaring enables java.time on API 24+; format scheduled time with user's preferred 12h/24h mode and locale across all supported OS versions
+                    val formattedScheduledTime = if (user != null) {
                         try {
                             com.example.dosezy.utils.TimeFormatUtils.formatTime(primaryEntry.scheduledDateTime, user.timeFormat, currentLocale)
                         } catch (_: Exception) {
@@ -431,7 +430,6 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private suspend fun rescheduleAllAlarms(context: Context) {
         val userRepository = UserRepository(database)
         val scheduleRepository = ScheduleRepository(database)
