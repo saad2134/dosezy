@@ -181,8 +181,9 @@ fun HomeScreen(
         val lateAfter = currentUser?.considerLateAfter ?: 3
         val missedAfter = currentUser?.considerMissedAfter ?: 6
         val targetScheduleEntry = todayEntries.find { it.scheduleEntry.entryId == entryId }?.scheduleEntry
+        // Guard: Use isTakenLate so overdue doses past missedAfter are correctly recorded as TAKEN_LATE instead of reverting to on-time
         val isLate = if (targetScheduleEntry != null) {
-            TimeCalculationUtils.isLate(targetScheduleEntry.scheduledDateTime, resolvedDateTime, lateAfter, missedAfter)
+            TimeCalculationUtils.isTakenLate(targetScheduleEntry.scheduledDateTime, resolvedDateTime, lateAfter)
         } else false
 
         val takenAt = resolvedDateTime.toString()

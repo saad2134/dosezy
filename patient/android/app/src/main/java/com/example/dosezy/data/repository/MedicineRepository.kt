@@ -10,6 +10,7 @@ import com.example.dosezy.data.model.Medicine
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -101,11 +102,12 @@ class MedicineRepository @Inject constructor(
                 // Cancel existing alarms for this medicine BEFORE modifying or deleting schedule entries
                 scheduleRepository.cancelAlarmsForMedicine(medicine.medicineId, this.context)
 
-                val startOfToday = LocalDate.now().atStartOfDay()
-                val startOfTodayEpochMillis = startOfToday.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+                // Guard: Align deletion cutoff with generateScheduleEntries (now - 15m) so untaken doses from earlier today are not deleted and lost from adherence history
+                val cutoff = LocalDateTime.now().minusMinutes(15)
+                val cutoffEpochMillis = cutoff.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
 
-                // Delete all untaken schedule entries from start of today onwards for this medicine
-                database.scheduleDao().deleteUntakenScheduleEntriesFrom(medicine.medicineId, startOfTodayEpochMillis)
+                // Delete untaken schedule entries from cutoff onwards for this medicine
+                database.scheduleDao().deleteUntakenScheduleEntriesFrom(medicine.medicineId, cutoffEpochMillis)
 
                 // Generate new schedule entries starting from today for 30 days
                 val newEntries = medicine.generateScheduleEntries(LocalDate.now(), 30)

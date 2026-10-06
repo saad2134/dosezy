@@ -127,7 +127,6 @@ fun BackupRestoreScreen(
     }
 
     // Color definitions linked dynamically to current MaterialTheme
-    val cardBg = if (isDark) Color(0xFF1E2228) else Color.White
     val subCardBg = if (isDark) Color(0xFF15181E) else Color(0xFFF8FAFC)
     val bannerBg = if (isDark) Color(0xFF1193D4).copy(alpha = 0.18f) else Color(0xFF1193D4).copy(alpha = 0.10f)
     val textPrimary = MaterialTheme.colorScheme.onSurface

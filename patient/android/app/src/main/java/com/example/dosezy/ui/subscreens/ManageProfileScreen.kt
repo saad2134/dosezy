@@ -86,7 +86,6 @@ fun ManageProfileScreen(navController: NavController) {
     val isLoading by userViewModel.isLoading.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
     val context = androidx.compose.ui.platform.LocalContext.current
     val focusManager = LocalFocusManager.current
 
@@ -358,7 +357,6 @@ fun ManageProfileScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(32.dp))
 
                     val updatedSuccessStr = stringResource(R.string.profile_updated_success)
-                    val cannotDeleteStr = stringResource(R.string.profile_cannot_delete_only)
 
                     // Save Changes Button
                     Button(

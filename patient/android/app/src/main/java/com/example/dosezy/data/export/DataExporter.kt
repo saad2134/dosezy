@@ -60,14 +60,21 @@ class DataExporter(
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun exportAllUsersToCsv(): File = exportUserData(null, ExportFormat.CSV)
 
+    // Guard: Strip directory separators and illegal filesystem characters to prevent FileNotFoundException or invalid paths
+    private fun sanitizeFileName(name: String): String {
+        return name.trim().replace(Regex("[^a-zA-Z0-9._-]"), "_")
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun exportUserToCsv(userId: String): File = withContext(Dispatchers.IO) {
         val user = userRepository.getUserByIdSync(userId) ?: throw Exception("User not found")
-        val medicines = medicineRepository.getMedicinesByUserSync(userId)
+        // Guard: Use getMedicinesByUserDirect to include archived/discontinued medicines and prevent broken foreign key references in historical exports
+        val medicines = medicineRepository.getMedicinesByUserDirect(userId)
         val schedules = scheduleRepository.getSchedulesByUserSync(userId)
 
         val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
-        val fileName = "dosezy_export_${user.fullName.replace(" ", "_")}_$timestamp.csv"
+        val safeName = sanitizeFileName(user.fullName)
+        val fileName = "dosezy_export_${safeName}_$timestamp.csv"
 
         val csvContent = buildCsvContent(user, medicines, schedules)
         return@withContext saveExportToFile(csvContent, fileName)
@@ -76,11 +83,13 @@ class DataExporter(
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun exportUserToJson(userId: String): File = withContext(Dispatchers.IO) {
         val user = userRepository.getUserByIdSync(userId) ?: throw Exception("User not found")
-        val medicines = medicineRepository.getMedicinesByUserSync(userId)
+        // Guard: Use getMedicinesByUserDirect to include archived/discontinued medicines and prevent broken foreign key references in historical exports
+        val medicines = medicineRepository.getMedicinesByUserDirect(userId)
         val schedules = scheduleRepository.getSchedulesByUserSync(userId)
 
         val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
-        val fileName = "dosezy_export_${user.fullName.replace(" ", "_")}_$timestamp.json"
+        val safeName = sanitizeFileName(user.fullName)
+        val fileName = "dosezy_export_${safeName}_$timestamp.json"
 
         val jsonContent = buildJsonContent(user, medicines, schedules)
         return@withContext saveExportToFile(jsonContent, fileName)
@@ -89,14 +98,18 @@ class DataExporter(
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun exportUserToPdf(userId: String): File = withContext(Dispatchers.IO) {
         val user = userRepository.getUserByIdSync(userId) ?: throw Exception("User not found")
-        val medicines = medicineRepository.getMedicinesByUserSync(userId)
+        // Guard: Use getMedicinesByUserDirect to include archived/discontinued medicines and prevent "Unknown" labels in historical reports
+        val medicines = medicineRepository.getMedicinesByUserDirect(userId)
         val schedules = scheduleRepository.getSchedulesByUserSync(userId)
 
         val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
-        val fileName = "dosezy_report_${user.fullName.replace(" ", "_")}_$timestamp.pdf"
+        val safeName = sanitizeFileName(user.fullName)
+        val fileName = "dosezy_report_${safeName}_$timestamp.pdf"
 
         val pdfDoc = buildPdfDocument(user, medicines, schedules)
-        val file = File(context.getExternalFilesDir(null), fileName)
+        // Guard: Use getExportDirectory() fallback to filesDir when externalFilesDir is null/unmounted to prevent NPE
+        val exportDir = getExportDirectory()
+        val file = File(exportDir, fileName)
         FileOutputStream(file).use { out ->
             pdfDoc.writeTo(out)
         }
@@ -107,16 +120,19 @@ class DataExporter(
     @RequiresApi(Build.VERSION_CODES.O)
     private suspend fun createUsersZipFormatted(users: List<User>, format: ExportFormat): File = withContext(Dispatchers.IO) {
         val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
-        val zipFile = File(context.getExternalFilesDir(null), "dosezy_export_$timestamp.zip")
+        // Guard: Use getExportDirectory() fallback to filesDir when externalFilesDir is null/unmounted to prevent NPE
+        val exportDir = getExportDirectory()
+        val zipFile = File(exportDir, "dosezy_export_$timestamp.zip")
 
         FileOutputStream(zipFile).use { fileOutputStream ->
             ZipOutputStream(fileOutputStream).use { zipOutputStream ->
                 users.forEach { user ->
                     try {
-                        val medicines = medicineRepository.getMedicinesByUserSync(user.userId)
+                        // Guard: Use getMedicinesByUserDirect to include archived/discontinued medicines
+                        val medicines = medicineRepository.getMedicinesByUserDirect(user.userId)
                         val schedules = scheduleRepository.getSchedulesByUserSync(user.userId)
 
-                        val userFolder = user.fullName.replace(" ", "_")
+                        val userFolder = sanitizeFileName(user.fullName)
                         when (format) {
                             ExportFormat.CSV -> {
                                 val content = buildCsvContent(user, medicines, schedules)
@@ -564,7 +580,8 @@ class DataExporter(
 
     suspend fun saveExportToFile(content: String, fileName: String): File {
         return withContext(Dispatchers.IO) {
-            val file = File(context.getExternalFilesDir(null), fileName)
+            // Guard: Use getExportDirectory() fallback to filesDir when externalFilesDir is null/unmounted to prevent NPE
+            val file = File(getExportDirectory(), fileName)
             file.writeText(content)
             file
         }

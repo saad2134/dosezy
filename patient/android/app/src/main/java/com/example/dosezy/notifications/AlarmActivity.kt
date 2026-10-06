@@ -720,8 +720,8 @@ fun GroupedAlarmScreenContent(
                                 val missedAfter = user?.considerMissedAfter ?: 6
                                 if (medicinesList.isNotEmpty()) {
                                     medicinesList.forEach { (entry, _) ->
-                                        // Guard: Dynamically evaluate TAKEN_LATE vs TAKEN_ON_TIME in alarm action to prevent recording delayed/snoozed doses as on-time
-                                        val status = if (TimeCalculationUtils.isLate(entry.scheduledDateTime, now, lateAfter, missedAfter)) {
+                                        // Guard: Use isTakenLate so delayed/snoozed or overdue doses past missedAfter are correctly recorded as TAKEN_LATE
+                                        val status = if (TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, lateAfter)) {
                                             "TAKEN_LATE"
                                         } else {
                                             "TAKEN_ON_TIME"
@@ -734,8 +734,8 @@ fun GroupedAlarmScreenContent(
                                         val entryUser = entry?.let { database.userDao().getUserByIdDirect(it.userId) } ?: user
                                         val entryLateAfter = entryUser?.considerLateAfter ?: 3
                                         val entryMissedAfter = entryUser?.considerMissedAfter ?: 6
-                                        // Guard: Dynamically evaluate TAKEN_LATE vs TAKEN_ON_TIME in alarm action to prevent recording delayed/snoozed doses as on-time
-                                        val status = if (entry != null && TimeCalculationUtils.isLate(entry.scheduledDateTime, now, entryLateAfter, entryMissedAfter)) {
+                                        // Guard: Use isTakenLate so delayed/snoozed or overdue doses past missedAfter are correctly recorded as TAKEN_LATE
+                                        val status = if (entry != null && TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, entryLateAfter)) {
                                             "TAKEN_LATE"
                                         } else {
                                             "TAKEN_ON_TIME"
