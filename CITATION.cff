@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use Dosezy, please cite it as below."
 type: software
 title: "Dosezy"
-version: 2.5.9
+version: 2.5.10
 date-released: 2026-10-06
 url: "https://github.com/saad2134/dosezy"
 repository-code: "https://github.com/saad2134/dosezy"
