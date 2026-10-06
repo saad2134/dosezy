@@ -66,11 +66,6 @@ class MainActivity : ComponentActivity() {
 
     private val userViewModel: UserViewModel by viewModels()
 
-    override fun attachBaseContext(newBase: android.content.Context) {
-        val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(newBase)
-        val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(newBase, savedLanguage)
-        super.attachBaseContext(localizedContext)
-    }
 
     override fun applyOverrideConfiguration(overrideConfiguration: android.content.res.Configuration?) {
         if (overrideConfiguration != null) {
@@ -209,6 +204,11 @@ fun DosezyApp() {
     val currentDestination = currentBackStackEntry?.destination
     val context = androidx.compose.ui.platform.LocalContext.current
 
+    val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
+    val users by userViewModel.users.collectAsState()
+    val currentUser by userViewModel.currentUser.collectAsState()
+    val isViewModelLoading by userViewModel.isLoading.collectAsState()
+
     val permissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
         onResult = {}
@@ -219,22 +219,24 @@ fun DosezyApp() {
     var showOverlayPrompt by remember { mutableStateOf(false) }
     var showLowStorageDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(currentUser) {
         if (com.example.dosezy.utils.StorageUtils.isStorageCriticallyLow(context)) {
             showLowStorageDialog = true
         }
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         }
-        val batteryDismissed = prefs.getBoolean("battery_prompt_dismissed", false)
-        if (!batteryDismissed && !com.example.dosezy.utils.NotificationUtils.isIgnoringBatteryOptimizations(context)) {
-            kotlinx.coroutines.delay(1200)
-            showBatteryPrompt = true
-        } else if (!com.example.dosezy.utils.NotificationUtils.canDrawOverlays(context)) {
-            val dismissed = prefs.getBoolean("overlay_prompt_dismissed", false)
-            if (!dismissed) {
+        if (currentUser != null) {
+            val batteryDismissed = prefs.getBoolean("battery_prompt_dismissed", false)
+            if (!batteryDismissed && !com.example.dosezy.utils.NotificationUtils.isIgnoringBatteryOptimizations(context)) {
                 kotlinx.coroutines.delay(1200)
-                showOverlayPrompt = true
+                showBatteryPrompt = true
+            } else if (!com.example.dosezy.utils.NotificationUtils.canDrawOverlays(context)) {
+                val dismissed = prefs.getBoolean("overlay_prompt_dismissed", false)
+                if (!dismissed) {
+                    kotlinx.coroutines.delay(1200)
+                    showOverlayPrompt = true
+                }
             }
         }
     }
@@ -340,10 +342,6 @@ fun DosezyApp() {
         )
     }
 
-    val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
-    val users by userViewModel.users.collectAsState()
-    val currentUser by userViewModel.currentUser.collectAsState()
-    val isViewModelLoading by userViewModel.isLoading.collectAsState()
 
     var isInitialized by remember { mutableStateOf(false) }
 

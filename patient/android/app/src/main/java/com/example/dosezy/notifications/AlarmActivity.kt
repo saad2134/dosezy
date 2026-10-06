@@ -94,11 +94,6 @@ class AlarmActivity : ComponentActivity() {
     private val activeMedicineNameState = mutableStateOf("Medication")
     private val activeScheduledTimeState = mutableStateOf("")
 
-    override fun attachBaseContext(newBase: android.content.Context) {
-        val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(newBase)
-        val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(newBase, savedLanguage)
-        super.attachBaseContext(localizedContext)
-    }
 
     override fun applyOverrideConfiguration(overrideConfiguration: android.content.res.Configuration?) {
         if (overrideConfiguration != null) {
