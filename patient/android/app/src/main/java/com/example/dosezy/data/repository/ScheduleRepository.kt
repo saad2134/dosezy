@@ -177,6 +177,9 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 it.scheduledDateTime.isBefore(limitTime)
             }
 
+            val user = database.userDao().getUserByIdDirect(userId)
+            val userTimeFormat = user?.timeFormat
+
             // Group entries by exact scheduled time slot
             val groupedByTime = pendingEntries.groupBy { it.scheduledDateTime.withSecond(0).withNano(0) }
 
@@ -189,7 +192,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 if (entriesWithNames.isNotEmpty()) {
                     val entriesList = entriesWithNames.map { it.first }
                     val namesList = entriesWithNames.map { it.second }
-                    alarmScheduler.scheduleGroupedMedicineAlarm(slotDateTime, entriesList, namesList)
+                    // Guard: Pass user's timeFormat so scheduled alarm intent contains user's preferred 12h/24h time string
+                    alarmScheduler.scheduleGroupedMedicineAlarm(slotDateTime, entriesList, namesList, timeFormat = userTimeFormat)
                     scheduledCount += entriesWithNames.size
                 }
             }
@@ -216,6 +220,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 it.status == MedicationStatus.PENDING &&
                 it.scheduledDateTime.isAfter(LocalDateTime.now())
             }
+            val user = database.userDao().getUserByIdDirect(userId)
+            val userTimeFormat = user?.timeFormat
             val groupedByTime = pendingEntries.groupBy { it.scheduledDateTime.withSecond(0).withNano(0) }
             groupedByTime.forEach { (slotDateTime, entriesInSlot) ->
                 val entriesWithNames = entriesInSlot.mapNotNull { entry ->
@@ -225,7 +231,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 if (entriesWithNames.isNotEmpty()) {
                     val entriesList = entriesWithNames.map { it.first }
                     val namesList = entriesWithNames.map { it.second }
-                    alarmScheduler.scheduleGroupedMedicineAlarm(slotDateTime, entriesList, namesList)
+                    // Guard: Pass user's timeFormat so scheduled alarm intent contains user's preferred 12h/24h time string
+                    alarmScheduler.scheduleGroupedMedicineAlarm(slotDateTime, entriesList, namesList, timeFormat = userTimeFormat)
                     scheduledCount += entriesWithNames.size
                 }
             }

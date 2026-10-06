@@ -366,9 +366,9 @@ fun GroupedAlarmScreenContent(
                 if (medicinesList.isNotEmpty()) {
                     val ids = medicinesList.map { it.first.entryId }
                     val names = medicinesList.map { it.second.medicationName }
-                    alarmScheduler.scheduleGroupedSnooze(ids, snoozeMinutes, names)
+                    alarmScheduler.scheduleGroupedSnooze(ids, snoozeMinutes, names, timeFormat = user?.timeFormat)
                 } else if (entryIds.isNotEmpty()) {
-                    alarmScheduler.scheduleGroupedSnooze(entryIds, snoozeMinutes, listOf(initialMedicineName))
+                    alarmScheduler.scheduleGroupedSnooze(entryIds, snoozeMinutes, listOf(initialMedicineName), timeFormat = user?.timeFormat)
                 }
             }
             onDismiss()
@@ -501,12 +501,23 @@ fun GroupedAlarmScreenContent(
                                 ),
                                 color = MaterialTheme.colorScheme.onSurface
                             )
-                            val ageStr = user?.let { "${it.age} yrs" } ?: ""
-                            val genderStr = user?.gender?.getLocalizedName() ?: ""
-                            val detailsStr = listOf(ageStr, genderStr).filter { it.isNotEmpty() }.joinToString(" • ")
+                            // Guard: Use localized strings for age, gender, and profile fallback rather than hardcoded English " yrs" and "Medication Profile"
+                            val currentUser = user
+                            val detailsStr = when {
+                                currentUser != null && currentUser.age > 0 && currentUser.gender != null -> {
+                                    stringResource(R.string.profile_age_gender_format, currentUser.age, currentUser.gender.getLocalizedName())
+                                }
+                                currentUser != null && currentUser.age > 0 -> {
+                                    stringResource(R.string.years_format, currentUser.age)
+                                }
+                                currentUser != null && currentUser.gender != null -> {
+                                    currentUser.gender.getLocalizedName()
+                                }
+                                else -> ""
+                            }
 
                             Text(
-                                text = if (detailsStr.isNotEmpty()) detailsStr else "Medication Profile",
+                                text = if (detailsStr.isNotEmpty()) detailsStr else stringResource(R.string.profile),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = Color(0xFF1193D4),
                                 fontWeight = FontWeight.SemiBold,
@@ -516,19 +527,19 @@ fun GroupedAlarmScreenContent(
                     }
                 }
 
-                // Guard: Format scheduled time or current time instead of fallback string to prevent duplicate "MEDICATION REMINDER" title
+                // Guard: Format scheduled time prioritizing loaded entry time with user's preferred 12h/24h format and active locale
                 val displayTime = remember(initialScheduledTime, medicinesList, user) {
-                    if (initialScheduledTime.isNotBlank()) {
+                    val firstDt = medicinesList.firstOrNull()?.first?.scheduledDateTime
+                    val tf = user?.timeFormat ?: com.example.dosezy.data.model.TimeFormat.HOUR_12
+                    val savedLang = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+                    val activeLocale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLang)
+                    if (firstDt != null) {
+                        com.example.dosezy.utils.TimeFormatUtils.formatTime(firstDt, tf, activeLocale)
+                    } else if (initialScheduledTime.isNotBlank()) {
                         initialScheduledTime
                     } else {
-                        val firstDt = medicinesList.firstOrNull()?.first?.scheduledDateTime
-                        val tf = user?.timeFormat ?: com.example.dosezy.data.model.TimeFormat.HOUR_12
-                        if (firstDt != null) {
-                            com.example.dosezy.utils.TimeFormatUtils.formatTime(firstDt, tf)
-                        } else {
-                            val now = java.time.LocalTime.now()
-                            com.example.dosezy.utils.TimeFormatUtils.formatLocalTime(now, tf)
-                        }
+                        val now = java.time.LocalTime.now()
+                        com.example.dosezy.utils.TimeFormatUtils.formatLocalTime(now, tf, activeLocale)
                     }
                 }
 

@@ -165,6 +165,20 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                         autoSilenceSeconds = duration
                     )
 
+                    val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+                    val currentLocale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLanguage)
+
+                    // Guard: Resolve user's preferred 12h/24h time format and locale from DB rather than hardcoded 12h string, preventing AM/PM desync
+                    val formattedScheduledTime = if (user != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        try {
+                            com.example.dosezy.utils.TimeFormatUtils.formatTime(primaryEntry.scheduledDateTime, user.timeFormat, currentLocale)
+                        } catch (_: Exception) {
+                            scheduledTime
+                        }
+                    } else {
+                        scheduledTime
+                    }
+
                     showNotification(
                         context = context,
                         entryId = primaryEntry.entryId,
@@ -172,7 +186,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                         medicineName = effectiveMedicineName,
                         medicineNames = activeMedicineNames,
                         medicineDetails = medicineDetails,
-                        scheduledTime = scheduledTime,
+                        scheduledTime = formattedScheduledTime,
                         isNagging = isNagging,
                         naggingCount = naggingCount,
                         maxNagging = user?.naggingMaxRepeats ?: 3,
@@ -189,7 +203,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                             naggingCount = naggingCount + 1,
                             entryIds = activeEntryIds,
                             medicineNames = activeMedicineNames,
-                            scheduledTime = scheduledTime
+                            scheduledTime = formattedScheduledTime
                         )
                     }
                 } catch (ex: Exception) {
