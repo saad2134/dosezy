@@ -201,7 +201,8 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
         if (saved == null && prefs.contains("contacts_json")) {
             saved = prefs.getString("contacts_json", null)
             if (saved != null) {
-                prefs.edit().putString(userKey, saved).apply()
+                // Guard: Remove legacy un-namespaced key upon migration to prevent newly created profiles from inheriting another user's contacts
+                prefs.edit().putString(userKey, saved).remove("contacts_json").apply()
             }
         }
         val list = androidx.compose.runtime.mutableStateListOf<Pair<String, String>>()

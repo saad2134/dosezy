@@ -80,6 +80,8 @@ class MainActivity : ComponentActivity() {
         super.applyOverrideConfiguration(overrideConfiguration)
     }
 
+    private val pendingRouteState = androidx.compose.runtime.mutableStateOf<String?>(null)
+
     override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
@@ -87,12 +89,23 @@ class MainActivity : ComponentActivity() {
         if (!targetUserId.isNullOrBlank()) {
             userViewModel.setCurrentUserById(targetUserId)
         }
+        // Guard: Route to schedule screen when tapped notification specifies fragment=schedule
+        val targetFragment = intent.getStringExtra("fragment")
+        if (targetFragment == "schedule") {
+            pendingRouteState.value = "schedule"
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+        // Guard: Parse initial launch intent extras to route directly to schedule screen on cold start
+        val targetFragment = intent.getStringExtra("fragment")
+        if (targetFragment == "schedule") {
+            pendingRouteState.value = "schedule"
+        }
 
         // Safety fallback: if an uncaught locale/formatting error occurs, reset language to SYSTEM so app opens cleanly on next launch
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
@@ -187,7 +200,10 @@ class MainActivity : ComponentActivity() {
                             modifier = androidx.compose.ui.Modifier.fillMaxSize(),
                             color = MaterialTheme.colorScheme.background
                         ) {
-                            DosezyApp()
+                            DosezyApp(
+                                pendingRouteState = pendingRouteState,
+                                onRouteConsumed = { pendingRouteState.value = null }
+                            )
                         }
                     }
                 }
@@ -198,7 +214,10 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
-fun DosezyApp() {
+fun DosezyApp(
+    pendingRouteState: androidx.compose.runtime.State<String?> = androidx.compose.runtime.mutableStateOf(null),
+    onRouteConsumed: () -> Unit = {}
+) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination
@@ -354,9 +373,24 @@ fun DosezyApp() {
                     popUpTo("loading") { inclusive = true }
                 }
             } else {
-                navController.navigate("home") {
+                val startRoute = if (pendingRouteState.value == "schedule") "schedule" else "home"
+                if (pendingRouteState.value != null) {
+                    onRouteConsumed()
+                }
+                navController.navigate(startRoute) {
                     popUpTo("loading") { inclusive = true }
                 }
+            }
+        }
+    }
+
+    // Guard: Navigate to schedule screen dynamically when notification is tapped while MainActivity is in foreground
+    LaunchedEffect(pendingRouteState.value) {
+        val target = pendingRouteState.value
+        if (target != null && isInitialized && currentUser != null) {
+            onRouteConsumed()
+            navController.navigate(target) {
+                launchSingleTop = true
             }
         }
     }
@@ -372,7 +406,11 @@ fun DosezyApp() {
                         popUpTo("loading") { inclusive = true }
                     }
                 } else {
-                    navController.navigate("home") {
+                    val startRoute = if (pendingRouteState.value == "schedule") "schedule" else "home"
+                    if (pendingRouteState.value != null) {
+                        onRouteConsumed()
+                    }
+                    navController.navigate(startRoute) {
                         popUpTo("loading") { inclusive = true }
                     }
                 }

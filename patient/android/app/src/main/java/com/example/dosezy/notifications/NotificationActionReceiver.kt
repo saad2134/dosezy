@@ -56,6 +56,10 @@ class NotificationActionReceiver : BroadcastReceiver() {
         val alarmScheduler = AlarmScheduler(context)
         allIds.forEach { id ->
             alarmScheduler.cancelNagging(id)
+            if (action == "TAKEN_ACTION") {
+                // Guard: Cancel snooze alarm so taking medication prevents delayed phantom snooze triggers
+                alarmScheduler.cancelSnooze(id)
+            }
         }
 
         // Cancel notification for both Taken and Snooze actions

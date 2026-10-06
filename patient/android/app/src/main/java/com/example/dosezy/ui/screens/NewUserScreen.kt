@@ -1126,9 +1126,10 @@ fun ProfileItem(user: User, onClick: () -> Unit, modifier: Modifier = Modifier) 
             ) {
                 // Profile picture with fallback
                 if (!user.profilePicPath.isNullOrEmpty()) {
+                    val modelData = remember(user.profilePicPath) { com.example.dosezy.utils.ImageUtils.resolveImageModel(user.profilePicPath) }
                     AsyncImage(
                         model = ImageRequest.Builder(context)
-                            .data(File(user.profilePicPath))
+                            .data(modelData)
                             .crossfade(true)
                             .build(),
                         contentDescription = stringResource(R.string.profile_picture_desc),

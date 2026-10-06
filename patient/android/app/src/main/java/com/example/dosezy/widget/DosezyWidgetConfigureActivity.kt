@@ -458,9 +458,10 @@ private fun WidgetConfigureScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 if (!user.profilePicPath.isNullOrEmpty()) {
+                                    val modelData = remember(user.profilePicPath) { com.example.dosezy.utils.ImageUtils.resolveImageModel(user.profilePicPath) }
                                     AsyncImage(
                                         model = ImageRequest.Builder(context)
-                                            .data(File(user.profilePicPath))
+                                            .data(modelData)
                                             .crossfade(true)
                                             .build(),
                                         contentDescription = user.fullName,

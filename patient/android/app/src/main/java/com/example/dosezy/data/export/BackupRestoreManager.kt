@@ -465,7 +465,8 @@ class BackupRestoreManager(
                                     medAssetsDir.mkdirs()
                                     val targetMedAsset = File(medAssetsDir, "image.jpg")
                                     medAssetFile.copyTo(targetMedAsset, overwrite = true)
-                                    "file://${targetMedAsset.absolutePath}"
+                                    // Guard: Save canonical absolutePath without file:// scheme to ensure consistent image loading across Coil and file pickers
+                                    targetMedAsset.absolutePath
                                 } else null
 
                                 val newMed = med.copy(

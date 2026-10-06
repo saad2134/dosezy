@@ -599,9 +599,10 @@ fun ProfileImage(
             .clip(RoundedCornerShape(16.dp))
     ) {
         if (currentUser?.profilePicPath != null) {
+            val modelData = remember(currentUser.profilePicPath) { com.example.dosezy.utils.ImageUtils.resolveImageModel(currentUser.profilePicPath) }
             AsyncImage(
                 model = ImageRequest.Builder(context)
-                    .data(File(currentUser.profilePicPath))
+                    .data(modelData)
                     .crossfade(true)
                     .build(),
                 contentDescription = "Profile Picture",

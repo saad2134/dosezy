@@ -124,13 +124,21 @@ class ScheduleRepository(private val database: DosezyDatabase) {
     suspend fun cancelAlarmsForMedicine(medicineId: String, context: Context) {
         val alarmScheduler = AlarmScheduler(context)
         val scheduleEntries = database.scheduleDao().getScheduleEntriesByMedicine(medicineId)
-        scheduleEntries.forEach { entry ->
+        val now = LocalDateTime.now()
+        val activeWindowStart = now.minusHours(24)
+        val activeWindowEnd = now.plusDays(8)
+        // Guard: Only cancel alarms within the active window; looping over months of past history triggers thousands of redundant Binder IPC calls
+        val entriesToCancel = scheduleEntries.filter { entry ->
+            entry.scheduledDateTime.isAfter(activeWindowStart) &&
+            entry.scheduledDateTime.isBefore(activeWindowEnd)
+        }
+        entriesToCancel.forEach { entry ->
             alarmScheduler.cancelAlarm(entry.entryId)
             alarmScheduler.cancelSnooze(entry.entryId)
             alarmScheduler.cancelNagging(entry.entryId)
             alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
         }
-        Log.d(TAG, "Cancelled alarms for medicine ID: $medicineId (${scheduleEntries.size} entries)")
+        Log.d(TAG, "Cancelled active alarms for medicine ID: $medicineId (${entriesToCancel.size} active entries)")
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -144,8 +152,17 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             // Get all schedule entries for the user
             val allEntries = database.scheduleDao().getAllScheduleEntries(userId)
 
-            // Cancel all existing alarms first
-            allEntries.forEach { entry ->
+            val now = LocalDateTime.now()
+            val limitTime = now.plusDays(7)
+            val activeWindowStart = now.minusHours(24)
+            val activeWindowEnd = limitTime.plusDays(1)
+
+            // Guard: Only cancel alarms within the active window; looping over months of past history triggers thousands of redundant Binder IPC calls
+            val entriesToCancel = allEntries.filter { entry ->
+                entry.scheduledDateTime.isAfter(activeWindowStart) &&
+                entry.scheduledDateTime.isBefore(activeWindowEnd)
+            }
+            entriesToCancel.forEach { entry ->
                 alarmScheduler.cancelAlarm(entry.entryId)
                 alarmScheduler.cancelSnooze(entry.entryId)
                 alarmScheduler.cancelNagging(entry.entryId)
@@ -154,8 +171,6 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
             // Schedule grouped alarms for strictly future pending entries within the 7-day window
             var scheduledCount = 0
-            val now = LocalDateTime.now()
-            val limitTime = now.plusDays(7)
             val pendingEntries = allEntries.filter { 
                 it.status == MedicationStatus.PENDING &&
                 it.scheduledDateTime.isAfter(now) &&
@@ -327,11 +342,17 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             }
         }
 
-        // 4. Cancel active notification for this entry and update widgets
+        // 4. Cancel active notification for this entry, disarm snooze/nagging alarms, and update widgets
         if (context != null) {
             try {
                 val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
                 nManager.cancel(entryId.hashCode())
+            } catch (_: Exception) {}
+            try {
+                // Guard: Cancel armed snooze and nagging alarms so taking in-app prevents phantom alarms from ringing later
+                val alarmScheduler = com.example.dosezy.notifications.AlarmScheduler(context)
+                alarmScheduler.cancelSnooze(entryId)
+                alarmScheduler.cancelNagging(entryId)
             } catch (_: Exception) {}
             try {
                 com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
@@ -363,11 +384,17 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         // 2. Stop any active alarm sound / popup
         com.example.dosezy.notifications.AlarmActivity.stopActiveAlarm()
 
-        // 3. Cancel active notification for this entry and update widgets
+        // 3. Cancel active notification for this entry, disarm snooze/nagging alarms, and update widgets
         if (context != null) {
             try {
                 val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
                 nManager.cancel(entryId.hashCode())
+            } catch (_: Exception) {}
+            try {
+                // Guard: Cancel armed snooze and nagging alarms so skipping in-app prevents phantom alarms from ringing later
+                val alarmScheduler = com.example.dosezy.notifications.AlarmScheduler(context)
+                alarmScheduler.cancelSnooze(entryId)
+                alarmScheduler.cancelNagging(entryId)
             } catch (_: Exception) {}
             try {
                 com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)

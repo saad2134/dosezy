@@ -254,9 +254,9 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             medicineName
         }
 
-        // Create intent for opening the app
+        // Guard: Use SINGLE_TOP/CLEAR_TOP so clicking the notification delivers to onNewIntent or launches MainActivity with schedule route
         val mainIntent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra("fragment", "schedule")
         }
 
@@ -391,7 +391,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             .setFullScreenIntent(fullScreenPendingIntent, true)
             .setAutoCancel(true)
             .setSilent(true)
-            .setContentIntent(fullScreenPendingIntent)
+            .setContentIntent(pendingIntent)
             .addAction(
                 getNotificationIcon(context, Icons.Filled.Check),
                 localizedContext.getString(R.string.home_action_taken),

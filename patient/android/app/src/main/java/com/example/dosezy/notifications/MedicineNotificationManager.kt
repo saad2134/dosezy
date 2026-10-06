@@ -66,13 +66,21 @@ class MedicineNotificationManager @Inject constructor(
     suspend fun cancelAllAlarmsForUser(userId: String) = withContext(Dispatchers.IO) {
         try {
             val allEntries = scheduleRepository.getSchedulesByUserSync(userId)
-            allEntries.forEach { entry ->
+            val now = java.time.LocalDateTime.now()
+            val activeWindowStart = now.minusHours(24)
+            val activeWindowEnd = now.plusDays(8)
+            // Guard: Only cancel alarms within the active window; looping over months of past history triggers thousands of redundant Binder IPC calls
+            val entriesToCancel = allEntries.filter { entry ->
+                entry.scheduledDateTime.isAfter(activeWindowStart) &&
+                entry.scheduledDateTime.isBefore(activeWindowEnd)
+            }
+            entriesToCancel.forEach { entry ->
                 alarmScheduler.cancelAlarm(entry.entryId)
                 alarmScheduler.cancelSnooze(entry.entryId)
                 alarmScheduler.cancelNagging(entry.entryId)
                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
             }
-            Log.d(TAG, "Cancelled all alarms for user: $userId (${allEntries.size} entries)")
+            Log.d(TAG, "Cancelled active window alarms for user: $userId (${entriesToCancel.size} active entries)")
         } catch (e: Exception) {
             Log.e(TAG, "Error cancelling alarms for user: $userId", e)
         }
