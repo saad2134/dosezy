@@ -238,7 +238,8 @@ fun GridTimePickerDialog(
                         FilterChip(
                             selected = isSelected,
                             onClick = { selectedTimeState = selectedTimeState.withMinute(min) },
-                            label = { Text(":$min", fontWeight = FontWeight.Bold) },
+                            // Guard: Zero-pad minute notation (:00 instead of :0) for standard digital clock formatting
+                            label = { Text(String.format(":%02d", min), fontWeight = FontWeight.Bold) },
                             modifier = Modifier.weight(1f)
                         )
                     }

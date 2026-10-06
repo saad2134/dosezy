@@ -151,13 +151,15 @@ class AnalyticsViewModel @Inject constructor(
 
         fun getRangeEntries(range: AdherenceRange): List<ScheduleEntry> {
             return when (range) {
+                // Guard: Align LAST_7_DAYS to today.minusDays(6)..today (exactly 7 days) to match 7-day weekly trend chart cardinality
                 AdherenceRange.LAST_7_DAYS -> scheduleEntries.filter {
                     val d = it.scheduledDateTime.toLocalDate()
-                    d >= today.minusDays(7) && d <= today
+                    d >= today.minusDays(6) && d <= today
                 }
+                // Guard: Align LAST_30_DAYS to today.minusDays(29)..today (exactly 30 days) to prevent 31-day off-by-one window expansion
                 AdherenceRange.LAST_30_DAYS -> scheduleEntries.filter {
                     val d = it.scheduledDateTime.toLocalDate()
-                    d >= today.minusDays(30) && d <= today
+                    d >= today.minusDays(29) && d <= today
                 }
                 AdherenceRange.SIX_MONTHS -> scheduleEntries.filter {
                     val d = it.scheduledDateTime.toLocalDate()
