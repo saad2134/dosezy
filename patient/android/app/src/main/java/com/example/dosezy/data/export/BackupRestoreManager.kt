@@ -175,15 +175,17 @@ class BackupRestoreManager(
     }
 
     suspend fun inspectBackupZip(uri: Uri): ZipInspectionResult = withContext(Dispatchers.IO) {
+        var tempDir: File? = null
         try {
             val inputStream = context.contentResolver.openInputStream(uri)
                 ?: return@withContext ZipInspectionResult(false, message = "Could not open backup file.")
 
-            val tempDir = File(context.cacheDir, "dosezy_inspect_${System.currentTimeMillis()}")
-            tempDir.mkdirs()
+            val inspectDir = File(context.cacheDir, "dosezy_inspect_${System.currentTimeMillis()}")
+            inspectDir.mkdirs()
+            tempDir = inspectDir
 
             // Guard: Android 7.0/7.1 (API 24/25) lacks File.toPath(); use canonicalPath to prevent crash and Zip Slip vulnerabilities
-            val canonicalTempDir = tempDir.canonicalPath
+            val canonicalTempDir = inspectDir.canonicalPath
             ZipInputStream(BufferedInputStream(inputStream)).use { zis ->
                 var entry = zis.nextEntry
                 while (entry != null) {
@@ -272,6 +274,8 @@ class BackupRestoreManager(
             )
         } catch (e: Exception) {
             e.printStackTrace()
+            // Guard: Clean up temporary extraction folder on corrupt or interrupted backup inspection to prevent disk cache leakage
+            try { tempDir?.deleteRecursively() } catch (_: Exception) {}
             return@withContext ZipInspectionResult(false, message = "Inspection failed: ${e.localizedMessage}")
         }
     }
@@ -393,6 +397,11 @@ class BackupRestoreManager(
                             }
                         } catch (_: Exception) {}
 
+                        val localUsers = database.userDao().getAllUsersDirect()
+                        val existingLocalUser = localUsers.firstOrNull { it.userId == targetUserId }
+                        // Guard: Preserve existing local user's active status (or promote if this is the sole/first profile) to prevent wiping the active session on overwrite restore
+                        val shouldBeCurrent = existingLocalUser?.isCurrentUser ?: (totalProfiles == 0)
+
                         // Clear old records for this profile
                         database.scheduleDao().deleteScheduleByUser(targetUserId)
                         database.medicineDao().deleteMedicinesByUser(targetUserId)
@@ -406,7 +415,11 @@ class BackupRestoreManager(
                             targetAvatar.absolutePath
                         } else originalUser.profilePicPath
 
-                        val restoredUser = originalUser.copy(userId = targetUserId, profilePicPath = finalPicPath)
+                        val restoredUser = originalUser.copy(
+                            userId = targetUserId,
+                            profilePicPath = finalPicPath,
+                            isCurrentUser = shouldBeCurrent
+                        )
                         database.userDao().insertUser(restoredUser)
                         if (firstRestoredUserId == null) firstRestoredUserId = targetUserId
                         totalProfiles++

@@ -55,6 +55,7 @@ import com.example.dosezy.data.model.User
 import com.example.dosezy.data.model.getLocalizedName
 import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.ui.theme.DosezyTheme
+import com.example.dosezy.utils.TimeCalculationUtils
 import com.example.dosezy.utils.TimeFormatUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -713,14 +714,33 @@ fun GroupedAlarmScreenContent(
                                 allIds.forEach { id ->
                                     alarmScheduler.cancelNagging(id)
                                 }
-                                val nowStr = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                                val now = LocalDateTime.now()
+                                val nowStr = now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                                val lateAfter = user?.considerLateAfter ?: 3
+                                val missedAfter = user?.considerMissedAfter ?: 6
                                 if (medicinesList.isNotEmpty()) {
                                     medicinesList.forEach { (entry, _) ->
-                                        scheduleRepository.recordDoseTaken(entry.entryId, "TAKEN_ON_TIME", nowStr, context)
+                                        // Guard: Dynamically evaluate TAKEN_LATE vs TAKEN_ON_TIME in alarm action to prevent recording delayed/snoozed doses as on-time
+                                        val status = if (TimeCalculationUtils.isLate(entry.scheduledDateTime, now, lateAfter, missedAfter)) {
+                                            "TAKEN_LATE"
+                                        } else {
+                                            "TAKEN_ON_TIME"
+                                        }
+                                        scheduleRepository.recordDoseTaken(entry.entryId, status, nowStr, context)
                                     }
                                 } else if (entryIds.isNotEmpty()) {
                                     entryIds.forEach { id ->
-                                        scheduleRepository.recordDoseTaken(id, "TAKEN_ON_TIME", nowStr, context)
+                                        val entry = database.scheduleDao().getScheduleEntryById(id)
+                                        val entryUser = entry?.let { database.userDao().getUserByIdDirect(it.userId) } ?: user
+                                        val entryLateAfter = entryUser?.considerLateAfter ?: 3
+                                        val entryMissedAfter = entryUser?.considerMissedAfter ?: 6
+                                        // Guard: Dynamically evaluate TAKEN_LATE vs TAKEN_ON_TIME in alarm action to prevent recording delayed/snoozed doses as on-time
+                                        val status = if (entry != null && TimeCalculationUtils.isLate(entry.scheduledDateTime, now, entryLateAfter, entryMissedAfter)) {
+                                            "TAKEN_LATE"
+                                        } else {
+                                            "TAKEN_ON_TIME"
+                                        }
+                                        scheduleRepository.recordDoseTaken(id, status, nowStr, context)
                                     }
                                 }
                             }

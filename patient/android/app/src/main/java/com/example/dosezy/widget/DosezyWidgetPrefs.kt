@@ -46,4 +46,12 @@ object DosezyWidgetPrefs {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getString("profile_theme_" + userId, null)
     }
+
+    // Guard: Remove orphaned widget profile theme entries when a profile is deleted to prevent shared preference bloat
+    fun deleteWidgetProfileTheme(context: Context, userId: String) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .remove("profile_theme_" + userId)
+            .apply()
+    }
 }

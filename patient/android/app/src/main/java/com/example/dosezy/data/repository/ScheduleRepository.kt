@@ -433,6 +433,14 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
         // 3. Update app widgets
         if (context != null) {
+            // Guard: Reschedule alarms for upcoming doses so undoing a mistakenly marked dose restores future AlarmManager reminders
+            if (previousEntry != null && previousEntry.scheduledDateTime.isAfter(LocalDateTime.now())) {
+                try {
+                    rescheduleAllAlarms(previousEntry.userId, context)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error rescheduling alarms on undoDoseTaken", e)
+                }
+            }
             try {
                 com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
             } catch (_: Exception) {}

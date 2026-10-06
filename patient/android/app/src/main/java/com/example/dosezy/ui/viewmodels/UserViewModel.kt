@@ -50,7 +50,13 @@ class UserViewModel @Inject constructor(
                         _users.value = userList
 
                         // Find current user
-                        val current = userList.firstOrNull { it.isCurrentUser }
+                        var current = userList.firstOrNull { it.isCurrentUser }
+                        // Guard: Auto-promote first profile if profiles exist but none has isCurrentUser=true (e.g. after selective restore or migration) to ensure an active profile always exists
+                        if (current == null && userList.isNotEmpty()) {
+                            val promoted = userList.first().copy(isCurrentUser = true)
+                            userRepository.updateUser(promoted)
+                            current = promoted
+                        }
                         _currentUser.value = current
                         if (current != null) {
                             try {
@@ -229,6 +235,16 @@ class UserViewModel @Inject constructor(
 
                     // Delete the user from DB (cascades to medicines & schedules)
                     userRepository.deleteUser(user)
+
+                    // Guard: Scrub orphaned emergency contacts and widget profile preferences for the deleted profile to prevent SharedPreferences leakage
+                    try {
+                        val emPrefs = medicineRepository.context.getSharedPreferences("emergency_contacts", android.content.Context.MODE_PRIVATE)
+                        emPrefs.edit().remove("contacts_json_${user.userId}").apply()
+                    } catch (_: Exception) {}
+
+                    try {
+                        com.example.dosezy.widget.DosezyWidgetPrefs.deleteWidgetProfileTheme(medicineRepository.context, user.userId)
+                    } catch (_: Exception) {}
 
                     // Fetch remaining users directly from DB
                     val remainingUsers = userRepository.getAllUsersList().filter { it.userId != user.userId }

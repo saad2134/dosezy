@@ -73,7 +73,9 @@ import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.viewmodels.UserViewModel
+import com.example.dosezy.utils.TimeCalculationUtils
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
@@ -119,7 +121,14 @@ fun AnalyticsScreen(navController: NavController) {
     val scheduleEntries = scheduleEntriesNullable ?: emptyList()
 
     val today = LocalDate.now()
+    val now = LocalDateTime.now()
+    val missedAfterHours = currentUser?.considerMissedAfter ?: 6
     var selectedRange by remember { mutableStateOf(AdherenceRange.TOTAL) }
+
+    // Guard: Dynamic adherence evaluation for PENDING doses exceeding considerMissedAfter threshold to prevent inflated compliance rates prior to background worker execution
+    fun isEntryMissed(entry: ScheduleEntry): Boolean =
+        entry.status == MedicationStatus.MISSED ||
+        (entry.status == MedicationStatus.PENDING && now.isAfter(entry.scheduledDateTime) && TimeCalculationUtils.isMissed(entry.scheduledDateTime, now, missedAfterHours))
 
     fun getRangeEntries(range: AdherenceRange): List<ScheduleEntry> {
         return when (range) {
@@ -149,7 +158,7 @@ fun AnalyticsScreen(navController: NavController) {
         val entries = getRangeEntries(range).filter { !it.entryId.startsWith("PRN_") }
         val total = entries.size
         val taken = entries.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
-        val missed = entries.count { it.status == MedicationStatus.MISSED }
+        val missed = entries.count { isEntryMissed(it) }
         val decided = taken + missed
         val rate = if (decided > 0) ((taken.toDouble() / decided.toDouble()) * 100).toInt() else 0
         return RangeAdherenceData(range, label, taken, decided, total, rate)
@@ -171,7 +180,7 @@ fun AnalyticsScreen(navController: NavController) {
     val totalEntries = pastAndTodayEntries.size
     val takenOnTime = pastAndTodayEntries.count { it.status == MedicationStatus.TAKEN_ON_TIME }
     val takenLate = pastAndTodayEntries.count { it.status == MedicationStatus.TAKEN_LATE }
-    val missed = pastAndTodayEntries.count { it.status == MedicationStatus.MISSED }
+    val missed = pastAndTodayEntries.count { isEntryMissed(it) }
     val skipped = pastAndTodayEntries.count { it.status == MedicationStatus.SKIPPED }
     val totalTaken = takenOnTime + takenLate
     val totalDecided = totalTaken + missed
@@ -190,7 +199,7 @@ fun AnalyticsScreen(navController: NavController) {
         val date = today.minusDays(daysAgo.toLong())
         val dayEntries = scheduleEntries.filter { it.scheduledDateTime.toLocalDate() == date && !it.entryId.startsWith("PRN_") }
         val dayTaken = dayEntries.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
-        val dayMissed = dayEntries.count { it.status == MedicationStatus.MISSED }
+        val dayMissed = dayEntries.count { isEntryMissed(it) }
         val dayDecided = dayTaken + dayMissed
         val dayRate = if (dayDecided > 0) ((dayTaken.toDouble() / dayDecided.toDouble()) * 100).toInt() else 0
         DayStat(

@@ -1028,13 +1028,14 @@ fun AlarmSoundSelectionDialog(
                             setAudioStreamType(android.media.AudioManager.STREAM_ALARM)
                         }
                         setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
-                        afd.close()
                         setOnCompletionListener {
                             previewingSound = null
                         }
                         prepare()
                         start()
                     }
+                    // Guard: Close AssetFileDescriptor only AFTER prepare() to prevent Bad file descriptor status=0x1 failure in MediaPlayer native layer
+                    try { afd.close() } catch (_: Exception) {}
                     mediaPlayer = mp
                 }
             } else {

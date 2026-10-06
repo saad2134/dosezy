@@ -122,7 +122,6 @@ object AlarmAudioPlayer {
                                 .build()
                         )
                         setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
-                        afd.close()
                         isLooping = shouldLoop
                         if (!shouldLoop) {
                             setOnCompletionListener {
@@ -134,6 +133,8 @@ object AlarmAudioPlayer {
                         prepare()
                         start()
                     }
+                    // Guard: Close AssetFileDescriptor only AFTER prepare() to prevent Bad file descriptor status=0x1 failure in MediaPlayer native layer
+                    try { afd.close() } catch (_: Exception) {}
                     playbackStarted = true
                 }
             } catch (e: Exception) {
