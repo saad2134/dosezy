@@ -273,12 +273,13 @@ class DataExporter(
             sObj.put("medicineId", sch.medicineId)
             sObj.put("scheduledDateTime", sch.scheduledDateTime.toString())
             sObj.put("status", sch.status.name)
-            sObj.put("skipReason", sch.skipReason ?: "")
-            sObj.put("takenAt", sch.takenAt?.toString() ?: "")
+            // Guard: Omit null fields rather than writing empty strings to prevent ambiguous import semantics (null vs explicitly-cleared)
+            sch.skipReason?.let { sObj.put("skipReason", it) }
+            sch.takenAt?.let { sObj.put("takenAt", it.toString()) }
             if (sch.dosage != null) {
                 sObj.put("dosage", sch.dosage)
             }
-            sObj.put("doseNotes", sch.doseNotes ?: "")
+            sch.doseNotes?.let { sObj.put("doseNotes", it) }
             schedArray.put(sObj)
         }
         root.put("schedules", schedArray)
@@ -385,12 +386,27 @@ class DataExporter(
         y += 20f
 
         // Analytics & Adherence Summary Section (Calculated from past decided doses)
-        val totalCount = schedules.size
-        val takenOnTimeCount = schedules.count { it.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_ON_TIME }
-        val takenLateCount = schedules.count { it.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_LATE }
-        val skippedCount = schedules.count { it.status == com.example.dosezy.data.model.MedicationStatus.SKIPPED }
-        val missedCount = schedules.count { it.status == com.example.dosezy.data.model.MedicationStatus.MISSED }
-        val pendingCount = schedules.count { it.status == com.example.dosezy.data.model.MedicationStatus.PENDING }
+        val evalNow = LocalDateTime.now()
+        val evalToday = java.time.LocalDate.now()
+        val missedAfterHours = user.considerMissedAfter
+
+        // Guard: Dynamically evaluate stale PENDING entries past considerMissedAfter as MISSED, matching AnalyticsViewModel logic to prevent adherence inflation in exported reports
+        fun isEntryMissed(entry: ScheduleEntry): Boolean =
+            entry.status == com.example.dosezy.data.model.MedicationStatus.MISSED ||
+            (entry.status == com.example.dosezy.data.model.MedicationStatus.PENDING && evalNow.isAfter(entry.scheduledDateTime) &&
+                java.time.Duration.between(entry.scheduledDateTime, evalNow).toHours() >= missedAfterHours.toLong())
+
+        // Guard: Exclude PRN ad-hoc doses and future entries from adherence calculation to match in-app analytics
+        val adherenceEntries = schedules.filter {
+            !it.entryId.startsWith("PRN_") && it.scheduledDateTime.toLocalDate() <= evalToday
+        }
+
+        val totalCount = adherenceEntries.size
+        val takenOnTimeCount = adherenceEntries.count { it.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_ON_TIME }
+        val takenLateCount = adherenceEntries.count { it.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_LATE }
+        val skippedCount = adherenceEntries.count { it.status == com.example.dosezy.data.model.MedicationStatus.SKIPPED }
+        val missedCount = adherenceEntries.count { isEntryMissed(it) }
+        val pendingCount = adherenceEntries.count { it.status == com.example.dosezy.data.model.MedicationStatus.PENDING && !isEntryMissed(it) }
 
         val takenTotal = takenOnTimeCount + takenLateCount
         val decidedCount = takenTotal + missedCount

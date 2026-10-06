@@ -756,7 +756,10 @@ class BackupRestoreManager(
             val obj = try { elem.asJsonObject } catch (_: Exception) { continue }
             // Guard: Safe-extract scheduledDateTime and skip entry if missing or invalid to prevent unhandled NPE aborting zip inspection
             val rawScheduledTime = obj.get("scheduledDateTime")?.takeUnless { it.isJsonNull }?.asString ?: continue
-            val parsedScheduledTime = try {
+            // Guard: Handle epoch-millis formatted timestamps from older versions or external tools before ISO parsing to prevent silent data corruption via LocalDateTime.now() fallback
+            val parsedScheduledTime = rawScheduledTime.toLongOrNull()?.let {
+                java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime()
+            } ?: try {
                 LocalDateTime.parse(rawScheduledTime)
             } catch (_: Exception) {
                 try {
@@ -781,7 +784,12 @@ class BackupRestoreManager(
                 medicineId = medicineIdVal,
                 scheduledDateTime = parsedScheduledTime,
                 status = statusVal,
-                takenAt = obj.get("takenAt")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { LocalDateTime.parse(it) }.getOrNull() },
+                // Guard: Handle epoch-millis formatted takenAt from older versions or external tools to prevent silent null-ification
+                takenAt = obj.get("takenAt")?.takeUnless { it.isJsonNull }?.asString?.let { raw ->
+                    raw.toLongOrNull()?.let { millis ->
+                        java.time.Instant.ofEpochMilli(millis).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime()
+                    } ?: runCatching { LocalDateTime.parse(raw) }.getOrNull()
+                },
                 skipReason = obj.get("skipReason")?.takeUnless { it.isJsonNull }?.asString,
                 dosage = obj.get("dosage")?.takeUnless { it.isJsonNull }?.runCatching { asDouble }?.getOrNull(),
                 doseNotes = obj.get("doseNotes")?.takeUnless { it.isJsonNull }?.asString
