@@ -248,52 +248,57 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
                     .padding(bottom = 16.dp),
                 shape = RoundedCornerShape(18.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFEF4444).copy(alpha = 0.3f))
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFEF4444).copy(alpha = 0.35f))
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.padding(18.dp)) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(32.dp)
+                                .size(36.dp)
                                 .clip(CircleShape)
                                 .background(Color(0xFFEF4444).copy(alpha = 0.15f)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("🚨", fontSize = 16.sp)
+                            Text("🚨", fontSize = 18.sp)
                         }
                         Text(
                             text = stringResource(com.example.dosezy.R.string.emergency_medical_profile),
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(14.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = "${user.fullName} (${user.age})",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         if (user.contactNumber.isNotBlank()) {
                             Text(
                                 text = user.contactNumber,
-                                style = MaterialTheme.typography.bodySmall,
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 16.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     // Allergies
                     Row(
@@ -302,19 +307,21 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
                     ) {
                         Text(
                             text = "${stringResource(com.example.dosezy.R.string.profile_allergies)}: ",
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
                             color = Color(0xFFEF4444)
                         )
                         Text(
                             text = if (!user.allergies.isNullOrBlank()) user.allergies else stringResource(com.example.dosezy.R.string.emergency_no_allergies),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodyLarge,
                             fontWeight = if (!user.allergies.isNullOrBlank()) FontWeight.SemiBold else FontWeight.Normal,
+                            fontSize = 16.sp,
                             color = if (!user.allergies.isNullOrBlank()) Color(0xFFEF4444) else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     // Medical Conditions
                     Row(
@@ -323,14 +330,17 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
                     ) {
                         Text(
                             text = "${stringResource(com.example.dosezy.R.string.profile_medical_conditions)}: ",
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
                             color = MaterialTheme.colorScheme.primary
                         )
                         Text(
                             text = if (!user.medicalConditions.isNullOrBlank()) user.medicalConditions else stringResource(com.example.dosezy.R.string.emergency_no_conditions),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
@@ -541,10 +551,10 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
-            Spacer(modifier = Modifier.height(32.dp))
         }
+
+        Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+        Spacer(modifier = Modifier.height(32.dp))
     }
 
     // Add Contact Dialog

@@ -172,9 +172,6 @@ class MainActivity : ComponentActivity() {
             val isRtl = currentLocale.language == "ar"
             val layoutDirection = if (isRtl) androidx.compose.ui.unit.LayoutDirection.Rtl else androidx.compose.ui.unit.LayoutDirection.Ltr
 
-            val localizedContext = remember(currentLang) {
-                com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, currentLang)
-            }
             val localizedConfig = remember(currentLang) {
                 val config = android.content.res.Configuration(context.resources.configuration)
                 config.setLocale(currentLocale)
@@ -188,7 +185,6 @@ class MainActivity : ComponentActivity() {
             androidx.compose.runtime.key(currentLang) {
                 androidx.compose.runtime.CompositionLocalProvider(
                     androidx.compose.ui.platform.LocalLayoutDirection provides layoutDirection,
-                    androidx.compose.ui.platform.LocalContext provides localizedContext,
                     androidx.compose.ui.platform.LocalConfiguration provides localizedConfig
                 ) {
                     DosezyTheme(darkTheme = isDark) {
