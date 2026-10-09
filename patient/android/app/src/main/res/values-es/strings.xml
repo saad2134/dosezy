@@ -157,6 +157,9 @@
     <string name="unit_drop">gota(s)</string>
     <string name="unit_tablet">pastilla(s)</string>
     <string name="unit_capsule">cápsula(s)</string>
+    <string name="unit_meq">mEq</string>
+    <string name="unit_puff">inhalación(es)</string>
+    <string name="unit_ampule">ampolla(s)</string>
 
     <!-- Help &amp; Support -->
     <string name="help_title">Ayuda y soporte</string>

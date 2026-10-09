@@ -144,6 +144,9 @@
     <string name="unit_drop">قطرة</string>
     <string name="unit_tablet">قرص</string>
     <string name="unit_capsule">كبسولة</string>
+    <string name="unit_meq">مكافئ (mEq)</string>
+    <string name="unit_puff">بخة</string>
+    <string name="unit_ampule">أمبولة</string>
 
     <string name="help_title">المساعدة والدعم</string>
     <string name="help_resources">الموارد</string>

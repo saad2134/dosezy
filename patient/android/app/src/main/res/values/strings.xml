@@ -172,6 +172,9 @@
     <string name="unit_drop">drop</string>
     <string name="unit_tablet">tablet</string>
     <string name="unit_capsule">capsule</string>
+    <string name="unit_meq">mEq</string>
+    <string name="unit_puff">puff</string>
+    <string name="unit_ampule">ampule</string>
 
     <!-- Help &amp; Support -->
     <string name="help_title">Help &amp; Support</string>

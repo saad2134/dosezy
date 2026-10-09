@@ -62,6 +62,9 @@ class MedicineLogicTest {
         assertEquals("2 drop", med(2.0, DosageUnit.DROP).getDosageDisplay())
         assertEquals("3 capsule", med(3.0, DosageUnit.CAPSULE).getDosageDisplay())
         assertEquals("50 mcg", med(50.0, DosageUnit.MCG).getDosageDisplay())
+        assertEquals("20 mEq", med(20.0, DosageUnit.MEQ).getDosageDisplay())
+        assertEquals("2 puff", med(2.0, DosageUnit.PUFF).getDosageDisplay())
+        assertEquals("1 ampule", med(1.0, DosageUnit.AMPULE).getDosageDisplay())
     }
 
     @Test
@@ -203,6 +206,30 @@ class MedicineLogicTest {
     fun stockDeduction_liquidMinimumOne() {
         assertEquals(1, med(0.5, DosageUnit.ML).getStockDeductionAmount()) // 0.5.toInt() = 0, coerced to 1
         assertEquals(3, med(3.0, DosageUnit.DROP).getStockDeductionAmount())
+    }
+
+    @Test
+    fun stockDeduction_meqAlwaysOne() {
+        assertEquals(1, med(10.0, DosageUnit.MEQ).getStockDeductionAmount())
+        assertEquals(1, med(20.0, DosageUnit.MEQ).getStockDeductionAmount())
+        assertEquals(1, med(40.0, DosageUnit.MEQ).getStockDeductionAmount())
+    }
+
+    @Test
+    fun stockDeduction_puffDeductsIntakeQuantity() {
+        assertEquals(2, med(2.0, DosageUnit.PUFF).getStockDeductionAmount())
+        assertEquals(1, med(1.0, DosageUnit.PUFF).getStockDeductionAmount())
+        assertEquals(4, med(4.0, DosageUnit.PUFF).getStockDeductionAmount())
+        assertEquals(1, med(0.5, DosageUnit.PUFF).getStockDeductionAmount()) // coerced to 1
+    }
+
+    @Test
+    fun stockDeduction_ampuleClampedTo1Through10() {
+        assertEquals(1, med(1.0, DosageUnit.AMPULE).getStockDeductionAmount())
+        assertEquals(2, med(2.0, DosageUnit.AMPULE).getStockDeductionAmount())
+        assertEquals(10, med(10.0, DosageUnit.AMPULE).getStockDeductionAmount())
+        // > 10 falls back to 1
+        assertEquals(1, med(20.0, DosageUnit.AMPULE).getStockDeductionAmount())
     }
 
     @Test

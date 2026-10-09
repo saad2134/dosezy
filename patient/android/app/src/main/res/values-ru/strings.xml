@@ -144,6 +144,9 @@
     <string name="unit_drop">капля</string>
     <string name="unit_tablet">таблетка</string>
     <string name="unit_capsule">капсула</string>
+    <string name="unit_meq">мЭкв</string>
+    <string name="unit_puff">доза (вдох)</string>
+    <string name="unit_ampule">ампула</string>
 
     <string name="help_title">Справка и поддержка</string>
     <string name="help_resources">Ресурсы</string>

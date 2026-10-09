@@ -727,7 +727,10 @@ class DataExporter(
                 val totalNeeded = customQuantities[med.medicineId] ?: med.calculateRefillQuantity(supplyDays)
 
                 val showDosageInTitle = includeDosage && when (med.dosageUnit) {
-                    com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG, com.example.dosezy.data.model.DosageUnit.ML -> true
+                    com.example.dosezy.data.model.DosageUnit.MG,
+                    com.example.dosezy.data.model.DosageUnit.MCG,
+                    com.example.dosezy.data.model.DosageUnit.ML,
+                    com.example.dosezy.data.model.DosageUnit.MEQ -> true
                     else -> med.dosage > 0
                 }
                 val dosageDisplay = if (med.dosage > 0) {
@@ -738,7 +741,9 @@ class DataExporter(
                 val orderUnitStr = if (isDrop) {
                     if (totalNeeded > 1) context.getString(com.example.dosezy.R.string.unit_bottles) else context.getString(com.example.dosezy.R.string.unit_bottle)
                 } else when (med.dosageUnit) {
-                    com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG -> {
+                    com.example.dosezy.data.model.DosageUnit.MG,
+                    com.example.dosezy.data.model.DosageUnit.MCG,
+                    com.example.dosezy.data.model.DosageUnit.MEQ -> {
                         context.getString(com.example.dosezy.R.string.unit_units)
                     }
                     else -> med.dosageUnit.getLocalizedName(context)

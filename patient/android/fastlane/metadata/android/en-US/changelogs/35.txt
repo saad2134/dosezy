@@ -1,3 +1,3 @@
+• Added support for additional dosage units: mEq, inhaler puffs, and ampules with smart stock and refill tracking
 • Fixed backup and export restore to preserve all custom medication frequencies and interval schedules
-• Synchronized app and widget theme preferences when auto-promoting active profile upon profile deletion
-• Fixed onboarding backup restore to accurately activate the primary profile in multi-profile archives
+• Synchronized app and widget theme preferences and improved active profile selection on backup restore

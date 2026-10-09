@@ -144,6 +144,9 @@
     <string name="unit_drop">goccia</string>
     <string name="unit_tablet">compressa</string>
     <string name="unit_capsule">capsula</string>
+    <string name="unit_meq">mEq</string>
+    <string name="unit_puff">erogazione</string>
+    <string name="unit_ampule">fiala</string>
 
     <string name="help_title">Aiuto e Supporto</string>
     <string name="help_resources">Risorse</string>

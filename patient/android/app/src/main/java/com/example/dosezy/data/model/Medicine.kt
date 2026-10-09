@@ -212,6 +212,10 @@ data class Medicine(
             DosageUnit.DROP -> "drop"
             DosageUnit.TABLET -> "tablet"
             DosageUnit.CAPSULE -> "capsule"
+            // Support for mEq (electrolyte supplements), puffs/actuations (inhalers), and ampules (single-use liquid)
+            DosageUnit.MEQ -> "mEq"
+            DosageUnit.PUFF -> "puff"
+            DosageUnit.AMPULE -> "ampule"
         }
 
         // Remove decimal if it's a whole number
@@ -289,12 +293,15 @@ data class Medicine(
     fun getStockDeductionAmount(time: LocalTime? = null): Int {
         val targetDosage = getDosageForTime(time)
         return when (dosageUnit) {
-            DosageUnit.MG, DosageUnit.MCG -> 1
-            DosageUnit.TABLET, DosageUnit.CAPSULE -> {
+            // Chemical strength units (MG, MCG, MEQ): stock is counted in physical dosage units (1 per intake)
+            DosageUnit.MG, DosageUnit.MCG, DosageUnit.MEQ -> 1
+            // Unit containers/discrete items: deduct dose count if in reasonable single intake range
+            DosageUnit.TABLET, DosageUnit.CAPSULE, DosageUnit.AMPULE -> {
                 val count = targetDosage.toInt()
                 if (count in 1..10) count else 1
             }
-            DosageUnit.DROP, DosageUnit.ML -> {
+            // Continuous/metered quantities (drops, liquid mL, inhaler puffs): deduct specified dose count
+            DosageUnit.DROP, DosageUnit.ML, DosageUnit.PUFF -> {
                 targetDosage.toInt().coerceAtLeast(1)
             }
         }
@@ -359,10 +366,10 @@ data class Medicine(
         }
 
         val dosesPerIntake = when (dosageUnit) {
-            DosageUnit.TABLET, DosageUnit.CAPSULE, DosageUnit.ML -> {
+            DosageUnit.TABLET, DosageUnit.CAPSULE, DosageUnit.ML, DosageUnit.PUFF, DosageUnit.AMPULE -> {
                 if (dosage > 0) dosage.toInt().coerceAtLeast(1) else 1
             }
-            DosageUnit.MG, DosageUnit.MCG, DosageUnit.DROP -> 1
+            DosageUnit.MG, DosageUnit.MCG, DosageUnit.DROP, DosageUnit.MEQ -> 1
         }
 
         return kotlin.math.ceil(totalIntakes * dosesPerIntake).toInt().coerceAtLeast(1)
@@ -370,7 +377,7 @@ data class Medicine(
 }
 
 enum class DosageUnit {
-    MG, MCG, ML, DROP, TABLET, CAPSULE
+    MG, MCG, ML, DROP, TABLET, CAPSULE, MEQ, PUFF, AMPULE
 }
 
 @androidx.compose.runtime.Composable
@@ -382,6 +389,9 @@ fun DosageUnit.getLocalizedName(): String {
         DosageUnit.DROP -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_drop)
         DosageUnit.TABLET -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_tablet)
         DosageUnit.CAPSULE -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_capsule)
+        DosageUnit.MEQ -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_meq)
+        DosageUnit.PUFF -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_puff)
+        DosageUnit.AMPULE -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_ampule)
     }
 }
 
@@ -393,6 +403,9 @@ fun DosageUnit.getLocalizedName(context: android.content.Context): String {
         DosageUnit.DROP -> context.getString(com.example.dosezy.R.string.unit_drop)
         DosageUnit.TABLET -> context.getString(com.example.dosezy.R.string.unit_tablet)
         DosageUnit.CAPSULE -> context.getString(com.example.dosezy.R.string.unit_capsule)
+        DosageUnit.MEQ -> context.getString(com.example.dosezy.R.string.unit_meq)
+        DosageUnit.PUFF -> context.getString(com.example.dosezy.R.string.unit_puff)
+        DosageUnit.AMPULE -> context.getString(com.example.dosezy.R.string.unit_ampule)
     }
 }
 

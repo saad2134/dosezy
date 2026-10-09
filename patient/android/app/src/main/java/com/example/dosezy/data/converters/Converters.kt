@@ -32,8 +32,9 @@ class Converters {
     @TypeConverter
     fun fromDosageUnit(unit: DosageUnit): String = unit.name
 
+    // Guard: Prevent IllegalArgumentException crash on legacy or malformed enum strings; fallback to TABLET
     @TypeConverter
-    fun toDosageUnit(unit: String): DosageUnit = enumValueOf(unit)
+    fun toDosageUnit(unit: String): DosageUnit = runCatching { enumValueOf<DosageUnit>(unit) }.getOrDefault(DosageUnit.TABLET)
 
     // MedicationStatus converters
     @TypeConverter

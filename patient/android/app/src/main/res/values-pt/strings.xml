@@ -144,6 +144,9 @@
     <string name="unit_drop">gota</string>
     <string name="unit_tablet">comprimido</string>
     <string name="unit_capsule">cápsula</string>
+    <string name="unit_meq">mEq</string>
+    <string name="unit_puff">jato</string>
+    <string name="unit_ampule">ampola</string>
 
     <string name="help_title">Ajuda e Suporte</string>
     <string name="help_resources">Recursos</string>

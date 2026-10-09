@@ -77,6 +77,9 @@ val DosageUnit.displayName: String
         DosageUnit.DROP -> "drop"
         DosageUnit.TABLET -> "tablet"
         DosageUnit.CAPSULE -> "capsule"
+        DosageUnit.MEQ -> "mEq"
+        DosageUnit.PUFF -> "puff"
+        DosageUnit.AMPULE -> "ampule"
     }
 
 fun isMedicineFormValid(

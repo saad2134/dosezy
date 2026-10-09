@@ -144,6 +144,9 @@
     <string name="unit_drop">ফোটা</string>
     <string name="unit_tablet">ট্যাবলেট</string>
     <string name="unit_capsule">ক্যাপসুল</string>
+    <string name="unit_meq">mEq</string>
+    <string name="unit_puff">পাফ</string>
+    <string name="unit_ampule">অ্যাম্পুল</string>
 
     <string name="help_title">সাহায্য ও সহায়তা</string>
     <string name="help_resources">সম্পদসমূহ</string>

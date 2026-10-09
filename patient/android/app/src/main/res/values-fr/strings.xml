@@ -144,6 +144,9 @@
     <string name="unit_drop">goutte</string>
     <string name="unit_tablet">comprimé</string>
     <string name="unit_capsule">gélule</string>
+    <string name="unit_meq">mEq</string>
+    <string name="unit_puff">bouffée</string>
+    <string name="unit_ampule">ampoule</string>
 
     <string name="help_title">Aide &amp; Support</string>
     <string name="help_resources">Ressources</string>

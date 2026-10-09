@@ -732,7 +732,16 @@ class BackupRestoreManager(
             val medId = obj.get("medicineId")?.takeUnless { it.isJsonNull }?.asString ?: UUID.randomUUID().toString()
             val uId = obj.get("userId")?.takeUnless { it.isJsonNull }?.asString ?: ""
             val dosageVal = obj.get("dosage")?.takeUnless { it.isJsonNull }?.runCatching { asDouble }?.getOrNull() ?: 1.0
-            val dosageUnitVal = obj.get("dosageUnit")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { DosageUnit.valueOf(it) }.getOrNull() } ?: DosageUnit.TABLET
+            // Guard: Safe-parse dosage unit with normalization for aliases (puffs, actuations, ampules, mEq) and fallback to TABLET
+            val dosageUnitVal = obj.get("dosageUnit")?.takeUnless { it.isJsonNull }?.asString?.let { raw ->
+                val normalized = raw.trim().uppercase()
+                when (normalized) {
+                    "MEQ", "MILLIEQUIVALENT", "MILLIEQUIVALENTS" -> DosageUnit.MEQ
+                    "PUFF", "PUFFS", "ACTUATION", "ACTUATIONS" -> DosageUnit.PUFF
+                    "AMPULE", "AMPULES", "AMP", "AMPOULE", "AMPOULES" -> DosageUnit.AMPULE
+                    else -> runCatching { DosageUnit.valueOf(normalized) }.getOrNull()
+                }
+            } ?: DosageUnit.TABLET
             val timesPerDayVal = obj.get("timesPerDay")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 1
 
             val med = Medicine(
