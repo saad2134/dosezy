@@ -1,60 +1,60 @@
 <en-IN>
 • Added support for additional dosage units: mEq, inhaler puffs, and ampules with smart stock and refill tracking
-• Fixed backup and export restore to preserve all custom medication frequencies and interval schedules
+• Fixed backup export dialog path display and restored full parity for custom medication frequencies
 • Synchronized app and widget theme preferences and improved active profile selection on backup restore
 </en-IN>
 <en-US>
 • Added support for additional dosage units: mEq, inhaler puffs, and ampules with smart stock and refill tracking
-• Fixed backup and export restore to preserve all custom medication frequencies and interval schedules
+• Fixed backup export dialog path display and restored full parity for custom medication frequencies
 • Synchronized app and widget theme preferences and improved active profile selection on backup restore
 </en-US>
 <ar>
 • إضافة دعم لوحدات جرعات جديدة: مليمكافئ (mEq)، بخاخات الاستنشاق، والأمبولات مع تتبع ذكي للمخزون
-• إصلاح استعادة النسخ الاحتياطية والتصدير للحفاظ على كافة جداول وفترات تكرار الأدوية المخصصة
+• إصلاح مسار التصدير في حوار النسخ الاحتياطي والحفاظ على كافة جداول وفترات تكرار الأدوية
 • مزامنة مظهر التطبيق والأداة تلقائياً وتحسين تحديد الملف الشخصي النشط عند استعادة النسخ
 </ar>
 <de-DE>
 • Neue Dosiseinheiten hinzugefügt: mEq, Sprühstöße/Hübe und Ampullen mit intelligenter Vorratsberechnung
-• Fehler behoben: Wiederherstellung von Backups und Exporten behält alle benutzerdefinierten Einnahmeintervalle bei
+• Pfadanzeige im Backup-Exportdialog behoben und vollständige Wiederherstellung benutzerdefinierter Intervalle
 • Automatische Design-Synchronisierung für App und Widget sowie optimierte Profilauswahl bei Wiederherstellung
 </de-DE>
 <es-419>
 • Nuevas unidades de dosis: mEq, inhalaciones y ampollas con control inteligente de existencias y reposición
-• Corrección al restaurar copias y exportaciones para conservar frecuencias e intervalos personalizados
+• Corrección de ruta en diálogo de exportación de copia de seguridad y paridad en frecuencias de medicamentos
 • Sincronización automática de temas en app y widget, y mejor selección de perfil activo al restaurar
 </es-419>
 <fr-FR>
 • Nouvelles unités de dosage : mEq, bouffées d\'inhalateur et ampoules avec suivi intelligent des stocks
-• Correction de la restauration pour préserver toutes les fréquences et intervalles personnalisés des médicaments
+• Correction de l'affichage du chemin d'exportation de sauvegarde et maintien des fréquences personnalisées
 • Synchronisation automatique des thèmes et meilleure sélection du profil actif lors de la restauration
 </fr-FR>
 <hi-IN>
 • नई खुराक इकाइयों का समर्थन: mEq, इनहेलर पफ और एम्पुल के साथ स्मार्ट स्टॉक और रिफिल ट्रैकिंग
-• बैकअप और निर्यात रीस्टोर में सभी कस्टम दवा आवृत्तियों और अंतराल शेड्यूल को सुरक्षित रखने का सुधार
+• बैकअप निर्यात संवाद में पथ प्रदर्शन ठीक किया गया और कस्टम दवा शेड्यूल को सुरक्षित रखा गया
 • ऐप और विजेट थीम प्राथमिकताओं का समन्वय और बैकअप रीस्टोर पर सक्रिय प्रोफ़ाइल चयन में सुधार
 </hi-IN>
 <it-IT>
 • Nuove unità di dosaggio: mEq, erogazioni per inalatori e fiale con tracciamento scorte e ricariche
-• Corretto il ripristino dei backup per preservare tutte le frequenze e gli intervalli personalizzati dei farmaci
-• Sincronizzazione automatica dei temi dell'app e del widget e selezione ottimizzata del profilo attivo
+• Corretta visualizzazione del percorso nel dialogo di backup e parità completa nelle frequenze dei farmaci
+• Sincronizzazione automatica dei temi dell'app e del widget e selezione ottimizzata del profilo activo
 </it-IT>
 <ja-JP>
 • 新しい用量単位を追加：mEq、吸入（パフ）、アンプルに対応し、在庫と補充をスマートに管理
-• バックアップやエクスポートの復元時にカスタム服薬頻度やインターバル周期が保持されるよう修正
+• バックアップ保存ダイアログのパス表示を修正し、カスタム服薬頻度やインターバル周期を完全保持
 • アプリとウィジェットのテーマ設定の自動同期、および復元時のアクティブプロファイル選択を改善
 </ja-JP>
 <pt-BR>
 • Novas unidades de dosagem: mEq, jatos inalatórios e ampolas com controle inteligente de estoque e refil
-• Correção na restauração de backups para manter todas as frequências e intervalos personalizados
+• Correção do caminho na caixa de exportação de backup e paridade total nas frequências personalizadas
 • Sincronização automática de temas do app e widget e melhor seleção de perfil ativo ao restaurar
 </pt-BR>
 <ru-RU>
 • Новые единицы дозировки: мЭкв, дозы ингалятора (вдохи) и ампулы с умным учетом остатков и пополнения
-• Исправлено восстановление резервных копий с сохранением всех настроенных интервалов и частоты приема
+• Исправлено отображение пути в диалоге резервного копирования и сохранение всех интервалов приема
 • Автоматическая синхронизация тем приложения и виджета и улучшенный выбор активного профиля при восстановлении
 </ru-RU>
 <zh-CN>
 • 新增服药剂量单位：毫克当量 (mEq)、吸入喷剂和安瓿，支持智能库存与补药追踪
-• 修复备份与导出恢复问题，完整保留所有自定义服药频率与周期计划
+• 修复备份导出对话框路径显示，并完整保留所有自定义服药频率与周期计划
 • 自动同步应用与小部件主题偏好，并优化恢复备份时的活跃个人资料选择
 </zh-CN>
