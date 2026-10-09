@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -39,6 +40,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -685,32 +688,51 @@ fun MedicineTimingsAndDosagesCard(
 
             Spacer(modifier = Modifier.height(18.dp))
 
-            // Dosage & Unit Section
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedTextField(
-                    shape = RoundedCornerShape(16.dp),
-                    value = dosage,
-                    onValueChange = onDosageChange,
-                    modifier = Modifier
-                        .weight(1.3f)
-                        .defaultMinSize(minHeight = 56.dp),
-                    label = { Text(stringResource(R.string.form_dosage)) },
-                    placeholder = { Text(stringResource(R.string.form_dosage_placeholder)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF1193D4),
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                    ),
-                    singleLine = true
-                )
+            val showDifferentDosagesOption = scheduledTimesList.size > 1 && selectedFrequency != FrequencyPattern.AS_NEEDED
 
+            // Guard: Toggle switch for different dosage per time, placed ABOVE single dose with enlarged typography
+            if (showDifferentDosagesOption) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable { onHasDifferentDosagesChange(!hasDifferentDosages) }
+                        .padding(vertical = 4.dp, horizontal = 2.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = stringResource(R.string.med_different_dosages_toggle),
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 12.dp)
+                    )
+                    Switch(
+                        checked = hasDifferentDosages,
+                        onCheckedChange = { onHasDifferentDosagesChange(it) },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = Color(0xFF1193D4)
+                        )
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
+            // Guard: Match container heights (56.dp) between Time surface and dose text field to prevent baseline/layout misalignment; hide single dose when different dosages is enabled to prevent confusing duplicate inputs
+            if (hasDifferentDosages && showDifferentDosagesOption) {
+                // When different dose for each time is enabled, single dose disappears.
+                // Display the unit dropdown selector full-width so user can easily choose the dosage unit.
                 ExposedDropdownMenuBox(
                     expanded = dosageUnitExpanded,
                     onExpandedChange = { dosageUnitExpanded = !dosageUnitExpanded },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     OutlinedTextField(
                         shape = RoundedCornerShape(16.dp),
@@ -748,78 +770,139 @@ fun MedicineTimingsAndDosagesCard(
                         }
                     }
                 }
-            }
 
-            // Per-time dosages customization toggle
-            if (scheduledTimesList.size > 1 && selectedFrequency != FrequencyPattern.AS_NEEDED) {
-                Spacer(modifier = Modifier.height(14.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onHasDifferentDosagesChange(!hasDifferentDosages) }
-                        .padding(vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Checkbox(
-                        checked = hasDifferentDosages,
-                        onCheckedChange = { onHasDifferentDosagesChange(it) },
-                        colors = CheckboxDefaults.colors(checkedColor = Color(0xFF1193D4))
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = stringResource(R.string.med_different_dosages_toggle),
-                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Per-time doses list with perfectly aligned, equal-height (56.dp) time and dose containers
+                scheduledTimesList.forEach { time ->
+                    val key = String.format(Locale.US, "%02d:%02d", time.hour, time.minute)
+                    val timeStr = TimeFormatUtils.formatLocalTime(time, timeFormat)
+                    val currentVal = perTimeDosages[key] ?: (if (dosage.isNotBlank()) dosage else "")
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Surface(
+                            shape = RoundedCornerShape(14.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)),
+                            modifier = Modifier
+                                .width(105.dp)
+                                .height(56.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Schedule,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = timeStr,
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Bold
+                                    ),
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+
+                        OutlinedTextField(
+                            value = currentVal,
+                            onValueChange = { newVal ->
+                                val updated = perTimeDosages.toMutableMap()
+                                updated[key] = newVal
+                                onPerTimeDosagesChange(updated)
+                            },
+                            label = { Text(selectedDosageUnit.displayName) },
+                            placeholder = { Text(if (dosage.isNotBlank()) dosage else "0") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            shape = RoundedCornerShape(14.dp),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(56.dp),
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color(0xFF1193D4),
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                            )
+                        )
+                    }
                 }
+            } else {
+                // Single dose and unit row when different dosages is disabled
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedTextField(
+                        shape = RoundedCornerShape(16.dp),
+                        value = dosage,
+                        onValueChange = onDosageChange,
+                        modifier = Modifier
+                            .weight(1.3f)
+                            .defaultMinSize(minHeight = 56.dp),
+                        label = { Text(stringResource(R.string.form_dosage)) },
+                        placeholder = { Text(stringResource(R.string.form_dosage_placeholder)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFF1193D4),
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                        ),
+                        singleLine = true
+                    )
 
-                if (hasDifferentDosages) {
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    scheduledTimesList.forEach { time ->
-                        val key = String.format(Locale.US, "%02d:%02d", time.hour, time.minute)
-                        val timeStr = TimeFormatUtils.formatLocalTime(time, timeFormat)
-                        val currentVal = perTimeDosages[key] ?: (if (dosage.isNotBlank()) dosage else "")
-
-                        Row(
+                    ExposedDropdownMenuBox(
+                        expanded = dosageUnitExpanded,
+                        onExpandedChange = { dosageUnitExpanded = !dosageUnitExpanded },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        OutlinedTextField(
+                            shape = RoundedCornerShape(16.dp),
+                            value = selectedDosageUnit.displayName,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text(stringResource(R.string.form_dosage_unit)) },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Surface(
-                                shape = RoundedCornerShape(8.dp),
-                                color = MaterialTheme.colorScheme.surfaceVariant,
-                                modifier = Modifier.width(90.dp).height(44.dp)
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Text(
-                                        text = timeStr,
-                                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                }
+                                .defaultMinSize(minHeight = 56.dp)
+                                .menuAnchor(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color(0xFF1193D4),
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                            ),
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = dosageUnitExpanded)
                             }
+                        )
 
-                            OutlinedTextField(
-                                value = currentVal,
-                                onValueChange = { newVal ->
-                                    val updated = perTimeDosages.toMutableMap()
-                                    updated[key] = newVal
-                                    onPerTimeDosagesChange(updated)
-                                },
-                                label = { Text("${selectedDosageUnit.displayName}") },
-                                placeholder = { Text(if (dosage.isNotBlank()) dosage else "0") },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.weight(1f).height(56.dp),
-                                singleLine = true,
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = Color(0xFF1193D4),
-                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                        ExposedDropdownMenu(
+                            expanded = dosageUnitExpanded,
+                            onDismissRequest = { dosageUnitExpanded = false },
+                            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                        ) {
+                            DosageUnit.values().forEach { unit ->
+                                DropdownMenuItem(
+                                    text = { Text(unit.displayName) },
+                                    onClick = {
+                                        onDosageUnitChange(unit)
+                                        dosageUnitExpanded = false
+                                    },
+                                    modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                                 )
-                            )
+                            }
                         }
                     }
                 }

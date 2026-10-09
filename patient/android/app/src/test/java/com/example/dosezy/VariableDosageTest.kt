@@ -152,5 +152,53 @@ class VariableDosageTest {
             java.util.Locale.setDefault(originalLocale)
         }
     }
+
+    @Test
+    fun testVariableDosageWithBlankGlobalDosage() {
+        // When different dose for each time is enabled, the single dose field is hidden and empty.
+        // The per-time dosage map provides exact doses for each scheduled slot.
+        val scheduledTimes = listOf(LocalTime.of(8, 0), LocalTime.of(14, 0), LocalTime.of(20, 0))
+        val perTimeDosages = mapOf(
+            "08:00" to "2.5",
+            "14:00" to "1.0",
+            "20:00" to "3.0"
+        )
+        val globalDosage = "" // Hidden in UI
+
+        val isDosageValid = scheduledTimes.all { t ->
+            val key = String.format(java.util.Locale.US, "%02d:%02d", t.hour, t.minute)
+            val valueStr = perTimeDosages[key] ?: (if (globalDosage.isNotBlank()) globalDosage else null)
+            val d = valueStr?.toDoubleOrNull()
+            d != null && d > 0.0
+        }
+        org.junit.Assert.assertTrue("All per-time dosages are valid even when global single dose is empty", isDosageValid)
+
+        val firstKey = scheduledTimes.firstOrNull()?.let { String.format(java.util.Locale.US, "%02d:%02d", it.hour, it.minute) }
+        val baseDose = (firstKey?.let { perTimeDosages[it] })?.toDoubleOrNull() ?: 0.0
+        assertEquals(2.5, baseDose, 0.001)
+
+        val finalCustomDosages = scheduledTimes.associate { t ->
+            val key = String.format(java.util.Locale.US, "%02d:%02d", t.hour, t.minute)
+            key to (perTimeDosages[key]?.toDoubleOrNull() ?: baseDose)
+        }
+        assertEquals(2.5, finalCustomDosages["08:00"] ?: 0.0, 0.001)
+        assertEquals(1.0, finalCustomDosages["14:00"] ?: 0.0, 0.001)
+        assertEquals(3.0, finalCustomDosages["20:00"] ?: 0.0, 0.001)
+    }
+
+    @Test
+    fun testSlideActionsUserPreference() {
+        val defaultUser = com.example.dosezy.data.model.User(
+            userId = "test_user_slide",
+            fullName = "Test User",
+            age = 30,
+            gender = com.example.dosezy.data.model.Gender.MALE,
+            contactNumber = "1234567890"
+        )
+        org.junit.Assert.assertTrue("slideActionsEnabled must default to true", defaultUser.slideActionsEnabled)
+
+        val updatedUser = defaultUser.copy(slideActionsEnabled = false)
+        org.junit.Assert.assertFalse("slideActionsEnabled can be toggled to false", updatedUser.slideActionsEnabled)
+    }
 }
 

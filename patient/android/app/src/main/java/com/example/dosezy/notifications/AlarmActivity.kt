@@ -35,6 +35,8 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.FastForward
 import androidx.compose.material.icons.filled.Medication
@@ -776,22 +778,24 @@ fun GroupedAlarmScreenContent(
                     } else {
                         stringResource(R.string.alarm_slide_to_take)
                     }
+                    // Guard: Mark as taken dragged left-to-right (slideToLeft = false) for natural affirmative gesture
                     SlideToConfirmButton(
                         text = slideTakeText,
                         icon = Icons.Default.Check,
                         trackColor = Color(0xFF10B981),
                         thumbColor = Color(0xFF10B981),
-                        slideToLeft = true,
+                        slideToLeft = false,
                         onConfirmed = takeAction
                     )
 
                     val slideSnoozeText = stringResource(R.string.alarm_slide_to_snooze, snoozeMinutes)
+                    // Guard: Snooze dragged right-to-left (slideToLeft = true)
                     SlideToConfirmButton(
                         text = slideSnoozeText,
                         icon = Icons.Default.Snooze,
                         trackColor = Color(0xFFF59E0B),
                         thumbColor = Color(0xFFF59E0B),
-                        slideToLeft = false,
+                        slideToLeft = true,
                         onConfirmed = { snoozeAction() }
                     )
                 } else {
@@ -900,7 +904,7 @@ fun GroupedAlarmScreenContent(
     }
 }
 
-// Guard: SlideToConfirmButton provides distinct slide-to-act tracks (Take slides left, Snooze slides right)
+// Guard: SlideToConfirmButton provides distinct slide-to-act tracks (Take drags left-to-right, Snooze drags right-to-left) with vector arrows to prevent corrupted unicode symbols
 @Composable
 private fun SlideToConfirmButton(
     text: String,
@@ -915,8 +919,8 @@ private fun SlideToConfirmButton(
     val dragOffset = remember { Animatable(0f) }
     var trackWidthPx by remember { mutableStateOf(0f) }
     val density = LocalDensity.current
-    val thumbSizeDp = 50.dp
-    val thumbPaddingDp = 4.dp
+    val thumbSizeDp = 58.dp
+    val thumbPaddingDp = 5.dp
     val thumbSizePx = with(density) { thumbSizeDp.toPx() }
     val paddingPx = with(density) { thumbPaddingDp.toPx() }
     val maxTravelPx = (trackWidthPx - thumbSizePx - (2 * paddingPx)).coerceAtLeast(1f)
@@ -925,12 +929,12 @@ private fun SlideToConfirmButton(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(58.dp)
-            .clip(RoundedCornerShape(18.dp))
+            .height(68.dp)
+            .clip(RoundedCornerShape(22.dp))
             .background(trackColor.copy(alpha = 0.22f))
             .border(
                 BorderStroke(1.5.dp, trackColor.copy(alpha = 0.6f)),
-                RoundedCornerShape(18.dp)
+                RoundedCornerShape(22.dp)
             )
             .onSizeChanged {
                 trackWidthPx = it.width.toFloat()
@@ -958,11 +962,11 @@ private fun SlideToConfirmButton(
             )
         }
 
-        // Action prompt text inside track
+        // Action prompt text inside track with crisp vector arrow icons (zero corrupted unicode characters)
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 20.dp),
             contentAlignment = Alignment.Center
         ) {
             Row(
@@ -971,18 +975,32 @@ private fun SlideToConfirmButton(
                 modifier = Modifier.alpha((1f - progress * 1.5f).coerceAtLeast(0f))
             ) {
                 if (slideToLeft) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = null,
+                        tint = Color.White.copy(alpha = 0.9f),
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "⮜  $text",
+                        text = text,
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                         color = Color.White,
-                        fontSize = 16.sp
+                        fontSize = 17.sp
                     )
                 } else {
                     Text(
-                        text = "$text  ⮞",
+                        text = text,
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                         color = Color.White,
-                        fontSize = 16.sp
+                        fontSize = 17.sp
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        imageVector = Icons.Default.ArrowForward,
+                        contentDescription = null,
+                        tint = Color.White.copy(alpha = 0.9f),
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
@@ -1001,7 +1019,7 @@ private fun SlideToConfirmButton(
             modifier = Modifier
                 .offset(x = knobXOffsetDp)
                 .size(thumbSizeDp)
-                .clip(RoundedCornerShape(14.dp))
+                .clip(RoundedCornerShape(17.dp))
                 .background(thumbColor)
                 .pointerInput(slideToLeft, maxTravelPx, isConfirmed) {
                     if (isConfirmed) return@pointerInput
@@ -1037,7 +1055,7 @@ private fun SlideToConfirmButton(
                 imageVector = icon,
                 contentDescription = null,
                 tint = Color.White,
-                modifier = Modifier.size(26.dp)
+                modifier = Modifier.size(30.dp)
             )
         }
     }
