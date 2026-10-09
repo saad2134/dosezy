@@ -1,24 +1,60 @@
 <en-IN>
+• Fixed backup and export restore to preserve all custom medication frequencies and interval schedules
+• Synchronized app and widget theme preferences when auto-promoting active profile upon profile deletion
+• Fixed onboarding backup restore to accurately activate the primary profile in multi-profile archives
 </en-IN>
 <en-US>
+• Fixed backup and export restore to preserve all custom medication frequencies and interval schedules
+• Synchronized app and widget theme preferences when auto-promoting active profile upon profile deletion
+• Fixed onboarding backup restore to accurately activate the primary profile in multi-profile archives
 </en-US>
 <ar>
+• إصلاح استعادة النسخ الاحتياطية والتصدير للحفاظ على كافة جداول وفترات تكرار الأدوية المخصصة
+• مزامنة إعدادات مظهر التطبيق والأداة تلقائياً عند ترقية الملف الشخصي النشط أثناء حذف ملف شخصي
+• إصلاح استعادة النسخ الاحتياطية عند الإعداد الأولي لتفعيل الملف الشخصي الأساسي بشكل صحيح
 </ar>
 <de-DE>
+• Fehler behoben: Wiederherstellung von Backups und Exporten behält alle benutzerdefinierten Einnahmeintervalle bei
+• Automatische Synchronisierung von App- und Widget-Design beim Wechsel des aktiven Profils nach Profillöschung
+• Fehlerbehebung bei Ersteinrichtung: Primäres Profil wird bei Wiederherstellung aus Mehrbenutzer-Backups korrekt aktiviert
 </de-DE>
 <es-419>
+• Corrección al restaurar copias y exportaciones para conservar frecuencias e intervalos personalizados de medicamentos
+• Sincronización automática del tema de la app y del widget al promover el perfil activo tras eliminar un perfil
+• Corrección al restaurar respaldos en la configuración inicial para activar correctamente el perfil principal
 </es-419>
 <fr-FR>
+• Correction de la restauration pour préserver toutes les fréquences et intervalles personnalisés des médicaments
+• Synchronisation automatique du thème de l'application et du widget lors du changement de profil après suppression
+• Correction de la restauration initiale pour activer le profil principal dans les sauvegardes multi-profils
 </fr-FR>
 <hi-IN>
+• बैकअप और निर्यात रीस्टोर में सभी कस्टम दवा आवृत्तियों और अंतराल शेड्यूल को सुरक्षित रखने का सुधार
+• प्रोफ़ाइल हटाने पर सक्रिय प्रोफ़ाइल बदलते समय ऐप और विजेट थीम प्राथमिकताओं का स्वचालित समन्वय
+• ऑनबोर्डिंग के दौरान मल्टी-प्रोफ़ाइल बैकअप रीस्टोर करते समय मुख्य प्रोफ़ाइल को सही ढंग से सक्रिय करने का सुधार
 </hi-IN>
 <it-IT>
+• Corretto il ripristino dei backup per preservare tutte le frequenze e gli intervalli personalizzati dei farmaci
+• Sincronizzazione automatica del tema dell'app e del widget quando viene promosso il profilo attivo dopo l'eliminazione
+• Risolto il ripristino iniziale per attivare correttamente il profilo principale dai backup multi-profilo
 </it-IT>
 <ja-JP>
+• バックアップやエクスポートの復元時にカスタム服薬頻度やインターバル周期が保持されるよう修正
+• プロファイル削除時に新しいアクティブプロファイルへアプリとウィジェットのテーマ設定を自動同期
+• 初回起動時のバックアップ復元でマルチプロファイルの中からメインプロファイルを正しく有効化するよう修正
 </ja-JP>
 <pt-BR>
+• Correção na restauração de backups para manter todas as frequências e intervalos personalizados de medicamentos
+• Sincronização automática do tema do app e do widget ao promover o perfil ativo após a exclusão de um perfil
+• Correção na restauração inicial para ativar corretamente o perfil principal em backups com múltiplos perfis
 </pt-BR>
 <ru-RU>
+• Исправлено восстановление резервных копий с сохранением всех настроенных интервалов и частоты приема лекарств
+• Автоматическая синхронизация темы приложения и виджета при смене активного профиля после удаления
+• Корректная активация основного профиля при восстановлении архива с несколькими профилями при первом запуске
 </ru-RU>
 <zh-CN>
+• 修复备份与导出恢复问题，完整保留所有自定义服药频率与周期计划
+• 修复删除个人资料后自动切换活跃用户时应用与小部件主题偏好的同步问题
+• 修复初始设置中恢复多用户备份时正确激活主要个人资料的问题
 </zh-CN>
