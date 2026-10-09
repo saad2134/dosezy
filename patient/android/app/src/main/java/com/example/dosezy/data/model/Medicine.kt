@@ -86,26 +86,54 @@ data class Medicine(
 
         if (effectiveStart.isAfter(effectiveEnd)) return emptyList()
 
+        // Guard: Generate EVERY_X_HOURS along a continuous timeline across midnight boundaries rather than day-by-day truncation to prevent missing nocturnal doses and schedule drift
+        if (frequency.pattern == FrequencyPattern.EVERY_X_HOURS) {
+            val interval = (frequency.intervalHours ?: 4).coerceIn(1, 23)
+            val startTime = (scheduledTimes.firstOrNull() ?: LocalTime.of(8, 0)).withSecond(0).withNano(0)
+            val baseAnchor = LocalDateTime.of(startDate ?: effectiveStart, startTime)
+            val now = LocalDateTime.now()
+
+            var cursor = baseAnchor
+            if (cursor.isBefore(effectiveStart.atStartOfDay())) {
+                val hoursDiff = java.time.Duration.between(cursor, effectiveStart.atStartOfDay()).toHours()
+                val steps = (hoursDiff / interval).coerceAtLeast(0)
+                cursor = cursor.plusHours(steps * interval)
+                while (cursor.isBefore(effectiveStart.atStartOfDay())) {
+                    cursor = cursor.plusHours(interval.toLong())
+                }
+            }
+
+            val endDateTime = effectiveEnd.atTime(LocalTime.MAX)
+            while (!cursor.isAfter(endDateTime)) {
+                if (endDate != null && cursor.toLocalDate().isAfter(endDate)) break
+                val itemDate = cursor.toLocalDate()
+                val cleanTime = cursor.toLocalTime().withSecond(0).withNano(0)
+                val scheduledDateTime = cursor.withSecond(0).withNano(0)
+
+                // Skip past reminder times on the current day to avoid immediate missed status
+                if (!(itemDate.isEqual(now.toLocalDate()) && scheduledDateTime.isBefore(now.minusMinutes(15)))) {
+                    val entryId = "${medicineId}_${itemDate}_${cleanTime}".replace(":", "_").replace("-", "_")
+                    val entry = ScheduleEntry(
+                        entryId = entryId,
+                        userId = userId,
+                        medicineId = medicineId,
+                        scheduledDateTime = scheduledDateTime,
+                        status = MedicationStatus.PENDING,
+                        dosage = getDosageForTime(cleanTime)
+                    )
+                    entries.add(entry)
+                }
+                cursor = cursor.plusHours(interval.toLong())
+            }
+            return entries
+        }
+
         var currentDate = effectiveStart
         while (currentDate.isBefore(effectiveEnd) || currentDate.isEqual(effectiveEnd)) {
             // Check if medicine should be taken on this day based on frequency
             if (shouldTakeOnDate(currentDate)) {
                 val now = LocalDateTime.now()
-                val effectiveTimes = if (frequency.pattern == FrequencyPattern.EVERY_X_HOURS) {
-                    val interval = (frequency.intervalHours ?: 4).coerceIn(1, 23)
-                    val startTime = scheduledTimes.firstOrNull() ?: LocalTime.of(8, 0)
-                    val generated = mutableListOf<LocalTime>()
-                    var t = startTime
-                    while (true) {
-                        generated.add(t)
-                        val nextHour = t.hour + interval
-                        if (nextHour >= 24) break
-                        t = t.plusHours(interval.toLong())
-                    }
-                    generated
-                } else {
-                    scheduledTimes
-                }
+                val effectiveTimes = scheduledTimes
 
                 effectiveTimes.forEach { time ->
                     val cleanTime = time.withSecond(0).withNano(0)

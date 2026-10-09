@@ -1148,8 +1148,9 @@ fun ProfileItem(user: User, onClick: () -> Unit, modifier: Modifier = Modifier) 
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium
                     )
+                    // Guard: Use user.gender.getLocalizedName() so non-English locales (Arabic, German, Spanish, French, Hindi, etc.) display localized gender instead of hardcoded English displayName
                     Text(
-                        text = stringResource(R.string.profile_age_gender_format, user.age, user.gender.displayName),
+                        text = stringResource(R.string.profile_age_gender_format, user.age, user.gender.getLocalizedName()),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

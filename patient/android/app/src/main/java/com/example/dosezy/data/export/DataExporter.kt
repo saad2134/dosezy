@@ -213,6 +213,10 @@ class DataExporter(
         userObj.put("allowDoseUndo", user.allowDoseUndo)
         userObj.put("allowDoseNotes", user.allowDoseNotes)
         userObj.put("promptDoseNotes", user.promptDoseNotes)
+        // Guard: Explicitly serialize slideActionsEnabled, timelineModeEnabled, and thickerCalendarDayHighlight to prevent dropping UI preferences on backup restore
+        userObj.put("slideActionsEnabled", user.slideActionsEnabled)
+        userObj.put("timelineModeEnabled", user.timelineModeEnabled)
+        userObj.put("thickerCalendarDayHighlight", user.thickerCalendarDayHighlight)
         root.put("user", userObj)
 
         val medArray = JSONArray()
@@ -387,7 +391,8 @@ class DataExporter(
         y += 15f
         canvas.drawText("Name: ${user.fullName}", 40f, y, textPaint)
         canvas.drawText("Age: ${user.age}", 240f, y, textPaint)
-        canvas.drawText("Gender: ${user.gender}", 360f, y, textPaint)
+        // Guard: Format gender with displayName to prevent drawing raw uppercase enum identifier (e.g. DO_NOT_SPECIFY) in patient medical report
+        canvas.drawText("Gender: ${user.gender.displayName}", 360f, y, textPaint)
         y += 15f
 
         // Allergies & Medical Conditions in PDF
@@ -578,11 +583,13 @@ class DataExporter(
 
             // Medicines Section
             csvBuilder.append("MEDICINES\n")
-            // Guard: Include Refill Threshold, Auto Deduct Stock, Is Archived, and Custom Dosages to preserve inventory metadata in CSV exports
-            csvBuilder.append("Medicine ID,User ID,Medication Name,Dosage,Dosage Unit,Times Per Day,Frequency Pattern,Interval Hours,Interval Days,Interval Weeks,Scheduled Times,Pill Shape,Pill Color,Doctor Notes,Start Date,End Date,Duration Days,Stock,Refill Threshold,Auto Deduct Stock,Is Archived,Custom Dosages,Image URI\n")
+            // Guard: Include Refill Threshold, Auto Deduct Stock, Is Archived, Custom Dosages, and Days of Week/Month to preserve complete inventory and frequency metadata in CSV exports
+            csvBuilder.append("Medicine ID,User ID,Medication Name,Dosage,Dosage Unit,Times Per Day,Frequency Pattern,Interval Hours,Interval Days,Interval Weeks,Days Per Week,Days Per Month,Selected Days Of Week,Selected Days Of Month,Scheduled Times,Pill Shape,Pill Color,Doctor Notes,Start Date,End Date,Duration Days,Stock,Refill Threshold,Auto Deduct Stock,Is Archived,Custom Dosages,Image URI\n")
             medicines.forEach { medicine ->
                 val scheduledTimesStr = medicine.scheduledTimes.joinToString(";") { it.toString() }
                 val customDosagesStr = medicine.customDosages?.entries?.joinToString(";") { "${it.key}:${it.value}" } ?: ""
+                val selectedDaysOfWeekStr = medicine.frequency.selectedDaysOfWeek?.joinToString(";") ?: ""
+                val selectedDaysOfMonthStr = medicine.frequency.selectedDaysOfMonth?.joinToString(";") ?: ""
                 csvBuilder.append(
                     "${escapeCsv(medicine.medicineId)}," +
                     "${escapeCsv(medicine.userId)}," +
@@ -594,6 +601,10 @@ class DataExporter(
                     "${medicine.frequency.intervalHours ?: ""}," +
                     "${medicine.frequency.intervalDays ?: ""}," +
                     "${medicine.frequency.intervalWeeks ?: ""}," +
+                    "${medicine.frequency.daysPerWeek ?: ""}," +
+                    "${medicine.frequency.daysPerMonth ?: ""}," +
+                    "${escapeCsv(selectedDaysOfWeekStr)}," +
+                    "${escapeCsv(selectedDaysOfMonthStr)}," +
                     "${escapeCsv(scheduledTimesStr)}," +
                     "${escapeCsv(medicine.pillShape.name)}," +
                     "${escapeCsv(medicine.pillColor)}," +

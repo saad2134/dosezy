@@ -80,6 +80,33 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 notificationManager.createNotificationChannel(refillChannel)
             }
         }
+
+        // Guard: Update active slot notification in shade when individual medications in a cohort are marked taken in-app without re-triggering full-screen activity
+        fun updateCohortNotification(
+            context: Context,
+            entryId: String,
+            entryIds: ArrayList<String>?,
+            medicineName: String,
+            medicineNames: ArrayList<String>?,
+            medicineDetails: List<Pair<String, String>> = emptyList(),
+            scheduledTime: String?,
+            snoozeMinutes: Int = 10
+        ) {
+            MedicineAlarmReceiver().showNotification(
+                context = context,
+                entryId = entryId,
+                entryIds = entryIds,
+                medicineName = medicineName,
+                medicineNames = medicineNames,
+                medicineDetails = medicineDetails,
+                scheduledTime = scheduledTime,
+                isNagging = false,
+                naggingCount = 0,
+                maxNagging = 3,
+                snoozeMinutes = snoozeMinutes,
+                isUpdateOnly = true
+            )
+        }
     }
 
     override fun onReceive(context: Context, intent: Intent?) {
@@ -241,7 +268,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         isNagging: Boolean = false,
         naggingCount: Int = 0,
         maxNagging: Int = 3,
-        snoozeMinutes: Int = 10
+        snoozeMinutes: Int = 10,
+        isUpdateOnly: Boolean = false
     ) {
         val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
         val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
@@ -352,11 +380,13 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             optionsBundle
         )
 
-        // Launch AlarmActivity directly if permitted (e.g., overlay granted or app in foreground)
-        try {
-            context.startActivity(alarmIntent)
-        } catch (e: Exception) {
-            Log.e(TAG, "Could not start AlarmActivity directly", e)
+        // Launch AlarmActivity directly only on full alarms, never during silent shade notification updates
+        if (!isUpdateOnly) {
+            try {
+                context.startActivity(alarmIntent)
+            } catch (e: Exception) {
+                Log.e(TAG, "Could not start AlarmActivity directly", e)
+            }
         }
 
         val notificationTitle = if (isNagging) {
@@ -394,14 +424,13 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         }
 
         // Create silent notification: AlarmAudioPlayer is the single source of sound & vibration
-        val notification = NotificationCompat.Builder(localizedContext, CHANNEL_ID)
+        val notificationBuilder = NotificationCompat.Builder(localizedContext, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_medicine_notification)
             .setContentTitle(notificationTitle)
             .setContentText(notificationText)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setFullScreenIntent(fullScreenPendingIntent, true)
             .setAutoCancel(true)
             .setSilent(true)
             .setContentIntent(pendingIntent)
@@ -416,7 +445,12 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 snoozePendingIntent
             )
             .setStyle(NotificationCompat.BigTextStyle().bigText(bigText))
-            .build()
+
+        if (!isUpdateOnly) {
+            notificationBuilder.setFullScreenIntent(fullScreenPendingIntent, true)
+        }
+
+        val notification = notificationBuilder.build()
 
         try {
             val notificationManager =
