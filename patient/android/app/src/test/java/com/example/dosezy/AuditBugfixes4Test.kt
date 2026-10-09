@@ -91,17 +91,6 @@ class AuditBugfixes4Test {
 
     @Test
     fun bug1_overwriteRestore_doesNotPersistDeadOldDevicePathWhenAvatarMissing() {
-        val foreignPicPath = "/data/user/0/com.old.app/files/avatar_foreign.jpg"
-        val originalUser = User(
-            userId = "user_restored",
-            fullName = "Restored User",
-            age = 45,
-            gender = Gender.MALE,
-            contactNumber = "555-0199",
-            profilePicPath = foreignPicPath,
-            isCurrentUser = true
-        )
-
         val avatarFileInBackup = File(context.cacheDir, "non_existent_avatar.jpg")
         assertFalse(avatarFileInBackup.exists())
 

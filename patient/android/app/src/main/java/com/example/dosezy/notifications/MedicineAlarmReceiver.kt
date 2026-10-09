@@ -142,6 +142,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         if (entryId != null && medicineName != null) {
             val pendingResult = goAsync()
             val powerManager = context.getSystemService(Context.POWER_SERVICE) as? android.os.PowerManager
+            // Guard: ACQUIRE_CAUSES_WAKEUP deprecated in API 33+ but required to turn screen on for alarms on API 24-32
+            @Suppress("DEPRECATION")
             val wakeLock = powerManager?.newWakeLock(
                 android.os.PowerManager.PARTIAL_WAKE_LOCK or
                         android.os.PowerManager.ACQUIRE_CAUSES_WAKEUP or
@@ -362,7 +364,9 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         }
 
         // Android 14+ background activity start options for PendingIntent creation
+        // Guard: MODE_BACKGROUND_ACTIVITY_START_ALLOWED deprecated in API 35+ but required on Android 14 (API 34)
         val optionsBundle = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            @Suppress("DEPRECATION")
             android.app.ActivityOptions.makeBasic().apply {
                 setPendingIntentCreatorBackgroundActivityStartMode(
                     android.app.ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED
@@ -435,12 +439,12 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             .setSilent(true)
             .setContentIntent(pendingIntent)
             .addAction(
-                getNotificationIcon(context, Icons.Filled.Check),
+                getNotificationIcon(Icons.Filled.Check),
                 localizedContext.getString(R.string.home_action_taken),
                 takenPendingIntent
             )
             .addAction(
-                getNotificationIcon(context, Icons.Filled.Snooze),
+                getNotificationIcon(Icons.Filled.Snooze),
                 localizedContext.getString(R.string.notif_action_snooze_format, snoozeMinutes),
                 snoozePendingIntent
             )
@@ -486,7 +490,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
     }
 
     // Helper function to convert Compose icons to NotificationCompat.Action
-    private fun getNotificationIcon(context: Context, icon: androidx.compose.ui.graphics.vector.ImageVector): Int {
+    private fun getNotificationIcon(icon: androidx.compose.ui.graphics.vector.ImageVector): Int {
         // Using different built-in system icons for the actions
         return when (icon) {
             Icons.Filled.Check -> android.R.drawable.checkbox_on_background

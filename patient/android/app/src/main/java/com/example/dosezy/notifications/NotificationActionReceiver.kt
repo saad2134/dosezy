@@ -76,7 +76,6 @@ class NotificationActionReceiver : BroadcastReceiver() {
                     val entry = database.scheduleDao().getScheduleEntryById(id)
                     val user = entry?.let { database.userDao().getUserByIdDirect(it.userId) }
                     val lateAfter = user?.considerLateAfter ?: 3
-                    val missedAfter = user?.considerMissedAfter ?: 6
                     // Guard: Use isTakenLate so doses taken past missedAfter are recorded as TAKEN_LATE rather than TAKEN_ON_TIME
                     val status = if (entry != null && com.example.dosezy.utils.TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, lateAfter)) {
                         "TAKEN_LATE"

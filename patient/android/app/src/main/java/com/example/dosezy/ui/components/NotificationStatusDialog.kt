@@ -73,7 +73,7 @@ fun NotificationStatusDialog(
 
     // Auto-refresh status every 2 seconds
     LaunchedEffect(refreshCounter) {
-        notificationStatuses = createNotificationStatuses(context, refreshCounter)
+        notificationStatuses = createNotificationStatuses(context)
     }
 
     // Auto-refresh loop
@@ -155,10 +155,8 @@ fun NotificationStatusDialog(
 
 // Non-composable function to create notification statuses
 private fun createNotificationStatuses(
-    context: Context,
-    refreshCounter: Int
+    context: Context
 ): List<NotificationStatus> {
-    // Force recomputation by using refreshCounter
     val notificationPermStatus = NotificationUtils.hasNotificationPermission(context)
     val exactAlarmsStatus = NotificationUtils.canScheduleExactAlarms(context)
     val overlayStatus = NotificationUtils.canDrawOverlays(context)

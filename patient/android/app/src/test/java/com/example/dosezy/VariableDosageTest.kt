@@ -138,7 +138,7 @@ class VariableDosageTest {
     fun testVariableDosageInArabicLocale() {
         val originalLocale = java.util.Locale.getDefault()
         try {
-            java.util.Locale.setDefault(java.util.Locale("ar"))
+            java.util.Locale.setDefault(java.util.Locale.forLanguageTag("ar"))
             val custom = mapOf(
                 "08:00" to 20.0,
                 "20:00" to 10.0

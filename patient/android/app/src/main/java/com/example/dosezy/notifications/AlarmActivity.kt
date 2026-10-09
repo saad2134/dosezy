@@ -516,13 +516,10 @@ fun GroupedAlarmScreenContent(
                             // Guard: Use localized strings for age, gender, and profile fallback rather than hardcoded English " yrs" and "Medication Profile"
                             val currentUser = user
                             val detailsStr = when {
-                                currentUser != null && currentUser.age > 0 && currentUser.gender != null -> {
+                                currentUser != null && currentUser.age > 0 -> {
                                     stringResource(R.string.profile_age_gender_format, currentUser.age, currentUser.gender.getLocalizedName())
                                 }
-                                currentUser != null && currentUser.age > 0 -> {
-                                    stringResource(R.string.years_format, currentUser.age)
-                                }
-                                currentUser != null && currentUser.gender != null -> {
+                                currentUser != null -> {
                                     currentUser.gender.getLocalizedName()
                                 }
                                 else -> ""
@@ -742,7 +739,6 @@ fun GroupedAlarmScreenContent(
                             val now = LocalDateTime.now()
                             val nowStr = now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
                             val lateAfter = user?.considerLateAfter ?: 3
-                            val missedAfter = user?.considerMissedAfter ?: 6
                             if (medicinesList.isNotEmpty()) {
                                 medicinesList.forEach { (entry, _) ->
                                     // Guard: Use isTakenLate so delayed/snoozed or overdue doses past missedAfter are correctly recorded as TAKEN_LATE
@@ -758,7 +754,6 @@ fun GroupedAlarmScreenContent(
                                     val entry = database.scheduleDao().getScheduleEntryById(id)
                                     val entryUser = entry?.let { database.userDao().getUserByIdDirect(it.userId) } ?: user
                                     val entryLateAfter = entryUser?.considerLateAfter ?: 3
-                                    val entryMissedAfter = entryUser?.considerMissedAfter ?: 6
                                     // Guard: Use isTakenLate so delayed/snoozed or overdue doses past missedAfter are correctly recorded as TAKEN_LATE
                                     val status = if (entry != null && TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, entryLateAfter)) {
                                         "TAKEN_LATE"

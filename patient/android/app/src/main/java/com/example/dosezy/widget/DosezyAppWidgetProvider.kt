@@ -90,8 +90,8 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
 
         fun updateWidget(
             context: Context,
-            appWidgetManager: AppWidgetManager,
-            appWidgetId: Int
+            @Suppress("UNUSED_PARAMETER") appWidgetManager: AppWidgetManager? = null,
+            @Suppress("UNUSED_PARAMETER") appWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID
         ) {
             updateAppWidgets(context)
         }
@@ -150,6 +150,8 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                         putExtra("is_dark", isDark)
                         data = Uri.parse("dosezy://widget/service/$appWidgetId?dark=$isDark&ts=${System.currentTimeMillis()}")
                     }
+                    // Guard: setRemoteAdapter(Intent) is deprecated in API 35+ in favor of RemoteCollectionItems (API 31+); required for API 24-30 backward compatibility
+                    @Suppress("DEPRECATION")
                     views.setRemoteAdapter(R.id.widget_medicine_list, serviceIntent)
                     views.setEmptyView(R.id.widget_medicine_list, R.id.widget_status_container)
 
@@ -212,6 +214,8 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                 }
 
                 // Batch notify ListView data changed ONCE for all widgets
+                // Guard: notifyAppWidgetViewDataChanged(IntArray, Int) is deprecated in API 35+; required for RemoteViewsService adapter updates across API 24-34
+                @Suppress("DEPRECATION")
                 appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_medicine_list)
             } catch (e: Exception) {
                 e.printStackTrace()

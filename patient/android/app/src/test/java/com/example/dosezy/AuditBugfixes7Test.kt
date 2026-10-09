@@ -412,19 +412,16 @@ class AuditBugfixes7Test {
 
         // Now test intentional failure inside withTransaction:
         // We verify that Room withTransaction maintains rollback guarantees
-        var exceptionCaught = false
-        try {
+        val runResult = runCatching {
             db.withTransaction {
                 db.scheduleDao().deleteScheduleByUser(existingUser.userId)
                 db.medicineDao().deleteMedicinesByUser(existingUser.userId)
                 // Intentionally throw mid-transaction
                 throw IllegalStateException("Simulated disk error midway through overwrite")
             }
-        } catch (_: IllegalStateException) {
-            exceptionCaught = true
         }
-
-        assertTrue(exceptionCaught)
+        assertTrue(runResult.isFailure)
+        assertTrue(runResult.exceptionOrNull() is IllegalStateException)
         // Verify that existingUser's medicines and schedules were NOT deleted due to transaction rollback!
         val remainingMeds = db.medicineDao().getMedicinesByUserDirect(existingUser.userId)
         val remainingSchedules = db.scheduleDao().getAllScheduleEntries(existingUser.userId)

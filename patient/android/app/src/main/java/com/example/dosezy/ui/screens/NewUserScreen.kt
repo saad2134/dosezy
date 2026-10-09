@@ -108,7 +108,7 @@ fun NewUserScreen(
     navController: NavController,
     currentFrame: Int,
     onNext: (Int) -> Unit,
-    onSkip: () -> Unit,
+    @Suppress("UNUSED_PARAMETER") onSkip: () -> Unit = {},
     isCreatingNewProfile: Boolean = false,
     userViewModel: UserViewModel = hiltViewModel()
 ) {
@@ -153,7 +153,6 @@ fun NewUserScreen(
         bottomBar = {
             NewUserBottomBar(
                 currentFrame = currentFrame,
-                isCreatingNewProfile = isCreatingNewProfile,
                 existingUsers = users,
                 onBack = {
                     if (currentFrame > 1) {
@@ -169,8 +168,6 @@ fun NewUserScreen(
                     }
                 },
                 onNext = { onNext(currentFrame + 1) },
-                onSkip = onSkip,
-                onShowExistingProfiles = { showExistingProfiles = true },
                 isProfileSetupValid = isProfileSetupValid,
                 onCompleteProfileSetup = {
                     if (isProfileSetupValid) {
@@ -196,12 +193,6 @@ fun NewUserScreen(
         ) {
             when (currentFrame) {
                 1 -> WelcomePage(
-                    isCreatingNewProfile = isCreatingNewProfile,
-                    existingUsers = users,
-                    onSelectUser = { user ->
-                        userViewModel.setCurrentUser(user)
-                    },
-                    onCreateNewProfile = { onNext(2) },
                     onImportBackup = { showImportSourceDialog = true }
                 )
                 2 -> FeaturesPage()
@@ -324,14 +315,8 @@ fun NewUserScreen(
 
 @Composable
 fun WelcomePage(
-    isCreatingNewProfile: Boolean,
-    existingUsers: List<User>,
-    onSelectUser: (User) -> Unit,
-    onCreateNewProfile: () -> Unit,
     onImportBackup: () -> Unit = {}
 ) {
-    var showExistingProfiles by remember { mutableStateOf(false) }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -863,12 +848,9 @@ fun ProgressDot(active: Boolean) {
 @Composable
 fun NewUserBottomBar(
     currentFrame: Int,
-    isCreatingNewProfile: Boolean,
     existingUsers: List<User>,
     onBack: () -> Unit,
     onNext: () -> Unit,
-    onSkip: () -> Unit,
-    onShowExistingProfiles: () -> Unit,
     isProfileSetupValid: Boolean = true,
     onCompleteProfileSetup: () -> Unit = {}
 ) {
@@ -1170,29 +1152,7 @@ fun ProfileItem(user: User, onClick: () -> Unit, modifier: Modifier = Modifier) 
 @Composable
 fun PreviewWelcomePage() {
     MaterialTheme {
-        WelcomePage(
-            isCreatingNewProfile = false,
-            existingUsers = listOf(
-                User(
-                    userId = "1",
-                    fullName = "John Doe",
-                    age = 30,
-                    gender = Gender.MALE,
-                    contactNumber = "+1234567890",
-                    isCurrentUser = true
-                ),
-                User(
-                    userId = "2",
-                    fullName = "Jane Smith",
-                    age = 25,
-                    gender = Gender.FEMALE,
-                    contactNumber = "+0987654321",
-                    isCurrentUser = false
-                )
-            ),
-            onSelectUser = {},
-            onCreateNewProfile = {}
-        )
+        WelcomePage()
     }
 }
 
@@ -1221,12 +1181,7 @@ fun PreviewNewUserScreenFrame1() {
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surface)
         ) {
-            WelcomePage(
-                isCreatingNewProfile = false,
-                existingUsers = emptyList(),
-                onSelectUser = {},
-                onCreateNewProfile = {}
-            )
+            WelcomePage()
         }
     }
 }

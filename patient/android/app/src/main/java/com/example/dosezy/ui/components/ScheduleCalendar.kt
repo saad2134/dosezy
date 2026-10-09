@@ -214,12 +214,12 @@ private fun CalendarGrid(
         // Create rows for the calendar
         var dayCounter = 1 - startOffset
 
-        repeat(6) { weekIndex -> // Maximum 6 weeks in a month
+        repeat(6) { // Maximum 6 weeks in a month
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                repeat(7) { dayIndex ->
+                repeat(7) {
                     val currentDay = dayCounter
                     val date = if (currentDay in 1..daysInMonth) {
                         currentMonth.atDay(currentDay)
@@ -242,7 +242,6 @@ private fun CalendarGrid(
                         if (date != null && currentDay in 1..daysInMonth) {
                             CalendarDay(
                                 day = currentDay,
-                                date = date,
                                 isSelected = date == selectedDate,
                                 statusColor = statusColor,
                                 thickerHighlight = thickerHighlight,
@@ -271,7 +270,6 @@ private fun CalendarGrid(
 @Composable
 private fun CalendarDay(
     day: Int,
-    date: LocalDate,
     isSelected: Boolean,
     statusColor: Color,
     thickerHighlight: Boolean = false,
@@ -372,8 +370,6 @@ private fun getDateStatusColor(entries: List<ScheduleEntry>, missedAfterHours: I
 fun ScheduleList(
     scheduleWithMedicine: List<ScheduleWithMedicine>,
     timeFormat: TimeFormat, // time format parameter
-    onMarkAsTaken: (String, String) -> Unit,
-    onMarkAsLate: (String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -383,8 +379,6 @@ fun ScheduleList(
             ScheduleListItem(
                 scheduleWithMedicine = item,
                 timeFormat = timeFormat, // Pass to list item
-                onMarkAsTaken = onMarkAsTaken,
-                onMarkAsLate = onMarkAsLate,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 4.dp)
@@ -399,9 +393,7 @@ fun ScheduleListItem(
     timeFormat: TimeFormat, // time format parameter
     targetLocale: java.util.Locale = java.util.Locale.getDefault(),
     missedAfter: Int = 6,
-    modifier: Modifier = Modifier,
-    onMarkAsTaken: ((String, String) -> Unit)? = null,
-    onMarkAsLate: ((String, String) -> Unit)? = null
+    modifier: Modifier = Modifier
 ) {
     val entry = scheduleWithMedicine.scheduleEntry
     val medicine = scheduleWithMedicine.medicine
