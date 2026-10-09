@@ -342,6 +342,8 @@
     <string name="backup_header_desc">Manage your patient profiles, dosage schedules, adherence history logs, and custom photos across devices.</string>
     <string name="backup_section_automatic">AUTOMATIC</string>
     <string name="backup_section_manual">MANUAL</string>
+    <string name="backup_tab_automatic">Automatic</string>
+    <string name="backup_tab_manual">Manual</string>
     <string name="backup_cloud_title">Dosezy Cloud Server</string>
     <string name="backup_cloud_sub">Managed Caregiver &amp; Sync Platform</string>
     <string name="backup_cloud_desc">Optional managed cloud platform for real-time family sharing, caregiver remote monitoring, and automated multi-device synchronization without compromising data privacy.</string>

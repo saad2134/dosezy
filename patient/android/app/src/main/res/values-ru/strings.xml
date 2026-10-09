@@ -365,6 +365,8 @@
     <string name="backup_saved_success">Резервная копия успешно сохранена в папку «Загрузки».</string>
     <string name="backup_section_automatic">АВТОМАТИЧЕСКИ</string>
     <string name="backup_section_manual">ВРУЧНУЮ</string>
+    <string name="backup_tab_automatic">Автоматически</string>
+    <string name="backup_tab_manual">Вручную</string>
     <string name="backup_self_hosted_title">Собственный сервер бэкенда</string>
     <string name="backup_self_hosted_sub" formatted="false">100% открытый исходный код и приватность</string>
     <string name="backup_self_hosted_desc">Подключайтесь напрямую к собственному серверу Dosezy для полного суверенитета данных, панели ухода и независимого контроля.</string>

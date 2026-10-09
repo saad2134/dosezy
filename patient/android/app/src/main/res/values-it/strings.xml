@@ -365,6 +365,8 @@ Vuoi continuare?</string>
     <string name="backup_saved_success">Il backup è stato salvato con successo nella cartella Download.</string>
     <string name="backup_section_automatic">AUTOMATICO</string>
     <string name="backup_section_manual">MANUALE</string>
+    <string name="backup_tab_automatic">Automatico</string>
+    <string name="backup_tab_manual">Manuale</string>
     <string name="backup_self_hosted_title">Server backend self-hosted</string>
     <string name="backup_self_hosted_sub" formatted="false">100% Open Source e privato</string>
     <string name="backup_self_hosted_desc">Collegati direttamente alla tua istanza server Dosezy per la piena sovranità dei dati, dashboard per i caregiver e controllo privato dell\'infrastruttura.</string>

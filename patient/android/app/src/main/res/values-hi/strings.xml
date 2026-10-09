@@ -381,6 +381,8 @@
     <string name="backup_saved_success">बैकअप सफलतापूर्वक डाउनलोड फ़ोल्डर में सहेजा गया।</string>
     <string name="backup_section_automatic">स्वचालित</string>
     <string name="backup_section_manual">मैन्युअल</string>
+    <string name="backup_tab_automatic">स्वचालित</string>
+    <string name="backup_tab_manual">मैन्युअल</string>
     <string name="backup_self_hosted_title">सेल्फ-होस्टेड बैकएंड सर्वर</string>
     <string name="backup_self_hosted_sub" formatted="false">100% ओपन सोर्स और निजी</string>
     <string name="backup_self_hosted_desc">संपूर्ण डेटा संप्रभुता, परिवार देखभालकर्ता डैशबोर्ड और निजी नियंत्रण के लिए अपने स्वयं के डोज़ेज़ी सर्वर से सीधे जुड़ें।</string>

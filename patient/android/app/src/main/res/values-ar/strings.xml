@@ -365,6 +365,8 @@
     <string name="backup_saved_success">تم حفظ النسخة الاحتياطية بنجاح في مجلد التنزيلات.</string>
     <string name="backup_section_automatic">تلقائي</string>
     <string name="backup_section_manual">يدوي</string>
+    <string name="backup_tab_automatic">تلقائي</string>
+    <string name="backup_tab_manual">يدوي</string>
     <string name="backup_self_hosted_title">خادم خلفي مستضاف ذاتياً</string>
     <string name="backup_self_hosted_sub" formatted="false">مفتوح المصدر وخاص بنسبة 100%</string>
     <string name="backup_self_hosted_desc">اتصل مباشرة بخادم Dosezy الخاص بك للتمتع بالسيادة الكاملة على بياناتك، ولوحة تحكم الرعاية الأسرية، والتحكم الكامل في البنية التحتية.</string>

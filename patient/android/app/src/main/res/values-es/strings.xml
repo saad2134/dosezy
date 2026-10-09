@@ -381,6 +381,8 @@
     <string name="backup_saved_success">La copia de seguridad se guardó correctamente en Descargas.</string>
     <string name="backup_section_automatic">AUTOMÁTICO</string>
     <string name="backup_section_manual">MANUAL</string>
+    <string name="backup_tab_automatic">Automático</string>
+    <string name="backup_tab_manual">Manual</string>
     <string name="backup_self_hosted_title">Servidor backend autoalojado</string>
     <string name="backup_self_hosted_sub" formatted="false">100% Código abierto y privado</string>
     <string name="backup_self_hosted_desc">Conéctate directamente a tu propia instancia de servidor Dosezy para una soberanía total de datos, panel de cuidadores familiares y control de infraestructura.</string>

@@ -365,6 +365,8 @@ Voulez-vous continuer ?</string>
     <string name="backup_saved_success">La sauvegarde a été enregistrée avec succès dans les Téléchargements.</string>
     <string name="backup_section_automatic">AUTOMATIQUE</string>
     <string name="backup_section_manual">MANUEL</string>
+    <string name="backup_tab_automatic">Automatique</string>
+    <string name="backup_tab_manual">Manuel</string>
     <string name="backup_self_hosted_title">Serveur backend auto-hébergé</string>
     <string name="backup_self_hosted_sub" formatted="false">100% Open Source &amp; Privé</string>
     <string name="backup_self_hosted_desc">Connectez-vous directement à votre propre instance Dosezy pour une souveraineté totale des données, un tableau de bord familial et le contrôle de l\'infrastructure.</string>

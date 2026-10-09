@@ -365,6 +365,8 @@
     <string name="backup_saved_success">ব্যাকআপটি সফলভাবে ডাউনলোড ফোল্ডারে সংরক্ষিত হয়েছে।</string>
     <string name="backup_section_automatic">স্বয়ংক্রিয়</string>
     <string name="backup_section_manual">ম্যানুয়াল</string>
+    <string name="backup_tab_automatic">স্বয়ংক্রিয়</string>
+    <string name="backup_tab_manual">ম্যানুয়াল</string>
     <string name="backup_self_hosted_title">স্ব-হোস্ট করা ব্যাকএন্ড সার্ভার</string>
     <string name="backup_self_hosted_sub" formatted="false">১০০% ওপেন সোর্স এবং ব্যক্তিগত</string>
     <string name="backup_self_hosted_desc">সম্পূর্ণ ডেটা সার্বভৌমত্ব, পারিবারিক কেয়ারগিভার ড্যাশবোর্ড এবং ব্যক্তিগত নিয়ন্ত্রণের জন্য আপনার নিজস্ব ডোজইজি সার্ভারের সাথে সরাসরি সংযোগ করুন।</string>

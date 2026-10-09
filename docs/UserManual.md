@@ -389,14 +389,18 @@ Manage medications for your whole household on a single phone:
 
 Protect your records or transfer them seamlessly to a new phone:
 
-### Exporting Backups:
+### Automatic Cloud & Self-Hosted Server Backups:
 1. Go to **Menu > Backup & Restore**.
+2. The **Automatic** tab displays network and cloud backup options, including upcoming end-to-end encrypted Cloud Sync and Self-Hosted server backups.
+
+### Exporting Manual Backups:
+1. Go to **Menu > Backup & Restore** and select the **Manual** tab.
 2. Tap **Export Backup** to generate a complete encrypted ZIP archive containing all profiles, active & archived medicines, compliance logs, and emergency contacts.
 3. Use the direct system share sheet or save the file to Google Drive, internal storage, or email.
 
 ### Selective Profile Restore & Conflict Resolution:
-1. On your new phone, install Dosezy, open **Menu > Backup & Restore**, and tap **Restore Backup**.
-2. Select your backup ZIP file. Dosezy inspects the archive with an in-front loading spinner.
+1. On your new phone, install Dosezy, open **Menu > Backup & Restore**, and switch to the **Manual** tab.
+2. Tap **Restore Backup** and select your backup ZIP file. Dosezy inspects the archive with an in-front loading spinner.
 3. The **Select Profiles to Import** dialog displays each profile found in the archive.
 4. For each conflicting profile, choose your preferred strategy:
    - **Create New Profile**: Imports the profile as a separate new user with an updated name.

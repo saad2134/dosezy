@@ -365,6 +365,8 @@
     <string name="backup_saved_success">バックアップがダウンロードフォルダに正常に保存されました。</string>
     <string name="backup_section_automatic">自動</string>
     <string name="backup_section_manual">手動</string>
+    <string name="backup_tab_automatic">自動</string>
+    <string name="backup_tab_manual">手動</string>
     <string name="backup_self_hosted_title">セルフホスト バックエンドサーバー</string>
     <string name="backup_self_hosted_sub" formatted="false">100% オープンソース＆プライベート</string>
     <string name="backup_self_hosted_desc">完全なデータ主権、家族向け介護ダッシュボード、プライベートインフラ制御のために、独自のDosezyサーバーに直接接続します。</string>

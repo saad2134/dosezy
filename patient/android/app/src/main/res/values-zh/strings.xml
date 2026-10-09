@@ -381,6 +381,8 @@
     <string name="backup_saved_success">备份文件已成功保存至下载目录。</string>
     <string name="backup_section_automatic">自动</string>
     <string name="backup_section_manual">手动</string>
+    <string name="backup_tab_automatic">自动</string>
+    <string name="backup_tab_manual">手动</string>
     <string name="backup_self_hosted_title">自建后端服务器</string>
     <string name="backup_self_hosted_sub" formatted="false">100% 开源与私有化</string>
     <string name="backup_self_hosted_desc">直接连接至您自行搭建的Dosezy服务实例，享有完全的数据自主权、家庭看护仪表盘及私有基础设施控制。</string>
