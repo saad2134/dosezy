@@ -25,6 +25,8 @@ import java.time.LocalTime
     indices = [Index("userId")]
 )
 @TypeConverters(Converters::class)
+// Guard: Mark Immutable so Compose skips recomposing unchanged items in LazyColumn on slower devices
+@androidx.compose.runtime.Immutable
 data class Medicine(
     @PrimaryKey val medicineId: String,
     val userId: String, // Foreign key to User

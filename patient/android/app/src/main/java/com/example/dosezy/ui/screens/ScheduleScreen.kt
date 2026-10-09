@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -81,96 +83,111 @@ fun ScheduleScreen(navController: NavController) {
                 actions = {}
             )
 
-            Column(
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val currentLocale = remember(context) { com.example.dosezy.utils.LocaleHelper.getCurrentLocale(context) }
+            val considerMissedAfter = currentUser?.considerMissedAfter ?: 6
+
+            // Guard: Virtualize Schedule list with LazyColumn to prevent O(N) simultaneous layout measurements on older devices
+            androidx.compose.foundation.lazy.LazyColumn(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
-                    .verticalScroll(rememberScrollState())
-                    .padding(bottom = 16.dp)
+                    .background(MaterialTheme.colorScheme.background),
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 16.dp)
             ) {
                 // Calendar Section wrapped in Card-styled Surface
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    color = MaterialTheme.colorScheme.surface,
-                    tonalElevation = 0.dp,
-                    shadowElevation = 2.dp
-                ) {
-                    val rawScheduleEntries by scheduleViewModel.scheduleEntries.collectAsState()
+                item {
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        color = MaterialTheme.colorScheme.surface,
+                        tonalElevation = 0.dp,
+                        shadowElevation = 2.dp
+                    ) {
+                        val rawScheduleEntries by scheduleViewModel.scheduleEntries.collectAsState()
 
-                    ScheduleCalendar(
-                        selectedDate = selectedDate,
-                        scheduleEntries = rawScheduleEntries,
-                        onDateSelected = { date ->
-                            scheduleViewModel.setSelectedDate(date)
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                        ScheduleCalendar(
+                            selectedDate = selectedDate,
+                            scheduleEntries = rawScheduleEntries,
+                            onDateSelected = { date ->
+                                scheduleViewModel.setSelectedDate(date)
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
 
                 // Date Header
-                val context = androidx.compose.ui.platform.LocalContext.current
-                val currentLocale = remember(context) { com.example.dosezy.utils.LocaleHelper.getCurrentLocale(context) }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = selectedDate.format(
-                            java.time.format.DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.LONG).withLocale(currentLocale)
-                        ),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.weight(1f)
-                    )
-                    if (selectedDate != java.time.LocalDate.now()) {
-                        androidx.compose.material3.TextButton(
-                            onClick = { scheduleViewModel.setSelectedDate(java.time.LocalDate.now()) },
-                            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                            colors = androidx.compose.material3.ButtonDefaults.textButtonColors(
-                                contentColor = MaterialTheme.colorScheme.primary
-                            )
-                        ) {
-                            Text(
-                                text = androidx.compose.ui.res.stringResource(R.string.btn_jump_to_today),
-                                fontWeight = FontWeight.Bold,
-                                style = MaterialTheme.typography.labelLarge
-                            )
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = selectedDate.format(
+                                java.time.format.DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.LONG).withLocale(currentLocale)
+                            ),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.weight(1f)
+                        )
+                        if (selectedDate != java.time.LocalDate.now()) {
+                            androidx.compose.material3.TextButton(
+                                onClick = { scheduleViewModel.setSelectedDate(java.time.LocalDate.now()) },
+                                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                                colors = androidx.compose.material3.ButtonDefaults.textButtonColors(
+                                    contentColor = MaterialTheme.colorScheme.primary
+                                )
+                            ) {
+                                Text(
+                                    text = androidx.compose.ui.res.stringResource(R.string.btn_jump_to_today),
+                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.labelLarge
+                                )
+                            }
                         }
                     }
                 }
 
                 // Schedule Items
                 if (isRefreshing && scheduleWithMedicine.isEmpty()) {
-                    com.example.dosezy.ui.components.ScheduleSkeletonList(count = 3)
+                    item {
+                        com.example.dosezy.ui.components.ScheduleSkeletonList(count = 3)
+                    }
                 } else if (scheduleWithMedicine.isNotEmpty()) {
-                    scheduleWithMedicine.forEach { swm ->
+                    items(
+                        items = scheduleWithMedicine,
+                        key = { it.scheduleEntry.entryId }
+                    ) { swm ->
                         com.example.dosezy.ui.components.ScheduleListItem(
                             scheduleWithMedicine = swm,
                             timeFormat = timeFormat,
+                            targetLocale = currentLocale,
+                            missedAfter = considerMissedAfter,
                             modifier = Modifier.fillMaxWidth()
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 } else {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(32.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(R.string.schedule_no_meds_date),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(32.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = stringResource(R.string.schedule_no_meds_date),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
                     }
                 }
             }

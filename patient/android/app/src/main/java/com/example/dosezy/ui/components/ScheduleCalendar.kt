@@ -397,14 +397,14 @@ fun ScheduleList(
 fun ScheduleListItem(
     scheduleWithMedicine: ScheduleWithMedicine,
     timeFormat: TimeFormat, // time format parameter
+    targetLocale: java.util.Locale = java.util.Locale.getDefault(),
+    missedAfter: Int = 6,
     modifier: Modifier = Modifier,
     onMarkAsTaken: ((String, String) -> Unit)? = null,
     onMarkAsLate: ((String, String) -> Unit)? = null
 ) {
     val entry = scheduleWithMedicine.scheduleEntry
     val medicine = scheduleWithMedicine.medicine
-    val userViewModel: com.example.dosezy.ui.viewmodels.UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
-    val currentUser by userViewModel.currentUser.collectAsState()
 
     Row(
         modifier = modifier
@@ -453,9 +453,6 @@ fun ScheduleListItem(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            val targetLocale = remember(currentUser?.language) {
-                com.example.dosezy.utils.LocaleHelper.getLocale(currentUser?.language ?: com.example.dosezy.data.model.Language.SYSTEM)
-            }
             // TimeFormatUtils to format time according to user preference & locale
             Text(
                 text = TimeFormatUtils.formatTime(entry.scheduledDateTime, timeFormat, targetLocale),
@@ -468,7 +465,6 @@ fun ScheduleListItem(
 
         // Status Indicator (Read-only status overview on Schedule page)
         val now = java.time.LocalDateTime.now()
-        val missedAfter = currentUser?.considerMissedAfter ?: 6
         val isPassed = now.isAfter(entry.scheduledDateTime)
         
         val resolvedStatus = when {

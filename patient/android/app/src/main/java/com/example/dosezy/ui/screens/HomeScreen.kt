@@ -30,6 +30,8 @@ import com.example.dosezy.ui.components.DoseNoteDialog
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
@@ -294,46 +296,25 @@ fun HomeScreen(
             if (isTodayLoading && !hasMedications) {
                 com.example.dosezy.ui.components.HomeSkeletonView()
             } else {
-                // Main content with scrolling
-                Column(
+                // Main content with virtualized scrolling
+                // Guard: Virtualize home content with LazyColumn to eliminate massive initial layout measurement overhead on older devices
+                LazyColumn(
                     modifier = Modifier
                         .weight(1f)
-                        .verticalScroll(rememberScrollState())
-                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    contentPadding = PaddingValues(16.dp)
                 ) {
                     if (hasMedications) {
                         if (allCompleted && hasTaken) {
-                            AllGoodBanner()
-                            Spacer(modifier = Modifier.height(8.dp))
+                            item(key = "all_good_banner") {
+                                AllGoodBanner()
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
                         }
                         if (currentUser?.timelineModeEnabled == true) {
-                            HomeTimelineView(
-                                groupedEntries = groupedEntries,
-                                currentDateTime = currentTime,
-                                currentUser = currentUser,
-                                onMarkAsTaken = handleMarkAsTaken,
-                                onMarkAsLate = handleMarkAsLate,
-                                onUndo = { entryId ->
-                                    val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
-                                    if (currentUser?.allowDoseUndo == true && target != null) {
-                                        undoConfirmTarget = target
-                                    }
-                                },
-                                onEditNote = { entryId ->
-                                    val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
-                                    if (target != null) {
-                                        noteEditEntry = target
-                                    }
-                                },
-                                onSkip = { entryId ->
-                                    skippingEntryId = entryId
-                                }
-                            )
-                        } else {
-                            groupedEntries.forEach { (time, entries) ->
-                                TimeSection(
-                                    time = time,
-                                    entries = entries,
+                            item(key = "timeline_view") {
+                                HomeTimelineView(
+                                    groupedEntries = groupedEntries,
                                     currentDateTime = currentTime,
                                     currentUser = currentUser,
                                     onMarkAsTaken = handleMarkAsTaken,
@@ -354,40 +335,72 @@ fun HomeScreen(
                                         skippingEntryId = entryId
                                     }
                                 )
-                                Spacer(modifier = Modifier.height(16.dp))
+                            }
+                        } else {
+                            groupedEntries.forEach { (time, entries) ->
+                                item(key = "time_section_$time") {
+                                    TimeSection(
+                                        time = time,
+                                        entries = entries,
+                                        currentDateTime = currentTime,
+                                        currentUser = currentUser,
+                                        onMarkAsTaken = handleMarkAsTaken,
+                                        onMarkAsLate = handleMarkAsLate,
+                                        onUndo = { entryId ->
+                                            val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
+                                            if (currentUser?.allowDoseUndo == true && target != null) {
+                                                undoConfirmTarget = target
+                                            }
+                                        },
+                                        onEditNote = { entryId ->
+                                            val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
+                                            if (target != null) {
+                                                noteEditEntry = target
+                                            }
+                                        },
+                                        onSkip = { entryId ->
+                                            skippingEntryId = entryId
+                                        }
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                }
                             }
                         }
                     } else if (userMedicines.isEmpty()) {
-                        NoMedicationsState(onAddMedicineClick = { navController.navigate("add_med") })
+                        item(key = "no_meds_state") {
+                            NoMedicationsState(onAddMedicineClick = { navController.navigate("add_med") })
+                        }
                     } else {
                         // User has medications, but none scheduled for today (e.g. PRN or non-today)
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 16.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-                        ) {
-                            Column(
+                        item(key = "no_scheduled_doses") {
+                            Surface(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(24.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                    .padding(vertical = 16.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.Check,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(40.dp)
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = androidx.compose.ui.res.stringResource(R.string.no_scheduled_doses_today),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(24.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(40.dp)
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        text = androidx.compose.ui.res.stringResource(R.string.no_scheduled_doses_today),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
                             }
                         }
                     }
@@ -395,50 +408,57 @@ fun HomeScreen(
                     // --- v2.4.0 As-Needed (PRN) Medications Section ---
                     val prnMedicines = userMedicines.filter { it.frequency.pattern == com.example.dosezy.data.model.FrequencyPattern.AS_NEEDED }
                     if (prnMedicines.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { isPrnExpanded = !isPrnExpanded },
-                            shape = RoundedCornerShape(16.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-                        ) {
-                            Row(
+                        item(key = "prn_header") {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Surface(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 14.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
+                                    .clickable { isPrnExpanded = !isPrnExpanded },
+                                shape = RoundedCornerShape(16.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                             ) {
                                 Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 14.dp),
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                    horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Medication,
+                                            contentDescription = null,
+                                            tint = Color(0xFF1193D4),
+                                            modifier = Modifier.size(22.dp)
+                                        )
+                                        Text(
+                                            text = "${androidx.compose.ui.res.stringResource(R.string.prn_section_title)} (${prnMedicines.size})",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
                                     Icon(
-                                        imageVector = Icons.Default.Medication,
+                                        imageVector = if (isPrnExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                                         contentDescription = null,
-                                        tint = Color(0xFF1193D4),
-                                        modifier = Modifier.size(22.dp)
-                                    )
-                                    Text(
-                                        text = "${androidx.compose.ui.res.stringResource(R.string.prn_section_title)} (${prnMedicines.size})",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onSurface
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
-                                Icon(
-                                    imageVector = if (isPrnExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
                             }
                         }
 
                         if (isPrnExpanded) {
-                            Spacer(modifier = Modifier.height(10.dp))
-                            prnMedicines.forEach { prnMed ->
+                            item(key = "prn_spacer") {
+                                Spacer(modifier = Modifier.height(10.dp))
+                            }
+                            items(
+                                items = prnMedicines,
+                                key = { "prn_${it.medicineId}" }
+                            ) { prnMed ->
                                 Surface(
                                     modifier = Modifier.fillMaxWidth(),
                                     shape = RoundedCornerShape(12.dp),

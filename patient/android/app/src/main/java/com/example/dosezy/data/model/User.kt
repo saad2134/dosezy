@@ -17,6 +17,8 @@ import java.util.UUID
     indices = [Index("userId")]
 )
 @TypeConverters(Converters::class)
+// Guard: Mark Immutable so Compose skips recomposing unchanged profile data on slower devices
+@androidx.compose.runtime.Immutable
 data class User(
     @PrimaryKey val userId: String = UUID.randomUUID().toString(),
     val profilePicPath: String? = null,

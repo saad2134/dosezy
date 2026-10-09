@@ -30,6 +30,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.LinearEasing
 import com.example.dosezy.ui.components.CustomNavigationBar
 import com.example.dosezy.ui.screens.DebugScreen
 import com.example.dosezy.ui.screens.HomeScreen
@@ -439,10 +443,11 @@ fun DosezyApp(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = innerPadding.calculateBottomPadding()),
-            enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.None },
-            popEnterTransition = { EnterTransition.None },
-            popExitTransition = { ExitTransition.None }
+            // Guard: 140ms lightweight micro-fade provides buttery-smooth page switches and masks composition measurement hitches on older devices
+            enterTransition = { fadeIn(animationSpec = tween(140, easing = LinearEasing)) },
+            exitTransition = { fadeOut(animationSpec = tween(140, easing = LinearEasing)) },
+            popEnterTransition = { fadeIn(animationSpec = tween(140, easing = LinearEasing)) },
+            popExitTransition = { fadeOut(animationSpec = tween(140, easing = LinearEasing)) }
         ) {
             // Main Screens
             composable("loading") {
