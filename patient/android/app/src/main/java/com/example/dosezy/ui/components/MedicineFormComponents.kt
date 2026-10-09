@@ -819,6 +819,7 @@ fun MedicineTimingsAndDosagesCard(
                             }
                         }
 
+                        // Guard: Use suffix instead of floating label and defaultMinSize(minHeight = 56.dp) so text values and decimals are vertically centered and never clipped at the bottom
                         OutlinedTextField(
                             value = currentVal,
                             onValueChange = { newVal ->
@@ -826,13 +827,19 @@ fun MedicineTimingsAndDosagesCard(
                                 updated[key] = newVal
                                 onPerTimeDosagesChange(updated)
                             },
-                            label = { Text(selectedDosageUnit.displayName) },
+                            suffix = {
+                                Text(
+                                    text = selectedDosageUnit.displayName,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
                             placeholder = { Text(if (dosage.isNotBlank()) dosage else "0") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             shape = RoundedCornerShape(14.dp),
                             modifier = Modifier
                                 .weight(1f)
-                                .height(56.dp),
+                                .defaultMinSize(minHeight = 56.dp),
                             singleLine = true,
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = Color(0xFF1193D4),

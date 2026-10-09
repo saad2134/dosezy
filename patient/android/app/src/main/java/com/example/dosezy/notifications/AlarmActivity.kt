@@ -52,6 +52,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -962,17 +963,23 @@ private fun SlideToConfirmButton(
             )
         }
 
-        // Action prompt text inside track with crisp vector arrow icons (zero corrupted unicode characters)
+        // Guard: Center action prompt text within the open sliding lane (excluding the button footprint on either side so it never crowds or overlaps)
+        val knobFootprintDp = thumbSizeDp + (thumbPaddingDp * 2)
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp),
+                .padding(
+                    start = if (slideToLeft) thumbPaddingDp else knobFootprintDp,
+                    end = if (slideToLeft) knobFootprintDp else thumbPaddingDp
+                ),
             contentAlignment = Alignment.Center
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.alpha((1f - progress * 1.5f).coerceAtLeast(0f))
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .alpha((1f - progress * 1.5f).coerceAtLeast(0f))
             ) {
                 if (slideToLeft) {
                     Icon(
@@ -986,14 +993,18 @@ private fun SlideToConfirmButton(
                         text = text,
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                         color = Color.White,
-                        fontSize = 17.sp
+                        fontSize = 17.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 } else {
                     Text(
                         text = text,
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                         color = Color.White,
-                        fontSize = 17.sp
+                        fontSize = 17.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
