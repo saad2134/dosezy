@@ -1,6 +1,8 @@
 package com.example.dosezy.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -102,6 +104,7 @@ fun ScheduleCalendar(
             selectedDate = selectedDate,
             scheduleEntries = scheduleEntries,
             missedAfterHours = currentUser?.considerMissedAfter ?: 6,
+            thickerHighlight = currentUser?.thickerCalendarDayHighlight == true,
             firstDayOfWeek = firstDayOfWeek,
             onDateSelected = { date ->
                 onDateSelected(date)
@@ -190,6 +193,7 @@ private fun CalendarGrid(
     scheduleEntries: List<ScheduleEntry>,
     onDateSelected: (LocalDate) -> Unit,
     missedAfterHours: Int = 6,
+    thickerHighlight: Boolean = false,
     firstDayOfWeek: java.time.DayOfWeek = java.time.temporal.WeekFields.of(java.util.Locale.getDefault()).firstDayOfWeek,
     modifier: Modifier = Modifier
 ) {
@@ -241,6 +245,7 @@ private fun CalendarGrid(
                                 date = date,
                                 isSelected = date == selectedDate,
                                 statusColor = statusColor,
+                                thickerHighlight = thickerHighlight,
                                 onClick = { onDateSelected(date) }
                             )
                         } else if (currentDay > 0 && currentDay <= daysInMonth + 7) {
@@ -262,22 +267,39 @@ private fun CalendarGrid(
     }
 }
 
+// Guard: When thickerCalendarDayHighlight is enabled, every scheduled day receives a full colored frame instead of only an underline
 @Composable
 private fun CalendarDay(
     day: Int,
     date: LocalDate,
     isSelected: Boolean,
     statusColor: Color,
+    thickerHighlight: Boolean = false,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val backgroundColor = if (isSelected) Color(0xFF2084E4) else Color.Transparent
-    val textColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
+    val isColored = statusColor != Color.Transparent
+    val backgroundColor = when {
+        isSelected -> Color(0xFF2084E4)
+        thickerHighlight && isColored -> statusColor.copy(alpha = 0.12f)
+        else -> Color.Transparent
+    }
+    val textColor = when {
+        isSelected -> Color.White
+        else -> MaterialTheme.colorScheme.onSurface
+    }
+
+    val cellBorder = when {
+        isSelected && thickerHighlight && isColored -> BorderStroke(2.5.dp, statusColor)
+        thickerHighlight && isColored -> BorderStroke(2.dp, statusColor)
+        else -> null
+    }
 
     Box(
         modifier = modifier
             .fillMaxSize()
             .clip(RoundedCornerShape(12.dp))
+            .then(if (cellBorder != null) Modifier.border(cellBorder, RoundedCornerShape(12.dp)) else Modifier)
             .background(backgroundColor)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
@@ -289,10 +311,10 @@ private fun CalendarDay(
                 text = day.toString(),
                 color = textColor,
                 fontSize = 21.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = if (thickerHighlight && isColored) FontWeight.ExtraBold else FontWeight.Bold
             )
 
-            if (statusColor != Color.Transparent) {
+            if (isColored && !thickerHighlight) {
                 Spacer(modifier = Modifier.height(2.dp))
                 Box(
                     modifier = Modifier
@@ -300,6 +322,15 @@ private fun CalendarDay(
                         .height(4.dp)
                         .clip(RoundedCornerShape(2.dp))
                         .background(if (isSelected) Color.White else statusColor)
+                )
+            } else if (isColored && isSelected) {
+                Spacer(modifier = Modifier.height(2.dp))
+                Box(
+                    modifier = Modifier
+                        .width(22.dp)
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(Color.White)
                 )
             }
         }

@@ -779,4 +779,18 @@ Vuoi continuare?</string>
     <string name="stock_inventory_card_title">Scorta e inventario farmaci</string>
     <string name="widget_configure_auto_badge">Auto</string>
     <string name="dialog_validation_title">Avviso</string>
+
+    <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
+    <string name="pref_section_appearance">Aspetto</string>
+    <string name="pref_slide_actions_title">Scorri per Assumere e Posporre</string>
+    <string name="pref_slide_actions_desc">Richiede di scorrere anziché toccare per assumere o posporre le dosi negli allarmi.</string>
+    <string name="pref_timeline_mode_title">Vista Sequenza Temporale</string>
+    <string name="pref_timeline_mode_desc">Mostra il programma di oggi in una sequenza temporale verticale chiara.</string>
+    <string name="pref_calendar_thicker_highlight_title">Cornice Completa Giorni</string>
+    <string name="pref_calendar_thicker_highlight_desc">Evidenzia ciascun giorno programmato nel calendario con una cornice colorata intera.</string>
+    <string name="alarm_slide_to_take">Scorri per assumere</string>
+    <string name="alarm_slide_to_take_all">Scorri per assumere tutto (%1$d)</string>
+    <string name="alarm_slide_to_snooze">Scorri per posporre (%1$d min)</string>
+    <string name="home_view_standard">Standard</string>
+    <string name="home_view_timeline">Sequenza temporale</string>
 </resources>

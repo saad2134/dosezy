@@ -778,4 +778,18 @@
     <string name="stock_inventory_card_title">ওষুধের স্টক এবং ইনভেন্টরি</string>
     <string name="widget_configure_auto_badge">স্বয়ংক্রিয়</string>
     <string name="dialog_validation_title">বিজ্ঞপ্তি</string>
+
+    <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
+    <string name="pref_section_appearance">রূপ ও প্রদর্শন</string>
+    <string name="pref_slide_actions_title">গ্রহণ ও স্নুজ করতে স্লাইড করুন</string>
+    <string name="pref_slide_actions_desc">অ্যালার্মে ওষুধ গ্রহণ বা স্নুজ করতে ট্যাপ করার পরিবর্তে স্লাইড করার প্রয়োজন।</string>
+    <string name="pref_timeline_mode_title">টাইমলাইন ভিউ</string>
+    <string name="pref_timeline_mode_desc">আজকের সময়সূচি একটি বিস্তারিত উল্লম্ব টাইমলাইনে প্রদর্শন করুন।</string>
+    <string name="pref_calendar_thicker_highlight_title">পূর্ণ ফ্রেম বিশিষ্ট দিন</string>
+    <string name="pref_calendar_thicker_highlight_desc">ক্যালেন্ডারে প্রতিটি নির্ধারিত দিন সম্পূর্ণ রঙিন ফ্রেমে চিহ্নিত করুন।</string>
+    <string name="alarm_slide_to_take">গ্রহণ করতে স্লাইড করুন</string>
+    <string name="alarm_slide_to_take_all">সবগুলো গ্রহণ করতে স্লাইড করুন (%1$d)</string>
+    <string name="alarm_slide_to_snooze">স্নুজ করতে স্লাইড করুন (%1$d মি)</string>
+    <string name="home_view_standard">সাধারণ</string>
+    <string name="home_view_timeline">টাইমলাইন</string>
 </resources>

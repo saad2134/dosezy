@@ -45,7 +45,11 @@ data class User(
     val hideAddMedicineNavButton: Boolean = false,
     val allowDoseUndo: Boolean = false,
     val allowDoseNotes: Boolean = false,
-    val promptDoseNotes: Boolean = false
+    val promptDoseNotes: Boolean = false,
+    // Guard: Preferences for sliding dose confirmation, home timeline view, and full-frame calendar highlight
+    val slideActionsEnabled: Boolean = true,
+    val timelineModeEnabled: Boolean = false,
+    val thickerCalendarDayHighlight: Boolean = false
 )
 
 enum class AlarmSound(val rawResId: Int?) {

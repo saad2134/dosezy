@@ -779,4 +779,18 @@ Möchten Sie fortfahren?</string>
     <string name="stock_inventory_card_title">Medikamentenvorrat &amp; Bestand</string>
     <string name="widget_configure_auto_badge">Auto</string>
     <string name="dialog_validation_title">Hinweis</string>
+
+    <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
+    <string name="pref_section_appearance">Erscheinungsbild</string>
+    <string name="pref_slide_actions_title">Wischen zum Einnehmen &amp; Schlummern</string>
+    <string name="pref_slide_actions_desc">Erfordert Wischen statt Tippen, um Dosen bei Alarmen einzunehmen oder zu schlummern.</string>
+    <string name="pref_timeline_mode_title">Zeitachsen-Ansicht</string>
+    <string name="pref_timeline_mode_desc">Zeigt den heutigen Einnahmeplan in einer übersichtlichen vertikalen Zeitleiste an.</string>
+    <string name="pref_calendar_thicker_highlight_title">Vollständige Tagesumrandung</string>
+    <string name="pref_calendar_thicker_highlight_desc">Umrandet jeden geplanten Kalendertag mit einem farbigen Rahmen.</string>
+    <string name="alarm_slide_to_take">Zum Einnehmen wischen</string>
+    <string name="alarm_slide_to_take_all">Alle einnehmen (%1$d)</string>
+    <string name="alarm_slide_to_snooze">Zum Schlummern wischen (%1$d Min)</string>
+    <string name="home_view_standard">Standard</string>
+    <string name="home_view_timeline">Zeitleiste</string>
 </resources>

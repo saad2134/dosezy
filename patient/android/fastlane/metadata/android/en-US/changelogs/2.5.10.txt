@@ -1,3 +1,3 @@
-• Added support for additional dosage units: mEq, inhaler puffs, and ampules with smart stock and refill tracking
-• Fixed backup export dialog path display and restored full parity for custom medication frequencies
-• Synchronized app and widget theme preferences and improved active profile selection on backup restore
+• Added Home timeline view mode, slide-to-confirm alarm actions, thicker calendar highlights, and Appearance settings
+• Added dosage units (mEq, inhaler puffs, ampules) with inventory tracking and refill management
+• Fixed backup export path display, schedule restoration parity, and profile theme synchronization

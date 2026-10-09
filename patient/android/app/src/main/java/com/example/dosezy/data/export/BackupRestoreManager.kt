@@ -659,7 +659,11 @@ class BackupRestoreManager(
             hideAddMedicineNavButton = json.get("hideAddMedicineNavButton")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
             allowDoseUndo = json.get("allowDoseUndo")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
             allowDoseNotes = json.get("allowDoseNotes")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
-            promptDoseNotes = json.get("promptDoseNotes")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false
+            promptDoseNotes = json.get("promptDoseNotes")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+            // Guard: Defensively parse slide actions, timeline mode, and thicker calendar highlight with non-breaking defaults for legacy backup archives
+            slideActionsEnabled = json.get("slideActionsEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: true,
+            timelineModeEnabled = json.get("timelineModeEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+            thickerCalendarDayHighlight = json.get("thickerCalendarDayHighlight")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false
         )
     }
 

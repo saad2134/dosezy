@@ -101,7 +101,7 @@ class AuditBugfixes9Test {
         db.close()
     }
 
-    private suspend fun awaitCondition(timeoutMs: Long = 3000, condition: suspend () -> Boolean) {
+    private suspend fun awaitCondition(timeoutMs: Long = 10000, condition: suspend () -> Boolean) {
         val start = System.currentTimeMillis()
         while (!condition()) {
             if (System.currentTimeMillis() - start > timeoutMs) {

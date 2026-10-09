@@ -779,4 +779,18 @@
     <string name="stock_inventory_card_title">مخزون الأدوية والجرد</string>
     <string name="widget_configure_auto_badge">تلقائي</string>
     <string name="dialog_validation_title">تنبيه</string>
+
+    <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
+    <string name="pref_section_appearance">المظهر</string>
+    <string name="pref_slide_actions_title">السحب للتناول والتأجيل</string>
+    <string name="pref_slide_actions_desc">يتطلب السحب بدلاً من الضغط لتناول الجرعة أو تأجيلها في التنبيهات.</string>
+    <string name="pref_timeline_mode_title">عرض المخطط الزمني</string>
+    <string name="pref_timeline_mode_desc">عرض جدول اليوم في مخطط زمني عمودي واسع.</string>
+    <string name="pref_calendar_thicker_highlight_title">إطار كامل للأيام المجدولة</string>
+    <string name="pref_calendar_thicker_highlight_desc">تمييز كل يوم مجدول في التقويم بإطار ملون كامل.</string>
+    <string name="alarm_slide_to_take">اسحب للتناول</string>
+    <string name="alarm_slide_to_take_all">اسحب لتناول الكل (%1$d)</string>
+    <string name="alarm_slide_to_snooze">اسحب للتأجيل (%1$d دقيقة)</string>
+    <string name="home_view_standard">قياسي</string>
+    <string name="home_view_timeline">مخطط زمني</string>
 </resources>

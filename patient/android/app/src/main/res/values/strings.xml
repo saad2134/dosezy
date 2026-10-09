@@ -807,4 +807,18 @@ Do you want to continue?</string>
     <string name="stock_inventory_card_title">Medicine Stock &amp; Inventory</string>
     <string name="widget_configure_auto_badge">Auto</string>
     <string name="dialog_validation_title">Notice</string>
+
+    <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
+    <string name="pref_section_appearance">Appearance</string>
+    <string name="pref_slide_actions_title">Slide to Take &amp; Snooze</string>
+    <string name="pref_slide_actions_desc">Require sliding instead of tapping to take or snooze doses in alarms.</string>
+    <string name="pref_timeline_mode_title">Timeline View</string>
+    <string name="pref_timeline_mode_desc">Display today\'s schedule in an expanded vertical timeline.</string>
+    <string name="pref_calendar_thicker_highlight_title">Full Frame Day Highlights</string>
+    <string name="pref_calendar_thicker_highlight_desc">Outline each scheduled day on the calendar with a full colored frame.</string>
+    <string name="alarm_slide_to_take">Slide to Take</string>
+    <string name="alarm_slide_to_take_all">Slide to Take All (%1$d)</string>
+    <string name="alarm_slide_to_snooze">Slide to Snooze (%1$d min)</string>
+    <string name="home_view_standard">Standard</string>
+    <string name="home_view_timeline">Timeline</string>
 </resources>

@@ -778,4 +778,18 @@ Deseja continuar?</string>
     <string name="stock_inventory_card_title">Estoque e inventário de medicamentos</string>
     <string name="widget_configure_auto_badge">Automático</string>
     <string name="dialog_validation_title">Aviso</string>
+
+    <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
+    <string name="pref_section_appearance">Aparência</string>
+    <string name="pref_slide_actions_title">Deslizar para tomar e adiar</string>
+    <string name="pref_slide_actions_desc">Exigir deslizar em vez de tocar para tomar ou adiar doses nos alarmes.</string>
+    <string name="pref_timeline_mode_title">Modo linha do tempo</string>
+    <string name="pref_timeline_mode_desc">Exibir a programação de hoje em uma linha do tempo vertical expandida.</string>
+    <string name="pref_calendar_thicker_highlight_title">Destaque de moldura completa nos dias</string>
+    <string name="pref_calendar_thicker_highlight_desc">Contornar cada dia agendado no calendário com uma moldura colorida completa.</string>
+    <string name="alarm_slide_to_take">Deslize para tomar</string>
+    <string name="alarm_slide_to_take_all">Deslize para tomar todos (%1$d)</string>
+    <string name="alarm_slide_to_snooze">Deslize para adiar (%1$d min)</string>
+    <string name="home_view_standard">Padrão</string>
+    <string name="home_view_timeline">Linha do tempo</string>
 </resources>
