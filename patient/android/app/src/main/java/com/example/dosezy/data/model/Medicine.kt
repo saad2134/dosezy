@@ -68,168 +68,21 @@ data class Medicine(
     }
 
     /**
-     * Generates schedule entries for this medicine for a given date range
-     * @param startDateRange The start date for generating schedule entries
-     * @param days Number of days to generate entries for (default: 30 days)
-     * @return List of ScheduleEntry objects
+     * Generates schedule entries for this medicine for a given date range.
+     * Delegated to [com.example.dosezy.domain.ScheduleRecurrenceEngine] for clean domain separation.
      */
     @RequiresApi(Build.VERSION_CODES.O)
     fun generateScheduleEntries(startDateRange: LocalDate, days: Int = 30): List<ScheduleEntry> {
-        // As-needed (PRN) and archived medications do not generate automated scheduled reminder slots
-        if (frequency.pattern == FrequencyPattern.AS_NEEDED || isArchived) {
-            return emptyList()
-        }
-
-        val entries = mutableListOf<ScheduleEntry>()
-        val effectiveStart = if (startDate != null && startDate.isAfter(startDateRange)) startDate else startDateRange
-        val effectiveEnd = if (endDate != null && endDate.isBefore(startDateRange.plusDays(days.toLong()))) endDate else startDateRange.plusDays(days.toLong())
-
-        if (effectiveStart.isAfter(effectiveEnd)) return emptyList()
-
-        // Guard: Generate EVERY_X_HOURS along a continuous timeline across midnight boundaries rather than day-by-day truncation to prevent missing nocturnal doses and schedule drift
-        if (frequency.pattern == FrequencyPattern.EVERY_X_HOURS) {
-            val interval = (frequency.intervalHours ?: 4).coerceIn(1, 23)
-            val startTime = (scheduledTimes.firstOrNull() ?: LocalTime.of(8, 0)).withSecond(0).withNano(0)
-            // Guard: Anchor to stable epoch if startDate is null to allow timeline to step across midnight boundaries and preserve nocturnal doses
-            val baseDate = startDate ?: LocalDate.of(2020, 1, 1)
-            val baseAnchor = LocalDateTime.of(baseDate, startTime)
-            val now = LocalDateTime.now()
-
-            var cursor = baseAnchor
-            if (cursor.isBefore(effectiveStart.atStartOfDay())) {
-                val hoursDiff = java.time.Duration.between(cursor, effectiveStart.atStartOfDay()).toHours()
-                val steps = (hoursDiff / interval).coerceAtLeast(0)
-                cursor = cursor.plusHours(steps * interval)
-                while (cursor.isBefore(effectiveStart.atStartOfDay())) {
-                    cursor = cursor.plusHours(interval.toLong())
-                }
-            }
-
-            val endDateTime = effectiveEnd.atTime(LocalTime.MAX)
-            while (!cursor.isAfter(endDateTime)) {
-                if (endDate != null && cursor.toLocalDate().isAfter(endDate)) break
-                val itemDate = cursor.toLocalDate()
-                val cleanTime = cursor.toLocalTime().withSecond(0).withNano(0)
-                val scheduledDateTime = cursor.withSecond(0).withNano(0)
-
-                // Skip past reminder times on the current day to avoid immediate missed status
-                if (!(itemDate.isEqual(now.toLocalDate()) && scheduledDateTime.isBefore(now.minusMinutes(15)))) {
-                    val entryId = "${medicineId}_${itemDate}_${cleanTime}".replace(":", "_").replace("-", "_")
-                    val entry = ScheduleEntry(
-                        entryId = entryId,
-                        userId = userId,
-                        medicineId = medicineId,
-                        scheduledDateTime = scheduledDateTime,
-                        status = MedicationStatus.PENDING,
-                        dosage = getDosageForTime(cleanTime)
-                    )
-                    entries.add(entry)
-                }
-                cursor = cursor.plusHours(interval.toLong())
-            }
-            return entries
-        }
-
-        var currentDate = effectiveStart
-        while (currentDate.isBefore(effectiveEnd) || currentDate.isEqual(effectiveEnd)) {
-            // Check if medicine should be taken on this day based on frequency
-            if (shouldTakeOnDate(currentDate)) {
-                val now = LocalDateTime.now()
-                val effectiveTimes = scheduledTimes
-
-                effectiveTimes.forEach { time ->
-                    val cleanTime = time.withSecond(0).withNano(0)
-                    val scheduledDateTime = LocalDateTime.of(currentDate, cleanTime)
-
-                    // Skip past reminder times on the current day to avoid immediate missed status
-                    if (currentDate.isEqual(now.toLocalDate()) && scheduledDateTime.isBefore(now.minusMinutes(15))) {
-                        return@forEach
-                    }
-
-                    val entryId = "${medicineId}_${currentDate}_${cleanTime}".replace(":", "_").replace("-", "_")
-                    val entry = ScheduleEntry(
-                        entryId = entryId,
-                        userId = userId,
-                        medicineId = medicineId,
-                        scheduledDateTime = scheduledDateTime,
-                        status = MedicationStatus.PENDING,
-                        dosage = getDosageForTime(cleanTime)
-                    )
-                    entries.add(entry)
-                }
-            }
-            currentDate = currentDate.plusDays(1)
-        }
-
-        return entries
+        return com.example.dosezy.domain.ScheduleRecurrenceEngine.generateScheduleEntries(this, startDateRange, days)
     }
 
     /**
-     * Determines if the medicine should be taken on the given date based on frequency pattern
+     * Determines if the medicine should be taken on the given date based on frequency pattern.
+     * Delegated to [com.example.dosezy.domain.ScheduleRecurrenceEngine].
      */
     @RequiresApi(Build.VERSION_CODES.O)
     internal fun shouldTakeOnDate(date: LocalDate): Boolean {
-        // Verify within finite course bounds
-        if (startDate != null && date.isBefore(startDate)) return false
-        if (endDate != null && date.isAfter(endDate)) return false
-
-        return when (frequency.pattern) {
-            FrequencyPattern.DAILY -> true
-            FrequencyPattern.AS_NEEDED -> false
-            FrequencyPattern.EVERY_X_HOURS -> true
-            FrequencyPattern.EVERY_X_DAYS -> {
-                val interval = (frequency.intervalDays ?: 2).coerceAtLeast(1)
-                val baseDate = startDate ?: LocalDate.of(2020, 1, 1)
-                val daysDiff = java.time.temporal.ChronoUnit.DAYS.between(baseDate, date)
-                daysDiff % interval == 0L
-            }
-            FrequencyPattern.WEEKLY -> {
-                val selectedDays = frequency.selectedDaysOfWeek
-                if (!selectedDays.isNullOrEmpty()) {
-                    // Use explicitly selected days (1=Mon ... 7=Sun, ISO standard)
-                    date.dayOfWeek.value in selectedDays
-                } else {
-                    // Fallback: treat daysPerWeek as "first N days of the week"
-                    val daysPerWeek = frequency.daysPerWeek ?: 7
-                    date.dayOfWeek.value <= daysPerWeek
-                }
-            }
-            FrequencyPattern.MONTHLY -> {
-                val selectedDays = frequency.selectedDaysOfMonth
-                if (!selectedDays.isNullOrEmpty()) {
-                    // Use explicitly selected days of month
-                    val maxDayInMonth = date.lengthOfMonth()
-                    selectedDays.any { targetDay ->
-                        val effectiveDay = targetDay.coerceAtMost(maxDayInMonth)
-                        date.dayOfMonth == effectiveDay
-                    }
-                } else {
-                    // Fallback: treat daysPerMonth as "first N days of the month"
-                    val daysPerMonth = frequency.daysPerMonth ?: 30
-                    date.dayOfMonth <= daysPerMonth
-                }
-            }
-            FrequencyPattern.CUSTOM -> {
-                val intervalWks = (frequency.intervalWeeks ?: 1).coerceAtLeast(1)
-                val baseDate = startDate ?: LocalDate.of(2020, 1, 6) // Jan 6, 2020 was Monday
-                val baseMonday = baseDate.with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY))
-                val dateMonday = date.with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY))
-                val weeksDiff = java.time.temporal.ChronoUnit.WEEKS.between(baseMonday, dateMonday)
-                val isIntervalWeek = weeksDiff >= 0 && (weeksDiff % intervalWks == 0L)
-
-                val selectedDays = frequency.selectedDaysOfWeek
-                val isDayMatch = if (!selectedDays.isNullOrEmpty()) {
-                    date.dayOfWeek.value in selectedDays
-                } else {
-                    if (frequency.intervalWeeks != null && frequency.intervalWeeks > 1) {
-                        date.dayOfWeek == baseDate.dayOfWeek
-                    } else {
-                        true
-                    }
-                }
-                isIntervalWeek && isDayMatch
-            }
-        }
+        return com.example.dosezy.domain.ScheduleRecurrenceEngine.shouldTakeOnDate(this, date)
     }
 
     /**

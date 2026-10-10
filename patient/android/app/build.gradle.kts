@@ -117,6 +117,10 @@ android {
     }
 }
 
+tasks.withType<Test>().configureEach {
+    jvmArgs("-Djdk.attach.allowAttachSelf=true")
+}
+
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
