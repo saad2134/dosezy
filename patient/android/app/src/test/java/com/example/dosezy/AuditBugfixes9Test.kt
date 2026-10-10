@@ -141,7 +141,7 @@ class AuditBugfixes9Test {
 
         // 4. Delete the active user, which must trigger alarm cancellation and promotion
         userViewModel.deleteUser(activeUser!!)
-        awaitCondition { userRepository.getUserByIdSync(secondUser.userId) == null }
+        awaitCondition { userRepository.getUserByIdSync(secondUser.userId) == null && userRepository.getAllUsersList().firstOrNull()?.isCurrentUser == true }
 
         val remainingUsers = userRepository.getAllUsersList()
         assertEquals(1, remainingUsers.size)

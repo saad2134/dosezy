@@ -817,11 +817,13 @@ class BackupRestoreManager(
                 medicineId = medicineIdVal,
                 scheduledDateTime = parsedScheduledTime,
                 status = statusVal,
-                // Guard: Handle epoch-millis formatted takenAt from older versions using ZoneOffset.UTC matching Converters.kt
+                // Guard: Handle epoch-millis, standard ISO, offset ISO, and UTC Instant strings to prevent dropping completion timestamps
                 takenAt = obj.get("takenAt")?.takeUnless { it.isJsonNull }?.asString?.let { raw ->
                     raw.toLongOrNull()?.let { millis ->
                         java.time.Instant.ofEpochMilli(millis).atZone(java.time.ZoneOffset.UTC).toLocalDateTime()
                     } ?: runCatching { LocalDateTime.parse(raw) }.getOrNull()
+                      ?: runCatching { java.time.OffsetDateTime.parse(raw).toLocalDateTime() }.getOrNull()
+                      ?: runCatching { java.time.Instant.parse(raw).atZone(java.time.ZoneOffset.UTC).toLocalDateTime() }.getOrNull()
                 },
                 skipReason = obj.get("skipReason")?.takeUnless { it.isJsonNull }?.asString,
                 dosage = obj.get("dosage")?.takeUnless { it.isJsonNull }?.runCatching { asDouble }?.getOrNull(),

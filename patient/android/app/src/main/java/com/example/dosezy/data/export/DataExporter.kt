@@ -517,7 +517,13 @@ class DataExporter(
         checkPageBreak(50f)
         val sortedSchedules = schedules.sortedByDescending { it.scheduledDateTime }
         val medMap = medicines.associateBy { it.medicineId }
-        canvas.drawText("Recent Dose History (${sortedSchedules.size} entries)", 40f, y, headerPaint)
+        // Guard: Explicitly clarify entry count in dose history header when total schedules exceed the 150-item PDF page limit
+        val historyHeaderText = if (sortedSchedules.size > 150) {
+            "Recent Dose History (Latest 150 of ${sortedSchedules.size} entries)"
+        } else {
+            "Recent Dose History (${sortedSchedules.size} entries)"
+        }
+        canvas.drawText(historyHeaderText, 40f, y, headerPaint)
         y += 18f
 
         subtitlePaint.isFakeBoldText = true

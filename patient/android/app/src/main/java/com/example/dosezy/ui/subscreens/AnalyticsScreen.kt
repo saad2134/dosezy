@@ -89,8 +89,12 @@ fun AnalyticsScreen(
     val selectedData = uiState.selectedData
     val breakdown = uiState.breakdown
 
+    val currentLang = currentUser?.language ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(androidx.compose.ui.platform.LocalContext.current)
+    val activeLocale = remember(currentLang) { com.example.dosezy.utils.LocaleHelper.getLocale(currentLang) }
+
+    // Guard: Format earliest date using user's active in-app language locale instead of device system default
     val sinceString = if (uiState.earliestDate != null) {
-        val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+        val formatter = remember(activeLocale) { DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(activeLocale) }
         stringResource(R.string.analytics_using_since, uiState.earliestDate!!.format(formatter))
     } else {
         stringResource(R.string.analytics_using_today)
