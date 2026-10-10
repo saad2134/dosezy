@@ -15,6 +15,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,8 +24,13 @@ class UserViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val medicineRepository: MedicineRepository,
     private val scheduleRepository: ScheduleRepository,
-    private val medicineNotificationManager: MedicineNotificationManager
+    private val medicineNotificationManager: MedicineNotificationManager,
+    @ApplicationContext private val appContext: Context? = null
 ) : ViewModel() {
+
+    // Context resolution: uses injected ApplicationContext with fallback for testing
+    private val context: Context
+        get() = appContext ?: medicineRepository.context
 
     // debouncing to prevent rapid updates
     private val _users = MutableStateFlow<List<User>>(emptyList())
@@ -59,9 +66,9 @@ class UserViewModel @Inject constructor(
                         _currentUser.value = current
                         if (current != null) {
                             try {
-                                val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                                val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
                                 prefs.edit().putString("theme", current.theme.name.lowercase()).apply()
-                                com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, current.userId, current.theme.name.lowercase(), isCurrentProfile = true)
+                                com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, current.userId, current.theme.name.lowercase(), isCurrentProfile = true)
                             } catch (_: Exception) {}
                         }
 
@@ -103,14 +110,14 @@ class UserViewModel @Inject constructor(
                     medicineNotificationManager.scheduleAlarmsForUser(updatedUser.userId)
 
                     try {
-                        val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                        val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
                         prefs.edit().putString("theme", updatedUser.theme.name.lowercase()).apply()
-                        com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, updatedUser.userId, updatedUser.theme.name.lowercase(), isCurrentProfile = true)
+                        com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, updatedUser.userId, updatedUser.theme.name.lowercase(), isCurrentProfile = true)
                     } catch (_: Exception) {}
 
                     // Update home screen widget for the new current user
                     try {
-                        com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(medicineRepository.context)
+                        com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
                     } catch (_: Exception) {}
                 }
                 _isLoading.value = false
@@ -157,12 +164,12 @@ class UserViewModel @Inject constructor(
                         // Guard: Core library desugaring supports API 24+; schedule alarms for new profile across all supported OS versions
                         medicineNotificationManager.scheduleAlarmsForUser(userToInsert.userId)
                         try {
-                            val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                            val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
                             prefs.edit().putString("theme", userToInsert.theme.name.lowercase()).apply()
-                            com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, userToInsert.userId, userToInsert.theme.name.lowercase(), isCurrentProfile = shouldBeCurrent)
+                            com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, userToInsert.userId, userToInsert.theme.name.lowercase(), isCurrentProfile = shouldBeCurrent)
                         } catch (_: Exception) {}
                         try {
-                            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(medicineRepository.context)
+                            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
                         } catch (_: Exception) {}
                     }
                 }
@@ -181,13 +188,13 @@ class UserViewModel @Inject constructor(
             if (user.isCurrentUser) {
                 _currentUser.value = user
                 try {
-                    val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                    val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
                     prefs.edit().putString("theme", user.theme.name.lowercase()).apply()
                 } catch (_: Exception) {}
             }
             try {
-                com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, user.userId, user.theme.name.lowercase(), isCurrentProfile = user.isCurrentUser)
-                com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(medicineRepository.context)
+                com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, user.userId, user.theme.name.lowercase(), isCurrentProfile = user.isCurrentUser)
+                com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
             } catch (_: Exception) {}
         }
     }
@@ -205,7 +212,7 @@ class UserViewModel @Inject constructor(
                         try {
                             val cleanPath = path.removePrefix("file://")
                             val file = java.io.File(cleanPath)
-                            val filesDir = medicineRepository.context.filesDir
+                            val filesDir = context.filesDir
                             if (file.exists() && (file.parentFile?.canonicalPath == filesDir.canonicalPath || file.canonicalPath.startsWith(filesDir.canonicalPath + java.io.File.separator))) {
                                 file.delete()
                             }
@@ -215,7 +222,7 @@ class UserViewModel @Inject constructor(
                     // Clean up associated medicine images before database cascade deletion
                     try {
                         val meds = medicineRepository.getMedicinesByUserDirect(user.userId)
-                        val filesDir = medicineRepository.context.filesDir
+                        val filesDir = context.filesDir
                         meds.forEach { med ->
                             med.imageUri?.let { uriStr ->
                                 val cleanPath = uriStr.removePrefix("file://")
@@ -232,12 +239,12 @@ class UserViewModel @Inject constructor(
 
                     // Guard: Scrub orphaned emergency contacts and widget profile preferences for the deleted profile to prevent SharedPreferences leakage
                     try {
-                        val emPrefs = medicineRepository.context.getSharedPreferences("emergency_contacts", android.content.Context.MODE_PRIVATE)
+                        val emPrefs = context.getSharedPreferences("emergency_contacts", android.content.Context.MODE_PRIVATE)
                         emPrefs.edit().remove("contacts_json_${user.userId}").apply()
                     } catch (_: Exception) {}
 
                     try {
-                        com.example.dosezy.widget.DosezyWidgetPrefs.deleteWidgetProfileTheme(medicineRepository.context, user.userId)
+                        com.example.dosezy.widget.DosezyWidgetPrefs.deleteWidgetProfileTheme(context, user.userId)
                     } catch (_: Exception) {}
 
                     // Fetch remaining users directly from DB
@@ -254,9 +261,9 @@ class UserViewModel @Inject constructor(
 
                         // Guard: Synchronize app theme and widget preferences for promoted active profile to prevent theme lock on deleted profile
                         try {
-                            val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                            val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
                             prefs.edit().putString("theme", nextUser.theme.name.lowercase()).apply()
-                            com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, nextUser.userId, nextUser.theme.name.lowercase(), isCurrentProfile = true)
+                            com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, nextUser.userId, nextUser.theme.name.lowercase(), isCurrentProfile = true)
                         } catch (_: Exception) {}
 
                         // Guard: Core library desugaring supports API 24+; schedule alarms for next active profile across all OS versions
@@ -268,13 +275,13 @@ class UserViewModel @Inject constructor(
                         }
                         // Guard: Clean up app theme back to system default when no user profiles remain
                         try {
-                            val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                            val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
                             prefs.edit().putString("theme", "system").apply()
                         } catch (_: Exception) {}
                     }
 
                     try {
-                        com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(medicineRepository.context)
+                        com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
                     } catch (_: Exception) {}
                 }
             } catch (e: Exception) {

@@ -18,7 +18,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 class MedicineRepository @Inject constructor(
     private val database: DosezyDatabase,
     private val scheduleRepository: ScheduleRepository,
-    @ApplicationContext val context: Context
+    @ApplicationContext internal val context: Context
 ) {
 
     companion object {
