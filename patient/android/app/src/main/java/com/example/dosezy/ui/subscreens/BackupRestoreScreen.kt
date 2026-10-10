@@ -84,7 +84,9 @@ import com.example.dosezy.data.export.BackupRestoreManager
 import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.utils.sharedUserViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 // Guard: Keep available on API 24+; BackupRestoreManager uses canonicalPath for full Android 7.0+ compatibility
 @Composable
@@ -734,6 +736,16 @@ fun BackupRestoreScreen(
                             statusMessage = result.message
                             if (result.success) {
                                 Toast.makeText(context, result.message, Toast.LENGTH_LONG).show()
+                                // Guard: Synchronize active UserViewModel profile and widgets after restore to prevent stale in-memory state
+                                withContext(Dispatchers.IO) {
+                                    val updatedUsers = database.userDao().getAllUsersDirect()
+                                    if (updatedUsers.isNotEmpty()) {
+                                        val targetUser = updatedUsers.find { it.isCurrentUser } ?: updatedUsers.first()
+                                        withContext(Dispatchers.Main) {
+                                            userViewModel.setCurrentUser(targetUser)
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
