@@ -51,6 +51,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.FastForward
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.PlayArrow
@@ -58,8 +59,10 @@ import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Snooze
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.Swipe
 import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.ViewTimeline
 import androidx.compose.material.icons.filled.VolumeUp
 import com.example.dosezy.utils.SoundUtils
 import java.io.File
@@ -136,20 +139,6 @@ fun PreferencesScreen(navController: NavController) {
             }
 
             item {
-                // Theme Preference
-                PreferenceItem(
-                    title = androidx.compose.ui.res.stringResource(R.string.pref_theme),
-                    currentValue = when (currentUser?.theme ?: Theme.SYSTEM) {
-                        Theme.SYSTEM -> androidx.compose.ui.res.stringResource(R.string.theme_system)
-                        Theme.LIGHT -> androidx.compose.ui.res.stringResource(R.string.theme_light)
-                        Theme.DARK -> androidx.compose.ui.res.stringResource(R.string.theme_dark)
-                    },
-                    iconName = "palette",
-                    onClick = { showThemeDialog = true }
-                )
-            }
-
-            item {
                 // Language Preference
                 val sysLangName = com.example.dosezy.utils.LocaleHelper.getSystemLanguageDisplayName()
                 PreferenceItem(
@@ -176,6 +165,142 @@ fun PreferencesScreen(navController: NavController) {
                 )
             }
 
+            // ── Appearance Section ──
+            item {
+                Text(
+                    text = stringResource(R.string.pref_section_appearance),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(start = 16.dp, top = 20.dp, bottom = 4.dp)
+                )
+            }
+
+            item {
+                // Theme Preference
+                PreferenceItem(
+                    title = androidx.compose.ui.res.stringResource(R.string.pref_theme),
+                    currentValue = when (currentUser?.theme ?: Theme.SYSTEM) {
+                        Theme.SYSTEM -> androidx.compose.ui.res.stringResource(R.string.theme_system)
+                        Theme.LIGHT -> androidx.compose.ui.res.stringResource(R.string.theme_light)
+                        Theme.DARK -> androidx.compose.ui.res.stringResource(R.string.theme_dark)
+                    },
+                    iconName = "palette",
+                    onClick = { showThemeDialog = true }
+                )
+            }
+
+            // Timeline Mode Switch
+            item {
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 0.dp,
+                    shadowElevation = 2.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 6.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            modifier = Modifier.weight(1f).padding(end = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ViewTimeline,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(36.dp)
+                            )
+                            Column {
+                                Text(
+                                    text = stringResource(R.string.pref_timeline_mode_title),
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Text(
+                                    text = stringResource(R.string.pref_timeline_mode_desc),
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                        Switch(
+                            checked = currentUser?.timelineModeEnabled == true,
+                            onCheckedChange = { isChecked ->
+                                currentUser?.let { user ->
+                                    userViewModel.updateUser(user.copy(timelineModeEnabled = isChecked))
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+
+            // Thicker Calendar Day Highlight Switch
+            item {
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 0.dp,
+                    shadowElevation = 2.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 6.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            modifier = Modifier.weight(1f).padding(end = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CalendarMonth,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(36.dp)
+                            )
+                            Column {
+                                Text(
+                                    text = stringResource(R.string.pref_calendar_thicker_highlight_title),
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Text(
+                                    text = stringResource(R.string.pref_calendar_thicker_highlight_desc),
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                        Switch(
+                            checked = currentUser?.thickerCalendarDayHighlight == true,
+                            onCheckedChange = { isChecked ->
+                                currentUser?.let { user ->
+                                    userViewModel.updateUser(user.copy(thickerCalendarDayHighlight = isChecked))
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+
+            // Hide Navigation Add Button Switch
             item {
                 Surface(
                     shape = RoundedCornerShape(16.dp),
@@ -239,6 +364,61 @@ fun PreferencesScreen(navController: NavController) {
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(start = 16.dp, top = 20.dp, bottom = 4.dp)
                 )
+            }
+
+            // Slide to Take & Snooze Switch
+            item {
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 0.dp,
+                    shadowElevation = 2.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 6.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            modifier = Modifier.weight(1f).padding(end = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Swipe,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(36.dp)
+                            )
+                            Column {
+                                Text(
+                                    text = stringResource(R.string.pref_slide_actions_title),
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Text(
+                                    text = stringResource(R.string.pref_slide_actions_desc),
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                        Switch(
+                            checked = currentUser?.slideActionsEnabled != false,
+                            onCheckedChange = { isChecked ->
+                                currentUser?.let { user ->
+                                    userViewModel.updateUser(user.copy(slideActionsEnabled = isChecked))
+                                }
+                            }
+                        )
+                    }
+                }
             }
 
             item {

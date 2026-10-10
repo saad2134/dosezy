@@ -236,6 +236,8 @@ object AlarmAudioPlayer {
                     .setUsage(AudioAttributes.USAGE_ALARM)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .build()
+                // Guard: vibrate(VibrationEffect, AudioAttributes) deprecated in API 33+ but required for API 26-32 alarm audio attributes
+                @Suppress("DEPRECATION")
                 vibrator?.vibrate(android.os.VibrationEffect.createWaveform(pattern, repeatIndex), audioAttributes)
             } else {
                 @Suppress("DEPRECATION")

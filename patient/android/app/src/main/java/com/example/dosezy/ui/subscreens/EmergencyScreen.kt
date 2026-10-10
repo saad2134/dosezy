@@ -179,7 +179,14 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
 
     // Persist emergency country selection in SharedPreferences
     val emergencyPrefs = remember { context.getSharedPreferences("emergency_prefs", android.content.Context.MODE_PRIVATE) }
-    val savedCountryCode = remember { emergencyPrefs.getString("selected_country_code", null) }
+    val userCountryKey = "selected_country_code_${currentUser?.userId ?: "default"}"
+    // Guard: Reactive state namespaced per profile prevents locale/recomposition from overriding user's chosen country
+    var savedCountryCode by remember(currentUser?.userId) {
+        mutableStateOf(
+            emergencyPrefs.getString(userCountryKey, null)
+                ?: emergencyPrefs.getString("selected_country_code", null)
+        )
+    }
 
     val defaultCountry = remember(userLanguage, context, savedCountryCode) {
         if (!savedCountryCode.isNullOrBlank()) {
@@ -189,7 +196,8 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
         } ?: detectDeviceEmergencyCountry(context, userLanguage)
     }
 
-    var selectedCountry by remember { mutableStateOf(defaultCountry) }
+    // Guard: Recompute selectedCountry when defaultCountry changes (e.g. user profile switch or language update)
+    var selectedCountry by remember(defaultCountry) { mutableStateOf(defaultCountry) }
     var countryDropdownExpanded by remember { mutableStateOf(false) }
 
     // Persist personal contacts via SharedPreferences, namespaced per user profile
@@ -383,7 +391,12 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
                         text = { Text("${country.flag} ${stringResource(country.nameRes)}", color = MaterialTheme.colorScheme.onSurface) },
                         onClick = {
                             selectedCountry = country
-                            emergencyPrefs.edit().putString("selected_country_code", country.code).apply()
+                            savedCountryCode = country.code
+                            // Guard: Save namespaced preference and global fallback so profile switches maintain respective country selection
+                            emergencyPrefs.edit()
+                                .putString(userCountryKey, country.code)
+                                .putString("selected_country_code", country.code)
+                                .apply()
                             countryDropdownExpanded = false
                         },
                         modifier = Modifier.background(MaterialTheme.colorScheme.surface)
@@ -801,11 +814,12 @@ fun EmergencyServiceCard(
 
 
 
-// Guard: Strip spaces/hyphens and use Uri.fromParts to prevent dialer number truncation and scheme parsing crashes across Android versions
+// Guard: Strip spaces/hyphens, use Uri.fromParts, and add FLAG_ACTIVITY_NEW_TASK to prevent dialer number truncation and non-Activity context crashes
 internal fun createDialIntent(phoneNumber: String): android.content.Intent {
     val cleaned = phoneNumber.replace(Regex("[^0-9+*#]"), "")
     return android.content.Intent(android.content.Intent.ACTION_DIAL).apply {
         data = android.net.Uri.fromParts("tel", cleaned, null)
+        addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
     }
 }
 

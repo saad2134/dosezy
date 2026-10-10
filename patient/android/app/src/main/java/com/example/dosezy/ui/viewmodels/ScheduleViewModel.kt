@@ -248,8 +248,9 @@ class ScheduleViewModel @Inject constructor(
 
                 // Refresh the current view only if any entry was marked missed
                 if (hasUpdated) {
-                    _currentUserId.value?.let { currentUserId ->
-                        loadScheduleForDate(currentUserId, _selectedDate.value)
+                    // Guard: Refresh schedule if active user matches or if current user ID is pending initial load
+                    if (_currentUserId.value == null || _currentUserId.value == userId) {
+                        loadScheduleForDate(userId, _selectedDate.value)
                     }
                     try {
                         com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)

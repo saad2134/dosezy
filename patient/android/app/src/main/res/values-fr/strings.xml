@@ -144,6 +144,9 @@
     <string name="unit_drop">goutte</string>
     <string name="unit_tablet">comprimé</string>
     <string name="unit_capsule">gélule</string>
+    <string name="unit_meq">mEq</string>
+    <string name="unit_puff">bouffée</string>
+    <string name="unit_ampule">ampoule</string>
 
     <string name="help_title">Aide &amp; Support</string>
     <string name="help_resources">Ressources</string>
@@ -362,6 +365,8 @@ Voulez-vous continuer ?</string>
     <string name="backup_saved_success">La sauvegarde a été enregistrée avec succès dans les Téléchargements.</string>
     <string name="backup_section_automatic">AUTOMATIQUE</string>
     <string name="backup_section_manual">MANUEL</string>
+    <string name="backup_tab_automatic">Automatique</string>
+    <string name="backup_tab_manual">Manuel</string>
     <string name="backup_self_hosted_title">Serveur backend auto-hébergé</string>
     <string name="backup_self_hosted_sub" formatted="false">100% Open Source &amp; Privé</string>
     <string name="backup_self_hosted_desc">Connectez-vous directement à votre propre instance Dosezy pour une souveraineté totale des données, un tableau de bord familial et le contrôle de l\'infrastructure.</string>
@@ -776,4 +781,18 @@ Voulez-vous continuer ?</string>
     <string name="stock_inventory_card_title">Stock et inventaire des médicaments</string>
     <string name="widget_configure_auto_badge">Auto</string>
     <string name="dialog_validation_title">Remarque</string>
+
+    <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
+    <string name="pref_section_appearance">Apparence</string>
+    <string name="pref_slide_actions_title">Glisser pour Prendre et Reporter</string>
+    <string name="pref_slide_actions_desc">Nécessite de faire glisser au lieu d\'appuyer pour prendre ou reporter les doses.</string>
+    <string name="pref_timeline_mode_title">Vue Chronologique</string>
+    <string name="pref_timeline_mode_desc">Affiche le planning du jour dans une chronologie verticale claire.</string>
+    <string name="pref_calendar_thicker_highlight_title">Cadre Complet des Jours</string>
+    <string name="pref_calendar_thicker_highlight_desc">Entoure chaque jour planifié dans le calendrier d\'un cadre coloré complet.</string>
+    <string name="alarm_slide_to_take">Glisser pour prendre</string>
+    <string name="alarm_slide_to_take_all">Glisser pour tout prendre (%1$d)</string>
+    <string name="alarm_slide_to_snooze">Glisser pour reporter (%1$d min)</string>
+    <string name="home_view_standard">Standard</string>
+    <string name="home_view_timeline">Chronologie</string>
 </resources>

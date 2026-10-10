@@ -124,6 +124,8 @@ class BackupRestoreValidationTest {
         // Default values apply
         assertFalse(user.allowCustomDoseTime)
         assertFalse(user.allowDoseSkipping)
+        assertFalse(user.timelineModeEnabled)
+        assertFalse(user.thickerCalendarDayHighlight)
     }
 
     // ───────────────────────────────────────────────────────────────

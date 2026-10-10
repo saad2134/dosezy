@@ -1,0 +1,3 @@
+• Added Home timeline view, slide-to-confirm alarms, Backup & Restore tab group, and Appearance settings
+• Added dosage units (mEq, inhaler puffs, ampules) with inventory tracking and refill management
+• Optimized performance with virtualized lists and smoother navigation on older devices, plus data sync fixes

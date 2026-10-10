@@ -66,7 +66,8 @@ class DataExporter(
 
     // Guard: Strip directory separators and illegal filesystem characters to prevent FileNotFoundException or invalid paths
     private fun sanitizeFileName(name: String): String {
-        return name.trim().replace(Regex("[^a-zA-Z0-9._-]"), "_")
+        val clean = name.trim().replace(Regex("[^a-zA-Z0-9._-]"), "_").trim('_', '.')
+        return clean.ifBlank { "user" }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -128,6 +129,7 @@ class DataExporter(
         val exportDir = getExportDirectory()
         val zipFile = File(exportDir, "dosezy_export_$timestamp.zip")
 
+        val usedFolders = mutableSetOf<String>()
         FileOutputStream(zipFile).use { fileOutputStream ->
             ZipOutputStream(fileOutputStream).use { zipOutputStream ->
                 users.forEach { user ->
@@ -136,7 +138,14 @@ class DataExporter(
                         val medicines = medicineRepository.getMedicinesByUserDirect(user.userId)
                         val schedules = scheduleRepository.getSchedulesByUserSync(user.userId)
 
-                        val userFolder = sanitizeFileName(user.fullName)
+                        // Guard: Deduplicate zip entry folder names across multi-user exports to prevent ZipException duplicate entry drops
+                        var baseFolder = sanitizeFileName(user.fullName)
+                        if (usedFolders.contains(baseFolder)) {
+                            baseFolder = "${baseFolder}_${user.userId.take(6)}"
+                        }
+                        usedFolders.add(baseFolder)
+                        val userFolder = baseFolder
+
                         when (format) {
                             ExportFormat.CSV -> {
                                 val content = buildCsvContent(user, medicines, schedules)
@@ -157,14 +166,18 @@ class DataExporter(
                             ExportFormat.PDF -> {
                                 val pdfDoc = buildPdfDocument(user, medicines, schedules)
                                 val tempPdf = File(context.cacheDir, "${user.userId}.pdf")
-                                FileOutputStream(tempPdf).use { pdfDoc.writeTo(it) }
-                                pdfDoc.close()
+                                try {
+                                    FileOutputStream(tempPdf).use { pdfDoc.writeTo(it) }
+                                    pdfDoc.close()
 
-                                val entry = ZipEntry("$userFolder/health_report.pdf")
-                                zipOutputStream.putNextEntry(entry)
-                                zipOutputStream.write(tempPdf.readBytes())
-                                zipOutputStream.closeEntry()
-                                tempPdf.delete()
+                                    val entry = ZipEntry("$userFolder/health_report.pdf")
+                                    zipOutputStream.putNextEntry(entry)
+                                    zipOutputStream.write(tempPdf.readBytes())
+                                    zipOutputStream.closeEntry()
+                                } finally {
+                                    // Guard: Ensure temporary PDF file in cacheDir is deleted even if zip write throws an exception to prevent cache leak
+                                    tempPdf.delete()
+                                }
                             }
                         }
                     } catch (e: Exception) {
@@ -213,6 +226,10 @@ class DataExporter(
         userObj.put("allowDoseUndo", user.allowDoseUndo)
         userObj.put("allowDoseNotes", user.allowDoseNotes)
         userObj.put("promptDoseNotes", user.promptDoseNotes)
+        // Guard: Explicitly serialize slideActionsEnabled, timelineModeEnabled, and thickerCalendarDayHighlight to prevent dropping UI preferences on backup restore
+        userObj.put("slideActionsEnabled", user.slideActionsEnabled)
+        userObj.put("timelineModeEnabled", user.timelineModeEnabled)
+        userObj.put("thickerCalendarDayHighlight", user.thickerCalendarDayHighlight)
         root.put("user", userObj)
 
         val medArray = JSONArray()
@@ -241,6 +258,26 @@ class DataExporter(
             mObj.put("intervalHours", med.frequency.intervalHours)
             mObj.put("intervalDays", med.frequency.intervalDays)
             mObj.put("intervalWeeks", med.frequency.intervalWeeks)
+
+            // Guard: Serialize nested frequency object alongside top-level keys for dual compatibility with Gson and BackupRestoreManager
+            val freqObj = JSONObject()
+            freqObj.put("pattern", med.frequency.pattern.name)
+            freqObj.put("daysPerWeek", med.frequency.daysPerWeek)
+            freqObj.put("daysPerMonth", med.frequency.daysPerMonth)
+            med.frequency.selectedDaysOfWeek?.let { days ->
+                val arr = JSONArray()
+                days.forEach { arr.put(it) }
+                freqObj.put("selectedDaysOfWeek", arr)
+            }
+            med.frequency.selectedDaysOfMonth?.let { days ->
+                val arr = JSONArray()
+                days.forEach { arr.put(it) }
+                freqObj.put("selectedDaysOfMonth", arr)
+            }
+            freqObj.put("intervalHours", med.frequency.intervalHours)
+            freqObj.put("intervalDays", med.frequency.intervalDays)
+            freqObj.put("intervalWeeks", med.frequency.intervalWeeks)
+            mObj.put("frequency", freqObj)
             mObj.put("scheduledTimes", JSONArray(med.scheduledTimes.map { it.toString() }))
             mObj.put("imageUri", med.imageUri ?: "")
             mObj.put("currentStock", med.currentStock)
@@ -367,7 +404,8 @@ class DataExporter(
         y += 15f
         canvas.drawText("Name: ${user.fullName}", 40f, y, textPaint)
         canvas.drawText("Age: ${user.age}", 240f, y, textPaint)
-        canvas.drawText("Gender: ${user.gender}", 360f, y, textPaint)
+        // Guard: Format gender with displayName to prevent drawing raw uppercase enum identifier (e.g. DO_NOT_SPECIFY) in patient medical report
+        canvas.drawText("Gender: ${user.gender.displayName}", 360f, y, textPaint)
         y += 15f
 
         // Allergies & Medical Conditions in PDF
@@ -479,7 +517,13 @@ class DataExporter(
         checkPageBreak(50f)
         val sortedSchedules = schedules.sortedByDescending { it.scheduledDateTime }
         val medMap = medicines.associateBy { it.medicineId }
-        canvas.drawText("Recent Dose History (${sortedSchedules.size} entries)", 40f, y, headerPaint)
+        // Guard: Explicitly clarify entry count in dose history header when total schedules exceed the 150-item PDF page limit
+        val historyHeaderText = if (sortedSchedules.size > 150) {
+            "Recent Dose History (Latest 150 of ${sortedSchedules.size} entries)"
+        } else {
+            "Recent Dose History (${sortedSchedules.size} entries)"
+        }
+        canvas.drawText(historyHeaderText, 40f, y, headerPaint)
         y += 18f
 
         subtitlePaint.isFakeBoldText = true
@@ -558,11 +602,13 @@ class DataExporter(
 
             // Medicines Section
             csvBuilder.append("MEDICINES\n")
-            // Guard: Include Refill Threshold, Auto Deduct Stock, Is Archived, and Custom Dosages to preserve inventory metadata in CSV exports
-            csvBuilder.append("Medicine ID,User ID,Medication Name,Dosage,Dosage Unit,Times Per Day,Frequency Pattern,Interval Hours,Interval Days,Interval Weeks,Scheduled Times,Pill Shape,Pill Color,Doctor Notes,Start Date,End Date,Duration Days,Stock,Refill Threshold,Auto Deduct Stock,Is Archived,Custom Dosages,Image URI\n")
+            // Guard: Include Refill Threshold, Auto Deduct Stock, Is Archived, Custom Dosages, and Days of Week/Month to preserve complete inventory and frequency metadata in CSV exports
+            csvBuilder.append("Medicine ID,User ID,Medication Name,Dosage,Dosage Unit,Times Per Day,Frequency Pattern,Interval Hours,Interval Days,Interval Weeks,Days Per Week,Days Per Month,Selected Days Of Week,Selected Days Of Month,Scheduled Times,Pill Shape,Pill Color,Doctor Notes,Start Date,End Date,Duration Days,Stock,Refill Threshold,Auto Deduct Stock,Is Archived,Custom Dosages,Image URI\n")
             medicines.forEach { medicine ->
                 val scheduledTimesStr = medicine.scheduledTimes.joinToString(";") { it.toString() }
                 val customDosagesStr = medicine.customDosages?.entries?.joinToString(";") { "${it.key}:${it.value}" } ?: ""
+                val selectedDaysOfWeekStr = medicine.frequency.selectedDaysOfWeek?.joinToString(";") ?: ""
+                val selectedDaysOfMonthStr = medicine.frequency.selectedDaysOfMonth?.joinToString(";") ?: ""
                 csvBuilder.append(
                     "${escapeCsv(medicine.medicineId)}," +
                     "${escapeCsv(medicine.userId)}," +
@@ -574,6 +620,10 @@ class DataExporter(
                     "${medicine.frequency.intervalHours ?: ""}," +
                     "${medicine.frequency.intervalDays ?: ""}," +
                     "${medicine.frequency.intervalWeeks ?: ""}," +
+                    "${medicine.frequency.daysPerWeek ?: ""}," +
+                    "${medicine.frequency.daysPerMonth ?: ""}," +
+                    "${escapeCsv(selectedDaysOfWeekStr)}," +
+                    "${escapeCsv(selectedDaysOfMonthStr)}," +
                     "${escapeCsv(scheduledTimesStr)}," +
                     "${escapeCsv(medicine.pillShape.name)}," +
                     "${escapeCsv(medicine.pillColor)}," +
@@ -707,7 +757,10 @@ class DataExporter(
                 val totalNeeded = customQuantities[med.medicineId] ?: med.calculateRefillQuantity(supplyDays)
 
                 val showDosageInTitle = includeDosage && when (med.dosageUnit) {
-                    com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG, com.example.dosezy.data.model.DosageUnit.ML -> true
+                    com.example.dosezy.data.model.DosageUnit.MG,
+                    com.example.dosezy.data.model.DosageUnit.MCG,
+                    com.example.dosezy.data.model.DosageUnit.ML,
+                    com.example.dosezy.data.model.DosageUnit.MEQ -> true
                     else -> med.dosage > 0
                 }
                 val dosageDisplay = if (med.dosage > 0) {
@@ -718,7 +771,9 @@ class DataExporter(
                 val orderUnitStr = if (isDrop) {
                     if (totalNeeded > 1) context.getString(com.example.dosezy.R.string.unit_bottles) else context.getString(com.example.dosezy.R.string.unit_bottle)
                 } else when (med.dosageUnit) {
-                    com.example.dosezy.data.model.DosageUnit.MG, com.example.dosezy.data.model.DosageUnit.MCG -> {
+                    com.example.dosezy.data.model.DosageUnit.MG,
+                    com.example.dosezy.data.model.DosageUnit.MCG,
+                    com.example.dosezy.data.model.DosageUnit.MEQ -> {
                         context.getString(com.example.dosezy.R.string.unit_units)
                     }
                     else -> med.dosageUnit.getLocalizedName(context)

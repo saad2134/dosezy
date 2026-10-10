@@ -28,6 +28,8 @@ import com.example.dosezy.data.repository.ScheduleRepository
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializer
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -180,6 +182,40 @@ class AuditBugfixes7Test {
         assertEquals(TimeFormat.HOUR_12, user.timeFormat)
         assertEquals(Language.SYSTEM, user.language)
         assertEquals(AlarmSound.SYSTEM_DEFAULT, user.alarmSound)
+        assertEquals(true, user.slideActionsEnabled)
+        assertEquals(false, user.timelineModeEnabled)
+        assertEquals(false, user.thickerCalendarDayHighlight)
+    }
+
+    @Test
+    fun issue3_parseUserFromJson_withNewAppearanceAndSlidePreferences() {
+        val json = """
+            {
+              "userId": "user_456",
+              "fullName": "Preferences User",
+              "slideActionsEnabled": false,
+              "timelineModeEnabled": true,
+              "thickerCalendarDayHighlight": true
+            }
+        """.trimIndent()
+
+        val user = backupManager.parseUserFromJson(json)
+        assertEquals("user_456", user.userId)
+        assertEquals(false, user.slideActionsEnabled)
+        assertEquals(true, user.timelineModeEnabled)
+        assertEquals(true, user.thickerCalendarDayHighlight)
+    }
+
+    @Test
+    fun migration16_17_addsSlideTimelineAndHighlightColumnsWithCorrectDefaults() {
+        val sqliteDb = mockk<SupportSQLiteDatabase>(relaxed = true)
+        DosezyDatabase.MIGRATION_16_17.migrate(sqliteDb)
+
+        verify(exactly = 1) {
+            sqliteDb.execSQL("ALTER TABLE users ADD COLUMN slideActionsEnabled INTEGER NOT NULL DEFAULT 1")
+            sqliteDb.execSQL("ALTER TABLE users ADD COLUMN timelineModeEnabled INTEGER NOT NULL DEFAULT 0")
+            sqliteDb.execSQL("ALTER TABLE users ADD COLUMN thickerCalendarDayHighlight INTEGER NOT NULL DEFAULT 0")
+        }
     }
 
     // ───────────────────────────────────────────────────────────────
@@ -376,19 +412,16 @@ class AuditBugfixes7Test {
 
         // Now test intentional failure inside withTransaction:
         // We verify that Room withTransaction maintains rollback guarantees
-        var exceptionCaught = false
-        try {
+        val runResult = runCatching {
             db.withTransaction {
                 db.scheduleDao().deleteScheduleByUser(existingUser.userId)
                 db.medicineDao().deleteMedicinesByUser(existingUser.userId)
                 // Intentionally throw mid-transaction
                 throw IllegalStateException("Simulated disk error midway through overwrite")
             }
-        } catch (_: IllegalStateException) {
-            exceptionCaught = true
         }
-
-        assertTrue(exceptionCaught)
+        assertTrue(runResult.isFailure)
+        assertTrue(runResult.exceptionOrNull() is IllegalStateException)
         // Verify that existingUser's medicines and schedules were NOT deleted due to transaction rollback!
         val remainingMeds = db.medicineDao().getMedicinesByUserDirect(existingUser.userId)
         val remainingSchedules = db.scheduleDao().getAllScheduleEntries(existingUser.userId)

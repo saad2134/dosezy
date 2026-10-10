@@ -48,18 +48,19 @@ object LocaleHelper {
                     Locale.ENGLISH
                 }
             }
-            Language.ENGLISH -> Locale("en")
-            Language.SPANISH -> Locale("es")
-            Language.HINDI -> Locale("hi")
-            Language.CHINESE -> Locale("zh")
-            Language.PORTUGUESE -> Locale("pt")
-            Language.ARABIC -> Locale("ar")
-            Language.FRENCH -> Locale("fr")
-            Language.GERMAN -> Locale("de")
-            Language.JAPANESE -> Locale("ja")
-            Language.RUSSIAN -> Locale("ru")
-            Language.ITALIAN -> Locale("it")
-            Language.BENGALI -> Locale("bn")
+            // Guard: Locale(String) constructor deprecated in Java 19+; Locale.forLanguageTag is supported on API 21+ across all Android targets
+            Language.ENGLISH -> Locale.forLanguageTag("en")
+            Language.SPANISH -> Locale.forLanguageTag("es")
+            Language.HINDI -> Locale.forLanguageTag("hi")
+            Language.CHINESE -> Locale.forLanguageTag("zh")
+            Language.PORTUGUESE -> Locale.forLanguageTag("pt")
+            Language.ARABIC -> Locale.forLanguageTag("ar")
+            Language.FRENCH -> Locale.forLanguageTag("fr")
+            Language.GERMAN -> Locale.forLanguageTag("de")
+            Language.JAPANESE -> Locale.forLanguageTag("ja")
+            Language.RUSSIAN -> Locale.forLanguageTag("ru")
+            Language.ITALIAN -> Locale.forLanguageTag("it")
+            Language.BENGALI -> Locale.forLanguageTag("bn")
         }
     }
 

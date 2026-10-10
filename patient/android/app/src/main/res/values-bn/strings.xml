@@ -144,6 +144,9 @@
     <string name="unit_drop">ফোটা</string>
     <string name="unit_tablet">ট্যাবলেট</string>
     <string name="unit_capsule">ক্যাপসুল</string>
+    <string name="unit_meq">mEq</string>
+    <string name="unit_puff">পাফ</string>
+    <string name="unit_ampule">অ্যাম্পুল</string>
 
     <string name="help_title">সাহায্য ও সহায়তা</string>
     <string name="help_resources">সম্পদসমূহ</string>
@@ -362,6 +365,8 @@
     <string name="backup_saved_success">ব্যাকআপটি সফলভাবে ডাউনলোড ফোল্ডারে সংরক্ষিত হয়েছে।</string>
     <string name="backup_section_automatic">স্বয়ংক্রিয়</string>
     <string name="backup_section_manual">ম্যানুয়াল</string>
+    <string name="backup_tab_automatic">স্বয়ংক্রিয়</string>
+    <string name="backup_tab_manual">ম্যানুয়াল</string>
     <string name="backup_self_hosted_title">স্ব-হোস্ট করা ব্যাকএন্ড সার্ভার</string>
     <string name="backup_self_hosted_sub" formatted="false">১০০% ওপেন সোর্স এবং ব্যক্তিগত</string>
     <string name="backup_self_hosted_desc">সম্পূর্ণ ডেটা সার্বভৌমত্ব, পারিবারিক কেয়ারগিভার ড্যাশবোর্ড এবং ব্যক্তিগত নিয়ন্ত্রণের জন্য আপনার নিজস্ব ডোজইজি সার্ভারের সাথে সরাসরি সংযোগ করুন।</string>
@@ -775,4 +780,18 @@
     <string name="stock_inventory_card_title">ওষুধের স্টক এবং ইনভেন্টরি</string>
     <string name="widget_configure_auto_badge">স্বয়ংক্রিয়</string>
     <string name="dialog_validation_title">বিজ্ঞপ্তি</string>
+
+    <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
+    <string name="pref_section_appearance">রূপ ও প্রদর্শন</string>
+    <string name="pref_slide_actions_title">গ্রহণ ও স্নুজ করতে স্লাইড করুন</string>
+    <string name="pref_slide_actions_desc">অ্যালার্মে ওষুধ গ্রহণ বা স্নুজ করতে ট্যাপ করার পরিবর্তে স্লাইড করার প্রয়োজন।</string>
+    <string name="pref_timeline_mode_title">টাইমলাইন ভিউ</string>
+    <string name="pref_timeline_mode_desc">আজকের সময়সূচি একটি বিস্তারিত উল্লম্ব টাইমলাইনে প্রদর্শন করুন।</string>
+    <string name="pref_calendar_thicker_highlight_title">পূর্ণ ফ্রেম বিশিষ্ট দিন</string>
+    <string name="pref_calendar_thicker_highlight_desc">ক্যালেন্ডারে প্রতিটি নির্ধারিত দিন সম্পূর্ণ রঙিন ফ্রেমে চিহ্নিত করুন।</string>
+    <string name="alarm_slide_to_take">গ্রহণ করতে স্লাইড করুন</string>
+    <string name="alarm_slide_to_take_all">সবগুলো গ্রহণ করতে স্লাইড করুন (%1$d)</string>
+    <string name="alarm_slide_to_snooze">স্নুজ করতে স্লাইড করুন (%1$d মি)</string>
+    <string name="home_view_standard">সাধারণ</string>
+    <string name="home_view_timeline">টাইমলাইন</string>
 </resources>

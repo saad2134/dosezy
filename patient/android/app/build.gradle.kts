@@ -22,8 +22,8 @@ android {
         applicationId = "com.saad2134.dosezy"
         minSdk = 24
         targetSdk = 36
-        versionCode = 34
-        versionName = "2.5.9"
+        versionCode = 35
+        versionName = "2.5.10"
         buildConfigField("String", "VERSION_NAME", "\"$versionName\"")
         buildConfigField("int", "VERSION_CODE", "$versionCode")
 
@@ -135,6 +135,7 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.8.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.navigation:navigation-compose:2.7.5")
+    implementation("androidx.profileinstaller:profileinstaller:1.3.1")
 
     // Room Database
     implementation("androidx.room:room-runtime:2.6.0")

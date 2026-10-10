@@ -158,6 +158,9 @@
     <string name="unit_drop">滴</string>
     <string name="unit_tablet">片</string>
     <string name="unit_capsule">粒</string>
+    <string name="unit_meq">毫克当量 (mEq)</string>
+    <string name="unit_puff">喷</string>
+    <string name="unit_ampule">安瓿</string>
 
     <!-- Help &amp; Support -->
     <string name="help_title">帮助与支持</string>
@@ -378,6 +381,8 @@
     <string name="backup_saved_success">备份文件已成功保存至下载目录。</string>
     <string name="backup_section_automatic">自动</string>
     <string name="backup_section_manual">手动</string>
+    <string name="backup_tab_automatic">自动</string>
+    <string name="backup_tab_manual">手动</string>
     <string name="backup_self_hosted_title">自建后端服务器</string>
     <string name="backup_self_hosted_sub" formatted="false">100% 开源与私有化</string>
     <string name="backup_self_hosted_desc">直接连接至您自行搭建的Dosezy服务实例，享有完全的数据自主权、家庭看护仪表盘及私有基础设施控制。</string>
@@ -792,4 +797,18 @@
     <string name="stock_inventory_card_title">药品库存与清册</string>
     <string name="widget_configure_auto_badge">自动</string>
     <string name="dialog_validation_title">提示</string>
+
+    <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
+    <string name="pref_section_appearance">外观与界面</string>
+    <string name="pref_slide_actions_title">滑动以服药和稍后提醒</string>
+    <string name="pref_slide_actions_desc">在闹钟提醒中要求通过滑动而不是点击来服药或稍后提醒。</string>
+    <string name="pref_timeline_mode_title">时间轴视图</string>
+    <string name="pref_timeline_mode_desc">以展开的垂直时间轴显示当天的服药计划。</string>
+    <string name="pref_calendar_thicker_highlight_title">日程日全框高亮</string>
+    <string name="pref_calendar_thicker_highlight_desc">在日历上用完整彩色边框标出每个有计划的日期。</string>
+    <string name="alarm_slide_to_take">滑动以服药</string>
+    <string name="alarm_slide_to_take_all">滑动以全部服用 (%1$d)</string>
+    <string name="alarm_slide_to_snooze">滑动以稍后提醒 (%1$d分钟)</string>
+    <string name="home_view_standard">标准</string>
+    <string name="home_view_timeline">时间轴</string>
 </resources>

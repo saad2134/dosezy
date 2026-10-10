@@ -354,8 +354,10 @@ fun EditMedScreen(
                                     scheduledTimes = if (selectedFrequency == FrequencyPattern.AS_NEEDED) emptyList() else scheduledTimesList,
                                     imageUri = medicineImagePath,
                                     currentStock = currentStockText.normalizeArabicDigits().toIntOrNull(),
+                                    // Guard: Preserve configured refillThreshold across edits so low-stock alerts are not wiped to null
                                     refillThreshold = refillThresholdText.normalizeArabicDigits().toIntOrNull(),
-                                    autoDeductOnTake = true,
+                                    // Guard: Preserve existing autoDeductOnTake preference to prevent inadvertent inventory decrements when editing medication metadata
+                                    autoDeductOnTake = medicineToEdit?.autoDeductOnTake ?: true,
                                     notes = doctorNotes.trim().ifBlank { null },
                                     pillShape = selectedPillShape,
                                     pillColor = selectedPillColor,

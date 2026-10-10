@@ -104,6 +104,7 @@ import Footer from '../components/Footer.astro';
 					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
 						<p><strong class="text-white">Hardware Volume Silence:</strong> Press Volume Up or Down while an alarm rings to immediately silence the audio tone and stop vibration without dismissing the alert or unlocking your device.</p>
 						<p><strong class="text-white">Back-Gesture Snooze:</strong> Pressing your device's physical or gesture Back button automatically triggers a safe snooze for your configured duration.</p>
+						<p><strong class="text-white">Slide-to-Confirm Actions:</strong> Alarms feature separate sliding tracks: slide left to take doses (or Take All), and slide right to snooze, preventing accidental dismissals while half-asleep. You can switch to standard 1-tap buttons in Preferences.</p>
 						<p><strong class="text-white">Custom Tones &amp; Duration:</strong> In <em>Menu &gt; Preferences &gt; Notifications &amp; Alarms</em>, choose from built-in alert chimes, system alarms, or custom device ringtones with in-app audio preview playback. You can also configure alarm duration (30s, 1m, 2m, 3m, 5m, or continuous loop) and dedicated alarm volume.</p>
 					</div>
 				</details>
@@ -307,6 +308,20 @@ import Footer from '../components/Footer.astro';
 						<p>Instead of generic status labels, TalkBack audibly announces the exact clinical status of each dose (*"Taken"*, *"Late"*, *"Skipped"*, *"Missed"*, or *"Pending"*), allowing visually impaired users to navigate their full medication history with ease.</p>
 					</div>
 				</details>
+ 
+ 				<!-- Question: Timeline Mode & Calendar Day Highlights -->
+ 				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+ 					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+ 						<span>Can I use a timeline view on Home or make calendar days more visible?</span>
+ 						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+ 						</svg>
+ 					</summary>
+ 					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
+ 						<p><strong class="text-white">Home Timeline Mode:</strong> Tap the timeline toggle icon in the top app bar of your Home screen or turn on <em>Timeline Mode</em> in <strong>Menu &gt; Preferences &gt; Appearance</strong> to see today's doses along an expanded vertical progress line with color-coded nodes.</p>
+ 						<p><strong class="text-white">Thicker Calendar Day Highlight:</strong> In <strong>Menu &gt; Preferences &gt; Appearance</strong>, turn on <em>Thicker Calendar Day Highlight</em> to outline all scheduled days with a prominent full-frame border and container tint on your Schedule calendar.</p>
+ 					</div>
+ 				</details>
 
 				<!-- Question 12: Emergency Contacts & Backup -->
 				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">

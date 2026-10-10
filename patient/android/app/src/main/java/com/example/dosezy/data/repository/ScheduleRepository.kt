@@ -11,6 +11,7 @@ import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.data.model.ScheduleWithMedicine
 import com.example.dosezy.notifications.AlarmScheduler
+import com.example.dosezy.notifications.MedicineAlarmReceiver
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -95,8 +96,10 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     if (latestEntry == null || latestEntry.scheduledDateTime.isBefore(LocalDateTime.now().plusDays(15))) {
                         val today = LocalDate.now()
                         val latestDate = latestEntry?.scheduledDateTime?.toLocalDate()
-                        val startGenerateFrom = if (latestDate == null || latestDate.isBefore(today)) today else latestDate.plusDays(1)
+                        // Guard: Anchor to latestDate rather than plusDays(1) and filter by latestEntry.scheduledDateTime to prevent dropping evening or nocturnal doses
+                        val startGenerateFrom = if (latestDate == null || latestDate.isBefore(today)) today else latestDate
                         val newEntries = medicine.generateScheduleEntries(startGenerateFrom, 30)
+                            .filter { latestEntry == null || it.scheduledDateTime.isAfter(latestEntry.scheduledDateTime) }
                         if (newEntries.isNotEmpty()) {
                             database.scheduleDao().insertScheduleEntries(newEntries)
                             Log.d(TAG, "Auto-extended schedule for medicine: ${medicine.medicationName} by 30 days starting from $startGenerateFrom")
@@ -349,21 +352,9 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             }
         }
 
-        // 4. Cancel active notification for this entry, disarm snooze/nagging alarms, and update widgets
+        // 4. Synchronize active slot notifications, cancel armed alarms, and update widgets
         if (context != null) {
-            try {
-                val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-                nManager.cancel(entryId.hashCode())
-            } catch (_: Exception) {}
-            try {
-                // Guard: Cancel armed snooze and nagging alarms so taking in-app prevents phantom alarms from ringing later
-                val alarmScheduler = com.example.dosezy.notifications.AlarmScheduler(context)
-                alarmScheduler.cancelSnooze(entryId)
-                alarmScheduler.cancelNagging(entryId)
-            } catch (_: Exception) {}
-            try {
-                com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
-            } catch (_: Exception) {}
+            syncSlotNotificationAndAlarms(entryId, previousEntry, context)
         }
     }
 
@@ -386,55 +377,132 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         context: Context? = null
     ) {
         // 1. Update schedule entry status in database
+        val entry = database.scheduleDao().getScheduleEntryById(entryId)
         database.scheduleDao().updateMedicationStatusWithReason(entryId, "SKIPPED", null, skipReason)
 
         // 2. Stop any active alarm sound / popup
         com.example.dosezy.notifications.AlarmActivity.stopActiveAlarm()
 
-        // 3. Cancel active notification for this entry, disarm snooze/nagging alarms, and update widgets
+        // 3. Synchronize active slot notifications, cancel armed alarms, and update widgets
         if (context != null) {
-            try {
-                val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-                nManager.cancel(entryId.hashCode())
-            } catch (_: Exception) {}
-            try {
-                // Guard: Cancel armed snooze and nagging alarms so skipping in-app prevents phantom alarms from ringing later
-                val alarmScheduler = com.example.dosezy.notifications.AlarmScheduler(context)
-                alarmScheduler.cancelSnooze(entryId)
-                alarmScheduler.cancelNagging(entryId)
-            } catch (_: Exception) {}
-            try {
-                com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
-            } catch (_: Exception) {}
+            syncSlotNotificationAndAlarms(entryId, entry, context)
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun recordDoseMissed(
         entryId: String,
         context: Context? = null
     ) {
         // 1. Update schedule entry status in database
+        val entry = database.scheduleDao().getScheduleEntryById(entryId)
         database.scheduleDao().updateMedicationStatus(entryId, "MISSED", null as Long?)
 
         // 2. Stop any active alarm sound / popup
         com.example.dosezy.notifications.AlarmActivity.stopActiveAlarm()
 
-        // 3. Cancel active notification for this entry, disarm snooze/nagging alarms, and update widgets
+        // 3. Synchronize active slot notifications, cancel armed alarms, and update widgets
         if (context != null) {
-            try {
-                val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-                nManager.cancel(entryId.hashCode())
-            } catch (_: Exception) {}
-            try {
-                // Guard: Cancel armed snooze and nagging alarms so marking missed in-app prevents phantom alarms from ringing later
-                val alarmScheduler = com.example.dosezy.notifications.AlarmScheduler(context)
-                alarmScheduler.cancelSnooze(entryId)
-                alarmScheduler.cancelNagging(entryId)
-            } catch (_: Exception) {}
-            try {
-                com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
-            } catch (_: Exception) {}
+            syncSlotNotificationAndAlarms(entryId, entry, context)
         }
+    }
+
+    // Guard: Synchronize slot notification when taking/skipping/missing a dose to prevent dropping cohort reminders or leaving stale shade entries
+    @RequiresApi(Build.VERSION_CODES.O)
+    private suspend fun syncSlotNotificationAndAlarms(
+        entryId: String,
+        entry: ScheduleEntry?,
+        context: Context
+    ) {
+        val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
+
+        // Cancel armed snooze and nagging alarms so taking in-app prevents phantom alarms from ringing later
+        try {
+            val alarmScheduler = AlarmScheduler(context)
+            alarmScheduler.cancelSnooze(entryId)
+            alarmScheduler.cancelNagging(entryId)
+        } catch (_: Exception) {}
+
+        if (nManager != null) {
+            try {
+                val prefs = context.getSharedPreferences(
+                    AlarmScheduler.PREFS_COORDINATION,
+                    Context.MODE_PRIVATE
+                )
+                val primaryNagging = prefs.getString("nagging_member_$entryId", null)
+                val primarySnooze = prefs.getString("snooze_member_$entryId", null)
+                val primaryId = primaryNagging ?: primarySnooze
+
+                if (entry != null) {
+                    val slotMillis = entry.scheduledDateTime.withSecond(0).withNano(0)
+                        .atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+                    val slotEntries = database.scheduleDao().getScheduleForDateRangeDirect(entry.userId, slotMillis, slotMillis + 59999L)
+                    val remainingPending = slotEntries.filter { it.status == MedicationStatus.PENDING && it.entryId != entryId }
+
+                    if (remainingPending.isEmpty()) {
+                        // All medications in this slot are handled: cancel notification for entry, primary, and all slot items
+                        nManager.cancel(entryId.hashCode())
+                        if (primaryId != null) nManager.cancel(primaryId.hashCode())
+                        slotEntries.forEach { nManager.cancel(it.entryId.hashCode()) }
+                    } else {
+                        // Other medications remain pending in this slot; update active notification to remove taken medication
+                        val hasActiveNotification = try {
+                            val active = nManager.activeNotifications
+                            active.any { it.id == entryId.hashCode() || (primaryId != null && it.id == primaryId.hashCode()) }
+                        } catch (_: Exception) { false }
+
+                        nManager.cancel(entryId.hashCode())
+                        if (primaryId != null && primaryId == entryId) {
+                            nManager.cancel(primaryId.hashCode())
+                        }
+
+                        if (hasActiveNotification) {
+                            val newPrimary = remainingPending.first()
+                            val medDetails = remainingPending.mapNotNull { e ->
+                                val m = database.medicineDao().getMedicineByIdDirect(e.medicineId) ?: return@mapNotNull null
+                                val dose = m.getDosageDisplay(e.scheduledDateTime.toLocalTime())
+                                Pair(m.medicationName, dose)
+                            }
+                            val activeMedNames = ArrayList(remainingPending.mapNotNull { e ->
+                                database.medicineDao().getMedicineByIdDirect(e.medicineId)?.medicationName
+                            }.distinct())
+                            val effectiveMedName = if (activeMedNames.isNotEmpty()) activeMedNames.joinToString(", ") else "Medicine"
+                            val activeEntryIds = ArrayList(remainingPending.map { it.entryId })
+
+                            val user = database.userDao().getUserByIdDirect(entry.userId)
+                            val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+                            val currentLocale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLanguage)
+                            val formattedScheduledTime = if (user != null) {
+                                try {
+                                    com.example.dosezy.utils.TimeFormatUtils.formatTime(newPrimary.scheduledDateTime, user.timeFormat, currentLocale)
+                                } catch (_: Exception) { null }
+                            } else null
+
+                            MedicineAlarmReceiver.updateCohortNotification(
+                                context = context,
+                                entryId = newPrimary.entryId,
+                                entryIds = activeEntryIds,
+                                medicineName = effectiveMedName,
+                                medicineNames = activeMedNames,
+                                medicineDetails = medDetails,
+                                scheduledTime = formattedScheduledTime,
+                                snoozeMinutes = user?.snoozeDuration ?: 10
+                            )
+                        }
+                    }
+                } else {
+                    nManager.cancel(entryId.hashCode())
+                    if (primaryId != null) nManager.cancel(primaryId.hashCode())
+                }
+            } catch (ex: Exception) {
+                Log.e(TAG, "Error synchronizing slot notification in ScheduleRepository", ex)
+                try { nManager.cancel(entryId.hashCode()) } catch (_: Exception) {}
+            }
+        }
+
+        try {
+            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+        } catch (_: Exception) {}
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

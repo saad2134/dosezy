@@ -1,0 +1,60 @@
+<en-IN>
+• Added Home timeline view, slide-to-confirm alarms, Backup & Restore tab group, and Appearance settings
+• Added dosage units (mEq, inhaler puffs, ampules) with inventory tracking and refill management
+• Optimized performance with virtualized lists and smoother navigation on older devices, plus data sync fixes
+</en-IN>
+<en-US>
+• Added Home timeline view, slide-to-confirm alarms, Backup & Restore tab group, and Appearance settings
+• Added dosage units (mEq, inhaler puffs, ampules) with inventory tracking and refill management
+• Optimized performance with virtualized lists and smoother navigation on older devices, plus data sync fixes
+</en-US>
+<ar>
+• إضافة وضع المخطط الزمني بالرئيسية، وتمرير تأكيد التنبيهات، وتبويبات النسخ الاحتياطي، وإعدادات المظهر
+• دعم وحدات جرعات جديدة (مليمكافئ، بخاخات، أمبولات) مع تتبع المخزون وإدارة إعادة التعبئة
+• تحسين الأداء بقوائم افتراضية وانتقالات أكثر سلاسة على الأجهزة القديمة مع إصلاحات التزامن
+</ar>
+<de-DE>
+• Startseiten-Zeitachse, Wischgesten für Wecker, Backup-Registerkarten und Erscheinungsbild-Optionen
+• Neue Dosiseinheiten (mEq, Sprühstöße, Ampullen) mit intelligenter Vorrats- und Nachfüllverwaltung
+• Leistungsoptimierung durch virtualisierte Listen und flüssigere Navigation auf älteren Geräten
+</de-DE>
+<es-419>
+• Línea de tiempo en Inicio, deslizamiento en alarmas, pestañas en Respaldo y ajustes de aspecto
+• Nuevas unidades de dosis (mEq, inhalaciones, ampollas) con control de existencias y reposición
+• Rendimiento optimizado con listas virtualizadas y navegación más fluida en teléfonos antiguos
+</es-419>
+<fr-FR>
+• Vue chronologique à l'Accueil, alarmes par glissement, onglets de sauvegarde et paramètres d'apparence
+• Nouvelles unités de dosage (mEq, bouffées, ampoules) avec gestion des stocks et renouvellements
+• Performances optimisées avec listes virtualisées et navigation plus fluide sur anciens appareils
+</fr-FR>
+<hi-IN>
+• होम टाइमलाइन व्यू, अलार्म स्लाइड-टू-कन्फर्म, बैकअप और रीस्टोर टैब और नया अपीयरेंस सेक्शन
+• नई खुराक इकाइयां (mEq, इनहेलर पफ, एम्पुल) जोड़ी गईं, स्मार्ट स्टॉक और रिफिल ट्रैकिंग के साथ
+• पुराने फोन पर स्मूथ नेविगेशन और वर्चुअलाइज्ड सूचियों के साथ बेहतर प्रदर्शन और डेटा सिंक सुधार
+</hi-IN>
+<it-IT>
+• Vista cronologica nella Home, sveglie a scorrimento, schede di Backup e impostazioni aspetto
+• Nuove unità di dosaggio (mEq, erogazioni, fiale) con tracciamento delle scorte e ricariche
+• Prestazioni ottimizzate con elenchi virtualizzati e navigazione più fluida sui dispositivi meno recenti
+</it-IT>
+<ja-JP>
+• ホームのタイムライン表示、アラームのスライド操作、バックアップのタブ化、外観設定を追加
+• 新しい用量単位（mEq、吸入、アンプル）を追加し、在庫追跡と補充管理に対応
+• 仮想化リストとスムーズな画面切り替えで低スペック端末の動作を高速化、データ同期も修正
+</ja-JP>
+<pt-BR>
+• Linha do tempo na tela Inicial, deslizar em alarmes, abas no Backup e ajustes de aparência
+• Novas unidades de dose (mEq, jatos, ampolas) com controle de estoque e gerenciamento de refil
+• Desempenho otimizado com listas virtualizadas e navegação mais fluida em celulares antigos
+</pt-BR>
+<ru-RU>
+• Шкала времени на главном экране, свайп будильников, вкладки в «Резервном копировании» и внешний вид
+• Поддержка дозировок (мЭкв, дозы ингалятора, ампулы) с учетом запасов и управлением пополнением
+• Оптимизация списков и плавные переходы для старых устройств, а также исправление синхронизации
+</ru-RU>
+<zh-CN>
+• 新增主页时间线视图、闹钟滑动确认、备份与恢复标签分组以及外观设置
+• 新增服药单位（毫克当量、喷剂、安瓿），支持智能库存追踪与补药管理
+• 优化列表渲染与页面过渡性能，老旧设备更加流畅，并修复数据同步与路径显示
+</zh-CN>

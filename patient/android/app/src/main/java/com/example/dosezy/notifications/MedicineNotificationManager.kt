@@ -143,7 +143,7 @@ class MedicineNotificationManager @Inject constructor(
     }
 
     fun getScheduledAlarmCount(userId: String, callback: (count: Int) -> Unit) {
-        checkAlarmStatus(userId) { scheduled, total ->
+        checkAlarmStatus(userId) { scheduled, _ ->
             callback(scheduled)
         }
     }

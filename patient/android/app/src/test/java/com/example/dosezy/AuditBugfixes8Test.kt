@@ -195,8 +195,8 @@ class AuditBugfixes8Test {
 
     @Test
     fun issue2_medicationItem_onClickActionDispatch_prioritizesUndoForMissedDoses() {
-        var undoInvoked = false
-        var manualRecordInvoked = false
+        var undoInvoked: Boolean
+        var manualRecordInvoked: Boolean
 
         fun dispatchClick(
             isTaken: Boolean,

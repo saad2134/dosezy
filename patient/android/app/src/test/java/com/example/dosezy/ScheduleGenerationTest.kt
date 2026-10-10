@@ -340,6 +340,53 @@ class ScheduleGenerationTest {
         )
     }
 
+    @Test
+    fun everyXHours_crossesMidnightWithoutDriftOrTruncation() {
+        val start = LocalDate.of(2030, 1, 1)
+        val m = med(
+            Frequency(FrequencyPattern.EVERY_X_HOURS, intervalHours = 4),
+            times = listOf(LocalTime.of(22, 0)),
+            start = start
+        )
+        // 2 days (days = 1): Jan 1 and Jan 2
+        val entries = m.generateScheduleEntries(startDateRange = start, days = 1)
+        assertEquals(7, entries.size)
+        val expectedDateTimes = listOf(
+            start.atTime(22, 0),
+            start.plusDays(1).atTime(2, 0),
+            start.plusDays(1).atTime(6, 0),
+            start.plusDays(1).atTime(10, 0),
+            start.plusDays(1).atTime(14, 0),
+            start.plusDays(1).atTime(18, 0),
+            start.plusDays(1).atTime(22, 0)
+        )
+        assertEquals(expectedDateTimes, entries.map { it.scheduledDateTime })
+    }
+
+    @Test
+    fun everyXHours_continuousEightHourIntervalAcrossThreeDays() {
+        val start = LocalDate.of(2030, 1, 1)
+        val m = med(
+            Frequency(FrequencyPattern.EVERY_X_HOURS, intervalHours = 8),
+            times = listOf(LocalTime.of(8, 0)),
+            start = start
+        )
+        // 3 days (days = 2): Jan 1, Jan 2, Jan 3
+        val entries = m.generateScheduleEntries(startDateRange = start, days = 2)
+        assertEquals(8, entries.size)
+        val expectedDateTimes = listOf(
+            start.atTime(8, 0),
+            start.atTime(16, 0),
+            start.plusDays(1).atTime(0, 0), // Midnight transition preserved
+            start.plusDays(1).atTime(8, 0),
+            start.plusDays(1).atTime(16, 0),
+            start.plusDays(2).atTime(0, 0), // Midnight transition preserved
+            start.plusDays(2).atTime(8, 0),
+            start.plusDays(2).atTime(16, 0)
+        )
+        assertEquals(expectedDateTimes, entries.map { it.scheduledDateTime })
+    }
+
     // ───────────────────────────────────────────────────────────────
     // 7. CUSTOM multi-week frequency
     // ───────────────────────────────────────────────────────────────

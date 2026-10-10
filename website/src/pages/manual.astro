@@ -233,7 +233,7 @@ import Footer from '../components/Footer.astro';
 							<ol class="list-decimal list-inside space-y-1.5 text-neutral-300">
 								<li>Tap the <strong class="text-white">Menu</strong> tab at the bottom right.</li>
 								<li>Tap <strong class="text-white">Preferences</strong>.</li>
-								<li>Choose your preferred <strong class="text-white">Language</strong>, toggle between Light and Dark mode, or switch to 24-Hour time format.</li>
+								<li>Choose your preferred <strong class="text-white">Language</strong> under General, customize Light/Dark mode and visual styles under <strong class="text-white">Appearance</strong>, or switch to 24-Hour time format.</li>
 							</ol>
 						</div>
 					</article>
@@ -260,7 +260,7 @@ import Footer from '../components/Footer.astro';
 						</div>
 
 						<p class="text-xs text-neutral-300 leading-relaxed">
-							Your Home screen lists your daily doses grouped by chronological time. Helpful real-time indicators and colored badges show your compliance status at a glance:
+							Your Home screen lists your daily doses grouped by chronological time, with an optional vertical <strong class="text-white">Timeline Mode</strong> available via the top bar icon. Helpful real-time indicators and colored badges show your compliance status at a glance:
 						</p>
 
 						<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
@@ -379,6 +379,10 @@ import Footer from '../components/Footer.astro';
 						</p>
 
 						<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+							<div class="bg-[#030407] p-3.5 rounded-2xl border border-white/10 space-y-1 sm:col-span-2">
+								<strong class="text-sky-300 block">Slide to Take &amp; Snooze Gestures:</strong>
+								<span class="text-neutral-400 text-[11px]">Alarms feature separate sliding tracks: slide the green track left to record intake (or Take All), and slide the orange track right to snooze, avoiding accidental dismissals while half-asleep (can be toggled in Preferences).</span>
+							</div>
 							<div class="bg-[#030407] p-3.5 rounded-2xl border border-white/10 space-y-1">
 								<strong class="text-sky-300 block">Hardware Volume Rocker Silence:</strong>
 								<span class="text-neutral-400 text-[11px]">Press Volume Up or Down while an alarm rings to immediately silence ringtone and vibration without unlocking your device.</span>
@@ -521,8 +525,9 @@ import Footer from '../components/Footer.astro';
 						<div class="bg-[#030407] p-4 rounded-2xl border border-white/10 text-xs text-neutral-300 space-y-2">
 							<p>Preferences are organized into clean, focused sections in <strong class="text-white">Menu &gt; Preferences</strong>:</p>
 							<ul class="list-disc list-inside space-y-1.5 text-neutral-300">
-								<li><strong class="text-white">General:</strong> App language (12 languages), Light/Dark theme, 12h/24h time format, and <em>Hide Navigation Add Button</em> (hides the center '+' button for a symmetrical 4-tab bar and places an "Add Medicine" button on the Medicines screen).</li>
-								<li><strong class="text-white">Notifications &amp; Alarms:</strong> Default snooze interval (5–30 min), custom ringtone selection, volume slider, and alarm sound duration (30s–5m/loop).</li>
+								<li><strong class="text-white">General:</strong> App language (12 languages) and 12h/24h time format.</li>
+								<li><strong class="text-white">Appearance:</strong> Light/Dark theme, Home vertical Timeline Mode, Thicker Calendar Day Highlights, and <em>Hide Navigation Add Button</em> (hides the center '+' button for a symmetrical 4-tab bar and places an "Add Medicine" button on the Medicines screen).</li>
+								<li><strong class="text-white">Notifications &amp; Alarms:</strong> Slide to Take &amp; Snooze gestures, default snooze interval (5–30 min), custom ringtone selection, volume slider, and alarm sound duration (30s–5m/loop).</li>
 								<li><strong class="text-white">Dose Tracking:</strong>
 									<ul class="list-disc list-inside ml-3 mt-1 space-y-1 text-[11px] text-neutral-300">
 										<li><strong class="text-white">Allow Dose Undo:</strong> Toggle whether doses can be undone from cards or snackbars, with a safety confirmation dialog before restoring stock counts (default off).</li>
@@ -622,7 +627,7 @@ import Footer from '../components/Footer.astro';
 
 						<div class="bg-[#030407] p-3.5 rounded-2xl border border-white/10 text-xs text-neutral-300 space-y-1.5 mt-2">
 							<strong class="text-sky-300 block mb-1">Full ZIP Backup &amp; Selective Profile Restore:</strong>
-							<p class="text-[11px] text-neutral-400">Under <strong class="text-white">Menu &gt; Backup &amp; Restore</strong>, export a complete ZIP archive. When restoring on any phone, Dosezy inspects the archive with an in-front loader and lets you choose a conflict resolution strategy per profile: <strong class="text-white">Create New Profile</strong>, <strong class="text-white">Merge Records</strong>, or <strong class="text-white">Replace Profile</strong>.</p>
+							<p class="text-[11px] text-neutral-400">Under <strong class="text-white">Menu &gt; Backup &amp; Restore</strong>, switch between the <strong class="text-white">Automatic</strong> tab (cloud and self-hosted server options) and the <strong class="text-white">Manual</strong> tab to export an encrypted ZIP archive. When restoring on any phone, Dosezy inspects the archive with an in-front loader and lets you choose a conflict resolution strategy per profile: <strong class="text-white">Create New Profile</strong>, <strong class="text-white">Merge Records</strong>, or <strong class="text-white">Replace Profile</strong>.</p>
 						</div>
 					</article>
 

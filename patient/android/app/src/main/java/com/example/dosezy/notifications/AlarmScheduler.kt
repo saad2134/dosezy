@@ -302,14 +302,15 @@ class AlarmScheduler(private val context: Context) {
                         currentNames.removeAt(idx)
                     }
                 }
-                prefs.edit().remove("snooze_member_$entryId").apply()
+                // Guard: Atomic batch editor transaction for snooze coordination cleanup to prevent race conditions during concurrent reads
+                val editor = prefs.edit()
+                editor.remove("snooze_member_$entryId")
 
                 if (currentIds.isEmpty()) {
-                    prefs.edit()
-                        .remove("snooze_group_ids_$primaryId")
+                    editor.remove("snooze_group_ids_$primaryId")
                         .remove("snooze_group_names_$primaryId")
                         .remove("snooze_group_trigger_$primaryId")
-                        .apply()
+                    editor.apply()
                     if (primaryId != entryId) {
                         val pIntent = PendingIntent.getBroadcast(
                             context,
@@ -330,7 +331,6 @@ class AlarmScheduler(private val context: Context) {
                 } else {
                     if (entryId == primaryId) {
                         val newPrimary = currentIds.first()
-                        val editor = prefs.edit()
                         editor.remove("snooze_group_ids_$primaryId")
                         editor.remove("snooze_group_names_$primaryId")
                         editor.remove("snooze_group_trigger_$primaryId")
@@ -347,10 +347,9 @@ class AlarmScheduler(private val context: Context) {
                             scheduleGroupedSnooze(currentIds, remMins, currentNames, triggerTime)
                         }
                     } else {
-                        prefs.edit()
-                            .putString("snooze_group_ids_$primaryId", currentIds.joinToString(","))
+                        editor.putString("snooze_group_ids_$primaryId", currentIds.joinToString(","))
                             .putString("snooze_group_names_$primaryId", currentNames.joinToString("|||"))
-                            .apply()
+                        editor.apply()
 
                         val medNameSummary = if (currentNames.isNotEmpty()) currentNames.joinToString(", ") else "Medicine"
                         // Guard: Format snooze time respecting 24h vs 12h user preference and active locale instead of hardcoded 12h pattern
@@ -499,16 +498,17 @@ class AlarmScheduler(private val context: Context) {
                         currentNames.removeAt(idx)
                     }
                 }
-                prefs.edit().remove("nagging_member_$entryId").apply()
+                // Guard: Atomic batch editor transaction for nagging coordination cleanup to prevent race conditions during concurrent reads
+                val editor = prefs.edit()
+                editor.remove("nagging_member_$entryId")
 
                 if (currentIds.isEmpty()) {
-                    prefs.edit()
-                        .remove("nagging_group_ids_$primaryId")
+                    editor.remove("nagging_group_ids_$primaryId")
                         .remove("nagging_group_names_$primaryId")
                         .remove("nagging_group_trigger_$primaryId")
                         .remove("nagging_group_count_$primaryId")
                         .remove("nagging_group_sched_$primaryId")
-                        .apply()
+                    editor.apply()
                     if (primaryId != entryId) {
                         val pIntent = PendingIntent.getBroadcast(
                             context,
@@ -529,7 +529,6 @@ class AlarmScheduler(private val context: Context) {
                 } else {
                     if (entryId == primaryId) {
                         val newPrimary = currentIds.first()
-                        val editor = prefs.edit()
                         editor.remove("nagging_group_ids_$primaryId")
                         editor.remove("nagging_group_names_$primaryId")
                         editor.remove("nagging_group_trigger_$primaryId")
@@ -560,10 +559,9 @@ class AlarmScheduler(private val context: Context) {
                             )
                         }
                     } else {
-                        prefs.edit()
-                            .putString("nagging_group_ids_$primaryId", currentIds.joinToString(","))
+                        editor.putString("nagging_group_ids_$primaryId", currentIds.joinToString(","))
                             .putString("nagging_group_names_$primaryId", currentNames.joinToString("|||"))
-                            .apply()
+                        editor.apply()
 
                         val summaryName = if (currentNames.isNotEmpty()) currentNames.joinToString(", ") else "Medicine"
                         val updateIntent = Intent(context, MedicineAlarmReceiver::class.java).apply {

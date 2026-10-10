@@ -17,16 +17,35 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.FastForward
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.filled.Person
@@ -37,10 +56,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -504,13 +525,10 @@ fun GroupedAlarmScreenContent(
                             // Guard: Use localized strings for age, gender, and profile fallback rather than hardcoded English " yrs" and "Medication Profile"
                             val currentUser = user
                             val detailsStr = when {
-                                currentUser != null && currentUser.age > 0 && currentUser.gender != null -> {
+                                currentUser != null && currentUser.age > 0 -> {
                                     stringResource(R.string.profile_age_gender_format, currentUser.age, currentUser.gender.getLocalizedName())
                                 }
-                                currentUser != null && currentUser.age > 0 -> {
-                                    stringResource(R.string.years_format, currentUser.age)
-                                }
-                                currentUser != null && currentUser.gender != null -> {
+                                currentUser != null -> {
                                     currentUser.gender.getLocalizedName()
                                 }
                                 else -> ""
@@ -711,94 +729,123 @@ fun GroupedAlarmScreenContent(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // "Take / Take All" Green Primary Button
-                Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            withContext(Dispatchers.IO) {
-                                val alarmScheduler = AlarmScheduler(context)
-                                val allIds = if (medicinesList.isNotEmpty()) {
-                                    medicinesList.map { it.first.entryId }
-                                } else {
-                                    entryIds
-                                }
-                                allIds.forEach { id ->
-                                    // Guard: Cancel both nagging and snooze alarms upfront for all cohort IDs to prevent delayed phantom snooze triggers
-                                    alarmScheduler.cancelNagging(id)
-                                    alarmScheduler.cancelSnooze(id)
-                                }
-                                val now = LocalDateTime.now()
-                                val nowStr = now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-                                val lateAfter = user?.considerLateAfter ?: 3
-                                val missedAfter = user?.considerMissedAfter ?: 6
-                                if (medicinesList.isNotEmpty()) {
-                                    medicinesList.forEach { (entry, _) ->
-                                        // Guard: Use isTakenLate so delayed/snoozed or overdue doses past missedAfter are correctly recorded as TAKEN_LATE
-                                        val status = if (TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, lateAfter)) {
-                                            "TAKEN_LATE"
-                                        } else {
-                                            "TAKEN_ON_TIME"
-                                        }
-                                        scheduleRepository.recordDoseTaken(entry.entryId, status, nowStr, context)
+                // Guard: Support separate slide-to-confirm buttons for Take (slide left) and Snooze (slide right)
+                val useSlideActions = user?.slideActionsEnabled != false
+                val takeAction: () -> Unit = {
+                    coroutineScope.launch {
+                        withContext(Dispatchers.IO) {
+                            val alarmScheduler = AlarmScheduler(context)
+                            val allIds = if (medicinesList.isNotEmpty()) {
+                                medicinesList.map { it.first.entryId }
+                            } else {
+                                entryIds
+                            }
+                            allIds.forEach { id ->
+                                // Guard: Cancel both nagging and snooze alarms upfront for all cohort IDs to prevent delayed phantom snooze triggers
+                                alarmScheduler.cancelNagging(id)
+                                alarmScheduler.cancelSnooze(id)
+                            }
+                            val now = LocalDateTime.now()
+                            val nowStr = now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                            val lateAfter = user?.considerLateAfter ?: 3
+                            if (medicinesList.isNotEmpty()) {
+                                medicinesList.forEach { (entry, _) ->
+                                    // Guard: Use isTakenLate so delayed/snoozed or overdue doses past missedAfter are correctly recorded as TAKEN_LATE
+                                    val status = if (TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, lateAfter)) {
+                                        "TAKEN_LATE"
+                                    } else {
+                                        "TAKEN_ON_TIME"
                                     }
-                                } else if (entryIds.isNotEmpty()) {
-                                    entryIds.forEach { id ->
-                                        val entry = database.scheduleDao().getScheduleEntryById(id)
-                                        val entryUser = entry?.let { database.userDao().getUserByIdDirect(it.userId) } ?: user
-                                        val entryLateAfter = entryUser?.considerLateAfter ?: 3
-                                        val entryMissedAfter = entryUser?.considerMissedAfter ?: 6
-                                        // Guard: Use isTakenLate so delayed/snoozed or overdue doses past missedAfter are correctly recorded as TAKEN_LATE
-                                        val status = if (entry != null && TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, entryLateAfter)) {
-                                            "TAKEN_LATE"
-                                        } else {
-                                            "TAKEN_ON_TIME"
-                                        }
-                                        scheduleRepository.recordDoseTaken(id, status, nowStr, context)
+                                    scheduleRepository.recordDoseTaken(entry.entryId, status, nowStr, context)
+                                }
+                            } else if (entryIds.isNotEmpty()) {
+                                entryIds.forEach { id ->
+                                    val entry = database.scheduleDao().getScheduleEntryById(id)
+                                    val entryUser = entry?.let { database.userDao().getUserByIdDirect(it.userId) } ?: user
+                                    val entryLateAfter = entryUser?.considerLateAfter ?: 3
+                                    // Guard: Use isTakenLate so delayed/snoozed or overdue doses past missedAfter are correctly recorded as TAKEN_LATE
+                                    val status = if (entry != null && TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, entryLateAfter)) {
+                                        "TAKEN_LATE"
+                                    } else {
+                                        "TAKEN_ON_TIME"
                                     }
+                                    scheduleRepository.recordDoseTaken(id, status, nowStr, context)
                                 }
                             }
-                            onDismiss()
                         }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(18.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF10B981),
-                        contentColor = Color.White
-                    )
-                ) {
-                    Icon(imageVector = Icons.Default.Check, contentDescription = null, tint = Color.White)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = if (medicinesList.size > 1) stringResource(R.string.alarm_take_all, medicinesList.size) else stringResource(R.string.alarm_take_medicine),
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                        color = Color.White,
-                        fontSize = 17.sp
-                    )
+                        onDismiss()
+                    }
                 }
 
-                // Dynamic Snooze Orange Secondary Button (Identical Size 56dp)
-                Button(
-                    onClick = { snoozeAction() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(18.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFF59E0B),
-                        contentColor = Color.White
+                if (useSlideActions) {
+                    val slideTakeText = if (medicinesList.size > 1) {
+                        stringResource(R.string.alarm_slide_to_take_all, medicinesList.size)
+                    } else {
+                        stringResource(R.string.alarm_slide_to_take)
+                    }
+                    // Guard: Mark as taken dragged left-to-right (slideToLeft = false) for natural affirmative gesture
+                    SlideToConfirmButton(
+                        text = slideTakeText,
+                        icon = Icons.Default.Check,
+                        trackColor = Color(0xFF10B981),
+                        thumbColor = Color(0xFF10B981),
+                        slideToLeft = false,
+                        onConfirmed = takeAction
                     )
-                ) {
-                    Icon(imageVector = Icons.Default.Snooze, contentDescription = null, tint = Color.White)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.alarm_snooze_format, snoozeMinutes),
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                        color = Color.White,
-                        fontSize = 17.sp
+
+                    val slideSnoozeText = stringResource(R.string.alarm_slide_to_snooze, snoozeMinutes)
+                    // Guard: Snooze dragged right-to-left (slideToLeft = true)
+                    SlideToConfirmButton(
+                        text = slideSnoozeText,
+                        icon = Icons.Default.Snooze,
+                        trackColor = Color(0xFFF59E0B),
+                        thumbColor = Color(0xFFF59E0B),
+                        slideToLeft = true,
+                        onConfirmed = { snoozeAction() }
                     )
+                } else {
+                    // Standard Tap Buttons when sliding is turned off in preferences
+                    Button(
+                        onClick = takeAction,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = RoundedCornerShape(18.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF10B981),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Icon(imageVector = Icons.Default.Check, contentDescription = null, tint = Color.White)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = if (medicinesList.size > 1) stringResource(R.string.alarm_take_all, medicinesList.size) else stringResource(R.string.alarm_take_medicine),
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                            color = Color.White,
+                            fontSize = 17.sp
+                        )
+                    }
+
+                    Button(
+                        onClick = { snoozeAction() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = RoundedCornerShape(18.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFF59E0B),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Icon(imageVector = Icons.Default.Snooze, contentDescription = null, tint = Color.White)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.alarm_snooze_format, snoozeMinutes),
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                            color = Color.White,
+                            fontSize = 17.sp
+                        )
+                    }
                 }
 
                 // Opt-in Skip Dose Button (Outlined)
@@ -861,3 +908,226 @@ fun GroupedAlarmScreenContent(
         )
     }
 }
+
+// Guard: SlideToConfirmButton provides distinct slide-to-act tracks (Take drags left-to-right, Snooze drags right-to-left) with vector arrows to prevent corrupted unicode symbols
+@Composable
+private fun SlideToConfirmButton(
+    text: String,
+    icon: ImageVector,
+    trackColor: Color,
+    thumbColor: Color,
+    slideToLeft: Boolean,
+    onConfirmed: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val coroutineScope = rememberCoroutineScope()
+    val dragOffset = remember { Animatable(0f) }
+    var trackWidthPx by remember { mutableStateOf(0f) }
+    val density = LocalDensity.current
+    val thumbSizeDp = 58.dp
+    val thumbPaddingDp = 5.dp
+    val thumbSizePx = with(density) { thumbSizeDp.toPx() }
+    val paddingPx = with(density) { thumbPaddingDp.toPx() }
+    val maxTravelPx = (trackWidthPx - thumbSizePx - (2 * paddingPx)).coerceAtLeast(1f)
+    var isConfirmed by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(68.dp)
+            .clip(RoundedCornerShape(22.dp))
+            .background(trackColor.copy(alpha = 0.22f))
+            .border(
+                BorderStroke(1.5.dp, trackColor.copy(alpha = 0.6f)),
+                RoundedCornerShape(22.dp)
+            )
+            .onSizeChanged {
+                trackWidthPx = it.width.toFloat()
+            },
+        contentAlignment = Alignment.CenterStart
+    ) {
+        val progress = (dragOffset.value / maxTravelPx).coerceIn(0f, 1f)
+
+        // Progress fill inside track
+        if (slideToLeft) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(fraction = progress)
+                    .align(Alignment.CenterEnd)
+                    .background(trackColor.copy(alpha = 0.35f))
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(fraction = progress)
+                    .align(Alignment.CenterStart)
+                    .background(trackColor.copy(alpha = 0.35f))
+            )
+        }
+
+        // Guard: Center action prompt and animated chevrons horizontally within open lane between resting knob and opposite track edge
+        val emptyLaneStart = if (slideToLeft) thumbPaddingDp else (thumbPaddingDp + thumbSizeDp)
+        val emptyLaneEnd = if (slideToLeft) (thumbPaddingDp + thumbSizeDp) else thumbPaddingDp
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(
+                    start = emptyLaneStart,
+                    end = emptyLaneEnd
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .alpha((1f - progress * 1.5f).coerceAtLeast(0f))
+            ) {
+                if (slideToLeft) {
+                    SleekAnimatedChevrons(
+                        pointingLeft = true,
+                        chevronColor = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = text,
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        color = Color.White,
+                        fontSize = 17.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                } else {
+                    Text(
+                        text = text,
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        color = Color.White,
+                        fontSize = 17.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    SleekAnimatedChevrons(
+                        pointingLeft = false,
+                        chevronColor = Color.White
+                    )
+                }
+            }
+        }
+
+        // Sliding knob
+        val knobX = if (slideToLeft) {
+            (trackWidthPx - paddingPx - thumbSizePx - dragOffset.value).coerceAtLeast(paddingPx)
+        } else {
+            (paddingPx + dragOffset.value).coerceAtMost(trackWidthPx - paddingPx - thumbSizePx)
+        }
+
+        val knobXOffsetDp = with(density) { knobX.toDp() }
+
+        Box(
+            modifier = Modifier
+                .offset(x = knobXOffsetDp)
+                .size(thumbSizeDp)
+                .clip(RoundedCornerShape(17.dp))
+                .background(thumbColor)
+                .pointerInput(slideToLeft, maxTravelPx, isConfirmed) {
+                    if (isConfirmed) return@pointerInput
+                    detectHorizontalDragGestures(
+                        onDragEnd = {
+                            if (isConfirmed) return@detectHorizontalDragGestures
+                            val currentProg = dragOffset.value / maxTravelPx
+                            if (currentProg >= 0.70f) {
+                                isConfirmed = true
+                                coroutineScope.launch {
+                                    dragOffset.animateTo(maxTravelPx)
+                                    onConfirmed()
+                                }
+                            } else {
+                                coroutineScope.launch {
+                                    dragOffset.animateTo(0f, spring())
+                                }
+                            }
+                        },
+                        onHorizontalDrag = { _, dragAmount ->
+                            if (isConfirmed) return@detectHorizontalDragGestures
+                            val effectiveDelta = if (slideToLeft) -dragAmount else dragAmount
+                            val nextVal = (dragOffset.value + effectiveDelta).coerceIn(0f, maxTravelPx)
+                            coroutineScope.launch {
+                                dragOffset.snapTo(nextVal)
+                            }
+                        }
+                    )
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(30.dp)
+            )
+        }
+    }
+}
+
+// Guard: Hardware-accelerated graphicsLayer animates directional chevrons (> > > or < < <) without recomposition overhead across API 24+
+@Composable
+private fun SleekAnimatedChevrons(
+    pointingLeft: Boolean,
+    modifier: Modifier = Modifier,
+    chevronColor: Color = Color.White
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "chevron_flow")
+    val waveProgress by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1100, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "wave_progress"
+    )
+
+    val density = LocalDensity.current
+    val chevronIcon = if (pointingLeft) Icons.Default.ChevronLeft else Icons.Default.ChevronRight
+
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy((-7).dp)
+    ) {
+        for (i in 0..2) {
+            // Guard: Staggered pulse wave travels in slide direction (left-to-right for take, right-to-left for snooze)
+            val effectiveIndex = if (pointingLeft) (2 - i) else i
+            val phase = (waveProgress - (effectiveIndex * 0.18f) + 1f) % 1f
+            val pulse = if (phase in 0f..0.42f) {
+                kotlin.math.sin((phase / 0.42f) * Math.PI.toFloat())
+            } else {
+                0f
+            }
+
+            val alpha = (0.28f + (0.72f * pulse)).coerceIn(0.28f, 1f)
+            val nudgeX = if (pointingLeft) (-2.5f * pulse) else (2.5f * pulse)
+            val nudgePx = with(density) { nudgeX.dp.toPx() }
+            val scale = 0.94f + (0.14f * pulse)
+
+            Icon(
+                imageVector = chevronIcon,
+                contentDescription = null,
+                tint = chevronColor,
+                modifier = Modifier
+                    .size(19.dp)
+                    .graphicsLayer {
+                        this.alpha = alpha
+                        this.translationX = nudgePx
+                        this.scaleX = scale
+                        this.scaleY = scale
+                    }
+            )
+        }
+    }
+}
+

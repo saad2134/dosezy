@@ -1,6 +1,8 @@
 package com.example.dosezy.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -102,6 +104,7 @@ fun ScheduleCalendar(
             selectedDate = selectedDate,
             scheduleEntries = scheduleEntries,
             missedAfterHours = currentUser?.considerMissedAfter ?: 6,
+            thickerHighlight = currentUser?.thickerCalendarDayHighlight == true,
             firstDayOfWeek = firstDayOfWeek,
             onDateSelected = { date ->
                 onDateSelected(date)
@@ -190,6 +193,7 @@ private fun CalendarGrid(
     scheduleEntries: List<ScheduleEntry>,
     onDateSelected: (LocalDate) -> Unit,
     missedAfterHours: Int = 6,
+    thickerHighlight: Boolean = false,
     firstDayOfWeek: java.time.DayOfWeek = java.time.temporal.WeekFields.of(java.util.Locale.getDefault()).firstDayOfWeek,
     modifier: Modifier = Modifier
 ) {
@@ -210,12 +214,12 @@ private fun CalendarGrid(
         // Create rows for the calendar
         var dayCounter = 1 - startOffset
 
-        repeat(6) { weekIndex -> // Maximum 6 weeks in a month
+        repeat(6) { // Maximum 6 weeks in a month
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                repeat(7) { dayIndex ->
+                repeat(7) {
                     val currentDay = dayCounter
                     val date = if (currentDay in 1..daysInMonth) {
                         currentMonth.atDay(currentDay)
@@ -238,9 +242,9 @@ private fun CalendarGrid(
                         if (date != null && currentDay in 1..daysInMonth) {
                             CalendarDay(
                                 day = currentDay,
-                                date = date,
                                 isSelected = date == selectedDate,
                                 statusColor = statusColor,
+                                thickerHighlight = thickerHighlight,
                                 onClick = { onDateSelected(date) }
                             )
                         } else if (currentDay > 0 && currentDay <= daysInMonth + 7) {
@@ -262,22 +266,38 @@ private fun CalendarGrid(
     }
 }
 
+// Guard: When thickerCalendarDayHighlight is enabled, every scheduled day receives a full colored frame instead of only an underline
 @Composable
 private fun CalendarDay(
     day: Int,
-    date: LocalDate,
     isSelected: Boolean,
     statusColor: Color,
+    thickerHighlight: Boolean = false,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val backgroundColor = if (isSelected) Color(0xFF2084E4) else Color.Transparent
-    val textColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
+    val isColored = statusColor != Color.Transparent
+    val backgroundColor = when {
+        isSelected -> Color(0xFF2084E4)
+        thickerHighlight && isColored -> statusColor.copy(alpha = 0.12f)
+        else -> Color.Transparent
+    }
+    val textColor = when {
+        isSelected -> Color.White
+        else -> MaterialTheme.colorScheme.onSurface
+    }
+
+    val cellBorder = when {
+        isSelected && thickerHighlight && isColored -> BorderStroke(2.5.dp, statusColor)
+        thickerHighlight && isColored -> BorderStroke(2.dp, statusColor)
+        else -> null
+    }
 
     Box(
         modifier = modifier
             .fillMaxSize()
             .clip(RoundedCornerShape(12.dp))
+            .then(if (cellBorder != null) Modifier.border(cellBorder, RoundedCornerShape(12.dp)) else Modifier)
             .background(backgroundColor)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
@@ -289,10 +309,10 @@ private fun CalendarDay(
                 text = day.toString(),
                 color = textColor,
                 fontSize = 21.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = if (thickerHighlight && isColored) FontWeight.ExtraBold else FontWeight.Bold
             )
 
-            if (statusColor != Color.Transparent) {
+            if (isColored && !thickerHighlight) {
                 Spacer(modifier = Modifier.height(2.dp))
                 Box(
                     modifier = Modifier
@@ -300,6 +320,15 @@ private fun CalendarDay(
                         .height(4.dp)
                         .clip(RoundedCornerShape(2.dp))
                         .background(if (isSelected) Color.White else statusColor)
+                )
+            } else if (isColored && isSelected) {
+                Spacer(modifier = Modifier.height(2.dp))
+                Box(
+                    modifier = Modifier
+                        .width(22.dp)
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(Color.White)
                 )
             }
         }
@@ -341,8 +370,6 @@ private fun getDateStatusColor(entries: List<ScheduleEntry>, missedAfterHours: I
 fun ScheduleList(
     scheduleWithMedicine: List<ScheduleWithMedicine>,
     timeFormat: TimeFormat, // time format parameter
-    onMarkAsTaken: (String, String) -> Unit,
-    onMarkAsLate: (String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -352,8 +379,6 @@ fun ScheduleList(
             ScheduleListItem(
                 scheduleWithMedicine = item,
                 timeFormat = timeFormat, // Pass to list item
-                onMarkAsTaken = onMarkAsTaken,
-                onMarkAsLate = onMarkAsLate,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 4.dp)
@@ -366,14 +391,12 @@ fun ScheduleList(
 fun ScheduleListItem(
     scheduleWithMedicine: ScheduleWithMedicine,
     timeFormat: TimeFormat, // time format parameter
-    modifier: Modifier = Modifier,
-    onMarkAsTaken: ((String, String) -> Unit)? = null,
-    onMarkAsLate: ((String, String) -> Unit)? = null
+    targetLocale: java.util.Locale = java.util.Locale.getDefault(),
+    missedAfter: Int = 6,
+    modifier: Modifier = Modifier
 ) {
     val entry = scheduleWithMedicine.scheduleEntry
     val medicine = scheduleWithMedicine.medicine
-    val userViewModel: com.example.dosezy.ui.viewmodels.UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
-    val currentUser by userViewModel.currentUser.collectAsState()
 
     Row(
         modifier = modifier
@@ -422,9 +445,6 @@ fun ScheduleListItem(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            val targetLocale = remember(currentUser?.language) {
-                com.example.dosezy.utils.LocaleHelper.getLocale(currentUser?.language ?: com.example.dosezy.data.model.Language.SYSTEM)
-            }
             // TimeFormatUtils to format time according to user preference & locale
             Text(
                 text = TimeFormatUtils.formatTime(entry.scheduledDateTime, timeFormat, targetLocale),
@@ -437,7 +457,6 @@ fun ScheduleListItem(
 
         // Status Indicator (Read-only status overview on Schedule page)
         val now = java.time.LocalDateTime.now()
-        val missedAfter = currentUser?.considerMissedAfter ?: 6
         val isPassed = now.isAfter(entry.scheduledDateTime)
         
         val resolvedStatus = when {

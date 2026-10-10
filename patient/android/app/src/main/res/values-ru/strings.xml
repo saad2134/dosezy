@@ -144,6 +144,9 @@
     <string name="unit_drop">капля</string>
     <string name="unit_tablet">таблетка</string>
     <string name="unit_capsule">капсула</string>
+    <string name="unit_meq">мЭкв</string>
+    <string name="unit_puff">доза (вдох)</string>
+    <string name="unit_ampule">ампула</string>
 
     <string name="help_title">Справка и поддержка</string>
     <string name="help_resources">Ресурсы</string>
@@ -362,6 +365,8 @@
     <string name="backup_saved_success">Резервная копия успешно сохранена в папку «Загрузки».</string>
     <string name="backup_section_automatic">АВТОМАТИЧЕСКИ</string>
     <string name="backup_section_manual">ВРУЧНУЮ</string>
+    <string name="backup_tab_automatic">Автоматически</string>
+    <string name="backup_tab_manual">Вручную</string>
     <string name="backup_self_hosted_title">Собственный сервер бэкенда</string>
     <string name="backup_self_hosted_sub" formatted="false">100% открытый исходный код и приватность</string>
     <string name="backup_self_hosted_desc">Подключайтесь напрямую к собственному серверу Dosezy для полного суверенитета данных, панели ухода и независимого контроля.</string>
@@ -776,4 +781,18 @@
     <string name="stock_inventory_card_title">Запас лекарств и учет</string>
     <string name="widget_configure_auto_badge">Авто</string>
     <string name="dialog_validation_title">Внимание</string>
+
+    <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
+    <string name="pref_section_appearance">Внешний вид</string>
+    <string name="pref_slide_actions_title">Свайп для приема и откладывания</string>
+    <string name="pref_slide_actions_desc">Свайп вместо нажатия для приема или откладывания доз в будильнике.</string>
+    <string name="pref_timeline_mode_title">Хронологический вид</string>
+    <string name="pref_timeline_mode_desc">Отображать расписание на сегодня в виде вертикальной шкалы времени.</string>
+    <string name="pref_calendar_thicker_highlight_title">Выделение дней рамкой</string>
+    <string name="pref_calendar_thicker_highlight_desc">Выделять каждый запланированный день в календаре цветной рамкой.</string>
+    <string name="alarm_slide_to_take">Проведите для приема</string>
+    <string name="alarm_slide_to_take_all">Проведите для приема всех (%1$d)</string>
+    <string name="alarm_slide_to_snooze">Проведите для откладывания (%1$d мин)</string>
+    <string name="home_view_standard">Стандартный</string>
+    <string name="home_view_timeline">Шкала времени</string>
 </resources>

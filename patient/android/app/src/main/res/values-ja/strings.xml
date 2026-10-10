@@ -144,6 +144,9 @@
     <string name="unit_drop">滴</string>
     <string name="unit_tablet">錠</string>
     <string name="unit_capsule">カプセル</string>
+    <string name="unit_meq">mEq</string>
+    <string name="unit_puff">吸入</string>
+    <string name="unit_ampule">アンプル</string>
 
     <string name="help_title">ヘルプとサポート</string>
     <string name="help_resources">リソース</string>
@@ -362,6 +365,8 @@
     <string name="backup_saved_success">バックアップがダウンロードフォルダに正常に保存されました。</string>
     <string name="backup_section_automatic">自動</string>
     <string name="backup_section_manual">手動</string>
+    <string name="backup_tab_automatic">自動</string>
+    <string name="backup_tab_manual">手動</string>
     <string name="backup_self_hosted_title">セルフホスト バックエンドサーバー</string>
     <string name="backup_self_hosted_sub" formatted="false">100% オープンソース＆プライベート</string>
     <string name="backup_self_hosted_desc">完全なデータ主権、家族向け介護ダッシュボード、プライベートインフラ制御のために、独自のDosezyサーバーに直接接続します。</string>
@@ -776,4 +781,18 @@
     <string name="stock_inventory_card_title">薬の在庫と管理</string>
     <string name="widget_configure_auto_badge">自動</string>
     <string name="dialog_validation_title">お知らせ</string>
+
+    <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
+    <string name="pref_section_appearance">外観</string>
+    <string name="pref_slide_actions_title">スライドして服用・スヌーズ</string>
+    <string name="pref_slide_actions_desc">アラーム時に誤タップを防ぐため、スライド操作で服用またはスヌーズを実行します。</string>
+    <string name="pref_timeline_mode_title">タイムライン表示</string>
+    <string name="pref_timeline_mode_desc">今日のスケジュールを見やすい縦型タイムライン形式で表示します。</string>
+    <string name="pref_calendar_thicker_highlight_title">カレンダーの日枠表示</string>
+    <string name="pref_calendar_thicker_highlight_desc">カレンダー上の予定がある各日を色枠で囲んで強調表示します。</string>
+    <string name="alarm_slide_to_take">スライドして服用</string>
+    <string name="alarm_slide_to_take_all">スライドしてすべて服用 (%1$d)</string>
+    <string name="alarm_slide_to_snooze">スライドしてスヌーズ (%1$d分)</string>
+    <string name="home_view_standard">標準</string>
+    <string name="home_view_timeline">タイムライン</string>
 </resources>

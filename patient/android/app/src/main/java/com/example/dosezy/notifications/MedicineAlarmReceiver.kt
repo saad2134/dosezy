@@ -80,6 +80,33 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 notificationManager.createNotificationChannel(refillChannel)
             }
         }
+
+        // Guard: Update active slot notification in shade when individual medications in a cohort are marked taken in-app without re-triggering full-screen activity
+        fun updateCohortNotification(
+            context: Context,
+            entryId: String,
+            entryIds: ArrayList<String>?,
+            medicineName: String,
+            medicineNames: ArrayList<String>?,
+            medicineDetails: List<Pair<String, String>> = emptyList(),
+            scheduledTime: String?,
+            snoozeMinutes: Int = 10
+        ) {
+            MedicineAlarmReceiver().showNotification(
+                context = context,
+                entryId = entryId,
+                entryIds = entryIds,
+                medicineName = medicineName,
+                medicineNames = medicineNames,
+                medicineDetails = medicineDetails,
+                scheduledTime = scheduledTime,
+                isNagging = false,
+                naggingCount = 0,
+                maxNagging = 3,
+                snoozeMinutes = snoozeMinutes,
+                isUpdateOnly = true
+            )
+        }
     }
 
     override fun onReceive(context: Context, intent: Intent?) {
@@ -115,6 +142,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         if (entryId != null && medicineName != null) {
             val pendingResult = goAsync()
             val powerManager = context.getSystemService(Context.POWER_SERVICE) as? android.os.PowerManager
+            // Guard: ACQUIRE_CAUSES_WAKEUP deprecated in API 33+ but required to turn screen on for alarms on API 24-32
+            @Suppress("DEPRECATION")
             val wakeLock = powerManager?.newWakeLock(
                 android.os.PowerManager.PARTIAL_WAKE_LOCK or
                         android.os.PowerManager.ACQUIRE_CAUSES_WAKEUP or
@@ -241,7 +270,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         isNagging: Boolean = false,
         naggingCount: Int = 0,
         maxNagging: Int = 3,
-        snoozeMinutes: Int = 10
+        snoozeMinutes: Int = 10,
+        isUpdateOnly: Boolean = false
     ) {
         val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
         val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
@@ -334,7 +364,9 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         }
 
         // Android 14+ background activity start options for PendingIntent creation
+        // Guard: MODE_BACKGROUND_ACTIVITY_START_ALLOWED deprecated in API 35+ but required on Android 14 (API 34)
         val optionsBundle = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            @Suppress("DEPRECATION")
             android.app.ActivityOptions.makeBasic().apply {
                 setPendingIntentCreatorBackgroundActivityStartMode(
                     android.app.ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED
@@ -352,11 +384,13 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             optionsBundle
         )
 
-        // Launch AlarmActivity directly if permitted (e.g., overlay granted or app in foreground)
-        try {
-            context.startActivity(alarmIntent)
-        } catch (e: Exception) {
-            Log.e(TAG, "Could not start AlarmActivity directly", e)
+        // Launch AlarmActivity directly only on full alarms, never during silent shade notification updates
+        if (!isUpdateOnly) {
+            try {
+                context.startActivity(alarmIntent)
+            } catch (e: Exception) {
+                Log.e(TAG, "Could not start AlarmActivity directly", e)
+            }
         }
 
         val notificationTitle = if (isNagging) {
@@ -394,29 +428,33 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         }
 
         // Create silent notification: AlarmAudioPlayer is the single source of sound & vibration
-        val notification = NotificationCompat.Builder(localizedContext, CHANNEL_ID)
+        val notificationBuilder = NotificationCompat.Builder(localizedContext, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_medicine_notification)
             .setContentTitle(notificationTitle)
             .setContentText(notificationText)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setFullScreenIntent(fullScreenPendingIntent, true)
             .setAutoCancel(true)
             .setSilent(true)
             .setContentIntent(pendingIntent)
             .addAction(
-                getNotificationIcon(context, Icons.Filled.Check),
+                getNotificationIcon(Icons.Filled.Check),
                 localizedContext.getString(R.string.home_action_taken),
                 takenPendingIntent
             )
             .addAction(
-                getNotificationIcon(context, Icons.Filled.Snooze),
+                getNotificationIcon(Icons.Filled.Snooze),
                 localizedContext.getString(R.string.notif_action_snooze_format, snoozeMinutes),
                 snoozePendingIntent
             )
             .setStyle(NotificationCompat.BigTextStyle().bigText(bigText))
-            .build()
+
+        if (!isUpdateOnly) {
+            notificationBuilder.setFullScreenIntent(fullScreenPendingIntent, true)
+        }
+
+        val notification = notificationBuilder.build()
 
         try {
             val notificationManager =
@@ -452,7 +490,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
     }
 
     // Helper function to convert Compose icons to NotificationCompat.Action
-    private fun getNotificationIcon(context: Context, icon: androidx.compose.ui.graphics.vector.ImageVector): Int {
+    private fun getNotificationIcon(icon: androidx.compose.ui.graphics.vector.ImageVector): Int {
         // Using different built-in system icons for the actions
         return when (icon) {
             Icons.Filled.Check -> android.R.drawable.checkbox_on_background

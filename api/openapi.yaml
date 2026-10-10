@@ -429,7 +429,7 @@ components:
 
     DosageUnit:
       type: string
-      enum: [MG, MCG, ML, DROP, TABLET, CAPSULE]
+      enum: [MG, MCG, ML, DROP, TABLET, CAPSULE, MEQ, PUFF, AMPULE]
 
     FrequencyPattern:
       type: string
@@ -617,6 +617,21 @@ components:
           description: Whether to prompt for an optional note or symptom log whenever a dose is marked as taken
           default: false
           example: false
+        slideActionsEnabled:
+          type: boolean
+          description: Whether sliding gestures are required to confirm taking or snoozing doses in alarms
+          default: true
+          example: true
+        timelineModeEnabled:
+          type: boolean
+          description: Whether home page displays today's schedule in an expanded vertical timeline view
+          default: false
+          example: false
+        thickerCalendarDayHighlight:
+          type: boolean
+          description: Whether schedule calendar renders a full colored border frame around each scheduled day
+          default: false
+          example: false
 
     UserCreateInput:
       type: object
@@ -692,6 +707,12 @@ components:
         allowDoseNotes:
           type: boolean
         promptDoseNotes:
+          type: boolean
+        slideActionsEnabled:
+          type: boolean
+        timelineModeEnabled:
+          type: boolean
+        thickerCalendarDayHighlight:
           type: boolean
 
     Medicine:

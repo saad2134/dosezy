@@ -17,6 +17,8 @@ import java.util.UUID
     indices = [Index("userId")]
 )
 @TypeConverters(Converters::class)
+// Guard: Mark Immutable so Compose skips recomposing unchanged profile data on slower devices
+@androidx.compose.runtime.Immutable
 data class User(
     @PrimaryKey val userId: String = UUID.randomUUID().toString(),
     val profilePicPath: String? = null,
@@ -45,7 +47,11 @@ data class User(
     val hideAddMedicineNavButton: Boolean = false,
     val allowDoseUndo: Boolean = false,
     val allowDoseNotes: Boolean = false,
-    val promptDoseNotes: Boolean = false
+    val promptDoseNotes: Boolean = false,
+    // Guard: Preferences for sliding dose confirmation, home timeline view, and full-frame calendar highlight
+    val slideActionsEnabled: Boolean = true,
+    val timelineModeEnabled: Boolean = false,
+    val thickerCalendarDayHighlight: Boolean = false
 )
 
 enum class AlarmSound(val rawResId: Int?) {

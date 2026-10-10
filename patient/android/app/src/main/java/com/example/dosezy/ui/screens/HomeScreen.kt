@@ -14,6 +14,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +30,8 @@ import com.example.dosezy.ui.components.DoseNoteDialog
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
@@ -38,7 +41,13 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material.icons.filled.Medication
+import androidx.compose.material.icons.filled.PriorityHigh
+import androidx.compose.material.icons.filled.RemoveCircleOutline
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.ViewAgenda
+import androidx.compose.material.icons.filled.ViewTimeline
 import com.example.dosezy.data.model.Medicine
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -210,6 +219,44 @@ fun HomeScreen(
         }
     }
 
+    val handleMarkAsTaken: (String) -> Unit = { entryId ->
+        val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
+        if (currentUser?.allowCustomDoseTime == true) {
+            if (target != null) {
+                manualRecordEntry = target
+            } else {
+                executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
+            }
+        } else if (currentUser?.allowDoseNotes == true && currentUser?.promptDoseNotes == true) {
+            if (target != null) {
+                notePromptEntry = target
+            } else {
+                executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
+            }
+        } else {
+            executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
+        }
+    }
+
+    val handleMarkAsLate: (String) -> Unit = { entryId ->
+        val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
+        if (currentUser?.allowCustomDoseTime == true) {
+            if (target != null) {
+                manualRecordEntry = target
+            } else {
+                executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
+            }
+        } else if (currentUser?.allowDoseNotes == true && currentUser?.promptDoseNotes == true) {
+            if (target != null) {
+                notePromptEntry = target
+            } else {
+                executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
+            }
+        } else {
+            executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
+        }
+    }
+
     androidx.compose.material3.Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
@@ -227,115 +274,134 @@ fun HomeScreen(
                 currentUser = currentUser,
                 title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.home_todays_meds),
                 subtitle = "($dayOfWeek)",
-                actions = {}
+                actions = {
+                    if (hasMedications) {
+                        val isTimeline = currentUser?.timelineModeEnabled == true
+                        androidx.compose.material3.IconButton(
+                            onClick = {
+                                currentUser?.let { user ->
+                                    userViewModel.updateUser(user.copy(timelineModeEnabled = !isTimeline))
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = if (isTimeline) Icons.Default.ViewAgenda else Icons.Default.ViewTimeline,
+                                contentDescription = if (isTimeline) androidx.compose.ui.res.stringResource(R.string.home_view_standard) else androidx.compose.ui.res.stringResource(R.string.home_view_timeline),
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                }
             )
 
             if (isTodayLoading && !hasMedications) {
                 com.example.dosezy.ui.components.HomeSkeletonView()
             } else {
-                // Main content with scrolling
-                Column(
+                // Main content with virtualized scrolling
+                // Guard: Virtualize home content with LazyColumn to eliminate massive initial layout measurement overhead on older devices
+                LazyColumn(
                     modifier = Modifier
                         .weight(1f)
-                        .verticalScroll(rememberScrollState())
-                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    contentPadding = PaddingValues(16.dp)
                 ) {
                     if (hasMedications) {
                         if (allCompleted && hasTaken) {
-                            AllGoodBanner()
-                            Spacer(modifier = Modifier.height(8.dp))
+                            item(key = "all_good_banner") {
+                                AllGoodBanner()
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
                         }
-                        groupedEntries.forEach { (time, entries) ->
-                            TimeSection(
-                                time = time,
-                                entries = entries,
-                                currentDateTime = currentTime,
-                                currentUser = currentUser,
-                                onMarkAsTaken = { entryId ->
-                                    val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
-                                    if (currentUser?.allowCustomDoseTime == true) {
-                                        if (target != null) {
-                                            manualRecordEntry = target
-                                        } else {
-                                            executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
+                        if (currentUser?.timelineModeEnabled == true) {
+                            item(key = "timeline_view") {
+                                HomeTimelineView(
+                                    groupedEntries = groupedEntries,
+                                    currentDateTime = currentTime,
+                                    currentUser = currentUser,
+                                    onMarkAsTaken = handleMarkAsTaken,
+                                    onMarkAsLate = handleMarkAsLate,
+                                    onUndo = { entryId ->
+                                        val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
+                                        if (currentUser?.allowDoseUndo == true && target != null) {
+                                            undoConfirmTarget = target
                                         }
-                                    } else if (currentUser?.allowDoseNotes == true && currentUser?.promptDoseNotes == true) {
+                                    },
+                                    onEditNote = { entryId ->
+                                        val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
                                         if (target != null) {
-                                            notePromptEntry = target
-                                        } else {
-                                            executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
+                                            noteEditEntry = target
                                         }
-                                    } else {
-                                        executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
+                                    },
+                                    onSkip = { entryId ->
+                                        skippingEntryId = entryId
                                     }
-                                },
-                                onMarkAsLate = { entryId ->
-                                    val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
-                                    if (currentUser?.allowCustomDoseTime == true) {
-                                        if (target != null) {
-                                            manualRecordEntry = target
-                                        } else {
-                                            executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
+                                )
+                            }
+                        } else {
+                            groupedEntries.forEach { (time, entries) ->
+                                item(key = "time_section_$time") {
+                                    TimeSection(
+                                        time = time,
+                                        entries = entries,
+                                        currentDateTime = currentTime,
+                                        currentUser = currentUser,
+                                        onMarkAsTaken = handleMarkAsTaken,
+                                        onMarkAsLate = handleMarkAsLate,
+                                        onUndo = { entryId ->
+                                            val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
+                                            if (currentUser?.allowDoseUndo == true && target != null) {
+                                                undoConfirmTarget = target
+                                            }
+                                        },
+                                        onEditNote = { entryId ->
+                                            val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
+                                            if (target != null) {
+                                                noteEditEntry = target
+                                            }
+                                        },
+                                        onSkip = { entryId ->
+                                            skippingEntryId = entryId
                                         }
-                                    } else if (currentUser?.allowDoseNotes == true && currentUser?.promptDoseNotes == true) {
-                                        if (target != null) {
-                                            notePromptEntry = target
-                                        } else {
-                                            executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
-                                        }
-                                    } else {
-                                        executeTakeDose(entryId, java.time.LocalDateTime.now(), null)
-                                    }
-                                },
-                                onUndo = { entryId ->
-                                    val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
-                                    if (currentUser?.allowDoseUndo == true && target != null) {
-                                        undoConfirmTarget = target
-                                    }
-                                },
-                                onEditNote = { entryId ->
-                                    val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
-                                    if (target != null) {
-                                        noteEditEntry = target
-                                    }
-                                },
-                                onSkip = { entryId ->
-                                    skippingEntryId = entryId
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
                                 }
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
+                            }
                         }
                     } else if (userMedicines.isEmpty()) {
-                        NoMedicationsState(onAddMedicineClick = { navController.navigate("add_med") })
+                        item(key = "no_meds_state") {
+                            NoMedicationsState(onAddMedicineClick = { navController.navigate("add_med") })
+                        }
                     } else {
                         // User has medications, but none scheduled for today (e.g. PRN or non-today)
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 16.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-                        ) {
-                            Column(
+                        item(key = "no_scheduled_doses") {
+                            Surface(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(24.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                    .padding(vertical = 16.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.Check,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(40.dp)
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = androidx.compose.ui.res.stringResource(R.string.no_scheduled_doses_today),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(24.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(40.dp)
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        text = androidx.compose.ui.res.stringResource(R.string.no_scheduled_doses_today),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
                             }
                         }
                     }
@@ -343,50 +409,57 @@ fun HomeScreen(
                     // --- v2.4.0 As-Needed (PRN) Medications Section ---
                     val prnMedicines = userMedicines.filter { it.frequency.pattern == com.example.dosezy.data.model.FrequencyPattern.AS_NEEDED }
                     if (prnMedicines.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { isPrnExpanded = !isPrnExpanded },
-                            shape = RoundedCornerShape(16.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-                        ) {
-                            Row(
+                        item(key = "prn_header") {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Surface(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 14.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
+                                    .clickable { isPrnExpanded = !isPrnExpanded },
+                                shape = RoundedCornerShape(16.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                             ) {
                                 Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 14.dp),
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                    horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Medication,
+                                            contentDescription = null,
+                                            tint = Color(0xFF1193D4),
+                                            modifier = Modifier.size(22.dp)
+                                        )
+                                        Text(
+                                            text = "${androidx.compose.ui.res.stringResource(R.string.prn_section_title)} (${prnMedicines.size})",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
                                     Icon(
-                                        imageVector = Icons.Default.Medication,
+                                        imageVector = if (isPrnExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                                         contentDescription = null,
-                                        tint = Color(0xFF1193D4),
-                                        modifier = Modifier.size(22.dp)
-                                    )
-                                    Text(
-                                        text = "${androidx.compose.ui.res.stringResource(R.string.prn_section_title)} (${prnMedicines.size})",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onSurface
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
-                                Icon(
-                                    imageVector = if (isPrnExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
                             }
                         }
 
                         if (isPrnExpanded) {
-                            Spacer(modifier = Modifier.height(10.dp))
-                            prnMedicines.forEach { prnMed ->
+                            item(key = "prn_spacer") {
+                                Spacer(modifier = Modifier.height(10.dp))
+                            }
+                            items(
+                                items = prnMedicines,
+                                key = { "prn_${it.medicineId}" }
+                            ) { prnMed ->
                                 Surface(
                                     modifier = Modifier.fillMaxWidth(),
                                     shape = RoundedCornerShape(12.dp),
@@ -621,6 +694,182 @@ fun HomeScreen(
     }
 }
 
+// Guard: Timeline UI mode displaying today's medication schedule with clean vertical progress line and nodes
+@Composable
+private fun HomeTimelineView(
+    groupedEntries: List<Pair<String, List<ScheduleWithMedicine>>>,
+    currentDateTime: java.time.LocalDateTime,
+    currentUser: com.example.dosezy.data.model.User?,
+    onMarkAsTaken: (String) -> Unit,
+    onMarkAsLate: (String) -> Unit,
+    onUndo: (String) -> Unit = {},
+    onSkip: (String) -> Unit = {},
+    onEditNote: (String) -> Unit = {}
+) {
+    val lateAfter = currentUser?.considerLateAfter ?: 3
+    val missedAfter = currentUser?.considerMissedAfter ?: 6
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        groupedEntries.forEachIndexed { index, (time, entries) ->
+            val isLast = index == groupedEntries.lastIndex
+
+            // Guard: Differentiate taken vs skipped slot states so skipping a dose does not falsely report "All medications taken" with green checkmarks
+            val allTaken = entries.all {
+                it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
+                        it.scheduleEntry.status == MedicationStatus.TAKEN_LATE
+            }
+
+            val allSkipped = entries.all {
+                it.scheduleEntry.status == MedicationStatus.SKIPPED
+            }
+
+            val allCompleted = entries.all {
+                it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
+                        it.scheduleEntry.status == MedicationStatus.TAKEN_LATE ||
+                        it.scheduleEntry.status == MedicationStatus.SKIPPED
+            }
+
+            val hasMissed = entries.any { entryWithMed ->
+                val entry = entryWithMed.scheduleEntry
+                val isTakenOrSkipped = entry.status == MedicationStatus.TAKEN_ON_TIME ||
+                        entry.status == MedicationStatus.TAKEN_LATE ||
+                        entry.status == MedicationStatus.SKIPPED
+                entry.status == MedicationStatus.MISSED || (!isTakenOrSkipped && currentDateTime.isAfter(entry.scheduledDateTime) && TimeCalculationUtils.isMissed(entry.scheduledDateTime, currentDateTime, missedAfter))
+            }
+
+            val hasLate = !hasMissed && !allCompleted && entries.any { entryWithMed ->
+                val entry = entryWithMed.scheduleEntry
+                val isTakenOrSkipped = entry.status == MedicationStatus.TAKEN_ON_TIME ||
+                        entry.status == MedicationStatus.TAKEN_LATE ||
+                        entry.status == MedicationStatus.SKIPPED
+                !isTakenOrSkipped && currentDateTime.isAfter(entry.scheduledDateTime) && TimeCalculationUtils.isLate(entry.scheduledDateTime, currentDateTime, lateAfter, missedAfter)
+            }
+
+            val (nodeColor, nodeIcon) = when {
+                allTaken -> Color(0xFF10B981) to Icons.Default.Check
+                allSkipped -> Color(0xFF64748B) to Icons.Default.RemoveCircleOutline
+                allCompleted -> Color(0xFF10B981) to Icons.Default.Check
+                hasMissed -> Color(0xFFEF4444) to Icons.Default.PriorityHigh
+                hasLate -> Color(0xFFF59E0B) to Icons.Default.HourglassTop
+                else -> Color(0xFF1193D4) to Icons.Default.Schedule
+            }
+
+            // Calculate relative time or status text for badge
+            val pendingEntries = entries.filter {
+                it.scheduleEntry.status == MedicationStatus.PENDING ||
+                        it.scheduleEntry.status == MedicationStatus.MISSED
+            }
+            val firstPending = pendingEntries.firstOrNull()
+            val timeDiff = firstPending?.let {
+                TimeCalculationUtils.calculateTimeDifference(it.scheduleEntry.scheduledDateTime, currentDateTime)
+            }
+
+            val badgeText = when {
+                allTaken -> androidx.compose.ui.res.stringResource(R.string.status_all_medications_taken)
+                allSkipped -> androidx.compose.ui.res.stringResource(R.string.home_action_skipped)
+                allCompleted -> androidx.compose.ui.res.stringResource(R.string.status_all_medications_taken)
+                timeDiff != null -> {
+                    if (timeDiff.isLate) {
+                        androidx.compose.ui.res.stringResource(R.string.time_diff_ago, timeDiff.hours, timeDiff.minutes)
+                    } else {
+                        androidx.compose.ui.res.stringResource(R.string.to_be_taken_in, timeDiff.hours, timeDiff.minutes)
+                    }
+                }
+                else -> androidx.compose.ui.res.stringResource(R.string.status_scheduled_for_this_time)
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min)
+            ) {
+                // Left Timeline track & node
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.width(38.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(34.dp)
+                            .clip(CircleShape)
+                            .background(nodeColor),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = nodeIcon,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+
+                    if (!isLast) {
+                        Box(
+                            modifier = Modifier
+                                .width(3.dp)
+                                .weight(1f)
+                                .padding(vertical = 4.dp)
+                                .clip(RoundedCornerShape(1.5.dp))
+                                .background(MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                // Right Content: Time header + badge + cards
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(bottom = if (isLast) 8.dp else 24.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                    ) {
+                        Text(
+                            text = time,
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 20.sp
+                            ),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = nodeColor.copy(alpha = 0.14f),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, nodeColor.copy(alpha = 0.35f))
+                        ) {
+                            Text(
+                                text = badgeText,
+                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                color = nodeColor,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
+
+                    entries.forEach { entry ->
+                        MedicationCard(
+                            scheduleWithMedicine = entry,
+                            currentDateTime = currentDateTime,
+                            currentUser = currentUser,
+                            onMarkAsTaken = onMarkAsTaken,
+                            onMarkAsLate = onMarkAsLate,
+                            onUndo = onUndo,
+                            onSkip = onSkip,
+                            onEditNote = onEditNote
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Composable
 private fun TimeSection(
     time: String,
@@ -661,7 +910,15 @@ private fun TimeSection(
             )
         }
 
+        // Guard: Differentiate taken vs skipped slot states so skipping a dose does not falsely report "All medications taken"
         val allTaken = entries.all {
+            it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
+                    it.scheduleEntry.status == MedicationStatus.TAKEN_LATE
+        }
+        val allSkipped = entries.all {
+            it.scheduleEntry.status == MedicationStatus.SKIPPED
+        }
+        val allCompleted = entries.all {
             it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
                     it.scheduleEntry.status == MedicationStatus.TAKEN_LATE ||
                     it.scheduleEntry.status == MedicationStatus.SKIPPED
@@ -669,6 +926,12 @@ private fun TimeSection(
 
         val statusText = when {
             allTaken -> {
+                androidx.compose.ui.res.stringResource(R.string.status_all_medications_taken)
+            }
+            allSkipped -> {
+                androidx.compose.ui.res.stringResource(R.string.home_action_skipped)
+            }
+            allCompleted -> {
                 androidx.compose.ui.res.stringResource(R.string.status_all_medications_taken)
             }
             timeDiff != null -> {

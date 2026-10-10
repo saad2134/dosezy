@@ -144,6 +144,9 @@
     <string name="unit_drop">goccia</string>
     <string name="unit_tablet">compressa</string>
     <string name="unit_capsule">capsula</string>
+    <string name="unit_meq">mEq</string>
+    <string name="unit_puff">erogazione</string>
+    <string name="unit_ampule">fiala</string>
 
     <string name="help_title">Aiuto e Supporto</string>
     <string name="help_resources">Risorse</string>
@@ -362,6 +365,8 @@ Vuoi continuare?</string>
     <string name="backup_saved_success">Il backup è stato salvato con successo nella cartella Download.</string>
     <string name="backup_section_automatic">AUTOMATICO</string>
     <string name="backup_section_manual">MANUALE</string>
+    <string name="backup_tab_automatic">Automatico</string>
+    <string name="backup_tab_manual">Manuale</string>
     <string name="backup_self_hosted_title">Server backend self-hosted</string>
     <string name="backup_self_hosted_sub" formatted="false">100% Open Source e privato</string>
     <string name="backup_self_hosted_desc">Collegati direttamente alla tua istanza server Dosezy per la piena sovranità dei dati, dashboard per i caregiver e controllo privato dell\'infrastruttura.</string>
@@ -776,4 +781,18 @@ Vuoi continuare?</string>
     <string name="stock_inventory_card_title">Scorta e inventario farmaci</string>
     <string name="widget_configure_auto_badge">Auto</string>
     <string name="dialog_validation_title">Avviso</string>
+
+    <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
+    <string name="pref_section_appearance">Aspetto</string>
+    <string name="pref_slide_actions_title">Scorri per Assumere e Posporre</string>
+    <string name="pref_slide_actions_desc">Richiede di scorrere anziché toccare per assumere o posporre le dosi negli allarmi.</string>
+    <string name="pref_timeline_mode_title">Vista Sequenza Temporale</string>
+    <string name="pref_timeline_mode_desc">Mostra il programma di oggi in una sequenza temporale verticale chiara.</string>
+    <string name="pref_calendar_thicker_highlight_title">Cornice Completa Giorni</string>
+    <string name="pref_calendar_thicker_highlight_desc">Evidenzia ciascun giorno programmato nel calendario con una cornice colorata intera.</string>
+    <string name="alarm_slide_to_take">Scorri per assumere</string>
+    <string name="alarm_slide_to_take_all">Scorri per assumere tutto (%1$d)</string>
+    <string name="alarm_slide_to_snooze">Scorri per posporre (%1$d min)</string>
+    <string name="home_view_standard">Standard</string>
+    <string name="home_view_timeline">Sequenza temporale</string>
 </resources>

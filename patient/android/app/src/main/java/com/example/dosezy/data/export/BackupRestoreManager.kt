@@ -659,7 +659,11 @@ class BackupRestoreManager(
             hideAddMedicineNavButton = json.get("hideAddMedicineNavButton")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
             allowDoseUndo = json.get("allowDoseUndo")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
             allowDoseNotes = json.get("allowDoseNotes")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
-            promptDoseNotes = json.get("promptDoseNotes")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false
+            promptDoseNotes = json.get("promptDoseNotes")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+            // Guard: Defensively parse slide actions, timeline mode, and thicker calendar highlight with non-breaking defaults for legacy backup archives
+            slideActionsEnabled = json.get("slideActionsEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: true,
+            timelineModeEnabled = json.get("timelineModeEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+            thickerCalendarDayHighlight = json.get("thickerCalendarDayHighlight")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false
         )
     }
 
@@ -675,7 +679,7 @@ class BackupRestoreManager(
                 try { LocalTime.parse(it.asString) } catch (_: Exception) { null }
             }
 
-            // Guard: Defensively parse frequency object and fallback to DAILY if missing, malformed, or null to prevent inspection crashes on legacy or corrupted backups
+            // Guard: Defensively parse frequency object (nested or flattened from DataExporter/legacy backups) to prevent resetting non-daily schedules to DAILY
             val freqObj = if (obj.has("frequency") && !obj.get("frequency").isJsonNull && obj.get("frequency").isJsonObject) {
                 obj.getAsJsonObject("frequency")
             } else null
@@ -698,6 +702,26 @@ class BackupRestoreManager(
                     intervalDays = freqObj.get("intervalDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
                     intervalWeeks = freqObj.get("intervalWeeks")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()
                 )
+            } else if (obj.has("frequencyPattern") || obj.has("pattern")) {
+                // Guard: Support flattened frequency attributes from DataExporter exports and legacy backups to prevent silent schedule corruption
+                val rawPattern = (obj.get("frequencyPattern") ?: obj.get("pattern"))?.takeUnless { it.isJsonNull }?.asString ?: "DAILY"
+                val freqPattern = try {
+                    FrequencyPattern.valueOf(rawPattern)
+                } catch (_: Exception) {
+                    FrequencyPattern.DAILY
+                }
+                val selectedDaysOfWeek = obj.getAsJsonArray("selectedDaysOfWeek")?.mapNotNull { if (it.isJsonNull) null else runCatching { it.asInt }.getOrNull() }
+                val selectedDaysOfMonth = obj.getAsJsonArray("selectedDaysOfMonth")?.mapNotNull { if (it.isJsonNull) null else runCatching { it.asInt }.getOrNull() }
+                Frequency(
+                    pattern = freqPattern,
+                    daysPerWeek = obj.get("daysPerWeek")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    daysPerMonth = obj.get("daysPerMonth")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    selectedDaysOfWeek = selectedDaysOfWeek,
+                    selectedDaysOfMonth = selectedDaysOfMonth,
+                    intervalHours = obj.get("intervalHours")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    intervalDays = obj.get("intervalDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    intervalWeeks = obj.get("intervalWeeks")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()
+                )
             } else {
                 Frequency(FrequencyPattern.DAILY)
             }
@@ -712,7 +736,16 @@ class BackupRestoreManager(
             val medId = obj.get("medicineId")?.takeUnless { it.isJsonNull }?.asString ?: UUID.randomUUID().toString()
             val uId = obj.get("userId")?.takeUnless { it.isJsonNull }?.asString ?: ""
             val dosageVal = obj.get("dosage")?.takeUnless { it.isJsonNull }?.runCatching { asDouble }?.getOrNull() ?: 1.0
-            val dosageUnitVal = obj.get("dosageUnit")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { DosageUnit.valueOf(it) }.getOrNull() } ?: DosageUnit.TABLET
+            // Guard: Safe-parse dosage unit with normalization for aliases (puffs, actuations, ampules, mEq) and fallback to TABLET
+            val dosageUnitVal = obj.get("dosageUnit")?.takeUnless { it.isJsonNull }?.asString?.let { raw ->
+                val normalized = raw.trim().uppercase()
+                when (normalized) {
+                    "MEQ", "MILLIEQUIVALENT", "MILLIEQUIVALENTS" -> DosageUnit.MEQ
+                    "PUFF", "PUFFS", "ACTUATION", "ACTUATIONS" -> DosageUnit.PUFF
+                    "AMPULE", "AMPULES", "AMP", "AMPOULE", "AMPOULES" -> DosageUnit.AMPULE
+                    else -> runCatching { DosageUnit.valueOf(normalized) }.getOrNull()
+                }
+            } ?: DosageUnit.TABLET
             val timesPerDayVal = obj.get("timesPerDay")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 1
 
             val med = Medicine(
@@ -756,9 +789,9 @@ class BackupRestoreManager(
             val obj = try { elem.asJsonObject } catch (_: Exception) { continue }
             // Guard: Safe-extract scheduledDateTime and skip entry if missing or invalid to prevent unhandled NPE aborting zip inspection
             val rawScheduledTime = obj.get("scheduledDateTime")?.takeUnless { it.isJsonNull }?.asString ?: continue
-            // Guard: Handle epoch-millis formatted timestamps from older versions or external tools before ISO parsing to prevent silent data corruption via LocalDateTime.now() fallback
+            // Guard: Decode epoch-millis and UTC timestamps using ZoneOffset.UTC matching Converters.kt to prevent local timezone drift on import
             val parsedScheduledTime = rawScheduledTime.toLongOrNull()?.let {
-                java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime()
+                java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneOffset.UTC).toLocalDateTime()
             } ?: try {
                 LocalDateTime.parse(rawScheduledTime)
             } catch (_: Exception) {
@@ -766,7 +799,7 @@ class BackupRestoreManager(
                     java.time.OffsetDateTime.parse(rawScheduledTime).toLocalDateTime()
                 } catch (_: Exception) {
                     try {
-                        java.time.Instant.parse(rawScheduledTime).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime()
+                        java.time.Instant.parse(rawScheduledTime).atZone(java.time.ZoneOffset.UTC).toLocalDateTime()
                     } catch (_: Exception) {
                         LocalDateTime.now()
                     }
@@ -784,11 +817,13 @@ class BackupRestoreManager(
                 medicineId = medicineIdVal,
                 scheduledDateTime = parsedScheduledTime,
                 status = statusVal,
-                // Guard: Handle epoch-millis formatted takenAt from older versions or external tools to prevent silent null-ification
+                // Guard: Handle epoch-millis, standard ISO, offset ISO, and UTC Instant strings to prevent dropping completion timestamps
                 takenAt = obj.get("takenAt")?.takeUnless { it.isJsonNull }?.asString?.let { raw ->
                     raw.toLongOrNull()?.let { millis ->
-                        java.time.Instant.ofEpochMilli(millis).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime()
+                        java.time.Instant.ofEpochMilli(millis).atZone(java.time.ZoneOffset.UTC).toLocalDateTime()
                     } ?: runCatching { LocalDateTime.parse(raw) }.getOrNull()
+                      ?: runCatching { java.time.OffsetDateTime.parse(raw).toLocalDateTime() }.getOrNull()
+                      ?: runCatching { java.time.Instant.parse(raw).atZone(java.time.ZoneOffset.UTC).toLocalDateTime() }.getOrNull()
                 },
                 skipReason = obj.get("skipReason")?.takeUnless { it.isJsonNull }?.asString,
                 dosage = obj.get("dosage")?.takeUnless { it.isJsonNull }?.runCatching { asDouble }?.getOrNull(),

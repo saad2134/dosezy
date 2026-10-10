@@ -203,6 +203,10 @@ class MedicineRepository @Inject constructor(
         val med = database.medicineDao().getMedicineByIdDirect(medicineId)
         if (med != null) {
             deleteMedicinePermanently(med)
+        } else {
+            // Guard: Clean up orphaned schedule entries and alarms if medicine record was already deleted
+            scheduleRepository.cancelAlarmsForMedicine(medicineId, this.context)
+            database.scheduleDao().deleteScheduleEntriesByMedicine(medicineId)
         }
     }
 
@@ -227,10 +231,14 @@ class MedicineRepository @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun deleteMedicineWithAlarms(medicineId: String, context: Context) {
-        // Cancel alarms first
-        scheduleRepository.cancelAlarmsForMedicine(medicineId, context)
-
-        // Then delete the medicine (which will cascade delete schedule entries)
-        deleteMedicine(medicineId) // uses the overloaded method
+        val med = database.medicineDao().getMedicineByIdDirect(medicineId)
+        if (med != null) {
+            // Guard: Delegate to deleteMedicinePermanently to ensure alarms are rescheduled for remaining sibling medications
+            deleteMedicinePermanently(med)
+        } else {
+            // Guard: Cancel alarms, clean up orphaned entries, and reschedule remaining alarms
+            scheduleRepository.cancelAlarmsForMedicine(medicineId, context)
+            database.scheduleDao().deleteScheduleEntriesByMedicine(medicineId)
+        }
     }
 }

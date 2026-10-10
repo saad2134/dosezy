@@ -108,7 +108,7 @@ fun NewUserScreen(
     navController: NavController,
     currentFrame: Int,
     onNext: (Int) -> Unit,
-    onSkip: () -> Unit,
+    @Suppress("UNUSED_PARAMETER") onSkip: () -> Unit = {},
     isCreatingNewProfile: Boolean = false,
     userViewModel: UserViewModel = hiltViewModel()
 ) {
@@ -153,7 +153,6 @@ fun NewUserScreen(
         bottomBar = {
             NewUserBottomBar(
                 currentFrame = currentFrame,
-                isCreatingNewProfile = isCreatingNewProfile,
                 existingUsers = users,
                 onBack = {
                     if (currentFrame > 1) {
@@ -169,8 +168,6 @@ fun NewUserScreen(
                     }
                 },
                 onNext = { onNext(currentFrame + 1) },
-                onSkip = onSkip,
-                onShowExistingProfiles = { showExistingProfiles = true },
                 isProfileSetupValid = isProfileSetupValid,
                 onCompleteProfileSetup = {
                     if (isProfileSetupValid) {
@@ -196,12 +193,6 @@ fun NewUserScreen(
         ) {
             when (currentFrame) {
                 1 -> WelcomePage(
-                    isCreatingNewProfile = isCreatingNewProfile,
-                    existingUsers = users,
-                    onSelectUser = { user ->
-                        userViewModel.setCurrentUser(user)
-                    },
-                    onCreateNewProfile = { onNext(2) },
                     onImportBackup = { showImportSourceDialog = true }
                 )
                 2 -> FeaturesPage()
@@ -258,7 +249,9 @@ fun NewUserScreen(
                                     val updatedUsers = database.userDao().getAllUsersDirect()
                                     if (updatedUsers.isNotEmpty()) {
                                         withContext(Dispatchers.Main) {
-                                            userViewModel.setCurrentUser(updatedUsers.first())
+                                            // Guard: Prioritize profile with isCurrentUser=true (or first) to prevent landing on an unintended dependent profile
+                                            val targetUser = updatedUsers.find { it.isCurrentUser } ?: updatedUsers.first()
+                                            userViewModel.setCurrentUser(targetUser)
                                             navController.navigate("home") {
                                                 popUpTo("newuser/1") { inclusive = true }
                                             }
@@ -322,14 +315,8 @@ fun NewUserScreen(
 
 @Composable
 fun WelcomePage(
-    isCreatingNewProfile: Boolean,
-    existingUsers: List<User>,
-    onSelectUser: (User) -> Unit,
-    onCreateNewProfile: () -> Unit,
     onImportBackup: () -> Unit = {}
 ) {
-    var showExistingProfiles by remember { mutableStateOf(false) }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -861,12 +848,9 @@ fun ProgressDot(active: Boolean) {
 @Composable
 fun NewUserBottomBar(
     currentFrame: Int,
-    isCreatingNewProfile: Boolean,
     existingUsers: List<User>,
     onBack: () -> Unit,
     onNext: () -> Unit,
-    onSkip: () -> Unit,
-    onShowExistingProfiles: () -> Unit,
     isProfileSetupValid: Boolean = true,
     onCompleteProfileSetup: () -> Unit = {}
 ) {
@@ -1146,8 +1130,9 @@ fun ProfileItem(user: User, onClick: () -> Unit, modifier: Modifier = Modifier) 
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium
                     )
+                    // Guard: Use user.gender.getLocalizedName() so non-English locales (Arabic, German, Spanish, French, Hindi, etc.) display localized gender instead of hardcoded English displayName
                     Text(
-                        text = stringResource(R.string.profile_age_gender_format, user.age, user.gender.displayName),
+                        text = stringResource(R.string.profile_age_gender_format, user.age, user.gender.getLocalizedName()),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -1167,29 +1152,7 @@ fun ProfileItem(user: User, onClick: () -> Unit, modifier: Modifier = Modifier) 
 @Composable
 fun PreviewWelcomePage() {
     MaterialTheme {
-        WelcomePage(
-            isCreatingNewProfile = false,
-            existingUsers = listOf(
-                User(
-                    userId = "1",
-                    fullName = "John Doe",
-                    age = 30,
-                    gender = Gender.MALE,
-                    contactNumber = "+1234567890",
-                    isCurrentUser = true
-                ),
-                User(
-                    userId = "2",
-                    fullName = "Jane Smith",
-                    age = 25,
-                    gender = Gender.FEMALE,
-                    contactNumber = "+0987654321",
-                    isCurrentUser = false
-                )
-            ),
-            onSelectUser = {},
-            onCreateNewProfile = {}
-        )
+        WelcomePage()
     }
 }
 
@@ -1218,12 +1181,7 @@ fun PreviewNewUserScreenFrame1() {
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surface)
         ) {
-            WelcomePage(
-                isCreatingNewProfile = false,
-                existingUsers = emptyList(),
-                onSelectUser = {},
-                onCreateNewProfile = {}
-            )
+            WelcomePage()
         }
     }
 }

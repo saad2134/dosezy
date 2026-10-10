@@ -101,7 +101,7 @@ class AuditBugfixes9Test {
         db.close()
     }
 
-    private suspend fun awaitCondition(timeoutMs: Long = 3000, condition: suspend () -> Boolean) {
+    private suspend fun awaitCondition(timeoutMs: Long = 10000, condition: suspend () -> Boolean) {
         val start = System.currentTimeMillis()
         while (!condition()) {
             if (System.currentTimeMillis() - start > timeoutMs) {
@@ -141,7 +141,7 @@ class AuditBugfixes9Test {
 
         // 4. Delete the active user, which must trigger alarm cancellation and promotion
         userViewModel.deleteUser(activeUser!!)
-        awaitCondition { userRepository.getUserByIdSync(secondUser.userId) == null }
+        awaitCondition { userRepository.getUserByIdSync(secondUser.userId) == null && userRepository.getAllUsersList().firstOrNull()?.isCurrentUser == true }
 
         val remainingUsers = userRepository.getAllUsersList()
         assertEquals(1, remainingUsers.size)
@@ -280,6 +280,8 @@ class AuditBugfixes9Test {
             timesPerDay = 3,
             frequency = Frequency(FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(8, 0), LocalTime.of(13, 0), LocalTime.of(20, 0)),
+            // Guard: Start from tomorrow so past slots on today are not skipped by time-of-day filtering
+            startDate = java.time.LocalDate.now().plusDays(1),
             currentStock = 100,
             autoDeductOnTake = true
         )

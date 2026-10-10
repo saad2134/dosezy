@@ -157,6 +157,9 @@
     <string name="unit_drop">gota(s)</string>
     <string name="unit_tablet">pastilla(s)</string>
     <string name="unit_capsule">cápsula(s)</string>
+    <string name="unit_meq">mEq</string>
+    <string name="unit_puff">inhalación(es)</string>
+    <string name="unit_ampule">ampolla(s)</string>
 
     <!-- Help &amp; Support -->
     <string name="help_title">Ayuda y soporte</string>
@@ -378,6 +381,8 @@
     <string name="backup_saved_success">La copia de seguridad se guardó correctamente en Descargas.</string>
     <string name="backup_section_automatic">AUTOMÁTICO</string>
     <string name="backup_section_manual">MANUAL</string>
+    <string name="backup_tab_automatic">Automático</string>
+    <string name="backup_tab_manual">Manual</string>
     <string name="backup_self_hosted_title">Servidor backend autoalojado</string>
     <string name="backup_self_hosted_sub" formatted="false">100% Código abierto y privado</string>
     <string name="backup_self_hosted_desc">Conéctate directamente a tu propia instancia de servidor Dosezy para una soberanía total de datos, panel de cuidadores familiares y control de infraestructura.</string>
@@ -792,4 +797,18 @@
     <string name="stock_inventory_card_title">Stock e inventario de medicamentos</string>
     <string name="widget_configure_auto_badge">Automático</string>
     <string name="dialog_validation_title">Aviso</string>
+
+    <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
+    <string name="pref_section_appearance">Apariencia</string>
+    <string name="pref_slide_actions_title">Deslizar para Tomar y Posponer</string>
+    <string name="pref_slide_actions_desc">Requiere deslizar en lugar de pulsar para tomar o posponer dosis en las alarmas.</string>
+    <string name="pref_timeline_mode_title">Vista de Cronograma</string>
+    <string name="pref_timeline_mode_desc">Muestra el horario de hoy en una cronología vertical amplia.</string>
+    <string name="pref_calendar_thicker_highlight_title">Marco Completo por Día</string>
+    <string name="pref_calendar_thicker_highlight_desc">Resalta cada día programado en el calendario con un marco completo de color.</string>
+    <string name="alarm_slide_to_take">Deslizar para tomar</string>
+    <string name="alarm_slide_to_take_all">Deslizar para tomar todo (%1$d)</string>
+    <string name="alarm_slide_to_snooze">Deslizar para posponer (%1$d min)</string>
+    <string name="home_view_standard">Estándar</string>
+    <string name="home_view_timeline">Cronograma</string>
 </resources>

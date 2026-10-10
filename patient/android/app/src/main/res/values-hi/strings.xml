@@ -157,6 +157,9 @@
     <string name="unit_drop">बूंद</string>
     <string name="unit_tablet">गोली (tablet)</string>
     <string name="unit_capsule">कैप्सूल (capsule)</string>
+    <string name="unit_meq">mEq</string>
+    <string name="unit_puff">पफ (puff)</string>
+    <string name="unit_ampule">एम्पुल (ampule)</string>
 
     <!-- Help &amp; Support -->
     <string name="help_title">सहायता और सहायता</string>
@@ -378,6 +381,8 @@
     <string name="backup_saved_success">बैकअप सफलतापूर्वक डाउनलोड फ़ोल्डर में सहेजा गया।</string>
     <string name="backup_section_automatic">स्वचालित</string>
     <string name="backup_section_manual">मैन्युअल</string>
+    <string name="backup_tab_automatic">स्वचालित</string>
+    <string name="backup_tab_manual">मैन्युअल</string>
     <string name="backup_self_hosted_title">सेल्फ-होस्टेड बैकएंड सर्वर</string>
     <string name="backup_self_hosted_sub" formatted="false">100% ओपन सोर्स और निजी</string>
     <string name="backup_self_hosted_desc">संपूर्ण डेटा संप्रभुता, परिवार देखभालकर्ता डैशबोर्ड और निजी नियंत्रण के लिए अपने स्वयं के डोज़ेज़ी सर्वर से सीधे जुड़ें।</string>
@@ -792,4 +797,18 @@
     <string name="stock_inventory_card_title">दवा स्टॉक और इन्वेंटरी</string>
     <string name="widget_configure_auto_badge">ऑटो</string>
     <string name="dialog_validation_title">सूचना</string>
+
+    <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
+    <string name="pref_section_appearance">रूप-रंग</string>
+    <string name="pref_slide_actions_title">दवा लेने और स्नूज़ के लिए स्लाइड करें</string>
+    <string name="pref_slide_actions_desc">अलार्म में खुराक लेने या स्नूज़ करने के लिए टैप के बजाय स्लाइड करना आवश्यक है।</string>
+    <string name="pref_timeline_mode_title">टाइमलाइन दृश्य</string>
+    <string name="pref_timeline_mode_desc">आज का शेड्यूल एक स्पष्ट लंबवत टाइमलाइन में देखें।</string>
+    <string name="pref_calendar_thicker_highlight_title">पूर्ण फ्रेम दिवस हाइलाइट</string>
+    <string name="pref_calendar_thicker_highlight_desc">कैलेंडर में प्रत्येक निर्धारित दिन को पूरे रंगीन फ्रेम से रेखांकित करें।</string>
+    <string name="alarm_slide_to_take">लेने के लिए स्लाइड करें</string>
+    <string name="alarm_slide_to_take_all">सभी लेने के लिए स्लाइड करें (%1$d)</string>
+    <string name="alarm_slide_to_snooze">स्नूज़ के लिए स्लाइड करें (%1$d मि)</string>
+    <string name="home_view_standard">मानक</string>
+    <string name="home_view_timeline">टाइमलाइन</string>
 </resources>

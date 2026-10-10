@@ -144,6 +144,9 @@
     <string name="unit_drop">gota</string>
     <string name="unit_tablet">comprimido</string>
     <string name="unit_capsule">cápsula</string>
+    <string name="unit_meq">mEq</string>
+    <string name="unit_puff">jato</string>
+    <string name="unit_ampule">ampola</string>
 
     <string name="help_title">Ajuda e Suporte</string>
     <string name="help_resources">Recursos</string>
@@ -361,6 +364,8 @@ Deseja continuar?</string>
     <string name="backup_saved_success">O backup foi salvo com sucesso na pasta Downloads.</string>
     <string name="backup_section_automatic">AUTOMÁTICO</string>
     <string name="backup_section_manual">MANUAL</string>
+    <string name="backup_tab_automatic">Automático</string>
+    <string name="backup_tab_manual">Manual</string>
     <string name="backup_self_hosted_title">Servidor backend auto-hospedado</string>
     <string name="backup_self_hosted_sub" formatted="false">100% Código aberto e privado</string>
     <string name="backup_self_hosted_desc">Conecte-se diretamente à sua própria instância do servidor Dosezy para total soberania de dados, painel para cuidadores e controle de infraestrutura privada.</string>
@@ -775,4 +780,18 @@ Deseja continuar?</string>
     <string name="stock_inventory_card_title">Estoque e inventário de medicamentos</string>
     <string name="widget_configure_auto_badge">Automático</string>
     <string name="dialog_validation_title">Aviso</string>
+
+    <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
+    <string name="pref_section_appearance">Aparência</string>
+    <string name="pref_slide_actions_title">Deslizar para tomar e adiar</string>
+    <string name="pref_slide_actions_desc">Exigir deslizar em vez de tocar para tomar ou adiar doses nos alarmes.</string>
+    <string name="pref_timeline_mode_title">Modo linha do tempo</string>
+    <string name="pref_timeline_mode_desc">Exibir a programação de hoje em uma linha do tempo vertical expandida.</string>
+    <string name="pref_calendar_thicker_highlight_title">Destaque de moldura completa nos dias</string>
+    <string name="pref_calendar_thicker_highlight_desc">Contornar cada dia agendado no calendário com uma moldura colorida completa.</string>
+    <string name="alarm_slide_to_take">Deslize para tomar</string>
+    <string name="alarm_slide_to_take_all">Deslize para tomar todos (%1$d)</string>
+    <string name="alarm_slide_to_snooze">Deslize para adiar (%1$d min)</string>
+    <string name="home_view_standard">Padrão</string>
+    <string name="home_view_timeline">Linha do tempo</string>
 </resources>

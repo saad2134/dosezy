@@ -25,6 +25,8 @@ import java.time.LocalTime
     indices = [Index("userId")]
 )
 @TypeConverters(Converters::class)
+// Guard: Mark Immutable so Compose skips recomposing unchanged items in LazyColumn on slower devices
+@androidx.compose.runtime.Immutable
 data class Medicine(
     @PrimaryKey val medicineId: String,
     val userId: String, // Foreign key to User
@@ -84,26 +86,56 @@ data class Medicine(
 
         if (effectiveStart.isAfter(effectiveEnd)) return emptyList()
 
+        // Guard: Generate EVERY_X_HOURS along a continuous timeline across midnight boundaries rather than day-by-day truncation to prevent missing nocturnal doses and schedule drift
+        if (frequency.pattern == FrequencyPattern.EVERY_X_HOURS) {
+            val interval = (frequency.intervalHours ?: 4).coerceIn(1, 23)
+            val startTime = (scheduledTimes.firstOrNull() ?: LocalTime.of(8, 0)).withSecond(0).withNano(0)
+            // Guard: Anchor to stable epoch if startDate is null to allow timeline to step across midnight boundaries and preserve nocturnal doses
+            val baseDate = startDate ?: LocalDate.of(2020, 1, 1)
+            val baseAnchor = LocalDateTime.of(baseDate, startTime)
+            val now = LocalDateTime.now()
+
+            var cursor = baseAnchor
+            if (cursor.isBefore(effectiveStart.atStartOfDay())) {
+                val hoursDiff = java.time.Duration.between(cursor, effectiveStart.atStartOfDay()).toHours()
+                val steps = (hoursDiff / interval).coerceAtLeast(0)
+                cursor = cursor.plusHours(steps * interval)
+                while (cursor.isBefore(effectiveStart.atStartOfDay())) {
+                    cursor = cursor.plusHours(interval.toLong())
+                }
+            }
+
+            val endDateTime = effectiveEnd.atTime(LocalTime.MAX)
+            while (!cursor.isAfter(endDateTime)) {
+                if (endDate != null && cursor.toLocalDate().isAfter(endDate)) break
+                val itemDate = cursor.toLocalDate()
+                val cleanTime = cursor.toLocalTime().withSecond(0).withNano(0)
+                val scheduledDateTime = cursor.withSecond(0).withNano(0)
+
+                // Skip past reminder times on the current day to avoid immediate missed status
+                if (!(itemDate.isEqual(now.toLocalDate()) && scheduledDateTime.isBefore(now.minusMinutes(15)))) {
+                    val entryId = "${medicineId}_${itemDate}_${cleanTime}".replace(":", "_").replace("-", "_")
+                    val entry = ScheduleEntry(
+                        entryId = entryId,
+                        userId = userId,
+                        medicineId = medicineId,
+                        scheduledDateTime = scheduledDateTime,
+                        status = MedicationStatus.PENDING,
+                        dosage = getDosageForTime(cleanTime)
+                    )
+                    entries.add(entry)
+                }
+                cursor = cursor.plusHours(interval.toLong())
+            }
+            return entries
+        }
+
         var currentDate = effectiveStart
         while (currentDate.isBefore(effectiveEnd) || currentDate.isEqual(effectiveEnd)) {
             // Check if medicine should be taken on this day based on frequency
             if (shouldTakeOnDate(currentDate)) {
                 val now = LocalDateTime.now()
-                val effectiveTimes = if (frequency.pattern == FrequencyPattern.EVERY_X_HOURS) {
-                    val interval = (frequency.intervalHours ?: 4).coerceIn(1, 23)
-                    val startTime = scheduledTimes.firstOrNull() ?: LocalTime.of(8, 0)
-                    val generated = mutableListOf<LocalTime>()
-                    var t = startTime
-                    while (true) {
-                        generated.add(t)
-                        val nextHour = t.hour + interval
-                        if (nextHour >= 24) break
-                        t = t.plusHours(interval.toLong())
-                    }
-                    generated
-                } else {
-                    scheduledTimes
-                }
+                val effectiveTimes = scheduledTimes
 
                 effectiveTimes.forEach { time ->
                     val cleanTime = time.withSecond(0).withNano(0)
@@ -212,6 +244,10 @@ data class Medicine(
             DosageUnit.DROP -> "drop"
             DosageUnit.TABLET -> "tablet"
             DosageUnit.CAPSULE -> "capsule"
+            // Support for mEq (electrolyte supplements), puffs/actuations (inhalers), and ampules (single-use liquid)
+            DosageUnit.MEQ -> "mEq"
+            DosageUnit.PUFF -> "puff"
+            DosageUnit.AMPULE -> "ampule"
         }
 
         // Remove decimal if it's a whole number
@@ -289,12 +325,15 @@ data class Medicine(
     fun getStockDeductionAmount(time: LocalTime? = null): Int {
         val targetDosage = getDosageForTime(time)
         return when (dosageUnit) {
-            DosageUnit.MG, DosageUnit.MCG -> 1
-            DosageUnit.TABLET, DosageUnit.CAPSULE -> {
+            // Chemical strength units (MG, MCG, MEQ): stock is counted in physical dosage units (1 per intake)
+            DosageUnit.MG, DosageUnit.MCG, DosageUnit.MEQ -> 1
+            // Unit containers/discrete items: deduct dose count if in reasonable single intake range
+            DosageUnit.TABLET, DosageUnit.CAPSULE, DosageUnit.AMPULE -> {
                 val count = targetDosage.toInt()
                 if (count in 1..10) count else 1
             }
-            DosageUnit.DROP, DosageUnit.ML -> {
+            // Continuous/metered quantities (drops, liquid mL, inhaler puffs): deduct specified dose count
+            DosageUnit.DROP, DosageUnit.ML, DosageUnit.PUFF -> {
                 targetDosage.toInt().coerceAtLeast(1)
             }
         }
@@ -359,10 +398,10 @@ data class Medicine(
         }
 
         val dosesPerIntake = when (dosageUnit) {
-            DosageUnit.TABLET, DosageUnit.CAPSULE, DosageUnit.ML -> {
+            DosageUnit.TABLET, DosageUnit.CAPSULE, DosageUnit.ML, DosageUnit.PUFF, DosageUnit.AMPULE -> {
                 if (dosage > 0) dosage.toInt().coerceAtLeast(1) else 1
             }
-            DosageUnit.MG, DosageUnit.MCG, DosageUnit.DROP -> 1
+            DosageUnit.MG, DosageUnit.MCG, DosageUnit.DROP, DosageUnit.MEQ -> 1
         }
 
         return kotlin.math.ceil(totalIntakes * dosesPerIntake).toInt().coerceAtLeast(1)
@@ -370,7 +409,7 @@ data class Medicine(
 }
 
 enum class DosageUnit {
-    MG, MCG, ML, DROP, TABLET, CAPSULE
+    MG, MCG, ML, DROP, TABLET, CAPSULE, MEQ, PUFF, AMPULE
 }
 
 @androidx.compose.runtime.Composable
@@ -382,6 +421,9 @@ fun DosageUnit.getLocalizedName(): String {
         DosageUnit.DROP -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_drop)
         DosageUnit.TABLET -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_tablet)
         DosageUnit.CAPSULE -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_capsule)
+        DosageUnit.MEQ -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_meq)
+        DosageUnit.PUFF -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_puff)
+        DosageUnit.AMPULE -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_ampule)
     }
 }
 
@@ -393,6 +435,9 @@ fun DosageUnit.getLocalizedName(context: android.content.Context): String {
         DosageUnit.DROP -> context.getString(com.example.dosezy.R.string.unit_drop)
         DosageUnit.TABLET -> context.getString(com.example.dosezy.R.string.unit_tablet)
         DosageUnit.CAPSULE -> context.getString(com.example.dosezy.R.string.unit_capsule)
+        DosageUnit.MEQ -> context.getString(com.example.dosezy.R.string.unit_meq)
+        DosageUnit.PUFF -> context.getString(com.example.dosezy.R.string.unit_puff)
+        DosageUnit.AMPULE -> context.getString(com.example.dosezy.R.string.unit_ampule)
     }
 }
 
