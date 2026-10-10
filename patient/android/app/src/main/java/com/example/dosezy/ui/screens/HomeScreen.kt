@@ -44,6 +44,7 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.filled.PriorityHigh
+import androidx.compose.material.icons.filled.RemoveCircleOutline
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.ViewAgenda
 import androidx.compose.material.icons.filled.ViewTimeline
@@ -712,7 +713,17 @@ private fun HomeTimelineView(
         groupedEntries.forEachIndexed { index, (time, entries) ->
             val isLast = index == groupedEntries.lastIndex
 
+            // Guard: Differentiate taken vs skipped slot states so skipping a dose does not falsely report "All medications taken" with green checkmarks
             val allTaken = entries.all {
+                it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
+                        it.scheduleEntry.status == MedicationStatus.TAKEN_LATE
+            }
+
+            val allSkipped = entries.all {
+                it.scheduleEntry.status == MedicationStatus.SKIPPED
+            }
+
+            val allCompleted = entries.all {
                 it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
                         it.scheduleEntry.status == MedicationStatus.TAKEN_LATE ||
                         it.scheduleEntry.status == MedicationStatus.SKIPPED
@@ -726,7 +737,7 @@ private fun HomeTimelineView(
                 entry.status == MedicationStatus.MISSED || (!isTakenOrSkipped && currentDateTime.isAfter(entry.scheduledDateTime) && TimeCalculationUtils.isMissed(entry.scheduledDateTime, currentDateTime, missedAfter))
             }
 
-            val hasLate = !hasMissed && !allTaken && entries.any { entryWithMed ->
+            val hasLate = !hasMissed && !allCompleted && entries.any { entryWithMed ->
                 val entry = entryWithMed.scheduleEntry
                 val isTakenOrSkipped = entry.status == MedicationStatus.TAKEN_ON_TIME ||
                         entry.status == MedicationStatus.TAKEN_LATE ||
@@ -736,6 +747,8 @@ private fun HomeTimelineView(
 
             val (nodeColor, nodeIcon) = when {
                 allTaken -> Color(0xFF10B981) to Icons.Default.Check
+                allSkipped -> Color(0xFF64748B) to Icons.Default.RemoveCircleOutline
+                allCompleted -> Color(0xFF10B981) to Icons.Default.Check
                 hasMissed -> Color(0xFFEF4444) to Icons.Default.PriorityHigh
                 hasLate -> Color(0xFFF59E0B) to Icons.Default.HourglassTop
                 else -> Color(0xFF1193D4) to Icons.Default.Schedule
@@ -753,6 +766,8 @@ private fun HomeTimelineView(
 
             val badgeText = when {
                 allTaken -> androidx.compose.ui.res.stringResource(R.string.status_all_medications_taken)
+                allSkipped -> androidx.compose.ui.res.stringResource(R.string.home_action_skipped)
+                allCompleted -> androidx.compose.ui.res.stringResource(R.string.status_all_medications_taken)
                 timeDiff != null -> {
                     if (timeDiff.isLate) {
                         androidx.compose.ui.res.stringResource(R.string.time_diff_ago, timeDiff.hours, timeDiff.minutes)
@@ -895,7 +910,15 @@ private fun TimeSection(
             )
         }
 
+        // Guard: Differentiate taken vs skipped slot states so skipping a dose does not falsely report "All medications taken"
         val allTaken = entries.all {
+            it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
+                    it.scheduleEntry.status == MedicationStatus.TAKEN_LATE
+        }
+        val allSkipped = entries.all {
+            it.scheduleEntry.status == MedicationStatus.SKIPPED
+        }
+        val allCompleted = entries.all {
             it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
                     it.scheduleEntry.status == MedicationStatus.TAKEN_LATE ||
                     it.scheduleEntry.status == MedicationStatus.SKIPPED
@@ -903,6 +926,12 @@ private fun TimeSection(
 
         val statusText = when {
             allTaken -> {
+                androidx.compose.ui.res.stringResource(R.string.status_all_medications_taken)
+            }
+            allSkipped -> {
+                androidx.compose.ui.res.stringResource(R.string.home_action_skipped)
+            }
+            allCompleted -> {
                 androidx.compose.ui.res.stringResource(R.string.status_all_medications_taken)
             }
             timeDiff != null -> {

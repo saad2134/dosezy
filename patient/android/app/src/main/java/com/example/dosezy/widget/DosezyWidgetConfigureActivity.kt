@@ -146,7 +146,12 @@ class DosezyWidgetConfigureActivity : ComponentActivity() {
         try {
             val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
             val spTheme = prefs.getString("theme", "system") ?: "system"
-            DosezyWidgetPrefs.saveWidgetProfileTheme(this, selectedUserId, spTheme)
+            DosezyWidgetPrefs.saveWidgetProfileTheme(
+                this,
+                selectedUserId,
+                spTheme,
+                isCurrentProfile = (selectedUserId == DosezyWidgetPrefs.ACTIVE_PROFILE_ID)
+            )
         } catch (_: Exception) {}
 
         // Request widget manager update

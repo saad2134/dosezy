@@ -66,7 +66,8 @@ class DataExporter(
 
     // Guard: Strip directory separators and illegal filesystem characters to prevent FileNotFoundException or invalid paths
     private fun sanitizeFileName(name: String): String {
-        return name.trim().replace(Regex("[^a-zA-Z0-9._-]"), "_")
+        val clean = name.trim().replace(Regex("[^a-zA-Z0-9._-]"), "_").trim('_', '.')
+        return clean.ifBlank { "user" }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -128,6 +129,7 @@ class DataExporter(
         val exportDir = getExportDirectory()
         val zipFile = File(exportDir, "dosezy_export_$timestamp.zip")
 
+        val usedFolders = mutableSetOf<String>()
         FileOutputStream(zipFile).use { fileOutputStream ->
             ZipOutputStream(fileOutputStream).use { zipOutputStream ->
                 users.forEach { user ->
@@ -136,7 +138,14 @@ class DataExporter(
                         val medicines = medicineRepository.getMedicinesByUserDirect(user.userId)
                         val schedules = scheduleRepository.getSchedulesByUserSync(user.userId)
 
-                        val userFolder = sanitizeFileName(user.fullName)
+                        // Guard: Deduplicate zip entry folder names across multi-user exports to prevent ZipException duplicate entry drops
+                        var baseFolder = sanitizeFileName(user.fullName)
+                        if (usedFolders.contains(baseFolder)) {
+                            baseFolder = "${baseFolder}_${user.userId.take(6)}"
+                        }
+                        usedFolders.add(baseFolder)
+                        val userFolder = baseFolder
+
                         when (format) {
                             ExportFormat.CSV -> {
                                 val content = buildCsvContent(user, medicines, schedules)
@@ -157,14 +166,18 @@ class DataExporter(
                             ExportFormat.PDF -> {
                                 val pdfDoc = buildPdfDocument(user, medicines, schedules)
                                 val tempPdf = File(context.cacheDir, "${user.userId}.pdf")
-                                FileOutputStream(tempPdf).use { pdfDoc.writeTo(it) }
-                                pdfDoc.close()
+                                try {
+                                    FileOutputStream(tempPdf).use { pdfDoc.writeTo(it) }
+                                    pdfDoc.close()
 
-                                val entry = ZipEntry("$userFolder/health_report.pdf")
-                                zipOutputStream.putNextEntry(entry)
-                                zipOutputStream.write(tempPdf.readBytes())
-                                zipOutputStream.closeEntry()
-                                tempPdf.delete()
+                                    val entry = ZipEntry("$userFolder/health_report.pdf")
+                                    zipOutputStream.putNextEntry(entry)
+                                    zipOutputStream.write(tempPdf.readBytes())
+                                    zipOutputStream.closeEntry()
+                                } finally {
+                                    // Guard: Ensure temporary PDF file in cacheDir is deleted even if zip write throws an exception to prevent cache leak
+                                    tempPdf.delete()
+                                }
                             }
                         }
                     } catch (e: Exception) {

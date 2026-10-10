@@ -61,7 +61,7 @@ class UserViewModel @Inject constructor(
                             try {
                                 val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
                                 prefs.edit().putString("theme", current.theme.name.lowercase()).apply()
-                                com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, current.userId, current.theme.name.lowercase())
+                                com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, current.userId, current.theme.name.lowercase(), isCurrentProfile = true)
                             } catch (_: Exception) {}
                         }
 
@@ -105,7 +105,7 @@ class UserViewModel @Inject constructor(
                     try {
                         val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
                         prefs.edit().putString("theme", updatedUser.theme.name.lowercase()).apply()
-                        com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, updatedUser.userId, updatedUser.theme.name.lowercase())
+                        com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, updatedUser.userId, updatedUser.theme.name.lowercase(), isCurrentProfile = true)
                     } catch (_: Exception) {}
 
                     // Update home screen widget for the new current user
@@ -159,7 +159,7 @@ class UserViewModel @Inject constructor(
                         try {
                             val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
                             prefs.edit().putString("theme", userToInsert.theme.name.lowercase()).apply()
-                            com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, userToInsert.userId, userToInsert.theme.name.lowercase())
+                            com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, userToInsert.userId, userToInsert.theme.name.lowercase(), isCurrentProfile = shouldBeCurrent)
                         } catch (_: Exception) {}
                         try {
                             com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(medicineRepository.context)
@@ -186,7 +186,7 @@ class UserViewModel @Inject constructor(
                 } catch (_: Exception) {}
             }
             try {
-                com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, user.userId, user.theme.name.lowercase())
+                com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, user.userId, user.theme.name.lowercase(), isCurrentProfile = user.isCurrentUser)
                 com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(medicineRepository.context)
             } catch (_: Exception) {}
         }
@@ -256,7 +256,7 @@ class UserViewModel @Inject constructor(
                         try {
                             val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
                             prefs.edit().putString("theme", nextUser.theme.name.lowercase()).apply()
-                            com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, nextUser.userId, nextUser.theme.name.lowercase())
+                            com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, nextUser.userId, nextUser.theme.name.lowercase(), isCurrentProfile = true)
                         } catch (_: Exception) {}
 
                         // Guard: Core library desugaring supports API 24+; schedule alarms for next active profile across all OS versions

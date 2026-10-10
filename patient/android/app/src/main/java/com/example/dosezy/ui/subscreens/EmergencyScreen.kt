@@ -189,7 +189,8 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
         } ?: detectDeviceEmergencyCountry(context, userLanguage)
     }
 
-    var selectedCountry by remember { mutableStateOf(defaultCountry) }
+    // Guard: Recompute selectedCountry when defaultCountry changes (e.g. user profile switch or language update)
+    var selectedCountry by remember(defaultCountry) { mutableStateOf(defaultCountry) }
     var countryDropdownExpanded by remember { mutableStateOf(false) }
 
     // Persist personal contacts via SharedPreferences, namespaced per user profile

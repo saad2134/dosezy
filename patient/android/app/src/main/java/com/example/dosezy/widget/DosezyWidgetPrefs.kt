@@ -34,12 +34,14 @@ object DosezyWidgetPrefs {
             .apply()
     }
 
-    fun saveWidgetProfileTheme(context: Context, userId: String, theme: String) {
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putString("profile_theme_" + userId, theme)
-            .putString("profile_theme_" + ACTIVE_PROFILE_ID, theme)
-            .apply()
+    // Guard: Only update ACTIVE_PROFILE_ID theme when updating the active profile to prevent non-active profiles from corrupting the active profile widget theme
+    fun saveWidgetProfileTheme(context: Context, userId: String, theme: String, isCurrentProfile: Boolean = false) {
+        val editor = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
+        editor.putString("profile_theme_" + userId, theme)
+        if (userId == ACTIVE_PROFILE_ID || isCurrentProfile) {
+            editor.putString("profile_theme_" + ACTIVE_PROFILE_ID, theme)
+        }
+        editor.apply()
     }
 
     fun getWidgetProfileTheme(context: Context, userId: String): String? {
