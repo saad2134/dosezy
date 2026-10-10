@@ -90,7 +90,9 @@ data class Medicine(
         if (frequency.pattern == FrequencyPattern.EVERY_X_HOURS) {
             val interval = (frequency.intervalHours ?: 4).coerceIn(1, 23)
             val startTime = (scheduledTimes.firstOrNull() ?: LocalTime.of(8, 0)).withSecond(0).withNano(0)
-            val baseAnchor = LocalDateTime.of(startDate ?: effectiveStart, startTime)
+            // Guard: Anchor to stable epoch if startDate is null to allow timeline to step across midnight boundaries and preserve nocturnal doses
+            val baseDate = startDate ?: LocalDate.of(2020, 1, 1)
+            val baseAnchor = LocalDateTime.of(baseDate, startTime)
             val now = LocalDateTime.now()
 
             var cursor = baseAnchor

@@ -96,8 +96,10 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     if (latestEntry == null || latestEntry.scheduledDateTime.isBefore(LocalDateTime.now().plusDays(15))) {
                         val today = LocalDate.now()
                         val latestDate = latestEntry?.scheduledDateTime?.toLocalDate()
-                        val startGenerateFrom = if (latestDate == null || latestDate.isBefore(today)) today else latestDate.plusDays(1)
+                        // Guard: Anchor to latestDate rather than plusDays(1) and filter by latestEntry.scheduledDateTime to prevent dropping evening or nocturnal doses
+                        val startGenerateFrom = if (latestDate == null || latestDate.isBefore(today)) today else latestDate
                         val newEntries = medicine.generateScheduleEntries(startGenerateFrom, 30)
+                            .filter { latestEntry == null || it.scheduledDateTime.isAfter(latestEntry.scheduledDateTime) }
                         if (newEntries.isNotEmpty()) {
                             database.scheduleDao().insertScheduleEntries(newEntries)
                             Log.d(TAG, "Auto-extended schedule for medicine: ${medicine.medicationName} by 30 days starting from $startGenerateFrom")

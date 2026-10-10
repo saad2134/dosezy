@@ -789,9 +789,9 @@ class BackupRestoreManager(
             val obj = try { elem.asJsonObject } catch (_: Exception) { continue }
             // Guard: Safe-extract scheduledDateTime and skip entry if missing or invalid to prevent unhandled NPE aborting zip inspection
             val rawScheduledTime = obj.get("scheduledDateTime")?.takeUnless { it.isJsonNull }?.asString ?: continue
-            // Guard: Handle epoch-millis formatted timestamps from older versions or external tools before ISO parsing to prevent silent data corruption via LocalDateTime.now() fallback
+            // Guard: Decode epoch-millis and UTC timestamps using ZoneOffset.UTC matching Converters.kt to prevent local timezone drift on import
             val parsedScheduledTime = rawScheduledTime.toLongOrNull()?.let {
-                java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime()
+                java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneOffset.UTC).toLocalDateTime()
             } ?: try {
                 LocalDateTime.parse(rawScheduledTime)
             } catch (_: Exception) {
@@ -799,7 +799,7 @@ class BackupRestoreManager(
                     java.time.OffsetDateTime.parse(rawScheduledTime).toLocalDateTime()
                 } catch (_: Exception) {
                     try {
-                        java.time.Instant.parse(rawScheduledTime).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime()
+                        java.time.Instant.parse(rawScheduledTime).atZone(java.time.ZoneOffset.UTC).toLocalDateTime()
                     } catch (_: Exception) {
                         LocalDateTime.now()
                     }
@@ -817,10 +817,10 @@ class BackupRestoreManager(
                 medicineId = medicineIdVal,
                 scheduledDateTime = parsedScheduledTime,
                 status = statusVal,
-                // Guard: Handle epoch-millis formatted takenAt from older versions or external tools to prevent silent null-ification
+                // Guard: Handle epoch-millis formatted takenAt from older versions using ZoneOffset.UTC matching Converters.kt
                 takenAt = obj.get("takenAt")?.takeUnless { it.isJsonNull }?.asString?.let { raw ->
                     raw.toLongOrNull()?.let { millis ->
-                        java.time.Instant.ofEpochMilli(millis).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime()
+                        java.time.Instant.ofEpochMilli(millis).atZone(java.time.ZoneOffset.UTC).toLocalDateTime()
                     } ?: runCatching { LocalDateTime.parse(raw) }.getOrNull()
                 },
                 skipReason = obj.get("skipReason")?.takeUnless { it.isJsonNull }?.asString,
