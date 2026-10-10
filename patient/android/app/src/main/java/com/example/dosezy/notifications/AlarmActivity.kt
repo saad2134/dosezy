@@ -18,7 +18,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -38,6 +44,8 @@ import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.FastForward
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.filled.Person
@@ -48,6 +56,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -958,14 +967,15 @@ private fun SlideToConfirmButton(
             )
         }
 
-        // Guard: Center action prompt text within the open sliding lane (excluding the button footprint on either side so it never crowds or overlaps)
-        val knobFootprintDp = thumbSizeDp + (thumbPaddingDp * 2)
+        // Guard: Center action prompt and animated chevrons horizontally within open lane between resting knob and opposite track edge
+        val emptyLaneStart = if (slideToLeft) thumbPaddingDp else (thumbPaddingDp + thumbSizeDp)
+        val emptyLaneEnd = if (slideToLeft) (thumbPaddingDp + thumbSizeDp) else thumbPaddingDp
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(
-                    start = if (slideToLeft) thumbPaddingDp else knobFootprintDp,
-                    end = if (slideToLeft) knobFootprintDp else thumbPaddingDp
+                    start = emptyLaneStart,
+                    end = emptyLaneEnd
                 ),
             contentAlignment = Alignment.Center
         ) {
@@ -977,11 +987,9 @@ private fun SlideToConfirmButton(
                     .alpha((1f - progress * 1.5f).coerceAtLeast(0f))
             ) {
                 if (slideToLeft) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = null,
-                        tint = Color.White.copy(alpha = 0.9f),
-                        modifier = Modifier.size(20.dp)
+                    SleekAnimatedChevrons(
+                        pointingLeft = true,
+                        chevronColor = Color.White
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
@@ -1002,11 +1010,9 @@ private fun SlideToConfirmButton(
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Icon(
-                        imageVector = Icons.Default.ArrowForward,
-                        contentDescription = null,
-                        tint = Color.White.copy(alpha = 0.9f),
-                        modifier = Modifier.size(20.dp)
+                    SleekAnimatedChevrons(
+                        pointingLeft = false,
+                        chevronColor = Color.White
                     )
                 }
             }
@@ -1066,3 +1072,62 @@ private fun SlideToConfirmButton(
         }
     }
 }
+
+// Guard: Hardware-accelerated graphicsLayer animates directional chevrons (> > > or < < <) without recomposition overhead across API 24+
+@Composable
+private fun SleekAnimatedChevrons(
+    pointingLeft: Boolean,
+    modifier: Modifier = Modifier,
+    chevronColor: Color = Color.White
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "chevron_flow")
+    val waveProgress by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1100, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "wave_progress"
+    )
+
+    val density = LocalDensity.current
+    val chevronIcon = if (pointingLeft) Icons.Default.ChevronLeft else Icons.Default.ChevronRight
+
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy((-7).dp)
+    ) {
+        for (i in 0..2) {
+            // Guard: Staggered pulse wave travels in slide direction (left-to-right for take, right-to-left for snooze)
+            val effectiveIndex = if (pointingLeft) (2 - i) else i
+            val phase = (waveProgress - (effectiveIndex * 0.18f) + 1f) % 1f
+            val pulse = if (phase in 0f..0.42f) {
+                kotlin.math.sin((phase / 0.42f) * Math.PI.toFloat())
+            } else {
+                0f
+            }
+
+            val alpha = (0.28f + (0.72f * pulse)).coerceIn(0.28f, 1f)
+            val nudgeX = if (pointingLeft) (-2.5f * pulse) else (2.5f * pulse)
+            val nudgePx = with(density) { nudgeX.dp.toPx() }
+            val scale = 0.94f + (0.14f * pulse)
+
+            Icon(
+                imageVector = chevronIcon,
+                contentDescription = null,
+                tint = chevronColor,
+                modifier = Modifier
+                    .size(19.dp)
+                    .graphicsLayer {
+                        this.alpha = alpha
+                        this.translationX = nudgePx
+                        this.scaleX = scale
+                        this.scaleY = scale
+                    }
+            )
+        }
+    }
+}
+
