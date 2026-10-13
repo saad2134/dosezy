@@ -130,6 +130,7 @@ Dosezy transforms daily medication management into a stress-free experience. Inp
 [![Reddit](https://img.shields.io/badge/Reddit-r%2FDosezy-1e293b?style=flat&logo=reddit&logoColor=white&labelColor=FF4500)](https://www.reddit.com/r/Dosezy/)
 [![Facebook](https://img.shields.io/badge/Facebook-%40dosezyapp-1e293b?style=flat&logo=facebook&logoColor=white&labelColor=1877F2)](https://www.facebook.com/dosezyapp)
 [![Instagram](https://img.shields.io/badge/Instagram-%40dosezyapp-1e293b?style=flat&logo=instagram&logoColor=white&labelColor=E4405F)](https://www.instagram.com/dosezyapp)
+[![TikTok](https://img.shields.io/badge/TikTok-%40dosezyapp-1e293b?style=flat&logo=tiktok&logoColor=white&labelColor=ff4fc4)](https://www.tiktok.com/@dosezyapp)
 [![Threads](https://img.shields.io/badge/Threads-%40dosezyapp-1e293b?style=flat&logo=threads&logoColor=white&labelColor=000000)](https://www.threads.net/@dosezyapp)
 
 </div>
