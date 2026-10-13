@@ -354,7 +354,7 @@ dosezy/
 
 Dosezy is 100% free, open-source, and private with zero ads or telemetry. If Dosezy helps you or your family stay healthy, consider supporting ongoing development:
 - **GitHub Sponsors**: [Sponsor @saad2134](https://github.com/sponsors/saad2134)
-- **Buy Me a Coffee**: [buymeacoffee.com/saad2134](https://buymeacoffee.com/saad1inc)
+- **Buy Me a Coffee**: [buymeacoffee.com/saad1inc](https://buymeacoffee.com/saad1inc)
 - In-app crypto wallet options (BTC, ETH, SOL, LTC, ZEC) are also available under **Menu > About Dosezy**.
 
 ---
