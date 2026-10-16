@@ -206,7 +206,8 @@ object IntakeSafeguardManager {
             try {
                 val db = DosezyDatabase.getInstance(context)
                 val entry = db.scheduleDao().getScheduleEntryById(entryId)
-                val isStillPending = entry == null || entry.status.name == "PENDING" || entry.status.name == "MISSED"
+                // Guard: Only re-alert if entry still exists in database; do not fire ghost alarms if medication was deleted
+                val isStillPending = entry != null && (entry.status == com.example.dosezy.data.model.MedicationStatus.PENDING || entry.status == com.example.dosezy.data.model.MedicationStatus.MISSED)
 
                 if (isStillPending) {
                     Log.d(TAG, "Safeguard timer expired for unconfirmed entry $entryId; re-alerting user")

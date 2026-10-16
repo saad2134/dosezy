@@ -171,7 +171,10 @@ class DataExporter(
 
                                     val entry = ZipEntry("$userFolder/health_report.pdf")
                                     zipOutputStream.putNextEntry(entry)
-                                    zipOutputStream.write(tempPdf.readBytes())
+                                    // Guard: Stream tempPdf to zipOutputStream to prevent high heap byte array allocation and OOM on low-memory devices
+                                    tempPdf.inputStream().use { input ->
+                                        input.copyTo(zipOutputStream)
+                                    }
                                     zipOutputStream.closeEntry()
                                 } finally {
                                     // Guard: Ensure temporary PDF file in cacheDir is deleted even if zip write throws an exception to prevent cache leak

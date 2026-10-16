@@ -139,15 +139,13 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             val activeWindowStart = now.minusHours(24)
             val activeWindowEnd = limitTime.plusDays(1)
 
-            // Guard: Only cancel alarms within the active window; looping over months of past history triggers thousands of redundant Binder IPC calls
+            // Guard: Only cancel slot alarms within active window; preserve active snoozes and nagging reminders so rebuilding alarms does not wipe out active snooze timers
             val entriesToCancel = allEntries.filter { entry ->
                 entry.scheduledDateTime.isAfter(activeWindowStart) &&
                 entry.scheduledDateTime.isBefore(activeWindowEnd)
             }
             entriesToCancel.forEach { entry ->
                 alarmScheduler.cancelAlarm(entry.entryId)
-                alarmScheduler.cancelSnooze(entry.entryId)
-                alarmScheduler.cancelNagging(entry.entryId)
                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
             }
 

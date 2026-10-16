@@ -51,6 +51,10 @@ object AlarmAudioPlayer {
                     stop()
                     AlarmActivity.stopActiveAlarm()
                 }
+            } else if (autoSilenceSeconds == 0) {
+                // Guard: Cancel auto-silence job if incoming alarm specifies continuous loop playback so prior single-play timeout does not kill alarm
+                autoSilenceJob?.cancel()
+                autoSilenceJob = null
             }
             return
         }

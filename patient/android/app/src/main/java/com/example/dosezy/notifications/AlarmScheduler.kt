@@ -224,12 +224,31 @@ class AlarmScheduler(private val context: Context) {
         pendingIntent.cancel()
         Log.d(TAG, "Cancelled alarm for entry: $entryId")
 
-        if (userId != null && scheduledDateTime != null) {
-            cancelSlotAlarm(userId, scheduledDateTime)
+        var resolvedUserId = userId
+        var resolvedDateTime = scheduledDateTime
+
+        // Guard: Resolve userId and scheduledDateTime from database if omitted to ensure slot alarm is unhooked
+        if (resolvedUserId == null || resolvedDateTime == null) {
+            try {
+                val db = com.example.dosezy.data.DosezyDatabase.getInstance(context)
+                val entry = kotlinx.coroutines.runBlocking {
+                    kotlinx.coroutines.withTimeoutOrNull(500L) {
+                        db.scheduleDao().getScheduleEntryById(entryId)
+                    }
+                }
+                if (entry != null) {
+                    if (resolvedUserId == null) resolvedUserId = entry.userId
+                    if (resolvedDateTime == null) resolvedDateTime = entry.scheduledDateTime
+                }
+            } catch (_: Exception) {}
+        }
+
+        if (resolvedUserId != null && resolvedDateTime != null) {
+            cancelSlotAlarm(resolvedUserId, resolvedDateTime)
         } else {
             val parsed = com.example.dosezy.data.repository.ScheduleRepository.parseDateTimeFromEntryId(entryId)
-            if (parsed != null && userId != null) {
-                cancelSlotAlarm(userId, parsed)
+            if (parsed != null && resolvedUserId != null) {
+                cancelSlotAlarm(resolvedUserId, parsed)
             }
         }
     }
