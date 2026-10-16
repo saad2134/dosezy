@@ -8,6 +8,7 @@ import androidx.room.withTransaction
 import com.example.dosezy.data.DosezyDatabase
 import com.example.dosezy.data.model.*
 import com.example.dosezy.data.repository.ScheduleRepository
+import com.example.dosezy.utils.SoundUtils
 import com.google.gson.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -133,6 +134,19 @@ class BackupRestoreManager(
                     if (picFile.exists()) {
                         zos.putNextEntry(ZipEntry("$profileDir/avatar.jpg"))
                         picFile.inputStream().use { it.copyTo(zos) }
+                        zos.closeEntry()
+                    }
+                }
+
+                // Custom alarm sound asset if available
+                // Guard: Package custom alarm sound file into backup zip so custom ringtone audio is preserved across device migration
+                user.customAlarmSoundPath?.let { soundPath ->
+                    val cleanPath = soundPath.removePrefix("file://")
+                    val soundFile = File(cleanPath)
+                    if (soundFile.exists()) {
+                        val ext = soundFile.extension.ifEmpty { "mp3" }
+                        zos.putNextEntry(ZipEntry("$profileDir/custom_alarm.$ext"))
+                        soundFile.inputStream().use { it.copyTo(zos) }
                         zos.closeEntry()
                     }
                 }
@@ -335,11 +349,32 @@ class BackupRestoreManager(
                             targetAvatar.absolutePath
                         } else null
 
+                        val soundAssetFile = pDir.listFiles { f -> f.isFile && f.name.startsWith("custom_alarm.") }?.firstOrNull()
+                        // Guard: Unpack custom alarm sound into internal storage and update path, or fallback to SYSTEM_DEFAULT if asset is missing
+                        val finalSoundPath = if (soundAssetFile != null && soundAssetFile.exists()) {
+                            val soundDir = File(context.filesDir, "custom_sounds")
+                            soundDir.mkdirs()
+                            val ext = soundAssetFile.extension.ifEmpty { "mp3" }
+                            val targetSound = File(soundDir, "custom_alarm_${System.currentTimeMillis()}_${newUserId.take(8)}.$ext")
+                            soundAssetFile.copyTo(targetSound, overwrite = true)
+                            targetSound.absolutePath
+                        } else null
+
+                        val resolvedAlarmSound = if (finalSoundPath != null) {
+                            originalUser.alarmSound
+                        } else if (originalUser.alarmSound == AlarmSound.CUSTOM) {
+                            AlarmSound.SYSTEM_DEFAULT
+                        } else {
+                            originalUser.alarmSound
+                        }
+
                         val existingUsers = database.userDao().getAllUsersDirect()
                         val newUser = originalUser.copy(
                             userId = newUserId,
                             fullName = newName,
                             profilePicPath = finalPicPath,
+                            customAlarmSoundPath = finalSoundPath,
+                            alarmSound = resolvedAlarmSound,
                             isCurrentUser = (existingUsers.isEmpty() && totalProfiles == 0)
                         )
 
@@ -443,9 +478,34 @@ class BackupRestoreManager(
                             targetAvatar.absolutePath
                         } else existingLocalUser?.profilePicPath?.takeIf { File(it.removePrefix("file://")).exists() }
 
+                        val soundAssetFile = pDir.listFiles { f -> f.isFile && f.name.startsWith("custom_alarm.") }?.firstOrNull()
+                        // Guard: Unpack backup custom alarm sound or fall back to valid local sound, and delete overwritten old sound file
+                        val finalSoundPath = if (soundAssetFile != null && soundAssetFile.exists()) {
+                            val soundDir = File(context.filesDir, "custom_sounds")
+                            soundDir.mkdirs()
+                            val ext = soundAssetFile.extension.ifEmpty { "mp3" }
+                            val targetSound = File(soundDir, "custom_alarm_${System.currentTimeMillis()}_${targetUserId.take(8)}.$ext")
+                            soundAssetFile.copyTo(targetSound, overwrite = true)
+                            targetSound.absolutePath
+                        } else existingLocalUser?.customAlarmSoundPath?.takeIf { File(it.removePrefix("file://")).exists() }
+
+                        if (existingLocalUser?.customAlarmSoundPath != null && existingLocalUser.customAlarmSoundPath != finalSoundPath) {
+                            SoundUtils.deleteCustomAudio(context, existingLocalUser.customAlarmSoundPath)
+                        }
+
+                        val resolvedAlarmSound = if (finalSoundPath != null) {
+                            originalUser.alarmSound
+                        } else if (originalUser.alarmSound == AlarmSound.CUSTOM) {
+                            AlarmSound.SYSTEM_DEFAULT
+                        } else {
+                            originalUser.alarmSound
+                        }
+
                         val restoredUser = originalUser.copy(
                             userId = targetUserId,
                             profilePicPath = finalPicPath,
+                            customAlarmSoundPath = finalSoundPath,
+                            alarmSound = resolvedAlarmSound,
                             isCurrentUser = shouldBeCurrent
                         )
 

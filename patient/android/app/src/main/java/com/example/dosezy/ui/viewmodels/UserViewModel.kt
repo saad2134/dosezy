@@ -247,6 +247,9 @@ class UserViewModel @Inject constructor(
                         } catch (_: Exception) {}
                     }
 
+                    // Guard: Unlink custom alarm sound from internal storage upon profile deletion to prevent disk leakage
+                    com.example.dosezy.utils.SoundUtils.deleteCustomAudio(context, user.customAlarmSoundPath)
+
                     // Clean up associated medicine images before database cascade deletion
                     try {
                         val meds = medicineRepository.getMedicinesByUserDirect(user.userId)

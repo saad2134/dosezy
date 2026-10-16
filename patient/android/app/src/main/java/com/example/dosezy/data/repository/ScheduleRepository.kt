@@ -323,7 +323,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
                     // Trigger refill warning notification when crossing threshold boundary or running out
                     val threshold = medicine.refillThreshold
-                    val shouldNotifyRefill = threshold != null && ((medicine.currentStock > threshold && newStock <= threshold) || (medicine.currentStock > 0 && newStock == 0))
+                    // Guard: Check medicine.currentStock >= threshold and currentStock > newStock to catch boundary crossings when initial stock equals threshold
+                    val shouldNotifyRefill = threshold != null && ((medicine.currentStock >= threshold && newStock <= threshold && medicine.currentStock > newStock) || (medicine.currentStock > 0 && newStock == 0))
                     if (context != null && shouldNotifyRefill) {
                         // Guard: Ensure notification channels are registered before posting refill alerts to prevent Android 8.0+ (API 26+) from dropping notifications
                         com.example.dosezy.notifications.MedicineAlarmReceiver.createNotificationChannels(context)
@@ -419,11 +420,21 @@ class ScheduleRepository(private val database: DosezyDatabase) {
     ) {
         val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
 
-        // Cancel armed snooze and nagging alarms so taking in-app prevents phantom alarms from ringing later
+        // Cancel armed snooze, nagging, and intake safeguard alarms so taking in-app prevents phantom alarms from ringing later
         try {
             val alarmScheduler = AlarmScheduler(context)
             alarmScheduler.cancelSnooze(entryId)
             alarmScheduler.cancelNagging(entryId)
+            // Guard: Cancel intake safeguard re-alert alarm for this entry to prevent sounding alarm after dose was taken (#104)
+            alarmScheduler.cancelIntakeSafeguardAlarm(entryId)
+        } catch (_: Exception) {}
+
+        // Guard: Reconcile and dismiss active ADHD intake countdown notification if confirmed entry matches active countdown
+        try {
+            val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
+            if (activeCountdown != null && (activeCountdown.entryId == entryId || activeCountdown.entryIds.contains(entryId))) {
+                com.example.dosezy.notifications.IntakeSafeguardManager.cancelCountdown(context)
+            }
         } catch (_: Exception) {}
 
         if (nManager != null) {
@@ -595,7 +606,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             }
 
             val threshold = freshMedicine.refillThreshold
-            val shouldNotifyRefill = threshold != null && ((freshMedicine.currentStock > threshold && newStock <= threshold) || (freshMedicine.currentStock > 0 && newStock == 0))
+            // Guard: Check freshMedicine.currentStock >= threshold and currentStock > newStock to catch boundary crossings when initial stock equals threshold
+            val shouldNotifyRefill = threshold != null && ((freshMedicine.currentStock >= threshold && newStock <= threshold && freshMedicine.currentStock > newStock) || (freshMedicine.currentStock > 0 && newStock == 0))
             if (context != null && shouldNotifyRefill) {
                 // Guard: Ensure notification channels are registered before posting refill alerts to prevent Android 8.0+ (API 26+) from dropping notifications
                 com.example.dosezy.notifications.MedicineAlarmReceiver.createNotificationChannels(context)

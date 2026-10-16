@@ -318,6 +318,10 @@ fun PreferencesScreen(navController: NavController) {
                 customSoundPath = currentUser?.customAlarmSoundPath,
                 onSoundSelected = { newSound, customPath, customTitle ->
                     currentUser?.let { user ->
+                        // Guard: Delete previous custom alarm sound file when replaced by a new custom sound to prevent disk storage leaks
+                        if (customPath != null && customPath != user.customAlarmSoundPath) {
+                            com.example.dosezy.utils.SoundUtils.deleteCustomAudio(context, user.customAlarmSoundPath)
+                        }
                         userViewModel.updateUser(
                             user.copy(
                                 alarmSound = newSound,

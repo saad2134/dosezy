@@ -203,7 +203,7 @@ fun ProfilePicturePicker(
                     .align(Alignment.TopEnd)
                     .size(36.dp)
                     .clickable { 
-                        deleteOldImage(profilePicPath)
+                        deleteOldImage(context, profilePicPath)
                         onProfilePictureSelected(null) 
                     }
             ) {
@@ -403,12 +403,19 @@ private fun saveImageToInternalStorage(context: Context, uri: Uri, oldPath: Stri
     }
 }
 
-private fun deleteOldImage(path: String) {
+// Guard: Validate canonicalPath against context.filesDir and context.cacheDir to prevent path traversal and arbitrary sandbox file deletion
+private fun deleteOldImage(context: Context, path: String) {
     try {
         // Guard: Strip file:// prefix so File() can locate the file on disk without FileNotFoundException
         val cleanPath = path.removePrefix("file://")
         val file = File(cleanPath)
-        if (file.exists()) {
+        val filesDir = context.filesDir
+        val cacheDir = context.cacheDir
+        val isWithinFilesDir = file.parentFile?.canonicalPath == filesDir.canonicalPath ||
+                file.canonicalPath.startsWith(filesDir.canonicalPath + File.separator)
+        val isWithinCacheDir = file.parentFile?.canonicalPath == cacheDir.canonicalPath ||
+                file.canonicalPath.startsWith(cacheDir.canonicalPath + File.separator)
+        if (file.exists() && (isWithinFilesDir || isWithinCacheDir)) {
             val deleted = file.delete()
             Log.d("ProfilePicturePicker", "Deleted image: $cleanPath, success=$deleted")
         }
@@ -554,7 +561,7 @@ fun MedicinePhotoVisualPicker(
                     .align(Alignment.TopEnd)
                     .size(32.dp)
                     .clickable {
-                        deleteOldImage(imagePath)
+                        deleteOldImage(context, imagePath)
                         onImageSelected(null)
                     }
             ) {

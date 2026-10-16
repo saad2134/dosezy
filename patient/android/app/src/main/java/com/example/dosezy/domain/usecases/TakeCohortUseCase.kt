@@ -50,8 +50,18 @@ class TakeCohortUseCase @Inject constructor(
         entryIds.forEach { id ->
             alarmScheduler.cancelNagging(id)
             alarmScheduler.cancelSnooze(id)
+            // Guard: Cancel active intake safeguard alarm for each entry to prevent orphaned re-alerts after taking dose (#104)
+            alarmScheduler.cancelIntakeSafeguardAlarm(id)
             notificationManager?.cancel(id.hashCode())
         }
+
+        // Guard: Reconcile and dismiss active ADHD intake countdown notification if confirmed entries match active countdown
+        try {
+            val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
+            if (activeCountdown != null && (entryIds.contains(activeCountdown.entryId) || activeCountdown.entryIds.any { entryIds.contains(it) })) {
+                com.example.dosezy.notifications.IntakeSafeguardManager.cancelCountdown(context)
+            }
+        } catch (_: Exception) {}
 
         entryIds.forEach { id ->
             val entry = database.scheduleDao().getScheduleEntryById(id)
