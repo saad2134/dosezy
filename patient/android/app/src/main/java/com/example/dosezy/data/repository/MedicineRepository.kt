@@ -241,9 +241,14 @@ class MedicineRepository @Inject constructor(
             // Guard: Delegate to deleteMedicinePermanently to ensure alarms are rescheduled for remaining sibling medications
             deleteMedicinePermanently(med)
         } else {
-            // Guard: Cancel alarms, clean up orphaned entries, and reschedule remaining alarms
+            // Guard: Retrieve userId from orphaned entries to reschedule sibling alarms for shared time slots before deleting
+            val orphanedEntries = database.scheduleDao().getScheduleEntriesByMedicine(medicineId)
+            val affectedUserId = orphanedEntries.firstOrNull()?.userId
             scheduleRepository.cancelAlarmsForMedicine(medicineId, context)
             database.scheduleDao().deleteScheduleEntriesByMedicine(medicineId)
+            if (affectedUserId != null) {
+                scheduleRepository.rescheduleAllAlarms(affectedUserId, context)
+            }
         }
     }
 }

@@ -152,7 +152,8 @@ object ScheduleRecurrenceEngine {
                 val interval = (medicine.frequency.intervalDays ?: 2).coerceAtLeast(1)
                 val baseDate = medicine.startDate ?: LocalDate.of(2020, 1, 1)
                 val daysDiff = ChronoUnit.DAYS.between(baseDate, date)
-                daysDiff % interval == 0L
+                // Guard: Use Math.floorMod so negative day differences symmetrically follow the interval pattern
+                Math.floorMod(daysDiff, interval.toLong()) == 0L
             }
             FrequencyPattern.WEEKLY -> {
                 val selectedDays = medicine.frequency.selectedDaysOfWeek
@@ -186,7 +187,8 @@ object ScheduleRecurrenceEngine {
                 val baseMonday = baseDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
                 val dateMonday = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
                 val weeksDiff = ChronoUnit.WEEKS.between(baseMonday, dateMonday)
-                val isIntervalWeek = weeksDiff >= 0 && (weeksDiff % intervalWks == 0L)
+                // Guard: Use Math.floorMod so negative week offsets symmetrically follow the multi-week interval cycle
+                val isIntervalWeek = Math.floorMod(weeksDiff, intervalWks.toLong()) == 0L
 
                 val selectedDays = medicine.frequency.selectedDaysOfWeek
                 val isDayMatch = if (!selectedDays.isNullOrEmpty()) {

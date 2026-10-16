@@ -254,10 +254,15 @@ class UserViewModel @Inject constructor(
                     // Delete the user from DB (cascades to medicines & schedules)
                     userRepository.deleteUser(user)
 
-                    // Guard: Scrub orphaned emergency contacts and widget profile preferences for the deleted profile to prevent SharedPreferences leakage
+                    // Guard: Scrub orphaned emergency contacts, emergency preferences, and widget profile preferences for the deleted profile to prevent SharedPreferences leakage
                     try {
                         val emPrefs = context.getSharedPreferences("emergency_contacts", android.content.Context.MODE_PRIVATE)
                         emPrefs.edit().remove("contacts_json_${user.userId}").apply()
+                    } catch (_: Exception) {}
+
+                    try {
+                        val emergencyPrefs = context.getSharedPreferences("emergency_prefs", android.content.Context.MODE_PRIVATE)
+                        emergencyPrefs.edit().remove("selected_country_code_${user.userId}").apply()
                     } catch (_: Exception) {}
 
                     try {

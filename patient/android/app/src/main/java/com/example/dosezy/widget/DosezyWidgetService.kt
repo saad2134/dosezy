@@ -146,8 +146,10 @@ class DosezyRemoteViewsFactory(
         views.setTextViewText(R.id.widget_item_dose, item.doseLabel)
 
         // Fill-in intent for item click
+        // Guard: Pass fragment=schedule so tapping an item navigates directly to the Schedule tab in MainActivity
         val fillInIntent = Intent().apply {
             putExtra("switch_to_user_id", item.userId)
+            putExtra("fragment", "schedule")
         }
         views.setOnClickFillInIntent(R.id.widget_item_root, fillInIntent)
 

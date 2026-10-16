@@ -369,7 +369,7 @@ class BackupRestoreManager(
                         val newSchedules = schedules.mapNotNull { sch ->
                             val newMedId = medIdMap[sch.medicineId] ?: return@mapNotNull null
                             sch.copy(
-                                entryId = UUID.randomUUID().toString(),
+                                entryId = createRestoredEntryId(newMedId, sch.entryId, sch.scheduledDateTime),
                                 userId = newUserId,
                                 medicineId = newMedId
                             )
@@ -463,11 +463,11 @@ class BackupRestoreManager(
                             restoredMedicines.add(restoredMed)
                         }
 
-                        // Guard: Map schedule entries to remapped medicine IDs, generate fresh entryIds, and filter out orphaned schedules referencing missing medicines to prevent ForeignKey constraint failures
+                        // Guard: Map schedule entries to remapped medicine IDs, generate deterministic entryIds, and filter out orphaned schedules referencing missing medicines to prevent ForeignKey constraint failures
                         val restoredSchedules = schedules.mapNotNull { sch ->
                             val mappedMedId = medIdMap[sch.medicineId] ?: return@mapNotNull null
                             sch.copy(
-                                entryId = UUID.randomUUID().toString(),
+                                entryId = createRestoredEntryId(mappedMedId, sch.entryId, sch.scheduledDateTime),
                                 userId = targetUserId,
                                 medicineId = mappedMedId
                             )
@@ -550,7 +550,7 @@ class BackupRestoreManager(
                             if (!duplicate) {
                                 mergedSchedules.add(
                                     sch.copy(
-                                        entryId = UUID.randomUUID().toString(),
+                                        entryId = createRestoredEntryId(mappedMedId, sch.entryId, sch.scheduledDateTime),
                                         userId = targetUserId,
                                         medicineId = mappedMedId
                                     )
@@ -836,5 +836,16 @@ class BackupRestoreManager(
             list.add(entry)
         }
         return list
+    }
+
+    // Guard: Generate deterministic entryId formatted as <medicineId>_YYYY_MM_DD_HH_MM so AlarmScheduler and ScheduleRepository can extract timestamps without blocking DB queries
+    private fun createRestoredEntryId(medicineId: String, originalEntryId: String, scheduledDateTime: LocalDateTime): String {
+        return if (originalEntryId.startsWith("PRN_")) {
+            "PRN_${UUID.randomUUID()}"
+        } else {
+            val datePart = scheduledDateTime.toLocalDate().toString().replace("-", "_")
+            val timePart = scheduledDateTime.toLocalTime().withSecond(0).withNano(0).toString().replace(":", "_")
+            "${medicineId}_${datePart}_${timePart}"
+        }
     }
 }
