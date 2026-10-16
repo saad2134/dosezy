@@ -40,6 +40,8 @@ class NotificationActionReceiver : BroadcastReceiver() {
                         try {
                             com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
                         } catch (_: Exception) {}
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error handling intake confirmation", e)
                     } finally {
                         pendingResult?.finish()
                     }
@@ -66,6 +68,8 @@ class NotificationActionReceiver : BroadcastReceiver() {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     handleAction(context, action, allIds, entryId ?: allIds.first(), intent)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error handling notification action", e)
                 } finally {
                     pendingResult?.finish()
                 }
