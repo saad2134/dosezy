@@ -131,7 +131,8 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
 
                     // Header click opens MainActivity (switches to bound profile if specific)
                     val clickIntent = Intent(context, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        // Guard: Use SINGLE_TOP to bring existing instance to foreground without destroying in-progress UI state
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                         if (targetUserId != DosezyWidgetPrefs.ACTIVE_PROFILE_ID && user != null) {
                             putExtra("switch_to_user_id", user.userId)
                         }
@@ -157,7 +158,8 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
 
                     // Template PendingIntent for items in the scrollable ListView
                     val itemClickIntent = Intent(context, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        // Guard: Use SINGLE_TOP to bring existing instance to foreground and deliver extras to onNewIntent without wiping task state
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                     }
                     val itemPendingIntent = PendingIntent.getActivity(
                         context,

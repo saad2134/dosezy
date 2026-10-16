@@ -162,6 +162,18 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             val medicineNames = intent.getStringArrayListExtra(EXTRA_MEDICINE_NAMES)
             val scheduledTime = intent.getStringExtra(EXTRA_SCHEDULED_TIME)
             if (entryId != null) {
+                // Guard: Hold goAsync() and WakeLock for intake safeguard expiration to prevent device sleep before re-alert completes
+                val pendingResult = try { goAsync() } catch (_: Exception) { null }
+                val powerManager = context.getSystemService(Context.POWER_SERVICE) as? android.os.PowerManager
+                @Suppress("DEPRECATION")
+                val wakeLock = powerManager?.newWakeLock(
+                    android.os.PowerManager.PARTIAL_WAKE_LOCK or
+                            android.os.PowerManager.ACQUIRE_CAUSES_WAKEUP or
+                            android.os.PowerManager.ON_AFTER_RELEASE,
+                    "Dosezy:IntakeSafeguardWakeLock"
+                )
+                wakeLock?.acquire(30 * 1000L) // 30 seconds
+
                 Log.d(TAG, "Intake safeguard expired broadcast received for entry: $entryId")
                 IntakeSafeguardManager.handleCountdownExpired(
                     context = context,
@@ -169,7 +181,13 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                     medicineName = medicineName,
                     entryIds = entryIds,
                     medicineNames = medicineNames,
-                    scheduledTime = scheduledTime
+                    scheduledTime = scheduledTime,
+                    onComplete = {
+                        try {
+                            wakeLock?.let { if (it.isHeld) it.release() }
+                        } catch (_: Exception) {}
+                        pendingResult?.finish()
+                    }
                 )
             }
             return

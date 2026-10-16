@@ -31,7 +31,8 @@ class GenerateSchedulesUseCase @Inject constructor(
 
     suspend fun autoExtendSchedules(userId: String) {
         try {
-            val medicines = database.medicineDao().getActiveMedicinesByUser(userId).first()
+            // Guard: Use getActiveMedicinesByUserDirect to avoid Flow InvalidationTracker observer overhead in autoExtendSchedules
+            val medicines = database.medicineDao().getActiveMedicinesByUserDirect(userId)
             medicines.forEach { medicine ->
                 // Guard: Skip expired finite medications whose endDate is in the past to prevent redundant SQLite queries and recalculations
                 if (medicine.endDate != null && medicine.endDate.isBefore(LocalDate.now())) {

@@ -236,9 +236,9 @@ class ScheduleRepository(private val database: DosezyDatabase) {
     fun getScheduleForUser(userId: String): Flow<List<ScheduleEntry>> =
         database.scheduleDao().getScheduleForUser(userId)
 
-    // method to get schedules as list (not Flow)
+    // Guard: Use getAllScheduleEntries to execute one-shot query directly without InvalidationTracker Flow observer overhead
     suspend fun getSchedulesByUserSync(userId: String): List<ScheduleEntry> =
-        database.scheduleDao().getScheduleForUser(userId).first()
+        database.scheduleDao().getAllScheduleEntries(userId)
 
     suspend fun insertScheduleEntry(entry: ScheduleEntry) =
         database.scheduleDao().insertScheduleEntry(entry)

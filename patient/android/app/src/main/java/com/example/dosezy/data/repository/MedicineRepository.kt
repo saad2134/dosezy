@@ -37,9 +37,9 @@ class MedicineRepository @Inject constructor(
     fun getArchivedMedicinesByUser(userId: String): Flow<List<Medicine>> =
         database.medicineDao().getArchivedMedicinesByUser(userId)
 
-    // Get active medicines as list (not Flow)
+    // Guard: Use getActiveMedicinesByUserDirect to execute one-shot query without InvalidationTracker Flow observer overhead
     suspend fun getMedicinesByUserSync(userId: String): List<Medicine> =
-        database.medicineDao().getActiveMedicinesByUser(userId).first()
+        database.medicineDao().getActiveMedicinesByUserDirect(userId)
 
     // Get all medicines (active + archived) directly for cleanup / export
     suspend fun getMedicinesByUserDirect(userId: String): List<Medicine> =

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2026 Saad <reach.saad@outlook.com> (@saad2134)
  * Licensed under the MIT License. See LICENSE in the project root for license information.
  */
@@ -346,5 +346,32 @@ class IntakeSafeguardManagerLifecycleTest {
         dispatchTake(entryId = "e1", intakeSafeguardEnabled = false, allowCustomDoseTime = false)
         assertFalse(countdownStarted)
         assertTrue("Immediate take MUST execute when safeguard is disabled", immediateTakeExecuted)
+    }
+
+    @Test
+    fun testHandleCountdownExpired_invokesOnCompleteCallback() {
+        val entryId = "entry_expired_test"
+        var onCompleteCalled = false
+
+        IntakeSafeguardManager.handleCountdownExpired(
+            context = context,
+            entryId = entryId,
+            medicineName = "Test Med",
+            entryIds = listOf(entryId),
+            medicineNames = listOf("Test Med"),
+            scheduledTime = "08:00 AM",
+            onComplete = {
+                onCompleteCalled = true
+            }
+        )
+
+        val deadline = System.currentTimeMillis() + 3000
+        while (!onCompleteCalled && System.currentTimeMillis() < deadline) {
+            org.robolectric.shadows.ShadowLooper.idleMainLooper()
+            Thread.sleep(20)
+        }
+
+        assertTrue("onComplete must be invoked when handleCountdownExpired executes", onCompleteCalled)
+        assertNull("Active countdown state must be cleared", IntakeSafeguardManager.activeCountdown.value)
     }
 }

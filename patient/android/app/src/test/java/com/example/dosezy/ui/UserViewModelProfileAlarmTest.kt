@@ -1,4 +1,4 @@
-﻿package com.example.dosezy.ui
+package com.example.dosezy.ui
 
 import android.content.Context
 import androidx.room.Room
@@ -147,6 +147,41 @@ class UserViewModelProfileAlarmTest {
         assertEquals(1, remainingUsers.size)
         assertEquals(testUser.userId, remainingUsers.first().userId)
         assertTrue("Remaining user should now be promoted to current user", remainingUsers.first().isCurrentUser)
+    }
+
+    @Test
+    fun testDeleteUser_invokesOnNextUserSelected_whenDeletingNonCurrentUser() = runTest(testDispatcher) {
+        val secondUser = User(
+            userId = "user_audit9_second_callback",
+            fullName = "Second User",
+            age = 25,
+            gender = Gender.MALE,
+            contactNumber = "+1234567890",
+            isCurrentUser = false
+        )
+        val userViewModel = UserViewModel(userRepository, medicineRepository, scheduleRepository, medicineNotificationManager)
+
+        userViewModel.addUser(testUser)
+        awaitCondition { userRepository.getUserByIdSync(testUser.userId) != null }
+
+        userViewModel.addUser(secondUser)
+        awaitCondition { userRepository.getUserByIdSync(secondUser.userId) != null }
+
+        var callbackInvoked = false
+        var selectedUserAfterDelete: User? = null
+
+        // Delete non-current user (secondUser) while testUser is currently active
+        userViewModel.deleteUser(secondUser) { nextUser ->
+            callbackInvoked = true
+            selectedUserAfterDelete = nextUser
+        }
+
+        awaitCondition { callbackInvoked }
+
+        assertTrue("Callback must be invoked when deleting non-current user", callbackInvoked)
+        assertNotNull("Selected user should not be null", selectedUserAfterDelete)
+        assertEquals(testUser.userId, selectedUserAfterDelete?.userId)
+        assertTrue("Selected user should remain the active current user", selectedUserAfterDelete?.isCurrentUser == true)
     }
 
     @Test

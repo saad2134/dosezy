@@ -195,7 +195,8 @@ object IntakeSafeguardManager {
         medicineName: String,
         entryIds: List<String>?,
         medicineNames: List<String>?,
-        scheduledTime: String?
+        scheduledTime: String?,
+        onComplete: (() -> Unit)? = null
     ) {
         dismissIntakeNotification(context, entryId)
         clearState(context)
@@ -224,6 +225,9 @@ object IntakeSafeguardManager {
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error handling expired intake safeguard", e)
+            } finally {
+                // Guard: Always invoke onComplete to release WakeLock and finish goAsync BroadcastReceiver lifecycle
+                onComplete?.invoke()
             }
         }
     }

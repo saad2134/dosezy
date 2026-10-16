@@ -298,6 +298,11 @@ class UserViewModel @Inject constructor(
                         try {
                             syncAppTheme("system")
                         } catch (_: Exception) {}
+                    } else {
+                        // Guard: When deleting a secondary profile, notify completion with the unchanged active current profile
+                        withContext(Dispatchers.Main) {
+                            onNextUserSelected?.invoke(_currentUser.value)
+                        }
                     }
 
                     try {

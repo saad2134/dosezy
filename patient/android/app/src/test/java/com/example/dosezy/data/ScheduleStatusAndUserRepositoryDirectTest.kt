@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2026 Saad <reach.saad@outlook.com> (@saad2134)
  * Licensed under the MIT License. See LICENSE in the project root for license information.
  */
@@ -364,5 +364,39 @@ class ScheduleStatusAndUserRepositoryDirectTest {
 
         assertTrue("Callback should be invoked within timeout", completed)
         assertTrue("Callback must be dispatched on main looper", callbackInvokedOnMainLooper)
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // Bug 6: MedicineDao.getActiveMedicinesByUserDirect and Sync Lookups Without Flow Overhead
+    // ---------------------------------------------------------------------------------------------
+
+    @Test
+    fun medicineDao_getActiveMedicinesByUserDirect_filtersArchivedAndReturnsDirectList() = runBlocking {
+        val user = sampleUser("user_direct_meds")
+        userDao.insertUser(user)
+
+        val activeMed = sampleMedicine("med_active", "user_direct_meds").copy(isArchived = false)
+        val archivedMed = sampleMedicine("med_archived", "user_direct_meds").copy(isArchived = true)
+        medicineDao.insertMedicine(activeMed)
+        medicineDao.insertMedicine(archivedMed)
+
+        // 1. Verify MedicineDao.getActiveMedicinesByUserDirect excludes archived medications
+        val activeMeds = medicineDao.getActiveMedicinesByUserDirect("user_direct_meds")
+        assertEquals(1, activeMeds.size)
+        assertEquals("med_active", activeMeds.first().medicineId)
+
+        // 2. Verify MedicineRepository.getMedicinesByUserSync uses direct query
+        val scheduleRepository = com.example.dosezy.data.repository.ScheduleRepository(db)
+        val medicineRepository = com.example.dosezy.data.repository.MedicineRepository(db, scheduleRepository, context)
+        val syncMeds = medicineRepository.getMedicinesByUserSync("user_direct_meds")
+        assertEquals(1, syncMeds.size)
+        assertEquals("med_active", syncMeds.first().medicineId)
+
+        // 3. Verify GenerateSchedulesUseCase.autoExtendSchedules executes cleanly with direct query
+        generateSchedulesUseCase.autoExtendSchedules("user_direct_meds")
+
+        // 4. Verify ScheduleRepository.getSchedulesByUserSync returns direct list
+        val allSchedules = scheduleRepository.getSchedulesByUserSync("user_direct_meds")
+        assertNotNull(allSchedules)
     }
 }
