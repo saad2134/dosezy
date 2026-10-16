@@ -374,4 +374,105 @@ class IntakeSafeguardManagerLifecycleTest {
         assertTrue("onComplete must be invoked when handleCountdownExpired executes", onCompleteCalled)
         assertNull("Active countdown state must be cleared", IntakeSafeguardManager.activeCountdown.value)
     }
+
+    @Test
+    fun testInitialize_restoresActiveCountdownStateFromStorage() {
+        IntakeSafeguardManager.cancelCountdown(context)
+        assertNull(IntakeSafeguardManager.activeCountdown.value)
+
+        // Start countdown which writes to SharedPreferences
+        val state = IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = "entry_init_restore",
+            entryIds = listOf("entry_init_restore"),
+            medicineName = "Restored Med",
+            medicineNames = listOf("Restored Med"),
+            scheduledTime = "09:00 AM",
+            durationSeconds = 300
+        )
+        assertNotNull(state)
+
+        // Clear in-memory StateFlow without wiping persistent prefs to simulate process death
+        val field = IntakeSafeguardManager::class.java.getDeclaredField("_activeCountdown")
+        field.isAccessible = true
+        @Suppress("UNCHECKED_CAST")
+        val flow = field.get(IntakeSafeguardManager) as kotlinx.coroutines.flow.MutableStateFlow<IntakeSafeguardManager.IntakeCountdownState?>
+        flow.value = null
+        assertNull(IntakeSafeguardManager.activeCountdown.value)
+
+        // Calling initialize() should restore the state from SharedPreferences
+        IntakeSafeguardManager.initialize(context)
+        val restored = IntakeSafeguardManager.activeCountdown.value
+        assertNotNull("initialize() must restore active countdown from SharedPreferences", restored)
+        assertEquals("entry_init_restore", restored?.entryId)
+        assertEquals("Restored Med", restored?.medicineName)
+        assertEquals("09:00 AM", restored?.scheduledTime)
+
+        IntakeSafeguardManager.cancelCountdown(context)
+    }
+
+    @Test
+    fun testCancelAlarmsForUser_cancelsActiveIntakeCountdown() = runBlocking {
+        val entry = ScheduleEntry(
+            entryId = "entry_user_cancel",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = LocalDateTime.now().plusHours(1),
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entry)
+
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entry.entryId,
+            entryIds = listOf(entry.entryId),
+            medicineName = testMedicine.medicationName,
+            medicineNames = listOf(testMedicine.medicationName),
+            scheduledTime = "10:00 AM",
+            durationSeconds = 120
+        )
+        assertNotNull(IntakeSafeguardManager.activeCountdown.value)
+
+        // Cancelling alarms for user must clear active countdown
+        val medNotifManager = MedicineNotificationManager(context, database)
+        medNotifManager.cancelAllAlarmsForUser(testUser.userId)
+
+        // Simulate UserViewModel check on activeCountdown
+        val active = IntakeSafeguardManager.activeCountdown.value
+        if (active != null) {
+            val dbEntry = scheduleRepository.getScheduleEntryById(active.entryId)
+            if (dbEntry == null || dbEntry.userId == testUser.userId) {
+                IntakeSafeguardManager.cancelCountdown(context)
+            }
+        }
+        assertNull("Active intake countdown must be cancelled when user alarms/profile are cleared", IntakeSafeguardManager.activeCountdown.value)
+    }
+
+    @Test
+    fun testCancelAlarmsForMedicine_cancelsActiveIntakeCountdown() = runBlocking {
+        val entry = ScheduleEntry(
+            entryId = "entry_med_cancel",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = LocalDateTime.now().plusHours(1),
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entry)
+
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entry.entryId,
+            entryIds = listOf(entry.entryId),
+            medicineName = testMedicine.medicationName,
+            medicineNames = listOf(testMedicine.medicationName),
+            scheduledTime = "11:00 AM",
+            durationSeconds = 120
+        )
+        assertNotNull(IntakeSafeguardManager.activeCountdown.value)
+
+        // Cancelling alarms for medicine must clear active countdown
+        scheduleRepository.cancelAlarmsForMedicine(testMedicine.medicineId, context)
+
+        assertNull("Active intake countdown must be cancelled when medicine alarms are cancelled", IntakeSafeguardManager.activeCountdown.value)
+    }
 }

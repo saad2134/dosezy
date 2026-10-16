@@ -120,13 +120,23 @@ class NotificationActionReceiver : BroadcastReceiver() {
                         med?.medicationName
                     }
                     val primaryMedName = medicineNames.firstOrNull() ?: "Medicine"
+                    // Guard: Pass formatted scheduled time to IntakeSafeguardManager so safeguard notifications and expiry re-alerts display accurate time
+                    val is24 = user.timeFormat == com.example.dosezy.data.model.TimeFormat.HOUR_24 ||
+                            android.text.format.DateFormat.is24HourFormat(context)
+                    val timePattern = if (is24) "HH:mm" else "h:mm a"
+                    val savedLang = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+                    val locale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLang)
+                    val scheduledTimeStr = intent?.getStringExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME)
+                        ?.takeIf { it.isNotBlank() }
+                        ?: firstEntry?.scheduledDateTime?.let { it.format(java.time.format.DateTimeFormatter.ofPattern(timePattern, locale)) }
+                        ?: ""
                     IntakeSafeguardManager.startCountdown(
                         context = context,
                         entryId = primaryEntryId,
                         entryIds = allIds,
                         medicineName = primaryMedName,
                         medicineNames = medicineNames,
-                        scheduledTime = "",
+                        scheduledTime = scheduledTimeStr,
                         durationSeconds = user.intakeCountdownSeconds
                     )
                     Log.d(TAG, "Started intake countdown safeguard for ${allIds.size} medicines")

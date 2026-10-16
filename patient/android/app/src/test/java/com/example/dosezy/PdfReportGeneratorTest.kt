@@ -20,6 +20,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
@@ -124,5 +125,26 @@ class PdfReportGeneratorTest {
         assertEquals("Recent Dose History (150 entries)", generator.formatHistoryHeader(150))
         assertEquals("Recent Dose History (Latest 150 of 200 entries)", generator.formatHistoryHeader(200))
         assertEquals("Recent Dose History (Latest 150 of 850 entries)", generator.formatHistoryHeader(850))
+    }
+
+    @Test
+    fun testWrapTextToLines_wrapsLengthyAllergiesAndConditionsAcrossMultipleLines() {
+        val paint = android.graphics.Paint().apply { textSize = 10f }
+        val longAllergies = "Penicillin, Amoxicillin, Sulfa drugs, Peanuts, Latex, Aspirin, NSAIDs, Shellfish, Contrast dye, Tree nuts, ACE inhibitors"
+        // In Robolectric JVM environment without native font metrics, Paint.measureText defaults to string length
+        val wrappedLines = generator.wrapTextToLines("Allergies: ", longAllergies, paint, 35f)
+        assertTrue("Long allergies must be wrapped into multiple lines", wrappedLines.size > 1)
+        assertTrue("First line must start with prefix", wrappedLines.first().startsWith("Allergies: "))
+        assertTrue("All wrapped lines must fit within maxWidth", wrappedLines.all { paint.measureText(it) <= 35f })
+    }
+
+    @Test
+    fun testTruncateTextToWidth_truncatesLongDrugNamesWithEllipsis() {
+        val paint = android.graphics.Paint().apply { textSize = 10f }
+        val longMedName = "Amoxicillin and Clavulanate Potassium Extended Release Oral Suspension"
+        // In Robolectric JVM environment without native font metrics, Paint.measureText defaults to string length
+        val truncated = generator.truncateTextToWidth(longMedName, paint, 25f)
+        assertTrue("Truncated name must end with ellipsis", truncated.endsWith("..."))
+        assertTrue("Truncated text must fit within column maxWidth", paint.measureText(truncated) <= 25f)
     }
 }

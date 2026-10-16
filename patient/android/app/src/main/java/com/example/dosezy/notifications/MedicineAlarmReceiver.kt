@@ -362,7 +362,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
         createNotificationChannels(localizedContext)
 
-        val scheduledTimeStr = scheduledTime?.let {
+        // Guard: Check scheduledTime.isNotBlank() to prevent rendering empty 'Scheduled: ' label on safeguard re-alerts
+        val scheduledTimeStr = scheduledTime?.takeIf { it.isNotBlank() }?.let {
             localizedContext.getString(R.string.notif_content_scheduled_format, it)
         } ?: localizedContext.getString(R.string.notif_content_generic_reminder)
 
@@ -601,6 +602,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             }
 
             Log.d(TAG, "Successfully rescheduled alarms for ${allUsers.size} users after boot/timezone change")
+            // Guard: Reconcile in-progress ADHD intake countdown timer state after reboot or timezone change
+            IntakeSafeguardManager.initialize(context)
             com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
         } catch (e: Exception) {
             Log.e(TAG, "Error rescheduling alarms after boot/timezone change", e)

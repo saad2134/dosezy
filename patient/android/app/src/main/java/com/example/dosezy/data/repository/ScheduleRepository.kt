@@ -120,7 +120,16 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             alarmScheduler.cancelSnooze(entry.entryId)
             alarmScheduler.cancelNagging(entry.entryId)
             alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
+            // Guard: Cancel any active intake safeguard alarms for this entry to prevent orphaned re-alerts
+            alarmScheduler.cancelIntakeSafeguardAlarm(entry.entryId)
         }
+        // Guard: Dismiss active ADHD intake countdown notification if active countdown references deleted medicine
+        try {
+            val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
+            if (activeCountdown != null && (scheduleEntries.any { it.entryId == activeCountdown.entryId } || activeCountdown.entryIds.any { id -> scheduleEntries.any { it.entryId == id } })) {
+                com.example.dosezy.notifications.IntakeSafeguardManager.cancelCountdown(context)
+            }
+        } catch (_: Exception) {}
         Log.d(TAG, "Cancelled active alarms for medicine ID: $medicineId (${entriesToCancel.size} active entries)")
     }
 

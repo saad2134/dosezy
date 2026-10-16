@@ -224,6 +224,17 @@ class UserViewModel @Inject constructor(
                     // Guard: Cancel alarms across all supported versions (API 24+) to prevent orphaned alarms ringing after user deletion
                     medicineNotificationManager.cancelAllAlarmsForUser(user.userId)
 
+                    // Guard: Dismiss active ADHD intake countdown notification if active countdown belongs to deleted user
+                    try {
+                        val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
+                        if (activeCountdown != null) {
+                            val entry = scheduleRepository.getScheduleEntryById(activeCountdown.entryId)
+                            if (entry == null || entry.userId == user.userId) {
+                                com.example.dosezy.notifications.IntakeSafeguardManager.cancelCountdown(context)
+                            }
+                        }
+                    } catch (_: Exception) {}
+
                     // Delete user's profile picture from internal storage if it exists
                     user.profilePicPath?.let { path ->
                         try {

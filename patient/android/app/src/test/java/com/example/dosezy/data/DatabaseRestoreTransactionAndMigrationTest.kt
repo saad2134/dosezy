@@ -1,4 +1,4 @@
-﻿package com.example.dosezy.data
+package com.example.dosezy.data
 
 import android.content.Context
 import androidx.room.Room
@@ -35,6 +35,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -428,5 +429,104 @@ class DatabaseRestoreTransactionAndMigrationTest {
         assertTrue("Original medicines must be preserved by transaction rollback", remainingMeds.isNotEmpty())
         assertTrue("Original schedules must be preserved by transaction rollback", remainingSchedules.isNotEmpty())
         assertEquals("Restored Med", remainingMeds.first().medicationName)
+    }
+
+    @Test
+    fun testExecuteSelectiveRestore_overwriteDeletesOrphanedMedicineImageFilesAndCancelsSafeguard() = runBlocking {
+        // 1. Setup local user with medicine holding a file in context.filesDir
+        val localUser = User(
+            userId = "usr_img_clean",
+            fullName = "Old Image User",
+            age = 40,
+            gender = Gender.MALE,
+            contactNumber = "5551234567"
+        )
+        db.userDao().insertUser(localUser)
+
+        val medFolder = File(context.filesDir, "medicines/old_med_uuid")
+        medFolder.mkdirs()
+        val oldMedImage = File(medFolder, "image.jpg")
+        oldMedImage.writeText("fake image bytes")
+        assertTrue("Old medicine image must exist on disk before restore", oldMedImage.exists())
+
+        val localMed = Medicine(
+            medicineId = "old_med_uuid",
+            userId = localUser.userId,
+            medicationName = "Old Med With Photo",
+            dosage = 10.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            imageUri = "file://${oldMedImage.absolutePath}"
+        )
+        db.medicineDao().insertMedicine(localMed)
+
+        val localSchedule = ScheduleEntry(
+            entryId = "sch_img_safeguard",
+            userId = localUser.userId,
+            medicineId = localMed.medicineId,
+            scheduledDateTime = LocalDateTime.now().plusHours(2),
+            status = MedicationStatus.PENDING
+        )
+        db.scheduleDao().insertScheduleEntry(localSchedule)
+
+        // Start active intake safeguard for this entry
+        com.example.dosezy.notifications.IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = localSchedule.entryId,
+            entryIds = listOf(localSchedule.entryId),
+            medicineName = localMed.medicationName,
+            medicineNames = listOf(localMed.medicationName),
+            scheduledTime = "08:00 AM",
+            durationSeconds = 120
+        )
+        assertNotNull(com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value)
+
+        // 2. Prepare backup folder for overwrite with a different medicine (without reusing the old image)
+        val tempDir = File(context.cacheDir, "test_backup_img_${System.currentTimeMillis()}")
+        val profileFolder = File(tempDir, "profiles/backup_user_img")
+        profileFolder.mkdirs()
+
+        val backupUser = localUser.copy(fullName = "New Name User")
+        File(profileFolder, "profile.json").writeText(testGson.toJson(backupUser))
+
+        val newBackupMed = Medicine(
+            medicineId = "new_incoming_med",
+            userId = "backup_user_img",
+            medicationName = "New Fresh Med",
+            dosage = 20.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(10, 0))
+        )
+        File(profileFolder, "medicines.json").writeText(testGson.toJson(listOf(newBackupMed)))
+        File(profileFolder, "schedules.json").writeText(testGson.toJson(emptyList<ScheduleEntry>()))
+
+        val decision = ProfileImportDecision(
+            summary = ImportableProfileSummary(
+                originalUserId = "backup_user_img",
+                name = backupUser.fullName,
+                age = backupUser.age,
+                gender = backupUser.gender.name,
+                medicineCount = 1,
+                scheduleCount = 0,
+                avatarTempPath = null,
+                isConflict = true,
+                existingLocalUserId = localUser.userId,
+                profileFolder = profileFolder
+            ),
+            isSelected = true,
+            conflictStrategy = ConflictStrategy.OVERWRITE
+        )
+
+        // 3. Execute OVERWRITE restore
+        val result = backupManager.executeSelectiveRestore(tempDir, listOf(decision))
+        assertTrue(result.success)
+
+        // 4. Assert that old image file was deleted from disk and safeguard countdown was cancelled
+        assertFalse("Old medicine image file must be deleted on overwrite restore", oldMedImage.exists())
+        assertNull("Active safeguard countdown must be cancelled on overwrite restore", com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value)
     }
 }

@@ -100,6 +100,40 @@ class PdfReportGenerator(private val context: Context) {
 
     internal fun formatDiscontinuedMedicationsHeader(count: Int): String = "Discontinued Medications ($count)"
 
+    internal fun wrapTextToLines(prefix: String, fullText: String, paint: Paint, maxWidth: Float): List<String> {
+        val totalText = "$prefix$fullText"
+        if (paint.measureText(totalText) <= maxWidth) {
+            return listOf(totalText)
+        }
+        val lines = mutableListOf<String>()
+        val words = totalText.split(" ")
+        var currentLine = ""
+        for (w in words) {
+            val candidate = if (currentLine.isEmpty()) w else "$currentLine $w"
+            if (paint.measureText(candidate) <= maxWidth) {
+                currentLine = candidate
+            } else {
+                if (currentLine.isNotEmpty()) {
+                    lines.add(currentLine)
+                }
+                currentLine = w
+            }
+        }
+        if (currentLine.isNotEmpty()) {
+            lines.add(currentLine)
+        }
+        return lines
+    }
+
+    internal fun truncateTextToWidth(text: String, paint: Paint, maxWidth: Float): String {
+        if (paint.measureText(text) <= maxWidth) return text
+        var truncated = text
+        while (truncated.isNotEmpty() && paint.measureText("$truncated...") > maxWidth) {
+            truncated = truncated.dropLast(1)
+        }
+        return "$truncated..."
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun buildPdfDocument(user: User, medicines: List<Medicine>, schedules: List<ScheduleEntry>): PdfDocument {
         val pdfDocument = PdfDocument()
@@ -118,7 +152,7 @@ class PdfReportGenerator(private val context: Context) {
             textSize = 10f
         }
         val headerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.parseColor("#1F2937")
+            color = Color.parseColor("#111827")
             textSize = 12f
             isFakeBoldText = true
         }
@@ -188,14 +222,20 @@ class PdfReportGenerator(private val context: Context) {
         val allergiesText = if (!user.allergies.isNullOrBlank()) user.allergies else "None recorded"
         val conditionsText = if (!user.medicalConditions.isNullOrBlank()) user.medicalConditions else "None recorded"
 
-        if (!user.allergies.isNullOrBlank()) {
-            canvas.drawText("Allergies: $allergiesText", 40f, y, alertHeaderPaint)
-        } else {
-            canvas.drawText("Allergies: $allergiesText", 40f, y, textPaint)
+        fun drawWrappedLine(prefix: String, fullText: String, paint: Paint, maxWidth: Float, lineAdvance: Float) {
+            val lines = wrapTextToLines(prefix, fullText, paint, maxWidth)
+            lines.forEach { line ->
+                checkPageBreak(lineAdvance)
+                canvas.drawText(line, 40f, y, paint)
+                y += lineAdvance
+            }
         }
-        y += 15f
-        canvas.drawText("Chronic Conditions: $conditionsText", 40f, y, textPaint)
-        y += 18f
+
+        val allergyPaint = if (!user.allergies.isNullOrBlank()) alertHeaderPaint else textPaint
+        // Guard: Wrap lengthy patient allergy records and chronic conditions across lines to prevent off-page clipping
+        drawWrappedLine("Allergies: ", allergiesText, allergyPaint, 515f, 15f)
+        drawWrappedLine("Chronic Conditions: ", conditionsText, textPaint, 515f, 15f)
+        y += 3f
         canvas.drawLine(40f, y, 555f, y, linePaint)
         y += 20f
 
@@ -255,7 +295,9 @@ class PdfReportGenerator(private val context: Context) {
         subtitlePaint.isFakeBoldText = false
         activeMeds.forEach { med ->
             checkPageBreak(20f)
-            canvas.drawText(med.medicationName, 40f, y, textPaint)
+            // Guard: Truncate lengthy medication names to prevent overlapping adjacent Dosage column at 220f
+            val displayMed = truncateTextToWidth(med.medicationName, textPaint, 170f)
+            canvas.drawText(displayMed, 40f, y, textPaint)
             canvas.drawText("${med.dosage} ${med.dosageUnit}", 220f, y, textPaint)
             val freqLabel = med.getFrequencyDisplay()
             canvas.drawText(freqLabel, 360f, y, textPaint)
@@ -286,7 +328,9 @@ class PdfReportGenerator(private val context: Context) {
             subtitlePaint.isFakeBoldText = false
             archivedMeds.forEach { med ->
                 checkPageBreak(20f)
-                canvas.drawText(med.medicationName, 40f, y, textPaint)
+                // Guard: Truncate lengthy medication names to prevent overlapping adjacent Dosage column at 220f
+                val displayMed = truncateTextToWidth(med.medicationName, textPaint, 170f)
+                canvas.drawText(displayMed, 40f, y, textPaint)
                 canvas.drawText("${med.dosage} ${med.dosageUnit}", 220f, y, textPaint)
                 canvas.drawText("Discontinued", 360f, y, textPaint)
                 y += 16f

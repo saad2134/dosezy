@@ -239,13 +239,19 @@ fun HomeScreen(
         } else if (currentUser?.intakeSafeguardEnabled == true) {
             // Guard: Start intake countdown timer with re-alert safeguard for ADHD support (#104)
             val medName = target?.medicine?.medicationName ?: context.getString(R.string.form_med_name)
+            val is24 = currentUser?.timeFormat == com.example.dosezy.data.model.TimeFormat.HOUR_24 ||
+                android.text.format.DateFormat.is24HourFormat(context)
+            val timePattern = if (is24) "HH:mm" else "h:mm a"
+            val scheduledTimeStr = target?.scheduleEntry?.scheduledDateTime?.format(
+                java.time.format.DateTimeFormatter.ofPattern(timePattern, activeLocale)
+            ) ?: ""
             IntakeSafeguardManager.startCountdown(
                 context = context,
                 entryId = entryId,
                 entryIds = listOf(entryId),
                 medicineName = medName,
                 medicineNames = listOf(medName),
-                scheduledTime = "",
+                scheduledTime = scheduledTimeStr,
                 durationSeconds = currentUser?.intakeCountdownSeconds ?: 120
             )
         } else {
@@ -270,13 +276,19 @@ fun HomeScreen(
         } else if (currentUser?.intakeSafeguardEnabled == true) {
             // Guard: Start intake countdown timer with re-alert safeguard for ADHD support (#104)
             val medName = target?.medicine?.medicationName ?: context.getString(R.string.form_med_name)
+            val is24 = currentUser?.timeFormat == com.example.dosezy.data.model.TimeFormat.HOUR_24 ||
+                android.text.format.DateFormat.is24HourFormat(context)
+            val timePattern = if (is24) "HH:mm" else "h:mm a"
+            val scheduledTimeStr = target?.scheduleEntry?.scheduledDateTime?.format(
+                java.time.format.DateTimeFormatter.ofPattern(timePattern, activeLocale)
+            ) ?: ""
             IntakeSafeguardManager.startCountdown(
                 context = context,
                 entryId = entryId,
                 entryIds = listOf(entryId),
                 medicineName = medName,
                 medicineNames = listOf(medName),
-                scheduledTime = "",
+                scheduledTime = scheduledTimeStr,
                 durationSeconds = currentUser?.intakeCountdownSeconds ?: 120
             )
         } else {

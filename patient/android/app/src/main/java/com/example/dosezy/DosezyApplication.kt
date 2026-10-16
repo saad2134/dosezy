@@ -33,6 +33,9 @@ class DosezyApplication : Application(), ImageLoaderFactory
         // Ensure all required notification channels exist from app startup
         com.example.dosezy.notifications.MedicineAlarmReceiver.createNotificationChannels(this)
 
+        // Guard: Restore active ADHD intake countdown timer state or trigger expired re-alert on cold app startup
+        com.example.dosezy.notifications.IntakeSafeguardManager.initialize(this)
+
         // Guard: Core library desugaring enables java.time on API 24+; reschedule alarms on app startup across all supported versions to prevent silent alarm loss
         medicineNotificationManager.rescheduleAllAlarmsForAllUsers()
     }

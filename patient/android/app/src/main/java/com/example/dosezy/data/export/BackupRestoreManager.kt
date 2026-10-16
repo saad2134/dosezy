@@ -417,6 +417,13 @@ class BackupRestoreManager(
                                 alarmScheduler.cancelSnooze(entry.entryId)
                                 alarmScheduler.cancelNagging(entry.entryId)
                                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
+                                // Guard: Cancel any active intake safeguard alarms for this entry to prevent orphaned re-alerts
+                                alarmScheduler.cancelIntakeSafeguardAlarm(entry.entryId)
+                            }
+                            // Guard: Dismiss active ADHD intake countdown notification if active countdown references overwritten profile
+                            val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
+                            if (activeCountdown != null && existingSchedules.any { it.entryId == activeCountdown.entryId || activeCountdown.entryIds.contains(it.entryId) }) {
+                                com.example.dosezy.notifications.IntakeSafeguardManager.cancelCountdown(context)
                             }
                         } catch (_: Exception) {}
 
@@ -472,6 +479,24 @@ class BackupRestoreManager(
                                 medicineId = mappedMedId
                             )
                         }
+
+                        // Guard: Delete orphaned internal storage medicine images not retained by restored medicines to prevent storage leaks
+                        try {
+                            val retainedPaths = restoredMedicines.mapNotNull { it.imageUri?.removePrefix("file://") }.toSet()
+                            val filesDir = context.filesDir
+                            existingLocalMeds.forEach { oldMed ->
+                                oldMed.imageUri?.let { uriStr ->
+                                    val cleanPath = uriStr.removePrefix("file://")
+                                    if (!retainedPaths.contains(cleanPath)) {
+                                        val file = File(cleanPath)
+                                        if (file.exists() && (file.parentFile?.canonicalPath == filesDir.canonicalPath || file.canonicalPath.startsWith(filesDir.canonicalPath + File.separator))) {
+                                            file.delete()
+                                            file.parentFile?.delete()
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (_: Exception) {}
 
                         // Guard: Execute clear and restore within an atomic Room transaction so that if any failure occurs midway, previous profile data is rolled back rather than permanently lost
                         database.withTransaction {

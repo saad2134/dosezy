@@ -78,6 +78,8 @@ class MedicineNotificationManager @Inject constructor(
                 alarmScheduler.cancelSnooze(entry.entryId)
                 alarmScheduler.cancelNagging(entry.entryId)
                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
+                // Guard: Cancel any active intake safeguard alarms for this entry to prevent orphaned re-alerts
+                alarmScheduler.cancelIntakeSafeguardAlarm(entry.entryId)
             }
             Log.d(TAG, "Cancelled active window alarms for user: $userId (${entriesToCancel.size} active entries)")
         } catch (e: Exception) {
