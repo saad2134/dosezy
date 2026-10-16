@@ -795,4 +795,8 @@ Vuoi continuare?</string>
     <string name="alarm_slide_to_snooze">Scorri per posporre (%1$d min)</string>
     <string name="home_view_standard">Standard</string>
     <string name="home_view_timeline">Sequenza temporale</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">Posticipa di:</string>
+    <string name="snooze_duration_chip_format">%1$d min</string>
 </resources>

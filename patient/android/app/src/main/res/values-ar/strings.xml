@@ -795,4 +795,8 @@
     <string name="alarm_slide_to_snooze">اسحب للتأجيل (%1$d دقيقة)</string>
     <string name="home_view_standard">قياسي</string>
     <string name="home_view_timeline">مخطط زمني</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">تأجيل لمدة:</string>
+    <string name="snooze_duration_chip_format">%1$d د</string>
 </resources>

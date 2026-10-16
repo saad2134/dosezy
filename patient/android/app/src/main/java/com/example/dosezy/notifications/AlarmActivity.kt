@@ -176,8 +176,6 @@ class AlarmActivity : ComponentActivity() {
                 finish()
             }
 
-            val snoozeMinutes = user?.snoozeDuration ?: 10
-
             CompositionLocalProvider(
                 LocalLayoutDirection provides layoutDirection,
                 LocalContext provides localizedContext,
@@ -212,15 +210,16 @@ class AlarmActivity : ComponentActivity() {
                                 }
                             }
                         },
-                        onSnoozeAction = {
+                        // Guard: Support dynamic snooze duration chosen directly on alarm screen (#103)
+                        onSnoozeAction = { minutes ->
                             try {
                                 Toast.makeText(
                                     context,
-                                    context.getString(R.string.alarm_snoozed_toast, snoozeMinutes),
+                                    context.getString(R.string.alarm_snoozed_toast, minutes),
                                     Toast.LENGTH_SHORT
                                 ).show()
                             } catch (_: Exception) {}
-                            alarmViewModel.snoozeCohort(currentEntryIds, snoozeMinutes, currentMedName) {
+                            alarmViewModel.snoozeCohort(currentEntryIds, minutes, currentMedName) {
                                 dismissAction()
                             }
                         },

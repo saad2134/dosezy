@@ -32,7 +32,8 @@ class NotificationActionReceiver : BroadcastReceiver() {
         // Guard: Handle ADHD intake countdown safeguard notification interactions (#104)
         when (action) {
             IntakeSafeguardManager.ACTION_INTAKE_CONFIRM -> {
-                val pendingResult = goAsync()
+                // Guard: goAsync() returns null in unit tests and can throw if receiver lifecycle expired; guard against NPE
+                val pendingResult = try { goAsync() } catch (_: Exception) { null }
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
                         IntakeSafeguardManager.confirmIntake(context, database)
@@ -40,7 +41,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
                             com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
                         } catch (_: Exception) {}
                     } finally {
-                        pendingResult.finish()
+                        pendingResult?.finish()
                     }
                 }
                 return
@@ -60,18 +61,25 @@ class NotificationActionReceiver : BroadcastReceiver() {
         val allIds = (entryIds ?: if (entryId != null) listOf(entryId) else emptyList()).filter { it.isNotEmpty() }.distinct()
 
         if (allIds.isNotEmpty()) {
-            val pendingResult = goAsync()
+            // Guard: goAsync() returns null in unit tests and can throw if receiver lifecycle expired; guard against NPE
+            val pendingResult = try { goAsync() } catch (_: Exception) { null }
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    handleAction(context, action, allIds, entryId ?: allIds.first())
+                    handleAction(context, action, allIds, entryId ?: allIds.first(), intent)
                 } finally {
-                    pendingResult.finish()
+                    pendingResult?.finish()
                 }
             }
         }
     }
 
-    private suspend fun handleAction(context: Context, action: String?, allIds: List<String>, primaryEntryId: String) {
+    private suspend fun handleAction(
+        context: Context,
+        action: String?,
+        allIds: List<String>,
+        primaryEntryId: String,
+        intent: Intent? = null
+    ) {
         val scheduleRepository = ScheduleRepository(database)
 
         // Immediately stop active alarm sound and dismiss full-screen activity
@@ -141,7 +149,9 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 Log.d(TAG, "Snoozing medicine reminder for ${allIds.size} entries")
                 val firstEntry = database.scheduleDao().getScheduleEntryById(primaryEntryId)
                 val user = firstEntry?.let { database.userDao().getUserByIdDirect(it.userId) }
-                val snoozeMinutes = user?.snoozeDuration ?: 10
+                // Guard: Read explicit dynamic snooze duration from intent if passed, else fallback to user preference (#103)
+                val intentSnoozeMinutes = intent?.getIntExtra(MedicineAlarmReceiver.EXTRA_SNOOZE_MINUTES, -1) ?: -1
+                val snoozeMinutes = if (intentSnoozeMinutes > 0) intentSnoozeMinutes else (user?.snoozeDuration ?: 10)
 
                 val medicineNames = allIds.mapNotNull { id ->
                     val entry = database.scheduleDao().getScheduleEntryById(id)

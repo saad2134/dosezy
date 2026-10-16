@@ -794,4 +794,8 @@
     <string name="alarm_slide_to_snooze">স্নুজ করতে স্লাইড করুন (%1$d মি)</string>
     <string name="home_view_standard">সাধারণ</string>
     <string name="home_view_timeline">টাইমলাইন</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">স্নুজ করুন:</string>
+    <string name="snooze_duration_chip_format">%1$d মি</string>
 </resources>

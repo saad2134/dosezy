@@ -853,4 +853,8 @@ Do you want to continue?</string>
     <string name="dialog_take_all_title">Take All Medications?</string>
     <string name="dialog_take_all_message">Mark all %1$d medications scheduled for %2$s as taken?</string>
     <string name="take_all_success_toast">Marked all %1$d medications as taken</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">Snooze for:</string>
+    <string name="snooze_duration_chip_format">%1$dm</string>
 </resources>

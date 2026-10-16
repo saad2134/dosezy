@@ -811,4 +811,8 @@
     <string name="alarm_slide_to_snooze">滑动以稍后提醒 (%1$d分钟)</string>
     <string name="home_view_standard">标准</string>
     <string name="home_view_timeline">时间轴</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">稍后提醒:</string>
+    <string name="snooze_duration_chip_format">%1$d分钟</string>
 </resources>

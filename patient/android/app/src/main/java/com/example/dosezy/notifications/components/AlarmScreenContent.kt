@@ -79,16 +79,20 @@ fun AlarmScreenContent(
     isLoaded: Boolean,
     isDarkTheme: Boolean,
     onTakeAction: () -> Unit,
-    onSnoozeAction: () -> Unit,
+    onSnoozeAction: (Int) -> Unit,
     onSkipAction: (String) -> Unit
 ) {
     val context = LocalContext.current
     var showSkipReasonDialog by remember { mutableStateOf(false) }
-    val snoozeMinutes = user?.snoozeDuration ?: 10
+    val defaultSnooze = user?.snoozeDuration ?: 10
+    var selectedSnoozeMinutes by remember(user?.snoozeDuration) { mutableStateOf(defaultSnooze) }
+    val snoozeOptions = remember(defaultSnooze) {
+        (listOf(5, 10, 15, 30) + defaultSnooze).distinct().sorted()
+    }
 
     // Guard: Intercept hardware/system back gesture to safely trigger personalized snooze with alert feedback
     BackHandler {
-        onSnoozeAction()
+        onSnoozeAction(selectedSnoozeMinutes)
     }
 
     Surface(
@@ -397,7 +401,7 @@ fun AlarmScreenContent(
             // Bottom Section: Actions ("Take All" Green Primary & "Snooze" Orange Secondary)
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 // Guard: Support separate slide-to-confirm buttons for Take (slide left) and Snooze (slide right)
                 val useSlideActions = user?.slideActionsEnabled != false
@@ -416,17 +420,6 @@ fun AlarmScreenContent(
                         thumbColor = Color(0xFF10B981),
                         slideToLeft = false,
                         onConfirmed = onTakeAction
-                    )
-
-                    val slideSnoozeText = stringResource(R.string.alarm_slide_to_snooze, snoozeMinutes)
-                    // Guard: Snooze dragged right-to-left (slideToLeft = true)
-                    SlideToConfirmButton(
-                        text = slideSnoozeText,
-                        icon = Icons.Default.Snooze,
-                        trackColor = Color(0xFFF59E0B),
-                        thumbColor = Color(0xFFF59E0B),
-                        slideToLeft = true,
-                        onConfirmed = onSnoozeAction
                     )
                 } else {
                     // Standard Tap Buttons when sliding is turned off in preferences
@@ -450,9 +443,71 @@ fun AlarmScreenContent(
                             fontSize = 17.sp
                         )
                     }
+                }
 
+                // Guard: Dynamic snooze duration selector chips (#103)
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.alarm_snooze_duration_label),
+                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        snoozeOptions.forEach { minutes ->
+                            val isSelected = minutes == selectedSnoozeMinutes
+                            Surface(
+                                onClick = { selectedSnoozeMinutes = minutes },
+                                shape = RoundedCornerShape(12.dp),
+                                color = if (isSelected) Color(0xFFF59E0B) else if (isDarkTheme) Color(0xFF262A34) else MaterialTheme.colorScheme.surfaceVariant,
+                                contentColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
+                                border = if (isSelected) null else BorderStroke(1.dp, if (isDarkTheme) Color(0xFF3B404E) else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(38.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.snooze_duration_chip_format, minutes),
+                                        style = MaterialTheme.typography.labelMedium.copy(
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (useSlideActions) {
+                    val slideSnoozeText = stringResource(R.string.alarm_slide_to_snooze, selectedSnoozeMinutes)
+                    // Guard: Snooze dragged right-to-left (slideToLeft = true)
+                    SlideToConfirmButton(
+                        text = slideSnoozeText,
+                        icon = Icons.Default.Snooze,
+                        trackColor = Color(0xFFF59E0B),
+                        thumbColor = Color(0xFFF59E0B),
+                        slideToLeft = true,
+                        onConfirmed = { onSnoozeAction(selectedSnoozeMinutes) }
+                    )
+                } else {
                     Button(
-                        onClick = onSnoozeAction,
+                        onClick = { onSnoozeAction(selectedSnoozeMinutes) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
@@ -465,7 +520,7 @@ fun AlarmScreenContent(
                         Icon(imageVector = Icons.Default.Snooze, contentDescription = null, tint = Color.White)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = stringResource(R.string.alarm_snooze_format, snoozeMinutes),
+                            text = stringResource(R.string.alarm_snooze_format, selectedSnoozeMinutes),
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                             color = Color.White,
                             fontSize = 17.sp

@@ -795,4 +795,8 @@ Voulez-vous continuer ?</string>
     <string name="alarm_slide_to_snooze">Glisser pour reporter (%1$d min)</string>
     <string name="home_view_standard">Standard</string>
     <string name="home_view_timeline">Chronologie</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">Reporter pour :</string>
+    <string name="snooze_duration_chip_format">%1$d min</string>
 </resources>

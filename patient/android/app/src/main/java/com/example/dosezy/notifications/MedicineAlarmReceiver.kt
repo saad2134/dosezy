@@ -42,6 +42,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         const val EXTRA_IS_INTAKE_SAFEGUARD = "is_intake_safeguard"
         const val ACTION_INTAKE_SAFEGUARD_EXPIRED = "com.example.dosezy.INTAKE_SAFEGUARD_EXPIRED"
         const val EXTRA_IS_INTAKE_REALERT = "is_intake_realert"
+        const val EXTRA_SNOOZE_MINUTES = "extra_snooze_minutes"
 
         fun createNotificationChannels(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -392,6 +393,22 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             if (medicineNames != null) {
                 putStringArrayListExtra(EXTRA_MEDICINE_NAMES, medicineNames)
             }
+            putExtra(EXTRA_SNOOZE_MINUTES, snoozeMinutes)
+        }
+
+        // Guard: Provide dynamic quick extended snooze option directly in notification shade (#103)
+        val alternateSnoozeMinutes = if (snoozeMinutes == 30) 10 else if (snoozeMinutes > 30) 15 else 30
+        val alternateSnoozeIntent = Intent(context, NotificationActionReceiver::class.java).apply {
+            action = "SNOOZE_ACTION"
+            putExtra(EXTRA_ENTRY_ID, entryId)
+            if (entryIds != null) {
+                putStringArrayListExtra(EXTRA_ENTRY_IDS, entryIds)
+            }
+            putExtra(EXTRA_MEDICINE_NAME, medicineName)
+            if (medicineNames != null) {
+                putStringArrayListExtra(EXTRA_MEDICINE_NAMES, medicineNames)
+            }
+            putExtra(EXTRA_SNOOZE_MINUTES, alternateSnoozeMinutes)
         }
 
         val takenPendingIntent = PendingIntent.getBroadcast(
@@ -405,6 +422,14 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             context,
             entryId.hashCode() + 2,
             snoozeIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Guard: Distinct requestCode (+3) prevents collision with primary snooze PendingIntent
+        val alternateSnoozePendingIntent = PendingIntent.getBroadcast(
+            context,
+            entryId.hashCode() + 3,
+            alternateSnoozeIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -515,6 +540,11 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 getNotificationIcon(Icons.Filled.Snooze),
                 localizedContext.getString(R.string.notif_action_snooze_format, snoozeMinutes),
                 snoozePendingIntent
+            )
+            .addAction(
+                getNotificationIcon(Icons.Filled.Snooze),
+                localizedContext.getString(R.string.notif_action_snooze_format, alternateSnoozeMinutes),
+                alternateSnoozePendingIntent
             )
             .setStyle(NotificationCompat.BigTextStyle().bigText(bigText))
 

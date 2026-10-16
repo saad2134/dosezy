@@ -811,4 +811,8 @@
     <string name="alarm_slide_to_snooze">स्नूज़ के लिए स्लाइड करें (%1$d मि)</string>
     <string name="home_view_standard">मानक</string>
     <string name="home_view_timeline">टाइमलाइन</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">स्नूज़ करें:</string>
+    <string name="snooze_duration_chip_format">%1$d मि</string>
 </resources>

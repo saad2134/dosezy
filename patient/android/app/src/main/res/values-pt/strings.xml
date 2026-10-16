@@ -794,4 +794,8 @@ Deseja continuar?</string>
     <string name="alarm_slide_to_snooze">Deslize para adiar (%1$d min)</string>
     <string name="home_view_standard">Padrão</string>
     <string name="home_view_timeline">Linha do tempo</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">Adiar por:</string>
+    <string name="snooze_duration_chip_format">%1$d min</string>
 </resources>
