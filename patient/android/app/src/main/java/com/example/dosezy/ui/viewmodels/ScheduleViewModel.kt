@@ -118,6 +118,14 @@ class ScheduleViewModel @Inject constructor(
                     observeTodaySchedule(user.userId)
                     loadScheduleForDate(user.userId, _selectedDate.value)
                 } ?: run {
+                    // Guard: Cancel observation jobs and flush cached StateFlow lists when no active user exists to prevent stale schedule data retention across profile lifecycles
+                    todayJob?.cancel()
+                    scheduleJob?.cancel()
+                    rawScheduleJob?.cancel()
+                    _todayScheduleWithMedicine.value = emptyList()
+                    _scheduleWithMedicine.value = emptyList()
+                    _scheduleEntries.value = emptyList()
+                    currentCalendarUserId = null
                     _isTodayLoading.value = false
                     _isRefreshing.value = false
                 }

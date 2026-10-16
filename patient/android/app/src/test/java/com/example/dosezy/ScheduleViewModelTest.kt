@@ -22,6 +22,7 @@ import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -232,5 +233,22 @@ class ScheduleViewModelTest {
         viewModel.refreshAfterMedicineAdded()
 
         coVerify(atLeast = 2) { scheduleRepository.getScheduleWithMedicineForDate("user_123", any()) }
+    }
+
+    @Test
+    fun userLoggedOutOrDeleted_clearsScheduleAndStateFlows() = runTest {
+        // Guard: Verify schedule entries and flows are flushed and background jobs cancelled when user becomes null
+        val usersFlow = MutableStateFlow(listOf(testUser))
+        every { userRepository.getAllUsers() } returns usersFlow
+        val viewModel = createViewModel()
+
+        assertEquals(1, viewModel.todayScheduleWithMedicine.value.size)
+
+        // Simulate user logged out or profile deleted
+        usersFlow.value = emptyList()
+
+        assertEquals(0, viewModel.todayScheduleWithMedicine.value.size)
+        assertEquals(0, viewModel.scheduleWithMedicine.value.size)
+        assertEquals(0, viewModel.scheduleEntries.value.size)
     }
 }

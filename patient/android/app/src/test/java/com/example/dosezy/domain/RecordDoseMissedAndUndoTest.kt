@@ -23,6 +23,7 @@ import com.example.dosezy.data.model.User
 import com.example.dosezy.data.repository.MedicineRepository
 import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.data.repository.UserRepository
+import com.example.dosezy.notifications.MedicineAlarmReceiver
 import kotlinx.coroutines.runBlocking
 import org.json.JSONArray
 import org.json.JSONObject
@@ -335,5 +336,122 @@ class RecordDoseMissedAndUndoTest {
         // Should safely fallback to empty string without throwing null pointer or JSON exceptions
         assertEquals("", parsedSchedules[0].userId)
         assertEquals("legacy_entry_1", parsedSchedules[0].entryId)
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // Partial Stock Consumption and Notification Channel Integrity Tests
+    // ───────────────────────────────────────────────────────────────
+
+    @Test
+    fun recordDoseTaken_withPartialStock_appendsAuditTagAndUndoRestoresExactConsumedQuantity() = runBlocking {
+        // Set up medicine with stock of 1 tablet, but dose requirement of 2 tablets
+        val partialMed = testMedicine.copy(
+            medicineId = "med_partial_test",
+            dosage = 2.0,
+            dosageUnit = DosageUnit.TABLET,
+            currentStock = 1,
+            autoDeductOnTake = true
+        )
+        db.medicineDao().insertMedicine(partialMed)
+
+        val entryId = "entry_partial_stock_1"
+        val scheduleEntry = ScheduleEntry(
+            entryId = entryId,
+            userId = testUser.userId,
+            medicineId = partialMed.medicineId,
+            scheduledDateTime = LocalDateTime.now(),
+            status = MedicationStatus.PENDING,
+            dosage = 2.0
+        )
+        db.scheduleDao().insertScheduleEntry(scheduleEntry)
+
+        // Record dose taken
+        scheduleRepository.recordDoseTaken(entryId, context = context)
+
+        // Verify stock is clamped to 0
+        val medAfterTake = db.medicineDao().getMedicineByIdDirect(partialMed.medicineId)
+        assertNotNull(medAfterTake)
+        assertEquals(0, medAfterTake!!.currentStock)
+
+        // Verify partial stock note was recorded
+        val entryAfterTake = db.scheduleDao().getScheduleEntryById(entryId)
+        assertNotNull(entryAfterTake)
+        assertTrue(entryAfterTake!!.doseNotes?.contains("[Partial Stock: Took 1 of 2]") == true)
+
+        // Now undo the dose
+        scheduleRepository.undoDoseTaken(entryId, context = context)
+
+        // Verify stock is restored to exactly 1 (preventing inventory inflation to 2)
+        val medAfterUndo = db.medicineDao().getMedicineByIdDirect(partialMed.medicineId)
+        assertNotNull(medAfterUndo)
+        assertEquals(1, medAfterUndo!!.currentStock)
+    }
+
+    @Test
+    fun recordDoseTaken_triggersRefillAlert_andEnsuresNotificationChannelExists() = runBlocking {
+        // Set up medicine where taking 1 pill crosses the refill threshold
+        val refillMed = testMedicine.copy(
+            medicineId = "med_refill_channel_test",
+            dosage = 1.0,
+            dosageUnit = DosageUnit.TABLET,
+            currentStock = 2,
+            refillThreshold = 1,
+            autoDeductOnTake = true
+        )
+        db.medicineDao().insertMedicine(refillMed)
+
+        val entryId = "entry_refill_channel_1"
+        val scheduleEntry = ScheduleEntry(
+            entryId = entryId,
+            userId = testUser.userId,
+            medicineId = refillMed.medicineId,
+            scheduledDateTime = LocalDateTime.now(),
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        db.scheduleDao().insertScheduleEntry(scheduleEntry)
+
+        // Record dose taken - this will decrement stock to 1 (matching threshold) and trigger refill notification
+        scheduleRepository.recordDoseTaken(entryId, context = context)
+
+        // Verify notification channel was created before posting notification
+        val channel = notificationManager.getNotificationChannel(MedicineAlarmReceiver.REFILL_CHANNEL_ID)
+        assertNotNull("Refill notification channel must be registered in NotificationManager", channel)
+        assertEquals(MedicineAlarmReceiver.REFILL_CHANNEL_ID, channel!!.id)
+    }
+
+    @Test
+    fun logAsNeededDose_withPartialStock_appendsAuditTagAndRestoresCorrectly() = runBlocking {
+        // Set up medicine with stock of 1 tablet, but dose requirement of 2 tablets
+        val prnMed = testMedicine.copy(
+            medicineId = "med_prn_partial_test",
+            dosage = 2.0,
+            dosageUnit = DosageUnit.TABLET,
+            currentStock = 1,
+            autoDeductOnTake = true
+        )
+        db.medicineDao().insertMedicine(prnMed)
+
+        // Log as-needed dose
+        scheduleRepository.logAsNeededDose(prnMed, testUser.userId, context = context)
+
+        // Verify stock was decremented to 0
+        val medAfterTake = db.medicineDao().getMedicineByIdDirect(prnMed.medicineId)
+        assertNotNull(medAfterTake)
+        assertEquals(0, medAfterTake!!.currentStock)
+
+        // Find the generated PRN entry
+        val prnEntries = db.scheduleDao().getAllScheduleEntries(testUser.userId).filter { it.medicineId == prnMed.medicineId }
+        assertTrue("PRN entry should be created", prnEntries.isNotEmpty())
+        val prnEntry = prnEntries.first()
+        assertTrue(prnEntry.doseNotes?.contains("[Partial Stock: Took 1 of 2]") == true)
+
+        // Undo the PRN dose
+        scheduleRepository.undoDoseTaken(prnEntry.entryId, context = context)
+
+        // Verify stock restored to 1 without inflation
+        val medAfterUndo = db.medicineDao().getMedicineByIdDirect(prnMed.medicineId)
+        assertNotNull(medAfterUndo)
+        assertEquals(1, medAfterUndo!!.currentStock)
     }
 }

@@ -151,4 +151,20 @@ class MedicineFormValidationTest {
         assertEquals("tablet", DosageUnit.TABLET.displayName)
         assertEquals("capsule", DosageUnit.CAPSULE.displayName)
     }
+
+    @Test
+    fun testFormValidation_medicationNameWhitespaceTrimming() {
+        val rawName = "   Lisinopril   "
+        val trimmed = rawName.trim()
+        assertEquals("Lisinopril", trimmed)
+        val isValid = isMedicineFormValid(
+            medicationName = rawName,
+            isDosageValid = true,
+            selectedFrequency = FrequencyPattern.DAILY,
+            selectedDaysOfWeek = emptyList(),
+            selectedDaysOfMonth = emptyList(),
+            intervalWeeksText = "1"
+        )
+        assertTrue("Name with surrounding whitespace is valid and normalizes when trimmed", isValid)
+    }
 }

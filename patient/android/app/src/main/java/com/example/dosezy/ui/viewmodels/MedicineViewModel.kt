@@ -46,6 +46,11 @@ class MedicineViewModel @Inject constructor(
                 currentUser?.let { user ->
                     loadUserMedicines(user.userId)
                 } ?: run {
+                    // Guard: Cancel observation jobs and flush cached StateFlow lists when no active user exists to prevent stale patient data leakage across profile lifecycles
+                    medicinesJob?.cancel()
+                    archivedMedicinesJob?.cancel()
+                    _medicines.value = emptyList()
+                    _archivedMedicines.value = emptyList()
                     _isLoading.value = false
                 }
             }

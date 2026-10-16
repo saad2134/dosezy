@@ -340,7 +340,8 @@ fun EditMedScreen(
                                 val updatedMedicine = Medicine(
                                     medicineId = medicineToEdit?.medicineId ?: UUID.randomUUID().toString(),
                                     userId = targetUserId,
-                                    medicationName = medicationName,
+                                    // Guard: Trim medication name to avoid duplicate records with trailing whitespace and maintain restore matching
+                                    medicationName = medicationName.trim(),
                                     dosage = baseDose,
                                     dosageUnit = selectedDosageUnit,
                                     timesPerDay = if (selectedFrequency == FrequencyPattern.AS_NEEDED) 0 else scheduledTimesList.size,
