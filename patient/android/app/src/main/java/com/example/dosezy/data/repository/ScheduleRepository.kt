@@ -85,28 +85,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
     suspend fun autoExtendSchedules(userId: String) {
         try {
             reconcileLegacyScheduleEntries(userId)
-            val medicines = database.medicineDao().getActiveMedicinesByUser(userId).first()
-            medicines.forEach { medicine ->
-                if (!medicine.isArchived) {
-                    val scheduleEntries = database.scheduleDao().getScheduleEntriesByMedicine(medicine.medicineId)
-                    val latestEntry = scheduleEntries.maxByOrNull { it.scheduledDateTime }
-
-                    // If no entries exist, or the latest entry is less than 15 days in the future,
-                    // auto-generate/append next 30 days of schedules
-                    if (latestEntry == null || latestEntry.scheduledDateTime.isBefore(LocalDateTime.now().plusDays(15))) {
-                        val today = LocalDate.now()
-                        val latestDate = latestEntry?.scheduledDateTime?.toLocalDate()
-                        // Guard: Anchor to latestDate rather than plusDays(1) and filter by latestEntry.scheduledDateTime to prevent dropping evening or nocturnal doses
-                        val startGenerateFrom = if (latestDate == null || latestDate.isBefore(today)) today else latestDate
-                        val newEntries = medicine.generateScheduleEntries(startGenerateFrom, 30)
-                            .filter { latestEntry == null || it.scheduledDateTime.isAfter(latestEntry.scheduledDateTime) }
-                        if (newEntries.isNotEmpty()) {
-                            database.scheduleDao().insertScheduleEntries(newEntries)
-                            Log.d(TAG, "Auto-extended schedule for medicine: ${medicine.medicationName} by 30 days starting from $startGenerateFrom")
-                        }
-                    }
-                }
-            }
+            com.example.dosezy.domain.usecases.GenerateSchedulesUseCase(database).autoExtendSchedules(userId)
         } catch (e: Exception) {
             Log.e(TAG, "Error auto-extending schedules for user: $userId", e)
         }

@@ -17,6 +17,9 @@ import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.notifications.AlarmAudioPlayer
 import com.example.dosezy.notifications.AlarmScheduler
 import com.example.dosezy.utils.TimeCalculationUtils
+import com.example.dosezy.domain.usecases.TakeCohortUseCase
+import com.example.dosezy.domain.usecases.SnoozeCohortUseCase
+import com.example.dosezy.domain.usecases.SkipCohortUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
@@ -40,7 +43,10 @@ data class AlarmUiState(
 class AlarmViewModel @Inject constructor(
     private val database: DosezyDatabase,
     private val scheduleRepository: ScheduleRepository,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val takeCohortUseCase: TakeCohortUseCase,
+    private val snoozeCohortUseCase: SnoozeCohortUseCase,
+    private val skipCohortUseCase: SkipCohortUseCase
 ) : ViewModel() {
 
     internal var ioDispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -50,9 +56,29 @@ class AlarmViewModel @Inject constructor(
         scheduleRepository: ScheduleRepository,
         context: Context,
         ioDispatcher: CoroutineDispatcher
-    ) : this(database, scheduleRepository, context) {
+    ) : this(
+        database = database,
+        scheduleRepository = scheduleRepository,
+        context = context,
+        takeCohortUseCase = TakeCohortUseCase(database, scheduleRepository, context),
+        snoozeCohortUseCase = SnoozeCohortUseCase(database, context),
+        skipCohortUseCase = SkipCohortUseCase(scheduleRepository, context)
+    ) {
         this.ioDispatcher = ioDispatcher
     }
+
+    constructor(
+        database: DosezyDatabase,
+        scheduleRepository: ScheduleRepository,
+        context: Context
+    ) : this(
+        database = database,
+        scheduleRepository = scheduleRepository,
+        context = context,
+        takeCohortUseCase = TakeCohortUseCase(database, scheduleRepository, context),
+        snoozeCohortUseCase = SnoozeCohortUseCase(database, context),
+        skipCohortUseCase = SkipCohortUseCase(scheduleRepository, context)
+    )
 
     private val _uiState = MutableStateFlow(AlarmUiState())
     val uiState: StateFlow<AlarmUiState> = _uiState.asStateFlow()
@@ -130,7 +156,6 @@ class AlarmViewModel @Inject constructor(
         onComplete: () -> Unit
     ) {
         viewModelScope.launch(ioDispatcher) {
-            val alarmScheduler = AlarmScheduler(context)
             val medicinesList = _uiState.value.medicinesList
             val user = _uiState.value.user
             val allIds = if (medicinesList.isNotEmpty()) {
@@ -138,38 +163,7 @@ class AlarmViewModel @Inject constructor(
             } else {
                 entryIds
             }
-            allIds.forEach { id ->
-                // Guard: Cancel both nagging and snooze alarms upfront for all cohort IDs to prevent delayed phantom snooze triggers
-                alarmScheduler.cancelNagging(id)
-                alarmScheduler.cancelSnooze(id)
-            }
-            val now = LocalDateTime.now()
-            val nowStr = now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-            val lateAfter = user?.considerLateAfter ?: 3
-            if (medicinesList.isNotEmpty()) {
-                medicinesList.forEach { (entry, _) ->
-                    // Guard: Use isTakenLate so delayed/snoozed or overdue doses past missedAfter are correctly recorded as TAKEN_LATE
-                    val status = if (TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, lateAfter)) {
-                        "TAKEN_LATE"
-                    } else {
-                        "TAKEN_ON_TIME"
-                    }
-                    scheduleRepository.recordDoseTaken(entry.entryId, status, nowStr, context)
-                }
-            } else if (entryIds.isNotEmpty()) {
-                entryIds.forEach { id ->
-                    val entry = database.scheduleDao().getScheduleEntryById(id)
-                    val entryUser = entry?.let { database.userDao().getUserByIdDirect(it.userId) } ?: user
-                    val entryLateAfter = entryUser?.considerLateAfter ?: 3
-                    // Guard: Use isTakenLate so delayed/snoozed or overdue doses past missedAfter are correctly recorded as TAKEN_LATE
-                    val status = if (entry != null && TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, entryLateAfter)) {
-                        "TAKEN_LATE"
-                    } else {
-                        "TAKEN_ON_TIME"
-                    }
-                    scheduleRepository.recordDoseTaken(id, status, nowStr, context)
-                }
-            }
+            takeCohortUseCase(allIds, user = user)
             withContext(Dispatchers.Main) {
                 onComplete()
             }
@@ -183,7 +177,6 @@ class AlarmViewModel @Inject constructor(
         onComplete: () -> Unit
     ) {
         viewModelScope.launch(ioDispatcher) {
-            val alarmScheduler = AlarmScheduler(context)
             val medicinesList = _uiState.value.medicinesList
             val user = _uiState.value.user
             val allIds = if (medicinesList.isNotEmpty()) {
@@ -191,16 +184,18 @@ class AlarmViewModel @Inject constructor(
             } else {
                 entryIds
             }
-            allIds.forEach { id ->
-                alarmScheduler.cancelNagging(id)
+            val names = if (medicinesList.isNotEmpty()) {
+                medicinesList.map { it.second.medicationName }
+            } else {
+                listOf(initialMedicineName)
             }
-            if (medicinesList.isNotEmpty()) {
-                val ids = medicinesList.map { it.first.entryId }
-                val names = medicinesList.map { it.second.medicationName }
-                alarmScheduler.scheduleGroupedSnooze(ids, snoozeMinutes, names, timeFormat = user?.timeFormat)
-            } else if (entryIds.isNotEmpty()) {
-                alarmScheduler.scheduleGroupedSnooze(entryIds, snoozeMinutes, listOf(initialMedicineName), timeFormat = user?.timeFormat)
-            }
+            snoozeCohortUseCase(
+                entryIds = allIds,
+                explicitSnoozeMinutes = snoozeMinutes,
+                fallbackMedicineName = initialMedicineName,
+                medicineNames = names,
+                user = user
+            )
             withContext(Dispatchers.Main) {
                 onComplete()
             }
@@ -213,27 +208,13 @@ class AlarmViewModel @Inject constructor(
         onComplete: () -> Unit
     ) {
         viewModelScope.launch(ioDispatcher) {
-            val alarmScheduler = AlarmScheduler(context)
             val medicinesList = _uiState.value.medicinesList
             val allIds = if (medicinesList.isNotEmpty()) {
                 medicinesList.map { it.first.entryId }
             } else {
                 entryIds
             }
-            allIds.forEach { id ->
-                // Guard: Cancel both nagging and snooze alarms upfront for all cohort IDs to prevent delayed phantom snooze triggers when skipped
-                alarmScheduler.cancelNagging(id)
-                alarmScheduler.cancelSnooze(id)
-            }
-            if (medicinesList.isNotEmpty()) {
-                medicinesList.forEach { (entry, _) ->
-                    scheduleRepository.recordDoseSkipped(entry.entryId, reason, context)
-                }
-            } else if (entryIds.isNotEmpty()) {
-                entryIds.forEach { id ->
-                    scheduleRepository.recordDoseSkipped(id, reason, context)
-                }
-            }
+            skipCohortUseCase(allIds, reason)
             withContext(Dispatchers.Main) {
                 onComplete()
             }

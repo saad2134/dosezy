@@ -12,6 +12,8 @@ import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.data.repository.UserRepository
 import com.example.dosezy.utils.TimeCalculationUtils
 import android.content.Context
+import com.example.dosezy.domain.usecases.TakeCohortUseCase
+import com.example.dosezy.domain.usecases.SkipCohortUseCase
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +29,9 @@ import javax.inject.Inject
 class ScheduleViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val userRepository: UserRepository,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val takeCohortUseCase: TakeCohortUseCase? = null,
+    private val skipCohortUseCase: SkipCohortUseCase? = null
 ) : ViewModel() {
 
     companion object {
@@ -184,16 +188,21 @@ class ScheduleViewModel @Inject constructor(
         lateAfter: Int = 3
     ) {
         viewModelScope.launch {
-            val now = try { LocalDateTime.parse(takenAt) } catch (_: Exception) { LocalDateTime.now() }
-            entryIds.forEach { entryId ->
-                val entry = scheduleRepository.getScheduleEntryById(entryId)
-                val status = if (entry != null && TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, lateAfter)) {
-                    "TAKEN_LATE"
-                } else {
-                    "TAKEN_ON_TIME"
+            if (takeCohortUseCase != null) {
+                val now = try { LocalDateTime.parse(takenAt) } catch (_: Exception) { LocalDateTime.now() }
+                takeCohortUseCase.invoke(entryIds, now)
+            } else {
+                val now = try { LocalDateTime.parse(takenAt) } catch (_: Exception) { LocalDateTime.now() }
+                entryIds.forEach { entryId ->
+                    val entry = scheduleRepository.getScheduleEntryById(entryId)
+                    val status = if (entry != null && TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, lateAfter)) {
+                        "TAKEN_LATE"
+                    } else {
+                        "TAKEN_ON_TIME"
+                    }
+                    // Guard: Record each cohort dose taken to ensure atomic stock decrement and alarm cancellation (#102)
+                    scheduleRepository.recordDoseTaken(entryId, status, takenAt, context, null)
                 }
-                // Guard: Record each cohort dose taken to ensure atomic stock decrement and alarm cancellation (#102)
-                scheduleRepository.recordDoseTaken(entryId, status, takenAt, context, null)
             }
             currentCalendarUserId = null
             _currentUserId.value?.let { userId ->
@@ -238,7 +247,11 @@ class ScheduleViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     fun markAsSkipped(entryId: String, reason: String) {
         viewModelScope.launch {
-            scheduleRepository.recordDoseSkipped(entryId, reason, context)
+            if (skipCohortUseCase != null) {
+                skipCohortUseCase.invoke(listOf(entryId), reason)
+            } else {
+                scheduleRepository.recordDoseSkipped(entryId, reason, context)
+            }
             currentCalendarUserId = null
             // Refresh the schedule after updating status
             _currentUserId.value?.let { userId ->
