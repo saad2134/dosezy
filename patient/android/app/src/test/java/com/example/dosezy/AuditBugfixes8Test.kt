@@ -167,81 +167,64 @@ class AuditBugfixes8Test {
             isTaken: Boolean,
             isSkipped: Boolean,
             isMissed: Boolean,
-            allowUndo: Boolean,
-            allowCustomTime: Boolean
+            allowUndo: Boolean
         ): Boolean {
             return when {
                 isTaken || isSkipped -> allowUndo
-                isMissed -> allowUndo || allowCustomTime
+                isMissed -> true
                 else -> true
             }
         }
 
-        // When dose is MISSED and allowUndo is true, button must be enabled
-        assertTrue(computeEnabled(isTaken = false, isSkipped = false, isMissed = true, allowUndo = true, allowCustomTime = false))
+        // Missed dose is always enabled so users can record late intake (#105)
+        assertTrue(computeEnabled(isTaken = false, isSkipped = false, isMissed = true, allowUndo = true))
+        assertTrue(computeEnabled(isTaken = false, isSkipped = false, isMissed = true, allowUndo = false))
 
-        // When dose is MISSED and allowUndo is false but allowCustomTime is true, button must be enabled
-        assertTrue(computeEnabled(isTaken = false, isSkipped = false, isMissed = true, allowUndo = false, allowCustomTime = true))
-
-        // When dose is MISSED and both are true, button must be enabled
-        assertTrue(computeEnabled(isTaken = false, isSkipped = false, isMissed = true, allowUndo = true, allowCustomTime = true))
-
-        // When dose is MISSED and neither is allowed, button must be disabled
-        assertFalse(computeEnabled(isTaken = false, isSkipped = false, isMissed = true, allowUndo = false, allowCustomTime = false))
+        // Taken/Skipped requires allowUndo
+        assertTrue(computeEnabled(isTaken = true, isSkipped = false, isMissed = false, allowUndo = true))
+        assertFalse(computeEnabled(isTaken = true, isSkipped = false, isMissed = false, allowUndo = false))
 
         // Standard pending dose is always enabled
-        assertTrue(computeEnabled(isTaken = false, isSkipped = false, isMissed = false, allowUndo = false, allowCustomTime = false))
+        assertTrue(computeEnabled(isTaken = false, isSkipped = false, isMissed = false, allowUndo = false))
     }
 
     @Test
-    fun issue2_medicationItem_onClickActionDispatch_prioritizesUndoForMissedDoses() {
+    fun issue2_medicationItem_onClickActionDispatch_routesMissedDosesToMarkAsTaken() {
         var undoInvoked: Boolean
-        var manualRecordInvoked: Boolean
+        var markAsTakenInvoked: Boolean
 
         fun dispatchClick(
             isTaken: Boolean,
             isSkipped: Boolean,
             isMissed: Boolean,
             isLate: Boolean,
-            allowUndo: Boolean,
-            allowCustomTime: Boolean
+            allowUndo: Boolean
         ) {
             when {
                 isTaken || isSkipped -> {
                     if (allowUndo) undoInvoked = true
                 }
                 isMissed -> {
-                    if (allowUndo) {
-                        undoInvoked = true
-                    } else if (allowCustomTime) {
-                        manualRecordInvoked = true
-                    }
+                    markAsTakenInvoked = true
                 }
                 isLate -> {}
-                else -> manualRecordInvoked = true
+                else -> markAsTakenInvoked = true
             }
         }
 
-        // Scenario A: allowUndo = true, allowCustomTime = false -> triggers undo
+        // Missed dose routes directly to markAsTaken to prevent infinite undo loop (#105)
         undoInvoked = false
-        manualRecordInvoked = false
-        dispatchClick(isTaken = false, isSkipped = false, isMissed = true, isLate = false, allowUndo = true, allowCustomTime = false)
-        assertTrue(undoInvoked)
-        assertFalse(manualRecordInvoked)
-
-        // Scenario B: allowUndo = false, allowCustomTime = true -> triggers manual record
-        undoInvoked = false
-        manualRecordInvoked = false
-        dispatchClick(isTaken = false, isSkipped = false, isMissed = true, isLate = false, allowUndo = false, allowCustomTime = true)
+        markAsTakenInvoked = false
+        dispatchClick(isTaken = false, isSkipped = false, isMissed = true, isLate = false, allowUndo = true)
         assertFalse(undoInvoked)
-        assertTrue(manualRecordInvoked)
+        assertTrue(markAsTakenInvoked)
 
-        // Scenario C: allowUndo = true, allowCustomTime = true -> prioritizes undo
+        // Missed dose with allowUndo=false also routes to markAsTaken
         undoInvoked = false
-        manualRecordInvoked = false
-        dispatchClick(isTaken = false, isSkipped = false, isMissed = true, isLate = false, allowUndo = true, allowCustomTime = true)
-        assertTrue(undoInvoked)
-        assertFalse(manualRecordInvoked)
+        markAsTakenInvoked = false
+        dispatchClick(isTaken = false, isSkipped = false, isMissed = true, isLate = false, allowUndo = false)
+        assertFalse(undoInvoked)
+        assertTrue(markAsTakenInvoked)
     }
 
     @Test

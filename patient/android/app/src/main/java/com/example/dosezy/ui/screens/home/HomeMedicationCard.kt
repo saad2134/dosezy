@@ -102,10 +102,10 @@ fun HomeMedicationCard(
         else -> MaterialTheme.colorScheme.onPrimary
     }
 
-    // Guard: Support undo for missed doses when allowDoseUndo is true, or retroactive recording when allowCustomDoseTime is true
+    // Guard: Allow users to take missed doses directly regardless of allowDoseUndo setting to prevent unclickable states (#105)
     val enabled = when {
         isTaken || isSkipped -> currentUser?.allowDoseUndo == true
-        isMissed -> currentUser?.allowDoseUndo == true || currentUser?.allowCustomDoseTime == true
+        isMissed -> true
         else -> true
     }
 
@@ -260,12 +260,8 @@ fun HomeMedicationCard(
                                 }
                             }
                             isMissed -> {
-                                // Guard: If allowDoseUndo is enabled, prioritize undoing missed status back to pending; otherwise fallback to custom dose recording
-                                if (currentUser?.allowDoseUndo == true) {
-                                    onUndo(entry.entryId)
-                                } else if (currentUser?.allowCustomDoseTime == true) {
-                                    onMarkAsTaken(entry.entryId)
-                                }
+                                // Guard: Route missed doses to onMarkAsTaken rather than onUndo to prevent infinite loop where dynamic check immediately re-marks missed (#105)
+                                onMarkAsTaken(entry.entryId)
                             }
                             isLate -> onMarkAsLate(entry.entryId)
                             else -> onMarkAsTaken(entry.entryId)
@@ -289,7 +285,8 @@ fun HomeMedicationCard(
                     )
                 }
 
-                if (currentUser?.allowDoseSkipping == true && !isTaken && !isSkipped && !isMissed) {
+                // Guard: Allow clinically skipping missed doses as well as pending doses (#105)
+                if (currentUser?.allowDoseSkipping == true && !isTaken && !isSkipped) {
                     TextButton(
                         onClick = { onSkip(entry.entryId) },
                         modifier = Modifier.height(28.dp),
