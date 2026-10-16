@@ -6,9 +6,19 @@
 package com.example.dosezy.ui.screens.home
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,7 +43,8 @@ fun HomeTimeSection(
     onMarkAsLate: (String) -> Unit,
     onUndo: (String) -> Unit = {},
     onSkip: (String) -> Unit = {},
-    onEditNote: (String) -> Unit = {}
+    onEditNote: (String) -> Unit = {},
+    onMarkAllTaken: ((List<ScheduleWithMedicine>) -> Unit)? = null
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -106,6 +117,33 @@ fun HomeTimeSection(
             color = statusColor,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
+
+        // Guard: Show Take All button only when 2 or more pending/missed medications share the slot (#102)
+        if (pendingEntries.size >= 2 && onMarkAllTaken != null) {
+            Spacer(modifier = Modifier.height(10.dp))
+            FilledTonalButton(
+                onClick = { onMarkAllTaken(pendingEntries) },
+                shape = RoundedCornerShape(20.dp),
+                colors = ButtonDefaults.filledTonalButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.DoneAll,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = stringResource(R.string.take_all_count, pendingEntries.size),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 

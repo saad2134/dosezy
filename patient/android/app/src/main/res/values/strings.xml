@@ -846,4 +846,11 @@ Do you want to continue?</string>
     <string name="home_intake_cancelled">Intake safeguard cancelled</string>
     <string name="alarm_realert_badge">ADHD INTAKE RE-ALERT</string>
     <string name="alarm_realert_subtitle">You tapped Take earlier, but intake was not confirmed. Did you take your medicine?</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">Take All</string>
+    <string name="take_all_count">Take All (%1$d)</string>
+    <string name="dialog_take_all_title">Take All Medications?</string>
+    <string name="dialog_take_all_message">Mark all %1$d medications scheduled for %2$s as taken?</string>
+    <string name="take_all_success_toast">Marked all %1$d medications as taken</string>
 </resources>

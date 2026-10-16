@@ -178,6 +178,30 @@ class ScheduleViewModel @Inject constructor(
         }
     }
 
+    fun markCohortAsTaken(
+        entryIds: List<String>,
+        takenAt: String,
+        lateAfter: Int = 3
+    ) {
+        viewModelScope.launch {
+            val now = try { LocalDateTime.parse(takenAt) } catch (_: Exception) { LocalDateTime.now() }
+            entryIds.forEach { entryId ->
+                val entry = scheduleRepository.getScheduleEntryById(entryId)
+                val status = if (entry != null && TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, lateAfter)) {
+                    "TAKEN_LATE"
+                } else {
+                    "TAKEN_ON_TIME"
+                }
+                // Guard: Record each cohort dose taken to ensure atomic stock decrement and alarm cancellation (#102)
+                scheduleRepository.recordDoseTaken(entryId, status, takenAt, context, null)
+            }
+            currentCalendarUserId = null
+            _currentUserId.value?.let { userId ->
+                loadScheduleForDate(userId, _selectedDate.value)
+            }
+        }
+    }
+
     fun updateDoseNotes(entryId: String, notes: String?) {
         viewModelScope.launch {
             scheduleRepository.updateDoseNotes(entryId, notes)

@@ -119,6 +119,7 @@ fun HomeScreen(
     var undoConfirmTarget by remember { mutableStateOf<ScheduleWithMedicine?>(null) }
     var notePromptEntry by remember { mutableStateOf<ScheduleWithMedicine?>(null) }
     var noteEditEntry by remember { mutableStateOf<ScheduleWithMedicine?>(null) }
+    var markAllConfirmSlot by remember { mutableStateOf<Pair<String, List<ScheduleWithMedicine>>?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
@@ -355,6 +356,12 @@ fun HomeScreen(
                                     },
                                     onSkip = { entryId ->
                                         skippingEntryId = entryId
+                                    },
+                                    onMarkAllTaken = { slotEntries ->
+                                        val timeSlot = slotEntries.firstOrNull()?.let {
+                                            TimeFormatUtils.formatTime(it.scheduleEntry.scheduledDateTime, timeFormat, activeLocale)
+                                        } ?: ""
+                                        markAllConfirmSlot = Pair(timeSlot, slotEntries)
                                     }
                                 )
                             }
@@ -382,6 +389,9 @@ fun HomeScreen(
                                         },
                                         onSkip = { entryId ->
                                             skippingEntryId = entryId
+                                        },
+                                        onMarkAllTaken = { slotEntries ->
+                                            markAllConfirmSlot = Pair(time, slotEntries)
                                         }
                                     )
                                     Spacer(modifier = Modifier.height(16.dp))
@@ -596,6 +606,78 @@ fun HomeScreen(
             },
             onDismiss = {
                 noteEditEntry = null
+            }
+        )
+    }
+
+    if (markAllConfirmSlot != null) {
+        val (slotTime, slotEntries) = markAllConfirmSlot!!
+        val medNamesSummary = slotEntries.joinToString(", ") { it.medicine?.medicationName ?: "" }
+        AlertDialog(
+            onDismissRequest = { markAllConfirmSlot = null },
+            title = {
+                Text(
+                    text = stringResource(R.string.dialog_take_all_title),
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column {
+                    Text(
+                        text = stringResource(R.string.dialog_take_all_message, slotEntries.size, slotTime),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = medNamesSummary,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val entryIds = slotEntries.map { it.scheduleEntry.entryId }
+                        val medNames = slotEntries.mapNotNull { it.medicine?.medicationName }
+                        val count = slotEntries.size
+                        markAllConfirmSlot = null
+
+                        val user = currentUser
+                        if (user?.intakeSafeguardEnabled == true) {
+                            // Guard: Start intake countdown timer for ADHD support when cohort take is confirmed (#104, #102)
+                            IntakeSafeguardManager.startCountdown(
+                                context = context,
+                                entryId = entryIds.first(),
+                                entryIds = entryIds,
+                                medicineName = medNames.firstOrNull() ?: "Medicine",
+                                medicineNames = medNames,
+                                scheduledTime = slotTime,
+                                durationSeconds = user.intakeCountdownSeconds
+                            )
+                        } else {
+                            val now = LocalDateTime.now()
+                            val lateAfter = user?.considerLateAfter ?: 3
+                            scheduleViewModel.markCohortAsTaken(entryIds, now.toString(), lateAfter)
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = context.getString(R.string.take_all_success_toast, count),
+                                    duration = SnackbarDuration.Short
+                                )
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text(stringResource(R.string.take_all))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { markAllConfirmSlot = null }
+                ) {
+                    Text(stringResource(android.R.string.cancel))
+                }
             }
         )
     }

@@ -277,6 +277,10 @@ class ScheduleRepository(private val database: DosezyDatabase) {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getScheduleEntryById(entryId: String): ScheduleEntry? {
+        return database.scheduleDao().getScheduleEntryById(entryId)
+    }
+
     suspend fun updateMedicationStatus(entryId: String, status: String, takenAtStr: String?) {
         val takenAt = takenAtStr?.let {
             try { LocalDateTime.parse(it) } catch (_: Exception) { LocalDateTime.now() }
