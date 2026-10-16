@@ -119,7 +119,11 @@ android {
 
 tasks.withType<Test>().configureEach {
     maxHeapSize = "1536m"
-    jvmArgs("-Djdk.attach.allowAttachSelf=true")
+    jvmArgs(
+        "-Djdk.attach.allowAttachSelf=true",
+        "-XX:-UseCompressedOops",
+        "-XX:TieredStopAtLevel=1"
+    )
 }
 
 dependencies {
