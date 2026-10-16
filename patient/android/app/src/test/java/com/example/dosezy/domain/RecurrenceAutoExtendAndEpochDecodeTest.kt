@@ -1,4 +1,4 @@
-package com.example.dosezy
+﻿package com.example.dosezy.domain
 
 import android.content.Context
 import com.example.dosezy.data.DosezyDatabase
@@ -34,7 +34,7 @@ import java.time.ZoneOffset
  *  3. BackupRestoreManager decodes epoch millis using ZoneOffset.UTC matching Room Converters.
  *  4. MedicineRepository.deleteMedicine and deleteMedicineWithAlarms clean up orphaned schedule entries and handle null records gracefully.
  */
-class AuditBugfixes14Test {
+class RecurrenceAutoExtendAndEpochDecodeTest {
 
     private lateinit var mockContext: Context
     private lateinit var mockDatabase: DosezyDatabase

@@ -1,4 +1,4 @@
-package com.example.dosezy
+﻿package com.example.dosezy.ui
 
 import android.content.Context
 import androidx.room.Room
@@ -43,7 +43,7 @@ import java.time.LocalTime
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
-class AuditBugfixes9Test {
+class UserViewModelProfileAlarmTest {
 
     private lateinit var context: Context
     private lateinit var db: DosezyDatabase

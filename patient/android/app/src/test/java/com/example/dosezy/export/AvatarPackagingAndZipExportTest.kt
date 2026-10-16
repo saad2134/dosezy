@@ -1,7 +1,8 @@
-package com.example.dosezy
+package com.example.dosezy.export
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
+import com.example.dosezy.R
 import com.example.dosezy.data.export.DataExporter
 import com.example.dosezy.data.model.DosageUnit
 import com.example.dosezy.data.model.Frequency
@@ -34,7 +35,7 @@ import java.util.zip.ZipOutputStream
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
-class AuditBugfixes4Test {
+class AvatarPackagingAndZipExportTest {
 
     private lateinit var context: Context
 

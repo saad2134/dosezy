@@ -1,9 +1,9 @@
-/*
+﻿/*
  * Copyright (c) 2026 Saad <reach.saad@outlook.com> (@saad2134)
  * Licensed under the MIT License. See LICENSE in the project root for license information.
  */
 
-package com.example.dosezy
+package com.example.dosezy.notifications
 
 import android.content.Context
 import androidx.room.Room
@@ -51,7 +51,7 @@ import java.time.LocalTime
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
-class AuditBugfixes19Test {
+class IntakeSafeguardManagerLifecycleTest {
 
     private lateinit var context: Context
     private lateinit var database: DosezyDatabase

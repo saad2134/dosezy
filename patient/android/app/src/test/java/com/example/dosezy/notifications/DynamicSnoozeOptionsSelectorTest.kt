@@ -1,9 +1,9 @@
-/*
+﻿/*
  * Copyright (c) 2026 Saad <reach.saad@outlook.com> (@saad2134)
  * Licensed under the MIT License. See LICENSE in the project root for license information.
  */
 
-package com.example.dosezy
+package com.example.dosezy.notifications
 
 import android.content.Context
 import android.content.Intent
@@ -53,7 +53,7 @@ import java.time.LocalTime
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
-class AuditBugfixes21Test {
+class DynamicSnoozeOptionsSelectorTest {
 
     private lateinit var context: Context
     private lateinit var database: DosezyDatabase

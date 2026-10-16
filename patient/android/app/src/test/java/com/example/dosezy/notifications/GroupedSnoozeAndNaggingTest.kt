@@ -1,4 +1,4 @@
-package com.example.dosezy
+﻿package com.example.dosezy.notifications
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
@@ -21,7 +21,7 @@ import java.time.LocalDateTime
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
-class AuditBugfixes5Test {
+class GroupedSnoozeAndNaggingTest {
 
     private lateinit var context: Context
 

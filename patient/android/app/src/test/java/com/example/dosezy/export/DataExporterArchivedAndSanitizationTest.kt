@@ -1,4 +1,4 @@
-package com.example.dosezy
+﻿package com.example.dosezy.export
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
@@ -35,7 +35,7 @@ import java.time.LocalTime
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
-class AuditBugfixes3Test {
+class DataExporterArchivedAndSanitizationTest {
 
     private lateinit var context: Context
 

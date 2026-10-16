@@ -1,9 +1,9 @@
-/*
+﻿/*
  * Copyright (c) 2026 Saad <reach.saad@outlook.com> (@saad2134)
  * Licensed under the MIT License. See LICENSE in the project root for license information.
  */
 
-package com.example.dosezy
+package com.example.dosezy.export
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
@@ -39,7 +39,7 @@ import java.util.Locale
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
-class AuditBugfixes16Test {
+class PdfPaginationAndTakenAtUtcFormatTest {
 
     private lateinit var context: Context
     private lateinit var mockDb: DosezyDatabase

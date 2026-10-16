@@ -1,4 +1,4 @@
-package com.example.dosezy
+﻿package com.example.dosezy.export
 
 import com.example.dosezy.data.model.DosageUnit
 import com.example.dosezy.data.model.Frequency
@@ -29,7 +29,7 @@ import java.time.ZoneId
  *  2. DataExporter PDF adherence formula with stale PENDING entries
  *  3. DataExporter JSON export null field serialization
  */
-class AuditBugfixes11Test {
+class JsonExportOmitNullAndDateTimeParseTest {
 
     // ───────────────────────────────────────────────────────────────
     // Test Utilities

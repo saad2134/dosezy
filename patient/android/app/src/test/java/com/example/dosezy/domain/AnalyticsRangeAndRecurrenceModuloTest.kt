@@ -1,9 +1,9 @@
-/*
+﻿/*
  * Copyright (c) 2026 Saad <reach.saad@outlook.com> (@saad2134)
  * Licensed under the MIT License. See LICENSE in the project root for license information.
  */
 
-package com.example.dosezy
+package com.example.dosezy.domain
 
 import android.content.Context
 import android.content.Intent
@@ -45,7 +45,7 @@ import java.time.temporal.TemporalAdjusters
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
-class AuditBugfixesFreshDeepDive2Test {
+class AnalyticsRangeAndRecurrenceModuloTest {
 
     private lateinit var context: Context
 

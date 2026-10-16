@@ -1,4 +1,4 @@
-package com.example.dosezy
+﻿package com.example.dosezy.export
 
 import android.content.Context
 import com.example.dosezy.data.DosezyDatabase
@@ -35,7 +35,7 @@ import java.util.UUID
  *  4. Onboarding backup restore profile selection prioritizes isCurrentUser = true.
  *  5. Profile deletion theme preference synchronization and system fallback.
  */
-class AuditBugfixes12Test {
+class BackupFrequencyFormatAndProfileSelectionTest {
 
     private lateinit var mockContext: Context
     private lateinit var mockDatabase: DosezyDatabase

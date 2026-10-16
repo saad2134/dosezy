@@ -1,4 +1,4 @@
-package com.example.dosezy
+﻿package com.example.dosezy.data
 
 import android.content.Context
 import androidx.room.Room
@@ -49,7 +49,7 @@ import java.util.UUID
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
-class AuditBugfixes7Test {
+class DatabaseRestoreTransactionAndMigrationTest {
 
     private lateinit var context: Context
     private lateinit var db: DosezyDatabase

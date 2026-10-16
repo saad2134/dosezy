@@ -1,4 +1,4 @@
-package com.example.dosezy
+﻿package com.example.dosezy.notifications
 
 import android.content.Context
 import android.content.Intent
@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
-class AuditBugfixesTest {
+class AlarmAndNotificationRegressionTest {
 
     // ───────────────────────────────────────────────────────────────
     // Bug 1: Notification Click Routes to Schedule Screen

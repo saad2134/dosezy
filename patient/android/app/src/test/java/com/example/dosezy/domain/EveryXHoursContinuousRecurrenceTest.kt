@@ -1,4 +1,4 @@
-package com.example.dosezy
+﻿package com.example.dosezy.domain
 
 import android.content.Context
 import com.example.dosezy.data.DosezyDatabase
@@ -38,7 +38,7 @@ import java.util.UUID
  *  4. DataExporter.buildCsvContent includes weekly and monthly frequency day columns.
  *  5. DataExporter PDF report uses user.gender.displayName rather than raw enum identifier.
  */
-class AuditBugfixes13Test {
+class EveryXHoursContinuousRecurrenceTest {
 
     private lateinit var mockContext: Context
     private lateinit var mockDatabase: DosezyDatabase

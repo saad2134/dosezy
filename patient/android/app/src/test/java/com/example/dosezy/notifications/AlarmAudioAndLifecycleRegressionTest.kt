@@ -1,4 +1,4 @@
-package com.example.dosezy
+﻿package com.example.dosezy.notifications
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -33,7 +33,7 @@ import java.time.LocalDateTime
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
-class AuditBugfixes2Test {
+class AlarmAudioAndLifecycleRegressionTest {
 
     private lateinit var context: Context
 

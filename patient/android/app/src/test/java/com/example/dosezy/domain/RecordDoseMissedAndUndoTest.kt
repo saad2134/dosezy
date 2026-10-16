@@ -1,8 +1,9 @@
-package com.example.dosezy
+package com.example.dosezy.domain
 
 import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat
+import com.example.dosezy.R
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.example.dosezy.data.DosezyDatabase
@@ -41,7 +42,7 @@ import java.time.LocalTime
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
-class AuditBugfixes8Test {
+class RecordDoseMissedAndUndoTest {
 
     private lateinit var context: Context
     private lateinit var db: DosezyDatabase

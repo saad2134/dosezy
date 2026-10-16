@@ -1,9 +1,10 @@
-package com.example.dosezy
+package com.example.dosezy.notifications
 
 import android.app.AlarmManager
 import android.content.Context
 import android.media.MediaPlayer
 import androidx.test.core.app.ApplicationProvider
+import com.example.dosezy.R
 import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.Language
 import com.example.dosezy.data.model.MedicationStatus
@@ -34,7 +35,7 @@ import java.util.Locale
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
-class AuditBugfixes6Test {
+class AlarmAudioPlayerAnd24HourFormatTest {
 
     private lateinit var context: Context
 
