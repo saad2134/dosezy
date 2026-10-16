@@ -412,7 +412,8 @@ class BackupRestoreManager(
                             val alarmScheduler = com.example.dosezy.notifications.AlarmScheduler(context)
                             val existingSchedules = scheduleRepository.getSchedulesByUserSync(targetUserId)
                             existingSchedules.forEach { entry ->
-                                alarmScheduler.cancelAlarm(entry.entryId)
+                                // Guard: Pass entry directly to cancelAlarm to bypass sequential blocking DB lookups
+                                alarmScheduler.cancelAlarm(entry)
                                 alarmScheduler.cancelSnooze(entry.entryId)
                                 alarmScheduler.cancelNagging(entry.entryId)
                                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)

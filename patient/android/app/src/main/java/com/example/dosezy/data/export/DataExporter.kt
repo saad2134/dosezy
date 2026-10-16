@@ -111,14 +111,18 @@ class DataExporter(
         val fileName = "dosezy_report_${safeName}_$timestamp.pdf"
 
         val pdfDoc = pdfReportGenerator.buildPdfDocument(user, medicines, schedules)
-        // Guard: Use getExportDirectory() fallback to filesDir when externalFilesDir is null/unmounted to prevent NPE
-        val exportDir = getExportDirectory()
-        val file = File(exportDir, fileName)
-        FileOutputStream(file).use { out ->
-            pdfDoc.writeTo(out)
+        // Guard: Close native Skia PdfDocument in finally block to prevent C++ memory and file descriptor leaks on I/O failures
+        try {
+            // Guard: Use getExportDirectory() fallback to filesDir when externalFilesDir is null/unmounted to prevent NPE
+            val exportDir = getExportDirectory()
+            val file = File(exportDir, fileName)
+            FileOutputStream(file).use { out ->
+                pdfDoc.writeTo(out)
+            }
+            return@withContext file
+        } finally {
+            pdfDoc.close()
         }
-        pdfDoc.close()
-        return@withContext file
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -167,7 +171,6 @@ class DataExporter(
                                 val tempPdf = File(context.cacheDir, "${user.userId}.pdf")
                                 try {
                                     FileOutputStream(tempPdf).use { pdfDoc.writeTo(it) }
-                                    pdfDoc.close()
 
                                     val entry = ZipEntry("$userFolder/health_report.pdf")
                                     zipOutputStream.putNextEntry(entry)
@@ -177,6 +180,10 @@ class DataExporter(
                                     }
                                     zipOutputStream.closeEntry()
                                 } finally {
+                                    // Guard: Ensure native Skia PdfDocument is closed to prevent memory leaks on exception
+                                    try {
+                                        pdfDoc.close()
+                                    } catch (_: Exception) {}
                                     // Guard: Ensure temporary PDF file in cacheDir is deleted even if zip write throws an exception to prevent cache leak
                                     tempPdf.delete()
                                 }

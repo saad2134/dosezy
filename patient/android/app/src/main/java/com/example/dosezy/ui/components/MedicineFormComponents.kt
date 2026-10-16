@@ -49,6 +49,11 @@ fun isMedicineFormValid(
     )
 }
 
+// Guard: Validate that target userId is present and non-blank to prevent SQLiteConstraintException foreign key crash
+fun isMedicineFormReady(isFormValid: Boolean, userId: String?): Boolean {
+    return isFormValid && !userId.isNullOrBlank()
+}
+
 // -------------------------------------------------------------------------------------------------
 // Backward-compatible delegates to focused components in com.example.dosezy.ui.components.form
 // -------------------------------------------------------------------------------------------------

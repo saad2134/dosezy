@@ -249,6 +249,8 @@ fun AddMedScreen(
                 Button(
                     onClick = {
                         if (!isFormValid) return@Button
+                        // Guard: Abort save if target active user is null or blank to prevent SQLiteConstraintException foreign key crash
+                        val targetUserId = currentUser?.userId?.takeIf { it.isNotBlank() } ?: return@Button
 
                         val baseDose = if (hasDifferentDosages && scheduledTimesList.size > 1) {
                             val firstKey = scheduledTimesList.firstOrNull()?.let { String.format(java.util.Locale.US, "%02d:%02d", it.hour, it.minute) }
@@ -270,7 +272,7 @@ fun AddMedScreen(
 
                         val newMedicine = Medicine(
                             medicineId = UUID.randomUUID().toString(),
-                            userId = currentUser?.userId ?: "",
+                            userId = targetUserId,
                             medicationName = medicationName.trim(),
                             dosage = baseDose,
                             dosageUnit = selectedDosageUnit,
@@ -302,7 +304,7 @@ fun AddMedScreen(
                         navController.previousBackStackEntry?.savedStateHandle?.set("snackbar_message", context.getString(R.string.medication_added_success))
                         navController.popBackStack()
                     },
-                    enabled = isFormValid,
+                    enabled = isFormValid && !currentUser?.userId.isNullOrBlank(),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),

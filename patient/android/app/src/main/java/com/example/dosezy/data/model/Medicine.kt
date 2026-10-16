@@ -175,8 +175,9 @@ data class Medicine(
      *   if an unusually large number like 500 was entered representing mg strength).
      * - For liquid / drops (ML, DROP): deducts the specified dose quantity (at least 1).
      */
-    fun getStockDeductionAmount(time: LocalTime? = null): Int {
-        val targetDosage = getDosageForTime(time)
+    fun getStockDeductionAmount(time: LocalTime? = null, dosageOverride: Double? = null): Int {
+        // Guard: Use dosageOverride if provided to prevent stock deduction and restoration drift when a schedule entry has custom dosage
+        val targetDosage = dosageOverride ?: getDosageForTime(time)
         return when (dosageUnit) {
             // Chemical strength units (MG, MCG, MEQ): stock is counted in physical dosage units (1 per intake)
             DosageUnit.MG, DosageUnit.MCG, DosageUnit.MEQ -> 1

@@ -67,19 +67,39 @@ class ScheduleViewModel @Inject constructor(
         loadCurrentUserAndSchedule()
     }
 
+    private var currentObservedTodayDate: LocalDate? = null
+
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun observeTodaySchedule(userId: String) {
+    internal fun observeTodaySchedule(userId: String) {
         todayJob?.cancel()
         _isTodayLoading.value = true
+        val today = LocalDate.now()
+        currentObservedTodayDate = today
         todayJob = viewModelScope.launch {
             try {
-                scheduleRepository.getScheduleWithMedicineForDate(userId, LocalDate.now()).collect { entries ->
+                scheduleRepository.getScheduleWithMedicineForDate(userId, today).collect { entries ->
                     _todayScheduleWithMedicine.value = entries
                     _isTodayLoading.value = false
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error observing today schedule", e)
                 _isTodayLoading.value = false
+            }
+        }
+    }
+
+    // Guard: Reconnect today's schedule subscription when passing midnight so HomeScreen displays today's doses instead of remaining stuck on yesterday's query
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun checkMidnightDateTransition() {
+        val today = LocalDate.now()
+        if (currentObservedTodayDate != null && currentObservedTodayDate != today) {
+            val previousObserved = currentObservedTodayDate
+            _currentUserId.value?.let { userId ->
+                observeTodaySchedule(userId)
+                if (_selectedDate.value == previousObserved) {
+                    _selectedDate.value = today
+                    loadScheduleForDate(userId, today)
+                }
             }
         }
     }
@@ -262,6 +282,8 @@ class ScheduleViewModel @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun autoMarkMissedMedications(userId: String, missedAfterHours: Int) {
+        // Guard: Re-evaluate today's schedule subscription if crossing midnight before checking missed status
+        checkMidnightDateTransition()
         viewModelScope.launch {
             val currentTime = LocalDateTime.now()
             val cutoffTime = currentTime.minusHours(missedAfterHours.toLong())

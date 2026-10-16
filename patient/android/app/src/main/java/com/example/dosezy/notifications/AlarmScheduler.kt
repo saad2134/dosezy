@@ -227,7 +227,12 @@ class AlarmScheduler(private val context: Context) {
         var resolvedUserId = userId
         var resolvedDateTime = scheduledDateTime
 
-        // Guard: Resolve userId and scheduledDateTime from database if omitted to ensure slot alarm is unhooked
+        // Guard: Fast-path parse dateTime from entryId to avoid blocking database queries whenever possible
+        if (resolvedDateTime == null) {
+            resolvedDateTime = com.example.dosezy.data.repository.ScheduleRepository.parseDateTimeFromEntryId(entryId)
+        }
+
+        // Guard: Resolve userId and scheduledDateTime from database only if still omitted to ensure slot alarm is unhooked
         if (resolvedUserId == null || resolvedDateTime == null) {
             try {
                 val db = com.example.dosezy.data.DosezyDatabase.getInstance(context)
@@ -245,11 +250,6 @@ class AlarmScheduler(private val context: Context) {
 
         if (resolvedUserId != null && resolvedDateTime != null) {
             cancelSlotAlarm(resolvedUserId, resolvedDateTime)
-        } else {
-            val parsed = com.example.dosezy.data.repository.ScheduleRepository.parseDateTimeFromEntryId(entryId)
-            if (parsed != null && resolvedUserId != null) {
-                cancelSlotAlarm(resolvedUserId, parsed)
-            }
         }
     }
 

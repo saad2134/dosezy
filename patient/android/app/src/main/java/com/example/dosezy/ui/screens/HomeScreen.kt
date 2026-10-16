@@ -125,6 +125,8 @@ fun HomeScreen(
 
     // Auto-refresh every minute for real-time updates and run immediately on load
     LaunchedEffect(currentUser) {
+        // Guard: Reconnect today's schedule and calendar date on midnight transition to avoid displaying yesterday's doses
+        scheduleViewModel.checkMidnightDateTransition()
         currentUser?.let { user ->
             scheduleViewModel.autoMarkMissedMedications(
                 user.userId,
@@ -134,6 +136,9 @@ fun HomeScreen(
         while (true) {
             delay(60000) // Update every minute
             currentTime = LocalDateTime.now()
+
+            // Guard: Reconnect today's schedule and calendar date on midnight transition to avoid displaying yesterday's doses
+            scheduleViewModel.checkMidnightDateTransition()
 
             // Auto-mark as missed using ViewModel
             currentUser?.let { user ->

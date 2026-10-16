@@ -92,6 +92,14 @@ class PdfReportGenerator(private val context: Context) {
         }
     }
 
+    // Guard: Separate active vs discontinued/archived medications so doctors reading clinical reports are not misled into believing stopped drugs are currently active
+    internal fun partitionMedicines(medicines: List<Medicine>): Pair<List<Medicine>, List<Medicine>> =
+        medicines.partition { !it.isArchived }
+
+    internal fun formatActiveMedicationsHeader(count: Int): String = "Active Medications ($count)"
+
+    internal fun formatDiscontinuedMedicationsHeader(count: Int): String = "Discontinued Medications ($count)"
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun buildPdfDocument(user: User, medicines: List<Medicine>, schedules: List<ScheduleEntry>): PdfDocument {
         val pdfDocument = PdfDocument()
@@ -228,9 +236,12 @@ class PdfReportGenerator(private val context: Context) {
         canvas.drawLine(40f, y, 555f, y, linePaint)
         y += 20f
 
-        // Active Medications Table
+        // Active & Discontinued Medications Tables
+        // Guard: Separate active vs discontinued/archived medications so doctors reading clinical reports are not misled into believing stopped drugs are currently active
+        val (activeMeds, archivedMeds) = partitionMedicines(medicines)
+
         checkPageBreak(50f)
-        canvas.drawText("Active Medications (${medicines.size})", 40f, y, headerPaint)
+        canvas.drawText(formatActiveMedicationsHeader(activeMeds.size), 40f, y, headerPaint)
         y += 18f
 
         subtitlePaint.isFakeBoldText = true
@@ -242,7 +253,7 @@ class PdfReportGenerator(private val context: Context) {
         y += 16f
 
         subtitlePaint.isFakeBoldText = false
-        medicines.forEach { med ->
+        activeMeds.forEach { med ->
             checkPageBreak(20f)
             canvas.drawText(med.medicationName, 40f, y, textPaint)
             canvas.drawText("${med.dosage} ${med.dosageUnit}", 220f, y, textPaint)
@@ -250,9 +261,36 @@ class PdfReportGenerator(private val context: Context) {
             canvas.drawText(freqLabel, 360f, y, textPaint)
             y += 16f
         }
-        if (medicines.isEmpty()) {
+        if (activeMeds.isEmpty()) {
             canvas.drawText("No active medications recorded.", 40f, y, textPaint)
             y += 16f
+        }
+
+        if (archivedMeds.isNotEmpty()) {
+            y += 10f
+            canvas.drawLine(40f, y, 555f, y, linePaint)
+            y += 20f
+
+            checkPageBreak(50f)
+            canvas.drawText(formatDiscontinuedMedicationsHeader(archivedMeds.size), 40f, y, headerPaint)
+            y += 18f
+
+            subtitlePaint.isFakeBoldText = true
+            canvas.drawText("Medication", 40f, y, subtitlePaint)
+            canvas.drawText("Dosage", 220f, y, subtitlePaint)
+            canvas.drawText("Status", 360f, y, subtitlePaint)
+            y += 12f
+            canvas.drawLine(40f, y, 555f, y, linePaint)
+            y += 16f
+
+            subtitlePaint.isFakeBoldText = false
+            archivedMeds.forEach { med ->
+                checkPageBreak(20f)
+                canvas.drawText(med.medicationName, 40f, y, textPaint)
+                canvas.drawText("${med.dosage} ${med.dosageUnit}", 220f, y, textPaint)
+                canvas.drawText("Discontinued", 360f, y, textPaint)
+                y += 16f
+            }
         }
 
         y += 10f

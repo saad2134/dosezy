@@ -334,9 +334,12 @@ fun EditMedScreen(
                                     if (map.isNotEmpty()) map else null
                                 } else null
 
+                                // Guard: Preserve original medicine owner userId or fallback to active non-blank user; abort if absent to prevent SQLiteConstraintException
+                                val targetUserId = medicineToEdit?.userId ?: currentUser?.userId?.takeIf { it.isNotBlank() } ?: return@Button
+
                                 val updatedMedicine = Medicine(
                                     medicineId = medicineToEdit?.medicineId ?: UUID.randomUUID().toString(),
-                                    userId = currentUser?.userId ?: "",
+                                    userId = targetUserId,
                                     medicationName = medicationName,
                                     dosage = baseDose,
                                     dosageUnit = selectedDosageUnit,
@@ -383,7 +386,7 @@ fun EditMedScreen(
                                 }
                                 navController.popBackStack()
                             },
-                            enabled = isFormValid,
+                            enabled = isFormValid && (medicineToEdit != null || !currentUser?.userId.isNullOrBlank()),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),

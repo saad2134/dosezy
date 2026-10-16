@@ -115,7 +115,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             entry.scheduledDateTime.isBefore(activeWindowEnd)
         }
         entriesToCancel.forEach { entry ->
-            alarmScheduler.cancelAlarm(entry.entryId)
+            // Guard: Pass entry directly to cancelAlarm to bypass sequential blocking DB lookups
+            alarmScheduler.cancelAlarm(entry)
             alarmScheduler.cancelSnooze(entry.entryId)
             alarmScheduler.cancelNagging(entry.entryId)
             alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
@@ -145,7 +146,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 entry.scheduledDateTime.isBefore(activeWindowEnd)
             }
             entriesToCancel.forEach { entry ->
-                alarmScheduler.cancelAlarm(entry.entryId)
+                // Guard: Pass entry directly to cancelAlarm to bypass sequential blocking DB lookups
+                alarmScheduler.cancelAlarm(entry)
                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
             }
 
@@ -295,7 +297,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             try {
                 val medicine = database.medicineDao().getMedicineByIdDirect(previousEntry.medicineId)
                 if (medicine != null && medicine.currentStock != null && medicine.autoDeductOnTake) {
-                    val deductAmount = medicine.getStockDeductionAmount(previousEntry.scheduledDateTime.toLocalTime())
+                    // Guard: Pass previousEntry.dosage to getStockDeductionAmount to prevent inventory calculation drift on custom dose overrides
+                    val deductAmount = medicine.getStockDeductionAmount(previousEntry.scheduledDateTime.toLocalTime(), previousEntry.dosage)
                     val newStock = (medicine.currentStock - deductAmount).coerceAtLeast(0)
                     val updatedMedicine = medicine.copy(currentStock = newStock)
                     database.medicineDao().updateMedicine(updatedMedicine)
@@ -504,7 +507,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             try {
                 val medicine = database.medicineDao().getMedicineByIdDirect(previousEntry.medicineId)
                 if (medicine != null && medicine.currentStock != null && medicine.autoDeductOnTake) {
-                    val addAmount = medicine.getStockDeductionAmount(previousEntry.scheduledDateTime.toLocalTime())
+                    // Guard: Pass previousEntry.dosage to getStockDeductionAmount so undoing restores exact consumed quantity on custom dose overrides
+                    val addAmount = medicine.getStockDeductionAmount(previousEntry.scheduledDateTime.toLocalTime(), previousEntry.dosage)
                     val restoredStock = medicine.currentStock + addAmount
                     val updatedMedicine = medicine.copy(currentStock = restoredStock)
                     database.medicineDao().updateMedicine(updatedMedicine)
