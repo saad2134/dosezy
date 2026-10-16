@@ -102,6 +102,7 @@ class MedicineNotificationManager @Inject constructor(
         }
     }
 
+    // Guard: Dispatch callback on Dispatchers.Main to prevent CalledFromWrongThreadException when mutating UI or Compose state
     fun checkAlarmStatus(userId: String, callback: (scheduledCount: Int, totalCount: Int) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -111,10 +112,14 @@ class MedicineNotificationManager @Inject constructor(
                             it.status == MedicationStatus.PENDING
                 }
 
-                callback(futureEntries.size, allEntries.size)
+                withContext(Dispatchers.Main) {
+                    callback(futureEntries.size, allEntries.size)
+                }
             } catch (e: Exception) {
                 Log.e(TAG, "Error checking alarm status", e)
-                callback(0, 0)
+                withContext(Dispatchers.Main) {
+                    callback(0, 0)
+                }
             }
         }
     }

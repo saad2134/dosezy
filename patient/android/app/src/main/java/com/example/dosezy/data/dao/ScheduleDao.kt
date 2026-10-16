@@ -39,10 +39,12 @@ interface ScheduleDao {
     @Update
     suspend fun updateScheduleEntry(entry: ScheduleEntry)
 
-    @Query("UPDATE schedule_entries SET status = :status, takenAt = :takenAt WHERE entryId = :entryId")
+    // Guard: Clear skipReason = NULL when marking taken or missed so prior skip reasons do not leak into history or medical export reports
+    @Query("UPDATE schedule_entries SET status = :status, takenAt = :takenAt, skipReason = NULL WHERE entryId = :entryId")
     suspend fun updateMedicationStatus(entryId: String, status: String, takenAt: Long?)
 
-    @Query("UPDATE schedule_entries SET status = :status, takenAt = :takenAt, doseNotes = :notes WHERE entryId = :entryId")
+    // Guard: Clear skipReason = NULL when marking taken with notes so prior skip reasons do not leak into history or medical export reports
+    @Query("UPDATE schedule_entries SET status = :status, takenAt = :takenAt, doseNotes = :notes, skipReason = NULL WHERE entryId = :entryId")
     suspend fun updateMedicationStatusWithNotes(entryId: String, status: String, takenAt: Long?, notes: String?)
 
     @Query("UPDATE schedule_entries SET doseNotes = :notes WHERE entryId = :entryId")

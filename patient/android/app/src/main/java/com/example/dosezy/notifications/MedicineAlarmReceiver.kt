@@ -184,12 +184,13 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             action == Intent.ACTION_DATE_CHANGED) {
             
             Log.d(TAG, "Received system broadcast action: $action - rescheduling all alarms")
-            val pendingResult = goAsync()
+            // Guard: goAsync() returns null in unit tests and can throw if receiver lifecycle expired; guard against NPE and IllegalStateException
+            val pendingResult = try { goAsync() } catch (_: Exception) { null }
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     rescheduleAllAlarms(context)
                 } finally {
-                    pendingResult.finish()
+                    pendingResult?.finish()
                 }
             }
             return
@@ -203,7 +204,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         val naggingCount = intent?.getIntExtra(EXTRA_NAGGING_COUNT, 0) ?: 0
 
         if (entryId != null && medicineName != null) {
-            val pendingResult = goAsync()
+            // Guard: goAsync() returns null in unit tests and can throw if receiver lifecycle expired; guard against NPE and IllegalStateException
+            val pendingResult = try { goAsync() } catch (_: Exception) { null }
             val powerManager = context.getSystemService(Context.POWER_SERVICE) as? android.os.PowerManager
             // Guard: ACQUIRE_CAUSES_WAKEUP deprecated in API 33+ but required to turn screen on for alarms on API 24-32
             @Suppress("DEPRECATION")
@@ -316,7 +318,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                             wakeLock.release()
                         }
                     } catch (_: Exception) {}
-                    pendingResult.finish()
+                    pendingResult?.finish()
                 }
             }
         }

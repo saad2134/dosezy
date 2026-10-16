@@ -33,9 +33,19 @@ class GenerateSchedulesUseCase @Inject constructor(
         try {
             val medicines = database.medicineDao().getActiveMedicinesByUser(userId).first()
             medicines.forEach { medicine ->
+                // Guard: Skip expired finite medications whose endDate is in the past to prevent redundant SQLite queries and recalculations
+                if (medicine.endDate != null && medicine.endDate.isBefore(LocalDate.now())) {
+                    return@forEach
+                }
+
                 if (!medicine.isArchived) {
                     val scheduleEntries = database.scheduleDao().getScheduleEntriesByMedicine(medicine.medicineId)
                     val latestEntry = scheduleEntries.maxByOrNull { it.scheduledDateTime }
+
+                    // Guard: Skip if schedule already reached the medication finite endDate to prevent repeated recurrence scans
+                    if (medicine.endDate != null && latestEntry != null && !latestEntry.scheduledDateTime.toLocalDate().isBefore(medicine.endDate)) {
+                        return@forEach
+                    }
 
                     if (latestEntry == null || latestEntry.scheduledDateTime.isBefore(LocalDateTime.now().plusDays(15))) {
                         val today = LocalDate.now()
