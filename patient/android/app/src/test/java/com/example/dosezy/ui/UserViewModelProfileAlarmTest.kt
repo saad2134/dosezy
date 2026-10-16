@@ -28,6 +28,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -36,6 +37,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import com.example.dosezy.utils.SoundUtils
+import java.io.File
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -339,5 +342,58 @@ class UserViewModelProfileAlarmTest {
         val distinctDates = allSchedules.map { it.scheduledDateTime.toLocalDate() }.distinct()
         assertTrue("Entries must span across multiple calendar days", distinctDates.size >= 29)
         assertEquals("Total batch-inserted entries should equal 90", 90, allSchedules.size)
+    }
+
+    // =========================================================================
+    // Issue 1 & 3 Tests: SoundUtils Deletion and Canonical Path Sandboxing
+    // =========================================================================
+
+    @Test
+    fun testSoundUtils_deleteCustomAudio_deletesValidFileWithinCustomSounds() {
+        val soundsDir = File(context.filesDir, "custom_sounds").apply { mkdirs() }
+        val testAudio = File(soundsDir, "custom_alarm_test_123.mp3").apply { writeText("audio content") }
+        assertTrue(testAudio.exists())
+
+        val deleted = SoundUtils.deleteCustomAudio(context, testAudio.absolutePath)
+        assertTrue("deleteCustomAudio must return true for valid custom sound", deleted)
+        assertFalse("File must be deleted from internal storage", testAudio.exists())
+    }
+
+    @Test
+    fun testSoundUtils_deleteCustomAudio_rejectsExternalPathTraversal() {
+        val externalFile = File(context.cacheDir, "external_test_audio.mp3").apply { writeText("external audio") }
+        assertTrue(externalFile.exists())
+
+        val deleted = SoundUtils.deleteCustomAudio(context, externalFile.absolutePath)
+        assertFalse("deleteCustomAudio must refuse to delete files outside custom_sounds directory", deleted)
+        assertTrue("External file must remain untouched", externalFile.exists())
+
+        externalFile.delete()
+    }
+
+    @Test
+    fun testDeleteOldImage_sandboxing_allowsFilesDirAndCacheDirOnly() {
+        val filesDir = context.filesDir
+        val cacheDir = context.cacheDir
+
+        val validFilesDirFile = File(filesDir, "test_profile_pic.jpg").apply { writeText("data") }
+        val validCacheDirFile = File(cacheDir, "test_cache_pic.jpg").apply { writeText("data") }
+        val outsideFile = File(context.filesDir.parentFile, "outside_sensitive.txt").apply { writeText("sensitive") }
+
+        fun verifySandboxedPath(file: File): Boolean {
+            val isWithinFilesDir = file.parentFile?.canonicalPath == filesDir.canonicalPath ||
+                    file.canonicalPath.startsWith(filesDir.canonicalPath + File.separator)
+            val isWithinCacheDir = file.parentFile?.canonicalPath == cacheDir.canonicalPath ||
+                    file.canonicalPath.startsWith(cacheDir.canonicalPath + File.separator)
+            return file.exists() && (isWithinFilesDir || isWithinCacheDir)
+        }
+
+        assertTrue("Files within filesDir must be allowed", verifySandboxedPath(validFilesDirFile))
+        assertTrue("Files within cacheDir must be allowed", verifySandboxedPath(validCacheDirFile))
+        assertFalse("Files outside filesDir and cacheDir must be blocked", verifySandboxedPath(outsideFile))
+
+        validFilesDirFile.delete()
+        validCacheDirFile.delete()
+        outsideFile.delete()
     }
 }

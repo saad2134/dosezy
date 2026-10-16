@@ -454,4 +454,72 @@ class RecordDoseMissedAndUndoTest {
         assertNotNull(medAfterUndo)
         assertEquals(1, medAfterUndo!!.currentStock)
     }
+
+    @Test
+    fun testRecordDoseTaken_triggersRefillAlert_whenInitialStockEqualsThreshold() = runBlocking {
+        MedicineAlarmReceiver.createNotificationChannels(context)
+
+        // Stock is exactly equal to refillThreshold (5 pills)
+        val med = testMedicine.copy(
+            medicineId = "med_refill_boundary_test",
+            dosage = 1.0,
+            dosageUnit = DosageUnit.TABLET,
+            currentStock = 5,
+            refillThreshold = 5,
+            autoDeductOnTake = true
+        )
+        db.medicineDao().insertMedicine(med)
+
+        val entry = ScheduleEntry(
+            entryId = "entry_refill_boundary_test_1",
+            userId = testUser.userId,
+            medicineId = med.medicineId,
+            scheduledDateTime = LocalDateTime.now(),
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        db.scheduleDao().insertScheduleEntry(entry)
+
+        // Record dose taken: stock drops from 5 to 4
+        scheduleRepository.recordDoseTaken(entry.entryId, context = context)
+
+        val updatedMed = db.medicineDao().getMedicineByIdDirect(med.medicineId)
+        assertNotNull(updatedMed)
+        assertEquals(4, updatedMed!!.currentStock)
+
+        // Verify notification was posted for the refill alert
+        val refillNotifId = (med.medicineId + "_refill").hashCode()
+        val activeNotifs = notificationManager.activeNotifications
+        assertTrue("Refill notification must be posted when stock transitions from threshold to below threshold",
+            activeNotifs.any { it.id == refillNotifId })
+    }
+
+    @Test
+    fun testLogAsNeededDose_triggersRefillAlert_whenInitialStockEqualsThreshold() = runBlocking {
+        MedicineAlarmReceiver.createNotificationChannels(context)
+
+        // Stock is exactly equal to refillThreshold (3 pills)
+        val prnMed = testMedicine.copy(
+            medicineId = "med_prn_refill_boundary_test",
+            dosage = 1.0,
+            dosageUnit = DosageUnit.TABLET,
+            frequency = Frequency(FrequencyPattern.AS_NEEDED),
+            currentStock = 3,
+            refillThreshold = 3,
+            autoDeductOnTake = true
+        )
+        db.medicineDao().insertMedicine(prnMed)
+
+        // Log as-needed dose: stock drops from 3 to 2
+        scheduleRepository.logAsNeededDose(prnMed, testUser.userId, context = context)
+
+        val updatedMed = db.medicineDao().getMedicineByIdDirect(prnMed.medicineId)
+        assertNotNull(updatedMed)
+        assertEquals(2, updatedMed!!.currentStock)
+
+        val refillNotifId = (prnMed.medicineId + "_refill").hashCode()
+        val activeNotifs = notificationManager.activeNotifications
+        assertTrue("Refill notification must be posted on PRN dose when stock transitions from threshold to below threshold",
+            activeNotifs.any { it.id == refillNotifId })
+    }
 }

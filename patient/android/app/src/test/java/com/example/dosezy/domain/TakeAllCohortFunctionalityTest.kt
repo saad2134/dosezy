@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2026 Saad <reach.saad@outlook.com> (@saad2134)
  * Licensed under the MIT License. See LICENSE in the project root for license information.
  */
@@ -21,6 +21,7 @@ import com.example.dosezy.data.model.User
 import com.example.dosezy.data.repository.MedicineRepository
 import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.data.repository.UserRepository
+import com.example.dosezy.domain.usecases.TakeCohortUseCase
 import com.example.dosezy.notifications.IntakeSafeguardManager
 import com.example.dosezy.utils.TimeCalculationUtils
 import kotlinx.coroutines.runBlocking
@@ -402,5 +403,42 @@ class TakeAllCohortFunctionalityTest {
         assertEquals(MedicationStatus.PENDING, e2?.status)
         assertEquals(30, database.medicineDao().getMedicineByIdDirect(medA.medicineId)?.currentStock)
         assertEquals(15, database.medicineDao().getMedicineByIdDirect(medB.medicineId)?.currentStock)
+    }
+
+    @Test
+    fun testTakeCohortUseCase_cancelsActiveIntakeSafeguardCountdown() = runBlocking {
+        val entry = ScheduleEntry(
+            entryId = "entry_safeguard_cohort_take_usecase",
+            userId = testUser.userId,
+            medicineId = medA.medicineId,
+            scheduledDateTime = LocalDateTime.now(),
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        database.scheduleDao().insertScheduleEntry(entry)
+
+        // 1. Simulate user initiating an intake countdown
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entry.entryId,
+            entryIds = listOf(entry.entryId),
+            medicineName = medA.medicationName,
+            medicineNames = listOf(medA.medicationName),
+            scheduledTime = "08:00 AM",
+            durationSeconds = 120
+        )
+        assertNotNull("Intake countdown must be active", IntakeSafeguardManager.activeCountdown.value)
+
+        // 2. User confirms taking the dose via TakeCohortUseCase
+        val takeCohortUseCase = TakeCohortUseCase(database, scheduleRepository, context)
+        takeCohortUseCase.invoke(listOf(entry.entryId), user = testUser)
+
+        // 3. Assert dose is recorded as taken in database
+        val updatedEntry = database.scheduleDao().getScheduleEntryById(entry.entryId)
+        assertNotNull(updatedEntry)
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, updatedEntry!!.status)
+
+        // 4. Guard assertion: Active intake countdown must be cancelled so no phantom re-alert fires
+        assertNull("Active intake countdown must be cancelled upon dose completion", IntakeSafeguardManager.activeCountdown.value)
     }
 }

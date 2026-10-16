@@ -43,10 +43,12 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.io.File
+import java.io.FileInputStream
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.UUID
+import java.util.zip.ZipInputStream
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
@@ -528,5 +530,137 @@ class DatabaseRestoreTransactionAndMigrationTest {
         // 4. Assert that old image file was deleted from disk and safeguard countdown was cancelled
         assertFalse("Old medicine image file must be deleted on overwrite restore", oldMedImage.exists())
         assertNull("Active safeguard countdown must be cancelled on overwrite restore", com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value)
+    }
+
+    @Test
+    fun testBackupRestoreManager_packagesAndRestoresCustomAlarmAudio_createNew() = runBlocking {
+        // 1. Create a user with custom alarm audio
+        val soundsDir = File(context.filesDir, "custom_sounds").apply { mkdirs() }
+        val sourceAudio = File(soundsDir, "custom_alarm_source.mp3").apply { writeText("custom ringtone mp3 audio") }
+
+        val user = User(
+            userId = "user_custom_sound",
+            fullName = "Custom Sound User",
+            age = 30,
+            gender = Gender.FEMALE,
+            contactNumber = "+1234567890",
+            theme = Theme.SYSTEM,
+            timeFormat = TimeFormat.HOUR_12,
+            language = Language.ENGLISH,
+            alarmSound = AlarmSound.CUSTOM,
+            customAlarmSoundPath = sourceAudio.absolutePath,
+            customAlarmSoundTitle = "My Custom Song",
+            isCurrentUser = true
+        )
+        db.userDao().insertUser(user)
+
+        // 2. Create full backup zip
+        val backupZip = backupManager.createFullBackupZip()
+        assertTrue("Backup zip must be created", backupZip.exists())
+
+        // 3. Inspect zip entries to verify custom_alarm.mp3 is packaged under user's profile
+        var foundCustomAlarmEntry = false
+        ZipInputStream(FileInputStream(backupZip)).use { zis ->
+            var entry = zis.nextEntry
+            while (entry != null) {
+                if (entry.name == "profiles/${user.userId}/custom_alarm.mp3") {
+                    foundCustomAlarmEntry = true
+                }
+                zis.closeEntry()
+                entry = zis.nextEntry
+            }
+        }
+        assertTrue("Backup zip must contain custom_alarm.mp3 entry", foundCustomAlarmEntry)
+
+        // 4. Test restore via CREATE_NEW
+        val tempDir = File(context.cacheDir, "test_restore_sound_${System.currentTimeMillis()}")
+        val profileFolder = File(tempDir, "profiles/${user.userId}").apply { mkdirs() }
+        File(profileFolder, "profile.json").writeText(testGson.toJson(user))
+        File(profileFolder, "custom_alarm.mp3").writeText("custom ringtone mp3 audio")
+
+        val decision = ProfileImportDecision(
+            summary = ImportableProfileSummary(
+                originalUserId = user.userId,
+                name = user.fullName,
+                age = user.age,
+                gender = user.gender.name,
+                medicineCount = 0,
+                scheduleCount = 0,
+                avatarTempPath = null,
+                isConflict = false,
+                existingLocalUserId = null,
+                profileFolder = profileFolder
+            ),
+            isSelected = true,
+            conflictStrategy = ConflictStrategy.CREATE_NEW
+        )
+
+        val restoreResult = backupManager.executeSelectiveRestore(tempDir, listOf(decision))
+        assertTrue(restoreResult.success)
+
+        // 5. Verify the newly created profile points to an unpacked local sound file that exists on disk
+        val restoredUsers = db.userDao().getAllUsersDirect().filter { it.userId != user.userId }
+        assertEquals(1, restoredUsers.size)
+        val restoredUser = restoredUsers.first()
+        assertNotNull("Restored user must have customAlarmSoundPath populated", restoredUser.customAlarmSoundPath)
+        assertTrue("Unpacked custom alarm audio file must exist on disk", File(restoredUser.customAlarmSoundPath!!).exists())
+        assertEquals(AlarmSound.CUSTOM, restoredUser.alarmSound)
+    }
+
+    @Test
+    fun testBackupRestoreManager_overwriteDeletesOldCustomAudioOnDisk() = runBlocking {
+        // 1. Existing local user with sound file A
+        val soundsDir = File(context.filesDir, "custom_sounds").apply { mkdirs() }
+        val oldAudio = File(soundsDir, "custom_alarm_old.mp3").apply { writeText("old audio") }
+
+        val localUser = User(
+            userId = "user_overwrite_sound",
+            fullName = "Existing User",
+            age = 45,
+            gender = Gender.MALE,
+            contactNumber = "+1987654321",
+            theme = Theme.LIGHT,
+            timeFormat = TimeFormat.HOUR_24,
+            language = Language.ENGLISH,
+            alarmSound = AlarmSound.CUSTOM,
+            customAlarmSoundPath = oldAudio.absolutePath,
+            isCurrentUser = true
+        )
+        db.userDao().insertUser(localUser)
+        assertTrue("Old audio must initially exist", oldAudio.exists())
+
+        // 2. Prepare backup profile folder with sound file B
+        val tempDir = File(context.cacheDir, "test_overwrite_sound_${System.currentTimeMillis()}")
+        val profileFolder = File(tempDir, "profiles/backup_user").apply { mkdirs() }
+        val incomingUser = localUser.copy(fullName = "Updated User")
+        File(profileFolder, "profile.json").writeText(testGson.toJson(incomingUser))
+        File(profileFolder, "custom_alarm.mp3").writeText("new audio contents")
+
+        val decision = ProfileImportDecision(
+            summary = ImportableProfileSummary(
+                originalUserId = "backup_user",
+                name = incomingUser.fullName,
+                age = incomingUser.age,
+                gender = incomingUser.gender.name,
+                medicineCount = 0,
+                scheduleCount = 0,
+                avatarTempPath = null,
+                isConflict = true,
+                existingLocalUserId = localUser.userId,
+                profileFolder = profileFolder
+            ),
+            isSelected = true,
+            conflictStrategy = ConflictStrategy.OVERWRITE
+        )
+
+        val restoreResult = backupManager.executeSelectiveRestore(tempDir, listOf(decision))
+        assertTrue(restoreResult.success)
+
+        // 3. Verify old audio file A was deleted from disk and replaced by new audio file
+        assertFalse("Old audio file must be deleted upon overwrite restore", oldAudio.exists())
+        val updatedLocalUser = db.userDao().getUserByIdDirect(localUser.userId)
+        assertNotNull(updatedLocalUser)
+        assertNotNull(updatedLocalUser!!.customAlarmSoundPath)
+        assertTrue("New audio file must exist on disk", File(updatedLocalUser.customAlarmSoundPath!!).exists())
     }
 }
