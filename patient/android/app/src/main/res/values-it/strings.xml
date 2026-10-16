@@ -569,7 +569,7 @@ Vuoi continuare?</string>
     <string name="alarm_duration_1m">1 minuto</string>
     <string name="alarm_duration_2m">2 minuti</string>
     <string name="alarm_duration_5m">5 minuti</string>
-    <string name="alarm_silenced_auto_banner">Allarme silenziato automaticamente — registra le dosi quando sei pronto</string>
+    <string name="alarm_silenced_auto_banner">Allarme silenziato automaticamente - registra le dosi quando sei pronto</string>
 
     <string name="alarm_sound_custom">File audio personalizzato</string>
     <string name="alarm_sound_select_file">Scegli file audio</string>

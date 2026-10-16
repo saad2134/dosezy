@@ -663,4 +663,103 @@ class DatabaseRestoreTransactionAndMigrationTest {
         assertNotNull(updatedLocalUser!!.customAlarmSoundPath)
         assertTrue("New audio file must exist on disk", File(updatedLocalUser.customAlarmSoundPath!!).exists())
     }
+
+    @Test
+    fun testBackupRestoreManager_emergencyCountryExportAndRestoreAndOverwriteScrubbing() = runBlocking {
+        // 1. Export verification: Configure user and per-profile emergency country code
+        val exportUser = User(
+            userId = "user_em_export",
+            fullName = "Emergency Export User",
+            age = 30,
+            gender = Gender.MALE,
+            contactNumber = "+1112223333",
+            isCurrentUser = true
+        )
+        db.userDao().insertUser(exportUser)
+        val emergencyPrefs = context.getSharedPreferences("emergency_prefs", Context.MODE_PRIVATE)
+        val contactsPrefs = context.getSharedPreferences("emergency_contacts", Context.MODE_PRIVATE)
+
+        emergencyPrefs.edit().putString("selected_country_code_${exportUser.userId}", "GB").commit()
+
+        val zipFile = backupManager.createFullBackupZip()
+        assertTrue("Backup zip file must exist", zipFile.exists())
+
+        var foundEmergencyCountryEntry = false
+        var extractedCountryCode = ""
+        ZipInputStream(FileInputStream(zipFile)).use { zis ->
+            var entry = zis.nextEntry
+            while (entry != null) {
+                if (entry.name == "profiles/${exportUser.userId}/emergency_country.txt") {
+                    foundEmergencyCountryEntry = true
+                    extractedCountryCode = zis.bufferedReader().readText()
+                    break
+                }
+                entry = zis.nextEntry
+            }
+        }
+        assertTrue("Backup zip must contain profiles/${exportUser.userId}/emergency_country.txt", foundEmergencyCountryEntry)
+        assertEquals("GB", extractedCountryCode)
+
+        // 2. Overwrite restore verification: Set stale local contacts and country
+        contactsPrefs.edit().putString("contacts_json_${exportUser.userId}", "[{\"name\":\"Stale Contact\"}]").commit()
+        emergencyPrefs.edit().putString("selected_country_code_${exportUser.userId}", "US").commit()
+
+        // Incoming backup folder has CA for country, but no emergency contacts file
+        val tempDir = File(context.cacheDir, "test_overwrite_em_${System.currentTimeMillis()}")
+        val profileFolder = File(tempDir, "profiles/backup_em_user").apply { mkdirs() }
+        File(profileFolder, "profile.json").writeText(testGson.toJson(exportUser))
+        File(profileFolder, "emergency_country.txt").writeText("CA")
+
+        val decision = ProfileImportDecision(
+            summary = ImportableProfileSummary(
+                originalUserId = "backup_em_user",
+                name = exportUser.fullName,
+                age = exportUser.age,
+                gender = exportUser.gender.name,
+                medicineCount = 0,
+                scheduleCount = 0,
+                avatarTempPath = null,
+                isConflict = true,
+                existingLocalUserId = exportUser.userId,
+                profileFolder = profileFolder
+            ),
+            isSelected = true,
+            conflictStrategy = ConflictStrategy.OVERWRITE
+        )
+
+        val restoreResult = backupManager.executeSelectiveRestore(tempDir, listOf(decision))
+        assertTrue(restoreResult.success)
+
+        // Verify emergency country updated to CA and stale emergency contacts scrubbed
+        assertEquals("CA", emergencyPrefs.getString("selected_country_code_${exportUser.userId}", null))
+        assertNull(contactsPrefs.getString("contacts_json_${exportUser.userId}", null))
+
+        // 3. Overwrite with missing country file scrubs existing country code
+        val tempDir2 = File(context.cacheDir, "test_overwrite_em_empty_${System.currentTimeMillis()}")
+        val profileFolder2 = File(tempDir2, "profiles/backup_em_user_2").apply { mkdirs() }
+        File(profileFolder2, "profile.json").writeText(testGson.toJson(exportUser))
+        // No emergency_country.txt in profileFolder2
+
+        val decision2 = ProfileImportDecision(
+            summary = ImportableProfileSummary(
+                originalUserId = "backup_em_user_2",
+                name = exportUser.fullName,
+                age = exportUser.age,
+                gender = exportUser.gender.name,
+                medicineCount = 0,
+                scheduleCount = 0,
+                avatarTempPath = null,
+                isConflict = true,
+                existingLocalUserId = exportUser.userId,
+                profileFolder = profileFolder2
+            ),
+            isSelected = true,
+            conflictStrategy = ConflictStrategy.OVERWRITE
+        )
+
+        val restoreResult2 = backupManager.executeSelectiveRestore(tempDir2, listOf(decision2))
+        assertTrue(restoreResult2.success)
+        assertNull(emergencyPrefs.getString("selected_country_code_${exportUser.userId}", null))
+    }
 }
+

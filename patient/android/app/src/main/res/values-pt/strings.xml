@@ -568,7 +568,7 @@ Deseja continuar?</string>
     <string name="alarm_duration_1m">1 minuto</string>
     <string name="alarm_duration_2m">2 minutos</string>
     <string name="alarm_duration_5m">5 minutos</string>
-    <string name="alarm_silenced_auto_banner">Alarme silenciado automaticamente — registre suas doses quando estiver pronto</string>
+    <string name="alarm_silenced_auto_banner">Alarme silenciado automaticamente - registre suas doses quando estiver pronto</string>
 
     <string name="alarm_sound_custom">Arquivo de áudio personalizado</string>
     <string name="alarm_sound_select_file">Escolher arquivo de áudio</string>

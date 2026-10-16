@@ -91,4 +91,23 @@ class DosezyAppWidgetProviderTest {
         DosezyAppWidgetProvider.updateAppWidgets(context)
         org.robolectric.shadows.ShadowLooper.idleMainLooper()
     }
+
+    @Test
+    fun testWidgetProfileTheme_preservesSpecificProfileThemeIndependentOfAppPrefs() {
+        // Guard: Specific profile theme must override global app theme for dedicated profile widgets
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        prefs.edit().putString("theme", "light").commit()
+
+        val userId = "user_dark_mode"
+        DosezyWidgetPrefs.saveWidgetProfileTheme(context, userId, "dark", isCurrentProfile = false)
+
+        // Verify target profile widget resolves to dark despite global app theme being light
+        assertTrue(DosezyAppWidgetProvider.isWidgetDark(context, userId))
+
+        // When saved as light, resolves to light even if global app theme is dark
+        prefs.edit().putString("theme", "dark").commit()
+        DosezyWidgetPrefs.saveWidgetProfileTheme(context, userId, "light", isCurrentProfile = false)
+        assertFalse(DosezyAppWidgetProvider.isWidgetDark(context, userId))
+    }
 }
+

@@ -64,6 +64,7 @@ fun ProfilePicturePicker(
     val context = LocalContext.current
     var showImageSourceDialog by remember { mutableStateOf(false) }
     var tempUri by remember { mutableStateOf<Uri?>(null) }
+    var tempFile by remember { mutableStateOf<File?>(null) }
     var showError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
@@ -104,17 +105,25 @@ fun ProfilePicturePicker(
                 errorMessage = "Camera capture failed"
                 showError = true
             }
+            // Guard: Clean up temporary camera capture file from cache on both success and cancellation to prevent storage leaks
+            try {
+                tempFile?.let { if (it.exists()) it.delete() }
+            } catch (_: Exception) {}
             tempUri = null
+            tempFile = null
         }
     )
 
     // Camera open action (lambda)
     val openCamera = {
         try {
-            val uri = createImageFileUri(context)
-            if (uri != null) {
-                tempUri = uri
-                cameraLauncher.launch(uri)
+            // Guard: Clean up any prior unconfirmed camera capture file before launching new capture
+            try { tempFile?.let { if (it.exists()) it.delete() } } catch (_: Exception) {}
+            val fileResult = createImageFile(context)
+            if (fileResult != null) {
+                tempUri = fileResult.first
+                tempFile = fileResult.second
+                cameraLauncher.launch(fileResult.first)
             } else {
                 errorMessage = "Cannot create temporary file for camera"
                 showError = true
@@ -337,7 +346,8 @@ fun ImageSourceDialog(
 }
 
 // Utility function to create a file URI for camera
-private fun createImageFileUri(context: Context): Uri? {
+// Utility function to create a file and URI for camera
+internal fun createImageFile(context: Context): Pair<Uri, File>? {
     return try {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val storageDir = context.externalCacheDir ?: context.cacheDir
@@ -353,18 +363,20 @@ private fun createImageFileUri(context: Context): Uri? {
             createNewFile()
         }
 
-        FileProvider.getUriForFile(
+        val uri = FileProvider.getUriForFile(
             context,
             "${context.packageName}.provider",
             tempFile
-        ).also { uri ->
-            Log.d("ProfilePicturePicker", "Created temp file: $uri")
-        }
+        )
+        Pair(uri, tempFile)
     } catch (e: Exception) {
         Log.e("ProfilePicturePicker", "Error creating temp file: ${e.message}", e)
         null
     }
 }
+
+// Guard: Backward compatible helper delegating to createImageFile
+fun createImageFileUri(context: Context): Uri? = createImageFile(context)?.first
 
 // Utility function to save image to internal storage
 private fun saveImageToInternalStorage(context: Context, uri: Uri, oldPath: String? = null): String {
@@ -437,6 +449,7 @@ fun MedicinePhotoVisualPicker(
     var showImageSourceDialog by remember { mutableStateOf(false) }
     var showPillVisualDialog by remember { mutableStateOf(false) }
     var tempUri by remember { mutableStateOf<Uri?>(null) }
+    var tempFile by remember { mutableStateOf<File?>(null) }
     var showError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
@@ -471,16 +484,24 @@ fun MedicinePhotoVisualPicker(
                     }
                 }
             }
+            // Guard: Clean up temporary camera capture file from cache on both success and cancellation to prevent storage leaks
+            try {
+                tempFile?.let { if (it.exists()) it.delete() }
+            } catch (_: Exception) {}
             tempUri = null
+            tempFile = null
         }
     )
 
     val openCamera = {
         try {
-            val uri = createImageFileUri(context)
-            if (uri != null) {
-                tempUri = uri
-                cameraLauncher.launch(uri)
+            // Guard: Clean up any prior unconfirmed camera capture file before launching new capture
+            try { tempFile?.let { if (it.exists()) it.delete() } } catch (_: Exception) {}
+            val fileResult = createImageFile(context)
+            if (fileResult != null) {
+                tempUri = fileResult.first
+                tempFile = fileResult.second
+                cameraLauncher.launch(fileResult.first)
             } else {
                 errorMessage = "Cannot create temporary file for camera"
                 showError = true

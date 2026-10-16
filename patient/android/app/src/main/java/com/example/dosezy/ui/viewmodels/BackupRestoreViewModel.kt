@@ -56,9 +56,14 @@ class BackupRestoreViewModel @Inject constructor(
 
     fun inspectBackupZip(uri: Uri) {
         viewModelScope.launch {
+            // Guard: Clean up any prior uncommitted inspection directory before unpacking new archive to prevent cache directory leakage
+            try {
+                _uiState.value.inspectionResult?.tempDir?.deleteRecursively()
+            } catch (_: Exception) {}
             _uiState.value = _uiState.value.copy(
                 isLoading = true,
-                loadingMessage = context.getString(R.string.backup_status_inspecting)
+                loadingMessage = context.getString(R.string.backup_status_inspecting),
+                inspectionResult = null
             )
             val inspect = withContext(ioDispatcher) {
                 backupRestoreManager.inspectBackupZip(uri)
@@ -150,5 +155,13 @@ class BackupRestoreViewModel @Inject constructor(
 
     fun clearStatusMessage() {
         _uiState.value = _uiState.value.copy(statusMessage = null)
+    }
+
+    // Guard: Clean up unzipped archive extraction directory from cache when ViewModel is destroyed or screen is exited
+    override fun onCleared() {
+        super.onCleared()
+        try {
+            _uiState.value.inspectionResult?.tempDir?.deleteRecursively()
+        } catch (_: Exception) {}
     }
 }

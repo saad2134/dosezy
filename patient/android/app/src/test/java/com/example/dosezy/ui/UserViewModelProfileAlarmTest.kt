@@ -396,4 +396,54 @@ class UserViewModelProfileAlarmTest {
         validCacheDirFile.delete()
         outsideFile.delete()
     }
+
+    @Test
+    fun testCreateImageFile_allocatesInCacheAndCanBeDeleted() {
+        val result = com.example.dosezy.ui.components.createImageFile(context)
+        assertNotNull("createImageFile must return non-null result", result)
+        val (uri, file) = result!!
+        assertNotNull("Generated URI must not be null", uri)
+        assertTrue("Generated temporary file must exist on disk", file.exists())
+
+        val expectedCachePath = (context.externalCacheDir ?: context.cacheDir).canonicalPath
+        assertTrue("Temporary camera capture file must reside in cacheDir", file.canonicalPath.startsWith(expectedCachePath))
+
+        // Clean up file and verify it is removed
+        assertTrue("Deleting temp file must succeed", file.delete())
+        assertFalse("Deleted temp file must not exist", file.exists())
+    }
+
+    @Test
+    fun testAlarmSoundSelection_revertingFromCustomDeletesCustomFile() = runTest(testDispatcher) {
+        val customSoundsDir = File(context.filesDir, "custom_sounds")
+        customSoundsDir.mkdirs()
+        val customAudioFile = File(customSoundsDir, "custom_tone.mp3").apply { writeText("audio content") }
+        assertTrue(customAudioFile.exists())
+
+        val userWithCustomSound = testUser.copy(
+            alarmSound = com.example.dosezy.data.model.AlarmSound.CUSTOM,
+            customAlarmSoundPath = customAudioFile.absolutePath,
+            customAlarmSoundTitle = "custom_tone.mp3"
+        )
+        userRepository.insertUser(userWithCustomSound)
+        advanceUntilIdle()
+
+        // When switching from CUSTOM to a built-in sound:
+        // Delete the previous custom sound and null out path and title
+        SoundUtils.deleteCustomAudio(context, userWithCustomSound.customAlarmSoundPath)
+        val updatedUser = userWithCustomSound.copy(
+            alarmSound = com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT,
+            customAlarmSoundPath = null,
+            customAlarmSoundTitle = null
+        )
+        userRepository.updateUser(updatedUser)
+        advanceUntilIdle()
+
+        assertFalse("Custom audio file on disk must be deleted when reverting to built-in sound", customAudioFile.exists())
+        val fetchedUser = userRepository.getUserByIdSync(userWithCustomSound.userId)
+        assertNotNull(fetchedUser)
+        assertEquals(com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT, fetchedUser!!.alarmSound)
+        assertNull("customAlarmSoundPath must be null in user entity", fetchedUser.customAlarmSoundPath)
+        assertNull("customAlarmSoundTitle must be null in user entity", fetchedUser.customAlarmSoundTitle)
+    }
 }

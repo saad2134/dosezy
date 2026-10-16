@@ -585,7 +585,7 @@
     <string name="alarm_duration_1m">1 मिनट</string>
     <string name="alarm_duration_2m">2 मिनट</string>
     <string name="alarm_duration_5m">5 मिनट</string>
-    <string name="alarm_silenced_auto_banner">अलार्म स्वतः म्यूट हो गया — तैयार होने पर अपनी दवाएं दर्ज करें</string>
+    <string name="alarm_silenced_auto_banner">अलार्म स्वतः म्यूट हो गया - तैयार होने पर अपनी दवाएं दर्ज करें</string>
 
     <string name="alarm_sound_custom">कस्टम ऑडियो फ़ाइल</string>
     <string name="alarm_sound_select_file">ऑडियो फ़ाइल चुनें</string>

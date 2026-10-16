@@ -569,7 +569,7 @@
     <string name="alarm_duration_1m">১ মিনিট</string>
     <string name="alarm_duration_2m">২ মিনিট</string>
     <string name="alarm_duration_5m">৫ মিনিট</string>
-    <string name="alarm_silenced_auto_banner">অ্যালার্ম স্বয়ংক্রিয়ভাবে বন্ধ হয়েছে — সুবিধামতো ওষুধের হিসাব লিপিবদ্ধ করুন</string>
+    <string name="alarm_silenced_auto_banner">অ্যালার্ম স্বয়ংক্রিয়ভাবে বন্ধ হয়েছে - সুবিধামতো ওষুধের হিসাব লিপিবদ্ধ করুন</string>
     <string name="notif_exact_alarm_title">সঠিক সময়ের অ্যালার্ম</string>
     <string name="notif_exact_alarm_granted">অ্যালার্ম যথাসময়ে বাজবে।</string>
     <string name="notif_exact_alarm_desc">অ্যালার্ম সঠিক সময়ে বাজার জন্য প্রয়োজনীয়।</string>

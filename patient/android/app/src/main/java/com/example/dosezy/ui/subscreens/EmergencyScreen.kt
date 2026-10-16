@@ -356,7 +356,7 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
             }
         }
 
-        // Country Dropdown Picker (no redundant header — TopBar already shows title)
+        // Country Dropdown Picker (no redundant header - TopBar already shows title)
         ExposedDropdownMenuBox(
             expanded = countryDropdownExpanded,
             onExpandedChange = { countryDropdownExpanded = !countryDropdownExpanded }

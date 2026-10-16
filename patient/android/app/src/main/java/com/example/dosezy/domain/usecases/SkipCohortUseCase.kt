@@ -39,9 +39,19 @@ class SkipCohortUseCase @Inject constructor(
         entryIds.forEach { id ->
             alarmScheduler.cancelNagging(id)
             alarmScheduler.cancelSnooze(id)
+            // Guard: Cancel active intake safeguard alarm for each entry to prevent orphaned re-alerts after skipping dose (#104)
+            alarmScheduler.cancelIntakeSafeguardAlarm(id)
             notificationManager?.cancel(id.hashCode())
             scheduleRepository.recordDoseSkipped(id, reason, context)
         }
+
+        // Guard: Reconcile and dismiss active ADHD intake countdown notification if skipped entries match active countdown
+        try {
+            val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
+            if (activeCountdown != null && (entryIds.contains(activeCountdown.entryId) || activeCountdown.entryIds.any { entryIds.contains(it) })) {
+                com.example.dosezy.notifications.IntakeSafeguardManager.cancelCountdown(context)
+            }
+        } catch (_: Exception) {}
 
         try {
             DosezyAppWidgetProvider.updateAppWidgets(context)

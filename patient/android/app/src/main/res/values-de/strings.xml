@@ -569,7 +569,7 @@ Möchten Sie fortfahren?</string>
     <string name="alarm_duration_1m">1 Minute</string>
     <string name="alarm_duration_2m">2 Minuten</string>
     <string name="alarm_duration_5m">5 Minuten</string>
-    <string name="alarm_silenced_auto_banner">Alarm automatisch stummgeschaltet — erfassen Sie Ihre Dosen, wenn Sie bereit sind</string>
+    <string name="alarm_silenced_auto_banner">Alarm automatisch stummgeschaltet - erfassen Sie Ihre Dosen, wenn Sie bereit sind</string>
 
     <string name="alarm_sound_custom">Eigene Audiodatei</string>
     <string name="alarm_sound_select_file">Audiodatei auswählen</string>
@@ -734,7 +734,7 @@ Möchten Sie fortfahren?</string>
     <string name="about_developer_github">GitHub-Profil</string>
     <string name="about_features_title">Warum Dosezy?</string>
     <string name="about_feat_offline_title" formatted="false">100 % offline &amp; privat</string>
-    <string name="about_feat_offline_desc">Alle Daten bleiben sicher auf Ihrem Gerät – ganz ohne Cloud oder Tracker.</string>
+    <string name="about_feat_offline_desc">Alle Daten bleiben sicher auf Ihrem Gerät - ganz ohne Cloud oder Tracker.</string>
     <string name="about_feat_smart_alarms_title">Zuverlässige Wecker &amp; Zeitzonen</string>
     <string name="about_feat_smart_alarms_desc">Präzise Erinnerungen, die Ihr Gerät wecken und Zeitzonenwechsel automatisch anpassen.</string>
     <string name="about_feat_family_title">Familienpflege mit Profilen</string>

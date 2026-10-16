@@ -154,7 +154,7 @@ class ScheduleGenerationTest {
         // Generate 10 days: Dec 1..Dec 10
         val entries = m.generateScheduleEntries(startDateRange = start, days = 9)
         val dates = entries.map { it.scheduledDateTime.toLocalDate() }
-        // Day 0 (Dec 1), Day 3 (Dec 4), Day 6 (Dec 7), Day 9 (Dec 10) — 4 entries
+        // Day 0 (Dec 1), Day 3 (Dec 4), Day 6 (Dec 7), Day 9 (Dec 10): 4 entries
         assertEquals(4, entries.size)
         assertTrue(start in dates)
         assertTrue(start.plusDays(3) in dates)
@@ -175,7 +175,7 @@ class ScheduleGenerationTest {
     }
 
     // ───────────────────────────────────────────────────────────────
-    // 5. AS_NEEDED (PRN) — should never generate entries
+    // 5. AS_NEEDED (PRN): should never generate entries
     // ───────────────────────────────────────────────────────────────
 
     @Test
@@ -220,7 +220,7 @@ class ScheduleGenerationTest {
     fun medicine_emptyWhenStartAfterEnd() {
         val rangeStart = LocalDate.of(2026, 12, 15)
         val medStart = LocalDate.of(2026, 12, 20)
-        val medEnd = LocalDate.of(2026, 12, 10) // end before start — invalid course
+        val medEnd = LocalDate.of(2026, 12, 10) // end before start: invalid course
         val m = med(Frequency(FrequencyPattern.DAILY), start = medStart, end = medEnd)
         val entries = m.generateScheduleEntries(startDateRange = rangeStart, days = 30)
         assertTrue(entries.isEmpty())

@@ -163,4 +163,56 @@ class BackupRestoreViewModelTest {
         viewModel.clearStatusMessage()
         assertNull(viewModel.uiState.value.statusMessage)
     }
+
+    @Test
+    fun testInspectBackupZip_cleansUpPriorTempDir() = runTest(testDispatcher) {
+        val tempDir1 = File(context.cacheDir, "test_inspect_dir1").apply { mkdirs(); File(this, "data.txt").writeText("data1") }
+        val tempDir2 = File(context.cacheDir, "test_inspect_dir2").apply { mkdirs(); File(this, "data.txt").writeText("data2") }
+        assertTrue(tempDir1.exists())
+        assertTrue(tempDir2.exists())
+
+        val mockUri1 = mockk<Uri>()
+        val mockInspection1 = ZipInspectionResult(success = true, message = "Archive 1", profiles = listOf(mockk(relaxed = true)), tempDir = tempDir1)
+        coEvery { backupRestoreManager.inspectBackupZip(mockUri1) } returns mockInspection1
+
+        viewModel.inspectBackupZip(mockUri1)
+        advanceUntilIdle()
+        assertEquals(tempDir1, viewModel.uiState.value.inspectionResult?.tempDir)
+        assertTrue(tempDir1.exists())
+
+        // Inspect second file without explicitly dismissing first
+        val mockUri2 = mockk<Uri>()
+        val mockInspection2 = ZipInspectionResult(success = true, message = "Archive 2", profiles = listOf(mockk(relaxed = true)), tempDir = tempDir2)
+        coEvery { backupRestoreManager.inspectBackupZip(mockUri2) } returns mockInspection2
+
+        viewModel.inspectBackupZip(mockUri2)
+        advanceUntilIdle()
+
+        assertFalse("Prior tempDir must be cleaned up when inspecting a new backup archive", tempDir1.exists())
+        assertEquals(tempDir2, viewModel.uiState.value.inspectionResult?.tempDir)
+        assertTrue(tempDir2.exists())
+
+        tempDir2.deleteRecursively()
+    }
+
+    @Test
+    fun testOnCleared_cleansUpInspectionTempDir() = runTest(testDispatcher) {
+        val tempDir = File(context.cacheDir, "test_inspect_oncleared").apply { mkdirs(); File(this, "data.txt").writeText("data") }
+        assertTrue(tempDir.exists())
+
+        val mockUri = mockk<Uri>()
+        val mockInspection = ZipInspectionResult(success = true, message = "Archive", profiles = listOf(mockk(relaxed = true)), tempDir = tempDir)
+        coEvery { backupRestoreManager.inspectBackupZip(mockUri) } returns mockInspection
+
+        viewModel.inspectBackupZip(mockUri)
+        advanceUntilIdle()
+        assertEquals(tempDir, viewModel.uiState.value.inspectionResult?.tempDir)
+        assertTrue(tempDir.exists())
+
+        // Trigger onCleared via reflection
+        val onClearedMethod = androidx.lifecycle.ViewModel::class.java.getDeclaredMethod("onCleared").apply { isAccessible = true }
+        onClearedMethod.invoke(viewModel)
+
+        assertFalse("Extraction tempDir must be deleted when ViewModel is cleared", tempDir.exists())
+    }
 }

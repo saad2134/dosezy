@@ -279,7 +279,9 @@ fun AlarmSoundSelectionDialog(
                                     } else {
                                         selectedSound = sound
                                         playPreview(sound)
-                                        onSoundSelected(sound, currentCustomPath, currentCustomTitle)
+                                        val pathToSend = if (sound == AlarmSound.CUSTOM) currentCustomPath else null
+                                        val titleToSend = if (sound == AlarmSound.CUSTOM) currentCustomTitle else null
+                                        onSoundSelected(sound, pathToSend, titleToSend)
                                     }
                                 }
                             )

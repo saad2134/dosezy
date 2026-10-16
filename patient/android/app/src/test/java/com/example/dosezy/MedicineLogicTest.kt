@@ -51,7 +51,7 @@ class MedicineLogicTest {
     )
 
     // ───────────────────────────────────────────────────────────────
-    // 1. getDosageDisplay – formatting for all units
+    // 1. getDosageDisplay - formatting for all units
     // ───────────────────────────────────────────────────────────────
 
     @Test
@@ -91,7 +91,7 @@ class MedicineLogicTest {
     }
 
     // ───────────────────────────────────────────────────────────────
-    // 2. getDosageForTime – value resolution
+    // 2. getDosageForTime - value resolution
     // ───────────────────────────────────────────────────────────────
 
     @Test
@@ -115,7 +115,7 @@ class MedicineLogicTest {
     }
 
     // ───────────────────────────────────────────────────────────────
-    // 3. getFrequencyDisplay – text output for all patterns
+    // 3. getFrequencyDisplay - text output for all patterns
     // ───────────────────────────────────────────────────────────────
 
     @Test
@@ -166,7 +166,7 @@ class MedicineLogicTest {
     }
 
     // ───────────────────────────────────────────────────────────────
-    // 4. getStockDeductionAmount – edge cases
+    // 4. getStockDeductionAmount - edge cases
     // ───────────────────────────────────────────────────────────────
 
     @Test

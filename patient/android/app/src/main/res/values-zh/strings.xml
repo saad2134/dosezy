@@ -585,7 +585,7 @@
     <string name="alarm_duration_1m">1 分钟</string>
     <string name="alarm_duration_2m">2 分钟</string>
     <string name="alarm_duration_5m">5 分钟</string>
-    <string name="alarm_silenced_auto_banner">已自动停止响铃 — 方便时请确认用药</string>
+    <string name="alarm_silenced_auto_banner">已自动停止响铃 - 方便时请确认用药</string>
 
     <string name="alarm_sound_custom">自定义音频文件</string>
     <string name="alarm_sound_select_file">选择音频文件</string>

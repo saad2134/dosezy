@@ -607,7 +607,7 @@ Do you want to continue?</string>
     <string name="alarm_duration_1m">1 minute</string>
     <string name="alarm_duration_2m">2 minutes</string>
     <string name="alarm_duration_5m">5 minutes</string>
-    <string name="alarm_silenced_auto_banner">Alarm auto-silenced — record your doses when ready</string>
+    <string name="alarm_silenced_auto_banner">Alarm auto-silenced - record your doses when ready</string>
 
     <string name="alarm_sound_custom">Custom Audio File</string>
     <string name="alarm_sound_select_file">Choose Audio File</string>

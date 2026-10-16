@@ -185,6 +185,16 @@ class BackupRestoreManager(
                     zos.write(emContacts.toByteArray(Charsets.UTF_8))
                     zos.closeEntry()
                 }
+
+                // Guard: Export per-profile emergency country selection to preserve emergency dialing preferences across restore
+                val countryPrefs = context.getSharedPreferences("emergency_prefs", Context.MODE_PRIVATE)
+                val countryCode = countryPrefs.getString("selected_country_code_${user.userId}", null)
+                    ?: if (user.isCurrentUser) countryPrefs.getString("selected_country_code", null) else null
+                if (!countryCode.isNullOrEmpty()) {
+                    zos.putNextEntry(ZipEntry("$profileDir/emergency_country.txt"))
+                    zos.write(countryCode.toByteArray(Charsets.UTF_8))
+                    zos.closeEntry()
+                }
             }
         }
 
@@ -437,6 +447,16 @@ class BackupRestoreManager(
                                 emPrefs.edit().putString("contacts_json_$newUserId", emJson).apply()
                             }
                         }
+
+                        // Guard: Restore per-profile emergency country selection for newly created profile
+                        val countryFile = File(pDir, "emergency_country.txt")
+                        if (countryFile.exists()) {
+                            val cCode = countryFile.readText(Charsets.UTF_8).trim()
+                            if (cCode.isNotBlank()) {
+                                val emergencyPrefs = context.getSharedPreferences("emergency_prefs", Context.MODE_PRIVATE)
+                                emergencyPrefs.edit().putString("selected_country_code_$newUserId", cCode).apply()
+                            }
+                        }
                     }
 
                     ConflictStrategy.OVERWRITE -> {
@@ -581,12 +601,32 @@ class BackupRestoreManager(
                         scheduleRepository.rescheduleAllAlarms(targetUserId, context)
 
                         val emFile = File(pDir, "emergency_contacts.json")
+                        val emPrefs = context.getSharedPreferences("emergency_contacts", Context.MODE_PRIVATE)
                         if (emFile.exists()) {
                             val emJson = emFile.readText(Charsets.UTF_8)
                             if (emJson.isNotBlank()) {
-                                val emPrefs = context.getSharedPreferences("emergency_contacts", Context.MODE_PRIVATE)
                                 emPrefs.edit().putString("contacts_json_$targetUserId", emJson).apply()
+                            } else {
+                                // Guard: Scrub stale emergency contacts when overwriting a profile with an empty emergency contacts file
+                                emPrefs.edit().remove("contacts_json_$targetUserId").apply()
                             }
+                        } else {
+                            // Guard: Scrub stale emergency contacts when overwriting a profile with a backup archive lacking emergency contacts
+                            emPrefs.edit().remove("contacts_json_$targetUserId").apply()
+                        }
+
+                        // Guard: Restore emergency country selection or scrub stale country code when overwriting profile
+                        val countryFile = File(pDir, "emergency_country.txt")
+                        val emergencyPrefs = context.getSharedPreferences("emergency_prefs", Context.MODE_PRIVATE)
+                        if (countryFile.exists()) {
+                            val cCode = countryFile.readText(Charsets.UTF_8).trim()
+                            if (cCode.isNotBlank()) {
+                                emergencyPrefs.edit().putString("selected_country_code_$targetUserId", cCode).apply()
+                            } else {
+                                emergencyPrefs.edit().remove("selected_country_code_$targetUserId").apply()
+                            }
+                        } else {
+                            emergencyPrefs.edit().remove("selected_country_code_$targetUserId").apply()
                         }
                     }
 
@@ -666,6 +706,18 @@ class BackupRestoreManager(
                                 val emPrefs = context.getSharedPreferences("emergency_contacts", Context.MODE_PRIVATE)
                                 if (!emPrefs.contains("contacts_json_$targetUserId")) {
                                     emPrefs.edit().putString("contacts_json_$targetUserId", emJson).apply()
+                                }
+                            }
+                        }
+
+                        // Guard: Restore per-profile emergency country selection for merged profile if not already set
+                        val countryFile = File(pDir, "emergency_country.txt")
+                        if (countryFile.exists()) {
+                            val cCode = countryFile.readText(Charsets.UTF_8).trim()
+                            if (cCode.isNotBlank()) {
+                                val emergencyPrefs = context.getSharedPreferences("emergency_prefs", Context.MODE_PRIVATE)
+                                if (!emergencyPrefs.contains("selected_country_code_$targetUserId")) {
+                                    emergencyPrefs.edit().putString("selected_country_code_$targetUserId", cCode).apply()
                                 }
                             }
                         }

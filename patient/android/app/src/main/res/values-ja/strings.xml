@@ -569,7 +569,7 @@
     <string name="alarm_duration_1m">1 分</string>
     <string name="alarm_duration_2m">2 分</string>
     <string name="alarm_duration_5m">5 分</string>
-    <string name="alarm_silenced_auto_banner">アラームは自動停止しました — 準備ができたら服薬を記録してください</string>
+    <string name="alarm_silenced_auto_banner">アラームは自動停止しました - 準備ができたら服薬を記録してください</string>
 
     <string name="alarm_sound_custom">カスタム音声ファイル</string>
     <string name="alarm_sound_select_file">音声ファイルを選択</string>

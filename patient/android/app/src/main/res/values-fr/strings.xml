@@ -569,7 +569,7 @@ Voulez-vous continuer ?</string>
     <string name="alarm_duration_1m">1 minute</string>
     <string name="alarm_duration_2m">2 minutes</string>
     <string name="alarm_duration_5m">5 minutes</string>
-    <string name="alarm_silenced_auto_banner">Alarme arrêtée automatiquement — confirmez vos prises dès que possible</string>
+    <string name="alarm_silenced_auto_banner">Alarme arrêtée automatiquement - confirmez vos prises dès que possible</string>
 
     <string name="alarm_sound_custom">Fichier audio personnalisé</string>
     <string name="alarm_sound_select_file">Choisir un fichier audio</string>
