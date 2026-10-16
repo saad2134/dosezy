@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.content.Context
+import com.example.dosezy.data.preferences.UserPreferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -25,12 +26,32 @@ class UserViewModel @Inject constructor(
     private val medicineRepository: MedicineRepository,
     private val scheduleRepository: ScheduleRepository,
     private val medicineNotificationManager: MedicineNotificationManager,
-    @ApplicationContext private val appContext: Context? = null
+    @ApplicationContext private val appContext: Context? = null,
+    private val userPreferencesDataStore: UserPreferencesDataStore? = null
 ) : ViewModel() {
 
     // Context resolution: uses injected ApplicationContext with fallback for testing
     private val context: Context
         get() = appContext ?: medicineRepository.context
+
+    private val preferencesStore: UserPreferencesDataStore by lazy {
+        userPreferencesDataStore ?: UserPreferencesDataStore(context)
+    }
+
+    val preferencesDataStore: UserPreferencesDataStore
+        get() = preferencesStore
+
+    private suspend fun syncAppTheme(themeName: String) {
+        try {
+            preferencesStore.setTheme(themeName)
+        } catch (_: Exception) {
+            // Guard: Fallback to SharedPreferences if DataStore is uninitialized or in mock context
+            try {
+                val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                prefs.edit().putString("theme", themeName).apply()
+            } catch (_: Exception) {}
+        }
+    }
 
     // debouncing to prevent rapid updates
     private val _users = MutableStateFlow<List<User>>(emptyList())
@@ -66,8 +87,7 @@ class UserViewModel @Inject constructor(
                         _currentUser.value = current
                         if (current != null) {
                             try {
-                                val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                                prefs.edit().putString("theme", current.theme.name.lowercase()).apply()
+                                syncAppTheme(current.theme.name.lowercase())
                                 com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, current.userId, current.theme.name.lowercase(), isCurrentProfile = true)
                             } catch (_: Exception) {}
                         }
@@ -110,8 +130,7 @@ class UserViewModel @Inject constructor(
                     medicineNotificationManager.scheduleAlarmsForUser(updatedUser.userId)
 
                     try {
-                        val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                        prefs.edit().putString("theme", updatedUser.theme.name.lowercase()).apply()
+                        syncAppTheme(updatedUser.theme.name.lowercase())
                         com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, updatedUser.userId, updatedUser.theme.name.lowercase(), isCurrentProfile = true)
                     } catch (_: Exception) {}
 
@@ -164,8 +183,7 @@ class UserViewModel @Inject constructor(
                         // Guard: Core library desugaring supports API 24+; schedule alarms for new profile across all supported OS versions
                         medicineNotificationManager.scheduleAlarmsForUser(userToInsert.userId)
                         try {
-                            val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                            prefs.edit().putString("theme", userToInsert.theme.name.lowercase()).apply()
+                            syncAppTheme(userToInsert.theme.name.lowercase())
                             com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, userToInsert.userId, userToInsert.theme.name.lowercase(), isCurrentProfile = shouldBeCurrent)
                         } catch (_: Exception) {}
                         try {
@@ -188,8 +206,7 @@ class UserViewModel @Inject constructor(
             if (user.isCurrentUser) {
                 _currentUser.value = user
                 try {
-                    val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                    prefs.edit().putString("theme", user.theme.name.lowercase()).apply()
+                    syncAppTheme(user.theme.name.lowercase())
                 } catch (_: Exception) {}
             }
             try {
@@ -261,8 +278,7 @@ class UserViewModel @Inject constructor(
 
                         // Guard: Synchronize app theme and widget preferences for promoted active profile to prevent theme lock on deleted profile
                         try {
-                            val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                            prefs.edit().putString("theme", nextUser.theme.name.lowercase()).apply()
+                            syncAppTheme(nextUser.theme.name.lowercase())
                             com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, nextUser.userId, nextUser.theme.name.lowercase(), isCurrentProfile = true)
                         } catch (_: Exception) {}
 
@@ -275,8 +291,7 @@ class UserViewModel @Inject constructor(
                         }
                         // Guard: Clean up app theme back to system default when no user profiles remain
                         try {
-                            val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                            prefs.edit().putString("theme", "system").apply()
+                            syncAppTheme("system")
                         } catch (_: Exception) {}
                     }
 

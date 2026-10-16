@@ -44,6 +44,8 @@ class UserPreferencesDataStore @Inject constructor(
         val KEY_TIMELINE_MODE = booleanPreferencesKey("timeline_mode_enabled")
         val KEY_THICKER_CALENDAR = booleanPreferencesKey("thicker_calendar_day_highlight")
         val KEY_SLIDE_ACTIONS = booleanPreferencesKey("slide_actions_enabled")
+        val KEY_BATTERY_PROMPT_DISMISSED = booleanPreferencesKey("battery_prompt_dismissed")
+        val KEY_OVERLAY_PROMPT_DISMISSED = booleanPreferencesKey("overlay_prompt_dismissed")
     }
 
     private val preferencesFlow: Flow<Preferences> = context.dataStore.data
@@ -75,16 +77,38 @@ class UserPreferencesDataStore @Inject constructor(
         preferences[KEY_SLIDE_ACTIONS] ?: true
     }
 
+    val batteryPromptDismissedFlow: Flow<Boolean> = preferencesFlow.map { preferences ->
+        preferences[KEY_BATTERY_PROMPT_DISMISSED] ?: false
+    }
+
+    val overlayPromptDismissedFlow: Flow<Boolean> = preferencesFlow.map { preferences ->
+        preferences[KEY_OVERLAY_PROMPT_DISMISSED] ?: false
+    }
+
     suspend fun setTheme(theme: String) {
         context.dataStore.edit { preferences ->
             preferences[KEY_THEME] = theme
         }
+        // Guard: Mirror to legacy SharedPreferences for widgets and synchronous startup
+        try {
+            context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                .edit()
+                .putString("theme", theme)
+                .apply()
+        } catch (_: Exception) {}
     }
 
     suspend fun setLanguage(language: String) {
         context.dataStore.edit { preferences ->
             preferences[KEY_LANGUAGE] = language
         }
+        // Guard: Mirror to legacy SharedPreferences for synchronous LocaleHelper baseContext attachment
+        try {
+            context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                .edit()
+                .putString("selected_language", language)
+                .apply()
+        } catch (_: Exception) {}
     }
 
     suspend fun setTimelineMode(enabled: Boolean) {
@@ -103,5 +127,31 @@ class UserPreferencesDataStore @Inject constructor(
         context.dataStore.edit { preferences ->
             preferences[KEY_SLIDE_ACTIONS] = enabled
         }
+    }
+
+    suspend fun setBatteryPromptDismissed(dismissed: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_BATTERY_PROMPT_DISMISSED] = dismissed
+        }
+        // Guard: Mirror to legacy SharedPreferences for backwards compatibility
+        try {
+            context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean("battery_prompt_dismissed", dismissed)
+                .apply()
+        } catch (_: Exception) {}
+    }
+
+    suspend fun setOverlayPromptDismissed(dismissed: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_OVERLAY_PROMPT_DISMISSED] = dismissed
+        }
+        // Guard: Mirror to legacy SharedPreferences for backwards compatibility
+        try {
+            context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean("overlay_prompt_dismissed", dismissed)
+                .apply()
+        } catch (_: Exception) {}
     }
 }

@@ -39,6 +39,8 @@ class UserPreferencesDataStoreTest {
         assertFalse(dataStore.timelineModeFlow.first())
         assertFalse(dataStore.thickerCalendarFlow.first())
         assertTrue(dataStore.slideActionsFlow.first())
+        assertFalse(dataStore.batteryPromptDismissedFlow.first())
+        assertFalse(dataStore.overlayPromptDismissedFlow.first())
     }
 
     @Test
@@ -57,5 +59,11 @@ class UserPreferencesDataStoreTest {
 
         dataStore.setSlideActions(false)
         assertFalse(dataStore.slideActionsFlow.first())
+
+        dataStore.setBatteryPromptDismissed(true)
+        assertTrue(dataStore.batteryPromptDismissedFlow.first())
+
+        dataStore.setOverlayPromptDismissed(true)
+        assertTrue(dataStore.overlayPromptDismissedFlow.first())
     }
 }
