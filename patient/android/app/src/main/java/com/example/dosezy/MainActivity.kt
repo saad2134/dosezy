@@ -52,14 +52,8 @@ import com.example.dosezy.ui.subscreens.HelpSupportScreen
 import com.example.dosezy.ui.subscreens.ManageProfileScreen
 import com.example.dosezy.ui.subscreens.PreferencesScreen
 import com.example.dosezy.ui.subscreens.SwitchProfileScreen
+import com.example.dosezy.ui.components.AppPromptCoordinator
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.example.dosezy.data.model.Theme
 import com.example.dosezy.ui.theme.DosezyTheme
 import com.example.dosezy.ui.viewmodels.UserViewModel
@@ -225,166 +219,39 @@ fun DosezyApp(
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination
-    val context = androidx.compose.ui.platform.LocalContext.current
-
     val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
     val users by userViewModel.users.collectAsState()
     val currentUser by userViewModel.currentUser.collectAsState()
     val isViewModelLoading by userViewModel.isLoading.collectAsState()
 
-    val permissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
-        contract = androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
-        onResult = {}
+    AppPromptCoordinator(
+        currentUser = currentUser,
+        preferencesDataStore = userViewModel.preferencesDataStore
     )
 
-    val prefs = remember { context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE) }
-    var showBatteryPrompt by remember { mutableStateOf(false) }
-    var showOverlayPrompt by remember { mutableStateOf(false) }
-    var showLowStorageDialog by remember { mutableStateOf(false) }
+    var isInitialized by remember { mutableStateOf(false) }
 
-    LaunchedEffect(currentUser) {
-        if (com.example.dosezy.utils.StorageUtils.isStorageCriticallyLow(context)) {
-            showLowStorageDialog = true
-        }
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-        }
-        if (currentUser != null) {
-            val batteryDismissed = prefs.getBoolean("battery_prompt_dismissed", false)
-            if (!batteryDismissed && !com.example.dosezy.utils.NotificationUtils.isIgnoringBatteryOptimizations(context)) {
-                kotlinx.coroutines.delay(1200)
-                showBatteryPrompt = true
-            } else if (!com.example.dosezy.utils.NotificationUtils.canDrawOverlays(context)) {
-                val dismissed = prefs.getBoolean("overlay_prompt_dismissed", false)
-                if (!dismissed) {
-                    kotlinx.coroutines.delay(1200)
-                    showOverlayPrompt = true
-                }
+    fun navigateToInitialDestination() {
+        if (currentUser == null) {
+            navController.navigate("newuser/1") {
+                popUpTo("loading") { inclusive = true }
+            }
+        } else {
+            val startRoute = if (pendingRouteState.value == "schedule") "schedule" else "home"
+            if (pendingRouteState.value != null) {
+                onRouteConsumed()
+            }
+            navController.navigate(startRoute) {
+                popUpTo("loading") { inclusive = true }
             }
         }
     }
-
-    if (showBatteryPrompt) {
-        AlertDialog(
-            onDismissRequest = {
-                prefs.edit().putBoolean("battery_prompt_dismissed", true).apply()
-                showBatteryPrompt = false
-            },
-            title = {
-                Text(
-                    text = androidx.compose.ui.res.stringResource(R.string.notif_bg_title),
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            },
-            text = {
-                Text(
-                    text = androidx.compose.ui.res.stringResource(R.string.notif_bg_desc),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        prefs.edit().putBoolean("battery_prompt_dismissed", true).apply()
-                        showBatteryPrompt = false
-                        com.example.dosezy.utils.NotificationUtils.requestBatteryOptimizationExemption(context)
-                    }
-                ) {
-                    Text(
-                        text = androidx.compose.ui.res.stringResource(R.string.dialog_enable),
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1193D4)
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        prefs.edit().putBoolean("battery_prompt_dismissed", true).apply()
-                        showBatteryPrompt = false
-                    }
-                ) {
-                    Text(androidx.compose.ui.res.stringResource(R.string.dialog_later))
-                }
-            },
-            shape = RoundedCornerShape(20.dp),
-            containerColor = MaterialTheme.colorScheme.surface
-        )
-    }
-
-    if (showOverlayPrompt) {
-        AlertDialog(
-            onDismissRequest = { showOverlayPrompt = false },
-            title = {
-                Text(
-                    text = androidx.compose.ui.res.stringResource(R.string.notif_overlay_prompt_title),
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            },
-            text = {
-                Text(
-                    text = androidx.compose.ui.res.stringResource(R.string.notif_overlay_prompt_desc),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        prefs.edit().putBoolean("overlay_prompt_dismissed", true).apply()
-                        showOverlayPrompt = false
-                        com.example.dosezy.utils.NotificationUtils.requestOverlayPermission(context)
-                    }
-                ) {
-                    Text(
-                        text = androidx.compose.ui.res.stringResource(R.string.dialog_enable),
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1193D4)
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        prefs.edit().putBoolean("overlay_prompt_dismissed", true).apply()
-                        showOverlayPrompt = false
-                    }
-                ) {
-                    Text(androidx.compose.ui.res.stringResource(R.string.dialog_later))
-                }
-            },
-            shape = RoundedCornerShape(20.dp),
-            containerColor = MaterialTheme.colorScheme.surface
-        )
-    }
-
-    if (showLowStorageDialog) {
-        com.example.dosezy.ui.components.LowStorageDialog(
-            onDismiss = { showLowStorageDialog = false }
-        )
-    }
-
-
-    var isInitialized by remember { mutableStateOf(false) }
 
     // Check user data on app start
     LaunchedEffect(users, currentUser, isViewModelLoading) {
         if (!isInitialized && !isViewModelLoading) {
             isInitialized = true
-            if (currentUser == null) {
-                navController.navigate("newuser/1") {
-                    popUpTo("loading") { inclusive = true }
-                }
-            } else {
-                val startRoute = if (pendingRouteState.value == "schedule") "schedule" else "home"
-                if (pendingRouteState.value != null) {
-                    onRouteConsumed()
-                }
-                navController.navigate(startRoute) {
-                    popUpTo("loading") { inclusive = true }
-                }
-            }
+            navigateToInitialDestination()
         }
     }
 
@@ -405,19 +272,7 @@ fun DosezyApp(
             kotlinx.coroutines.delay(2000)
             if (!isInitialized) {
                 isInitialized = true
-                if (currentUser == null) {
-                    navController.navigate("newuser/1") {
-                        popUpTo("loading") { inclusive = true }
-                    }
-                } else {
-                    val startRoute = if (pendingRouteState.value == "schedule") "schedule" else "home"
-                    if (pendingRouteState.value != null) {
-                        onRouteConsumed()
-                    }
-                    navController.navigate(startRoute) {
-                        popUpTo("loading") { inclusive = true }
-                    }
-                }
+                navigateToInitialDestination()
             }
         }
     }
