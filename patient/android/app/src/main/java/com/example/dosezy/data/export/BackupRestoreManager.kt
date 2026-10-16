@@ -663,7 +663,10 @@ class BackupRestoreManager(
             // Guard: Defensively parse slide actions, timeline mode, and thicker calendar highlight with non-breaking defaults for legacy backup archives
             slideActionsEnabled = json.get("slideActionsEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: true,
             timelineModeEnabled = json.get("timelineModeEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
-            thickerCalendarDayHighlight = json.get("thickerCalendarDayHighlight")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false
+            thickerCalendarDayHighlight = json.get("thickerCalendarDayHighlight")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+            // Guard: Defensively parse intake safeguard preferences with non-breaking defaults for legacy backup archives (#104)
+            intakeSafeguardEnabled = json.get("intakeSafeguardEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+            intakeCountdownSeconds = json.get("intakeCountdownSeconds")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 120
         )
     }
 

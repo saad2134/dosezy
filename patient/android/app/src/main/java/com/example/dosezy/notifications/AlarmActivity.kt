@@ -192,8 +192,24 @@ class AlarmActivity : ComponentActivity() {
                         isLoaded = uiState.isLoaded,
                         isDarkTheme = isDark,
                         onTakeAction = {
-                            alarmViewModel.takeCohort(currentEntryIds) {
+                            val isIntakeReAlert = intent?.getBooleanExtra(MedicineAlarmReceiver.EXTRA_IS_INTAKE_REALERT, false) ?: false
+                            if (user?.intakeSafeguardEnabled == true && !isIntakeReAlert) {
+                                // Guard: Start intake countdown timer for ADHD support on alarm dismissal (#104)
+                                val medNames = uiState.medicinesList.map { it.second.medicationName }.ifEmpty { listOf(currentMedName) }
+                                IntakeSafeguardManager.startCountdown(
+                                    context = applicationContext,
+                                    entryId = currentEntryIds.firstOrNull() ?: "",
+                                    entryIds = currentEntryIds,
+                                    medicineName = currentMedName,
+                                    medicineNames = medNames,
+                                    scheduledTime = currentSchedTime,
+                                    durationSeconds = user.intakeCountdownSeconds
+                                )
                                 dismissAction()
+                            } else {
+                                alarmViewModel.takeCohort(currentEntryIds) {
+                                    dismissAction()
+                                }
                             }
                         },
                         onSnoozeAction = {

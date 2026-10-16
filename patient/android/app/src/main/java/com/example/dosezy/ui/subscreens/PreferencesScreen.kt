@@ -34,6 +34,7 @@ import com.example.dosezy.data.model.TimeFormat
 import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.subscreens.preferences.AlarmDurationSelectionDialog
 import com.example.dosezy.ui.subscreens.preferences.AlarmSoundSelectionDialog
+import com.example.dosezy.ui.subscreens.preferences.IntakeDurationSelectionDialog
 import com.example.dosezy.ui.subscreens.preferences.LanguageSelectionDialog
 import com.example.dosezy.ui.subscreens.preferences.LateAfterSelectionDialog
 import com.example.dosezy.ui.subscreens.preferences.MissedAfterSelectionDialog
@@ -66,6 +67,7 @@ fun PreferencesScreen(navController: NavController) {
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showNaggingIntervalDialog by remember { mutableStateOf(false) }
     var showNaggingRepeatsDialog by remember { mutableStateOf(false) }
+    var showIntakeDurationDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -164,6 +166,12 @@ fun PreferencesScreen(navController: NavController) {
                         userViewModel.updateUser(user.copy(promptDoseNotes = isChecked))
                     }
                 },
+                onIntakeSafeguardChange = { isChecked ->
+                    currentUser?.let { user ->
+                        userViewModel.updateUser(user.copy(intakeSafeguardEnabled = isChecked))
+                    }
+                },
+                onIntakeDurationClick = { showIntakeDurationDialog = true },
                 onLateAfterClick = { showLateAfterDialog = true },
                 onMissedAfterClick = { showMissedAfterDialog = true },
                 onTimeFormatClick = { showTimeFormatDialog = true }
@@ -334,6 +342,20 @@ fun PreferencesScreen(navController: NavController) {
                     showAlarmDurationDialog = false
                 },
                 onDismiss = { showAlarmDurationDialog = false }
+            )
+        }
+
+        // Guard: ADHD support intake countdown duration selection dialog (#104)
+        if (showIntakeDurationDialog) {
+            IntakeDurationSelectionDialog(
+                currentSeconds = currentUser?.intakeCountdownSeconds ?: 120,
+                onDurationSelected = { newSeconds ->
+                    currentUser?.let { user ->
+                        userViewModel.updateUser(user.copy(intakeCountdownSeconds = newSeconds))
+                    }
+                    showIntakeDurationDialog = false
+                },
+                onDismiss = { showIntakeDurationDialog = false }
             )
         }
     }

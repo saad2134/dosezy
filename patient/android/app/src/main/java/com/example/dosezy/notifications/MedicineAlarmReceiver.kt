@@ -39,6 +39,9 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         const val EXTRA_ENTRY_IDS = "entry_ids"
         const val EXTRA_MEDICINE_NAMES = "medicine_names"
         const val EXTRA_NAGGING_COUNT = "nagging_count"
+        const val EXTRA_IS_INTAKE_SAFEGUARD = "is_intake_safeguard"
+        const val ACTION_INTAKE_SAFEGUARD_EXPIRED = "com.example.dosezy.INTAKE_SAFEGUARD_EXPIRED"
+        const val EXTRA_IS_INTAKE_REALERT = "is_intake_realert"
 
         fun createNotificationChannels(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -107,11 +110,70 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 isUpdateOnly = true
             )
         }
+
+        // Guard: Trigger ADHD safeguard re-alert when intake countdown expires without confirmation (#104)
+        fun triggerReAlert(
+            context: Context,
+            entryId: String,
+            medicineName: String,
+            entryIds: ArrayList<String>?,
+            medicineNames: ArrayList<String>?,
+            scheduledTime: String?,
+            user: com.example.dosezy.data.model.User?
+        ) {
+            val sound = user?.alarmSound ?: com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT
+            val customPath = user?.customAlarmSoundPath
+            val duration = user?.alarmDurationSeconds ?: 0
+
+            AlarmAudioPlayer.play(
+                context = context,
+                sound = sound,
+                customPath = customPath,
+                autoSilenceSeconds = duration
+            )
+
+            val receiver = MedicineAlarmReceiver()
+            receiver.showNotification(
+                context = context,
+                entryId = entryId,
+                entryIds = entryIds,
+                medicineName = medicineName,
+                medicineNames = medicineNames,
+                scheduledTime = scheduledTime,
+                isNagging = false,
+                naggingCount = 0,
+                maxNagging = user?.naggingMaxRepeats ?: 3,
+                snoozeMinutes = user?.snoozeDuration ?: 10,
+                isIntakeReAlert = true
+            )
+        }
     }
 
     override fun onReceive(context: Context, intent: Intent?) {
         database = DosezyDatabase.getInstance(context)
         val action = intent?.action
+
+        // Guard: Handle ADHD intake countdown safeguard expiration re-alert broadcast (#104)
+        if (action == ACTION_INTAKE_SAFEGUARD_EXPIRED) {
+            val entryId = intent.getStringExtra(EXTRA_ENTRY_ID)
+            val medicineName = intent.getStringExtra(EXTRA_MEDICINE_NAME) ?: "Medicine"
+            val entryIds = intent.getStringArrayListExtra(EXTRA_ENTRY_IDS)
+            val medicineNames = intent.getStringArrayListExtra(EXTRA_MEDICINE_NAMES)
+            val scheduledTime = intent.getStringExtra(EXTRA_SCHEDULED_TIME)
+            if (entryId != null) {
+                Log.d(TAG, "Intake safeguard expired broadcast received for entry: $entryId")
+                IntakeSafeguardManager.handleCountdownExpired(
+                    context = context,
+                    entryId = entryId,
+                    medicineName = medicineName,
+                    entryIds = entryIds,
+                    medicineNames = medicineNames,
+                    scheduledTime = scheduledTime
+                )
+            }
+            return
+        }
+
         if (action == Intent.ACTION_BOOT_COMPLETED ||
             action == "android.intent.action.QUICKBOOT_POWERON" ||
             action == "android.intent.action.LOCKED_BOOT_COMPLETED" ||
@@ -271,7 +333,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         naggingCount: Int = 0,
         maxNagging: Int = 3,
         snoozeMinutes: Int = 10,
-        isUpdateOnly: Boolean = false
+        isUpdateOnly: Boolean = false,
+        isIntakeReAlert: Boolean = false
     ) {
         val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
         val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
@@ -361,6 +424,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 putStringArrayListExtra(EXTRA_MEDICINE_NAMES, medicineNames)
             }
             putExtra(EXTRA_SCHEDULED_TIME, scheduledTime ?: "")
+            putExtra(EXTRA_IS_INTAKE_REALERT, isIntakeReAlert)
         }
 
         // Android 14+ background activity start options for PendingIntent creation
@@ -393,7 +457,9 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             }
         }
 
-        val notificationTitle = if (isNagging) {
+        val notificationTitle = if (isIntakeReAlert) {
+            localizedContext.getString(R.string.notif_intake_realert_title)
+        } else if (isNagging) {
             localizedContext.getString(R.string.notif_nagging_title, primaryMedLabel)
         } else if (effectiveDetails.size > 1) {
             localizedContext.getString(R.string.alarm_medication_reminder_multi, effectiveDetails.size)
@@ -401,7 +467,9 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             localizedContext.getString(R.string.alarm_medication_reminder)
         }
 
-        val notificationText = if (isNagging) {
+        val notificationText = if (isIntakeReAlert) {
+            localizedContext.getString(R.string.notif_intake_realert_desc, primaryMedLabel)
+        } else if (isNagging) {
             localizedContext.getString(R.string.notif_nagging_text, naggingCount, maxNagging, scheduledTime ?: "")
         } else if (effectiveDetails.size == 1) {
             "$primaryMedLabel • $scheduledTimeStr"

@@ -5,6 +5,7 @@
 
 package com.example.dosezy.ui.subscreens.preferences
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.FastForward
+import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.Divider
@@ -42,6 +44,8 @@ fun LazyListScope.doseTrackingPreferencesSection(
     onAllowDoseUndoChange: (Boolean) -> Unit,
     onAllowDoseNotesChange: (Boolean) -> Unit,
     onPromptDoseNotesChange: (Boolean) -> Unit,
+    onIntakeSafeguardChange: (Boolean) -> Unit,
+    onIntakeDurationClick: () -> Unit,
     onLateAfterClick: () -> Unit,
     onMissedAfterClick: () -> Unit,
     onTimeFormatClick: () -> Unit
@@ -301,6 +305,100 @@ fun LazyListScope.doseTrackingPreferencesSection(
                         Switch(
                             checked = currentUser.promptDoseNotes,
                             onCheckedChange = onPromptDoseNotesChange
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    // Guard: Intake Countdown Safeguard (ADHD Support) Switch & Duration Card (#104)
+    item {
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 0.dp,
+            shadowElevation = 2.dp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 6.dp)
+        ) {
+            Column {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        modifier = Modifier.weight(1f).padding(end = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.HourglassTop,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(36.dp)
+                        )
+                        Column {
+                            Text(
+                                text = stringResource(R.string.pref_intake_safeguard_title),
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.pref_intake_safeguard_desc),
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                    Switch(
+                        checked = currentUser?.intakeSafeguardEnabled == true,
+                        onCheckedChange = onIntakeSafeguardChange
+                    )
+                }
+
+                // Child Duration Picker (only visible when Intake Safeguard is enabled)
+                if (currentUser?.intakeSafeguardEnabled == true) {
+                    Divider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(onClick = onIntakeDurationClick)
+                            .padding(horizontal = 20.dp, vertical = 14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(14.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Schedule,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                text = stringResource(R.string.pref_intake_duration_title),
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                        val durationMinutes = (currentUser.intakeCountdownSeconds / 60).coerceAtLeast(1)
+                        Text(
+                            text = stringResource(R.string.pref_intake_duration_format, durationMinutes),
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }

@@ -589,4 +589,83 @@ class AlarmScheduler(private val context: Context) {
 
         Log.d(TAG, "Cancelled nagging reminder for entry: $entryId")
     }
+
+    // Guard: Schedule exact re-alert alarm for ADHD intake safeguard expiration (#104)
+    @SuppressLint("ScheduleExactAlarm")
+    fun scheduleIntakeSafeguardAlarm(
+        entryId: String,
+        triggerTime: Long,
+        medicineName: String,
+        entryIds: ArrayList<String>? = null,
+        medicineNames: ArrayList<String>? = null,
+        scheduledTime: String? = null
+    ) {
+        val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
+            action = MedicineAlarmReceiver.ACTION_INTAKE_SAFEGUARD_EXPIRED
+            putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, entryId)
+            putExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME, medicineName)
+            putExtra(MedicineAlarmReceiver.EXTRA_IS_INTAKE_SAFEGUARD, true)
+            if (!entryIds.isNullOrEmpty()) {
+                putStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS, entryIds)
+            }
+            if (!medicineNames.isNullOrEmpty()) {
+                putStringArrayListExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAMES, medicineNames)
+            }
+            if (!scheduledTime.isNullOrBlank()) {
+                putExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME, scheduledTime)
+            }
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            entryId.hashCode() + 3000,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
+            val showIntent = PendingIntent.getActivity(
+                context,
+                entryId.hashCode() + 3500,
+                Intent(context, MainActivity::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            alarmManager.setAlarmClock(
+                AlarmManager.AlarmClockInfo(triggerTime, showIntent),
+                pendingIntent
+            )
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (canScheduleExact()) {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+            } else {
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+            }
+        } else {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+        }
+        Log.d(TAG, "Scheduled intake safeguard re-alert for entry: $entryId at $triggerTime")
+    }
+
+    // Guard: Cancel intake safeguard re-alert alarm and release PendingIntent tokens (#104)
+    fun cancelIntakeSafeguardAlarm(entryId: String) {
+        val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
+            action = MedicineAlarmReceiver.ACTION_INTAKE_SAFEGUARD_EXPIRED
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            entryId.hashCode() + 3000,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        alarmManager.cancel(pendingIntent)
+        pendingIntent.cancel()
+
+        val showIntent = PendingIntent.getActivity(
+            context,
+            entryId.hashCode() + 3500,
+            Intent(context, MainActivity::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        showIntent.cancel()
+        Log.d(TAG, "Cancelled intake safeguard alarm for entry: $entryId")
+    }
 }

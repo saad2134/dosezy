@@ -56,9 +56,12 @@ import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.Medicine
 import com.example.dosezy.data.model.ScheduleWithMedicine
 import com.example.dosezy.data.model.TimeFormat
+import com.example.dosezy.data.DosezyDatabase
+import com.example.dosezy.notifications.IntakeSafeguardManager
 import com.example.dosezy.ui.components.DoseNoteDialog
 import com.example.dosezy.ui.components.DosezySnackbarHost
 import com.example.dosezy.ui.components.HomeSkeletonView
+import com.example.dosezy.ui.components.IntakeSafeguardBanner
 import com.example.dosezy.ui.components.RecordDoseTimeDialog
 import com.example.dosezy.ui.components.SkipReasonDialog
 import com.example.dosezy.ui.components.TopBar
@@ -100,6 +103,8 @@ fun HomeScreen(
     val isTodayLoading by scheduleViewModel.isTodayLoading.collectAsState()
 
     val context = LocalContext.current
+    val database = remember { DosezyDatabase.getInstance(context) }
+    val activeIntake by IntakeSafeguardManager.activeCountdown.collectAsState()
     val currentLang = currentUser?.language ?: LocaleHelper.getSavedLanguage(context)
     val activeLocale = remember(currentLang) { LocaleHelper.getLocale(currentLang) }
     // Get current day for subtitle
@@ -225,6 +230,18 @@ fun HomeScreen(
             } else {
                 executeTakeDose(entryId, LocalDateTime.now(), null)
             }
+        } else if (currentUser?.intakeSafeguardEnabled == true) {
+            // Guard: Start intake countdown timer with re-alert safeguard for ADHD support (#104)
+            val medName = target?.medicine?.medicationName ?: context.getString(R.string.form_med_name)
+            IntakeSafeguardManager.startCountdown(
+                context = context,
+                entryId = entryId,
+                entryIds = listOf(entryId),
+                medicineName = medName,
+                medicineNames = listOf(medName),
+                scheduledTime = "",
+                durationSeconds = currentUser?.intakeCountdownSeconds ?: 120
+            )
         } else {
             executeTakeDose(entryId, LocalDateTime.now(), null)
         }
@@ -244,6 +261,18 @@ fun HomeScreen(
             } else {
                 executeTakeDose(entryId, LocalDateTime.now(), null)
             }
+        } else if (currentUser?.intakeSafeguardEnabled == true) {
+            // Guard: Start intake countdown timer with re-alert safeguard for ADHD support (#104)
+            val medName = target?.medicine?.medicationName ?: context.getString(R.string.form_med_name)
+            IntakeSafeguardManager.startCountdown(
+                context = context,
+                entryId = entryId,
+                entryIds = listOf(entryId),
+                medicineName = medName,
+                medicineNames = listOf(medName),
+                scheduledTime = "",
+                durationSeconds = currentUser?.intakeCountdownSeconds ?: 120
+            )
         } else {
             executeTakeDose(entryId, LocalDateTime.now(), null)
         }
@@ -380,6 +409,35 @@ fun HomeScreen(
                     )
                 }
             }
+
+            // Guard: Render ADHD intake countdown safeguard banner at the bottom of HomeScreen above navigation (#104)
+            IntakeSafeguardBanner(
+                state = activeIntake,
+                onConfirm = {
+                    coroutineScope.launch {
+                        val medName = activeIntake?.medicineName ?: ""
+                        IntakeSafeguardManager.confirmIntake(context, database)
+                        if (medName.isNotBlank()) {
+                            snackbarHostState.showSnackbar(
+                                message = context.getString(R.string.home_intake_confirmed, medName),
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                    }
+                },
+                onExtend = {
+                    IntakeSafeguardManager.extendCountdown(context, 60)
+                },
+                onCancel = {
+                    IntakeSafeguardManager.cancelCountdown(context)
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = context.getString(R.string.home_intake_cancelled),
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                }
+            )
         }
     }
 

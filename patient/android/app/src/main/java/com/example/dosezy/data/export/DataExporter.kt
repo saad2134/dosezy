@@ -230,6 +230,9 @@ class DataExporter(
         userObj.put("slideActionsEnabled", user.slideActionsEnabled)
         userObj.put("timelineModeEnabled", user.timelineModeEnabled)
         userObj.put("thickerCalendarDayHighlight", user.thickerCalendarDayHighlight)
+        // Guard: Explicitly serialize intake safeguard preferences to retain ADHD support settings on backup restore (#104)
+        userObj.put("intakeSafeguardEnabled", user.intakeSafeguardEnabled)
+        userObj.put("intakeCountdownSeconds", user.intakeCountdownSeconds)
         root.put("user", userObj)
 
         val medArray = JSONArray()

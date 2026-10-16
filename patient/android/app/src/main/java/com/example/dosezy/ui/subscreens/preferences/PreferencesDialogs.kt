@@ -484,3 +484,26 @@ fun SnoozeSelectionDialog(
         onDismiss = onDismiss
     )
 }
+
+// Guard: ADHD support intake safeguard duration picker dialog (options: 1, 2, 3, 5 minutes) (#104)
+@Composable
+fun IntakeDurationSelectionDialog(
+    currentSeconds: Int,
+    onDurationSelected: (Int) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val options = listOf(
+        60 to stringResource(R.string.pref_intake_duration_format, 1),
+        120 to stringResource(R.string.pref_intake_duration_format, 2),
+        180 to stringResource(R.string.pref_intake_duration_format, 3),
+        300 to stringResource(R.string.pref_intake_duration_format, 5)
+    )
+
+    SelectionDialog(
+        title = stringResource(R.string.dialog_intake_duration_title),
+        options = options.map { it.second to it.first },
+        currentSelection = currentSeconds,
+        onOptionSelected = onDurationSelected,
+        onDismiss = onDismiss
+    )
+}

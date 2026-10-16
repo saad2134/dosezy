@@ -823,4 +823,27 @@ Do you want to continue?</string>
     <string name="alarm_slide_to_snooze">Slide to Snooze (%1$d min)</string>
     <string name="home_view_standard">Standard</string>
     <string name="home_view_timeline">Timeline</string>
+
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">Intake Countdown Safeguard</string>
+    <string name="pref_intake_safeguard_desc">ADHD support: countdown buffer before confirming intake with re-alert if distracted.</string>
+    <string name="pref_intake_duration_title">Safeguard Duration</string>
+    <string name="pref_intake_duration_format">%1$d minutes</string>
+    <string name="dialog_intake_duration_title">Select Safeguard Duration</string>
+    <string name="notif_intake_in_progress_title">Intake in Progress</string>
+    <string name="notif_intake_in_progress_desc">%1$s: Confirm once taken</string>
+    <string name="notif_intake_action_confirm">Confirm Taken</string>
+    <string name="notif_intake_action_extend">+1 Min</string>
+    <string name="notif_intake_action_cancel">Cancel</string>
+    <string name="notif_intake_realert_title">Medication Not Confirmed</string>
+    <string name="notif_intake_realert_desc">Did you take %1$s? Tap to confirm intake or snooze.</string>
+    <string name="home_intake_in_progress">Intake in progress for %1$s</string>
+    <string name="home_intake_time_remaining">%1$s remaining</string>
+    <string name="home_intake_confirm">Confirm Taken</string>
+    <string name="home_intake_extend">+1 Min</string>
+    <string name="home_intake_cancel">Cancel</string>
+    <string name="home_intake_confirmed">Intake recorded for %1$s</string>
+    <string name="home_intake_cancelled">Intake safeguard cancelled</string>
+    <string name="alarm_realert_badge">ADHD INTAKE RE-ALERT</string>
+    <string name="alarm_realert_subtitle">You tapped Take earlier, but intake was not confirmed. Did you take your medicine?</string>
 </resources>
