@@ -88,19 +88,38 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
             }
         }
 
+        // Guard: Execute immediate synchronous widget update for configure activity or targeted widget ID without 150ms debounce delay so widget renders populated layout before launcher binding and Android 12+ background suspension
         fun updateWidget(
             context: Context,
             @Suppress("UNUSED_PARAMETER") appWidgetManager: AppWidgetManager? = null,
-            @Suppress("UNUSED_PARAMETER") appWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID
+            appWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID
         ) {
-            updateAppWidgets(context)
+            val appContext = context.applicationContext
+            if (appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                try {
+                    kotlinx.coroutines.runBlocking {
+                        kotlinx.coroutines.withTimeoutOrNull(2000L) {
+                            performUpdateAllWidgets(appContext, targetWidgetId = appWidgetId)
+                        }
+                    }
+                } catch (_: Exception) {
+                    updateAppWidgets(appContext)
+                }
+            } else {
+                updateAppWidgets(appContext)
+            }
         }
 
-        private suspend fun performUpdateAllWidgets(context: Context) {
+        private suspend fun performUpdateAllWidgets(context: Context, targetWidgetId: Int? = null) {
             try {
                 val appWidgetManager = AppWidgetManager.getInstance(context)
                 val thisWidget = ComponentName(context, DosezyAppWidgetProvider::class.java)
-                val appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
+                val allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
+                val appWidgetIds = if (targetWidgetId != null && targetWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                    intArrayOf(targetWidgetId)
+                } else {
+                    allWidgetIds
+                }
                 if (appWidgetIds.isEmpty()) return
 
                 val db = DosezyDatabase.getInstance(context)
@@ -131,7 +150,8 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
 
                     // Header click opens MainActivity (switches to bound profile if specific)
                     val clickIntent = Intent(context, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        // Guard: Use SINGLE_TOP to bring existing instance to foreground without destroying in-progress UI state
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                         if (targetUserId != DosezyWidgetPrefs.ACTIVE_PROFILE_ID && user != null) {
                             putExtra("switch_to_user_id", user.userId)
                         }
@@ -157,7 +177,8 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
 
                     // Template PendingIntent for items in the scrollable ListView
                     val itemClickIntent = Intent(context, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        // Guard: Use SINGLE_TOP to bring existing instance to foreground and deliver extras to onNewIntent without wiping task state
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                     }
                     val itemPendingIntent = PendingIntent.getActivity(
                         context,
@@ -184,11 +205,13 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                         views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_no_profile))
                     } else {
                         val todayEntries = db.scheduleDao().getScheduleForDateRangeDirect(user.userId, startOfDay, endOfDay)
-                        val totalToday = todayEntries.size
-                        val takenToday = todayEntries.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
-                        val skippedToday = todayEntries.count { it.status == MedicationStatus.SKIPPED }
+                        // Guard: Exclude ad-hoc PRN doses from widget scheduled progress counts to prevent inflating totalToday or falsely reporting all scheduled doses taken
+                        val scheduledToday = todayEntries.filter { !it.entryId.startsWith("PRN_") }
+                        val totalToday = scheduledToday.size
+                        val takenToday = scheduledToday.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
+                        val skippedToday = scheduledToday.count { it.status == MedicationStatus.SKIPPED }
 
-                        if (todayEntries.isNotEmpty()) {
+                        if (scheduledToday.isNotEmpty()) {
                             when {
                                 takenToday == totalToday -> {
                                     views.setImageViewResource(R.id.widget_status_icon, R.drawable.ic_widget_check_circle)

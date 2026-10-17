@@ -51,7 +51,10 @@ data class User(
     // Guard: Preferences for sliding dose confirmation, home timeline view, and full-frame calendar highlight
     val slideActionsEnabled: Boolean = true,
     val timelineModeEnabled: Boolean = false,
-    val thickerCalendarDayHighlight: Boolean = false
+    val thickerCalendarDayHighlight: Boolean = false,
+    // Guard: ADHD support intake countdown timer safeguard with automatic re-alert if unconfirmed (#104)
+    val intakeSafeguardEnabled: Boolean = false,
+    val intakeCountdownSeconds: Int = 120
 )
 
 enum class AlarmSound(val rawResId: Int?) {

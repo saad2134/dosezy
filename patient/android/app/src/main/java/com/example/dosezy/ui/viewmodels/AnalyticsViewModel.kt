@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -47,7 +48,8 @@ data class RangeAdherenceData(
     val takenCount: Int,
     val decidedCount: Int,
     val totalEntries: Int,
-    val rate: Int
+    val rate: Int,
+    val breakdown: AnalyticsBreakdown = AnalyticsBreakdown()
 )
 
 data class DayStat(
@@ -112,26 +114,30 @@ class AnalyticsViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            combine(_currentUser, _selectedRange) { user, range ->
-                user to range
-            }.flatMapLatest { (user, range) ->
+            // Guard: Decouple range selection from database re-queries so switching tabs selects from in-memory precomputed rangeDataList without cancelling and re-executing SQLite queries
+            _currentUser.flatMapLatest { user ->
                 if (user == null) {
-                    flowOf(AnalyticsUiState(isLoading = false, isEmpty = true, selectedRange = range))
+                    flowOf(AnalyticsUiState(isLoading = false, isEmpty = true, selectedRange = _selectedRange.value))
                 } else {
-                    scheduleRepository.getScheduleForUser(user.userId).combine(flowOf(range)) { entries, r ->
-                        calculateAnalytics(entries, user, r)
+                    scheduleRepository.getScheduleForUser(user.userId).map { entries ->
+                        calculateAnalytics(entries, user, _selectedRange.value)
                     }
                 }
             }.flowOn(Dispatchers.Default)
             .collect { state ->
-                _uiState.value = state
+                // Guard: Retain active range selection when fresh schedule entries are emitted by Room
+                val currentRange = _selectedRange.value
+                val matchingBreakdown = state.rangeDataList.find { it.range == currentRange }?.breakdown ?: state.breakdown
+                _uiState.value = state.copy(selectedRange = currentRange, breakdown = matchingBreakdown)
             }
         }
     }
 
     fun selectRange(range: AdherenceRange) {
         _selectedRange.value = range
-        _uiState.value = _uiState.value.copy(selectedRange = range)
+        // Guard: Synchronously update selectedRange and matching breakdown from precomputed rangeDataList without re-querying SQLite
+        val matchingBreakdown = _uiState.value.rangeDataList.find { it.range == range }?.breakdown ?: _uiState.value.breakdown
+        _uiState.value = _uiState.value.copy(selectedRange = range, breakdown = matchingBreakdown)
     }
 
     private fun calculateAnalytics(
@@ -180,11 +186,24 @@ class AnalyticsViewModel @Inject constructor(
             // Guard: Exclude ad-hoc PRN doses from scheduled adherence calculation to prevent skewing compliance
             val entries = getRangeEntries(range).filter { !it.entryId.startsWith("PRN_") }
             val total = entries.size
-            val taken = entries.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
+            val takenOnTime = entries.count { it.status == MedicationStatus.TAKEN_ON_TIME }
+            val takenLate = entries.count { it.status == MedicationStatus.TAKEN_LATE }
+            val taken = takenOnTime + takenLate
             val missed = entries.count { isEntryMissed(it) }
+            val skipped = entries.count { it.status == MedicationStatus.SKIPPED }
             val decided = taken + missed
             val rate = if (decided > 0) ((taken.toDouble() / decided.toDouble()) * 100).toInt() else 0
-            return RangeAdherenceData(range, taken, decided, total, rate)
+            // Guard: Compute range-specific breakdown so metric cards dynamically match the selected time window
+            val rangeBreakdown = AnalyticsBreakdown(
+                totalEntries = total,
+                takenOnTime = takenOnTime,
+                takenLate = takenLate,
+                missed = missed,
+                skipped = skipped,
+                totalTaken = taken,
+                totalDecided = decided
+            )
+            return RangeAdherenceData(range, taken, decided, total, rate, rangeBreakdown)
         }
 
         val rangeDataList = listOf(
@@ -196,26 +215,9 @@ class AnalyticsViewModel @Inject constructor(
             computeAdherence(AdherenceRange.TOTAL)
         )
 
-        val pastAndTodayEntries = scheduleEntries.filter {
-            it.scheduledDateTime.toLocalDate() <= today && !it.entryId.startsWith("PRN_")
-        }
-        val totalEntries = pastAndTodayEntries.size
-        val takenOnTime = pastAndTodayEntries.count { it.status == MedicationStatus.TAKEN_ON_TIME }
-        val takenLate = pastAndTodayEntries.count { it.status == MedicationStatus.TAKEN_LATE }
-        val missed = pastAndTodayEntries.count { isEntryMissed(it) }
-        val skipped = pastAndTodayEntries.count { it.status == MedicationStatus.SKIPPED }
-        val totalTaken = takenOnTime + takenLate
-        val totalDecided = totalTaken + missed
-
-        val breakdown = AnalyticsBreakdown(
-            totalEntries = totalEntries,
-            takenOnTime = takenOnTime,
-            takenLate = takenLate,
-            missed = missed,
-            skipped = skipped,
-            totalTaken = totalTaken,
-            totalDecided = totalDecided
-        )
+        val activeBreakdown = rangeDataList.find { it.range == selectedRange }?.breakdown
+            ?: rangeDataList.firstOrNull()?.breakdown
+            ?: AnalyticsBreakdown()
 
         val earliestDate = scheduleEntries.minByOrNull { it.scheduledDateTime }?.scheduledDateTime?.toLocalDate()
 
@@ -239,12 +241,16 @@ class AnalyticsViewModel @Inject constructor(
             )
         }
 
+        val totalAllTimeEntries = scheduleEntries.count {
+            it.scheduledDateTime.toLocalDate() <= today && !it.entryId.startsWith("PRN_")
+        }
+
         return AnalyticsUiState(
             isLoading = false,
-            isEmpty = totalEntries == 0,
+            isEmpty = totalAllTimeEntries == 0,
             selectedRange = selectedRange,
             rangeDataList = rangeDataList,
-            breakdown = breakdown,
+            breakdown = activeBreakdown,
             past7Days = past7Days,
             earliestDate = earliestDate,
             currentUser = user

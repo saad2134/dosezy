@@ -435,6 +435,7 @@
     <string name="to_be_taken_in">يجب تناوله خلال %1$d س و %2$d د</string>
     <string name="time_diff_ago">منذ %1$d س و %2$d د</string>
     <string name="status_all_medications_taken">تم تناول جميع الأدوية</string>
+    <string name="status_slot_completed_with_skipped">مكتمل (تم تخطي البعض)</string>
     <string name="status_scheduled_for_this_time">مجدول لهذا الوقت</string>
     <string name="daily_frequency_presets_title">الإعدادات المسبقة للتكرار اليومي</string>
     <string name="action_edit_medicine_cd">تعديل الدواء</string>
@@ -569,7 +570,7 @@
     <string name="alarm_duration_1m">دقيقة واحدة</string>
     <string name="alarm_duration_2m">دقيقتان</string>
     <string name="alarm_duration_5m">5 دقائق</string>
-    <string name="alarm_silenced_auto_banner">تم إيقاف المنبه تلقائياً — سجّل جرعاتك عندما تكون جاهزاً</string>
+    <string name="alarm_silenced_auto_banner">تم إيقاف المنبه تلقائياً - سجّل جرعاتك عندما تكون جاهزاً</string>
 
     <string name="alarm_sound_custom">ملف صوتي مخصص</string>
     <string name="alarm_sound_select_file">اختيار ملف صوتي</string>
@@ -795,4 +796,8 @@
     <string name="alarm_slide_to_snooze">اسحب للتأجيل (%1$d دقيقة)</string>
     <string name="home_view_standard">قياسي</string>
     <string name="home_view_timeline">مخطط زمني</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">تأجيل لمدة:</string>
+    <string name="snooze_duration_chip_format">%1$d د</string>
 </resources>

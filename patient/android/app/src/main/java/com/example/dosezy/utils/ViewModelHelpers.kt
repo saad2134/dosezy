@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2026 Saad <reach.saad@outlook.com> (@saad2134)
+ * Licensed under the MIT License. See LICENSE in the project root for license information.
+ */
+
 package com.example.dosezy.utils
 
 import android.content.Context
@@ -7,21 +12,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.dosezy.ui.viewmodels.UserViewModel
-import com.example.dosezy.ui.viewmodels.ScheduleViewModel
+import androidx.lifecycle.ViewModel
+import com.example.dosezy.ui.viewmodels.AnalyticsViewModel
 import com.example.dosezy.ui.viewmodels.MedicineViewModel
+import com.example.dosezy.ui.viewmodels.ScheduleViewModel
+import com.example.dosezy.ui.viewmodels.UserViewModel
 
-@Composable
-fun sharedUserViewModel(): UserViewModel {
-    val context = LocalContext.current
-    val activity = remember(context) {
-        var c = context
-        while (c is ContextWrapper) {
-            if (c is ComponentActivity) break
-            c = c.baseContext
-        }
-        c as? ComponentActivity
+/**
+ * Traverses the [Context] hierarchy unwrapping [ContextWrapper] instances to locate the hosting [ComponentActivity].
+ */
+fun Context.findActivity(): ComponentActivity? {
+    var current = this
+    while (current is ContextWrapper) {
+        if (current is ComponentActivity) return current
+        current = current.baseContext
     }
+    return null
+}
+
+/**
+ * Scopes a Hilt ViewModel to the hosting Activity if available, falling back to NavBackStackEntry/LocalViewModelStoreOwner.
+ */
+@Composable
+inline fun <reified VM : ViewModel> sharedActivityViewModel(): VM {
+    val context = LocalContext.current
+    val activity = remember(context) { context.findActivity() }
     return if (activity != null) {
         hiltViewModel(activity)
     } else {
@@ -30,56 +45,13 @@ fun sharedUserViewModel(): UserViewModel {
 }
 
 @Composable
-fun sharedScheduleViewModel(): ScheduleViewModel {
-    val context = LocalContext.current
-    val activity = remember(context) {
-        var c = context
-        while (c is ContextWrapper) {
-            if (c is ComponentActivity) break
-            c = c.baseContext
-        }
-        c as? ComponentActivity
-    }
-    return if (activity != null) {
-        hiltViewModel(activity)
-    } else {
-        hiltViewModel()
-    }
-}
+fun sharedUserViewModel(): UserViewModel = sharedActivityViewModel()
 
 @Composable
-fun sharedMedicineViewModel(): MedicineViewModel {
-    val context = LocalContext.current
-    val activity = remember(context) {
-        var c = context
-        while (c is ContextWrapper) {
-            if (c is ComponentActivity) break
-            c = c.baseContext
-        }
-        c as? ComponentActivity
-    }
-    return if (activity != null) {
-        hiltViewModel(activity)
-    } else {
-        hiltViewModel()
-    }
-}
+fun sharedScheduleViewModel(): ScheduleViewModel = sharedActivityViewModel()
 
 @Composable
-fun sharedAnalyticsViewModel(): com.example.dosezy.ui.viewmodels.AnalyticsViewModel {
-    val context = LocalContext.current
-    val activity = remember(context) {
-        var c = context
-        while (c is ContextWrapper) {
-            if (c is ComponentActivity) break
-            c = c.baseContext
-        }
-        c as? ComponentActivity
-    }
-    return if (activity != null) {
-        hiltViewModel(activity)
-    } else {
-        hiltViewModel()
-    }
-}
+fun sharedMedicineViewModel(): MedicineViewModel = sharedActivityViewModel()
 
+@Composable
+fun sharedAnalyticsViewModel(): AnalyticsViewModel = sharedActivityViewModel()

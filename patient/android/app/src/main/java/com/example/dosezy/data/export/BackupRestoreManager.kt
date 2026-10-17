@@ -8,6 +8,7 @@ import androidx.room.withTransaction
 import com.example.dosezy.data.DosezyDatabase
 import com.example.dosezy.data.model.*
 import com.example.dosezy.data.repository.ScheduleRepository
+import com.example.dosezy.utils.SoundUtils
 import com.google.gson.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -79,7 +80,12 @@ class BackupRestoreManager(
             JsonPrimitive(src.toString())
         })
         .registerTypeAdapter(LocalDate::class.java, JsonDeserializer { json, _, _ ->
-            try { LocalDate.parse(json.asString) } catch (_: Exception) { null }
+            try {
+                val str = json.asString.trim()
+                str.toLongOrNull()?.let { millis ->
+                    java.time.Instant.ofEpochMilli(millis).atZone(java.time.ZoneOffset.UTC).toLocalDate()
+                } ?: LocalDate.parse(str)
+            } catch (_: Exception) { null }
         })
         .registerTypeAdapter(LocalDate::class.java, JsonSerializer<LocalDate> { src, _, _ ->
             JsonPrimitive(src.toString())
@@ -137,6 +143,19 @@ class BackupRestoreManager(
                     }
                 }
 
+                // Custom alarm sound asset if available
+                // Guard: Package custom alarm sound file into backup zip so custom ringtone audio is preserved across device migration
+                user.customAlarmSoundPath?.let { soundPath ->
+                    val cleanPath = soundPath.removePrefix("file://")
+                    val soundFile = File(cleanPath)
+                    if (soundFile.exists()) {
+                        val ext = soundFile.extension.ifEmpty { "mp3" }
+                        zos.putNextEntry(ZipEntry("$profileDir/custom_alarm.$ext"))
+                        soundFile.inputStream().use { it.copyTo(zos) }
+                        zos.closeEntry()
+                    }
+                }
+
                 // medicines.json
                 val medicines = database.medicineDao().getMedicinesByUserDirect(user.userId)
                 zos.putNextEntry(ZipEntry("$profileDir/medicines.json"))
@@ -164,11 +183,26 @@ class BackupRestoreManager(
 
                 // emergency_contacts.json (per-profile)
                 val emPrefs = context.getSharedPreferences("emergency_contacts", Context.MODE_PRIVATE)
+                // Guard: Fallback to contacts_json and contacts_json_default for active user if namespaced key is absent to preserve emergency contacts in backups
                 val emContacts = emPrefs.getString("contacts_json_${user.userId}", null)
-                    ?: if (user.isCurrentUser) emPrefs.getString("contacts_json", null) else null
+                    ?: if (user.isCurrentUser) {
+                        (emPrefs.getString("contacts_json", null) ?: emPrefs.getString("contacts_json_default", null))?.also {
+                            emPrefs.edit().putString("contacts_json_${user.userId}", it).apply()
+                        }
+                    } else null
                 if (!emContacts.isNullOrEmpty()) {
                     zos.putNextEntry(ZipEntry("$profileDir/emergency_contacts.json"))
                     zos.write(emContacts.toByteArray(Charsets.UTF_8))
+                    zos.closeEntry()
+                }
+
+                // Guard: Export per-profile emergency country selection to preserve emergency dialing preferences across restore
+                val countryPrefs = context.getSharedPreferences("emergency_prefs", Context.MODE_PRIVATE)
+                val countryCode = countryPrefs.getString("selected_country_code_${user.userId}", null)
+                    ?: if (user.isCurrentUser) countryPrefs.getString("selected_country_code", null) else null
+                if (!countryCode.isNullOrEmpty()) {
+                    zos.putNextEntry(ZipEntry("$profileDir/emergency_country.txt"))
+                    zos.write(countryCode.toByteArray(Charsets.UTF_8))
                     zos.closeEntry()
                 }
             }
@@ -335,11 +369,32 @@ class BackupRestoreManager(
                             targetAvatar.absolutePath
                         } else null
 
+                        val soundAssetFile = pDir.listFiles { f -> f.isFile && f.name.startsWith("custom_alarm.") }?.firstOrNull()
+                        // Guard: Unpack custom alarm sound into internal storage and update path, or fallback to SYSTEM_DEFAULT if asset is missing
+                        val finalSoundPath = if (soundAssetFile != null && soundAssetFile.exists()) {
+                            val soundDir = File(context.filesDir, "custom_sounds")
+                            soundDir.mkdirs()
+                            val ext = soundAssetFile.extension.ifEmpty { "mp3" }
+                            val targetSound = File(soundDir, "custom_alarm_${System.currentTimeMillis()}_${newUserId.take(8)}.$ext")
+                            soundAssetFile.copyTo(targetSound, overwrite = true)
+                            targetSound.absolutePath
+                        } else null
+
+                        val resolvedAlarmSound = if (finalSoundPath != null) {
+                            originalUser.alarmSound
+                        } else if (originalUser.alarmSound == AlarmSound.CUSTOM) {
+                            AlarmSound.SYSTEM_DEFAULT
+                        } else {
+                            originalUser.alarmSound
+                        }
+
                         val existingUsers = database.userDao().getAllUsersDirect()
                         val newUser = originalUser.copy(
                             userId = newUserId,
                             fullName = newName,
                             profilePicPath = finalPicPath,
+                            customAlarmSoundPath = finalSoundPath,
+                            alarmSound = resolvedAlarmSound,
                             isCurrentUser = (existingUsers.isEmpty() && totalProfiles == 0)
                         )
 
@@ -369,7 +424,7 @@ class BackupRestoreManager(
                         val newSchedules = schedules.mapNotNull { sch ->
                             val newMedId = medIdMap[sch.medicineId] ?: return@mapNotNull null
                             sch.copy(
-                                entryId = UUID.randomUUID().toString(),
+                                entryId = createRestoredEntryId(newMedId, sch.entryId, sch.scheduledDateTime),
                                 userId = newUserId,
                                 medicineId = newMedId
                             )
@@ -402,6 +457,16 @@ class BackupRestoreManager(
                                 emPrefs.edit().putString("contacts_json_$newUserId", emJson).apply()
                             }
                         }
+
+                        // Guard: Restore per-profile emergency country selection for newly created profile
+                        val countryFile = File(pDir, "emergency_country.txt")
+                        if (countryFile.exists()) {
+                            val cCode = countryFile.readText(Charsets.UTF_8).trim()
+                            if (cCode.isNotBlank()) {
+                                val emergencyPrefs = context.getSharedPreferences("emergency_prefs", Context.MODE_PRIVATE)
+                                emergencyPrefs.edit().putString("selected_country_code_$newUserId", cCode).apply()
+                            }
+                        }
                     }
 
                     ConflictStrategy.OVERWRITE -> {
@@ -412,17 +477,25 @@ class BackupRestoreManager(
                             val alarmScheduler = com.example.dosezy.notifications.AlarmScheduler(context)
                             val existingSchedules = scheduleRepository.getSchedulesByUserSync(targetUserId)
                             existingSchedules.forEach { entry ->
-                                alarmScheduler.cancelAlarm(entry.entryId)
+                                // Guard: Pass entry directly to cancelAlarm to bypass sequential blocking DB lookups
+                                alarmScheduler.cancelAlarm(entry)
                                 alarmScheduler.cancelSnooze(entry.entryId)
                                 alarmScheduler.cancelNagging(entry.entryId)
                                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
+                                // Guard: Cancel any active intake safeguard alarms for this entry to prevent orphaned re-alerts
+                                alarmScheduler.cancelIntakeSafeguardAlarm(entry.entryId)
+                            }
+                            // Guard: Dismiss active ADHD intake countdown notification if active countdown references overwritten profile
+                            val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
+                            if (activeCountdown != null && existingSchedules.any { it.entryId == activeCountdown.entryId || activeCountdown.entryIds.contains(it.entryId) }) {
+                                com.example.dosezy.notifications.IntakeSafeguardManager.cancelCountdown(context)
                             }
                         } catch (_: Exception) {}
 
                         val localUsers = database.userDao().getAllUsersDirect()
                         val existingLocalUser = localUsers.firstOrNull { it.userId == targetUserId }
-                        // Guard: Preserve existing local user's active status (or promote if this is the sole/first profile) to prevent wiping the active session on overwrite restore
-                        val shouldBeCurrent = existingLocalUser?.isCurrentUser ?: (totalProfiles == 0)
+                        // Guard: Preserve existing local user's active status, or promote only if no local profile is currently active and this is the first restored profile, preventing duplicate active users
+                        val shouldBeCurrent = existingLocalUser?.isCurrentUser ?: (localUsers.none { it.isCurrentUser } && totalProfiles == 0)
                         val existingLocalMeds = database.medicineDao().getMedicinesByUserDirect(targetUserId)
 
                         val avatarFile = File(pDir, "avatar.jpg")
@@ -435,9 +508,34 @@ class BackupRestoreManager(
                             targetAvatar.absolutePath
                         } else existingLocalUser?.profilePicPath?.takeIf { File(it.removePrefix("file://")).exists() }
 
+                        val soundAssetFile = pDir.listFiles { f -> f.isFile && f.name.startsWith("custom_alarm.") }?.firstOrNull()
+                        // Guard: Unpack backup custom alarm sound or fall back to valid local sound, and delete overwritten old sound file
+                        val finalSoundPath = if (soundAssetFile != null && soundAssetFile.exists()) {
+                            val soundDir = File(context.filesDir, "custom_sounds")
+                            soundDir.mkdirs()
+                            val ext = soundAssetFile.extension.ifEmpty { "mp3" }
+                            val targetSound = File(soundDir, "custom_alarm_${System.currentTimeMillis()}_${targetUserId.take(8)}.$ext")
+                            soundAssetFile.copyTo(targetSound, overwrite = true)
+                            targetSound.absolutePath
+                        } else existingLocalUser?.customAlarmSoundPath?.takeIf { File(it.removePrefix("file://")).exists() }
+
+                        if (existingLocalUser?.customAlarmSoundPath != null && existingLocalUser.customAlarmSoundPath != finalSoundPath) {
+                            SoundUtils.deleteCustomAudio(context, existingLocalUser.customAlarmSoundPath)
+                        }
+
+                        val resolvedAlarmSound = if (finalSoundPath != null) {
+                            originalUser.alarmSound
+                        } else if (originalUser.alarmSound == AlarmSound.CUSTOM) {
+                            AlarmSound.SYSTEM_DEFAULT
+                        } else {
+                            originalUser.alarmSound
+                        }
+
                         val restoredUser = originalUser.copy(
                             userId = targetUserId,
                             profilePicPath = finalPicPath,
+                            customAlarmSoundPath = finalSoundPath,
+                            alarmSound = resolvedAlarmSound,
                             isCurrentUser = shouldBeCurrent
                         )
 
@@ -462,15 +560,33 @@ class BackupRestoreManager(
                             restoredMedicines.add(restoredMed)
                         }
 
-                        // Guard: Map schedule entries to remapped medicine IDs, generate fresh entryIds, and filter out orphaned schedules referencing missing medicines to prevent ForeignKey constraint failures
+                        // Guard: Map schedule entries to remapped medicine IDs, generate deterministic entryIds, and filter out orphaned schedules referencing missing medicines to prevent ForeignKey constraint failures
                         val restoredSchedules = schedules.mapNotNull { sch ->
                             val mappedMedId = medIdMap[sch.medicineId] ?: return@mapNotNull null
                             sch.copy(
-                                entryId = UUID.randomUUID().toString(),
+                                entryId = createRestoredEntryId(mappedMedId, sch.entryId, sch.scheduledDateTime),
                                 userId = targetUserId,
                                 medicineId = mappedMedId
                             )
                         }
+
+                        // Guard: Delete orphaned internal storage medicine images not retained by restored medicines to prevent storage leaks
+                        try {
+                            val retainedPaths = restoredMedicines.mapNotNull { it.imageUri?.removePrefix("file://") }.toSet()
+                            val filesDir = context.filesDir
+                            existingLocalMeds.forEach { oldMed ->
+                                oldMed.imageUri?.let { uriStr ->
+                                    val cleanPath = uriStr.removePrefix("file://")
+                                    if (!retainedPaths.contains(cleanPath)) {
+                                        val file = File(cleanPath)
+                                        if (file.exists() && (file.parentFile?.canonicalPath == filesDir.canonicalPath || file.canonicalPath.startsWith(filesDir.canonicalPath + File.separator))) {
+                                            file.delete()
+                                            file.parentFile?.delete()
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (_: Exception) {}
 
                         // Guard: Execute clear and restore within an atomic Room transaction so that if any failure occurs midway, previous profile data is rolled back rather than permanently lost
                         database.withTransaction {
@@ -495,12 +611,32 @@ class BackupRestoreManager(
                         scheduleRepository.rescheduleAllAlarms(targetUserId, context)
 
                         val emFile = File(pDir, "emergency_contacts.json")
+                        val emPrefs = context.getSharedPreferences("emergency_contacts", Context.MODE_PRIVATE)
                         if (emFile.exists()) {
                             val emJson = emFile.readText(Charsets.UTF_8)
                             if (emJson.isNotBlank()) {
-                                val emPrefs = context.getSharedPreferences("emergency_contacts", Context.MODE_PRIVATE)
                                 emPrefs.edit().putString("contacts_json_$targetUserId", emJson).apply()
+                            } else {
+                                // Guard: Scrub stale emergency contacts when overwriting a profile with an empty emergency contacts file
+                                emPrefs.edit().remove("contacts_json_$targetUserId").apply()
                             }
+                        } else {
+                            // Guard: Scrub stale emergency contacts when overwriting a profile with a backup archive lacking emergency contacts
+                            emPrefs.edit().remove("contacts_json_$targetUserId").apply()
+                        }
+
+                        // Guard: Restore emergency country selection or scrub stale country code when overwriting profile
+                        val countryFile = File(pDir, "emergency_country.txt")
+                        val emergencyPrefs = context.getSharedPreferences("emergency_prefs", Context.MODE_PRIVATE)
+                        if (countryFile.exists()) {
+                            val cCode = countryFile.readText(Charsets.UTF_8).trim()
+                            if (cCode.isNotBlank()) {
+                                emergencyPrefs.edit().putString("selected_country_code_$targetUserId", cCode).apply()
+                            } else {
+                                emergencyPrefs.edit().remove("selected_country_code_$targetUserId").apply()
+                            }
+                        } else {
+                            emergencyPrefs.edit().remove("selected_country_code_$targetUserId").apply()
                         }
                     }
 
@@ -549,7 +685,7 @@ class BackupRestoreManager(
                             if (!duplicate) {
                                 mergedSchedules.add(
                                     sch.copy(
-                                        entryId = UUID.randomUUID().toString(),
+                                        entryId = createRestoredEntryId(mappedMedId, sch.entryId, sch.scheduledDateTime),
                                         userId = targetUserId,
                                         medicineId = mappedMedId
                                     )
@@ -559,6 +695,47 @@ class BackupRestoreManager(
 
                         // Guard: Execute MERGE inserts within an atomic Room transaction to ensure database consistency on failure
                         database.withTransaction {
+                            // Guard: Ensure parent User entity exists before inserting child medicines and schedules to prevent SQLiteConstraintException FOREIGN KEY failures when merging into missing or deleted local profiles
+                            if (database.userDao().getUserByIdDirect(targetUserId) == null) {
+                                val localUsers = database.userDao().getAllUsersDirect()
+                                val avatarFile = File(pDir, "avatar.jpg")
+                                val finalPicPath = if (avatarFile.exists()) {
+                                    val userAssetsDir = File(context.filesDir, "profiles/$targetUserId")
+                                    userAssetsDir.mkdirs()
+                                    val targetAvatar = File(userAssetsDir, "avatar.jpg")
+                                    avatarFile.copyTo(targetAvatar, overwrite = true)
+                                    targetAvatar.absolutePath
+                                } else null
+
+                                val soundAssetFile = pDir.listFiles { f -> f.isFile && f.name.startsWith("custom_alarm.") }?.firstOrNull()
+                                val finalSoundPath = if (soundAssetFile != null && soundAssetFile.exists()) {
+                                    val soundDir = File(context.filesDir, "custom_sounds")
+                                    soundDir.mkdirs()
+                                    val ext = soundAssetFile.extension.ifEmpty { "mp3" }
+                                    val targetSound = File(soundDir, "custom_alarm_${System.currentTimeMillis()}_${targetUserId.take(8)}.$ext")
+                                    soundAssetFile.copyTo(targetSound, overwrite = true)
+                                    targetSound.absolutePath
+                                } else null
+
+                                val resolvedAlarmSound = if (finalSoundPath != null) {
+                                    originalUser.alarmSound
+                                } else if (originalUser.alarmSound == AlarmSound.CUSTOM) {
+                                    AlarmSound.SYSTEM_DEFAULT
+                                } else {
+                                    originalUser.alarmSound
+                                }
+
+                                val shouldBeCurrent = localUsers.none { it.isCurrentUser } && totalProfiles == 0
+                                val restoredUser = originalUser.copy(
+                                    userId = targetUserId,
+                                    profilePicPath = finalPicPath,
+                                    customAlarmSoundPath = finalSoundPath,
+                                    alarmSound = resolvedAlarmSound,
+                                    isCurrentUser = shouldBeCurrent
+                                )
+                                database.userDao().insertUser(restoredUser)
+                            }
+
                             for (newMed in newMedsToInsert) {
                                 database.medicineDao().insertMedicine(newMed)
                             }
@@ -580,6 +757,18 @@ class BackupRestoreManager(
                                 val emPrefs = context.getSharedPreferences("emergency_contacts", Context.MODE_PRIVATE)
                                 if (!emPrefs.contains("contacts_json_$targetUserId")) {
                                     emPrefs.edit().putString("contacts_json_$targetUserId", emJson).apply()
+                                }
+                            }
+                        }
+
+                        // Guard: Restore per-profile emergency country selection for merged profile if not already set
+                        val countryFile = File(pDir, "emergency_country.txt")
+                        if (countryFile.exists()) {
+                            val cCode = countryFile.readText(Charsets.UTF_8).trim()
+                            if (cCode.isNotBlank()) {
+                                val emergencyPrefs = context.getSharedPreferences("emergency_prefs", Context.MODE_PRIVATE)
+                                if (!emergencyPrefs.contains("selected_country_code_$targetUserId")) {
+                                    emergencyPrefs.edit().putString("selected_country_code_$targetUserId", cCode).apply()
                                 }
                             }
                         }
@@ -663,7 +852,10 @@ class BackupRestoreManager(
             // Guard: Defensively parse slide actions, timeline mode, and thicker calendar highlight with non-breaking defaults for legacy backup archives
             slideActionsEnabled = json.get("slideActionsEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: true,
             timelineModeEnabled = json.get("timelineModeEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
-            thickerCalendarDayHighlight = json.get("thickerCalendarDayHighlight")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false
+            thickerCalendarDayHighlight = json.get("thickerCalendarDayHighlight")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+            // Guard: Defensively parse intake safeguard preferences with non-breaking defaults for legacy backup archives (#104)
+            intakeSafeguardEnabled = json.get("intakeSafeguardEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+            intakeCountdownSeconds = json.get("intakeCountdownSeconds")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 120
         )
     }
 
@@ -728,8 +920,17 @@ class BackupRestoreManager(
 
             val pillShape = obj.get("pillShape")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { PillShape.valueOf(it) }.getOrNull() } ?: PillShape.ROUND
             val pillColor = obj.get("pillColor")?.takeUnless { it.isJsonNull }?.asString ?: "#1193D4"
-            val startDate = obj.get("startDate")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
-            val endDate = obj.get("endDate")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+            // Guard: Parse epoch-millis and ISO-8601 date strings to prevent dropping course bounds on restore
+            val startDate = obj.get("startDate")?.takeUnless { it.isJsonNull }?.asString?.let { raw ->
+                raw.trim().toLongOrNull()?.let { millis ->
+                    java.time.Instant.ofEpochMilli(millis).atZone(java.time.ZoneOffset.UTC).toLocalDate()
+                } ?: runCatching { LocalDate.parse(raw.trim()) }.getOrNull()
+            }
+            val endDate = obj.get("endDate")?.takeUnless { it.isJsonNull }?.asString?.let { raw ->
+                raw.trim().toLongOrNull()?.let { millis ->
+                    java.time.Instant.ofEpochMilli(millis).atZone(java.time.ZoneOffset.UTC).toLocalDate()
+                } ?: runCatching { LocalDate.parse(raw.trim()) }.getOrNull()
+            }
 
             // Guard: Safe-extract required primitives with sane defaults to prevent NullPointerException from aborting archive inspection
             val medName = obj.get("medicationName")?.takeUnless { it.isJsonNull }?.asString ?: "Unknown Medication"
@@ -832,5 +1033,15 @@ class BackupRestoreManager(
             list.add(entry)
         }
         return list
+    }
+
+    // Guard: Generate deterministic entryId identical to ScheduleRecurrenceEngine to prevent duplicate schedule entries on auto-extend or medication update
+    internal fun createRestoredEntryId(medicineId: String, originalEntryId: String, scheduledDateTime: LocalDateTime): String {
+        return if (originalEntryId.startsWith("PRN_")) {
+            "PRN_${UUID.randomUUID()}"
+        } else {
+            val cleanTime = scheduledDateTime.toLocalTime().withSecond(0).withNano(0)
+            "${medicineId}_${scheduledDateTime.toLocalDate()}_$cleanTime".replace(":", "_").replace("-", "_")
+        }
     }
 }

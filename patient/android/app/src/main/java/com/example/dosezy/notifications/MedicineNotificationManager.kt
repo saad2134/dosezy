@@ -73,10 +73,13 @@ class MedicineNotificationManager @Inject constructor(
                 entry.scheduledDateTime.isBefore(activeWindowEnd)
             }
             entriesToCancel.forEach { entry ->
-                alarmScheduler.cancelAlarm(entry.entryId)
+                // Guard: Pass entry directly to cancelAlarm to bypass sequential blocking DB lookups
+                alarmScheduler.cancelAlarm(entry)
                 alarmScheduler.cancelSnooze(entry.entryId)
                 alarmScheduler.cancelNagging(entry.entryId)
                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
+                // Guard: Cancel any active intake safeguard alarms for this entry to prevent orphaned re-alerts
+                alarmScheduler.cancelIntakeSafeguardAlarm(entry.entryId)
             }
             Log.d(TAG, "Cancelled active window alarms for user: $userId (${entriesToCancel.size} active entries)")
         } catch (e: Exception) {
@@ -101,6 +104,7 @@ class MedicineNotificationManager @Inject constructor(
         }
     }
 
+    // Guard: Dispatch callback on Dispatchers.Main to prevent CalledFromWrongThreadException when mutating UI or Compose state
     fun checkAlarmStatus(userId: String, callback: (scheduledCount: Int, totalCount: Int) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -110,10 +114,14 @@ class MedicineNotificationManager @Inject constructor(
                             it.status == MedicationStatus.PENDING
                 }
 
-                callback(futureEntries.size, allEntries.size)
+                withContext(Dispatchers.Main) {
+                    callback(futureEntries.size, allEntries.size)
+                }
             } catch (e: Exception) {
                 Log.e(TAG, "Error checking alarm status", e)
-                callback(0, 0)
+                withContext(Dispatchers.Main) {
+                    callback(0, 0)
+                }
             }
         }
     }

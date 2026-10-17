@@ -365,6 +365,10 @@ fun ManageProfileScreen(navController: NavController) {
                         onClick = {
                             if (isFormValid) {
                                 currentUser?.let { user ->
+                                    // Guard: Clean up previous active profile picture file when saving a new picture to prevent disk storage leaks and avoid deleting during uncommitted drafts
+                                    if (!user.profilePicPath.isNullOrBlank() && user.profilePicPath != profilePicPath) {
+                                        com.example.dosezy.ui.components.deleteOldImage(context, user.profilePicPath)
+                                    }
                                     val updatedUser = user.copy(
                                         profilePicPath = profilePicPath,
                                         fullName = fullName.trim(),

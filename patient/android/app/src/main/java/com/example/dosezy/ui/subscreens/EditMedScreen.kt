@@ -137,7 +137,12 @@ fun EditMedScreen(
             doctorNotes = medicineToEdit.notes ?: ""
             isFiniteCourse = (medicineToEdit.endDate != null || medicineToEdit.durationDays != null)
             selectedStartDate = medicineToEdit.startDate ?: LocalDate.now()
-            durationDaysText = medicineToEdit.durationDays?.toString() ?: ""
+            // Guard: Precompute durationDays from existing startDate and endDate if durationDays is null to prevent wiping finite course duration on edit
+            val computedDays = medicineToEdit.durationDays ?: if (medicineToEdit.startDate != null && medicineToEdit.endDate != null) {
+                val days = java.time.temporal.ChronoUnit.DAYS.between(medicineToEdit.startDate, medicineToEdit.endDate) + 1
+                if (days > 0) days.toInt() else null
+            } else null
+            durationDaysText = computedDays?.toString() ?: ""
             intervalHoursText = medicineToEdit.frequency.intervalHours?.toString() ?: "4"
             intervalDaysText = medicineToEdit.frequency.intervalDays?.toString() ?: "2"
             intervalWeeksText = medicineToEdit.frequency.intervalWeeks?.toString() ?: "2"
@@ -257,8 +262,13 @@ fun EditMedScreen(
                         // --- Card 3: Course Duration Card ---
                         val durationDaysInt = durationDaysText.normalizeArabicDigits().toIntOrNull()
                         val calcStartDate = selectedStartDate
-                        val calcEndDate = if (isFiniteCourse && durationDaysInt != null) {
-                            selectedStartDate.plusDays((durationDaysInt - 1).toLong().coerceAtLeast(0L))
+                        // Guard: Retain medicineToEdit.endDate if durationDaysInt is null while isFiniteCourse is true to prevent silent conversion to indefinite schedule
+                        val calcEndDate = if (isFiniteCourse) {
+                            if (durationDaysInt != null) {
+                                selectedStartDate.plusDays((durationDaysInt - 1).toLong().coerceAtLeast(0L))
+                            } else {
+                                medicineToEdit?.endDate
+                            }
                         } else null
 
                         MedicineCourseDurationCard(
@@ -309,7 +319,10 @@ fun EditMedScreen(
                             selectedFrequency = selectedFrequency,
                             selectedDaysOfWeek = selectedDaysOfWeek,
                             selectedDaysOfMonth = selectedDaysOfMonth,
-                            intervalWeeksText = intervalWeeksText
+                            intervalWeeksText = intervalWeeksText,
+                            isFiniteCourse = isFiniteCourse,
+                            durationDaysText = durationDaysText,
+                            hasExistingEndDate = medicineToEdit?.endDate != null
                         )
 
                         // Save Changes Button
@@ -334,10 +347,14 @@ fun EditMedScreen(
                                     if (map.isNotEmpty()) map else null
                                 } else null
 
+                                // Guard: Preserve original medicine owner userId or fallback to active non-blank user; abort if absent to prevent SQLiteConstraintException
+                                val targetUserId = medicineToEdit?.userId ?: currentUser?.userId?.takeIf { it.isNotBlank() } ?: return@Button
+
                                 val updatedMedicine = Medicine(
                                     medicineId = medicineToEdit?.medicineId ?: UUID.randomUUID().toString(),
-                                    userId = currentUser?.userId ?: "",
-                                    medicationName = medicationName,
+                                    userId = targetUserId,
+                                    // Guard: Trim medication name to avoid duplicate records with trailing whitespace and maintain restore matching
+                                    medicationName = medicationName.trim(),
                                     dosage = baseDose,
                                     dosageUnit = selectedDosageUnit,
                                     timesPerDay = if (selectedFrequency == FrequencyPattern.AS_NEEDED) 0 else scheduledTimesList.size,
@@ -363,12 +380,18 @@ fun EditMedScreen(
                                     pillColor = selectedPillColor,
                                     startDate = calcStartDate,
                                     endDate = calcEndDate,
-                                    durationDays = if (isFiniteCourse) durationDaysInt else null,
+                                    // Guard: Preserve computed or existing durationDays when duration text was not modified to maintain finite course integrity
+                                    durationDays = if (isFiniteCourse) (durationDaysInt ?: medicineToEdit?.durationDays) else null,
                                     isArchived = medicineToEdit?.isArchived ?: false,
-                                    customDosages = finalCustomDosages
+                                    // Guard: Clear customDosages if frequency is AS_NEEDED to prevent leaking orphaned scheduled custom dosages into PRN doses and reports
+                                    customDosages = if (selectedFrequency == FrequencyPattern.AS_NEEDED) null else finalCustomDosages
                                 )
 
                                 if (medicineToEdit != null) {
+                                    // Guard: Clean up previous active medicine image when saving a new image to prevent disk storage leaks and avoid deleting during uncommitted drafts
+                                    if (!medicineToEdit.imageUri.isNullOrBlank() && medicineToEdit.imageUri != medicineImagePath) {
+                                        com.example.dosezy.ui.components.deleteOldImage(context, medicineToEdit.imageUri)
+                                    }
                                     medicineViewModel.updateMedicine(updatedMedicine)
                                     navController.previousBackStackEntry?.savedStateHandle?.set(
                                         "snackbar_message",
@@ -383,7 +406,7 @@ fun EditMedScreen(
                                 }
                                 navController.popBackStack()
                             },
-                            enabled = isFormValid,
+                            enabled = isFormValid && (medicineToEdit != null || !currentUser?.userId.isNullOrBlank()),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),

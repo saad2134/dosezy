@@ -451,6 +451,7 @@
     <string name="to_be_taken_in">%1$dघंटे %2$dमिनट में लेनी है</string>
     <string name="time_diff_ago">%1$dघंटे %2$dमिनट पहले</string>
     <string name="status_all_medications_taken">सभी दवाएं ले ली गईं</string>
+    <string name="status_slot_completed_with_skipped">पूर्ण (कुछ छोड़ दिए गए)</string>
     <string name="status_scheduled_for_this_time">इस समय के लिए निर्धारित</string>
     <string name="daily_frequency_presets_title">दैनिक आवृत्ति प्रीसेट</string>
     <string name="action_edit_medicine_cd">दवा संपादित करें</string>
@@ -585,7 +586,7 @@
     <string name="alarm_duration_1m">1 मिनट</string>
     <string name="alarm_duration_2m">2 मिनट</string>
     <string name="alarm_duration_5m">5 मिनट</string>
-    <string name="alarm_silenced_auto_banner">अलार्म स्वतः म्यूट हो गया — तैयार होने पर अपनी दवाएं दर्ज करें</string>
+    <string name="alarm_silenced_auto_banner">अलार्म स्वतः म्यूट हो गया - तैयार होने पर अपनी दवाएं दर्ज करें</string>
 
     <string name="alarm_sound_custom">कस्टम ऑडियो फ़ाइल</string>
     <string name="alarm_sound_select_file">ऑडियो फ़ाइल चुनें</string>
@@ -811,4 +812,8 @@
     <string name="alarm_slide_to_snooze">स्नूज़ के लिए स्लाइड करें (%1$d मि)</string>
     <string name="home_view_standard">मानक</string>
     <string name="home_view_timeline">टाइमलाइन</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">स्नूज़ करें:</string>
+    <string name="snooze_duration_chip_format">%1$d मि</string>
 </resources>

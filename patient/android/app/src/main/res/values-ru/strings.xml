@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Dosezy</string>
-    <string name="app_tagline">Прием лекарств — это просто</string>
+    <string name="app_tagline">Прием лекарств - это просто</string>
 
     <string name="nav_home">Главная</string>
     <string name="nav_schedule">Расписание</string>
@@ -12,7 +12,7 @@
     <string name="greeting_afternoon">Добрый день,</string>
     <string name="greeting_evening">Добрый вечер,</string>
     <string name="greeting_night">Доброй ночи,</string>
-    <string name="health_quote">\"Здоровье — это бесценное богатство.\"</string>
+    <string name="health_quote">\"Здоровье - это бесценное богатство.\"</string>
 
     <string name="home_todays_meds">Лекарства на сегодня</string>
     <string name="home_todays_adherence">Прием за сегодня</string>
@@ -172,7 +172,7 @@
 
     <string name="setup_welcome_title">Добро пожаловать в Dosezy</string>
     <string name="setup_welcome_sub">Ваш личный помощник по приему лекарств.</string>
-    <string name="setup_features_title">Ваше здоровье — это просто!</string>
+    <string name="setup_features_title">Ваше здоровье - это просто!</string>
     <string name="setup_features_sub">Ключевые возможности Dosezy</string>
     <string name="setup_feat1_title">Никогда не пропускайте прием</string>
     <string name="setup_feat1_desc">Получайте своевременные напоминания о каждом лекарстве.</string>
@@ -435,6 +435,7 @@
     <string name="to_be_taken_in">Принять через %1$d ч %2$d мин</string>
     <string name="time_diff_ago">%1$d ч %2$d мин назад</string>
     <string name="status_all_medications_taken">Все лекарства приняты</string>
+    <string name="status_slot_completed_with_skipped">Завершено (некоторые пропущены)</string>
     <string name="status_scheduled_for_this_time">Запланировано на это время</string>
     <string name="daily_frequency_presets_title">Предустановки частоты приема</string>
     <string name="action_edit_medicine_cd">Редактировать лекарство</string>
@@ -569,7 +570,7 @@
     <string name="alarm_duration_1m">1 минута</string>
     <string name="alarm_duration_2m">2 минуты</string>
     <string name="alarm_duration_5m">5 минут</string>
-    <string name="alarm_silenced_auto_banner">Будильник автоматически выключен — отметьте прием лекарств, когда будете готовы</string>
+    <string name="alarm_silenced_auto_banner">Будильник автоматически выключен - отметьте прием лекарств, когда будете готовы</string>
 
     <string name="alarm_sound_custom">Свой звуковой файл</string>
     <string name="alarm_sound_select_file">Выбрать аудиофайл</string>
@@ -795,4 +796,8 @@
     <string name="alarm_slide_to_snooze">Проведите для откладывания (%1$d мин)</string>
     <string name="home_view_standard">Стандартный</string>
     <string name="home_view_timeline">Шкала времени</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">Отложить на:</string>
+    <string name="snooze_duration_chip_format">%1$d мин</string>
 </resources>

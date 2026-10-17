@@ -54,4 +54,14 @@ object AppModule {
     ): MedicineNotificationManager {
         return MedicineNotificationManager(context, database)
     }
+
+    @Provides
+    @Singleton
+    fun provideBackupRestoreManager(
+        @ApplicationContext context: Context,
+        database: DosezyDatabase,
+        scheduleRepository: ScheduleRepository
+    ): com.example.dosezy.data.export.BackupRestoreManager {
+        return com.example.dosezy.data.export.BackupRestoreManager(context, database, scheduleRepository)
+    }
 }

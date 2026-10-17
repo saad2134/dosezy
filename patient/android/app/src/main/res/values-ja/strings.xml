@@ -435,6 +435,7 @@
     <string name="to_be_taken_in">%1$d時間%2$d分後に服用</string>
     <string name="time_diff_ago">%1$d時間%2$d分前</string>
     <string name="status_all_medications_taken">すべての薬を服用済み</string>
+    <string name="status_slot_completed_with_skipped">完了 (一部スキップ)</string>
     <string name="status_scheduled_for_this_time">この時間に予定されています</string>
     <string name="daily_frequency_presets_title">1日の服用頻度プリセット</string>
     <string name="action_edit_medicine_cd">薬を編集</string>
@@ -569,7 +570,7 @@
     <string name="alarm_duration_1m">1 分</string>
     <string name="alarm_duration_2m">2 分</string>
     <string name="alarm_duration_5m">5 分</string>
-    <string name="alarm_silenced_auto_banner">アラームは自動停止しました — 準備ができたら服薬を記録してください</string>
+    <string name="alarm_silenced_auto_banner">アラームは自動停止しました - 準備ができたら服薬を記録してください</string>
 
     <string name="alarm_sound_custom">カスタム音声ファイル</string>
     <string name="alarm_sound_select_file">音声ファイルを選択</string>
@@ -795,4 +796,8 @@
     <string name="alarm_slide_to_snooze">スライドしてスヌーズ (%1$d分)</string>
     <string name="home_view_standard">標準</string>
     <string name="home_view_timeline">タイムライン</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">スヌーズ時間:</string>
+    <string name="snooze_duration_chip_format">%1$d分</string>
 </resources>

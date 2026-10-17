@@ -15,6 +15,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import android.content.Context
+import com.example.dosezy.data.preferences.UserPreferencesDataStore
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,8 +25,33 @@ class UserViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val medicineRepository: MedicineRepository,
     private val scheduleRepository: ScheduleRepository,
-    private val medicineNotificationManager: MedicineNotificationManager
+    private val medicineNotificationManager: MedicineNotificationManager,
+    @ApplicationContext private val appContext: Context? = null,
+    private val userPreferencesDataStore: UserPreferencesDataStore? = null
 ) : ViewModel() {
+
+    // Context resolution: uses injected ApplicationContext with fallback for testing
+    private val context: Context
+        get() = appContext ?: medicineRepository.context
+
+    private val preferencesStore: UserPreferencesDataStore by lazy {
+        userPreferencesDataStore ?: UserPreferencesDataStore(context)
+    }
+
+    val preferencesDataStore: UserPreferencesDataStore
+        get() = preferencesStore
+
+    private suspend fun syncAppTheme(themeName: String) {
+        try {
+            preferencesStore.setTheme(themeName)
+        } catch (_: Exception) {
+            // Guard: Fallback to SharedPreferences if DataStore is uninitialized or in mock context
+            try {
+                val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                prefs.edit().putString("theme", themeName).apply()
+            } catch (_: Exception) {}
+        }
+    }
 
     // debouncing to prevent rapid updates
     private val _users = MutableStateFlow<List<User>>(emptyList())
@@ -59,9 +87,8 @@ class UserViewModel @Inject constructor(
                         _currentUser.value = current
                         if (current != null) {
                             try {
-                                val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                                prefs.edit().putString("theme", current.theme.name.lowercase()).apply()
-                                com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, current.userId, current.theme.name.lowercase(), isCurrentProfile = true)
+                                syncAppTheme(current.theme.name.lowercase())
+                                com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, current.userId, current.theme.name.lowercase(), isCurrentProfile = true)
                             } catch (_: Exception) {}
                         }
 
@@ -82,17 +109,11 @@ class UserViewModel @Inject constructor(
             try {
                 // coroutine scope to run in background
                 withContext(Dispatchers.IO) {
-                    // Clear current user flag from all users
-                    val allUsers = userRepository.getAllUsersList()
-                    allUsers.forEach { existingUser ->
-                        if (existingUser.isCurrentUser && existingUser.userId != user.userId) {
-                            userRepository.updateUser(existingUser.copy(isCurrentUser = false))
-                        }
-                    }
+                    // Guard: Atomically update isCurrentUser flag in a single SQLite statement to prevent Room intermediate emissions with 0 active users triggering auto-promotion
+                    userRepository.setCurrentUser(user.userId)
 
                     // Set new current user
                     val updatedUser = user.copy(isCurrentUser = true)
-                    userRepository.updateUser(updatedUser)
 
                     // Update state on main thread
                     withContext(Dispatchers.Main) {
@@ -103,14 +124,13 @@ class UserViewModel @Inject constructor(
                     medicineNotificationManager.scheduleAlarmsForUser(updatedUser.userId)
 
                     try {
-                        val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                        prefs.edit().putString("theme", updatedUser.theme.name.lowercase()).apply()
-                        com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, updatedUser.userId, updatedUser.theme.name.lowercase(), isCurrentProfile = true)
+                        syncAppTheme(updatedUser.theme.name.lowercase())
+                        com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, updatedUser.userId, updatedUser.theme.name.lowercase(), isCurrentProfile = true)
                     } catch (_: Exception) {}
 
                     // Update home screen widget for the new current user
                     try {
-                        com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(medicineRepository.context)
+                        com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
                     } catch (_: Exception) {}
                 }
                 _isLoading.value = false
@@ -138,31 +158,24 @@ class UserViewModel @Inject constructor(
                     val allUsers = userRepository.getAllUsersList()
                     val shouldBeCurrent = user.isCurrentUser || allUsers.isEmpty() || allUsers.none { it.isCurrentUser }
 
-                    if (shouldBeCurrent) {
-                        // Demote existing users to maintain the single current user invariant
-                        allUsers.forEach { existingUser ->
-                            if (existingUser.isCurrentUser) {
-                                userRepository.updateUser(existingUser.copy(isCurrentUser = false))
-                            }
-                        }
-                    }
-
                     val userToInsert = user.copy(isCurrentUser = shouldBeCurrent)
                     userRepository.insertUser(userToInsert)
 
                     if (shouldBeCurrent) {
+                        // Guard: Atomically ensure only the newly added profile is current without intermediate 0-active states
+                        userRepository.setCurrentUser(userToInsert.userId)
+
                         withContext(Dispatchers.Main) {
                             _currentUser.value = userToInsert
                         }
                         // Guard: Core library desugaring supports API 24+; schedule alarms for new profile across all supported OS versions
                         medicineNotificationManager.scheduleAlarmsForUser(userToInsert.userId)
                         try {
-                            val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                            prefs.edit().putString("theme", userToInsert.theme.name.lowercase()).apply()
-                            com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, userToInsert.userId, userToInsert.theme.name.lowercase(), isCurrentProfile = shouldBeCurrent)
+                            syncAppTheme(userToInsert.theme.name.lowercase())
+                            com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, userToInsert.userId, userToInsert.theme.name.lowercase(), isCurrentProfile = shouldBeCurrent)
                         } catch (_: Exception) {}
                         try {
-                            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(medicineRepository.context)
+                            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
                         } catch (_: Exception) {}
                     }
                 }
@@ -181,13 +194,12 @@ class UserViewModel @Inject constructor(
             if (user.isCurrentUser) {
                 _currentUser.value = user
                 try {
-                    val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                    prefs.edit().putString("theme", user.theme.name.lowercase()).apply()
+                    syncAppTheme(user.theme.name.lowercase())
                 } catch (_: Exception) {}
             }
             try {
-                com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, user.userId, user.theme.name.lowercase(), isCurrentProfile = user.isCurrentUser)
-                com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(medicineRepository.context)
+                com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, user.userId, user.theme.name.lowercase(), isCurrentProfile = user.isCurrentUser)
+                com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
             } catch (_: Exception) {}
         }
     }
@@ -200,22 +212,36 @@ class UserViewModel @Inject constructor(
                     // Guard: Cancel alarms across all supported versions (API 24+) to prevent orphaned alarms ringing after user deletion
                     medicineNotificationManager.cancelAllAlarmsForUser(user.userId)
 
+                    // Guard: Dismiss active ADHD intake countdown notification if active countdown belongs to deleted user
+                    try {
+                        val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
+                        if (activeCountdown != null) {
+                            val entry = scheduleRepository.getScheduleEntryById(activeCountdown.entryId)
+                            if (entry == null || entry.userId == user.userId) {
+                                com.example.dosezy.notifications.IntakeSafeguardManager.cancelCountdown(context)
+                            }
+                        }
+                    } catch (_: Exception) {}
+
                     // Delete user's profile picture from internal storage if it exists
                     user.profilePicPath?.let { path ->
                         try {
                             val cleanPath = path.removePrefix("file://")
                             val file = java.io.File(cleanPath)
-                            val filesDir = medicineRepository.context.filesDir
+                            val filesDir = context.filesDir
                             if (file.exists() && (file.parentFile?.canonicalPath == filesDir.canonicalPath || file.canonicalPath.startsWith(filesDir.canonicalPath + java.io.File.separator))) {
                                 file.delete()
                             }
                         } catch (_: Exception) {}
                     }
 
+                    // Guard: Unlink custom alarm sound from internal storage upon profile deletion to prevent disk leakage
+                    com.example.dosezy.utils.SoundUtils.deleteCustomAudio(context, user.customAlarmSoundPath)
+
                     // Clean up associated medicine images before database cascade deletion
                     try {
                         val meds = medicineRepository.getMedicinesByUserDirect(user.userId)
-                        val filesDir = medicineRepository.context.filesDir
+                        val filesDir = context.filesDir
                         meds.forEach { med ->
                             med.imageUri?.let { uriStr ->
                                 val cleanPath = uriStr.removePrefix("file://")
@@ -230,14 +256,19 @@ class UserViewModel @Inject constructor(
                     // Delete the user from DB (cascades to medicines & schedules)
                     userRepository.deleteUser(user)
 
-                    // Guard: Scrub orphaned emergency contacts and widget profile preferences for the deleted profile to prevent SharedPreferences leakage
+                    // Guard: Scrub orphaned emergency contacts, emergency preferences, and widget profile preferences for the deleted profile to prevent SharedPreferences leakage
                     try {
-                        val emPrefs = medicineRepository.context.getSharedPreferences("emergency_contacts", android.content.Context.MODE_PRIVATE)
+                        val emPrefs = context.getSharedPreferences("emergency_contacts", android.content.Context.MODE_PRIVATE)
                         emPrefs.edit().remove("contacts_json_${user.userId}").apply()
                     } catch (_: Exception) {}
 
                     try {
-                        com.example.dosezy.widget.DosezyWidgetPrefs.deleteWidgetProfileTheme(medicineRepository.context, user.userId)
+                        val emergencyPrefs = context.getSharedPreferences("emergency_prefs", android.content.Context.MODE_PRIVATE)
+                        emergencyPrefs.edit().remove("selected_country_code_${user.userId}").apply()
+                    } catch (_: Exception) {}
+
+                    try {
+                        com.example.dosezy.widget.DosezyWidgetPrefs.deleteWidgetProfileTheme(context, user.userId)
                     } catch (_: Exception) {}
 
                     // Fetch remaining users directly from DB
@@ -254,9 +285,8 @@ class UserViewModel @Inject constructor(
 
                         // Guard: Synchronize app theme and widget preferences for promoted active profile to prevent theme lock on deleted profile
                         try {
-                            val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                            prefs.edit().putString("theme", nextUser.theme.name.lowercase()).apply()
-                            com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(medicineRepository.context, nextUser.userId, nextUser.theme.name.lowercase(), isCurrentProfile = true)
+                            syncAppTheme(nextUser.theme.name.lowercase())
+                            com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, nextUser.userId, nextUser.theme.name.lowercase(), isCurrentProfile = true)
                         } catch (_: Exception) {}
 
                         // Guard: Core library desugaring supports API 24+; schedule alarms for next active profile across all OS versions
@@ -268,13 +298,17 @@ class UserViewModel @Inject constructor(
                         }
                         // Guard: Clean up app theme back to system default when no user profiles remain
                         try {
-                            val prefs = medicineRepository.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                            prefs.edit().putString("theme", "system").apply()
+                            syncAppTheme("system")
                         } catch (_: Exception) {}
+                    } else {
+                        // Guard: When deleting a secondary profile, notify completion with the unchanged active current profile
+                        withContext(Dispatchers.Main) {
+                            onNextUserSelected?.invoke(_currentUser.value)
+                        }
                     }
 
                     try {
-                        com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(medicineRepository.context)
+                        com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
                     } catch (_: Exception) {}
                 }
             } catch (e: Exception) {

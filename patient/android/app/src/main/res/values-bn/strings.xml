@@ -435,6 +435,7 @@
     <string name="to_be_taken_in">%1$dঘণ্টা %2$dমিনিটের মধ্যে সেব্য</string>
     <string name="time_diff_ago">%1$dঘণ্টা %2$dমিনিট আগে</string>
     <string name="status_all_medications_taken">সমস্ত ওষুধ গ্রহণ করা হয়েছে</string>
+    <string name="status_slot_completed_with_skipped">সম্পূর্ণ (কিছু বাদ দেওয়া হয়েছে)</string>
     <string name="status_scheduled_for_this_time">এই সময়ের জন্য নির্ধারিত</string>
     <string name="daily_frequency_presets_title">দৈনিক ফ্রিকোয়েন্সি প্রিসেট</string>
     <string name="action_edit_medicine_cd">ওষুধ সম্পাদনা করুন</string>
@@ -569,7 +570,7 @@
     <string name="alarm_duration_1m">১ মিনিট</string>
     <string name="alarm_duration_2m">২ মিনিট</string>
     <string name="alarm_duration_5m">৫ মিনিট</string>
-    <string name="alarm_silenced_auto_banner">অ্যালার্ম স্বয়ংক্রিয়ভাবে বন্ধ হয়েছে — সুবিধামতো ওষুধের হিসাব লিপিবদ্ধ করুন</string>
+    <string name="alarm_silenced_auto_banner">অ্যালার্ম স্বয়ংক্রিয়ভাবে বন্ধ হয়েছে - সুবিধামতো ওষুধের হিসাব লিপিবদ্ধ করুন</string>
     <string name="notif_exact_alarm_title">সঠিক সময়ের অ্যালার্ম</string>
     <string name="notif_exact_alarm_granted">অ্যালার্ম যথাসময়ে বাজবে।</string>
     <string name="notif_exact_alarm_desc">অ্যালার্ম সঠিক সময়ে বাজার জন্য প্রয়োজনীয়।</string>
@@ -794,4 +795,8 @@
     <string name="alarm_slide_to_snooze">স্নুজ করতে স্লাইড করুন (%1$d মি)</string>
     <string name="home_view_standard">সাধারণ</string>
     <string name="home_view_timeline">টাইমলাইন</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">স্নুজ করুন:</string>
+    <string name="snooze_duration_chip_format">%1$d মি</string>
 </resources>

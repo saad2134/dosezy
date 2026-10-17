@@ -80,18 +80,20 @@ class DosezyRemoteViewsFactory(
                 val next7Days = today.plusDays(7).atStartOfDay(zoneUtc).toInstant().toEpochMilli() - 1
 
                 val todayEntries = db.scheduleDao().getScheduleForDateRangeDirect(user.userId, startOfDay, endOfDay)
-                val todayPending = todayEntries.filter { it.status == MedicationStatus.PENDING }.sortedBy { it.scheduledDateTime }
+                // Guard: Filter out ad-hoc PRN doses so today's scheduled pending list and upcoming fallback are not suppressed by ad-hoc doses
+                val scheduledToday = todayEntries.filter { !it.entryId.startsWith("PRN_") }
+                val todayPending = scheduledToday.filter { it.status == MedicationStatus.PENDING }.sortedBy { it.scheduledDateTime }
                 val medicines = db.medicineDao().getMedicinesByUserDirect(user.userId).associateBy { it.medicineId }
 
                 val displayEntries: List<ScheduleEntry>
                 if (todayPending.isNotEmpty()) {
                     displayEntries = todayPending
-                } else if (todayEntries.isNotEmpty()) {
+                } else if (scheduledToday.isNotEmpty()) {
                     displayEntries = emptyList()
                 } else {
                     val upcomingEntries = db.scheduleDao().getScheduleForDateRangeDirect(user.userId, startOfDay, next7Days)
                     displayEntries = upcomingEntries.filter {
-                        it.status == MedicationStatus.PENDING && (it.scheduledDateTime.isAfter(LocalDateTime.now()) || it.scheduledDateTime.toLocalDate() == today)
+                        !it.entryId.startsWith("PRN_") && it.status == MedicationStatus.PENDING && (it.scheduledDateTime.isAfter(LocalDateTime.now()) || it.scheduledDateTime.toLocalDate() == today)
                     }.sortedBy { it.scheduledDateTime }
                 }
 
@@ -146,8 +148,10 @@ class DosezyRemoteViewsFactory(
         views.setTextViewText(R.id.widget_item_dose, item.doseLabel)
 
         // Fill-in intent for item click
+        // Guard: Pass fragment=schedule so tapping an item navigates directly to the Schedule tab in MainActivity
         val fillInIntent = Intent().apply {
             putExtra("switch_to_user_id", item.userId)
+            putExtra("fragment", "schedule")
         }
         views.setOnClickFillInIntent(R.id.widget_item_root, fillInIntent)
 

@@ -435,6 +435,7 @@ Möchten Sie fortfahren?</string>
     <string name="to_be_taken_in">Einzunehmen in %1$d Std. %2$d Min.</string>
     <string name="time_diff_ago">Vor %1$d Std. %2$d Min.</string>
     <string name="status_all_medications_taken">Alle Medikamente eingenommen</string>
+    <string name="status_slot_completed_with_skipped">Abgeschlossen (einige übersprungen)</string>
     <string name="status_scheduled_for_this_time">Für diese Zeit geplant</string>
     <string name="daily_frequency_presets_title">Tägliche Häufigkeitsvoreinstellungen</string>
     <string name="action_edit_medicine_cd">Medikament bearbeiten</string>
@@ -569,7 +570,7 @@ Möchten Sie fortfahren?</string>
     <string name="alarm_duration_1m">1 Minute</string>
     <string name="alarm_duration_2m">2 Minuten</string>
     <string name="alarm_duration_5m">5 Minuten</string>
-    <string name="alarm_silenced_auto_banner">Alarm automatisch stummgeschaltet — erfassen Sie Ihre Dosen, wenn Sie bereit sind</string>
+    <string name="alarm_silenced_auto_banner">Alarm automatisch stummgeschaltet - erfassen Sie Ihre Dosen, wenn Sie bereit sind</string>
 
     <string name="alarm_sound_custom">Eigene Audiodatei</string>
     <string name="alarm_sound_select_file">Audiodatei auswählen</string>
@@ -734,7 +735,7 @@ Möchten Sie fortfahren?</string>
     <string name="about_developer_github">GitHub-Profil</string>
     <string name="about_features_title">Warum Dosezy?</string>
     <string name="about_feat_offline_title" formatted="false">100 % offline &amp; privat</string>
-    <string name="about_feat_offline_desc">Alle Daten bleiben sicher auf Ihrem Gerät – ganz ohne Cloud oder Tracker.</string>
+    <string name="about_feat_offline_desc">Alle Daten bleiben sicher auf Ihrem Gerät - ganz ohne Cloud oder Tracker.</string>
     <string name="about_feat_smart_alarms_title">Zuverlässige Wecker &amp; Zeitzonen</string>
     <string name="about_feat_smart_alarms_desc">Präzise Erinnerungen, die Ihr Gerät wecken und Zeitzonenwechsel automatisch anpassen.</string>
     <string name="about_feat_family_title">Familienpflege mit Profilen</string>
@@ -795,4 +796,8 @@ Möchten Sie fortfahren?</string>
     <string name="alarm_slide_to_snooze">Zum Schlummern wischen (%1$d Min)</string>
     <string name="home_view_standard">Standard</string>
     <string name="home_view_timeline">Zeitleiste</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">Schlummern für:</string>
+    <string name="snooze_duration_chip_format">%1$d Min</string>
 </resources>

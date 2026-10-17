@@ -12,6 +12,8 @@ import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.data.repository.UserRepository
 import com.example.dosezy.utils.TimeCalculationUtils
 import android.content.Context
+import com.example.dosezy.domain.usecases.TakeCohortUseCase
+import com.example.dosezy.domain.usecases.SkipCohortUseCase
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +29,9 @@ import javax.inject.Inject
 class ScheduleViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val userRepository: UserRepository,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val takeCohortUseCase: TakeCohortUseCase? = null,
+    private val skipCohortUseCase: SkipCohortUseCase? = null
 ) : ViewModel() {
 
     companion object {
@@ -63,19 +67,39 @@ class ScheduleViewModel @Inject constructor(
         loadCurrentUserAndSchedule()
     }
 
+    private var currentObservedTodayDate: LocalDate? = null
+
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun observeTodaySchedule(userId: String) {
+    internal fun observeTodaySchedule(userId: String) {
         todayJob?.cancel()
         _isTodayLoading.value = true
+        val today = LocalDate.now()
+        currentObservedTodayDate = today
         todayJob = viewModelScope.launch {
             try {
-                scheduleRepository.getScheduleWithMedicineForDate(userId, LocalDate.now()).collect { entries ->
+                scheduleRepository.getScheduleWithMedicineForDate(userId, today).collect { entries ->
                     _todayScheduleWithMedicine.value = entries
                     _isTodayLoading.value = false
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error observing today schedule", e)
                 _isTodayLoading.value = false
+            }
+        }
+    }
+
+    // Guard: Reconnect today's schedule subscription when passing midnight so HomeScreen displays today's doses instead of remaining stuck on yesterday's query
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun checkMidnightDateTransition() {
+        val today = LocalDate.now()
+        if (currentObservedTodayDate != null && currentObservedTodayDate != today) {
+            val previousObserved = currentObservedTodayDate
+            _currentUserId.value?.let { userId ->
+                observeTodaySchedule(userId)
+                if (_selectedDate.value == previousObserved) {
+                    _selectedDate.value = today
+                    loadScheduleForDate(userId, today)
+                }
             }
         }
     }
@@ -94,6 +118,14 @@ class ScheduleViewModel @Inject constructor(
                     observeTodaySchedule(user.userId)
                     loadScheduleForDate(user.userId, _selectedDate.value)
                 } ?: run {
+                    // Guard: Cancel observation jobs and flush cached StateFlow lists when no active user exists to prevent stale schedule data retention across profile lifecycles
+                    todayJob?.cancel()
+                    scheduleJob?.cancel()
+                    rawScheduleJob?.cancel()
+                    _todayScheduleWithMedicine.value = emptyList()
+                    _scheduleWithMedicine.value = emptyList()
+                    _scheduleEntries.value = emptyList()
+                    currentCalendarUserId = null
                     _isTodayLoading.value = false
                     _isRefreshing.value = false
                 }
@@ -178,6 +210,35 @@ class ScheduleViewModel @Inject constructor(
         }
     }
 
+    fun markCohortAsTaken(
+        entryIds: List<String>,
+        takenAt: String,
+        lateAfter: Int = 3
+    ) {
+        viewModelScope.launch {
+            if (takeCohortUseCase != null) {
+                val now = try { LocalDateTime.parse(takenAt) } catch (_: Exception) { LocalDateTime.now() }
+                takeCohortUseCase.invoke(entryIds, now)
+            } else {
+                val now = try { LocalDateTime.parse(takenAt) } catch (_: Exception) { LocalDateTime.now() }
+                entryIds.forEach { entryId ->
+                    val entry = scheduleRepository.getScheduleEntryById(entryId)
+                    val status = if (entry != null && TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, lateAfter)) {
+                        "TAKEN_LATE"
+                    } else {
+                        "TAKEN_ON_TIME"
+                    }
+                    // Guard: Record each cohort dose taken to ensure atomic stock decrement and alarm cancellation (#102)
+                    scheduleRepository.recordDoseTaken(entryId, status, takenAt, context, null)
+                }
+            }
+            currentCalendarUserId = null
+            _currentUserId.value?.let { userId ->
+                loadScheduleForDate(userId, _selectedDate.value)
+            }
+        }
+    }
+
     fun updateDoseNotes(entryId: String, notes: String?) {
         viewModelScope.launch {
             scheduleRepository.updateDoseNotes(entryId, notes)
@@ -214,7 +275,11 @@ class ScheduleViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     fun markAsSkipped(entryId: String, reason: String) {
         viewModelScope.launch {
-            scheduleRepository.recordDoseSkipped(entryId, reason, context)
+            if (skipCohortUseCase != null) {
+                skipCohortUseCase.invoke(listOf(entryId), reason)
+            } else {
+                scheduleRepository.recordDoseSkipped(entryId, reason, context)
+            }
             currentCalendarUserId = null
             // Refresh the schedule after updating status
             _currentUserId.value?.let { userId ->
@@ -225,6 +290,8 @@ class ScheduleViewModel @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun autoMarkMissedMedications(userId: String, missedAfterHours: Int) {
+        // Guard: Re-evaluate today's schedule subscription if crossing midnight before checking missed status
+        checkMidnightDateTransition()
         viewModelScope.launch {
             val currentTime = LocalDateTime.now()
             val cutoffTime = currentTime.minusHours(missedAfterHours.toLong())
