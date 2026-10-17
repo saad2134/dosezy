@@ -446,4 +446,40 @@ class UserViewModelProfileAlarmTest {
         assertNull("customAlarmSoundPath must be null in user entity", fetchedUser.customAlarmSoundPath)
         assertNull("customAlarmSoundTitle must be null in user entity", fetchedUser.customAlarmSoundTitle)
     }
+
+    @Test
+    fun testSetCurrentUser_atomicallySwitchesProfileWithoutAutoPromoteRegression() = runTest(testDispatcher) {
+        val userViewModel = UserViewModel(userRepository, medicineRepository, scheduleRepository, medicineNotificationManager)
+
+        val thirdUser = User(
+            userId = "user_audit9_third",
+            fullName = "Third User",
+            age = 40,
+            gender = Gender.MALE,
+            contactNumber = "9988776655",
+            isCurrentUser = false
+        )
+
+        userViewModel.addUser(testUser)
+        awaitCondition { userRepository.getUserByIdSync(testUser.userId) != null }
+
+        userViewModel.addUser(secondUser)
+        awaitCondition { userRepository.getUserByIdSync(secondUser.userId) != null }
+
+        userViewModel.addUser(thirdUser)
+        awaitCondition { userRepository.getUserByIdSync(thirdUser.userId) != null }
+
+        // Guard: Switching to third user atomically updates isCurrentUser without 0-active intermediate state triggering auto-promotion of user 1
+        val thirdFromDb = userRepository.getUserByIdSync(thirdUser.userId)!!
+        userViewModel.setCurrentUser(thirdFromDb)
+        awaitCondition { userRepository.getAllUsersList().firstOrNull { it.isCurrentUser }?.userId == thirdUser.userId }
+
+        advanceUntilIdle()
+
+        val allUsers = userRepository.getAllUsersList()
+        val currentUsers = allUsers.filter { it.isCurrentUser }
+        assertEquals("Exactly one user should be current", 1, currentUsers.size)
+        assertEquals("Current user must be the third user", thirdUser.userId, currentUsers.first().userId)
+    }
 }
+

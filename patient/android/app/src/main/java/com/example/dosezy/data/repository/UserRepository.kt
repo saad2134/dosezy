@@ -62,4 +62,15 @@ class UserRepository(private val database: DosezyDatabase) {
                 throw e
             }
         }
+
+    // Guard: Atomically update isCurrentUser flag in a single SQLite statement to prevent Room intermediate emissions with 0 active users triggering auto-promotion
+    suspend fun setCurrentUser(userId: String) =
+        withContext(Dispatchers.IO) {
+            try {
+                database.userDao().setCurrentUserAtomic(userId)
+            } catch (e: Exception) {
+                android.util.Log.e("UserRepository", "Error setting current user", e)
+                throw e
+            }
+        }
 }

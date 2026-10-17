@@ -31,6 +31,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -399,4 +400,45 @@ class ScheduleStatusAndUserRepositoryDirectTest {
         val allSchedules = scheduleRepository.getSchedulesByUserSync("user_direct_meds")
         assertNotNull(allSchedules)
     }
+
+    // ---------------------------------------------------------------------------------------------
+    // Atomic Current User Switching (Profile Switch Race Guard)
+    // ---------------------------------------------------------------------------------------------
+
+    @Test
+    fun testSetCurrentUserAtomic_updatesSingleProfileAndDemotesOthers() = runBlocking {
+        val user1 = sampleUser("user_atomic_1").copy(isCurrentUser = true)
+        val user2 = sampleUser("user_atomic_2").copy(isCurrentUser = false)
+        val user3 = sampleUser("user_atomic_3").copy(isCurrentUser = false)
+
+        userDao.insertUser(user1)
+        userDao.insertUser(user2)
+        userDao.insertUser(user3)
+
+        // Guard: Verify atomic update flips target user to 1 and all others to 0 in a single query
+        userRepository.setCurrentUser("user_atomic_2")
+
+        val u1After = userRepository.getUserByIdSync("user_atomic_1")
+        val u2After = userRepository.getUserByIdSync("user_atomic_2")
+        val u3After = userRepository.getUserByIdSync("user_atomic_3")
+
+        assertNotNull(u1After)
+        assertNotNull(u2After)
+        assertNotNull(u3After)
+        assertFalse(u1After!!.isCurrentUser)
+        assertTrue(u2After!!.isCurrentUser)
+        assertFalse(u3After!!.isCurrentUser)
+
+        // Switch to user 3
+        userRepository.setCurrentUser("user_atomic_3")
+
+        val u1Final = userRepository.getUserByIdSync("user_atomic_1")
+        val u2Final = userRepository.getUserByIdSync("user_atomic_2")
+        val u3Final = userRepository.getUserByIdSync("user_atomic_3")
+
+        assertFalse(u1Final!!.isCurrentUser)
+        assertFalse(u2Final!!.isCurrentUser)
+        assertTrue(u3Final!!.isCurrentUser)
+    }
 }
+

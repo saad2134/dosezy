@@ -475,4 +475,71 @@ class IntakeSafeguardManagerLifecycleTest {
 
         assertNull("Active intake countdown must be cancelled when medicine alarms are cancelled", IntakeSafeguardManager.activeCountdown.value)
     }
+
+    @Test
+    fun testStartCountdown_preemptsPriorActiveCountdown() {
+        val entry1 = "entry_preempt_1"
+        val entry2 = "entry_preempt_2"
+
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entry1,
+            entryIds = listOf(entry1),
+            medicineName = "Med 1",
+            medicineNames = listOf("Med 1"),
+            scheduledTime = "08:00 AM",
+            durationSeconds = 120
+        )
+
+        val firstState = IntakeSafeguardManager.activeCountdown.value
+        assertNotNull(firstState)
+        assertEquals(entry1, firstState?.entryId)
+        assertEquals(120, firstState?.totalDurationSeconds)
+
+        // Guard: Starting a new countdown while one is active preempts the previous one cleanly
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entry2,
+            entryIds = listOf(entry2),
+            medicineName = "Med 2",
+            medicineNames = listOf("Med 2"),
+            scheduledTime = "09:00 AM",
+            durationSeconds = 60
+        )
+
+        val secondState = IntakeSafeguardManager.activeCountdown.value
+        assertNotNull(secondState)
+        assertEquals(entry2, secondState?.entryId)
+        assertEquals(60, secondState?.totalDurationSeconds)
+
+        IntakeSafeguardManager.cancelCountdown(context)
+        assertNull(IntakeSafeguardManager.activeCountdown.value)
+    }
+
+    @Test
+    fun testStartCountdown_cancelsActiveSnoozeForCohort() {
+        val entryId = "entry_snooze_safeguard"
+        val scheduler = AlarmScheduler(context)
+
+        // Schedule snooze for this entry
+        scheduler.scheduleGroupedSnooze(listOf(entryId), 10, listOf("Med A"))
+        val prefs = context.getSharedPreferences(AlarmScheduler.PREFS_COORDINATION, Context.MODE_PRIVATE)
+        assertEquals(entryId, prefs.getString("snooze_member_$entryId", null))
+
+        // Guard: Starting intake countdown cancels snooze and nagging alarms so they do not ring during the countdown buffer
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entryId,
+            entryIds = listOf(entryId),
+            medicineName = "Med A",
+            medicineNames = listOf("Med A"),
+            scheduledTime = "08:00 AM",
+            durationSeconds = 90
+        )
+
+        assertNull("Snooze coordination member must be cancelled upon countdown start", prefs.getString("snooze_member_$entryId", null))
+
+        IntakeSafeguardManager.cancelCountdown(context)
+    }
 }
+

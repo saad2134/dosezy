@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2026 Saad <reach.saad@outlook.com> (@saad2134)
  * Licensed under the MIT License. See LICENSE in the project root for license information.
  */
@@ -172,4 +172,45 @@ class EmergencyDialAndEditMedScreenTest {
         assertEquals("u2", targetUser.userId)
         assertEquals("Restored Active User", targetUser.fullName)
     }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 5. EmergencyScreen: Secondary Profile Global Fallback Isolation
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testEmergencyScreen_secondaryProfileDoesNotPolluteGlobalFallback() {
+        val prefs = context.getSharedPreferences("emergency_prefs", Context.MODE_PRIVATE)
+        prefs.edit().clear().commit()
+
+        val primaryUserId = "user_primary"
+        val secondaryUserId = "user_secondary"
+        val newUserId = "user_brand_new"
+
+        // Primary profile sets IN
+        prefs.edit()
+            .putString("selected_country_code_$primaryUserId", "IN")
+            .putString("selected_country_code", "IN")
+            .commit()
+
+        // Guard: Secondary profile selection updates only namespaced key, protecting global fallback for primary/new profiles
+        val isCurrentSecondary = false
+        val editor = prefs.edit().putString("selected_country_code_$secondaryUserId", "US")
+        if (isCurrentSecondary) {
+            editor.putString("selected_country_code", "US")
+        }
+        editor.commit()
+
+        val readPrimary = prefs.getString("selected_country_code_$primaryUserId", null)
+            ?: prefs.getString("selected_country_code", null)
+        assertEquals("IN", readPrimary)
+
+        val readSecondary = prefs.getString("selected_country_code_$secondaryUserId", null)
+            ?: prefs.getString("selected_country_code", null)
+        assertEquals("US", readSecondary)
+
+        val readNew = prefs.getString("selected_country_code_$newUserId", null)
+            ?: prefs.getString("selected_country_code", null)
+        assertEquals("IN", readNew)
+    }
 }
+

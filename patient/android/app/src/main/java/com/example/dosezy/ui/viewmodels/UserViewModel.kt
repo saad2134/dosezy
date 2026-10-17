@@ -109,17 +109,11 @@ class UserViewModel @Inject constructor(
             try {
                 // coroutine scope to run in background
                 withContext(Dispatchers.IO) {
-                    // Clear current user flag from all users
-                    val allUsers = userRepository.getAllUsersList()
-                    allUsers.forEach { existingUser ->
-                        if (existingUser.isCurrentUser && existingUser.userId != user.userId) {
-                            userRepository.updateUser(existingUser.copy(isCurrentUser = false))
-                        }
-                    }
+                    // Guard: Atomically update isCurrentUser flag in a single SQLite statement to prevent Room intermediate emissions with 0 active users triggering auto-promotion
+                    userRepository.setCurrentUser(user.userId)
 
                     // Set new current user
                     val updatedUser = user.copy(isCurrentUser = true)
-                    userRepository.updateUser(updatedUser)
 
                     // Update state on main thread
                     withContext(Dispatchers.Main) {
@@ -164,19 +158,13 @@ class UserViewModel @Inject constructor(
                     val allUsers = userRepository.getAllUsersList()
                     val shouldBeCurrent = user.isCurrentUser || allUsers.isEmpty() || allUsers.none { it.isCurrentUser }
 
-                    if (shouldBeCurrent) {
-                        // Demote existing users to maintain the single current user invariant
-                        allUsers.forEach { existingUser ->
-                            if (existingUser.isCurrentUser) {
-                                userRepository.updateUser(existingUser.copy(isCurrentUser = false))
-                            }
-                        }
-                    }
-
                     val userToInsert = user.copy(isCurrentUser = shouldBeCurrent)
                     userRepository.insertUser(userToInsert)
 
                     if (shouldBeCurrent) {
+                        // Guard: Atomically ensure only the newly added profile is current without intermediate 0-active states
+                        userRepository.setCurrentUser(userToInsert.userId)
+
                         withContext(Dispatchers.Main) {
                             _currentUser.value = userToInsert
                         }

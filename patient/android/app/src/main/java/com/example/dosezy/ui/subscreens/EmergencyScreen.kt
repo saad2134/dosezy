@@ -392,11 +392,12 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
                         onClick = {
                             selectedCountry = country
                             savedCountryCode = country.code
-                            // Guard: Save namespaced preference and global fallback so profile switches maintain respective country selection
-                            emergencyPrefs.edit()
-                                .putString(userCountryKey, country.code)
-                                .putString("selected_country_code", country.code)
-                                .apply()
+                            // Guard: Save namespaced preference, and only update global fallback for primary user to prevent secondary profiles from polluting default emergency country
+                            val editor = emergencyPrefs.edit().putString(userCountryKey, country.code)
+                            if (currentUser == null || currentUser.isCurrentUser) {
+                                editor.putString("selected_country_code", country.code)
+                            }
+                            editor.apply()
                             countryDropdownExpanded = false
                         },
                         modifier = Modifier.background(MaterialTheme.colorScheme.surface)

@@ -245,17 +245,24 @@ data class Medicine(
             }
         }
 
-        if (isDrop) {
-            val dropsPerIntake = if (dosage > 0) dosage.toInt().coerceAtLeast(1) else 1
-            val totalDrops = totalIntakes * dropsPerIntake
-            return kotlin.math.ceil(totalDrops / 100.0).toInt().coerceAtLeast(1)
+        // Guard: Calculate unit consumption using Double precision and respect customDosages per slot without truncating decimal doses (e.g. 1.5 tablets)
+        val dosesPerIntake: Double = if (!customDosages.isNullOrEmpty() && scheduledTimes.isNotEmpty()) {
+            val totalCustom = scheduledTimes.sumOf { getDosageForTime(it) }
+            totalCustom / scheduledTimes.size.toDouble()
+        } else {
+            when (dosageUnit) {
+                DosageUnit.TABLET, DosageUnit.CAPSULE, DosageUnit.ML, DosageUnit.PUFF, DosageUnit.AMPULE -> {
+                    if (dosage > 0) dosage else 1.0
+                }
+                DosageUnit.MG, DosageUnit.MCG, DosageUnit.DROP, DosageUnit.MEQ -> 1.0
+            }
         }
 
-        val dosesPerIntake = when (dosageUnit) {
-            DosageUnit.TABLET, DosageUnit.CAPSULE, DosageUnit.ML, DosageUnit.PUFF, DosageUnit.AMPULE -> {
-                if (dosage > 0) dosage.toInt().coerceAtLeast(1) else 1
-            }
-            DosageUnit.MG, DosageUnit.MCG, DosageUnit.DROP, DosageUnit.MEQ -> 1
+        if (isDrop) {
+            val dropsPerIntake = if (dosage > 0) dosage else 1.0
+            val effectiveDropsPerIntake = if (!customDosages.isNullOrEmpty() && scheduledTimes.isNotEmpty()) dosesPerIntake else dropsPerIntake
+            val totalDrops = totalIntakes * effectiveDropsPerIntake
+            return kotlin.math.ceil(totalDrops / 100.0).toInt().coerceAtLeast(1)
         }
 
         return kotlin.math.ceil(totalIntakes * dosesPerIntake).toInt().coerceAtLeast(1)

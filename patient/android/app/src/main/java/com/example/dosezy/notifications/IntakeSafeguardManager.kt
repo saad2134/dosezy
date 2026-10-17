@@ -84,11 +84,28 @@ object IntakeSafeguardManager {
         scheduledTime: String,
         durationSeconds: Int
     ): IntakeCountdownState {
+        val scheduler = AlarmScheduler(context)
+
+        // Guard: Cancel and dismiss previous active countdown alarm and notification if another countdown was already running to prevent ghost alarms and notification leaks (#104)
+        val priorState = _activeCountdown.value ?: restoreState(context)
+        if (priorState != null && priorState.entryId != entryId) {
+            scheduler.cancelIntakeSafeguardAlarm(priorState.entryId)
+            dismissIntakeNotification(context, priorState.entryId)
+        }
+
+        val allTargetIds = if (entryIds.isEmpty()) listOf(entryId) else entryIds.distinct()
+
+        // Guard: Cancel active nagging reminders and snooze alarms across all entries in the cohort so alarms do not ring over the user during the countdown buffer
+        allTargetIds.forEach { id ->
+            scheduler.cancelNagging(id)
+            scheduler.cancelSnooze(id)
+        }
+
         val now = System.currentTimeMillis()
         val target = now + (durationSeconds * 1000L)
         val state = IntakeCountdownState(
             entryId = entryId,
-            entryIds = if (entryIds.isEmpty()) listOf(entryId) else entryIds.distinct(),
+            entryIds = allTargetIds,
             medicineName = medicineName,
             medicineNames = if (medicineNames.isEmpty()) listOf(medicineName) else medicineNames.distinct(),
             scheduledTime = scheduledTime,
@@ -101,7 +118,6 @@ object IntakeSafeguardManager {
         _activeCountdown.value = state
 
         // Guard: Schedule exact re-alert alarm via AlarmManager in case the user leaves the app or puts phone to sleep (#104)
-        val scheduler = AlarmScheduler(context)
         scheduler.scheduleIntakeSafeguardAlarm(
             entryId = entryId,
             triggerTime = target,
@@ -186,6 +202,9 @@ object IntakeSafeguardManager {
         }
         clearState(context)
         _activeCountdown.value = null
+        try {
+            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+        } catch (_: Exception) {}
         Log.d(TAG, "Cancelled intake countdown")
     }
 
@@ -201,6 +220,9 @@ object IntakeSafeguardManager {
         dismissIntakeNotification(context, entryId)
         clearState(context)
         _activeCountdown.value = null
+        try {
+            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+        } catch (_: Exception) {}
 
         // Trigger the re-alert via MedicineAlarmReceiver
         CoroutineScope(Dispatchers.IO).launch {

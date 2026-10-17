@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2026 Saad <reach.saad@outlook.com> (@saad2134)
  * Licensed under the MIT License. See LICENSE in the project root for license information.
  */
@@ -198,4 +198,67 @@ class MidnightTransitionAndStockOverrideTest {
         // Invalid form and valid userId -> NOT ready
         assertFalse(isMedicineFormReady(isFormValid = false, userId = "user_uuid_12345"))
     }
+
+    // ---------------------------------------------------------------------------------------------
+    // Bug 6: Refill Quantity Calculation with Decimal and Custom Dosages
+    // ---------------------------------------------------------------------------------------------
+
+    @Test
+    fun testCalculateRefillQuantity_preservesDecimalPrecisionWithoutTruncation() {
+        // 1.5 tablets once daily for 30 days must yield 45 tablets (not 30 from integer truncation)
+        val decimalMed = Medicine(
+            medicineId = "med_dec",
+            userId = "usr_1",
+            medicationName = "Thyroxine",
+            dosage = 1.5,
+            dosageUnit = DosageUnit.TABLET,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+        // Guard: 1.5 tablets * 1 per day * 30 days = 45 tablets
+        assertEquals(45, decimalMed.calculateRefillQuantity(30))
+
+        // 0.5 tablets twice daily for 30 days must yield 30 tablets
+        val halfTabletMed = decimalMed.copy(
+            dosage = 0.5,
+            timesPerDay = 2,
+            scheduledTimes = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0))
+        )
+        // Guard: (0.5 + 0.5) * 30 days = 30 tablets
+        assertEquals(30, halfTabletMed.calculateRefillQuantity(30))
+
+        // 0.5 tablets once daily for 30 days must yield 15 tablets (ceil(0.5) * 30 = 15)
+        val singleHalfTabletMed = decimalMed.copy(
+            dosage = 0.5,
+            timesPerDay = 1,
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+        assertEquals(15, singleHalfTabletMed.calculateRefillQuantity(30))
+    }
+
+    @Test
+    fun testCalculateRefillQuantity_respectsCustomDosagesAcrossSlots() {
+        // Morning dose = 2.0 tablets (08:00), Evening dose = 1.0 tablet (20:00)
+        val variableMed = Medicine(
+            medicineId = "med_var",
+            userId = "usr_1",
+            medicationName = "Carvedilol",
+            dosage = 1.0,
+            dosageUnit = DosageUnit.TABLET,
+            timesPerDay = 2,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
+            customDosages = mapOf("08:00" to 2.0, "20:00" to 1.0)
+        )
+        // Guard: Total daily dose is 2.0 + 1.0 = 3.0 tablets * 30 days = 90 tablets (not 1.0 * 2 * 30 = 60)
+        assertEquals(90, variableMed.calculateRefillQuantity(30))
+
+        // When a slot is omitted from customDosages, it falls back to base dosage
+        val partialCustomMed = variableMed.copy(
+            customDosages = mapOf("08:00" to 2.5) // 20:00 slot omitted, falls back to dosage = 1.0 -> (2.5 + 1.0) * 30 = 105
+        )
+        assertEquals(105, partialCustomMed.calculateRefillQuantity(30))
+    }
 }
+
