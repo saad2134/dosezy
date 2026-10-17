@@ -504,5 +504,61 @@ class ScheduleStatusAndUserRepositoryDirectTest {
         assertEquals(1, remainingPending.size)
         assertEquals("entry_cohort_a", remainingPending.first().entryId)
     }
+
+    // ---------------------------------------------------------------------------------------------
+    // Clinical Dose Notes Preservation Guard on Undo (BUG-04)
+    // ---------------------------------------------------------------------------------------------
+
+    @Test
+    fun testUndoDoseTaken_preservesUserClinicalNotes_whileStrippingPartialStockAuditTag() = runBlocking {
+        val user = sampleUser("user_notes_test")
+        userDao.insertUser(user)
+        val med = sampleMedicine("med_notes_test", "user_notes_test", name = "Metformin").copy(currentStock = 1, autoDeductOnTake = true)
+        medicineDao.insertMedicine(med)
+
+        val slotTime = LocalDateTime.of(2026, 10, 17, 9, 0, 0)
+        val entry = sampleScheduleEntry("entry_notes_test", "user_notes_test", "med_notes_test", slotTime)
+        scheduleDao.insertScheduleEntry(entry)
+
+        val scheduleRepository = com.example.dosezy.data.repository.ScheduleRepository(db)
+        val userAuthoredNote = "Took with light breakfast; mild dizziness reported"
+
+        // Record dose taken with custom clinical note
+        scheduleRepository.recordDoseTaken(
+            entryId = entry.entryId,
+            status = "TAKEN_ON_TIME",
+            takenAt = slotTime,
+            context = context,
+            notes = userAuthoredNote
+        )
+
+        val takenEntry = scheduleDao.getScheduleEntryById(entry.entryId)
+        assertNotNull(takenEntry)
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, takenEntry!!.status)
+        assertTrue(
+            "Taken entry must contain user clinical note",
+            takenEntry.doseNotes?.contains(userAuthoredNote) == true
+        )
+
+        // User undos the taken dose
+        scheduleRepository.undoDoseTaken(entry.entryId, context)
+
+        val undoneEntry = scheduleDao.getScheduleEntryById(entry.entryId)
+        assertNotNull(undoneEntry)
+        assertEquals(MedicationStatus.PENDING, undoneEntry!!.status)
+        assertNull("takenAt must be reset to null", undoneEntry.takenAt)
+
+        // Clinical notes must NOT be wiped
+        assertEquals(
+            "User-authored clinical note must be preserved on dose undo",
+            userAuthoredNote,
+            undoneEntry.doseNotes
+        )
+        assertFalse(
+            "Partial stock audit tag must be cleanly removed on dose undo",
+            undoneEntry.doseNotes?.contains("[Partial Stock:") == true
+        )
+    }
 }
+
 

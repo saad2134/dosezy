@@ -299,7 +299,8 @@ class PdfReportGenerator(private val context: Context) {
             // Guard: Truncate lengthy medication names to prevent overlapping adjacent Dosage column at 220f
             val displayMed = truncateTextToWidth(med.medicationName, textPaint, 170f)
             canvas.drawText(displayMed, 40f, y, textPaint)
-            canvas.drawText("${med.dosage} ${med.dosageUnit}", 220f, y, textPaint)
+            // Guard: Render standard pharmaceutical dosage format rather than raw decimal and uppercase enum name (#BUG-05)
+            canvas.drawText(med.getDosageDisplay(), 220f, y, textPaint)
             val freqLabel = med.getFrequencyDisplay()
             canvas.drawText(freqLabel, 360f, y, textPaint)
             y += 16f
@@ -332,7 +333,8 @@ class PdfReportGenerator(private val context: Context) {
                 // Guard: Truncate lengthy medication names to prevent overlapping adjacent Dosage column at 220f
                 val displayMed = truncateTextToWidth(med.medicationName, textPaint, 170f)
                 canvas.drawText(displayMed, 40f, y, textPaint)
-                canvas.drawText("${med.dosage} ${med.dosageUnit}", 220f, y, textPaint)
+                // Guard: Render standard pharmaceutical dosage format rather than raw decimal and uppercase enum name (#BUG-05)
+                canvas.drawText(med.getDosageDisplay(), 220f, y, textPaint)
                 canvas.drawText("Discontinued", 360f, y, textPaint)
                 y += 16f
             }

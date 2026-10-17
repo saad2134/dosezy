@@ -661,5 +661,121 @@ class IntakeSafeguardManagerLifecycleTest {
         assertEquals(MedicationStatus.TAKEN_ON_TIME, updated1?.status)
         assertEquals(MedicationStatus.TAKEN_ON_TIME, updated2?.status)
     }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 7. Intake Countdown Safeguard: Low Stock Refill Notification & Slot Sync (BUG-01)
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testConfirmIntake_triggersRefillAlert_whenStockCrossesRefillThreshold() = runBlocking {
+        // Set up medicine with currentStock = 5 and refillThreshold = 5
+        val lowStockMed = testMedicine.copy(
+            medicineId = "med_low_stock_refill",
+            medicationName = "Lisdexamfetamine",
+            currentStock = 5,
+            refillThreshold = 5,
+            autoDeductOnTake = true
+        )
+        database.medicineDao().insertMedicine(lowStockMed)
+
+        val entry = ScheduleEntry(
+            entryId = "entry_refill_alert_test",
+            userId = testUser.userId,
+            medicineId = lowStockMed.medicineId,
+            scheduledDateTime = LocalDateTime.now().minusMinutes(5),
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entry)
+
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entry.entryId,
+            entryIds = listOf(entry.entryId),
+            medicineName = lowStockMed.medicationName,
+            medicineNames = listOf(lowStockMed.medicationName),
+            scheduledTime = "08:00 AM",
+            durationSeconds = 60
+        )
+
+        val confirmed = IntakeSafeguardManager.confirmIntake(context, database)
+        assertTrue("Intake must be confirmed", confirmed)
+
+        // Verify stock dropped from 5 to 4
+        val updatedMed = database.medicineDao().getMedicineByIdDirect(lowStockMed.medicineId)
+        assertNotNull(updatedMed)
+        assertEquals(4, updatedMed!!.currentStock)
+
+        // Verify refill warning notification was posted to NotificationManager
+        val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+        val activeNotifs = nManager.activeNotifications
+        val expectedRefillTagHash = (lowStockMed.medicineId + "_refill").hashCode()
+        assertTrue(
+            "NotificationManager must receive refill alert when stock crosses threshold on countdown confirm",
+            activeNotifs.any { it.id == expectedRefillTagHash }
+        )
+    }
+
+    @Test
+    fun testConfirmIntake_reconcilesSlotNotification_whenSiblingSlotMedicationRemainsPending() = runBlocking {
+        val siblingMed = testMedicine.copy(
+            medicineId = "med_sibling_slot",
+            medicationName = "Guanfacine",
+            currentStock = 20
+        )
+        database.medicineDao().insertMedicine(siblingMed)
+
+        val slotTime = LocalDateTime.now().minusMinutes(5).withSecond(0).withNano(0)
+        val entry1 = ScheduleEntry(
+            entryId = "entry_slot_confirmed",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.PENDING
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_slot_pending_sibling",
+            userId = testUser.userId,
+            medicineId = siblingMed.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntries(listOf(entry1, entry2))
+
+        // Pre-post notification for the slot
+        val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+        val notif = android.app.Notification.Builder(context)
+            .setContentTitle("Slot Reminder")
+            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+            .build()
+        nManager.notify(entry1.entryId.hashCode(), notif)
+
+        // Start and confirm countdown for entry1 ONLY
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entry1.entryId,
+            entryIds = listOf(entry1.entryId),
+            medicineName = testMedicine.medicationName,
+            medicineNames = listOf(testMedicine.medicationName),
+            scheduledTime = "08:00 AM",
+            durationSeconds = 60
+        )
+
+        val confirmed = IntakeSafeguardManager.confirmIntake(context, database)
+        assertTrue(confirmed)
+
+        // Entry 1 is TAKEN_ON_TIME, entry 2 remains PENDING
+        val updated1 = database.scheduleDao().getScheduleEntryById(entry1.entryId)
+        val updated2 = database.scheduleDao().getScheduleEntryById(entry2.entryId)
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, updated1?.status)
+        assertEquals(MedicationStatus.PENDING, updated2?.status)
+
+        // Active notification in shade must NOT be wiped: sibling entry2 must still be represented
+        val activeNotifs = nManager.activeNotifications
+        assertTrue(
+            "Notification shade must retain active notification for remaining sibling pending dose",
+            activeNotifs.any { it.id == entry2.entryId.hashCode() }
+        )
+    }
 }
+
 

@@ -53,6 +53,10 @@ interface ScheduleDao {
     @Query("UPDATE schedule_entries SET status = :status, takenAt = :takenAt, skipReason = :skipReason WHERE entryId = :entryId")
     suspend fun updateMedicationStatusWithReason(entryId: String, status: String, takenAt: Long?, skipReason: String?)
 
+    // Guard: Preserve user-authored clinical notes when resetting status on undo rather than unconditionally setting doseNotes = NULL (#BUG-04)
+    @Query("UPDATE schedule_entries SET status = 'PENDING', takenAt = NULL, skipReason = NULL, doseNotes = :notes WHERE entryId = :entryId")
+    suspend fun resetScheduleEntryToPendingWithNotes(entryId: String, notes: String?)
+
     @Query("UPDATE schedule_entries SET status = 'PENDING', takenAt = NULL, skipReason = NULL, doseNotes = NULL WHERE entryId = :entryId")
     suspend fun resetScheduleEntryToPending(entryId: String)
 

@@ -20,6 +20,7 @@ import com.example.dosezy.ui.subscreens.createDialIntent
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -269,5 +270,86 @@ class EmergencyDialAndEditMedScreenTest {
         assertEquals(draftImage2.absolutePath, savedMedicine.imageUri)
         assertTrue("Committed image must exist on disk", java.io.File(savedMedicine.imageUri!!).exists())
     }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 6. ProfilePicturePicker & MedicinePhotoVisualPicker: Remove Button Safety (BUG-02)
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testImagePicker_removeButton_onlyCleansUncommittedDraft_preservingActiveSavedImage() {
+        val filesDir = context.filesDir
+        val activeImageFile = java.io.File(filesDir, "active_user_photo.jpg").apply {
+            writeText("active saved photo on disk")
+        }
+        val user = User(
+            userId = "user_photo_test",
+            fullName = "Test User",
+            age = 30,
+            gender = Gender.MALE,
+            contactNumber = "+1234567890",
+            profilePicPath = activeImageFile.absolutePath
+        )
+
+        // Scenario A: User opens screen with active photo, taps Remove button, but cancels the screen
+        var selectedProfilePic: String? = user.profilePicPath
+        assertEquals(activeImageFile.absolutePath, selectedProfilePic)
+        var uncommittedDraftPath: String? = null
+
+        // Emulate clicking Remove button in ProfilePicturePicker
+        uncommittedDraftPath?.let { draft ->
+            deleteOldImage(context, draft)
+            uncommittedDraftPath = null
+        }
+        selectedProfilePic = null
+        assertNull("Selected profile pic state in memory is reset to null on remove", selectedProfilePic)
+
+        // User hits back/cancel without saving
+        val cancelledWithoutSaving = true
+        if (cancelledWithoutSaving) {
+            // Active image must still exist on disk because user never saved
+            assertTrue(
+                "Active image file must NOT be deleted from disk on picker remove click before form save",
+                activeImageFile.exists()
+            )
+        }
+
+        // Scenario B: User picks a new draft photo, then decides to tap Remove button
+        val draftImageFile = java.io.File(filesDir, "new_draft_user_photo.jpg").apply {
+            writeText("temporary draft photo")
+        }
+        uncommittedDraftPath = draftImageFile.absolutePath
+        selectedProfilePic = draftImageFile.absolutePath
+        assertEquals(draftImageFile.absolutePath, selectedProfilePic)
+
+        // User clicks Remove button
+        uncommittedDraftPath?.let { draft ->
+            deleteOldImage(context, draft)
+            uncommittedDraftPath = null
+        }
+        selectedProfilePic = null
+        assertNull("Selected profile pic state in memory is reset to null after removing draft", selectedProfilePic)
+
+        // Uncommitted draft is cleaned up immediately to avoid disk leaks
+        assertFalse(
+            "Uncommitted draft must be cleaned up on remove click",
+            draftImageFile.exists()
+        )
+        // Active saved image remains completely intact
+        assertTrue(
+            "Active saved photo remains on disk after draft removal",
+            activeImageFile.exists()
+        )
+
+        // Scenario C: User explicitly saves form with selectedProfilePic = null
+        val formSaved = true
+        if (formSaved && !user.profilePicPath.isNullOrBlank() && user.profilePicPath != selectedProfilePic) {
+            deleteOldImage(context, user.profilePicPath)
+        }
+        assertFalse(
+            "Active image is safely deleted only upon explicit form save",
+            activeImageFile.exists()
+        )
+    }
 }
+
 

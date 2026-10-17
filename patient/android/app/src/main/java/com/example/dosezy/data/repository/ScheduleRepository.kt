@@ -284,7 +284,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         status: String = "TAKEN_ON_TIME",
         takenAt: LocalDateTime = LocalDateTime.now(),
         context: Context? = null,
-        notes: String? = null
+        notes: String? = null,
+        syncSlotNotification: Boolean = true
     ) {
         // Inspect previous status to prevent double stock deduction
         val previousEntry = database.scheduleDao().getScheduleEntryById(entryId)
@@ -357,7 +358,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         }
 
         // 4. Synchronize active slot notifications, cancel armed alarms, and update widgets
-        if (context != null) {
+        // Guard: Allow suppressing intermediate slot synchronization during coordinated batch processing (e.g. IntakeSafeguardManager) to avoid redundant notification churn (#BUG-01)
+        if (context != null && syncSlotNotification) {
             syncSlotNotificationAndAlarms(entryId, previousEntry, context)
         }
     }
@@ -368,10 +370,11 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         status: String,
         takenAtStr: String,
         context: Context? = null,
-        notes: String? = null
+        notes: String? = null,
+        syncSlotNotification: Boolean = true
     ) {
         val takenAt = try { LocalDateTime.parse(takenAtStr) } catch (_: Exception) { LocalDateTime.now() }
-        recordDoseTaken(entryId, status, takenAt, context, notes)
+        recordDoseTaken(entryId, status, takenAt, context, notes, syncSlotNotification)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -451,8 +454,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     val slotMillis = entry.scheduledDateTime.withSecond(0).withNano(0)
                         .atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
                     val slotEntries = database.scheduleDao().getScheduleForDateRangeDirect(entry.userId, slotMillis, slotMillis + 59999L)
-                    // Guard: Exclude ad-hoc PRN doses from slot remaining pending check so as-needed doses never count as pending scheduled items
-                    val remainingPending = slotEntries.filter { !it.entryId.startsWith("PRN_") && it.status == MedicationStatus.PENDING && it.entryId != entryId }
+                    // Guard: Include entry in remainingPending if its status is PENDING (e.g. on undo) so cohort notification is restored (#BUG-03)
+                    val remainingPending = slotEntries.filter { !it.entryId.startsWith("PRN_") && it.status == MedicationStatus.PENDING && (entry.status == MedicationStatus.PENDING || it.entryId != entryId) }
 
                     if (remainingPending.isEmpty()) {
                         // All medications in this slot are handled: cancel notification for entry, primary, and all slot items
@@ -461,8 +464,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                         slotEntries.forEach { nManager.cancel(it.entryId.hashCode()) }
                     } else {
                         // Other medications remain pending in this slot; update active notification to remove taken medication
-                        // Guard: Check active notifications against all slot entry IDs and stored primaryId to detect active shade alerts regardless of which med was posted first
-                        val hasActiveNotification = try {
+                        // Guard: Check active notifications against all slot entry IDs and stored primaryId; if entry is PENDING (undo), force active alert restoration (#BUG-03)
+                        val hasActiveNotification = (entry.status == MedicationStatus.PENDING) || try {
                             val active = nManager.activeNotifications
                             active.any { notif ->
                                 slotEntries.any { it.entryId.hashCode() == notif.id } || (primaryId != null && notif.id == primaryId.hashCode())
@@ -508,6 +511,24 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                                 scheduledTime = formattedScheduledTime,
                                 snoozeMinutes = user?.snoozeDuration ?: 10
                             )
+
+                            // Guard: Re-arm nagging reminder if undone dose is overdue and nagging reminders are enabled (#BUG-03)
+                            if (entry.status == MedicationStatus.PENDING && user != null && user.naggingRemindersEnabled && entry.scheduledDateTime.isBefore(LocalDateTime.now())) {
+                                try {
+                                    val alarmScheduler = AlarmScheduler(context)
+                                    alarmScheduler.scheduleNaggingReminder(
+                                        entryId = newPrimary.entryId,
+                                        minutes = user.naggingIntervalMinutes,
+                                        medicineName = effectiveMedName,
+                                        naggingCount = 1,
+                                        entryIds = activeEntryIds,
+                                        medicineNames = activeMedNames,
+                                        scheduledTime = formattedScheduledTime
+                                    )
+                                } catch (ex: Exception) {
+                                    Log.e(TAG, "Error scheduling nagging reminder on undoDoseTaken", ex)
+                                }
+                            }
                         }
                     }
                 } else {
@@ -535,7 +556,12 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         if (entryId.startsWith("PRN_")) {
             database.scheduleDao().deleteScheduleEntry(entryId)
         } else {
-            database.scheduleDao().resetScheduleEntryToPending(entryId)
+            // Guard: Strip automated partial stock tag while preserving user-authored clinical notes (#BUG-04)
+            val cleanedNotes = previousEntry?.doseNotes
+                ?.replace(Regex("\\[Partial Stock: Took \\d+ of \\d+\\]"), "")
+                ?.trim(' ', '|', '-')
+                ?.ifBlank { null }
+            database.scheduleDao().resetScheduleEntryToPendingWithNotes(entryId, cleanedNotes)
         }
 
         // 2. Revert stock auto-decrement only if previously taken
@@ -557,14 +583,22 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             }
         }
 
-        // 3. Update app widgets
-        if (context != null) {
-            // Guard: Reschedule alarms for upcoming doses so undoing a mistakenly marked dose restores future AlarmManager reminders
-            if (previousEntry != null && previousEntry.scheduledDateTime.isAfter(LocalDateTime.now())) {
+        // 3. Update app widgets and alarms
+        if (context != null && previousEntry != null) {
+            val now = LocalDateTime.now()
+            if (previousEntry.scheduledDateTime.isAfter(now)) {
+                // Guard: Reschedule alarms for upcoming doses so undoing a mistakenly marked future dose restores future AlarmManager reminders
                 try {
                     rescheduleAllAlarms(previousEntry.userId, context)
                 } catch (e: Exception) {
                     Log.e(TAG, "Error rescheduling alarms on undoDoseTaken", e)
+                }
+            } else {
+                // Guard: Re-post shade notification and re-arm reminder for current or overdue undone dose (#BUG-03)
+                try {
+                    syncSlotNotificationAndAlarms(entryId, previousEntry.copy(status = MedicationStatus.PENDING), context)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error resyncing slot notification on undoDoseTaken", e)
                 }
             }
             try {

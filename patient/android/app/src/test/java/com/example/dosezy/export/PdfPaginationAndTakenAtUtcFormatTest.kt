@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2026 Saad <reach.saad@outlook.com> (@saad2134)
  * Licensed under the MIT License. See LICENSE in the project root for license information.
  */
@@ -26,6 +26,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
@@ -193,4 +194,47 @@ class PdfPaginationAndTakenAtUtcFormatTest {
         assertEquals("Recent Dose History (Latest 150 of 200 entries)", buildHeader(200))
         assertEquals("Recent Dose History (Latest 150 of 600 entries)", buildHeader(600))
     }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 5. PdfReportGenerator: Standard Clinical Dosage Typography (BUG-05)
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testPdfReportGenerator_activeAndDiscontinuedMeds_renderStandardDosageTypography() {
+        val medMg = Medicine(
+            medicineId = "med_mg",
+            userId = "user_pdf",
+            medicationName = "Amoxicillin",
+            dosage = 500.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+        val medTab = Medicine(
+            medicineId = "med_tab",
+            userId = "user_pdf",
+            medicationName = "Aspirin",
+            dosage = 1.0,
+            dosageUnit = DosageUnit.TABLET,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+        val medMl = Medicine(
+            medicineId = "med_ml",
+            userId = "user_pdf",
+            medicationName = "Cough Syrup",
+            dosage = 7.5,
+            dosageUnit = DosageUnit.ML,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+
+        assertEquals("500 mg", medMg.getDosageDisplay())
+        assertEquals("1 tablet", medTab.getDosageDisplay())
+        assertEquals("7.5 mL", medMl.getDosageDisplay())
+    }
 }
+

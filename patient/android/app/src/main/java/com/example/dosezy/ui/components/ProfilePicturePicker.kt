@@ -224,7 +224,11 @@ fun ProfilePicturePicker(
                     .align(Alignment.TopEnd)
                     .size(36.dp)
                     .clickable { 
-                        deleteOldImage(context, profilePicPath)
+                        // Guard: Only delete uncommitted draft; defer active saved image deletion until form save to prevent data loss on cancel (#BUG-02)
+                        uncommittedDraftPath?.let { draft ->
+                            deleteOldImage(context, draft)
+                            uncommittedDraftPath = null
+                        }
                         onProfilePictureSelected(null) 
                     }
             ) {
@@ -593,7 +597,11 @@ fun MedicinePhotoVisualPicker(
                     .align(Alignment.TopEnd)
                     .size(32.dp)
                     .clickable {
-                        deleteOldImage(context, imagePath)
+                        // Guard: Only delete uncommitted draft; defer active saved image deletion until form save to prevent data loss on cancel (#BUG-02)
+                        uncommittedDraftPath?.let { draft ->
+                            deleteOldImage(context, draft)
+                            uncommittedDraftPath = null
+                        }
                         onImageSelected(null)
                     }
             ) {

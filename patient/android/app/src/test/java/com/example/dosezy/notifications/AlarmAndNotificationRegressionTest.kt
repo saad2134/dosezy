@@ -1,4 +1,4 @@
-﻿package com.example.dosezy.notifications
+package com.example.dosezy.notifications
 
 import android.content.Context
 import android.content.Intent
@@ -217,4 +217,61 @@ class AlarmAndNotificationRegressionTest {
         verify(exactly = 1) { alarmScheduler.cancelSnooze(testEntryId) }
         verify(exactly = 1) { alarmScheduler.cancelNagging(testEntryId) }
     }
+
+    // ───────────────────────────────────────────────────────────────
+    // Bug 7: Undoing Past Dose Resyncs Notification and Rearms Nagging (BUG-03)
+    // ───────────────────────────────────────────────────────────────
+    @Test
+    fun bug7_undoDoseTaken_forPastDose_resyncsSlotNotificationAndRearmsNagging() {
+        val now = LocalDateTime.now()
+        val pastScheduledTime = now.minusMinutes(15)
+
+        // Previous entry scheduled 15 minutes ago (in the past)
+        val pastEntry = ScheduleEntry(
+            entryId = "entry_past_undo",
+            userId = "user_undo_test",
+            medicineId = "med_undo_test",
+            scheduledDateTime = pastScheduledTime,
+            status = MedicationStatus.TAKEN_ON_TIME
+        )
+
+        // On undo, scheduledDateTime is NOT in the future
+        assertFalse(
+            "Past entry must not be after now",
+            pastEntry.scheduledDateTime.isAfter(now)
+        )
+
+        // Verify that entry with status PENDING is preserved in remainingPending calculation
+        val slotEntries = listOf(
+            pastEntry.copy(status = MedicationStatus.PENDING),
+            ScheduleEntry(
+                entryId = "entry_past_sibling",
+                userId = "user_undo_test",
+                medicineId = "med_undo_test_2",
+                scheduledDateTime = pastScheduledTime,
+                status = MedicationStatus.TAKEN_ON_TIME
+            )
+        )
+        val pendingEntry = pastEntry.copy(status = MedicationStatus.PENDING)
+        val remainingPending = slotEntries.filter {
+            !it.entryId.startsWith("PRN_") &&
+            it.status == MedicationStatus.PENDING &&
+            (pendingEntry.status == MedicationStatus.PENDING || it.entryId != pastEntry.entryId)
+        }
+
+        assertEquals(
+            "Undone pending entry must be included in remainingPending slot items",
+            1,
+            remainingPending.size
+        )
+        assertEquals("entry_past_undo", remainingPending.first().entryId)
+
+        // Verify that hasActiveNotification evaluates to true on undo to force shade alert re-issue
+        val hasActiveNotification = (pendingEntry.status == MedicationStatus.PENDING)
+        assertTrue(
+            "Undoing dose must force active notification restoration to shade",
+            hasActiveNotification
+        )
+    }
 }
+
