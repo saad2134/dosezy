@@ -435,6 +435,7 @@
     <string name="to_be_taken_in">%1$dঘণ্টা %2$dমিনিটের মধ্যে সেব্য</string>
     <string name="time_diff_ago">%1$dঘণ্টা %2$dমিনিট আগে</string>
     <string name="status_all_medications_taken">সমস্ত ওষুধ গ্রহণ করা হয়েছে</string>
+    <string name="status_slot_completed_with_skipped">সম্পূর্ণ (কিছু বাদ দেওয়া হয়েছে)</string>
     <string name="status_scheduled_for_this_time">এই সময়ের জন্য নির্ধারিত</string>
     <string name="daily_frequency_presets_title">দৈনিক ফ্রিকোয়েন্সি প্রিসেট</string>
     <string name="action_edit_medicine_cd">ওষুধ সম্পাদনা করুন</string>

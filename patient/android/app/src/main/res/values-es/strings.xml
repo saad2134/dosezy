@@ -451,6 +451,7 @@
     <string name="to_be_taken_in">Por tomar en %1$dh %2$dm</string>
     <string name="time_diff_ago">Hace %1$dh %2$dm</string>
     <string name="status_all_medications_taken">Todos los medicamentos tomados</string>
+    <string name="status_slot_completed_with_skipped">Completado (algunos omitidos)</string>
     <string name="status_scheduled_for_this_time">Programado para esta hora</string>
     <string name="daily_frequency_presets_title">Ajustes preestablecidos diarios</string>
     <string name="action_edit_medicine_cd">Editar medicamento</string>

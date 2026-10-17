@@ -104,7 +104,8 @@ fun HomeTimelineView(
             val (nodeColor, nodeIcon) = when {
                 allTaken -> Color(0xFF10B981) to Icons.Default.Check
                 allSkipped -> Color(0xFF64748B) to Icons.Default.RemoveCircleOutline
-                allCompleted -> Color(0xFF10B981) to Icons.Default.Check
+                // Guard: Render neutral slate styling for mixed completed slots with skipped doses instead of false adherence green
+                allCompleted -> Color(0xFF64748B) to Icons.Default.Check
                 hasMissed -> Color(0xFFEF4444) to Icons.Default.PriorityHigh
                 hasLate -> Color(0xFFF59E0B) to Icons.Default.HourglassTop
                 else -> Color(0xFF1193D4) to Icons.Default.Schedule
@@ -123,7 +124,8 @@ fun HomeTimelineView(
             val badgeText = when {
                 allTaken -> stringResource(R.string.status_all_medications_taken)
                 allSkipped -> stringResource(R.string.home_action_skipped)
-                allCompleted -> stringResource(R.string.status_all_medications_taken)
+                // Guard: Differentiate fully taken slots from mixed completed slots with skipped doses to avoid misleading adherence status
+                allCompleted -> stringResource(R.string.status_slot_completed_with_skipped)
                 timeDiff != null -> {
                     if (timeDiff.isLate) {
                         stringResource(R.string.time_diff_ago, timeDiff.hours, timeDiff.minutes)

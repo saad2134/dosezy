@@ -15,6 +15,7 @@ import androidx.core.app.NotificationCompat
 import com.example.dosezy.MainActivity
 import com.example.dosezy.R
 import com.example.dosezy.data.DosezyDatabase
+import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.utils.TimeCalculationUtils
 import kotlinx.coroutines.CoroutineScope
@@ -185,9 +186,38 @@ object IntakeSafeguardManager {
                 "TAKEN_ON_TIME"
             }
             Log.d(TAG, "Recording confirmed dose intake ($status) for entry: $id")
-            scheduleRepository.recordDoseTaken(id, status, takenAt, context)
+            // Guard: Pass null context to bypass intermediate cohort re-posting and redundant widget broadcasts on each iteration
+            scheduleRepository.recordDoseTaken(id, status, takenAt, null)
             scheduler.cancelNagging(id)
             scheduler.cancelSnooze(id)
+        }
+
+        // Guard: Dismiss slot notifications and update app widgets once after all cohort entries are committed to SQLite to eliminate notification flickering and duplicate IPC broadcasts
+        try {
+            val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+            val prefs = context.getSharedPreferences("cohort_alarms", Context.MODE_PRIVATE)
+            current.entryIds.forEach { id ->
+                nManager?.cancel(id.hashCode())
+                val primaryId = prefs.getString("primary_$id", null)
+                if (primaryId != null) nManager?.cancel(primaryId.hashCode())
+            }
+            val anchorPrimary = prefs.getString("primary_${current.entryId}", null)
+            if (anchorPrimary != null) nManager?.cancel(anchorPrimary.hashCode())
+            nManager?.cancel(current.entryId.hashCode())
+
+            val anchorEntry = database.scheduleDao().getScheduleEntryById(current.entryId)
+            if (anchorEntry != null) {
+                val slotMillis = anchorEntry.scheduledDateTime.withSecond(0).withNano(0)
+                    .atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+                val slotEntries = database.scheduleDao().getScheduleForDateRangeDirect(anchorEntry.userId, slotMillis, slotMillis + 59999L)
+                val remainingPending = slotEntries.filter { !it.entryId.startsWith("PRN_") && it.status == MedicationStatus.PENDING }
+                if (remainingPending.isEmpty()) {
+                    slotEntries.forEach { nManager?.cancel(it.entryId.hashCode()) }
+                }
+            }
+            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error finalizing cohort notifications and widget update: ${e.message}", e)
         }
 
         return true

@@ -451,6 +451,7 @@
     <string name="to_be_taken_in">%1$d 小时 %2$d 分钟后服用</string>
     <string name="time_diff_ago">%1$d 小时 %2$d 分钟前</string>
     <string name="status_all_medications_taken">所有药物均已服用</string>
+    <string name="status_slot_completed_with_skipped">已完成 (部分已跳过)</string>
     <string name="status_scheduled_for_this_time">已安排在此时间</string>
     <string name="daily_frequency_presets_title">每日服药频率预设</string>
     <string name="action_edit_medicine_cd">编辑药物</string>

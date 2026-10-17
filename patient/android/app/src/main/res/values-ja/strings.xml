@@ -435,6 +435,7 @@
     <string name="to_be_taken_in">%1$d時間%2$d分後に服用</string>
     <string name="time_diff_ago">%1$d時間%2$d分前</string>
     <string name="status_all_medications_taken">すべての薬を服用済み</string>
+    <string name="status_slot_completed_with_skipped">完了 (一部スキップ)</string>
     <string name="status_scheduled_for_this_time">この時間に予定されています</string>
     <string name="daily_frequency_presets_title">1日の服用頻度プリセット</string>
     <string name="action_edit_medicine_cd">薬を編集</string>

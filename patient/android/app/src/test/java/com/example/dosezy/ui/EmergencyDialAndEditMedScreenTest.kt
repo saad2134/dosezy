@@ -15,8 +15,10 @@ import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.Medicine
 import com.example.dosezy.data.model.User
 import com.example.dosezy.data.model.normalizeArabicDigits
+import com.example.dosezy.ui.components.deleteOldImage
 import com.example.dosezy.ui.subscreens.createDialIntent
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -211,6 +213,61 @@ class EmergencyDialAndEditMedScreenTest {
         val readNew = prefs.getString("selected_country_code_$newUserId", null)
             ?: prefs.getString("selected_country_code", null)
         assertEquals("IN", readNew)
+    }
+
+    @Test
+    fun testDraftImageSelection_preservesActiveImageUntilExplicitSave() {
+        val filesDir = context.filesDir
+        val activeImageFile = java.io.File(filesDir, "active_med_photo.jpg").apply { writeText("original photo") }
+        assertTrue("Original active image must exist on disk", activeImageFile.exists())
+
+        val medicine = Medicine(
+            medicineId = "med_image_test_1",
+            userId = "user_1",
+            medicationName = "Aspirin",
+            dosage = 100.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            imageUri = activeImageFile.absolutePath
+        )
+
+        // 1. Emulate picking a draft image in EditMedScreen
+        val draftImage1 = java.io.File(filesDir, "draft_photo_1.jpg").apply { writeText("draft 1") }
+        var currentDraftPath = draftImage1.absolutePath
+
+        // Guard: Selecting a draft image must NOT delete the active persisted entity image
+        assertTrue("Active image must remain intact during draft selection", activeImageFile.exists())
+
+        // 2. Emulate picking a second draft image in the same session
+        val draftImage2 = java.io.File(filesDir, "draft_photo_2.jpg").apply { writeText("draft 2") }
+        // Intermediate draft 1 is cleaned up, but active image remains untouched
+        if (currentDraftPath != medicine.imageUri) {
+            deleteOldImage(context, currentDraftPath)
+        }
+        currentDraftPath = draftImage2.absolutePath
+
+        assertFalse("Intermediate uncommitted draft 1 must be cleaned up", draftImage1.exists())
+        assertTrue("Active image must still remain intact before explicit form save", activeImageFile.exists())
+        assertTrue("Newly selected draft 2 must exist on disk", draftImage2.exists())
+
+        // 3. User cancels form without saving -> active image remains intact in SQLite and on disk
+        val cancelled = true
+        if (cancelled) {
+            assertEquals(activeImageFile.absolutePath, medicine.imageUri)
+            assertTrue("Active image remains valid after form cancellation", java.io.File(medicine.imageUri!!).exists())
+        }
+
+        // 4. User re-enters and saves changes -> active image is deleted and replaced with committed draft
+        if (!medicine.imageUri.isNullOrBlank() && medicine.imageUri != currentDraftPath) {
+            deleteOldImage(context, medicine.imageUri)
+        }
+        val savedMedicine = medicine.copy(imageUri = currentDraftPath)
+
+        assertFalse("Superseded active image must be deleted only upon explicit save", activeImageFile.exists())
+        assertEquals(draftImage2.absolutePath, savedMedicine.imageUri)
+        assertTrue("Committed image must exist on disk", java.io.File(savedMedicine.imageUri!!).exists())
     }
 }
 

@@ -318,17 +318,15 @@ fun PreferencesScreen(navController: NavController) {
                 customSoundPath = currentUser?.customAlarmSoundPath,
                 onSoundSelected = { newSound, customPath, customTitle ->
                     currentUser?.let { user ->
-                        // Guard: Delete previous custom alarm sound file when replaced by a new custom sound or when reverting to a preset to prevent disk storage leaks
-                        if (customPath != null && customPath != user.customAlarmSoundPath) {
-                            com.example.dosezy.utils.SoundUtils.deleteCustomAudio(context, user.customAlarmSoundPath)
-                        } else if (newSound != AlarmSound.CUSTOM && user.customAlarmSoundPath != null) {
+                        // Guard: Only delete custom alarm audio file when a new custom audio file replaces the old one; do not delete on preset preview or selection to prevent permanent audio loss
+                        if (newSound == AlarmSound.CUSTOM && customPath != null && customPath != user.customAlarmSoundPath) {
                             com.example.dosezy.utils.SoundUtils.deleteCustomAudio(context, user.customAlarmSoundPath)
                         }
                         userViewModel.updateUser(
                             user.copy(
                                 alarmSound = newSound,
-                                customAlarmSoundPath = if (newSound == AlarmSound.CUSTOM) (customPath ?: user.customAlarmSoundPath) else null,
-                                customAlarmSoundTitle = if (newSound == AlarmSound.CUSTOM) (customTitle ?: user.customAlarmSoundTitle) else null
+                                customAlarmSoundPath = if (newSound == AlarmSound.CUSTOM) (customPath ?: user.customAlarmSoundPath) else user.customAlarmSoundPath,
+                                customAlarmSoundTitle = if (newSound == AlarmSound.CUSTOM) (customTitle ?: user.customAlarmSoundTitle) else user.customAlarmSoundTitle
                             )
                         )
                     }

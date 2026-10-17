@@ -96,7 +96,8 @@ fun HomeTimeSection(
                 stringResource(R.string.home_action_skipped)
             }
             allCompleted -> {
-                stringResource(R.string.status_all_medications_taken)
+                // Guard: Differentiate fully taken slots from mixed completed slots with skipped doses to avoid misleading adherence status
+                stringResource(R.string.status_slot_completed_with_skipped)
             }
             timeDiff != null -> {
                 if (timeDiff.isLate) {

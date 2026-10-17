@@ -619,5 +619,47 @@ class IntakeSafeguardManagerLifecycleTest {
 
         IntakeSafeguardManager.cancelCountdown(context)
     }
+
+    @Test
+    fun testConfirmIntake_batchCohort_recordsAllEntriesTaken_andDismissesSlotNotificationsOnce() = runBlocking {
+        val entry1 = ScheduleEntry(
+            entryId = "entry_cohort_batch_1",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = LocalDateTime.now().minusMinutes(5),
+            status = MedicationStatus.PENDING
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_cohort_batch_2",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = LocalDateTime.now().minusMinutes(5),
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntries(listOf(entry1, entry2))
+
+        // Start countdown for multi-entry cohort
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entry1.entryId,
+            entryIds = listOf(entry1.entryId, entry2.entryId),
+            medicineName = "Batch Cohort Meds",
+            medicineNames = listOf("Batch Cohort Meds"),
+            scheduledTime = "08:00 AM",
+            durationSeconds = 60
+        )
+        assertNotNull(IntakeSafeguardManager.activeCountdown.value)
+
+        // Confirm intake for entire cohort
+        val result = IntakeSafeguardManager.confirmIntake(context, database)
+        assertTrue(result)
+        assertNull("Countdown state must be cleared after confirmation", IntakeSafeguardManager.activeCountdown.value)
+
+        // Both entries must be updated to TAKEN_ON_TIME
+        val updated1 = database.scheduleDao().getScheduleEntryById(entry1.entryId)
+        val updated2 = database.scheduleDao().getScheduleEntryById(entry2.entryId)
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, updated1?.status)
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, updated2?.status)
+    }
 }
 

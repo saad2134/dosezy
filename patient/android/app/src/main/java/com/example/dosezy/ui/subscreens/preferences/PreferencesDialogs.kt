@@ -332,7 +332,10 @@ fun AlarmSoundSelectionDialog(
                                 } else {
                                     selectedSound = sound
                                     playPreview(sound)
-                                    onSoundSelected(sound, currentCustomPath, currentCustomTitle)
+                                    // Guard: Only send custom path and title when selecting CUSTOM sound to prevent passing stale custom metadata to preset selections
+                                    val pathToSend = if (sound == AlarmSound.CUSTOM) currentCustomPath else null
+                                    val titleToSend = if (sound == AlarmSound.CUSTOM) currentCustomTitle else null
+                                    onSoundSelected(sound, pathToSend, titleToSend)
                                 }
                             }
                     )

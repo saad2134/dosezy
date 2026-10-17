@@ -68,13 +68,20 @@ fun ProfilePicturePicker(
     var showError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
+    var uncommittedDraftPath by remember { mutableStateOf<String?>(null) }
+
     // Gallery launcher
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
             if (uri != null) {
                 try {
-                    val savedPath = saveImageToInternalStorage(context, uri, profilePicPath)
+                    // Guard: Save image draft without deleting active saved picture; clean up prior uncommitted draft in same session
+                    val savedPath = saveImageToInternalStorage(context, uri)
+                    uncommittedDraftPath?.let { draft ->
+                        if (draft != profilePicPath) deleteOldImage(context, draft)
+                    }
+                    uncommittedDraftPath = savedPath
                     onProfilePictureSelected(savedPath)
                 } catch (e: Exception) {
                     Log.e("ProfilePicturePicker", "Gallery error: ${e.message}", e)
@@ -92,7 +99,12 @@ fun ProfilePicturePicker(
             if (success) {
                 tempUri?.let { uri ->
                     try {
-                        val savedPath = saveImageToInternalStorage(context, uri, profilePicPath)
+                        // Guard: Save image draft without deleting active saved picture; clean up prior uncommitted draft in same session
+                        val savedPath = saveImageToInternalStorage(context, uri)
+                        uncommittedDraftPath?.let { draft ->
+                            if (draft != profilePicPath) deleteOldImage(context, draft)
+                        }
+                        uncommittedDraftPath = savedPath
                         onProfilePictureSelected(savedPath)
                     } catch (e: Exception) {
                         Log.e("ProfilePicturePicker", "Camera save error: ${e.message}", e)
@@ -379,21 +391,7 @@ internal fun createImageFile(context: Context): Pair<Uri, File>? {
 fun createImageFileUri(context: Context): Uri? = createImageFile(context)?.first
 
 // Utility function to save image to internal storage
-private fun saveImageToInternalStorage(context: Context, uri: Uri, oldPath: String? = null): String {
-    // Delete old profile picture if it exists to prevent storage leak
-    if (!oldPath.isNullOrEmpty()) {
-        try {
-            val cleanPath = oldPath.removePrefix("file://")
-            val oldFile = File(cleanPath)
-            if (oldFile.exists() && (oldFile.parentFile?.canonicalPath == context.filesDir.canonicalPath || oldFile.canonicalPath.startsWith(context.filesDir.canonicalPath + File.separator))) {
-                val deleted = oldFile.delete()
-                Log.d("ProfilePicturePicker", "Deleted old image: $cleanPath, success=$deleted")
-            }
-        } catch (e: Exception) {
-            Log.e("ProfilePicturePicker", "Failed to delete old image: ${e.message}")
-        }
-    }
-
+private fun saveImageToInternalStorage(context: Context, uri: Uri): String {
     return try {
         val inputStream = context.contentResolver.openInputStream(uri)
             ?: throw IllegalStateException("Cannot open input stream")
@@ -416,7 +414,8 @@ private fun saveImageToInternalStorage(context: Context, uri: Uri, oldPath: Stri
 }
 
 // Guard: Validate canonicalPath against context.filesDir and context.cacheDir to prevent path traversal and arbitrary sandbox file deletion
-private fun deleteOldImage(context: Context, path: String) {
+fun deleteOldImage(context: Context, path: String?) {
+    if (path.isNullOrBlank()) return
     try {
         // Guard: Strip file:// prefix so File() can locate the file on disk without FileNotFoundException
         val cleanPath = path.removePrefix("file://")
@@ -453,12 +452,19 @@ fun MedicinePhotoVisualPicker(
     var showError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
+    var uncommittedDraftPath by remember { mutableStateOf<String?>(null) }
+
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
             if (uri != null) {
                 try {
-                    val savedPath = saveImageToInternalStorage(context, uri, imagePath)
+                    // Guard: Save image draft without deleting active saved picture; clean up prior uncommitted draft in same session
+                    val savedPath = saveImageToInternalStorage(context, uri)
+                    uncommittedDraftPath?.let { draft ->
+                        if (draft != imagePath) deleteOldImage(context, draft)
+                    }
+                    uncommittedDraftPath = savedPath
                     onImageSelected(savedPath)
                 } catch (e: Exception) {
                     Log.e("ProfilePicturePicker", "Gallery error: ${e.message}", e)
@@ -475,7 +481,12 @@ fun MedicinePhotoVisualPicker(
             if (success) {
                 tempUri?.let { uri ->
                     try {
-                        val savedPath = saveImageToInternalStorage(context, uri, imagePath)
+                        // Guard: Save image draft without deleting active saved picture; clean up prior uncommitted draft in same session
+                        val savedPath = saveImageToInternalStorage(context, uri)
+                        uncommittedDraftPath?.let { draft ->
+                            if (draft != imagePath) deleteOldImage(context, draft)
+                        }
+                        uncommittedDraftPath = savedPath
                         onImageSelected(savedPath)
                     } catch (e: Exception) {
                         Log.e("ProfilePicturePicker", "Camera save error: ${e.message}", e)

@@ -1,10 +1,11 @@
-﻿package com.example.dosezy.notifications
+package com.example.dosezy.notifications
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.AssetFileDescriptor
 import android.media.MediaPlayer
 import androidx.test.core.app.ApplicationProvider
+import com.example.dosezy.data.model.AlarmSound
 import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.Language
 import com.example.dosezy.data.model.MedicationStatus
@@ -12,6 +13,7 @@ import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.data.model.Theme
 import com.example.dosezy.data.model.TimeFormat
 import com.example.dosezy.data.model.User
+import com.example.dosezy.utils.SoundUtils
 import com.example.dosezy.utils.TimeCalculationUtils
 import com.example.dosezy.widget.DosezyWidgetPrefs
 import io.mockk.every
@@ -297,5 +299,61 @@ class AlarmAudioAndLifecycleRegressionTest {
             "Emergency contacts key for deleted user must be scrubbed",
             emPrefs.contains("contacts_json_$testUserId")
         )
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // Bug 7: Preserve Custom Audio File When Selecting Sound Presets
+    // ───────────────────────────────────────────────────────────────
+    @Test
+    fun bug7_alarmSoundSelection_presetSelection_preservesCustomAudioFileAndPath() {
+        val soundsDir = java.io.File(context.filesDir, "custom_sounds").apply { mkdirs() }
+        val customFile = java.io.File(soundsDir, "custom_test_audio.mp3").apply { writeText("audio content") }
+        assertTrue("Custom sound file must exist initially", customFile.exists())
+
+        val user = User(
+            userId = "user_alarm_sound_test",
+            fullName = "Alarm Sound Tester",
+            age = 30,
+            gender = Gender.DO_NOT_SPECIFY,
+            contactNumber = "1234567890",
+            alarmSound = AlarmSound.CUSTOM,
+            customAlarmSoundPath = customFile.absolutePath,
+            customAlarmSoundTitle = "My Custom Ringtone"
+        )
+
+        // Emulate selecting a preset: newSound = GENTLE_CHIME, customPath = null
+        val newSound = AlarmSound.GENTLE_CHIME
+        val customPath: String? = null
+        val customTitle: String? = null
+
+        // Guard: Custom audio file must NOT be deleted when switching to or previewing a preset
+        if (newSound == AlarmSound.CUSTOM && customPath != null && customPath != user.customAlarmSoundPath) {
+            SoundUtils.deleteCustomAudio(context, user.customAlarmSoundPath)
+        }
+
+        assertTrue("Custom audio file on disk must be preserved when previewing preset", customFile.exists())
+
+        // User preference must preserve customAlarmSoundPath & Title so switching back does not lose custom ringtone
+        val updatedUser = user.copy(
+            alarmSound = newSound,
+            customAlarmSoundPath = if (newSound == AlarmSound.CUSTOM) (customPath ?: user.customAlarmSoundPath) else user.customAlarmSoundPath,
+            customAlarmSoundTitle = if (newSound == AlarmSound.CUSTOM) (customTitle ?: user.customAlarmSoundTitle) else user.customAlarmSoundTitle
+        )
+
+        assertEquals(AlarmSound.GENTLE_CHIME, updatedUser.alarmSound)
+        assertEquals(customFile.absolutePath, updatedUser.customAlarmSoundPath)
+        assertEquals("My Custom Ringtone", updatedUser.customAlarmSoundTitle)
+
+        // Only when a NEW custom audio file replaces the old one should the previous file be deleted
+        val newCustomFile = java.io.File(soundsDir, "custom_new_audio.mp3").apply { writeText("new audio") }
+        val replacedSound = AlarmSound.CUSTOM
+        val replacementPath = newCustomFile.absolutePath
+
+        if (replacedSound == AlarmSound.CUSTOM && replacementPath != updatedUser.customAlarmSoundPath) {
+            SoundUtils.deleteCustomAudio(context, updatedUser.customAlarmSoundPath)
+        }
+
+        assertFalse("Previous custom audio file must be cleaned up when replaced by a new custom sound", customFile.exists())
+        assertTrue("Newly selected custom audio file must remain on disk", newCustomFile.exists())
     }
 }

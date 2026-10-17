@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2026 Saad <reach.saad@outlook.com> (@saad2134)
  * Licensed under the MIT License. See LICENSE in the project root for license information.
  */
@@ -16,6 +16,8 @@ import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.Medicine
 import com.example.dosezy.data.model.ScheduleEntry
+import com.example.dosezy.R
+import com.example.dosezy.data.model.ScheduleWithMedicine
 import com.example.dosezy.data.model.User
 import com.example.dosezy.data.repository.MedicineRepository
 import com.example.dosezy.data.repository.ScheduleRepository
@@ -252,5 +254,84 @@ class HomeMissedDoseActionRoutingTest {
 
         // 1 hour ago should NOT be considered late
         assertFalse(TimeCalculationUtils.isTakenLate(scheduled1HourAgo, now, 2))
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 3. Home Timeline & Section Status Badge Adherence Accuracy
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testHomeStatusBadge_mixedCompletedSlot_evaluatesToCompletedWithSkipped() {
+        val slotTime = LocalDateTime.now().withHour(8).withMinute(0)
+        val med1 = testMedicine.copy(medicineId = "med_badge_1", medicationName = "Pill 1")
+        val med2 = testMedicine.copy(medicineId = "med_badge_2", medicationName = "Pill 2")
+
+        val entryTaken = ScheduleEntry(
+            entryId = "entry_badge_taken",
+            userId = testUser.userId,
+            medicineId = med1.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.TAKEN_ON_TIME
+        )
+        val entrySkipped = ScheduleEntry(
+            entryId = "entry_badge_skipped",
+            userId = testUser.userId,
+            medicineId = med2.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.SKIPPED
+        )
+
+        val mixedEntries = listOf(
+            ScheduleWithMedicine(entryTaken, med1),
+            ScheduleWithMedicine(entrySkipped, med2)
+        )
+
+        val allTakenMixed = mixedEntries.all {
+            it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
+                    it.scheduleEntry.status == MedicationStatus.TAKEN_LATE
+        }
+        val allSkippedMixed = mixedEntries.all {
+            it.scheduleEntry.status == MedicationStatus.SKIPPED
+        }
+        val allCompletedMixed = mixedEntries.all {
+            it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
+                    it.scheduleEntry.status == MedicationStatus.TAKEN_LATE ||
+                    it.scheduleEntry.status == MedicationStatus.SKIPPED
+        }
+
+        assertFalse("Mixed slot must not evaluate as all taken", allTakenMixed)
+        assertFalse("Mixed slot must not evaluate as all skipped", allSkippedMixed)
+        assertTrue("Mixed slot where each dose is taken or skipped must evaluate as allCompleted", allCompletedMixed)
+
+        // Guard: Mixed completed slot must render status_slot_completed_with_skipped, not status_all_medications_taken
+        val badgeResMixed = when {
+            allTakenMixed -> R.string.status_all_medications_taken
+            allSkippedMixed -> R.string.home_action_skipped
+            allCompletedMixed -> R.string.status_slot_completed_with_skipped
+            else -> R.string.status_scheduled_for_this_time
+        }
+        assertEquals(R.string.status_slot_completed_with_skipped, badgeResMixed)
+
+        // Verify homogeneous taken slot still evaluates to status_all_medications_taken
+        val allTakenEntries = listOf(
+            ScheduleWithMedicine(entryTaken, med1),
+            ScheduleWithMedicine(entryTaken.copy(entryId = "entry_badge_taken_2"), med2)
+        )
+        val badgeResTaken = when {
+            allTakenEntries.all { it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME } -> R.string.status_all_medications_taken
+            else -> R.string.status_scheduled_for_this_time
+        }
+        assertEquals(R.string.status_all_medications_taken, badgeResTaken)
+
+        // Verify homogeneous skipped slot still evaluates to home_action_skipped
+        val allSkippedEntries = listOf(
+            ScheduleWithMedicine(entrySkipped, med1),
+            ScheduleWithMedicine(entrySkipped.copy(entryId = "entry_badge_skipped_2"), med2)
+        )
+        val badgeResSkipped = when {
+            allSkippedEntries.all { it.scheduleEntry.status == MedicationStatus.SKIPPED } -> R.string.home_action_skipped
+            else -> R.string.status_scheduled_for_this_time
+        }
+        assertEquals(R.string.home_action_skipped, badgeResSkipped)
     }
 }

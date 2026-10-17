@@ -435,6 +435,7 @@ Voulez-vous continuer ?</string>
     <string name="to_be_taken_in">À prendre dans %1$dh %2$dmin</string>
     <string name="time_diff_ago">Il y a %1$dh %2$dmin</string>
     <string name="status_all_medications_taken">Tous les médicaments sont pris</string>
+    <string name="status_slot_completed_with_skipped">Terminé (certains ignorés)</string>
     <string name="status_scheduled_for_this_time">Programmé pour cette heure</string>
     <string name="daily_frequency_presets_title">Préréglages de fréquence quotidienne</string>
     <string name="action_edit_medicine_cd">Modifier le médicament</string>

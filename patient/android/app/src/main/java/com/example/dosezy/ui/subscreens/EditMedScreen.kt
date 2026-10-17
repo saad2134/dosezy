@@ -387,6 +387,10 @@ fun EditMedScreen(
                                 )
 
                                 if (medicineToEdit != null) {
+                                    // Guard: Clean up previous active medicine image when saving a new image to prevent disk storage leaks and avoid deleting during uncommitted drafts
+                                    if (!medicineToEdit.imageUri.isNullOrBlank() && medicineToEdit.imageUri != medicineImagePath) {
+                                        com.example.dosezy.ui.components.deleteOldImage(context, medicineToEdit.imageUri)
+                                    }
                                     medicineViewModel.updateMedicine(updatedMedicine)
                                     navController.previousBackStackEntry?.savedStateHandle?.set(
                                         "snackbar_message",
