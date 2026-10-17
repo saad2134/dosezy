@@ -236,5 +236,20 @@ class PdfPaginationAndTakenAtUtcFormatTest {
         assertEquals("1 tablet", medTab.getDosageDisplay())
         assertEquals("7.5 mL", medMl.getDosageDisplay())
     }
+
+    @Test
+    fun testDataExporter_copyToClipboard_executesSafelyAcrossAndroidVersions() {
+        val realExporter = com.example.dosezy.data.export.DataExporter(
+            context = context,
+            userRepository = mockk(relaxed = true),
+            medicineRepository = mockk(relaxed = true),
+            scheduleRepository = mockScheduleRepo
+        )
+        realExporter.copyToClipboard("Test pharmacy order text")
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+        val clip = clipboard.primaryClip
+        assertNotNull("Primary clip must be populated on clipboard", clip)
+        assertEquals("Test pharmacy order text", clip?.getItemAt(0)?.text?.toString())
+    }
 }
 

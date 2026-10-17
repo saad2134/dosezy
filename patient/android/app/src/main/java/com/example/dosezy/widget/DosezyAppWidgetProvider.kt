@@ -88,19 +88,38 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
             }
         }
 
+        // Guard: Execute immediate synchronous widget update for configure activity or targeted widget ID without 150ms debounce delay so widget renders populated layout before launcher binding and Android 12+ background suspension
         fun updateWidget(
             context: Context,
             @Suppress("UNUSED_PARAMETER") appWidgetManager: AppWidgetManager? = null,
-            @Suppress("UNUSED_PARAMETER") appWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID
+            appWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID
         ) {
-            updateAppWidgets(context)
+            val appContext = context.applicationContext
+            if (appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                try {
+                    kotlinx.coroutines.runBlocking {
+                        kotlinx.coroutines.withTimeoutOrNull(2000L) {
+                            performUpdateAllWidgets(appContext, targetWidgetId = appWidgetId)
+                        }
+                    }
+                } catch (_: Exception) {
+                    updateAppWidgets(appContext)
+                }
+            } else {
+                updateAppWidgets(appContext)
+            }
         }
 
-        private suspend fun performUpdateAllWidgets(context: Context) {
+        private suspend fun performUpdateAllWidgets(context: Context, targetWidgetId: Int? = null) {
             try {
                 val appWidgetManager = AppWidgetManager.getInstance(context)
                 val thisWidget = ComponentName(context, DosezyAppWidgetProvider::class.java)
-                val appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
+                val allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
+                val appWidgetIds = if (targetWidgetId != null && targetWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                    intArrayOf(targetWidgetId)
+                } else {
+                    allWidgetIds
+                }
                 if (appWidgetIds.isEmpty()) return
 
                 val db = DosezyDatabase.getInstance(context)

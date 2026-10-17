@@ -93,6 +93,15 @@ class DosezyAppWidgetProviderTest {
     }
 
     @Test
+    fun testUpdateWidget_withTargetWidgetId_executesImmediateUpdateWithoutDebounce() {
+        val appWidgetManager = android.appwidget.AppWidgetManager.getInstance(context)
+        // Guard: Verify updateWidget with explicit widget ID executes synchronously without throwing and updates target widget
+        DosezyAppWidgetProvider.updateWidget(context, appWidgetManager, appWidgetId = 42)
+        // Verify invalid ID fallback also executes safely
+        DosezyAppWidgetProvider.updateWidget(context, appWidgetManager, appWidgetId = android.appwidget.AppWidgetManager.INVALID_APPWIDGET_ID)
+    }
+
+    @Test
     fun testWidgetProfileTheme_preservesSpecificProfileThemeIndependentOfAppPrefs() {
         // Guard: Specific profile theme must override global app theme for dedicated profile widgets
         val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)

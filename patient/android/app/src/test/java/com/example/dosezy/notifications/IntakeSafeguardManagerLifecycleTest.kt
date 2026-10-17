@@ -776,6 +776,43 @@ class IntakeSafeguardManagerLifecycleTest {
             activeNotifs.any { it.id == entry2.entryId.hashCode() }
         )
     }
+
+    @Test
+    fun testIntakeSafeguard_cancelCountdown_dismissesNotificationAndClearsState() = runBlocking {
+        val entry = ScheduleEntry(
+            entryId = "entry_cancel_test",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = LocalDateTime.of(2026, 10, 17, 9, 0),
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entry)
+
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entry.entryId,
+            entryIds = listOf(entry.entryId),
+            medicineName = testMedicine.medicationName,
+            medicineNames = listOf(testMedicine.medicationName),
+            scheduledTime = "09:00 AM",
+            durationSeconds = 120
+        )
+
+        assertNotNull("Active countdown must exist after startCountdown", IntakeSafeguardManager.activeCountdown.value)
+
+        // Cancel countdown (as when user disables preference in Settings)
+        IntakeSafeguardManager.cancelCountdown(context)
+
+        assertNull("Active countdown must be null after cancelCountdown", IntakeSafeguardManager.activeCountdown.value)
+        val prefs = context.getSharedPreferences("dosezy_intake_safeguard", Context.MODE_PRIVATE)
+        assertTrue("Persistent state must be cleared after cancelCountdown", prefs.all.isEmpty())
+
+        val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+        assertFalse(
+            "Notification shade must not retain cancelled countdown notification",
+            nManager.activeNotifications.any { it.id == entry.entryId.hashCode() }
+        )
+    }
 }
 
 

@@ -695,6 +695,47 @@ class BackupRestoreManager(
 
                         // Guard: Execute MERGE inserts within an atomic Room transaction to ensure database consistency on failure
                         database.withTransaction {
+                            // Guard: Ensure parent User entity exists before inserting child medicines and schedules to prevent SQLiteConstraintException FOREIGN KEY failures when merging into missing or deleted local profiles
+                            if (database.userDao().getUserByIdDirect(targetUserId) == null) {
+                                val localUsers = database.userDao().getAllUsersDirect()
+                                val avatarFile = File(pDir, "avatar.jpg")
+                                val finalPicPath = if (avatarFile.exists()) {
+                                    val userAssetsDir = File(context.filesDir, "profiles/$targetUserId")
+                                    userAssetsDir.mkdirs()
+                                    val targetAvatar = File(userAssetsDir, "avatar.jpg")
+                                    avatarFile.copyTo(targetAvatar, overwrite = true)
+                                    targetAvatar.absolutePath
+                                } else null
+
+                                val soundAssetFile = pDir.listFiles { f -> f.isFile && f.name.startsWith("custom_alarm.") }?.firstOrNull()
+                                val finalSoundPath = if (soundAssetFile != null && soundAssetFile.exists()) {
+                                    val soundDir = File(context.filesDir, "custom_sounds")
+                                    soundDir.mkdirs()
+                                    val ext = soundAssetFile.extension.ifEmpty { "mp3" }
+                                    val targetSound = File(soundDir, "custom_alarm_${System.currentTimeMillis()}_${targetUserId.take(8)}.$ext")
+                                    soundAssetFile.copyTo(targetSound, overwrite = true)
+                                    targetSound.absolutePath
+                                } else null
+
+                                val resolvedAlarmSound = if (finalSoundPath != null) {
+                                    originalUser.alarmSound
+                                } else if (originalUser.alarmSound == AlarmSound.CUSTOM) {
+                                    AlarmSound.SYSTEM_DEFAULT
+                                } else {
+                                    originalUser.alarmSound
+                                }
+
+                                val shouldBeCurrent = localUsers.none { it.isCurrentUser } && totalProfiles == 0
+                                val restoredUser = originalUser.copy(
+                                    userId = targetUserId,
+                                    profilePicPath = finalPicPath,
+                                    customAlarmSoundPath = finalSoundPath,
+                                    alarmSound = resolvedAlarmSound,
+                                    isCurrentUser = shouldBeCurrent
+                                )
+                                database.userDao().insertUser(restoredUser)
+                            }
+
                             for (newMed in newMedsToInsert) {
                                 database.medicineDao().insertMedicine(newMed)
                             }

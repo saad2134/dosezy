@@ -331,5 +331,33 @@ class AlarmAudioPlayerAnd24HourFormatTest {
             AlarmAudioPlayer.stop()
         }
     }
+
+    @Test
+    fun issue4_alarmAudioPlayer_continuousAlarm_upgradesFallbackRingtoneToLooping() {
+        val mockRingtone = mockk<android.media.Ringtone>(relaxed = true)
+        every { mockRingtone.isPlaying } returns true
+        var looping = false
+        every { mockRingtone.isLooping } answers { looping }
+        every { mockRingtone.isLooping = any() } answers { looping = firstArg() }
+
+        val mpField = AlarmAudioPlayer::class.java.getDeclaredField("mediaPlayer")
+        mpField.isAccessible = true
+        mpField.set(null, null)
+
+        val rtField = AlarmAudioPlayer::class.java.getDeclaredField("ringtone")
+        rtField.isAccessible = true
+        rtField.set(null, mockRingtone)
+
+        try {
+            // Incoming continuous loop alarm arrives while fallback ringtone is playing
+            AlarmAudioPlayer.play(context, com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT, autoSilenceSeconds = 0)
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                assertTrue("Fallback Ringtone must be upgraded to isLooping = true", looping)
+            }
+        } finally {
+            AlarmAudioPlayer.stop()
+        }
+    }
 }
 

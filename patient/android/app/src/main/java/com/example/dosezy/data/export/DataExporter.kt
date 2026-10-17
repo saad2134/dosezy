@@ -591,10 +591,13 @@ class DataExporter(
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
         val clip = android.content.ClipData.newPlainText(context.getString(com.example.dosezy.R.string.pharmacy_order_title), text)
         clipboard.setPrimaryClip(clip)
-        android.widget.Toast.makeText(
-            context,
-            context.getString(com.example.dosezy.R.string.pharmacy_order_copied),
-            android.widget.Toast.LENGTH_SHORT
-        ).show()
+        // Guard: Android 13+ (API 33+) provides system-level clipboard UI confirmation; suppress redundant Toast to prevent duplicate notifications
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            android.widget.Toast.makeText(
+                context,
+                context.getString(com.example.dosezy.R.string.pharmacy_order_copied),
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 }

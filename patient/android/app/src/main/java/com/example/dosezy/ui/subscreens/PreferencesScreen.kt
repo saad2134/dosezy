@@ -170,6 +170,10 @@ fun PreferencesScreen(navController: NavController) {
                     currentUser?.let { user ->
                         userViewModel.updateUser(user.copy(intakeSafeguardEnabled = isChecked))
                     }
+                    // Guard: Cancel active intake countdown notification and scheduled re-alert alarm if user disables safeguard preference
+                    if (!isChecked) {
+                        com.example.dosezy.notifications.IntakeSafeguardManager.cancelCountdown(context)
+                    }
                 },
                 onIntakeDurationClick = { showIntakeDurationDialog = true },
                 onLateAfterClick = { showLateAfterDialog = true },

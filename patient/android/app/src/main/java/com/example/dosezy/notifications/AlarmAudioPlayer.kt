@@ -63,6 +63,16 @@ object AlarmAudioPlayer {
                         }
                     }
                 } catch (_: Exception) {}
+                // Guard: Upgrade fallback Ringtone player to continuous looping on Android P+ (API 28+) so fallback audio does not prematurely silence
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    try {
+                        ringtone?.let { rt ->
+                            if (!rt.isLooping) {
+                                rt.isLooping = true
+                            }
+                        }
+                    } catch (_: Exception) {}
+                }
             } else if (autoSilenceSeconds == -1) {
                 // Guard: Refresh single-play timeout watchdog if incoming alarm specifies single play
                 autoSilenceJob?.cancel()

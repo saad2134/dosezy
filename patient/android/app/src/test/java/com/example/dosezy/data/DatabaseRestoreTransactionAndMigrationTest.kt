@@ -802,5 +802,80 @@ class DatabaseRestoreTransactionAndMigrationTest {
         // Verify: Namespaced key was also migrated
         assertEquals(defaultJson, contactsPrefs.getString("contacts_json_${testUser.userId}", null))
     }
+
+    @Test
+    fun testMergeStrategy_insertsParentUserWhenLocalUserMissing_andSatisfiesForeignKeyConstraint() = runBlocking {
+        val tempDir = File(context.cacheDir, "test_merge_missing_user_${System.currentTimeMillis()}")
+        val profileFolder = File(tempDir, "profiles/missing_user_1").apply { mkdirs() }
+
+        val backupUser = User(
+            userId = "missing_user_1",
+            fullName = "Merged Missing User",
+            age = 35,
+            gender = Gender.DO_NOT_SPECIFY,
+            contactNumber = "555-4321",
+            theme = Theme.DARK,
+            timeFormat = TimeFormat.HOUR_12,
+            language = Language.ENGLISH,
+            isCurrentUser = true
+        )
+        File(profileFolder, "profile.json").writeText(testGson.toJson(backupUser))
+
+        val backupMed = Medicine(
+            medicineId = "backup_med_merge_1",
+            userId = "missing_user_1",
+            medicationName = "Lisinopril",
+            dosage = 10.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+        File(profileFolder, "medicines.json").writeText(testGson.toJson(listOf(backupMed)))
+
+        val backupSchedule = ScheduleEntry(
+            entryId = "sch_merge_1",
+            userId = "missing_user_1",
+            medicineId = "backup_med_merge_1",
+            scheduledDateTime = LocalDateTime.of(2026, 10, 17, 8, 0),
+            status = MedicationStatus.PENDING
+        )
+        File(profileFolder, "schedules.json").writeText(testGson.toJson(listOf(backupSchedule)))
+
+        // Local users table is empty; existingLocalUserId is null
+        assertNull(db.userDao().getUserByIdDirect("missing_user_1"))
+
+        val decision = ProfileImportDecision(
+            summary = ImportableProfileSummary(
+                originalUserId = "missing_user_1",
+                name = backupUser.fullName,
+                age = backupUser.age,
+                gender = backupUser.gender.name,
+                medicineCount = 1,
+                scheduleCount = 1,
+                avatarTempPath = null,
+                isConflict = false,
+                existingLocalUserId = null,
+                profileFolder = profileFolder
+            ),
+            isSelected = true,
+            conflictStrategy = ConflictStrategy.MERGE
+        )
+
+        val restoreResult = backupManager.executeSelectiveRestore(tempDir, listOf(decision))
+        assertTrue("Selective restore with MERGE strategy must succeed", restoreResult.success)
+
+        // Verify parent user was inserted, satisfying foreign key constraints for medicines and schedules
+        val restoredUser = db.userDao().getUserByIdDirect("missing_user_1")
+        assertNotNull("Parent User must be inserted by MERGE when local user is missing", restoredUser)
+        assertEquals("Merged Missing User", restoredUser?.fullName)
+
+        val restoredMeds = db.medicineDao().getMedicinesByUserDirect("missing_user_1")
+        assertEquals(1, restoredMeds.size)
+        assertEquals("Lisinopril", restoredMeds.first().medicationName)
+
+        val restoredSchedules = db.scheduleDao().getAllScheduleEntries("missing_user_1")
+        assertTrue("Restored schedules must be populated and reconciled", restoredSchedules.isNotEmpty())
+    }
 }
 
