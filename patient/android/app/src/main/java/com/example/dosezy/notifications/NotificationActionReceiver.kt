@@ -159,7 +159,8 @@ class NotificationActionReceiver : BroadcastReceiver() {
                     notifAlarmScheduler.cancelNagging(id)
                     notifAlarmScheduler.cancelSnooze(id)
                     notifAlarmScheduler.cancelIntakeSafeguardAlarm(id)
-                    scheduleRepository.recordDoseTaken(id, status, takenAt, null)
+                    // Guard: Pass context with syncSlotNotification = false so stock deduction triggers refill alert while intermediate slot synchronization is deferred
+                    scheduleRepository.recordDoseTaken(id, status, takenAt, context, notes = null, syncSlotNotification = false)
                 }
 
                 // Guard: Perform coordinated single slot sync and widget update after all cohort entries in SQLite are updated to prevent shade notification flickering and duplicate widget updates

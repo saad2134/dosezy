@@ -203,14 +203,15 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
     // Persist personal contacts via SharedPreferences, namespaced per user profile
     val prefs = context.getSharedPreferences("emergency_contacts", android.content.Context.MODE_PRIVATE)
     val customContacts = remember(currentUser?.userId) {
-        val userKey = "contacts_json_${currentUser?.userId ?: "default"}"
+        val currentUserId = currentUser?.userId
+        val userKey = if (currentUserId != null) "contacts_json_$currentUserId" else "contacts_json_default"
         var saved = prefs.getString(userKey, null)
-        // Fallback to legacy un-namespaced key if userKey is not set yet
-        if (saved == null && prefs.contains("contacts_json")) {
-            saved = prefs.getString("contacts_json", null)
+        // Guard: Only migrate legacy contacts when currentUser is non-null to prevent migrating into default key during initial null Compose frame
+        if (currentUserId != null && saved == null) {
+            saved = prefs.getString("contacts_json", null) ?: prefs.getString("contacts_json_default", null)
             if (saved != null) {
-                // Guard: Remove legacy un-namespaced key upon migration to prevent newly created profiles from inheriting another user's contacts
-                prefs.edit().putString(userKey, saved).remove("contacts_json").apply()
+                // Guard: Remove legacy un-namespaced key and default key upon migration to prevent newly created profiles from inheriting another user's contacts
+                prefs.edit().putString(userKey, saved).remove("contacts_json").remove("contacts_json_default").apply()
             }
         }
         val list = androidx.compose.runtime.mutableStateListOf<Pair<String, String>>()

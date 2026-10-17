@@ -73,7 +73,8 @@ class TakeCohortUseCase @Inject constructor(
                 "TAKEN_ON_TIME"
             }
             Log.d(TAG, "Recording dose taken ($status) for entry: $id")
-            scheduleRepository.recordDoseTaken(id, status, nowStr, null, notes)
+            // Guard: Pass context with syncSlotNotification = false so stock deduction triggers refill alert while intermediate slot synchronization is deferred
+            scheduleRepository.recordDoseTaken(id, status, nowStr, context, notes, syncSlotNotification = false)
         }
 
         // Guard: Coordinate single slot notification sync and widget update after batch loop to prevent notification shade flicker and repeated widget broadcasts

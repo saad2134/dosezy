@@ -522,4 +522,36 @@ class RecordDoseMissedAndUndoTest {
         assertTrue("Refill notification must be posted on PRN dose when stock transitions from threshold to below threshold",
             activeNotifs.any { it.id == refillNotifId })
     }
+
+    @Test
+    fun testUnarchiveMedicine_resetsCourseDatesFromToday_whenEndDateInPast() = runBlocking {
+        val today = java.time.LocalDate.now()
+        val pastStart = today.minusDays(20)
+        val pastEnd = today.minusDays(10)
+        val expiredMed = testMedicine.copy(
+            medicineId = "med_expired_course",
+            medicationName = "Amoxicillin",
+            startDate = pastStart,
+            endDate = pastEnd,
+            durationDays = 10,
+            isArchived = true
+        )
+        db.medicineDao().insertMedicine(expiredMed)
+
+        // Unarchive expired medicine
+        medicineRepository.unarchiveMedicine(expiredMed)
+
+        val unarchived = db.medicineDao().getMedicineByIdDirect("med_expired_course")
+        assertNotNull(unarchived)
+        assertFalse("Medicine must be active (isArchived = false)", unarchived!!.isArchived)
+        assertEquals("Start date must be reset to today", today, unarchived.startDate)
+        assertEquals("End date must be reset to today + durationDays", today.plusDays(10), unarchived.endDate)
+
+        // Verify schedule entries were generated starting from today
+        val schedules = db.scheduleDao().getAllScheduleEntries(testUser.userId)
+            .filter { it.medicineId == "med_expired_course" }
+        assertTrue("Schedule entries must be generated for unarchived medicine", schedules.isNotEmpty())
+        assertTrue("All generated schedule entries must be on or after today",
+            schedules.all { !it.scheduledDateTime.toLocalDate().isBefore(today) })
+    }
 }

@@ -761,5 +761,46 @@ class DatabaseRestoreTransactionAndMigrationTest {
         assertTrue(restoreResult2.success)
         assertNull(emergencyPrefs.getString("selected_country_code_${exportUser.userId}", null))
     }
+
+    @Test
+    fun testBackup_exportsDefaultEmergencyContacts_andMigratesToNamespacedKey() = runBlocking {
+        val testUser = User(
+            userId = "backup_default_contacts_user",
+            fullName = "Default Contacts User",
+            age = 45,
+            gender = Gender.FEMALE,
+            contactNumber = "5551234",
+            isCurrentUser = true
+        )
+        db.userDao().insertUser(testUser)
+
+        val contactsPrefs = context.getSharedPreferences("emergency_contacts", Context.MODE_PRIVATE)
+        contactsPrefs.edit().clear().commit()
+
+        val defaultJson = """[{"name":"Caregiver","phone":"555-9988"}]"""
+        contactsPrefs.edit().putString("contacts_json_default", defaultJson).commit()
+
+        val zipFile = backupManager.createFullBackupZip()
+        assertTrue(zipFile.exists())
+
+        // Verify: The backup contains emergency_contacts.json with the contacts from contacts_json_default
+        var extractedEmergencyJson: String? = null
+        ZipInputStream(FileInputStream(zipFile)).use { zis ->
+            var entry = zis.nextEntry
+            while (entry != null) {
+                if (entry.name == "profiles/${testUser.userId}/emergency_contacts.json") {
+                    extractedEmergencyJson = zis.bufferedReader(Charsets.UTF_8).readText()
+                }
+                zis.closeEntry()
+                entry = zis.nextEntry
+            }
+        }
+
+        assertNotNull("Emergency contacts must be exported when stored in contacts_json_default", extractedEmergencyJson)
+        assertEquals(defaultJson, extractedEmergencyJson)
+
+        // Verify: Namespaced key was also migrated
+        assertEquals(defaultJson, contactsPrefs.getString("contacts_json_${testUser.userId}", null))
+    }
 }
 

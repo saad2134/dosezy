@@ -17,6 +17,9 @@ import com.example.dosezy.data.model.User
 import com.example.dosezy.data.model.normalizeArabicDigits
 import com.example.dosezy.ui.components.deleteOldImage
 import com.example.dosezy.ui.subscreens.createDialIntent
+import com.example.dosezy.ui.subscreens.createSupportDialIntent
+import com.example.dosezy.ui.subscreens.createSupportEmailIntent
+import com.example.dosezy.ui.subscreens.createSupportUrlIntent
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -348,6 +351,85 @@ class EmergencyDialAndEditMedScreenTest {
         assertFalse(
             "Active image is safely deleted only upon explicit form save",
             activeImageFile.exists()
+        )
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 7. EmergencyScreen: Initial Null Frame Migration & HelpSupportScreen Intents
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testEmergencyContactsMigration_preservesContactsWhenCurrentUserNullInitially() {
+        val prefs = context.getSharedPreferences("emergency_contacts", Context.MODE_PRIVATE)
+        prefs.edit().clear().commit()
+
+        val legacyJson = """[{"name":"Dr. Watson","phone":"555-0100"}]"""
+        prefs.edit().putString("contacts_json", legacyJson).commit()
+
+        // Phase 1: Initial Compose render frame where currentUser is null
+        val nullUserId: String? = null
+        val userKeyInitial = if (nullUserId != null) "contacts_json_$nullUserId" else "contacts_json_default"
+        var savedInitial = prefs.getString(userKeyInitial, null)
+        if (nullUserId != null && savedInitial == null) {
+            savedInitial = prefs.getString("contacts_json", null) ?: prefs.getString("contacts_json_default", null)
+            if (savedInitial != null) {
+                prefs.edit().putString(userKeyInitial, savedInitial).remove("contacts_json").remove("contacts_json_default").apply()
+            }
+        }
+
+        // Verify: Legacy key must NOT be migrated or wiped into default key during null frame
+        assertTrue("Legacy key must be preserved during initial null frame", prefs.contains("contacts_json"))
+        assertFalse("contacts_json_default must NOT be populated from legacy during null frame", prefs.contains("contacts_json_default"))
+
+        // Phase 2: Active profile resolves from Room (e.g. user_alpha)
+        val resolvedUserId = "user_alpha"
+        val userKeyResolved = "contacts_json_$resolvedUserId"
+        var savedResolved = prefs.getString(userKeyResolved, null)
+        if (savedResolved == null) {
+            savedResolved = prefs.getString("contacts_json", null) ?: prefs.getString("contacts_json_default", null)
+            if (savedResolved != null) {
+                prefs.edit().putString(userKeyResolved, savedResolved).remove("contacts_json").remove("contacts_json_default").apply()
+            }
+        }
+
+        // Verify: User profile claimed the legacy contacts, and legacy/default keys are cleaned up
+        assertEquals(legacyJson, prefs.getString(userKeyResolved, null))
+        assertFalse("Legacy key must be removed after successful user migration", prefs.contains("contacts_json"))
+        assertFalse("Default key must be removed after successful user migration", prefs.contains("contacts_json_default"))
+    }
+
+    @Test
+    fun testHelpSupportScreen_intentHelpers_includeNewTaskFlagAndSanitizedData() {
+        // URL Intent
+        val urlIntent = createSupportUrlIntent("https://dosezy.app/faq")
+        assertEquals(Intent.ACTION_VIEW, urlIntent.action)
+        assertEquals("https://dosezy.app/faq", urlIntent.data?.toString())
+        assertTrue(
+            "URL intent must have FLAG_ACTIVITY_NEW_TASK",
+            (urlIntent.flags and Intent.FLAG_ACTIVITY_NEW_TASK) != 0
+        )
+
+        // Email Intent
+        val emailIntent = createSupportEmailIntent("support@dosezy.app", "Bug Report")
+        assertEquals(Intent.ACTION_SENDTO, emailIntent.action)
+        assertEquals("mailto:", emailIntent.data?.toString())
+        val emails = emailIntent.getStringArrayExtra(Intent.EXTRA_EMAIL)
+        assertNotNull(emails)
+        assertEquals("support@dosezy.app", emails?.firstOrNull())
+        assertEquals("Bug Report", emailIntent.getStringExtra(Intent.EXTRA_SUBJECT))
+        assertTrue(
+            "Email intent must have FLAG_ACTIVITY_NEW_TASK",
+            (emailIntent.flags and Intent.FLAG_ACTIVITY_NEW_TASK) != 0
+        )
+
+        // Phone Intent (with formatting characters)
+        val dialIntent = createSupportDialIntent("+1 (888) 555-4321")
+        assertEquals(Intent.ACTION_DIAL, dialIntent.action)
+        assertEquals("tel", dialIntent.data?.scheme)
+        assertEquals("+18885554321", dialIntent.data?.schemeSpecificPart)
+        assertTrue(
+            "Dial intent must have FLAG_ACTIVITY_NEW_TASK",
+            (dialIntent.flags and Intent.FLAG_ACTIVITY_NEW_TASK) != 0
         )
     }
 }

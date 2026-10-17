@@ -150,10 +150,27 @@ class MedicineRepository @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun unarchiveMedicine(medicine: Medicine) {
-        // 1. Mark medicine as active (unarchived)
-        database.medicineDao().setArchivedStatus(medicine.medicineId, false)
+        val today = LocalDate.now()
+        // Guard: If unarchiving a finite course with an expired endDate, reset dates starting from today to prevent generating 0 schedules and ghost active medicines
+        val activeMedicine = if (medicine.endDate != null && medicine.endDate.isBefore(today)) {
+            val duration = medicine.durationDays?.toLong()
+                ?: if (medicine.startDate != null) java.time.temporal.ChronoUnit.DAYS.between(medicine.startDate, medicine.endDate).coerceAtLeast(1L)
+                else 30L
+            val updated = medicine.copy(
+                isArchived = false,
+                startDate = today,
+                endDate = today.plusDays(duration),
+                durationDays = duration.toInt()
+            )
+            database.medicineDao().updateMedicine(updated)
+            updated
+        } else {
+            database.medicineDao().setArchivedStatus(medicine.medicineId, false)
+            medicine.copy(isArchived = false)
+        }
+
         // 2. Generate new schedule entries starting from today for 30 days
-        val newEntries = medicine.copy(isArchived = false).generateScheduleEntries(LocalDate.now(), 30)
+        val newEntries = activeMedicine.generateScheduleEntries(today, 30)
         database.scheduleDao().insertScheduleEntries(newEntries)
         // 3. Reschedule all alarms for user so grouped slots are safely reconstructed
         scheduleRepository.rescheduleAllAlarms(medicine.userId, this.context)

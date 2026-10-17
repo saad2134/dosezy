@@ -548,5 +548,48 @@ class TakeAllCohortFunctionalityTest {
         assertEquals("Doctor advised", updated1.skipReason)
         assertEquals("Doctor advised", updated2.skipReason)
     }
+
+    @Test
+    fun testTakeCohortUseCase_triggersRefillAlert_whenStockCrossesThreshold() = runBlocking {
+        val lowStockMed = Medicine(
+            medicineId = "med_low_stock_refill",
+            userId = testUser.userId,
+            medicationName = "Thyroxine",
+            dosage = 50.0,
+            dosageUnit = DosageUnit.MCG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            currentStock = 3,
+            refillThreshold = 3,
+            autoDeductOnTake = true
+        )
+        database.medicineDao().insertMedicine(lowStockMed)
+
+        val slotTime = LocalDateTime.now().plusHours(1).withSecond(0).withNano(0)
+        val entry = ScheduleEntry(
+            entryId = "entry_refill_threshold_1",
+            userId = testUser.userId,
+            medicineId = lowStockMed.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        database.scheduleDao().insertScheduleEntry(entry)
+
+        val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+        nManager.cancelAll()
+
+        val takeCohortUseCase = TakeCohortUseCase(database, scheduleRepository, context)
+        takeCohortUseCase.invoke(listOf(entry.entryId), user = testUser)
+
+        val updatedMed = database.medicineDao().getMedicineByIdDirect(lowStockMed.medicineId)
+        assertEquals(2, updatedMed?.currentStock)
+
+        // Verify refill alert notification was posted
+        val refillNotifId = (lowStockMed.medicineId + "_refill").hashCode()
+        val activeNotifs = nManager.activeNotifications
+        assertTrue("Refill alert notification must be posted when stock drops to or below threshold", activeNotifs.any { it.id == refillNotifId })
+    }
 }
 

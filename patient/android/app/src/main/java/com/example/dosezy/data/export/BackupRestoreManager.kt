@@ -183,8 +183,13 @@ class BackupRestoreManager(
 
                 // emergency_contacts.json (per-profile)
                 val emPrefs = context.getSharedPreferences("emergency_contacts", Context.MODE_PRIVATE)
+                // Guard: Fallback to contacts_json and contacts_json_default for active user if namespaced key is absent to preserve emergency contacts in backups
                 val emContacts = emPrefs.getString("contacts_json_${user.userId}", null)
-                    ?: if (user.isCurrentUser) emPrefs.getString("contacts_json", null) else null
+                    ?: if (user.isCurrentUser) {
+                        (emPrefs.getString("contacts_json", null) ?: emPrefs.getString("contacts_json_default", null))?.also {
+                            emPrefs.edit().putString("contacts_json_${user.userId}", it).apply()
+                        }
+                    } else null
                 if (!emContacts.isNullOrEmpty()) {
                     zos.putNextEntry(ZipEntry("$profileDir/emergency_contacts.json"))
                     zos.write(emContacts.toByteArray(Charsets.UTF_8))
