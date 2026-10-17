@@ -87,10 +87,10 @@ class MainActivity : ComponentActivity() {
         if (!targetUserId.isNullOrBlank()) {
             userViewModel.setCurrentUserById(targetUserId)
         }
-        // Guard: Route to schedule screen when tapped notification specifies fragment=schedule
+        // Guard: Route to target screen when tapped notification specifies fragment (schedule or medicines)
         val targetFragment = intent.getStringExtra("fragment")
-        if (targetFragment == "schedule") {
-            pendingRouteState.value = "schedule"
+        if (targetFragment in listOf("schedule", "medicines")) {
+            pendingRouteState.value = targetFragment
         }
     }
 
@@ -105,10 +105,10 @@ class MainActivity : ComponentActivity() {
             userViewModel.setCurrentUserById(targetUserId)
         }
 
-        // Guard: Parse initial launch intent extras to route directly to schedule screen on cold start
+        // Guard: Parse initial launch intent extras to route directly to target screen on cold start
         val targetFragment = intent.getStringExtra("fragment")
-        if (targetFragment == "schedule") {
-            pendingRouteState.value = "schedule"
+        if (targetFragment in listOf("schedule", "medicines")) {
+            pendingRouteState.value = targetFragment
         }
 
         // Safety fallback: if an uncaught locale/formatting error occurs, reset language to SYSTEM so app opens cleanly on next launch
@@ -243,7 +243,11 @@ fun DosezyApp(
                 popUpTo("loading") { inclusive = true }
             }
         } else {
-            val startRoute = if (pendingRouteState.value == "schedule") "schedule" else "home"
+            val startRoute = when (pendingRouteState.value) {
+                "schedule" -> "schedule"
+                "medicines" -> "medicines"
+                else -> "home"
+            }
             if (pendingRouteState.value != null) {
                 onRouteConsumed()
             }

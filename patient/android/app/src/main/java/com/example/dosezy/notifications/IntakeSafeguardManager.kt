@@ -50,7 +50,8 @@ object IntakeSafeguardManager {
         val scheduledTime: String,
         val startTimestamp: Long,
         val targetTimestamp: Long,
-        val totalDurationSeconds: Int
+        val totalDurationSeconds: Int,
+        val userId: String? = null
     )
 
     private val _activeCountdown = MutableStateFlow<IntakeCountdownState?>(null)
@@ -83,7 +84,8 @@ object IntakeSafeguardManager {
         medicineName: String,
         medicineNames: List<String>,
         scheduledTime: String,
-        durationSeconds: Int
+        durationSeconds: Int,
+        userId: String? = null
     ): IntakeCountdownState {
         val scheduler = AlarmScheduler(context)
 
@@ -112,7 +114,8 @@ object IntakeSafeguardManager {
             scheduledTime = scheduledTime,
             startTimestamp = now,
             targetTimestamp = target,
-            totalDurationSeconds = durationSeconds
+            totalDurationSeconds = durationSeconds,
+            userId = userId
         )
 
         saveState(context, state)
@@ -278,6 +281,8 @@ object IntakeSafeguardManager {
         val mainIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra("fragment", "schedule")
+            // Guard: Attach target user ID so clicking intake safeguard notification switches to correct profile
+            state.userId?.let { putExtra("switch_to_user_id", it) }
         }
         val contentPendingIntent = PendingIntent.getActivity(
             context,
@@ -376,6 +381,7 @@ object IntakeSafeguardManager {
             .putLong("start_time", state.startTimestamp)
             .putLong("target_time", state.targetTimestamp)
             .putInt("duration_sec", state.totalDurationSeconds)
+            .putString("user_id", state.userId)
             .apply()
     }
 
@@ -389,6 +395,7 @@ object IntakeSafeguardManager {
         val startTime = prefs.getLong("start_time", 0L)
         val targetTime = prefs.getLong("target_time", 0L)
         val durationSec = prefs.getInt("duration_sec", 120)
+        val userId = prefs.getString("user_id", null)
 
         val entryIds = entryIdsStr.split(",").filter { it.isNotBlank() }
         val medNames = medNamesStr.split("|||").filter { it.isNotBlank() }
@@ -401,7 +408,8 @@ object IntakeSafeguardManager {
             scheduledTime = scheduledTime,
             startTimestamp = startTime,
             targetTimestamp = targetTime,
-            totalDurationSeconds = durationSec
+            totalDurationSeconds = durationSec,
+            userId = userId
         )
     }
 

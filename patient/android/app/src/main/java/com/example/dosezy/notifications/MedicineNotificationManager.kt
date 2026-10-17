@@ -72,6 +72,7 @@ class MedicineNotificationManager @Inject constructor(
                 entry.scheduledDateTime.isAfter(activeWindowStart) &&
                 entry.scheduledDateTime.isBefore(activeWindowEnd)
             }
+            val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
             entriesToCancel.forEach { entry ->
                 // Guard: Pass entry directly to cancelAlarm to bypass sequential blocking DB lookups
                 alarmScheduler.cancelAlarm(entry)
@@ -80,7 +81,24 @@ class MedicineNotificationManager @Inject constructor(
                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
                 // Guard: Cancel any active intake safeguard alarms for this entry to prevent orphaned re-alerts
                 alarmScheduler.cancelIntakeSafeguardAlarm(entry.entryId)
+                // Guard: Dismiss active reminder notifications from shade when cancelling user alarms
+                nManager?.cancel(entry.entryId.hashCode())
             }
+            // Guard: Dismiss any active refill alert notifications for the user's medicines
+            try {
+                val userMeds = database.medicineDao().getMedicinesByUserDirect(userId)
+                userMeds.forEach { med ->
+                    nManager?.cancel((med.medicineId + "_refill").hashCode())
+                }
+            } catch (_: Exception) {}
+
+            // Guard: Dismiss active ADHD intake countdown notification if active countdown references cancelled user or entries
+            try {
+                val activeCountdown = IntakeSafeguardManager.activeCountdown.value
+                if (activeCountdown != null && (activeCountdown.userId == userId || entriesToCancel.any { it.entryId == activeCountdown.entryId || activeCountdown.entryIds.contains(it.entryId) })) {
+                    IntakeSafeguardManager.cancelCountdown(context)
+                }
+            } catch (_: Exception) {}
             Log.d(TAG, "Cancelled active window alarms for user: $userId (${entriesToCancel.size} active entries)")
         } catch (e: Exception) {
             Log.e(TAG, "Error cancelling alarms for user: $userId", e)

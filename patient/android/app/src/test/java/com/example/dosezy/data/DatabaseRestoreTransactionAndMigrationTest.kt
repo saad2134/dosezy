@@ -877,5 +877,76 @@ class DatabaseRestoreTransactionAndMigrationTest {
         val restoredSchedules = db.scheduleDao().getAllScheduleEntries("missing_user_1")
         assertTrue("Restored schedules must be populated and reconciled", restoredSchedules.isNotEmpty())
     }
+
+    @Test
+    fun testRestore_overwriteStrategy_dismissesExistingNotificationsAndRefillAlerts() = runBlocking {
+        val tempDir = File(context.cacheDir, "test_overwrite_notif_${System.currentTimeMillis()}")
+        val existingUser = User(
+            userId = "user_overwrite_notif",
+            fullName = "Overwrite User",
+            age = 35,
+            gender = Gender.FEMALE,
+            contactNumber = "1234567890",
+            isCurrentUser = true
+        )
+        db.userDao().insertUser(existingUser)
+        val existingMed = Medicine(
+            medicineId = "med_overwrite_notif",
+            userId = existingUser.userId,
+            medicationName = "Aspirin",
+            dosage = 100.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            startDate = LocalDate.now()
+        )
+        db.medicineDao().insertMedicine(existingMed)
+        val existingEntry = ScheduleEntry(
+            entryId = "entry_overwrite_notif",
+            userId = existingUser.userId,
+            medicineId = existingMed.medicineId,
+            scheduledDateTime = LocalDateTime.now().plusHours(2),
+            status = MedicationStatus.PENDING
+        )
+        db.scheduleDao().insertScheduleEntry(existingEntry)
+
+        val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+        nManager.notify(existingEntry.entryId.hashCode(), androidx.core.app.NotificationCompat.Builder(context, "test").setContentTitle("Reminder").setSmallIcon(android.R.drawable.ic_dialog_info).build())
+        nManager.notify((existingMed.medicineId + "_refill").hashCode(), androidx.core.app.NotificationCompat.Builder(context, "test").setContentTitle("Refill").setSmallIcon(android.R.drawable.ic_dialog_info).build())
+
+        assertTrue(nManager.activeNotifications.any { it.id == existingEntry.entryId.hashCode() })
+        assertTrue(nManager.activeNotifications.any { it.id == (existingMed.medicineId + "_refill").hashCode() })
+
+        // Prepare backup profile folder
+        val profileFolder = File(tempDir, "profiles/${existingUser.userId}").apply { mkdirs() }
+        File(profileFolder, "profile.json").writeText(testGson.toJson(existingUser.copy(fullName = "Restored Overwrite User")))
+        File(profileFolder, "medicines.json").writeText(testGson.toJson(listOf(existingMed)))
+        File(profileFolder, "schedules.json").writeText(testGson.toJson(listOf(existingEntry)))
+
+        val decision = ProfileImportDecision(
+            summary = ImportableProfileSummary(
+                originalUserId = existingUser.userId,
+                name = existingUser.fullName,
+                age = existingUser.age,
+                gender = existingUser.gender.name,
+                medicineCount = 1,
+                scheduleCount = 1,
+                avatarTempPath = null,
+                isConflict = true,
+                existingLocalUserId = existingUser.userId,
+                profileFolder = profileFolder
+            ),
+            isSelected = true,
+            conflictStrategy = ConflictStrategy.OVERWRITE
+        )
+
+        val restoreResult = backupManager.executeSelectiveRestore(tempDir, listOf(decision))
+        assertTrue(restoreResult.success)
+
+        // Verify notifications dismissed from shade
+        assertFalse("Entry reminder must be dismissed from shade on overwrite", nManager.activeNotifications.any { it.id == existingEntry.entryId.hashCode() })
+        assertFalse("Refill alert must be dismissed from shade on overwrite", nManager.activeNotifications.any { it.id == (existingMed.medicineId + "_refill").hashCode() })
+    }
 }
 

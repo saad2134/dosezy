@@ -94,7 +94,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             medicineNames: ArrayList<String>?,
             medicineDetails: List<Pair<String, String>> = emptyList(),
             scheduledTime: String?,
-            snoozeMinutes: Int = 10
+            snoozeMinutes: Int = 10,
+            userId: String? = null
         ) {
             MedicineAlarmReceiver().showNotification(
                 context = context,
@@ -108,7 +109,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 naggingCount = 0,
                 maxNagging = 3,
                 snoozeMinutes = snoozeMinutes,
-                isUpdateOnly = true
+                isUpdateOnly = true,
+                userId = userId
             )
         }
 
@@ -145,7 +147,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 naggingCount = 0,
                 maxNagging = user?.naggingMaxRepeats ?: 3,
                 snoozeMinutes = user?.snoozeDuration ?: 10,
-                isIntakeReAlert = true
+                isIntakeReAlert = true,
+                userId = user?.userId
             )
         }
     }
@@ -301,7 +304,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                         isNagging = isNagging,
                         naggingCount = naggingCount,
                         maxNagging = user?.naggingMaxRepeats ?: 3,
-                        snoozeMinutes = user?.snoozeDuration ?: 10
+                        snoozeMinutes = user?.snoozeDuration ?: 10,
+                        userId = primaryEntry.userId
                     )
 
                     // Schedule next follow-up nagging reminder if enabled and below limit
@@ -355,7 +359,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         maxNagging: Int = 3,
         snoozeMinutes: Int = 10,
         isUpdateOnly: Boolean = false,
-        isIntakeReAlert: Boolean = false
+        isIntakeReAlert: Boolean = false,
+        userId: String? = null
     ) {
         val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
         val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
@@ -382,10 +387,11 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             medicineName
         }
 
-        // Guard: Use SINGLE_TOP/CLEAR_TOP so clicking the notification delivers to onNewIntent or launches MainActivity with schedule route
+        // Guard: Use SINGLE_TOP/CLEAR_TOP with profile switch and route so clicking notification switches user and displays schedule
         val mainIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra("fragment", "schedule")
+            userId?.let { putExtra("switch_to_user_id", it) }
         }
 
         val pendingIntent = PendingIntent.getActivity(

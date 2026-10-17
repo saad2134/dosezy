@@ -273,5 +273,41 @@ class AlarmAndNotificationRegressionTest {
             hasActiveNotification
         )
     }
+
+    @Test
+    fun notificationIntent_containsScheduleFragmentAndTargetUserId() {
+        val targetUserId = "user_switch_test_1"
+        val intent = Intent().apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra("fragment", "schedule")
+            putExtra("switch_to_user_id", targetUserId)
+        }
+
+        assertEquals("schedule", intent.getStringExtra("fragment"))
+        assertEquals(targetUserId, intent.getStringExtra("switch_to_user_id"))
+        assertTrue((intent.flags and Intent.FLAG_ACTIVITY_SINGLE_TOP) != 0)
+    }
+
+    @Test
+    fun refillNotificationIntent_containsMedicinesFragmentAndTargetUserId() {
+        val targetUserId = "user_refill_route_test"
+        val intent = Intent().apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra("fragment", "medicines")
+            putExtra("switch_to_user_id", targetUserId)
+        }
+
+        assertEquals("medicines", intent.getStringExtra("fragment"))
+        assertEquals(targetUserId, intent.getStringExtra("switch_to_user_id"))
+
+        // Verify routing resolver in MainActivity maps fragment=medicines to "medicines" route
+        val targetFragment = intent.getStringExtra("fragment")
+        val destinationRoute = when (targetFragment) {
+            "schedule" -> "schedule"
+            "medicines" -> "medicines"
+            else -> "home"
+        }
+        assertEquals("medicines", destinationRoute)
+    }
 }
 

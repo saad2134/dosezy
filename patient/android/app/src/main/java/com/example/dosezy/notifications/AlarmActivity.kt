@@ -203,7 +203,8 @@ class AlarmActivity : ComponentActivity() {
                                     medicineName = currentMedName,
                                     medicineNames = medNames,
                                     scheduledTime = currentSchedTime,
-                                    durationSeconds = user.intakeCountdownSeconds
+                                    durationSeconds = user.intakeCountdownSeconds,
+                                    userId = user.userId
                                 )
                                 dismissAction()
                             } else {

@@ -855,6 +855,46 @@ class IntakeSafeguardManagerLifecycleTest {
             nManager.activeNotifications.any { it.id == entry.entryId.hashCode() }
         )
     }
+
+    @Test
+    fun testIntakeSafeguard_startCountdown_propagatesAndPersistsUserId() = runBlocking {
+        val entry = ScheduleEntry(
+            entryId = "entry_user_id_test",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = LocalDateTime.of(2026, 10, 17, 10, 0),
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entry)
+
+        val state = IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entry.entryId,
+            entryIds = listOf(entry.entryId),
+            medicineName = testMedicine.medicationName,
+            medicineNames = listOf(testMedicine.medicationName),
+            scheduledTime = "10:00 AM",
+            durationSeconds = 120,
+            userId = entry.userId
+        )
+
+        assertEquals(testUser.userId, state.userId)
+        assertEquals(testUser.userId, IntakeSafeguardManager.activeCountdown.value?.userId)
+
+        val prefs = context.getSharedPreferences("dosezy_intake_safeguard", Context.MODE_PRIVATE)
+        assertEquals(testUser.userId, prefs.getString("user_id", null))
+
+        // Verify notification intent contains switch_to_user_id
+        val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+        val statusBarNotif = nManager.activeNotifications.firstOrNull { it.id == IntakeSafeguardManager.INTAKE_NOTIFICATION_BASE_ID }
+        assertNotNull("Intake notification must be posted", statusBarNotif)
+        val shadowPi = org.robolectric.Shadows.shadowOf(statusBarNotif!!.notification.contentIntent)
+        assertEquals("schedule", shadowPi.savedIntent.getStringExtra("fragment"))
+        assertEquals(testUser.userId, shadowPi.savedIntent.getStringExtra("switch_to_user_id"))
+
+        // Cleanup
+        IntakeSafeguardManager.cancelCountdown(context)
+    }
 }
 
 

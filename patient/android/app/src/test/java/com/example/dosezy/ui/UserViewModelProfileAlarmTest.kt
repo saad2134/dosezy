@@ -11,6 +11,7 @@ import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.Language
 import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.Medicine
+import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.data.model.Theme
 import com.example.dosezy.data.model.TimeFormat
 import com.example.dosezy.data.model.User
@@ -480,6 +481,61 @@ class UserViewModelProfileAlarmTest {
         val currentUsers = allUsers.filter { it.isCurrentUser }
         assertEquals("Exactly one user should be current", 1, currentUsers.size)
         assertEquals("Current user must be the third user", thirdUser.userId, currentUsers.first().userId)
+    }
+
+    @Test
+    fun testDeleteUser_dismissesShadeNotificationsAndCancelsIntakeSafeguard() = runTest(testDispatcher) {
+        val userViewModel = UserViewModel(userRepository, medicineRepository, scheduleRepository, medicineNotificationManager)
+        userViewModel.addUser(testUser)
+        awaitCondition { userRepository.getUserByIdSync(testUser.userId) != null }
+
+        val med = Medicine(
+            medicineId = "med_del_notif",
+            userId = testUser.userId,
+            medicationName = "Amoxicillin",
+            dosage = 500.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            startDate = LocalDate.now()
+        )
+        db.medicineDao().insertMedicine(med)
+        val entry = ScheduleEntry(
+            entryId = "entry_del_notif",
+            userId = testUser.userId,
+            medicineId = med.medicineId,
+            scheduledDateTime = LocalDateTime.now().plusHours(1),
+            status = MedicationStatus.PENDING
+        )
+        db.scheduleDao().insertScheduleEntry(entry)
+
+        val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+        nManager.notify(entry.entryId.hashCode(), androidx.core.app.NotificationCompat.Builder(context, "test").setContentTitle("Reminder").setSmallIcon(android.R.drawable.ic_dialog_info).build())
+        nManager.notify((med.medicineId + "_refill").hashCode(), androidx.core.app.NotificationCompat.Builder(context, "test").setContentTitle("Refill").setSmallIcon(android.R.drawable.ic_dialog_info).build())
+
+        com.example.dosezy.notifications.IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entry.entryId,
+            entryIds = listOf(entry.entryId),
+            medicineName = med.medicationName,
+            medicineNames = listOf(med.medicationName),
+            scheduledTime = "10:00 AM",
+            durationSeconds = 120,
+            userId = testUser.userId
+        )
+        assertNotNull(com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value)
+
+        // Delete user
+        userViewModel.deleteUser(testUser)
+        awaitCondition { userRepository.getUserByIdSync(testUser.userId) == null }
+        advanceUntilIdle()
+
+        // Verify reminder and refill notifications dismissed from shade
+        assertFalse(nManager.activeNotifications.any { it.id == entry.entryId.hashCode() })
+        assertFalse(nManager.activeNotifications.any { it.id == (med.medicineId + "_refill").hashCode() })
+        // Verify active ADHD intake countdown is cancelled
+        assertNull(com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value)
     }
 }
 

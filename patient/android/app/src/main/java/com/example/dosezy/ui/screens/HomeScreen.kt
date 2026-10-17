@@ -252,7 +252,8 @@ fun HomeScreen(
                 medicineName = medName,
                 medicineNames = listOf(medName),
                 scheduledTime = scheduledTimeStr,
-                durationSeconds = currentUser?.intakeCountdownSeconds ?: 120
+                durationSeconds = currentUser?.intakeCountdownSeconds ?: 120,
+                userId = currentUser?.userId
             )
         } else {
             executeTakeDose(entryId, LocalDateTime.now(), null)
@@ -289,7 +290,8 @@ fun HomeScreen(
                 medicineName = medName,
                 medicineNames = listOf(medName),
                 scheduledTime = scheduledTimeStr,
-                durationSeconds = currentUser?.intakeCountdownSeconds ?: 120
+                durationSeconds = currentUser?.intakeCountdownSeconds ?: 120,
+                userId = currentUser?.userId
             )
         } else {
             executeTakeDose(entryId, LocalDateTime.now(), null)
@@ -670,7 +672,8 @@ fun HomeScreen(
                                 medicineName = medNames.firstOrNull() ?: "Medicine",
                                 medicineNames = medNames,
                                 scheduledTime = slotTime,
-                                durationSeconds = user.intakeCountdownSeconds
+                                durationSeconds = user.intakeCountdownSeconds,
+                                userId = user.userId
                             )
                         } else {
                             val now = LocalDateTime.now()

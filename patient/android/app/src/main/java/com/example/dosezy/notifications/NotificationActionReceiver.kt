@@ -141,7 +141,8 @@ class NotificationActionReceiver : BroadcastReceiver() {
                         medicineName = primaryMedName,
                         medicineNames = medicineNames,
                         scheduledTime = scheduledTimeStr,
-                        durationSeconds = user.intakeCountdownSeconds
+                        durationSeconds = user.intakeCountdownSeconds,
+                        userId = firstEntry.userId
                     )
                     Log.d(TAG, "Started intake countdown safeguard for ${allIds.size} medicines")
                     return

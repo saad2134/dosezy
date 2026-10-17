@@ -114,6 +114,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             entry.scheduledDateTime.isAfter(activeWindowStart) &&
             entry.scheduledDateTime.isBefore(activeWindowEnd)
         }
+        val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
         entriesToCancel.forEach { entry ->
             // Guard: Pass entry directly to cancelAlarm to bypass sequential blocking DB lookups
             alarmScheduler.cancelAlarm(entry)
@@ -122,7 +123,11 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
             // Guard: Cancel any active intake safeguard alarms for this entry to prevent orphaned re-alerts
             alarmScheduler.cancelIntakeSafeguardAlarm(entry.entryId)
+            // Guard: Dismiss active reminder notifications from shade when cancelling medicine alarms
+            nManager?.cancel(entry.entryId.hashCode())
         }
+        // Guard: Dismiss any active refill alert notification for deleted/archived medicine
+        nManager?.cancel((medicineId + "_refill").hashCode())
         // Guard: Dismiss active ADHD intake countdown notification if active countdown references deleted medicine
         try {
             val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
@@ -338,6 +343,9 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                             (previousEntry.medicineId + "_refill_click").hashCode(),
                             Intent(context, com.example.dosezy.MainActivity::class.java).apply {
                                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                // Guard: Pass target user ID and route to medicines screen so tapping refill alert switches profile and navigates to medication list
+                                putExtra("switch_to_user_id", previousEntry.userId)
+                                putExtra("fragment", "medicines")
                             },
                             android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
                         )
@@ -509,7 +517,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                                 medicineNames = activeMedNames,
                                 medicineDetails = medDetails,
                                 scheduledTime = formattedScheduledTime,
-                                snoozeMinutes = user?.snoozeDuration ?: 10
+                                snoozeMinutes = user?.snoozeDuration ?: 10,
+                                userId = entry.userId
                             )
 
                             // Guard: Re-arm nagging reminder if undone dose is overdue and nagging reminders are enabled (#BUG-03)
@@ -660,6 +669,9 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     (freshMedicine.medicineId + "_refill_click").hashCode(),
                     Intent(context, com.example.dosezy.MainActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        // Guard: Pass target user ID and route to medicines screen so tapping refill alert switches profile and navigates to medication list
+                        putExtra("switch_to_user_id", freshMedicine.userId)
+                        putExtra("fragment", "medicines")
                     },
                     android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
                 )

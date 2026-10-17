@@ -554,4 +554,78 @@ class RecordDoseMissedAndUndoTest {
         assertTrue("All generated schedule entries must be on or after today",
             schedules.all { !it.scheduledDateTime.toLocalDate().isBefore(today) })
     }
+
+    @Test
+    fun recordDoseTaken_refillAlertIntent_containsSwitchToUserIdAndMedicinesFragment() = runBlocking {
+        val refillMed = testMedicine.copy(
+            medicineId = "med_refill_intent_test",
+            currentStock = 2,
+            refillThreshold = 1,
+            autoDeductOnTake = true
+        )
+        db.medicineDao().insertMedicine(refillMed)
+        val entryId = "entry_refill_intent_test"
+        val scheduleEntry = ScheduleEntry(
+            entryId = entryId,
+            userId = testUser.userId,
+            medicineId = refillMed.medicineId,
+            scheduledDateTime = java.time.LocalDateTime.now(),
+            dosage = 1.0,
+            status = MedicationStatus.PENDING
+        )
+        db.scheduleDao().insertScheduleEntry(scheduleEntry)
+
+        scheduleRepository.recordDoseTaken(entryId, context = context)
+
+        val shadowNm = Shadows.shadowOf(notificationManager)
+        val notif = shadowNm.allNotifications.firstOrNull { it.channelId == MedicineAlarmReceiver.REFILL_CHANNEL_ID }
+        assertNotNull("Refill alert notification must be posted", notif)
+        val shadowPi = Shadows.shadowOf(notif!!.contentIntent)
+        assertEquals("medicines", shadowPi.savedIntent.getStringExtra("fragment"))
+        assertEquals(testUser.userId, shadowPi.savedIntent.getStringExtra("switch_to_user_id"))
+    }
+
+    @Test
+    fun cancelAlarmsForMedicine_dismissesActiveShadeNotificationsAndRefillAlert() = runBlocking {
+        val medId = "med_cancel_notif_test"
+        val entryId = "entry_cancel_notif_test"
+        val med = testMedicine.copy(medicineId = medId)
+        db.medicineDao().insertMedicine(med)
+        val entry = ScheduleEntry(
+            entryId = entryId,
+            userId = testUser.userId,
+            medicineId = medId,
+            scheduledDateTime = java.time.LocalDateTime.now().plusHours(1),
+            status = MedicationStatus.PENDING
+        )
+        db.scheduleDao().insertScheduleEntry(entry)
+
+        // Post active reminder and refill notifications in shade
+        notificationManager.notify(entryId.hashCode(), NotificationCompat.Builder(context, "test").setContentTitle("Dose").setSmallIcon(android.R.drawable.ic_dialog_info).build())
+        notificationManager.notify((medId + "_refill").hashCode(), NotificationCompat.Builder(context, "test").setContentTitle("Refill").setSmallIcon(android.R.drawable.ic_dialog_info).build())
+
+        assertTrue(notificationManager.activeNotifications.any { it.id == entryId.hashCode() })
+        assertTrue(notificationManager.activeNotifications.any { it.id == (medId + "_refill").hashCode() })
+
+        // Cancel alarms for medicine
+        scheduleRepository.cancelAlarmsForMedicine(medId, context)
+
+        // Verify both notifications were cancelled from shade
+        assertFalse("Entry reminder notification must be dismissed on medicine alarm cancel", notificationManager.activeNotifications.any { it.id == entryId.hashCode() })
+        assertFalse("Refill notification must be dismissed on medicine alarm cancel", notificationManager.activeNotifications.any { it.id == (medId + "_refill").hashCode() })
+    }
+
+    @Test
+    fun syncSlotNotificationAndAlarms_withNullEntry_dismissesEntryAndPrimaryNotifications() = runBlocking {
+        val entryId = "entry_null_sync_test"
+        notificationManager.notify(entryId.hashCode(), NotificationCompat.Builder(context, "test").setContentTitle("Dose").setSmallIcon(android.R.drawable.ic_dialog_info).build())
+
+        assertTrue(notificationManager.activeNotifications.any { it.id == entryId.hashCode() })
+
+        // Sync slot notifications with null entry (e.g. entry was deleted)
+        scheduleRepository.syncSlotNotificationAndAlarms(entryId, null, context)
+
+        // Verify notification is dismissed from shade
+        assertFalse("Notification must be dismissed even when entry is null", notificationManager.activeNotifications.any { it.id == entryId.hashCode() })
+    }
 }

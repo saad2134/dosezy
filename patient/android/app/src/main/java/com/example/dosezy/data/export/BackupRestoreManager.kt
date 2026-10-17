@@ -475,6 +475,7 @@ class BackupRestoreManager(
                         // Cancel existing alarms before deleting records to prevent orphaned alarms
                         try {
                             val alarmScheduler = com.example.dosezy.notifications.AlarmScheduler(context)
+                            val notifManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
                             val existingSchedules = scheduleRepository.getSchedulesByUserSync(targetUserId)
                             existingSchedules.forEach { entry ->
                                 // Guard: Pass entry directly to cancelAlarm to bypass sequential blocking DB lookups
@@ -484,6 +485,12 @@ class BackupRestoreManager(
                                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
                                 // Guard: Cancel any active intake safeguard alarms for this entry to prevent orphaned re-alerts
                                 alarmScheduler.cancelIntakeSafeguardAlarm(entry.entryId)
+                                // Guard: Dismiss active reminder notifications from shade when overwriting profile
+                                notifManager?.cancel(entry.entryId.hashCode())
+                            }
+                            val existingLocalMedsBefore = database.medicineDao().getMedicinesByUserDirect(targetUserId)
+                            existingLocalMedsBefore.forEach { med ->
+                                notifManager?.cancel((med.medicineId + "_refill").hashCode())
                             }
                             // Guard: Dismiss active ADHD intake countdown notification if active countdown references overwritten profile
                             val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
