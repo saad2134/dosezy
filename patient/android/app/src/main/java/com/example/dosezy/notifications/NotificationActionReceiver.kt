@@ -97,6 +97,10 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 // Guard: Cancel snooze alarm so taking medication prevents delayed phantom snooze triggers
                 alarmScheduler.cancelSnooze(id)
             }
+            if (action == "SNOOZE_ACTION") {
+                // Guard: Cancel active intake safeguard alarm for each entry to prevent orphaned re-alerts after snoozing (#104)
+                alarmScheduler.cancelIntakeSafeguardAlarm(id)
+            }
         }
 
         // Cancel notification for both Taken and Snooze actions
@@ -176,6 +180,14 @@ class NotificationActionReceiver : BroadcastReceiver() {
             }
             "SNOOZE_ACTION" -> {
                 Log.d(TAG, "Snoozing medicine reminder for ${allIds.size} entries")
+                // Guard: Reconcile and dismiss active ADHD intake countdown notification if snoozed entries match active countdown (#104)
+                try {
+                    val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
+                    if (activeCountdown != null && (allIds.contains(activeCountdown.entryId) || activeCountdown.entryIds.any { allIds.contains(it) })) {
+                        com.example.dosezy.notifications.IntakeSafeguardManager.cancelCountdown(context)
+                    }
+                } catch (_: Exception) {}
+
                 val firstEntry = database.scheduleDao().getScheduleEntryById(primaryEntryId)
                 val user = firstEntry?.let { database.userDao().getUserByIdDirect(it.userId) }
                 // Guard: Read explicit dynamic snooze duration from intent if passed, else fallback to user preference (#103)

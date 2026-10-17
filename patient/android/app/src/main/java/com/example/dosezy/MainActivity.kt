@@ -99,6 +99,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
+        // Guard: Synchronously handle profile switch intent extra on cold start to prevent profile jumpiness and initial state flickering
+        val targetUserId = intent.getStringExtra("switch_to_user_id")
+        if (!targetUserId.isNullOrBlank()) {
+            userViewModel.setCurrentUserById(targetUserId)
+        }
+
         // Guard: Parse initial launch intent extras to route directly to schedule screen on cold start
         val targetFragment = intent.getStringExtra("fragment")
         if (targetFragment == "schedule") {
@@ -132,9 +138,9 @@ class MainActivity : ComponentActivity() {
             val context = androidx.compose.ui.platform.LocalContext.current
 
             LaunchedEffect(intent) {
-                val targetUserId = intent.getStringExtra("switch_to_user_id")
-                if (!targetUserId.isNullOrBlank()) {
-                    userViewModel.setCurrentUserById(targetUserId)
+                val launchUserId = intent.getStringExtra("switch_to_user_id")
+                if (!launchUserId.isNullOrBlank()) {
+                    userViewModel.setCurrentUserById(launchUserId)
                 }
             }
 

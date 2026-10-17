@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -113,26 +114,28 @@ class AnalyticsViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            combine(_currentUser, _selectedRange) { user, range ->
-                user to range
-            }.flatMapLatest { (user, range) ->
+            // Guard: Decouple range selection from database re-queries so switching tabs selects from in-memory precomputed rangeDataList without cancelling and re-executing SQLite queries
+            _currentUser.flatMapLatest { user ->
                 if (user == null) {
-                    flowOf(AnalyticsUiState(isLoading = false, isEmpty = true, selectedRange = range))
+                    flowOf(AnalyticsUiState(isLoading = false, isEmpty = true, selectedRange = _selectedRange.value))
                 } else {
-                    scheduleRepository.getScheduleForUser(user.userId).combine(flowOf(range)) { entries, r ->
-                        calculateAnalytics(entries, user, r)
+                    scheduleRepository.getScheduleForUser(user.userId).map { entries ->
+                        calculateAnalytics(entries, user, _selectedRange.value)
                     }
                 }
             }.flowOn(Dispatchers.Default)
             .collect { state ->
-                _uiState.value = state
+                // Guard: Retain active range selection when fresh schedule entries are emitted by Room
+                val currentRange = _selectedRange.value
+                val matchingBreakdown = state.rangeDataList.find { it.range == currentRange }?.breakdown ?: state.breakdown
+                _uiState.value = state.copy(selectedRange = currentRange, breakdown = matchingBreakdown)
             }
         }
     }
 
     fun selectRange(range: AdherenceRange) {
         _selectedRange.value = range
-        // Guard: Synchronously update both selectedRange and breakdown to prevent metric cards flashing stale values
+        // Guard: Synchronously update selectedRange and matching breakdown from precomputed rangeDataList without re-querying SQLite
         val matchingBreakdown = _uiState.value.rangeDataList.find { it.range == range }?.breakdown ?: _uiState.value.breakdown
         _uiState.value = _uiState.value.copy(selectedRange = range, breakdown = matchingBreakdown)
     }

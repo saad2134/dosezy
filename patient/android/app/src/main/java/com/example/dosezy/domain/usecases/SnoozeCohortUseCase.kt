@@ -39,10 +39,22 @@ class SnoozeCohortUseCase @Inject constructor(
         if (entryIds.isEmpty()) return
         val alarmScheduler = AlarmScheduler(context)
 
-        // Cancel nagging reminders upfront
+        // Cancel nagging reminders and active safeguard alarms upfront
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
         entryIds.forEach { id ->
             alarmScheduler.cancelNagging(id)
+            // Guard: Cancel active intake safeguard alarm for each entry to prevent orphaned re-alerts during snooze interval (#104)
+            alarmScheduler.cancelIntakeSafeguardAlarm(id)
+            notificationManager?.cancel(id.hashCode())
         }
+
+        // Guard: Reconcile and dismiss active ADHD intake countdown notification if snoozed entries match active countdown
+        try {
+            val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
+            if (activeCountdown != null && (entryIds.contains(activeCountdown.entryId) || activeCountdown.entryIds.any { entryIds.contains(it) })) {
+                com.example.dosezy.notifications.IntakeSafeguardManager.cancelCountdown(context)
+            }
+        } catch (_: Exception) {}
 
         val finalSnoozeMinutes = if (explicitSnoozeMinutes != null && explicitSnoozeMinutes > 0) {
             explicitSnoozeMinutes
@@ -73,6 +85,10 @@ class SnoozeCohortUseCase @Inject constructor(
             medicineNames = names,
             timeFormat = user?.timeFormat
         )
+        // Guard: Refresh app widgets to reflect updated snooze status immediately
+        try {
+            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+        } catch (_: Exception) {}
         Log.d(TAG, "Scheduled snooze for ${entryIds.size} medicines for $finalSnoozeMinutes minutes")
     }
 }

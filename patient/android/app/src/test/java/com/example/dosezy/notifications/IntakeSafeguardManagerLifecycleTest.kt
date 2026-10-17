@@ -621,6 +621,48 @@ class IntakeSafeguardManagerLifecycleTest {
     }
 
     @Test
+    fun testNotificationActionReceiver_snoozeAction_cancelsActiveIntakeSafeguardCountdown() = runBlocking {
+        val entry = ScheduleEntry(
+            entryId = "entry_snooze_safeguard",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = LocalDateTime.now(),
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entry)
+
+        // 1. Start active intake countdown
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entry.entryId,
+            entryIds = listOf(entry.entryId),
+            medicineName = testMedicine.medicationName,
+            medicineNames = listOf(testMedicine.medicationName),
+            scheduledTime = "09:00 AM",
+            durationSeconds = 120
+        )
+        assertNotNull("Intake countdown must be active", IntakeSafeguardManager.activeCountdown.value)
+
+        // 2. Trigger SNOOZE_ACTION via NotificationActionReceiver
+        val receiver = NotificationActionReceiver()
+        val intent = Intent().apply {
+            action = "SNOOZE_ACTION"
+            putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, entry.entryId)
+            putExtra(MedicineAlarmReceiver.EXTRA_SNOOZE_MINUTES, 10)
+        }
+        receiver.onReceive(context, intent)
+
+        // Wait for Dispatchers.IO coroutine in receiver
+        for (i in 1..20) {
+            kotlinx.coroutines.delay(50)
+            if (IntakeSafeguardManager.activeCountdown.value == null) break
+        }
+
+        // 3. Guard assertion: Active intake countdown must be cancelled upon snoozing dose
+        assertNull("Active intake countdown must be cancelled on SNOOZE_ACTION", IntakeSafeguardManager.activeCountdown.value)
+    }
+
+    @Test
     fun testConfirmIntake_batchCohort_recordsAllEntriesTaken_andDismissesSlotNotificationsOnce() = runBlocking {
         val entry1 = ScheduleEntry(
             entryId = "entry_cohort_batch_1",

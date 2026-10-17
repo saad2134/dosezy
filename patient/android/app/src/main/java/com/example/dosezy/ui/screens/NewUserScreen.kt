@@ -57,6 +57,7 @@ import com.example.dosezy.ui.screens.newuser.ProfileSetupPage
 import com.example.dosezy.ui.screens.newuser.WelcomePage
 import com.example.dosezy.ui.viewmodels.NewUserViewModel
 import com.example.dosezy.ui.viewmodels.UserViewModel
+import com.example.dosezy.utils.sharedUserViewModel
 
 /**
  * Screen coordinating the multi-step user onboarding and profile creation flow.
@@ -69,7 +70,8 @@ fun NewUserScreen(
     onNext: (Int) -> Unit,
     @Suppress("UNUSED_PARAMETER") onSkip: () -> Unit = {},
     isCreatingNewProfile: Boolean = false,
-    userViewModel: UserViewModel = hiltViewModel(),
+    // Guard: Use activity-scoped sharedUserViewModel() so onboarding and profile creation mutations sync immediately across the entire app
+    userViewModel: UserViewModel = sharedUserViewModel(),
     newUserViewModel: NewUserViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current

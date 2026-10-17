@@ -121,28 +121,32 @@ fun detectDeviceEmergencyCountry(context: android.content.Context, userLanguage:
         com.example.dosezy.data.model.Language.CHINESE -> emergencyCountries.find { it.code == "CN" }
         com.example.dosezy.data.model.Language.JAPANESE -> emergencyCountries.find { it.code == "JP" }
         com.example.dosezy.data.model.Language.RUSSIAN -> emergencyCountries.find { it.code == "RU" }
+        // Guard: Portuguese language fallback favors Brazil profile over generic EU
+        com.example.dosezy.data.model.Language.PORTUGUESE -> emergencyCountries.find { it.code == "BR" } ?: emergencyCountries.find { it.code == "EU" }
         com.example.dosezy.data.model.Language.SPANISH,
         com.example.dosezy.data.model.Language.FRENCH,
         com.example.dosezy.data.model.Language.GERMAN,
-        com.example.dosezy.data.model.Language.ITALIAN,
-        com.example.dosezy.data.model.Language.PORTUGUESE -> emergencyCountries.find { it.code == "EU" }
+        com.example.dosezy.data.model.Language.ITALIAN -> emergencyCountries.find { it.code == "EU" }
         com.example.dosezy.data.model.Language.HINDI -> emergencyCountries.find { it.code == "IN" }
         else -> emergencyCountries.find { it.code == "US" }
     } ?: emergencyCountries.find { it.code == "GB" } ?: emergencyCountries.first()
 }
 
-private fun matchEmergencyCountryByIso(iso: String): CountryEmergency? {
+internal fun matchEmergencyCountryByIso(iso: String): CountryEmergency? {
     return when (iso) {
         "GB" -> emergencyCountries.find { it.code == "GB" }
-        "US", "CA" -> emergencyCountries.find { it.code == "US" }
+        // Guard: Map North and Central American 911 jurisdictions (e.g. Mexico MX) to US/CA 911 profile
+        "US", "CA", "MX", "CR", "PA", "DO", "EC", "UY" -> emergencyCountries.find { it.code == "US" }
         "IN" -> emergencyCountries.find { it.code == "IN" }
-        "AU" -> emergencyCountries.find { it.code == "AU" }
+        // Guard: Map Oceania jurisdictions using 000/111 to AU profile
+        "AU", "NZ" -> emergencyCountries.find { it.code == "AU" }
         "BD" -> emergencyCountries.find { it.code == "BD" }
         "BR" -> emergencyCountries.find { it.code == "BR" }
         "CN" -> emergencyCountries.find { it.code == "CN" }
         "JP" -> emergencyCountries.find { it.code == "JP" }
         "RU" -> emergencyCountries.find { it.code == "RU" }
-        "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "NO", "CH", "IS", "LI" -> emergencyCountries.find { it.code == "EU" }
+        // Guard: Map European 112 member and affiliated states to EU profile
+        "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "NO", "CH", "IS", "LI", "UA", "TR" -> emergencyCountries.find { it.code == "EU" }
         else -> null
     }
 }

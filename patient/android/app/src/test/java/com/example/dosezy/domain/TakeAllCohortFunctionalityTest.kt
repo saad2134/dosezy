@@ -22,6 +22,7 @@ import com.example.dosezy.data.repository.MedicineRepository
 import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.data.repository.UserRepository
 import com.example.dosezy.domain.usecases.SkipCohortUseCase
+import com.example.dosezy.domain.usecases.SnoozeCohortUseCase
 import com.example.dosezy.domain.usecases.TakeCohortUseCase
 import com.example.dosezy.notifications.IntakeSafeguardManager
 import com.example.dosezy.utils.TimeCalculationUtils
@@ -479,6 +480,38 @@ class TakeAllCohortFunctionalityTest {
 
         // 4. Guard assertion: Active intake countdown must be cancelled upon skipping dose
         assertNull("Active intake countdown must be cancelled upon skipping dose", IntakeSafeguardManager.activeCountdown.value)
+    }
+
+    @Test
+    fun testSnoozeCohortUseCase_cancelsActiveIntakeSafeguardCountdown() = runBlocking {
+        val entry = ScheduleEntry(
+            entryId = "entry_safeguard_cohort_snooze_usecase",
+            userId = testUser.userId,
+            medicineId = medA.medicineId,
+            scheduledDateTime = LocalDateTime.now(),
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        database.scheduleDao().insertScheduleEntry(entry)
+
+        // 1. Simulate user initiating an intake countdown
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entry.entryId,
+            entryIds = listOf(entry.entryId),
+            medicineName = medA.medicationName,
+            medicineNames = listOf(medA.medicationName),
+            scheduledTime = "08:00 AM",
+            durationSeconds = 120
+        )
+        assertNotNull("Intake countdown must be active", IntakeSafeguardManager.activeCountdown.value)
+
+        // 2. User snoozes the dose via SnoozeCohortUseCase
+        val snoozeCohortUseCase = SnoozeCohortUseCase(database, context)
+        snoozeCohortUseCase.invoke(listOf(entry.entryId), explicitSnoozeMinutes = 15, user = testUser)
+
+        // 3. Guard assertion: Active intake countdown must be cancelled upon snoozing dose so no premature re-alert fires
+        assertNull("Active intake countdown must be cancelled upon snoozing dose", IntakeSafeguardManager.activeCountdown.value)
     }
 
     @Test

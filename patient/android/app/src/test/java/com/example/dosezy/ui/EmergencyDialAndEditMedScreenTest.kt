@@ -12,6 +12,7 @@ import com.example.dosezy.data.model.DosageUnit
 import com.example.dosezy.data.model.Frequency
 import com.example.dosezy.data.model.FrequencyPattern
 import com.example.dosezy.data.model.Gender
+import com.example.dosezy.data.model.Language
 import com.example.dosezy.data.model.Medicine
 import com.example.dosezy.data.model.User
 import com.example.dosezy.data.model.normalizeArabicDigits
@@ -20,6 +21,8 @@ import com.example.dosezy.ui.subscreens.createDialIntent
 import com.example.dosezy.ui.subscreens.createSupportDialIntent
 import com.example.dosezy.ui.subscreens.createSupportEmailIntent
 import com.example.dosezy.ui.subscreens.createSupportUrlIntent
+import com.example.dosezy.ui.subscreens.detectDeviceEmergencyCountry
+import com.example.dosezy.ui.subscreens.matchEmergencyCountryByIso
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -462,6 +465,56 @@ class EmergencyDialAndEditMedScreenTest {
         val asNeededFrequency = FrequencyPattern.AS_NEEDED
         val customDosagesAsNeeded = if (asNeededFrequency == FrequencyPattern.AS_NEEDED) null else finalCustomDosages
         assertNull("Switching frequency to AS_NEEDED must clear customDosages to prevent leaking stale scheduled doses into PRN logs", customDosagesAsNeeded)
+    }
+
+    @Test
+    fun testEmergencyScreen_countryDetection_supportsExtended911RegionsAndPortugueseLanguage() {
+        // Test extended 911 regions map to US
+        val mxMatch = matchEmergencyCountryByIso("MX")
+        assertNotNull("MX must map to 911 profile", mxMatch)
+        assertEquals("US", mxMatch?.code)
+        assertEquals("911", mxMatch?.ambulance)
+
+        val crMatch = matchEmergencyCountryByIso("CR")
+        assertNotNull("CR must map to 911 profile", crMatch)
+        assertEquals("US", crMatch?.code)
+
+        val paMatch = matchEmergencyCountryByIso("PA")
+        assertNotNull("PA must map to 911 profile", paMatch)
+        assertEquals("US", paMatch?.code)
+
+        // Test NZ maps to AU profile
+        val nzMatch = matchEmergencyCountryByIso("NZ")
+        assertNotNull("NZ must map to AU profile", nzMatch)
+        assertEquals("AU", nzMatch?.code)
+        assertEquals("000", nzMatch?.ambulance)
+
+        // Test fallback when device country ISO is unavailable/unmatched:
+        // Use a Context with an unmapped locale country so step 1 and 2 do not match US by default
+        val configPt = android.content.res.Configuration(context.resources.configuration)
+        configPt.setLocale(java.util.Locale.forLanguageTag("pt"))
+        val ptContext = context.createConfigurationContext(configPt)
+
+        // Test Portuguese language fallback selects Brazil (BR)
+        val detectedPortuguese = detectDeviceEmergencyCountry(ptContext, Language.PORTUGUESE)
+        assertEquals("BR", detectedPortuguese.code)
+        assertEquals("192", detectedPortuguese.ambulance)
+
+        // Test Spanish language fallback selects EU
+        val configEs = android.content.res.Configuration(context.resources.configuration)
+        configEs.setLocale(java.util.Locale.forLanguageTag("es"))
+        val esContext = context.createConfigurationContext(configEs)
+        val detectedSpanish = detectDeviceEmergencyCountry(esContext, Language.SPANISH)
+        assertEquals("EU", detectedSpanish.code)
+        assertEquals("112", detectedSpanish.ambulance)
+
+        // Test English fallback selects US (911)
+        val configEn = android.content.res.Configuration(context.resources.configuration)
+        configEn.setLocale(java.util.Locale.forLanguageTag("en"))
+        val enContext = context.createConfigurationContext(configEn)
+        val detectedEnglish = detectDeviceEmergencyCountry(enContext, Language.ENGLISH)
+        assertEquals("US", detectedEnglish.code)
+        assertEquals("911", detectedEnglish.ambulance)
     }
 }
 

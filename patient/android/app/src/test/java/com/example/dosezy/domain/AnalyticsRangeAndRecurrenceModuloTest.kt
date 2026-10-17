@@ -309,5 +309,35 @@ class AnalyticsRangeAndRecurrenceModuloTest {
         val firstEntry = entries.first()
         assertTrue("First entry must start at or after pastRangeStart", !firstEntry.scheduledDateTime.toLocalDate().isBefore(pastRangeStart))
     }
+
+    @Test
+    fun testAnalyticsUiState_selectRange_updatesSelectedDataAndBreakdownFromPrecomputedList() {
+        val breakdown7Days = AnalyticsBreakdown(totalEntries = 7, takenOnTime = 6, takenLate = 0, missed = 1, skipped = 0, totalTaken = 6, totalDecided = 7)
+        val breakdownTotal = AnalyticsBreakdown(totalEntries = 50, takenOnTime = 40, takenLate = 5, missed = 5, skipped = 0, totalTaken = 45, totalDecided = 50)
+
+        val data7Days = RangeAdherenceData(AdherenceRange.LAST_7_DAYS, 6, 7, 7, 85, breakdown7Days)
+        val dataTotal = RangeAdherenceData(AdherenceRange.TOTAL, 45, 50, 50, 90, breakdownTotal)
+
+        val initialState = com.example.dosezy.ui.viewmodels.AnalyticsUiState(
+            isLoading = false,
+            isEmpty = false,
+            selectedRange = AdherenceRange.TOTAL,
+            rangeDataList = listOf(data7Days, dataTotal),
+            breakdown = breakdownTotal
+        )
+
+        assertEquals(AdherenceRange.TOTAL, initialState.selectedRange)
+        assertEquals(90, initialState.selectedData.rate)
+        assertEquals(50, initialState.breakdown.totalEntries)
+
+        // Switch to LAST_7_DAYS in-memory
+        val targetRange = AdherenceRange.LAST_7_DAYS
+        val matchingBreakdown = initialState.rangeDataList.find { it.range == targetRange }?.breakdown ?: initialState.breakdown
+        val updatedState = initialState.copy(selectedRange = targetRange, breakdown = matchingBreakdown)
+
+        assertEquals(AdherenceRange.LAST_7_DAYS, updatedState.selectedRange)
+        assertEquals(85, updatedState.selectedData.rate)
+        assertEquals(7, updatedState.breakdown.totalEntries)
+    }
 }
 
