@@ -14,6 +14,8 @@ import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.data.model.TimeFormat
 import java.time.LocalDateTime
 import java.time.ZoneId
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 
 class AlarmScheduler(private val context: Context) {
 
@@ -30,6 +32,37 @@ class AlarmScheduler(private val context: Context) {
             alarmManager.canScheduleExactAlarms()
         } else {
             true
+        }
+    }
+
+    // Guard: Route alarm clock click to schedule screen under the specific target user profile to prevent taking medicines under the wrong user
+    private fun createAlarmClockShowIntent(
+        requestCode: Int,
+        targetUserId: String? = null
+    ): PendingIntent {
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            targetUserId?.let { putExtra("switch_to_user_id", it) }
+            putExtra("fragment", "schedule")
+        }
+        return PendingIntent.getActivity(
+            context,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+
+    private fun resolveUserId(entryId: String): String? {
+        return try {
+            val db = com.example.dosezy.data.DosezyDatabase.getInstance(context)
+            runBlocking {
+                withTimeoutOrNull(300L) {
+                    db.scheduleDao().getScheduleEntryById(entryId)?.userId
+                }
+            }
+        } catch (_: Exception) {
+            null
         }
     }
 
@@ -89,11 +122,9 @@ class AlarmScheduler(private val context: Context) {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
-            val showIntent = PendingIntent.getActivity(
-                context,
+            val showIntent = createAlarmClockShowIntent(
                 slotKey.hashCode() + 500,
-                Intent(context, MainActivity::class.java),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                entries.firstOrNull()?.userId
             )
             alarmManager.setAlarmClock(
                 AlarmManager.AlarmClockInfo(triggerTime, showIntent),
@@ -123,8 +154,8 @@ class AlarmScheduler(private val context: Context) {
     }
 
     @SuppressLint("ScheduleExactAlarm")
-    fun scheduleSnooze(entryId: String, minutes: Int, medicineName: String, timeFormat: TimeFormat? = null) {
-        scheduleGroupedSnooze(listOf(entryId), minutes, listOf(medicineName), timeFormat = timeFormat)
+    fun scheduleSnooze(entryId: String, minutes: Int, medicineName: String, timeFormat: TimeFormat? = null, userId: String? = null) {
+        scheduleGroupedSnooze(listOf(entryId), minutes, listOf(medicineName), timeFormat = timeFormat, userId = userId)
     }
 
     @SuppressLint("ScheduleExactAlarm")
@@ -133,7 +164,8 @@ class AlarmScheduler(private val context: Context) {
         minutes: Int,
         medicineNames: List<String>,
         explicitTriggerTime: Long? = null,
-        timeFormat: TimeFormat? = null
+        timeFormat: TimeFormat? = null,
+        userId: String? = null
     ) {
         if (entryIds.isEmpty()) return
         val primaryId = entryIds.first()
@@ -180,11 +212,9 @@ class AlarmScheduler(private val context: Context) {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
-            val showIntent = PendingIntent.getActivity(
-                context,
+            val showIntent = createAlarmClockShowIntent(
                 primaryId.hashCode() + 1500,
-                Intent(context, MainActivity::class.java),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                userId ?: resolveUserId(primaryId)
             )
             alarmManager.setAlarmClock(
                 AlarmManager.AlarmClockInfo(triggerTime, showIntent),
@@ -419,7 +449,8 @@ class AlarmScheduler(private val context: Context) {
         entryIds: ArrayList<String>? = null,
         medicineNames: ArrayList<String>? = null,
         scheduledTime: String? = null,
-        explicitTriggerTime: Long? = null
+        explicitTriggerTime: Long? = null,
+        userId: String? = null
     ) {
         val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
             putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, entryId)
@@ -464,11 +495,9 @@ class AlarmScheduler(private val context: Context) {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
-            val showIntent = PendingIntent.getActivity(
-                context,
+            val showIntent = createAlarmClockShowIntent(
                 entryId.hashCode() + 2500,
-                Intent(context, MainActivity::class.java),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                userId ?: resolveUserId(entryId)
             )
             alarmManager.setAlarmClock(
                 AlarmManager.AlarmClockInfo(triggerTime, showIntent),
@@ -627,7 +656,8 @@ class AlarmScheduler(private val context: Context) {
         medicineName: String,
         entryIds: ArrayList<String>? = null,
         medicineNames: ArrayList<String>? = null,
-        scheduledTime: String? = null
+        scheduledTime: String? = null,
+        userId: String? = null
     ) {
         val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
             action = MedicineAlarmReceiver.ACTION_INTAKE_SAFEGUARD_EXPIRED
@@ -652,11 +682,9 @@ class AlarmScheduler(private val context: Context) {
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
-            val showIntent = PendingIntent.getActivity(
-                context,
+            val showIntent = createAlarmClockShowIntent(
                 entryId.hashCode() + 3500,
-                Intent(context, MainActivity::class.java),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                userId ?: resolveUserId(entryId)
             )
             alarmManager.setAlarmClock(
                 AlarmManager.AlarmClockInfo(triggerTime, showIntent),

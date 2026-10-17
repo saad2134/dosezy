@@ -86,6 +86,14 @@ class MedicineRepository @Inject constructor(
         // Update the medicine metadata
         database.medicineDao().updateMedicine(medicine)
 
+        // Guard: Dismiss active refill warning notification from shade when stock is replenished above refill threshold
+        val currentStock = medicine.currentStock
+        val threshold = medicine.refillThreshold ?: 0
+        if (currentStock != null && currentStock > threshold) {
+            val nManager = this.context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
+            nManager?.cancel((medicine.medicineId + "_refill").hashCode())
+        }
+
         if (oldMedicine != null) {
             val scheduleChanged = oldMedicine.scheduledTimes != medicine.scheduledTimes ||
                     oldMedicine.frequency != medicine.frequency ||

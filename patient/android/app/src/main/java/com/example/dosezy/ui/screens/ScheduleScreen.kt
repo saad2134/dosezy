@@ -43,6 +43,7 @@ import com.example.dosezy.ui.theme.DosezyTheme
 import com.example.dosezy.ui.viewmodels.ScheduleViewModel
 import com.example.dosezy.ui.viewmodels.UserViewModel
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.delay
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -58,13 +59,26 @@ fun ScheduleScreen(navController: NavController) {
     // Get user's time format preference
     val timeFormat = currentUser?.timeFormat ?: TimeFormat.HOUR_12
 
-    // Auto-mark missed medications when user changes
+    // Auto-refresh every minute for real-time updates and check midnight date transition
     LaunchedEffect(currentUser) {
+        // Guard: Check midnight date transition on launch and user change to avoid displaying yesterday's doses
+        scheduleViewModel.checkMidnightDateTransition()
         currentUser?.let { user ->
             scheduleViewModel.autoMarkMissedMedications(
                 user.userId,
                 user.considerMissedAfter
             )
+        }
+        while (true) {
+            delay(60000)
+            // Guard: Reconnect schedule and calendar date on midnight transition to avoid displaying yesterday's doses
+            scheduleViewModel.checkMidnightDateTransition()
+            currentUser?.let { user ->
+                scheduleViewModel.autoMarkMissedMedications(
+                    user.userId,
+                    user.considerMissedAfter
+                )
+            }
         }
     }
 

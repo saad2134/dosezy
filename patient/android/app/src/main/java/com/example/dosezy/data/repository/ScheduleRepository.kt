@@ -466,6 +466,13 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     val remainingPending = slotEntries.filter { !it.entryId.startsWith("PRN_") && it.status == MedicationStatus.PENDING && (entry.status == MedicationStatus.PENDING || it.entryId != entryId) }
 
                     if (remainingPending.isEmpty()) {
+                        // Guard: Cancel exact slot alarm and entry alarms from AlarmManager when all slot doses are resolved to remove lockscreen alarm icon and prevent phantom CPU wakeups
+                        try {
+                            val alarmScheduler = AlarmScheduler(context)
+                            alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
+                            slotEntries.forEach { alarmScheduler.cancelAlarm(it) }
+                        } catch (_: Exception) {}
+
                         // All medications in this slot are handled: cancel notification for entry, primary, and all slot items
                         nManager.cancel(entryId.hashCode())
                         if (primaryId != null) nManager.cancel(primaryId.hashCode())
@@ -532,7 +539,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                                         naggingCount = 1,
                                         entryIds = activeEntryIds,
                                         medicineNames = activeMedNames,
-                                        scheduledTime = formattedScheduledTime
+                                        scheduledTime = formattedScheduledTime,
+                                        userId = newPrimary.userId
                                     )
                                 } catch (ex: Exception) {
                                     Log.e(TAG, "Error scheduling nagging reminder on undoDoseTaken", ex)
@@ -586,6 +594,12 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     val updatedMedicine = medicine.copy(currentStock = restoredStock)
                     database.medicineDao().updateMedicine(updatedMedicine)
                     Log.d(TAG, "Restored stock for ${medicine.medicationName}: ${medicine.currentStock} -> $restoredStock on undo (restored $addAmount)")
+
+                    // Guard: Dismiss active refill alert notification from shade when undo restores inventory above refill threshold
+                    if (restoredStock > (medicine.refillThreshold ?: 0)) {
+                        val nManager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
+                        nManager?.cancel((previousEntry.medicineId + "_refill").hashCode())
+                    }
                 }
             } catch (ex: Exception) {
                 Log.e(TAG, "Error reverting stock in undoDoseTaken", ex)

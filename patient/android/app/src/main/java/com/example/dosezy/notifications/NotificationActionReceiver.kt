@@ -201,8 +201,8 @@ class NotificationActionReceiver : BroadcastReceiver() {
                     med?.medicationName
                 }
 
-                // Guard: Pass user's timeFormat so snoozed alarm time matches user's 12h/24h preference
-                alarmScheduler.scheduleGroupedSnooze(allIds, snoozeMinutes, medicineNames, timeFormat = user?.timeFormat)
+                // Guard: Pass user's timeFormat and userId so snoozed alarm matches time format and routes to correct profile on tap
+                alarmScheduler.scheduleGroupedSnooze(allIds, snoozeMinutes, medicineNames, timeFormat = user?.timeFormat, userId = user?.userId)
                 Log.d(TAG, "Medicine reminder snoozed for $snoozeMinutes minutes for ${allIds.size} entries")
                 try {
                     com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)

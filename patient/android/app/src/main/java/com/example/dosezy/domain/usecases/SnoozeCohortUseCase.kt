@@ -83,7 +83,8 @@ class SnoozeCohortUseCase @Inject constructor(
             entryIds = entryIds,
             minutes = finalSnoozeMinutes,
             medicineNames = names,
-            timeFormat = user?.timeFormat
+            timeFormat = user?.timeFormat,
+            userId = user?.userId
         )
         // Guard: Refresh app widgets to reflect updated snooze status immediately
         try {

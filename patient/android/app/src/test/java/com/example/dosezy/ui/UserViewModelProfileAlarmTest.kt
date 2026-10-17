@@ -526,9 +526,12 @@ class UserViewModelProfileAlarmTest {
         )
         assertNotNull(com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value)
 
+        com.example.dosezy.widget.DosezyWidgetPrefs.saveAppWidgetUser(context, 777, testUser.userId)
+        assertEquals(testUser.userId, com.example.dosezy.widget.DosezyWidgetPrefs.getAppWidgetUser(context, 777))
+
         // Delete user
         userViewModel.deleteUser(testUser)
-        awaitCondition { userRepository.getUserByIdSync(testUser.userId) == null }
+        awaitCondition { userRepository.getUserByIdSync(testUser.userId) == null && com.example.dosezy.widget.DosezyWidgetPrefs.getAppWidgetUser(context, 777) == null }
         advanceUntilIdle()
 
         // Verify reminder and refill notifications dismissed from shade
@@ -536,6 +539,8 @@ class UserViewModelProfileAlarmTest {
         assertFalse(nManager.activeNotifications.any { it.id == (med.medicineId + "_refill").hashCode() })
         // Verify active ADHD intake countdown is cancelled
         assertNull(com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value)
+        // Verify app widget user binding is cleared
+        assertNull(com.example.dosezy.widget.DosezyWidgetPrefs.getAppWidgetUser(context, 777))
     }
 }
 

@@ -128,7 +128,8 @@ object IntakeSafeguardManager {
             medicineName = medicineName,
             entryIds = ArrayList(state.entryIds),
             medicineNames = ArrayList(state.medicineNames),
-            scheduledTime = scheduledTime
+            scheduledTime = scheduledTime,
+            userId = state.userId
         )
 
         showIntakeNotification(context, state)
@@ -157,7 +158,8 @@ object IntakeSafeguardManager {
             medicineName = current.medicineName,
             entryIds = ArrayList(current.entryIds),
             medicineNames = ArrayList(current.medicineNames),
-            scheduledTime = current.scheduledTime
+            scheduledTime = current.scheduledTime,
+            userId = current.userId
         )
 
         showIntakeNotification(context, updated)

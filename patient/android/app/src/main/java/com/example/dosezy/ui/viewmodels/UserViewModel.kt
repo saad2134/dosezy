@@ -253,9 +253,6 @@ class UserViewModel @Inject constructor(
                         }
                     } catch (_: Exception) {}
 
-                    // Delete the user from DB (cascades to medicines & schedules)
-                    userRepository.deleteUser(user)
-
                     // Guard: Scrub orphaned emergency contacts, emergency preferences, and widget profile preferences for the deleted profile to prevent SharedPreferences leakage
                     try {
                         val emPrefs = context.getSharedPreferences("emergency_contacts", android.content.Context.MODE_PRIVATE)
@@ -268,8 +265,12 @@ class UserViewModel @Inject constructor(
                     } catch (_: Exception) {}
 
                     try {
-                        com.example.dosezy.widget.DosezyWidgetPrefs.deleteWidgetProfileTheme(context, user.userId)
+                        // Guard: Scrub orphaned widget preferences and unbind widgets from deleted user to prevent SharedPreferences leakage and stale widget bindings
+                        com.example.dosezy.widget.DosezyWidgetPrefs.deleteWidgetPreferencesForUser(context, user.userId)
                     } catch (_: Exception) {}
+
+                    // Delete the user from DB (cascades to medicines & schedules)
+                    userRepository.deleteUser(user)
 
                     // Fetch remaining users directly from DB
                     val remainingUsers = userRepository.getAllUsersList().filter { it.userId != user.userId }

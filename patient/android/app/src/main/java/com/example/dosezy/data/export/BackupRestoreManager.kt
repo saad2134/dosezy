@@ -788,8 +788,9 @@ class BackupRestoreManager(
 
             tempDir.deleteRecursively()
 
+            // Guard: Require totalProfiles > 0 for success to prevent zero-profile imports from falsely reporting success or advancing onboarding
             return@withContext BackupResult(
-                success = true,
+                success = totalProfiles > 0,
                 profilesRestored = totalProfiles,
                 medicinesRestored = totalMedicines,
                 schedulesRestored = totalSchedules,

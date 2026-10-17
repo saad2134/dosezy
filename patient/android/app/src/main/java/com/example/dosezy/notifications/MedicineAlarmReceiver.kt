@@ -318,7 +318,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                             naggingCount = naggingCount + 1,
                             entryIds = activeEntryIds,
                             medicineNames = activeMedicineNames,
-                            scheduledTime = formattedScheduledTime
+                            scheduledTime = formattedScheduledTime,
+                            userId = primaryEntry.userId
                         )
                     }
                 } catch (ex: Exception) {

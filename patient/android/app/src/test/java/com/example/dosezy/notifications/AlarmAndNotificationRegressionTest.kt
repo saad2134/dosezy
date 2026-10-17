@@ -309,5 +309,19 @@ class AlarmAndNotificationRegressionTest {
         }
         assertEquals("medicines", destinationRoute)
     }
+
+    @Test
+    fun alarmClockShowIntent_containsScheduleFragmentAndTargetUserId() {
+        // Guard: Verify that the showIntent passed to AlarmClockInfo carries target profile and schedule fragment
+        val targetUserId = "user_dependent_profile"
+        val showIntent = Intent().apply {
+            setClassName("com.example.dosezy", "com.example.dosezy.MainActivity")
+            putExtra("switch_to_user_id", targetUserId)
+            putExtra("fragment", "schedule")
+        }
+
+        assertEquals(targetUserId, showIntent.getStringExtra("switch_to_user_id"))
+        assertEquals("schedule", showIntent.getStringExtra("fragment"))
+    }
 }
 

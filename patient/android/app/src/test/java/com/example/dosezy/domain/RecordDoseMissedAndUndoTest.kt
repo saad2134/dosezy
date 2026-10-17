@@ -22,7 +22,10 @@ import com.example.dosezy.data.model.TimeFormat
 import com.example.dosezy.data.model.User
 import com.example.dosezy.data.repository.MedicineRepository
 import com.example.dosezy.data.repository.ScheduleRepository
+import android.app.PendingIntent
+import android.content.Intent
 import com.example.dosezy.data.repository.UserRepository
+import com.example.dosezy.notifications.AlarmScheduler
 import com.example.dosezy.notifications.MedicineAlarmReceiver
 import kotlinx.coroutines.runBlocking
 import org.json.JSONArray
@@ -31,6 +34,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -627,5 +631,120 @@ class RecordDoseMissedAndUndoTest {
 
         // Verify notification is dismissed from shade
         assertFalse("Notification must be dismissed even when entry is null", notificationManager.activeNotifications.any { it.id == entryId.hashCode() })
+    }
+
+    @Test
+    fun undoDoseTaken_dismissesRefillAlert_whenRestoredStockExceedsThreshold() = runBlocking {
+        // Guard: Verify that undoing a dose when restored stock exceeds threshold dismisses active refill alert from shade
+        val medId = "med_undo_refill_dismiss_test"
+        val entryId = "entry_undo_refill_dismiss_test"
+        val med = testMedicine.copy(
+            medicineId = medId,
+            currentStock = 5,
+            refillThreshold = 4,
+            autoDeductOnTake = true
+        )
+        db.medicineDao().insertMedicine(med)
+        val entry = ScheduleEntry(
+            entryId = entryId,
+            userId = testUser.userId,
+            medicineId = medId,
+            scheduledDateTime = LocalDateTime.now().minusMinutes(5),
+            status = MedicationStatus.PENDING
+        )
+        db.scheduleDao().insertScheduleEntry(entry)
+
+        // Taking dose decrements stock from 5 to 4 (<= threshold 4) and triggers refill alert notification
+        scheduleRepository.recordDoseTaken(entryId, context = context)
+        val refillNotifId = (medId + "_refill").hashCode()
+        assertTrue(
+            "Refill notification must be posted when stock falls to 4 (threshold 4)",
+            notificationManager.activeNotifications.any { it.id == refillNotifId }
+        )
+
+        // Undo intake restores stock from 4 back to 5 (> threshold 4)
+        scheduleRepository.undoDoseTaken(entryId, context)
+        assertFalse(
+            "Refill notification must be dismissed after undo restores stock above threshold",
+            notificationManager.activeNotifications.any { it.id == refillNotifId }
+        )
+        val updatedMed = db.medicineDao().getMedicineByIdDirect(medId)
+        assertEquals(5, updatedMed?.currentStock)
+    }
+
+    @Test
+    fun updateMedicine_dismissesRefillAlert_whenReplenishedStockExceedsThreshold() = runBlocking {
+        // Guard: Verify that replenishing medication stock above refill threshold clears any active shade notification
+        val medId = "med_update_refill_dismiss_test"
+        val med = testMedicine.copy(
+            medicineId = medId,
+            currentStock = 2,
+            refillThreshold = 5
+        )
+        db.medicineDao().insertMedicine(med)
+
+        val refillNotifId = (medId + "_refill").hashCode()
+        notificationManager.notify(
+            refillNotifId,
+            NotificationCompat.Builder(context, "test")
+                .setContentTitle("Low Stock Warning")
+                .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                .build()
+        )
+        assertTrue("Refill notification should be active before replenish", notificationManager.activeNotifications.any { it.id == refillNotifId })
+
+        // Replenish stock via updateMedicine (e.g. quick refill +30)
+        medicineRepository.updateMedicine(med.copy(currentStock = 32))
+
+        assertFalse(
+            "Refill alert must be dismissed from shade when stock is replenished above threshold",
+            notificationManager.activeNotifications.any { it.id == refillNotifId }
+        )
+    }
+
+    @Test
+    fun syncSlotNotificationAndAlarms_cancelsSlotAlarmInAlarmManager_whenAllSlotDosesAreTaken() = runBlocking {
+        // Guard: Verify that when all medications in a slot are taken, AlarmScheduler cancels the exact slot alarm in AlarmManager
+        val slotTime = LocalDateTime.now().plusHours(2).withSecond(0).withNano(0)
+        val entry1 = ScheduleEntry(
+            entryId = "entry_slot_cancel_1",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.TAKEN_ON_TIME
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_slot_cancel_2",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.TAKEN_ON_TIME
+        )
+        db.scheduleDao().insertScheduleEntry(entry1)
+        db.scheduleDao().insertScheduleEntry(entry2)
+
+        val alarmScheduler = AlarmScheduler(context)
+        alarmScheduler.scheduleGroupedMedicineAlarm(slotTime, listOf(entry1, entry2), listOf(testMedicine.medicationName))
+
+        val slotKey = "${testUser.userId}_${slotTime}"
+        val alarmIntent = Intent(context, MedicineAlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            slotKey.hashCode(),
+            alarmIntent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+        )
+        assertNotNull("Slot alarm PendingIntent must exist before cancellation", pendingIntent)
+
+        // Call syncSlotNotificationAndAlarms with all entries taken
+        scheduleRepository.syncSlotNotificationAndAlarms(entry1.entryId, entry1, context)
+
+        val cancelledPendingIntent = PendingIntent.getBroadcast(
+            context,
+            slotKey.hashCode(),
+            alarmIntent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+        )
+        assertNull("Slot alarm PendingIntent must be cancelled when all slot doses are taken", cancelledPendingIntent)
     }
 }

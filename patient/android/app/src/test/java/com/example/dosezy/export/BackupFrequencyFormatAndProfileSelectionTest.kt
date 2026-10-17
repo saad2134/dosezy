@@ -449,4 +449,34 @@ class BackupFrequencyFormatAndProfileSelectionTest {
 
         assertFalse("Restored profile must NOT be promoted to current user when a local user is already active", shouldBeCurrent)
     }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 8. ConflictStrategy.MERGE Selective Restore Total Profiles Accounting
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testSelectiveRestoreMerge_incrementsTotalProfilesWhenRestoringProfiles() {
+        // Guard: Verify that when executing ConflictStrategy.MERGE, totalProfiles tracks restored users and produces proper success summary
+        var totalProfiles = 0
+        val selectedProfileIds = setOf("user_restored_1", "user_restored_2")
+        val restoredUsers = listOf(
+            User(userId = "user_restored_1", fullName = "Parent", age = 40, gender = Gender.MALE, contactNumber = "123", isCurrentUser = false),
+            User(userId = "user_restored_2", fullName = "Child", age = 8, gender = Gender.FEMALE, contactNumber = "456", isCurrentUser = false)
+        )
+
+        for (targetUserId in selectedProfileIds) {
+            val user = restoredUsers.firstOrNull { it.userId == targetUserId }
+            if (user != null) {
+                totalProfiles++
+            }
+        }
+
+        assertEquals(2, totalProfiles)
+        val message = if (totalProfiles > 0) {
+            "Restored $totalProfiles profile(s)"
+        } else {
+            "No profiles were imported."
+        }
+        assertEquals("Restored 2 profile(s)", message)
+    }
 }

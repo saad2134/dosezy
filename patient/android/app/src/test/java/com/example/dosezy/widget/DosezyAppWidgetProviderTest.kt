@@ -158,5 +158,29 @@ class DosezyAppWidgetProviderTest {
         val scheduledPrnOnly = prnOnlyToday.filter { !it.entryId.startsWith("PRN_") }
         assertTrue("Scheduled list must be empty when only PRN doses were taken", scheduledPrnOnly.isEmpty())
     }
+
+    @Test
+    fun testDeleteWidgetPreferencesForUser_removesWidgetBindingsAndProfileTheme() {
+        // Guard: Verify that deleting a user profile clears both theme overrides and appwidget_user_<id> bindings
+        val deletedUserId = "user_to_delete"
+        val remainingUserId = "user_to_keep"
+
+        // Set up widget configurations
+        DosezyWidgetPrefs.saveAppWidgetUser(context, 101, deletedUserId)
+        DosezyWidgetPrefs.saveAppWidgetUser(context, 102, remainingUserId)
+        DosezyWidgetPrefs.saveWidgetProfileTheme(context, deletedUserId, "dark", isCurrentProfile = false)
+        DosezyWidgetPrefs.saveWidgetProfileTheme(context, remainingUserId, "light", isCurrentProfile = false)
+
+        assertEquals(deletedUserId, DosezyWidgetPrefs.getAppWidgetUser(context, 101))
+        assertEquals(remainingUserId, DosezyWidgetPrefs.getAppWidgetUser(context, 102))
+
+        // Trigger cleanup
+        DosezyWidgetPrefs.deleteWidgetPreferencesForUser(context, deletedUserId)
+
+        // Verify deleted user's widget binding was cleared (now falls back to null/default)
+        org.junit.Assert.assertNull(DosezyWidgetPrefs.getAppWidgetUser(context, 101))
+        // Verify remaining user's widget binding is untouched
+        assertEquals(remainingUserId, DosezyWidgetPrefs.getAppWidgetUser(context, 102))
+    }
 }
 
