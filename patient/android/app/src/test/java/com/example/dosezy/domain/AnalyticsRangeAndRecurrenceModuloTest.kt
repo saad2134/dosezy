@@ -286,4 +286,28 @@ class AnalyticsRangeAndRecurrenceModuloTest {
         val futureEntries = generatedEntries.filter { !it.scheduledDateTime.isBefore(cutoff) }
         assertTrue("Future reminder entries must be scheduled", futureEntries.isNotEmpty())
     }
+
+    @Test
+    fun testScheduleRecurrenceEngine_everyXHours_pastStartDateRange_alignsSymmetrically() {
+        val medicine = Medicine(
+            medicineId = "med_x_hours_past",
+            userId = "usr_x",
+            medicationName = "Hydration Solution",
+            dosage = 250.0,
+            dosageUnit = DosageUnit.ML,
+            timesPerDay = 6,
+            frequency = Frequency(pattern = FrequencyPattern.EVERY_X_HOURS, intervalHours = 4),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            startDate = null // baseAnchor is anchored to 2020-01-01T08:00
+        )
+
+        // Start date range is in 2019 (before 2020-01-01 baseAnchor)
+        val pastRangeStart = LocalDate.of(2019, 12, 28)
+        val entries = ScheduleRecurrenceEngine.generateScheduleEntries(medicine, pastRangeStart, 2)
+
+        assertTrue("Recurrence engine must generate entries even for ranges starting before 2020 baseAnchor", entries.isNotEmpty())
+        val firstEntry = entries.first()
+        assertTrue("First entry must start at or after pastRangeStart", !firstEntry.scheduledDateTime.toLocalDate().isBefore(pastRangeStart))
+    }
 }
+

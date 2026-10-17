@@ -282,4 +282,54 @@ class AlarmAudioPlayerAnd24HourFormatTest {
         assertEquals("30 Jahre • Männlich", germanAgeGender)
         assertEquals("Profil", germanContext.getString(R.string.profile))
     }
+
+    // ───────────────────────────────────────────────────────────────
+    // Issue 4: AlarmAudioPlayer Continuous Looping Upgrade & Watchdog
+    // ───────────────────────────────────────────────────────────────
+
+    @Test
+    fun issue4_alarmAudioPlayer_continuousAlarm_upgradesNonLoopingPlayer() {
+        val mockPlayer = mockk<MediaPlayer>(relaxed = true)
+        every { mockPlayer.isPlaying } returns true
+        var looping = false
+        every { mockPlayer.isLooping } answers { looping }
+        every { mockPlayer.isLooping = any() } answers { looping = firstArg() }
+
+        val field = AlarmAudioPlayer::class.java.getDeclaredField("mediaPlayer")
+        field.isAccessible = true
+        field.set(null, mockPlayer)
+
+        try {
+            // Incoming continuous loop alarm arrives while non-looping audio is active
+            AlarmAudioPlayer.play(context, com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT, autoSilenceSeconds = 0)
+
+            // Verify player was upgraded to looping and completion listener detached
+            assertTrue("MediaPlayer must be upgraded to isLooping = true", looping)
+            verify { mockPlayer.setOnCompletionListener(null) }
+        } finally {
+            AlarmAudioPlayer.stop()
+        }
+    }
+
+    @Test
+    fun issue4_alarmAudioPlayer_singlePlayAlarm_schedulesWatchdogTimeout() {
+        val mockPlayer = mockk<MediaPlayer>(relaxed = true)
+        every { mockPlayer.isPlaying } returns true
+        val field = AlarmAudioPlayer::class.java.getDeclaredField("mediaPlayer")
+        field.isAccessible = true
+        field.set(null, mockPlayer)
+
+        val jobField = AlarmAudioPlayer::class.java.getDeclaredField("autoSilenceJob")
+        jobField.isAccessible = true
+
+        try {
+            AlarmAudioPlayer.play(context, com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT, autoSilenceSeconds = -1)
+            val job = jobField.get(null) as? kotlinx.coroutines.Job
+            assertNotNull("autoSilenceJob watchdog must be scheduled for autoSilenceSeconds = -1", job)
+            assertTrue("watchdog job must be active", job?.isActive == true)
+        } finally {
+            AlarmAudioPlayer.stop()
+        }
+    }
 }
+

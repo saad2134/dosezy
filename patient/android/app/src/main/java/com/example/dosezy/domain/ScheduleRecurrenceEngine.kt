@@ -74,6 +74,17 @@ object ScheduleRecurrenceEngine {
                 while (cursor.isBefore(effectiveStart.atStartOfDay())) {
                     cursor = cursor.plusHours(interval.toLong())
                 }
+            } else if (medicine.startDate == null && cursor.isAfter(effectiveStart.atStartOfDay())) {
+                // Guard: Step cursor backward in interval multiples when baseAnchor is after effectiveStart to align timeline symmetrically
+                val hoursDiff = java.time.Duration.between(effectiveStart.atStartOfDay(), cursor).toHours()
+                val steps = (hoursDiff / interval).coerceAtLeast(0)
+                cursor = cursor.minusHours(steps * interval)
+                while (cursor.isAfter(effectiveStart.atStartOfDay())) {
+                    cursor = cursor.minusHours(interval.toLong())
+                }
+                while (cursor.isBefore(effectiveStart.atStartOfDay())) {
+                    cursor = cursor.plusHours(interval.toLong())
+                }
             }
 
             val endDateTime = effectiveEnd.atTime(LocalTime.MAX)

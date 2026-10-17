@@ -302,7 +302,8 @@ fun AddMedScreen(
                             endDate = calcEndDate,
                             // Guard: Assign durationDays only when finite course and duration is positive to avoid invalid zero-day courses
                             durationDays = if (isFiniteCourse && durationDaysInt != null && durationDaysInt > 0) durationDaysInt else null,
-                            customDosages = finalCustomDosages
+                            // Guard: Clear customDosages if frequency is AS_NEEDED to prevent leaking orphaned scheduled custom dosages into PRN doses and reports
+                            customDosages = if (selectedFrequency == FrequencyPattern.AS_NEEDED) null else finalCustomDosages
                         )
                         medicineViewModel.addMedicine(newMedicine)
                         navController.previousBackStackEntry?.savedStateHandle?.set("snackbar_message", context.getString(R.string.medication_added_success))

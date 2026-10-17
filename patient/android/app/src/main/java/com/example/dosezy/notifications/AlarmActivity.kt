@@ -95,6 +95,8 @@ class AlarmActivity : ComponentActivity() {
         activeMedicineNameState.value = newMedName
         activeScheduledTimeState.value = newSchedTime
 
+        // Guard: Resume playback for incoming alarm if audio was silenced by volume rocker while activity remained open
+        alarmViewModel.startPlaybackIfNeeded(newId)
         alarmViewModel.loadCohort(merged)
     }
 

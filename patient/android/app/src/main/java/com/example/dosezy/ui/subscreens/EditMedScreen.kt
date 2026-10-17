@@ -383,7 +383,8 @@ fun EditMedScreen(
                                     // Guard: Preserve computed or existing durationDays when duration text was not modified to maintain finite course integrity
                                     durationDays = if (isFiniteCourse) (durationDaysInt ?: medicineToEdit?.durationDays) else null,
                                     isArchived = medicineToEdit?.isArchived ?: false,
-                                    customDosages = finalCustomDosages
+                                    // Guard: Clear customDosages if frequency is AS_NEEDED to prevent leaking orphaned scheduled custom dosages into PRN doses and reports
+                                    customDosages = if (selectedFrequency == FrequencyPattern.AS_NEEDED) null else finalCustomDosages
                                 )
 
                                 if (medicineToEdit != null) {

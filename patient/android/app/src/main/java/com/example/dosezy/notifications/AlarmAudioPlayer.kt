@@ -52,9 +52,30 @@ object AlarmAudioPlayer {
                     AlarmActivity.stopActiveAlarm()
                 }
             } else if (autoSilenceSeconds == 0) {
-                // Guard: Cancel auto-silence job if incoming alarm specifies continuous loop playback so prior single-play timeout does not kill alarm
+                // Guard: Upgrade player to continuous looping and detach single-play completion listener so incoming continuous alarm is not prematurely terminated
                 autoSilenceJob?.cancel()
                 autoSilenceJob = null
+                try {
+                    mediaPlayer?.let { player ->
+                        if (!player.isLooping) {
+                            player.isLooping = true
+                            player.setOnCompletionListener(null)
+                        }
+                    }
+                } catch (_: Exception) {}
+            } else if (autoSilenceSeconds == -1) {
+                // Guard: Refresh single-play timeout watchdog if incoming alarm specifies single play
+                autoSilenceJob?.cancel()
+                autoSilenceJob = scope.launch {
+                    var elapsed = 0L
+                    while (isPlaying() && elapsed < 30_000L) {
+                        delay(500L)
+                        elapsed += 500L
+                    }
+                    Log.d(TAG, "Single-play alarm completed or timed out after $elapsed ms")
+                    stop()
+                    AlarmActivity.stopActiveAlarm()
+                }
             }
             return
         }

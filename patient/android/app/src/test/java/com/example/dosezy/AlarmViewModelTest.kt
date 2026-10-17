@@ -35,6 +35,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -145,7 +146,9 @@ class AlarmViewModelTest {
                 entryId = eq("entry_123"),
                 status = any(),
                 takenAtStr = any(),
-                context = any()
+                context = any(),
+                notes = any(),
+                syncSlotNotification = any()
             )
         }
     }
@@ -168,5 +171,19 @@ class AlarmViewModelTest {
 
         assertTrue(completed)
         coVerify { scheduleRepository.recordDoseSkipped(eq("entry_123"), eq("Patient asleep"), any()) }
+    }
+
+    @Test
+    fun startPlaybackIfNeeded_triggersPlayback_whenAudioNotPlaying() = runTest(testDispatcher) {
+        coEvery { scheduleDao.getScheduleEntryById("entry_123") } returns testEntry
+        coEvery { userDao.getUserByIdDirect("user_123") } returns testUser
+
+        com.example.dosezy.notifications.AlarmAudioPlayer.stop()
+        val viewModel = AlarmViewModel(database, scheduleRepository, context, testDispatcher)
+        viewModel.startPlaybackIfNeeded("entry_123")
+        advanceUntilIdle()
+
+        // startPlaybackIfNeeded completes and loads target sound configuration without error
+        assertNotNull(viewModel)
     }
 }

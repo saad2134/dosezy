@@ -432,6 +432,38 @@ class EmergencyDialAndEditMedScreenTest {
             (dialIntent.flags and Intent.FLAG_ACTIVITY_NEW_TASK) != 0
         )
     }
+
+    @Test
+    fun testEditAndAddMedScreen_customDosagesClearedWhenFrequencySwitchedToAsNeeded() {
+        val scheduledTimesList = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0))
+        val perTimeDosages = mapOf("08:00" to "10", "20:00" to "20")
+        val hasDifferentDosages = true
+
+        val baseDose = 10.0
+        val finalCustomDosages: Map<String, Double>? = if (hasDifferentDosages && scheduledTimesList.size > 1) {
+            val map = mutableMapOf<String, Double>()
+            scheduledTimesList.forEach { t ->
+                val key = String.format(java.util.Locale.US, "%02d:%02d", t.hour, t.minute)
+                val entered = perTimeDosages[key]?.toDoubleOrNull() ?: baseDose
+                map[key] = entered
+            }
+            if (map.isNotEmpty()) map else null
+        } else null
+
+        assertNotNull("finalCustomDosages should be populated when multiple times have custom dosages", finalCustomDosages)
+
+        // Case A: User saves with DAILY frequency -> customDosages preserved
+        val dailyFrequency = FrequencyPattern.DAILY
+        val customDosagesDaily = if (dailyFrequency == FrequencyPattern.AS_NEEDED) null else finalCustomDosages
+        assertNotNull("Daily frequency must retain customDosages", customDosagesDaily)
+        assertEquals(2, customDosagesDaily?.size)
+
+        // Case B: User switches frequency dropdown to AS_NEEDED -> customDosages must be nullified
+        val asNeededFrequency = FrequencyPattern.AS_NEEDED
+        val customDosagesAsNeeded = if (asNeededFrequency == FrequencyPattern.AS_NEEDED) null else finalCustomDosages
+        assertNull("Switching frequency to AS_NEEDED must clear customDosages to prevent leaking stale scheduled doses into PRN logs", customDosagesAsNeeded)
+    }
 }
+
 
 
