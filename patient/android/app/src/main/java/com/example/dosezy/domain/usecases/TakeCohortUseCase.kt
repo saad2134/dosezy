@@ -73,11 +73,18 @@ class TakeCohortUseCase @Inject constructor(
                 "TAKEN_ON_TIME"
             }
             Log.d(TAG, "Recording dose taken ($status) for entry: $id")
-            scheduleRepository.recordDoseTaken(id, status, nowStr, context, notes)
+            scheduleRepository.recordDoseTaken(id, status, nowStr, null, notes)
         }
 
-        try {
-            DosezyAppWidgetProvider.updateAppWidgets(context)
-        } catch (_: Exception) {}
+        // Guard: Coordinate single slot notification sync and widget update after batch loop to prevent notification shade flicker and repeated widget broadcasts
+        val primaryId = entryIds.firstOrNull()
+        val primaryEntry = primaryId?.let { database.scheduleDao().getScheduleEntryById(it) }
+        if (primaryId != null && primaryEntry != null) {
+            scheduleRepository.syncSlotNotificationAndAlarms(primaryId, primaryEntry, context)
+        } else {
+            try {
+                DosezyAppWidgetProvider.updateAppWidgets(context)
+            } catch (_: Exception) {}
+        }
     }
 }

@@ -83,7 +83,7 @@ object ScheduleRecurrenceEngine {
                 val cleanTime = cursor.toLocalTime().withSecond(0).withNano(0)
                 val scheduledDateTime = cursor.withSecond(0).withNano(0)
 
-                // Skip past reminder times on the current day to avoid immediate missed status
+                // Guard: Skip past reminder times on current day to avoid immediate missed status
                 if (!(itemDate.isEqual(now.toLocalDate()) && scheduledDateTime.isBefore(now.minusMinutes(15)))) {
                     val entryId = "${medicine.medicineId}_${itemDate}_${cleanTime}".replace(":", "_").replace("-", "_")
                     val entry = ScheduleEntry(
@@ -112,7 +112,7 @@ object ScheduleRecurrenceEngine {
                     val cleanTime = time.withSecond(0).withNano(0)
                     val scheduledDateTime = LocalDateTime.of(currentDate, cleanTime)
 
-                    // Skip past reminder times on the current day to avoid immediate missed status
+                    // Guard: Skip past reminder times on current day to avoid immediate missed status
                     if (currentDate.isEqual(now.toLocalDate()) && scheduledDateTime.isBefore(now.minusMinutes(15))) {
                         return@forEach
                     }

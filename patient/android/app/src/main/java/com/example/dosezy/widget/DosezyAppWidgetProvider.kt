@@ -186,11 +186,13 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                         views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_no_profile))
                     } else {
                         val todayEntries = db.scheduleDao().getScheduleForDateRangeDirect(user.userId, startOfDay, endOfDay)
-                        val totalToday = todayEntries.size
-                        val takenToday = todayEntries.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
-                        val skippedToday = todayEntries.count { it.status == MedicationStatus.SKIPPED }
+                        // Guard: Exclude ad-hoc PRN doses from widget scheduled progress counts to prevent inflating totalToday or falsely reporting all scheduled doses taken
+                        val scheduledToday = todayEntries.filter { !it.entryId.startsWith("PRN_") }
+                        val totalToday = scheduledToday.size
+                        val takenToday = scheduledToday.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
+                        val skippedToday = scheduledToday.count { it.status == MedicationStatus.SKIPPED }
 
-                        if (todayEntries.isNotEmpty()) {
+                        if (scheduledToday.isNotEmpty()) {
                             when {
                                 takenToday == totalToday -> {
                                     views.setImageViewResource(R.id.widget_status_icon, R.drawable.ic_widget_check_circle)

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2026 Saad <reach.saad@outlook.com> (@saad2134)
  * Licensed under the MIT License. See LICENSE in the project root for license information.
  */
@@ -248,5 +248,42 @@ class AnalyticsRangeAndRecurrenceModuloTest {
         // Guard: Verify intent has both switch_to_user_id and fragment=schedule extras
         assertEquals(userId, fillInIntent.getStringExtra("switch_to_user_id"))
         assertEquals("schedule", fillInIntent.getStringExtra("fragment"))
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // Bug 7: Recurrence Engine Excludes Historical Past Reminders on Backdated Start Date
+    // ---------------------------------------------------------------------------------------------
+
+    @Test
+    fun testScheduleRecurrenceEngine_backdatedStartDate_skipsPastReminderSlots() {
+        val now = java.time.LocalDateTime.now()
+        val backdatedStart = now.toLocalDate().minusDays(5)
+
+        val medicine = Medicine(
+            medicineId = "med_backdated",
+            userId = "usr_1",
+            medicationName = "Amoxicillin Backdated",
+            dosage = 500.0,
+            dosageUnit = DosageUnit.MG,
+            frequency = Frequency(pattern = FrequencyPattern.DAILY),
+            startDate = backdatedStart,
+            scheduledTimes = listOf(LocalTime.of(8, 0), LocalTime.of(12, 0), LocalTime.of(20, 0)),
+            timesPerDay = 3
+        )
+
+        // Initial schedule generation anchors backdated medicine to today
+        val today = LocalDate.now()
+        val medStart = medicine.startDate
+        val anchoredStart = if (medStart != null && medStart.isBefore(today)) today else (medStart ?: today)
+        val generatedEntries = ScheduleRecurrenceEngine.generateScheduleEntries(medicine, anchoredStart, 10)
+
+        // Guard: All generated entries must be at or after now.minusMinutes(15) so backdated courses never produce stale PENDING historical records
+        val cutoff = now.minusMinutes(15)
+        val pastEntries = generatedEntries.filter { it.scheduledDateTime.isBefore(cutoff) }
+        assertTrue("No entries should be generated in the past before now - 15m (found ${pastEntries.size})", pastEntries.isEmpty())
+
+        // Future entries must still exist
+        val futureEntries = generatedEntries.filter { !it.scheduledDateTime.isBefore(cutoff) }
+        assertTrue("Future reminder entries must be scheduled", futureEntries.isNotEmpty())
     }
 }

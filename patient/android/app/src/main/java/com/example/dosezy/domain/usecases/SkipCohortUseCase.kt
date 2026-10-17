@@ -42,7 +42,7 @@ class SkipCohortUseCase @Inject constructor(
             // Guard: Cancel active intake safeguard alarm for each entry to prevent orphaned re-alerts after skipping dose (#104)
             alarmScheduler.cancelIntakeSafeguardAlarm(id)
             notificationManager?.cancel(id.hashCode())
-            scheduleRepository.recordDoseSkipped(id, reason, context)
+            scheduleRepository.recordDoseSkipped(id, reason, null)
         }
 
         // Guard: Reconcile and dismiss active ADHD intake countdown notification if skipped entries match active countdown
@@ -53,9 +53,16 @@ class SkipCohortUseCase @Inject constructor(
             }
         } catch (_: Exception) {}
 
-        try {
-            DosezyAppWidgetProvider.updateAppWidgets(context)
-        } catch (_: Exception) {}
+        // Guard: Coordinate single slot notification sync and widget update after batch loop to prevent notification shade flicker and repeated widget broadcasts
+        val primaryId = entryIds.firstOrNull()
+        val primaryEntry = primaryId?.let { scheduleRepository.getScheduleEntryById(it) }
+        if (primaryId != null && primaryEntry != null) {
+            scheduleRepository.syncSlotNotificationAndAlarms(primaryId, primaryEntry, context)
+        } else {
+            try {
+                DosezyAppWidgetProvider.updateAppWidgets(context)
+            } catch (_: Exception) {}
+        }
         Log.d(TAG, "Marked ${entryIds.size} doses as skipped")
     }
 }

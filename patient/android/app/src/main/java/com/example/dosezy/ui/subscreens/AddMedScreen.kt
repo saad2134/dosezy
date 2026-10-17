@@ -191,7 +191,8 @@ fun AddMedScreen(
                 // --- Card 3: Course Duration Card ---
                 val durationDaysInt = durationDaysText.normalizeArabicDigits().toIntOrNull()
                 val calcStartDate = selectedStartDate
-                val calcEndDate = if (isFiniteCourse && durationDaysInt != null) {
+                // Guard: Calculate finite course end date only when duration is positive to avoid creating invalid zero-day or negative courses
+                val calcEndDate = if (isFiniteCourse && durationDaysInt != null && durationDaysInt > 0) {
                     selectedStartDate.plusDays((durationDaysInt - 1).toLong().coerceAtLeast(0L))
                 } else null
 
@@ -243,7 +244,9 @@ fun AddMedScreen(
                     selectedFrequency = selectedFrequency,
                     selectedDaysOfWeek = selectedDaysOfWeek,
                     selectedDaysOfMonth = selectedDaysOfMonth,
-                    intervalWeeksText = intervalWeeksText
+                    intervalWeeksText = intervalWeeksText,
+                    isFiniteCourse = isFiniteCourse,
+                    durationDaysText = durationDaysText
                 )
 
                 Button(
@@ -297,7 +300,8 @@ fun AddMedScreen(
                             pillColor = selectedPillColor,
                             startDate = calcStartDate,
                             endDate = calcEndDate,
-                            durationDays = if (isFiniteCourse) durationDaysInt else null,
+                            // Guard: Assign durationDays only when finite course and duration is positive to avoid invalid zero-day courses
+                            durationDays = if (isFiniteCourse && durationDaysInt != null && durationDaysInt > 0) durationDaysInt else null,
                             customDosages = finalCustomDosages
                         )
                         medicineViewModel.addMedicine(newMedicine)

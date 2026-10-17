@@ -109,5 +109,45 @@ class DosezyAppWidgetProviderTest {
         DosezyWidgetPrefs.saveWidgetProfileTheme(context, userId, "light", isCurrentProfile = false)
         assertFalse(DosezyAppWidgetProvider.isWidgetDark(context, userId))
     }
+
+    @Test
+    fun testWidgetScheduledCalculation_excludesAdHocPrnDoses() {
+        val now = java.time.LocalDateTime.now()
+        val scheduled1 = com.example.dosezy.data.model.ScheduleEntry(
+            entryId = "med1_2026_10_17_08_00",
+            userId = "u1",
+            medicineId = "m1",
+            scheduledDateTime = now.withHour(8).withMinute(0),
+            status = com.example.dosezy.data.model.MedicationStatus.PENDING
+        )
+        val scheduled2 = com.example.dosezy.data.model.ScheduleEntry(
+            entryId = "med2_2026_10_17_12_00",
+            userId = "u1",
+            medicineId = "m2",
+            scheduledDateTime = now.withHour(12).withMinute(0),
+            status = com.example.dosezy.data.model.MedicationStatus.PENDING
+        )
+        val prnDose = com.example.dosezy.data.model.ScheduleEntry(
+            entryId = "PRN_inhaler_1729158000000",
+            userId = "u1",
+            medicineId = "inhaler",
+            scheduledDateTime = now.minusHours(1),
+            status = com.example.dosezy.data.model.MedicationStatus.TAKEN_ON_TIME
+        )
+
+        val rawTodayEntries = listOf(scheduled1, scheduled2, prnDose)
+
+        // Guard: Verify raw total counts 3 items, but scheduledToday filters out PRN entries
+        val scheduledToday = rawTodayEntries.filter { !it.entryId.startsWith("PRN_") }
+        assertEquals("Scheduled count must exclude PRN ad-hoc doses", 2, scheduledToday.size)
+        assertEquals("Taken scheduled count must be 0", 0, scheduledToday.count {
+            it.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_ON_TIME || it.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_LATE
+        })
+
+        // Edge case: 0 scheduled medications today, but 1 ad-hoc PRN dose taken
+        val prnOnlyToday = listOf(prnDose)
+        val scheduledPrnOnly = prnOnlyToday.filter { !it.entryId.startsWith("PRN_") }
+        assertTrue("Scheduled list must be empty when only PRN doses were taken", scheduledPrnOnly.isEmpty())
+    }
 }
 

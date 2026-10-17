@@ -145,6 +145,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
 
                 val now = LocalDateTime.now()
                 val takenAt = now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                val notifAlarmScheduler = AlarmScheduler(context)
                 allIds.forEach { id ->
                     val entry = database.scheduleDao().getScheduleEntryById(id)
                     val lateAfter = user?.considerLateAfter ?: 3
@@ -155,7 +156,20 @@ class NotificationActionReceiver : BroadcastReceiver() {
                         "TAKEN_ON_TIME"
                     }
                     Log.d(TAG, "Marking medicine as taken ($status) for entry: $id")
-                    scheduleRepository.recordDoseTaken(id, status, takenAt, context)
+                    notifAlarmScheduler.cancelNagging(id)
+                    notifAlarmScheduler.cancelSnooze(id)
+                    notifAlarmScheduler.cancelIntakeSafeguardAlarm(id)
+                    scheduleRepository.recordDoseTaken(id, status, takenAt, null)
+                }
+
+                // Guard: Perform coordinated single slot sync and widget update after all cohort entries in SQLite are updated to prevent shade notification flickering and duplicate widget updates
+                val updatedFirstEntry = database.scheduleDao().getScheduleEntryById(primaryEntryId) ?: firstEntry
+                if (updatedFirstEntry != null) {
+                    scheduleRepository.syncSlotNotificationAndAlarms(primaryEntryId, updatedFirstEntry, context)
+                } else {
+                    try {
+                        com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+                    } catch (_: Exception) {}
                 }
                 Log.d(TAG, "Marked ${allIds.size} medicines as taken and processed")
             }

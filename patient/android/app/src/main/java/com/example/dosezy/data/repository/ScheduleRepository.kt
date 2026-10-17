@@ -413,7 +413,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
     // Guard: Synchronize slot notification when taking/skipping/missing a dose to prevent dropping cohort reminders or leaving stale shade entries
     @RequiresApi(Build.VERSION_CODES.O)
-    private suspend fun syncSlotNotificationAndAlarms(
+    suspend fun syncSlotNotificationAndAlarms(
         entryId: String,
         entry: ScheduleEntry?,
         context: Context
@@ -451,7 +451,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     val slotMillis = entry.scheduledDateTime.withSecond(0).withNano(0)
                         .atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
                     val slotEntries = database.scheduleDao().getScheduleForDateRangeDirect(entry.userId, slotMillis, slotMillis + 59999L)
-                    val remainingPending = slotEntries.filter { it.status == MedicationStatus.PENDING && it.entryId != entryId }
+                    // Guard: Exclude ad-hoc PRN doses from slot remaining pending check so as-needed doses never count as pending scheduled items
+                    val remainingPending = slotEntries.filter { !it.entryId.startsWith("PRN_") && it.status == MedicationStatus.PENDING && it.entryId != entryId }
 
                     if (remainingPending.isEmpty()) {
                         // All medications in this slot are handled: cancel notification for entry, primary, and all slot items

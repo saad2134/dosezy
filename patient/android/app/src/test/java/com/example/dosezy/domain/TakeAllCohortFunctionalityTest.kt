@@ -480,5 +480,73 @@ class TakeAllCohortFunctionalityTest {
         // 4. Guard assertion: Active intake countdown must be cancelled upon skipping dose
         assertNull("Active intake countdown must be cancelled upon skipping dose", IntakeSafeguardManager.activeCountdown.value)
     }
+
+    @Test
+    fun testTakeCohortUseCase_multiMedicationCohort_coordinatesSingleSync() = runBlocking {
+        val slotTime = LocalDateTime.now().plusHours(2).withSecond(0).withNano(0)
+        val entry1 = ScheduleEntry(
+            entryId = "entry_cohort_sync_1",
+            userId = testUser.userId,
+            medicineId = medA.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_cohort_sync_2",
+            userId = testUser.userId,
+            medicineId = medB.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.PENDING,
+            dosage = 2.0
+        )
+        database.scheduleDao().insertScheduleEntry(entry1)
+        database.scheduleDao().insertScheduleEntry(entry2)
+
+        val takeCohortUseCase = TakeCohortUseCase(database, scheduleRepository, context)
+        takeCohortUseCase.invoke(listOf(entry1.entryId, entry2.entryId), user = testUser)
+
+        val updated1 = database.scheduleDao().getScheduleEntryById(entry1.entryId)
+        val updated2 = database.scheduleDao().getScheduleEntryById(entry2.entryId)
+        assertNotNull(updated1)
+        assertNotNull(updated2)
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, updated1!!.status)
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, updated2!!.status)
+    }
+
+    @Test
+    fun testSkipCohortUseCase_multiMedicationCohort_coordinatesSingleSync() = runBlocking {
+        val slotTime = LocalDateTime.now().plusHours(3).withSecond(0).withNano(0)
+        val entry1 = ScheduleEntry(
+            entryId = "entry_cohort_skip_sync_1",
+            userId = testUser.userId,
+            medicineId = medA.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_cohort_skip_sync_2",
+            userId = testUser.userId,
+            medicineId = medB.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.PENDING,
+            dosage = 2.0
+        )
+        database.scheduleDao().insertScheduleEntry(entry1)
+        database.scheduleDao().insertScheduleEntry(entry2)
+
+        val skipCohortUseCase = SkipCohortUseCase(scheduleRepository, context)
+        skipCohortUseCase.invoke(listOf(entry1.entryId, entry2.entryId), reason = "Doctor advised")
+
+        val updated1 = database.scheduleDao().getScheduleEntryById(entry1.entryId)
+        val updated2 = database.scheduleDao().getScheduleEntryById(entry2.entryId)
+        assertNotNull(updated1)
+        assertNotNull(updated2)
+        assertEquals(MedicationStatus.SKIPPED, updated1!!.status)
+        assertEquals(MedicationStatus.SKIPPED, updated2!!.status)
+        assertEquals("Doctor advised", updated1.skipReason)
+        assertEquals("Doctor advised", updated2.skipReason)
+    }
 }
 

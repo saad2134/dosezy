@@ -68,7 +68,9 @@ class GenerateSchedulesUseCase @Inject constructor(
     }
 
     suspend fun generateInitialSchedules(medicine: Medicine, daysCount: Int = 30): List<ScheduleEntry> {
-        val start = medicine.startDate ?: LocalDate.now()
+        val today = LocalDate.now()
+        // Guard: Anchor initial schedule generation to today if startDate is backdated to prevent generating stale historical PENDING entries
+        val start = if (medicine.startDate != null && medicine.startDate.isBefore(today)) today else (medicine.startDate ?: today)
         val entries = ScheduleRecurrenceEngine.generateScheduleEntries(medicine, start, daysCount)
         if (entries.isNotEmpty()) {
             database.scheduleDao().insertScheduleEntries(entries)

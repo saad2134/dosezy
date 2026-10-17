@@ -36,9 +36,14 @@ fun isMedicineFormValid(
     selectedFrequency: FrequencyPattern,
     selectedDaysOfWeek: List<Int>,
     selectedDaysOfMonth: List<Int>,
-    intervalWeeksText: String
+    intervalWeeksText: String,
+    isFiniteCourse: Boolean = false,
+    durationDaysText: String = "",
+    hasExistingEndDate: Boolean = false
 ): Boolean {
-    return medicationName.isNotBlank() && isDosageValid && (
+    // Guard: Validate that finite courses specify a positive duration or retain an existing valid end date to prevent silent conversion to indefinite schedules
+    val isFiniteValid = !isFiniteCourse || hasExistingEndDate || ((durationDaysText.normalizeArabicDigits().toIntOrNull() ?: 0) > 0)
+    return isFiniteValid && medicationName.isNotBlank() && isDosageValid && (
         selectedFrequency == FrequencyPattern.DAILY ||
         selectedFrequency == FrequencyPattern.AS_NEEDED ||
         selectedFrequency == FrequencyPattern.EVERY_X_HOURS ||
