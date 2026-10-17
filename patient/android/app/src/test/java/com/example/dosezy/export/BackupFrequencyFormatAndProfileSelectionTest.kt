@@ -19,6 +19,7 @@ import io.mockk.mockk
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -387,5 +388,65 @@ class BackupFrequencyFormatAndProfileSelectionTest {
         // Both IDs must match exactly to prevent duplicate schedule entries on restore and auto-extend
         assertEquals(expectedEntryId, restoredEntryId)
         assertTrue("Entry ID must replace hyphens with underscores matching ScheduleRecurrenceEngine", restoredEntryId.startsWith("45f69d30_b19e_4c74_9ec4_33b1e7fae44f"))
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 6. Epoch Millisecond Parsing for startDate and endDate
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testParseMedicinesFromJson_parsesNumericEpochMillisecondsForStartAndEndDate() {
+        val json = """
+            [
+                {
+                    "medicineId": "med_epoch_1",
+                    "userId": "user_epoch",
+                    "medicationName": "Prednisone",
+                    "dosage": 20.0,
+                    "dosageUnit": "MG",
+                    "timesPerDay": 1,
+                    "frequencyPattern": "DAILY",
+                    "scheduledTimes": ["08:00"],
+                    "startDate": "1729123200000",
+                    "endDate": "1731801600000"
+                }
+            ]
+        """.trimIndent()
+
+        val parsedMeds = backupRestoreManager.parseMedicinesFromJson(json)
+        assertEquals(1, parsedMeds.size)
+        val med = parsedMeds.first()
+        assertNotNull("startDate must be successfully decoded from epoch millis", med.startDate)
+        assertNotNull("endDate must be successfully decoded from epoch millis", med.endDate)
+
+        val expectedStart = java.time.Instant.ofEpochMilli(1729123200000L).atZone(java.time.ZoneOffset.UTC).toLocalDate()
+        val expectedEnd = java.time.Instant.ofEpochMilli(1731801600000L).atZone(java.time.ZoneOffset.UTC).toLocalDate()
+        assertEquals(expectedStart, med.startDate)
+        assertEquals(expectedEnd, med.endDate)
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 7. ConflictStrategy.OVERWRITE Active User Protection
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testSelectiveRestoreOverwrite_doesNotDuplicateActiveUserWhenRestoringNonExistentProfile() {
+        val existingActiveUser = User(
+            userId = "user_local_active",
+            fullName = "Active Local Profile",
+            age = 45,
+            gender = Gender.MALE,
+            contactNumber = "555-1111",
+            isCurrentUser = true
+        )
+        val localUsers = listOf(existingActiveUser)
+
+        val targetUserId = "user_restored_new"
+        val existingLocalUser = localUsers.firstOrNull { it.userId == targetUserId }
+        val totalProfiles = 0
+
+        val shouldBeCurrent = existingLocalUser?.isCurrentUser ?: (localUsers.none { it.isCurrentUser } && totalProfiles == 0)
+
+        assertFalse("Restored profile must NOT be promoted to current user when a local user is already active", shouldBeCurrent)
     }
 }

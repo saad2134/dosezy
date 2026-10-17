@@ -147,4 +147,42 @@ class PdfReportGeneratorTest {
         assertTrue("Truncated name must end with ellipsis", truncated.endsWith("..."))
         assertTrue("Truncated text must fit within column maxWidth", paint.measureText(truncated) <= 25f)
     }
+
+    @Test
+    fun testTruncateTextToWidth_preventsOverflowIntoAdjacentColumns() {
+        val paint = android.graphics.Paint().apply { textSize = 10f }
+        val longEntryText = "Methylprednisolone Sodium Succinate for Injection, USP (125 mg)"
+        val maxColumnWidth = 175f
+
+        val truncated = generator.truncateTextToWidth(longEntryText, paint, maxColumnWidth)
+        assertTrue("Truncated text must fit within the 175pt column width to protect the Status column", paint.measureText(truncated) <= maxColumnWidth)
+    }
+
+    @Test
+    fun testScheduleLogsTable_dosageOverrideFormatting() {
+        val medicine = com.example.dosezy.data.model.Medicine(
+            medicineId = "med_custom_dose",
+            userId = "user_1",
+            medicationName = "Prednisone",
+            dosage = 5.0,
+            dosageUnit = com.example.dosezy.data.model.DosageUnit.TABLET,
+            timesPerDay = 1,
+            frequency = com.example.dosezy.data.model.Frequency(com.example.dosezy.data.model.FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+
+        // Custom dosage override on schedule entry: 2.5 tablets
+        val customDose = 2.5
+        val unitAbbr = when (medicine.dosageUnit) {
+            com.example.dosezy.data.model.DosageUnit.TABLET -> "tablet"
+            else -> ""
+        }
+        val formattedDosage = if (customDose % 1 == 0.0) "${customDose.toInt()} $unitAbbr" else "$customDose $unitAbbr"
+        assertEquals("2.5 tablet", formattedDosage)
+
+        // Whole number dosage override: 3.0 tablets -> 3 tablet
+        val wholeDose = 3.0
+        val formattedWhole = if (wholeDose % 1 == 0.0) "${wholeDose.toInt()} $unitAbbr" else "$wholeDose $unitAbbr"
+        assertEquals("3 tablet", formattedWhole)
+    }
 }

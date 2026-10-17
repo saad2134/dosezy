@@ -460,15 +460,20 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                         slotEntries.forEach { nManager.cancel(it.entryId.hashCode()) }
                     } else {
                         // Other medications remain pending in this slot; update active notification to remove taken medication
+                        // Guard: Check active notifications against all slot entry IDs and stored primaryId to detect active shade alerts regardless of which med was posted first
                         val hasActiveNotification = try {
                             val active = nManager.activeNotifications
-                            active.any { it.id == entryId.hashCode() || (primaryId != null && it.id == primaryId.hashCode()) }
+                            active.any { notif ->
+                                slotEntries.any { it.entryId.hashCode() == notif.id } || (primaryId != null && notif.id == primaryId.hashCode())
+                            }
                         } catch (_: Exception) { false }
 
+                        // Guard: Cancel prior notifications for the taken entry, stored primary, and all slot items before re-issuing cohort notification to prevent orphan/duplicate notifications in shade
                         nManager.cancel(entryId.hashCode())
-                        if (primaryId != null && primaryId == entryId) {
+                        if (primaryId != null) {
                             nManager.cancel(primaryId.hashCode())
                         }
+                        slotEntries.forEach { nManager.cancel(it.entryId.hashCode()) }
 
                         if (hasActiveNotification) {
                             val newPrimary = remainingPending.first()
@@ -578,7 +583,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         dateTime: LocalDateTime = LocalDateTime.now(),
         context: Context? = null
     ) {
-        val entryId = "PRN_${medicine.medicineId}_${System.currentTimeMillis()}"
+        // Guard: Append random UUID suffix to prevent primary key collision and silent record overwrite on rapid PRN logging
+        val entryId = "PRN_${medicine.medicineId}_${System.currentTimeMillis()}_${java.util.UUID.randomUUID().toString().take(8)}"
         val entry = ScheduleEntry(
             entryId = entryId,
             userId = userId,

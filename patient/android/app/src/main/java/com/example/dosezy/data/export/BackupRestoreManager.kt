@@ -80,7 +80,12 @@ class BackupRestoreManager(
             JsonPrimitive(src.toString())
         })
         .registerTypeAdapter(LocalDate::class.java, JsonDeserializer { json, _, _ ->
-            try { LocalDate.parse(json.asString) } catch (_: Exception) { null }
+            try {
+                val str = json.asString.trim()
+                str.toLongOrNull()?.let { millis ->
+                    java.time.Instant.ofEpochMilli(millis).atZone(java.time.ZoneOffset.UTC).toLocalDate()
+                } ?: LocalDate.parse(str)
+            } catch (_: Exception) { null }
         })
         .registerTypeAdapter(LocalDate::class.java, JsonSerializer<LocalDate> { src, _, _ ->
             JsonPrimitive(src.toString())
@@ -484,8 +489,8 @@ class BackupRestoreManager(
 
                         val localUsers = database.userDao().getAllUsersDirect()
                         val existingLocalUser = localUsers.firstOrNull { it.userId == targetUserId }
-                        // Guard: Preserve existing local user's active status (or promote if this is the sole/first profile) to prevent wiping the active session on overwrite restore
-                        val shouldBeCurrent = existingLocalUser?.isCurrentUser ?: (totalProfiles == 0)
+                        // Guard: Preserve existing local user's active status, or promote only if no local profile is currently active and this is the first restored profile, preventing duplicate active users
+                        val shouldBeCurrent = existingLocalUser?.isCurrentUser ?: (localUsers.none { it.isCurrentUser } && totalProfiles == 0)
                         val existingLocalMeds = database.medicineDao().getMedicinesByUserDirect(targetUserId)
 
                         val avatarFile = File(pDir, "avatar.jpg")
@@ -869,8 +874,17 @@ class BackupRestoreManager(
 
             val pillShape = obj.get("pillShape")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { PillShape.valueOf(it) }.getOrNull() } ?: PillShape.ROUND
             val pillColor = obj.get("pillColor")?.takeUnless { it.isJsonNull }?.asString ?: "#1193D4"
-            val startDate = obj.get("startDate")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
-            val endDate = obj.get("endDate")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+            // Guard: Parse epoch-millis and ISO-8601 date strings to prevent dropping course bounds on restore
+            val startDate = obj.get("startDate")?.takeUnless { it.isJsonNull }?.asString?.let { raw ->
+                raw.trim().toLongOrNull()?.let { millis ->
+                    java.time.Instant.ofEpochMilli(millis).atZone(java.time.ZoneOffset.UTC).toLocalDate()
+                } ?: runCatching { LocalDate.parse(raw.trim()) }.getOrNull()
+            }
+            val endDate = obj.get("endDate")?.takeUnless { it.isJsonNull }?.asString?.let { raw ->
+                raw.trim().toLongOrNull()?.let { millis ->
+                    java.time.Instant.ofEpochMilli(millis).atZone(java.time.ZoneOffset.UTC).toLocalDate()
+                } ?: runCatching { LocalDate.parse(raw.trim()) }.getOrNull()
+            }
 
             // Guard: Safe-extract required primitives with sane defaults to prevent NullPointerException from aborting archive inspection
             val medName = obj.get("medicationName")?.takeUnless { it.isJsonNull }?.asString ?: "Unknown Medication"

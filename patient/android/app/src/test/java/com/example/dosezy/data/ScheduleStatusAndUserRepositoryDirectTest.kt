@@ -440,5 +440,69 @@ class ScheduleStatusAndUserRepositoryDirectTest {
         assertFalse(u2Final!!.isCurrentUser)
         assertTrue(u3Final!!.isCurrentUser)
     }
+
+    // ---------------------------------------------------------------------------------------------
+    // PRN As-Needed Dose Non-Colliding Primary Key Guard
+    // ---------------------------------------------------------------------------------------------
+
+    @Test
+    fun testLogAsNeededDose_createsUniquePrimaryKeys_andPreventsSilentOverwrite() = runBlocking {
+        val user = sampleUser("user_prn_unique")
+        userDao.insertUser(user)
+        val med = sampleMedicine("med_prn_unique", "user_prn_unique")
+        medicineDao.insertMedicine(med)
+
+        val scheduleRepository = com.example.dosezy.data.repository.ScheduleRepository(db)
+        val testInstant = LocalDateTime.of(2026, 10, 17, 10, 0, 0)
+
+        // Log two PRN doses with the identical target timestamp in rapid succession
+        scheduleRepository.logAsNeededDose(med, "user_prn_unique", testInstant, context)
+        scheduleRepository.logAsNeededDose(med, "user_prn_unique", testInstant, context)
+
+        val prnEntries = scheduleDao.getAllScheduleEntries("user_prn_unique")
+        assertEquals("Both PRN doses must be preserved in SQLite without overwrite", 2, prnEntries.size)
+        assertTrue("PRN entries must have distinct IDs", prnEntries[0].entryId != prnEntries[1].entryId)
+        assertTrue("Both entry IDs must start with PRN_", prnEntries.all { it.entryId.startsWith("PRN_") })
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // Slot Cohort Notification Synchronization Guard
+    // ---------------------------------------------------------------------------------------------
+
+    @Test
+    fun testSyncSlotNotificationAndAlarms_reconcilesActiveSlotCohortWhenSecondaryMedTaken() = runBlocking {
+        val user = sampleUser("user_cohort_slot")
+        userDao.insertUser(user)
+        val medA = sampleMedicine("med_cohort_a", "user_cohort_slot", name = "Aspirin")
+        val medB = sampleMedicine("med_cohort_b", "user_cohort_slot", name = "Metformin")
+        medicineDao.insertMedicine(medA)
+        medicineDao.insertMedicine(medB)
+
+        val slotTime = LocalDateTime.of(2026, 10, 17, 8, 0, 0)
+        val entryA = sampleScheduleEntry("entry_cohort_a", "user_cohort_slot", "med_cohort_a", slotTime)
+        val entryB = sampleScheduleEntry("entry_cohort_b", "user_cohort_slot", "med_cohort_b", slotTime)
+        scheduleDao.insertScheduleEntry(entryA)
+        scheduleDao.insertScheduleEntry(entryB)
+
+        val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+        val notif = android.app.Notification.Builder(context).setContentTitle("Medication Reminder").setSmallIcon(android.R.drawable.ic_lock_idle_alarm).build()
+        nManager.notify(entryA.entryId.hashCode(), notif)
+
+        val scheduleRepository = com.example.dosezy.data.repository.ScheduleRepository(db)
+        // User takes secondary medication (entryB) in-app
+        scheduleRepository.recordDoseTaken(entryB.entryId, "TAKEN_ON_TIME", slotTime, context)
+
+        val updatedEntryB = scheduleDao.getScheduleEntryById(entryB.entryId)
+        assertNotNull(updatedEntryB)
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, updatedEntryB!!.status)
+
+        val remainingPending = scheduleDao.getScheduleForDateRangeDirect(
+            "user_cohort_slot",
+            slotTime.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli(),
+            slotTime.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli() + 59999L
+        ).filter { it.status == MedicationStatus.PENDING }
+        assertEquals(1, remainingPending.size)
+        assertEquals("entry_cohort_a", remainingPending.first().entryId)
+    }
 }
 
