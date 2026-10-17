@@ -197,16 +197,24 @@ object IntakeSafeguardManager {
             scheduler.cancelSnooze(id)
         }
 
-        // Guard: Delegate slot notification reconciliation, alarm cancellation, and widget updates to ScheduleRepository (#BUG-01)
+        // Guard: Reconcile slot notifications and disarm alarms for every distinct slot across entryIds to prevent leaking non-primary slot notifications and alarms (#BUG-SAFEGUARD-MULTI-SLOT)
         try {
-            val anchorEntry = database.scheduleDao().getScheduleEntryById(current.entryId)
-            if (anchorEntry != null) {
-                scheduleRepository.syncSlotNotificationAndAlarms(current.entryId, anchorEntry, context)
+            val entries = current.entryIds.mapNotNull { database.scheduleDao().getScheduleEntryById(it) }
+            val distinctSlots = entries.distinctBy { it.scheduledDateTime.withSecond(0).withNano(0) }
+            if (distinctSlots.isNotEmpty()) {
+                distinctSlots.forEach { slotEntry ->
+                    scheduleRepository.syncSlotNotificationAndAlarms(slotEntry.entryId, slotEntry, context)
+                }
             } else {
-                val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
-                current.entryIds.forEach { id -> nManager?.cancel(id.hashCode()) }
-                nManager?.cancel(current.entryId.hashCode())
-                com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+                val anchorEntry = database.scheduleDao().getScheduleEntryById(current.entryId)
+                if (anchorEntry != null) {
+                    scheduleRepository.syncSlotNotificationAndAlarms(current.entryId, anchorEntry, context)
+                } else {
+                    val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+                    current.entryIds.forEach { id -> nManager?.cancel(id.hashCode()) }
+                    nManager?.cancel(current.entryId.hashCode())
+                    com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+                }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error finalizing cohort notifications and widget update: ${e.message}", e)

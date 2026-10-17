@@ -168,7 +168,9 @@ class DataExporter(
                             }
                             ExportFormat.PDF -> {
                                 val pdfDoc = pdfReportGenerator.buildPdfDocument(user, medicines, schedules)
-                                val tempPdf = File(context.cacheDir, "${user.userId}.pdf")
+                                // Guard: Create collision-free temporary PDF file with deleteOnExit to prevent concurrent export file lock collisions and uncollected cache files (#BUG-EXPORT-TEMP-FILE)
+                                val tempPdf = File.createTempFile("dosezy_export_${user.userId}_", ".pdf", context.cacheDir)
+                                tempPdf.deleteOnExit()
                                 try {
                                     FileOutputStream(tempPdf).use { pdfDoc.writeTo(it) }
 

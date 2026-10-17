@@ -132,8 +132,6 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                 val startOfDay = today.atStartOfDay(zoneUtc).toInstant().toEpochMilli()
                 val endOfDay = today.plusDays(1).atStartOfDay(zoneUtc).toInstant().toEpochMilli() - 1
 
-                val dateFormat = SimpleDateFormat("EEE, MMM d", Locale.getDefault())
-                val dateString = dateFormat.format(System.currentTimeMillis())
                 val appName = context.getString(R.string.app_name)
 
                 for (appWidgetId in appWidgetIds) {
@@ -194,6 +192,10 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                     } else {
                         appName
                     }
+                    // Guard: Format header date using the user profile's explicit language preference to match widget content locale (#BUG-WIDGET-LOCALE)
+                    val widgetLocale = user?.language?.let { com.example.dosezy.utils.LocaleHelper.getLocale(it) } ?: Locale.getDefault()
+                    val dateFormat = SimpleDateFormat("EEE, MMM d", widgetLocale)
+                    val dateString = dateFormat.format(System.currentTimeMillis())
                     views.setTextViewText(R.id.widget_title_text, titleText)
                     views.setTextViewText(R.id.widget_date_text, dateString)
 

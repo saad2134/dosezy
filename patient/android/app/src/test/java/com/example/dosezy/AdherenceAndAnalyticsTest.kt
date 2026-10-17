@@ -189,4 +189,47 @@ class AdherenceAndAnalyticsTest {
         val pastAndToday = entries.filter { it.scheduledDateTime.toLocalDate() <= today }
         assertEquals(2, pastAndToday.size)
     }
+
+    @Test
+    fun adherenceRate_todayOverduePendingDoses_penalizeAdherenceAndPreventFalse100Percent() {
+        val today = LocalDate.now()
+        val now = LocalDateTime.now()
+
+        val morningTaken = ScheduleEntry(
+            entryId = "entry_today_taken",
+            userId = "usr_1",
+            medicineId = "med_1",
+            scheduledDateTime = today.atTime(8, 0),
+            status = MedicationStatus.TAKEN_ON_TIME
+        )
+        // Dose scheduled in past today (overdue) but not yet exceeding considerMissedAfter
+        val afternoonOverduePending = ScheduleEntry(
+            entryId = "entry_today_pending_overdue",
+            userId = "usr_1",
+            medicineId = "med_2",
+            scheduledDateTime = now.minusHours(2),
+            status = MedicationStatus.PENDING
+        )
+        // Future dose later today
+        val eveningFuturePending = ScheduleEntry(
+            entryId = "entry_today_pending_future",
+            userId = "usr_1",
+            medicineId = "med_3",
+            scheduledDateTime = now.plusHours(4),
+            status = MedicationStatus.PENDING
+        )
+
+        val dayEntries = listOf(morningTaken, afternoonOverduePending, eveningFuturePending)
+        val dayTaken = dayEntries.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
+        val dayMissed = dayEntries.count { it.status == MedicationStatus.MISSED }
+        val dayOverduePending = dayEntries.count { it.status == MedicationStatus.PENDING && it.scheduledDateTime.isBefore(now) }
+        val dayDecided = dayTaken + dayMissed + dayOverduePending
+        val dayRate = if (dayDecided > 0) ((dayTaken.toDouble() / dayDecided.toDouble()) * 100).toInt() else 0
+
+        assertEquals(1, dayTaken)
+        assertEquals(0, dayMissed)
+        assertEquals(1, dayOverduePending)
+        assertEquals(2, dayDecided)
+        assertEquals(50, dayRate) // 1 taken out of 2 past doses = 50%, NOT false 100%
+    }
 }

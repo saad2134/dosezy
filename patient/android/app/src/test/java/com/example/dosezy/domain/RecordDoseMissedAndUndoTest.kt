@@ -747,4 +747,54 @@ class RecordDoseMissedAndUndoTest {
         )
         assertNull("Slot alarm PendingIntent must be cancelled when all slot doses are taken", cancelledPendingIntent)
     }
+
+    @Test
+    fun syncSlotNotificationAndAlarms_disarmsSiblingSnoozeNaggingAndSafeguard_whenSlotIsResolved() = runBlocking {
+        // Guard: Verify that when all slot medications are resolved, sibling entries also have snooze, nagging, and safeguard alarms cancelled in AlarmManager
+        val slotTime = LocalDateTime.now().plusHours(3).withSecond(0).withNano(0)
+        val entry1 = ScheduleEntry(
+            entryId = "entry_sibling_cancel_1",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.TAKEN_ON_TIME
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_sibling_cancel_2",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.TAKEN_ON_TIME
+        )
+        db.scheduleDao().insertScheduleEntry(entry1)
+        db.scheduleDao().insertScheduleEntry(entry2)
+
+        val alarmScheduler = AlarmScheduler(context)
+        alarmScheduler.scheduleSnooze(
+            entryId = entry2.entryId,
+            minutes = 10,
+            medicineName = "Ibuprofen"
+        )
+
+        // Verify snooze PendingIntent was scheduled for entry2
+        val snoozeIntent = Intent(context, MedicineAlarmReceiver::class.java)
+        val pendingSnooze = PendingIntent.getBroadcast(
+            context,
+            entry2.entryId.hashCode() + 1000,
+            snoozeIntent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+        )
+        assertNotNull("Sibling snooze PendingIntent must exist before slot resolution", pendingSnooze)
+
+        // Resolve slot via syncSlotNotificationAndAlarms on entry1
+        scheduleRepository.syncSlotNotificationAndAlarms(entry1.entryId, entry1, context)
+
+        val cancelledSnooze = PendingIntent.getBroadcast(
+            context,
+            entry2.entryId.hashCode() + 1000,
+            snoozeIntent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+        )
+        assertNull("Sibling snooze PendingIntent must be disarmed when all slot doses are taken", cancelledSnooze)
+    }
 }

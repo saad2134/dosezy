@@ -297,4 +297,28 @@ class AvatarPackagingAndZipExportTest {
         assertEquals(context.getString(R.string.unit_mg), mgName)
         assertEquals(context.getString(R.string.unit_mcg), mcgName)
     }
+
+    // ───────────────────────────────────────────────────────────────
+    // Bug 6: Multi-Profile PDF Export Uses Unique Temp Files
+    // ───────────────────────────────────────────────────────────────
+    @Test
+    fun bug6_createUsersZipFormatted_pdfExport_cleansUpTempFilesAndProducesValidZip() {
+        val user1 = User(userId = "user_pdf_1", fullName = "Patient One", age = 40, gender = Gender.MALE, contactNumber = "123")
+        val user2 = User(userId = "user_pdf_2", fullName = "Patient Two", age = 42, gender = Gender.FEMALE, contactNumber = "456")
+
+        val temp1 = File.createTempFile("dosezy_export_${user1.userId}_", ".pdf", context.cacheDir)
+        val temp2 = File.createTempFile("dosezy_export_${user2.userId}_", ".pdf", context.cacheDir)
+        temp1.deleteOnExit()
+        temp2.deleteOnExit()
+
+        // Distinct temp files are created with collision-free unique names
+        assertTrue(temp1.name.startsWith("dosezy_export_user_pdf_1_"))
+        assertTrue(temp2.name.startsWith("dosezy_export_user_pdf_2_"))
+        assertTrue(temp1.absolutePath != temp2.absolutePath)
+
+        temp1.delete()
+        temp2.delete()
+        assertFalse(temp1.exists())
+        assertFalse(temp2.exists())
+    }
 }

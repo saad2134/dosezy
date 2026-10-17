@@ -182,5 +182,47 @@ class DosezyAppWidgetProviderTest {
         // Verify remaining user's widget binding is untouched
         assertEquals(remainingUserId, DosezyWidgetPrefs.getAppWidgetUser(context, 102))
     }
+
+    @Test
+    fun testWidgetDateFormatting_respectsUserProfileLanguage() {
+        // Guard: Verify that widget date formatting resolves specific locale corresponding to user profile language
+        val frenchUser = com.example.dosezy.data.model.User(
+            userId = "user_french",
+            fullName = "Pierre",
+            age = 30,
+            gender = com.example.dosezy.data.model.Gender.DO_NOT_SPECIFY,
+            contactNumber = "+1234567890",
+            language = com.example.dosezy.data.model.Language.FRENCH
+        )
+        val arabicUser = com.example.dosezy.data.model.User(
+            userId = "user_arabic",
+            fullName = "Tariq",
+            age = 35,
+            gender = com.example.dosezy.data.model.Gender.DO_NOT_SPECIFY,
+            contactNumber = "+1234567891",
+            language = com.example.dosezy.data.model.Language.ARABIC
+        )
+
+        val frenchLocale = com.example.dosezy.utils.LocaleHelper.getLocale(frenchUser.language)
+        val arabicLocale = com.example.dosezy.utils.LocaleHelper.getLocale(arabicUser.language)
+
+        val cal = java.util.Calendar.getInstance()
+        cal.set(2026, java.util.Calendar.OCTOBER, 18, 10, 0)
+        val fixedMillis = cal.timeInMillis
+
+        val frenchFormat = java.text.SimpleDateFormat("EEE, MMM d", frenchLocale)
+        val frenchDate = frenchFormat.format(fixedMillis)
+
+        val arabicFormat = java.text.SimpleDateFormat("EEE, MMM d", arabicLocale)
+        val arabicDate = arabicFormat.format(fixedMillis)
+
+        val englishFormat = java.text.SimpleDateFormat("EEE, MMM d", java.util.Locale.ENGLISH)
+        val englishDate = englishFormat.format(fixedMillis)
+
+        assertEquals("fr", frenchLocale.language)
+        assertEquals("ar", arabicLocale.language)
+        assertFalse("French widget date should differ from English", frenchDate == englishDate)
+        assertFalse("Arabic widget date should differ from English", arabicDate == englishDate)
+    }
 }
 

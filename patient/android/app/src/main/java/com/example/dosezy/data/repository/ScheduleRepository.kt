@@ -467,10 +467,16 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
                     if (remainingPending.isEmpty()) {
                         // Guard: Cancel exact slot alarm and entry alarms from AlarmManager when all slot doses are resolved to remove lockscreen alarm icon and prevent phantom CPU wakeups
+                        // Guard: Disarm snooze, nagging, and intake safeguard alarms for all sibling slot entries to prevent phantom Doze wakeups (#BUG-SIBLING-CLEANUP)
                         try {
                             val alarmScheduler = AlarmScheduler(context)
                             alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
-                            slotEntries.forEach { alarmScheduler.cancelAlarm(it) }
+                            slotEntries.forEach { slotEntry ->
+                                alarmScheduler.cancelAlarm(slotEntry)
+                                alarmScheduler.cancelSnooze(slotEntry.entryId)
+                                alarmScheduler.cancelNagging(slotEntry.entryId)
+                                alarmScheduler.cancelIntakeSafeguardAlarm(slotEntry.entryId)
+                            }
                         } catch (_: Exception) {}
 
                         // All medications in this slot are handled: cancel notification for entry, primary, and all slot items

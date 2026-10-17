@@ -55,6 +55,8 @@ import com.example.dosezy.ui.subscreens.SwitchProfileScreen
 import com.example.dosezy.ui.components.AppPromptCoordinator
 import androidx.compose.foundation.isSystemInDarkTheme
 import com.example.dosezy.data.model.Theme
+import com.example.dosezy.notifications.AlarmActivity
+import com.example.dosezy.notifications.AlarmAudioPlayer
 import com.example.dosezy.ui.theme.DosezyTheme
 import com.example.dosezy.ui.viewmodels.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -83,6 +85,10 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        // Guard: Stop ringing alarm sound and vibration if brought to foreground from notification tap or while alarm is playing (#BUG-ALARM-TAP-STOP)
+        if (intent.getBooleanExtra("from_alarm", false) || AlarmAudioPlayer.isPlaying()) {
+            AlarmActivity.stopActiveAlarm()
+        }
         val targetUserId = intent.getStringExtra("switch_to_user_id")
         if (!targetUserId.isNullOrBlank()) {
             userViewModel.setCurrentUserById(targetUserId)
@@ -98,6 +104,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+        // Guard: Stop ringing alarm sound and vibration if cold-started from notification tap or while alarm is playing (#BUG-ALARM-TAP-STOP)
+        if (intent.getBooleanExtra("from_alarm", false) || AlarmAudioPlayer.isPlaying()) {
+            AlarmActivity.stopActiveAlarm()
+        }
 
         // Guard: Synchronously handle profile switch intent extra on cold start to prevent profile jumpiness and initial state flickering
         val targetUserId = intent.getStringExtra("switch_to_user_id")

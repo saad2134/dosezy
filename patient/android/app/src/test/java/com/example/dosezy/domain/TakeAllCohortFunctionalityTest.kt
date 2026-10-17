@@ -6,6 +6,7 @@
 package com.example.dosezy.domain
 
 import android.content.Context
+import android.content.Intent
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.example.dosezy.data.DosezyDatabase
@@ -623,6 +624,118 @@ class TakeAllCohortFunctionalityTest {
         val refillNotifId = (lowStockMed.medicineId + "_refill").hashCode()
         val activeNotifs = nManager.activeNotifications
         assertTrue("Refill alert notification must be posted when stock drops to or below threshold", activeNotifs.any { it.id == refillNotifId })
+    }
+
+    @Test
+    fun testTakeCohortUseCase_synchronizesAllDistinctTimeSlots() = runBlocking {
+        // Guard: Verify TakeCohortUseCase synchronizes alarms and notifications for every distinct time slot in entryIds
+        val slotTime1 = LocalDateTime.now().plusHours(1).withSecond(0).withNano(0)
+        val slotTime2 = LocalDateTime.now().plusHours(4).withSecond(0).withNano(0)
+
+        val entry1 = ScheduleEntry(
+            entryId = "entry_multislot_take_1",
+            userId = testUser.userId,
+            medicineId = medA.medicineId,
+            scheduledDateTime = slotTime1,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_multislot_take_2",
+            userId = testUser.userId,
+            medicineId = medB.medicineId,
+            scheduledDateTime = slotTime2,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        database.scheduleDao().insertScheduleEntry(entry1)
+        database.scheduleDao().insertScheduleEntry(entry2)
+
+        val alarmScheduler = com.example.dosezy.notifications.AlarmScheduler(context)
+        alarmScheduler.scheduleGroupedMedicineAlarm(slotTime1, listOf(entry1), listOf(medA.medicationName))
+        alarmScheduler.scheduleGroupedMedicineAlarm(slotTime2, listOf(entry2), listOf(medB.medicationName))
+
+        val slotKey1 = "${testUser.userId}_${slotTime1}"
+        val slotKey2 = "${testUser.userId}_${slotTime2}"
+        val alarmIntent = Intent(context, com.example.dosezy.notifications.MedicineAlarmReceiver::class.java)
+
+        assertNotNull(
+            "Slot 1 alarm must be armed before batch take",
+            android.app.PendingIntent.getBroadcast(context, slotKey1.hashCode(), alarmIntent, android.app.PendingIntent.FLAG_NO_CREATE or android.app.PendingIntent.FLAG_IMMUTABLE)
+        )
+        assertNotNull(
+            "Slot 2 alarm must be armed before batch take",
+            android.app.PendingIntent.getBroadcast(context, slotKey2.hashCode(), alarmIntent, android.app.PendingIntent.FLAG_NO_CREATE or android.app.PendingIntent.FLAG_IMMUTABLE)
+        )
+
+        val takeCohortUseCase = TakeCohortUseCase(database, scheduleRepository, context)
+        takeCohortUseCase.invoke(listOf(entry1.entryId, entry2.entryId), user = testUser)
+
+        // Both distinct slots must be disarmed from AlarmManager
+        assertNull(
+            "Slot 1 alarm must be cancelled after multi-slot batch take",
+            android.app.PendingIntent.getBroadcast(context, slotKey1.hashCode(), alarmIntent, android.app.PendingIntent.FLAG_NO_CREATE or android.app.PendingIntent.FLAG_IMMUTABLE)
+        )
+        assertNull(
+            "Slot 2 alarm must be cancelled after multi-slot batch take",
+            android.app.PendingIntent.getBroadcast(context, slotKey2.hashCode(), alarmIntent, android.app.PendingIntent.FLAG_NO_CREATE or android.app.PendingIntent.FLAG_IMMUTABLE)
+        )
+    }
+
+    @Test
+    fun testSkipCohortUseCase_synchronizesAllDistinctTimeSlots() = runBlocking {
+        // Guard: Verify SkipCohortUseCase synchronizes alarms and notifications for every distinct time slot in entryIds
+        val slotTime1 = LocalDateTime.now().plusHours(2).withSecond(0).withNano(0)
+        val slotTime2 = LocalDateTime.now().plusHours(5).withSecond(0).withNano(0)
+
+        val entry1 = ScheduleEntry(
+            entryId = "entry_multislot_skip_1",
+            userId = testUser.userId,
+            medicineId = medA.medicineId,
+            scheduledDateTime = slotTime1,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_multislot_skip_2",
+            userId = testUser.userId,
+            medicineId = medB.medicineId,
+            scheduledDateTime = slotTime2,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        database.scheduleDao().insertScheduleEntry(entry1)
+        database.scheduleDao().insertScheduleEntry(entry2)
+
+        val alarmScheduler = com.example.dosezy.notifications.AlarmScheduler(context)
+        alarmScheduler.scheduleGroupedMedicineAlarm(slotTime1, listOf(entry1), listOf(medA.medicationName))
+        alarmScheduler.scheduleGroupedMedicineAlarm(slotTime2, listOf(entry2), listOf(medB.medicationName))
+
+        val slotKey1 = "${testUser.userId}_${slotTime1}"
+        val slotKey2 = "${testUser.userId}_${slotTime2}"
+        val alarmIntent = Intent(context, com.example.dosezy.notifications.MedicineAlarmReceiver::class.java)
+
+        assertNotNull(
+            "Slot 1 alarm must be armed before batch skip",
+            android.app.PendingIntent.getBroadcast(context, slotKey1.hashCode(), alarmIntent, android.app.PendingIntent.FLAG_NO_CREATE or android.app.PendingIntent.FLAG_IMMUTABLE)
+        )
+        assertNotNull(
+            "Slot 2 alarm must be armed before batch skip",
+            android.app.PendingIntent.getBroadcast(context, slotKey2.hashCode(), alarmIntent, android.app.PendingIntent.FLAG_NO_CREATE or android.app.PendingIntent.FLAG_IMMUTABLE)
+        )
+
+        val skipCohortUseCase = SkipCohortUseCase(scheduleRepository, context)
+        skipCohortUseCase.invoke(listOf(entry1.entryId, entry2.entryId), "Travel conflict")
+
+        // Both distinct slots must be disarmed from AlarmManager
+        assertNull(
+            "Slot 1 alarm must be cancelled after multi-slot batch skip",
+            android.app.PendingIntent.getBroadcast(context, slotKey1.hashCode(), alarmIntent, android.app.PendingIntent.FLAG_NO_CREATE or android.app.PendingIntent.FLAG_IMMUTABLE)
+        )
+        assertNull(
+            "Slot 2 alarm must be cancelled after multi-slot batch skip",
+            android.app.PendingIntent.getBroadcast(context, slotKey2.hashCode(), alarmIntent, android.app.PendingIntent.FLAG_NO_CREATE or android.app.PendingIntent.FLAG_IMMUTABLE)
+        )
     }
 }
 

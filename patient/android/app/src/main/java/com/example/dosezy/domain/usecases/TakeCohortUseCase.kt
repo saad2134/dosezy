@@ -77,11 +77,13 @@ class TakeCohortUseCase @Inject constructor(
             scheduleRepository.recordDoseTaken(id, status, nowStr, context, notes, syncSlotNotification = false)
         }
 
-        // Guard: Coordinate single slot notification sync and widget update after batch loop to prevent notification shade flicker and repeated widget broadcasts
-        val primaryId = entryIds.firstOrNull()
-        val primaryEntry = primaryId?.let { database.scheduleDao().getScheduleEntryById(it) }
-        if (primaryId != null && primaryEntry != null) {
-            scheduleRepository.syncSlotNotificationAndAlarms(primaryId, primaryEntry, context)
+        // Guard: Coordinate slot notification sync and widget updates across each distinct time slot in entryIds (#BUG-MULTI-SLOT-COHORT)
+        val entries = entryIds.mapNotNull { database.scheduleDao().getScheduleEntryById(it) }
+        val distinctSlots = entries.distinctBy { it.scheduledDateTime.withSecond(0).withNano(0) }
+        if (distinctSlots.isNotEmpty()) {
+            distinctSlots.forEach { slotEntry ->
+                scheduleRepository.syncSlotNotificationAndAlarms(slotEntry.entryId, slotEntry, context)
+            }
         } else {
             try {
                 DosezyAppWidgetProvider.updateAppWidgets(context)

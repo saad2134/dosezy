@@ -230,7 +230,12 @@ class AnalyticsViewModel @Inject constructor(
                 it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE
             }
             val dayMissed = dayEntries.count { isEntryMissed(it) }
-            val dayDecided = dayTaken + dayMissed
+            val isToday = date.isEqual(today)
+            // Guard: Factor overdue pending doses on the current day into decided counts so today's adherence rate is not falsely reported as 100% while untaken past doses remain (#BUG-ANALYTICS-OVERDUE)
+            val dayOverduePending = if (isToday) {
+                dayEntries.count { it.status == MedicationStatus.PENDING && it.scheduledDateTime.isBefore(now) }
+            } else 0
+            val dayDecided = dayTaken + dayMissed + dayOverduePending
             val dayRate = if (dayDecided > 0) ((dayTaken.toDouble() / dayDecided.toDouble()) * 100).toInt() else 0
             DayStat(
                 date = date,

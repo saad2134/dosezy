@@ -108,8 +108,10 @@ class MedicineRepository @Inject constructor(
                 // Cancel existing alarms for this medicine BEFORE modifying or deleting schedule entries
                 scheduleRepository.cancelAlarmsForMedicine(medicine.medicineId, this.context)
 
-                // Guard: Align deletion cutoff with generateScheduleEntries (now - 15m) so untaken doses from earlier today are not deleted and lost from adherence history
-                val cutoff = LocalDateTime.now().minusMinutes(15)
+                // Guard: Clamp deletion cutoff to start of today so updating schedules shortly after midnight (00:00-00:15) does not delete yesterday's untaken evening doses (#BUG-MIDNIGHT-CUTOFF)
+                val startOfToday = LocalDate.now().atStartOfDay()
+                val computedCutoff = LocalDateTime.now().minusMinutes(15)
+                val cutoff = if (computedCutoff.isBefore(startOfToday)) startOfToday else computedCutoff
                 val cutoffEpochMillis = cutoff.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
 
                 // Delete untaken schedule entries from cutoff onwards for this medicine

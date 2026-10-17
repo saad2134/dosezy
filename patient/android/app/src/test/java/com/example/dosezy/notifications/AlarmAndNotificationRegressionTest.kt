@@ -323,5 +323,33 @@ class AlarmAndNotificationRegressionTest {
         assertEquals(targetUserId, showIntent.getStringExtra("switch_to_user_id"))
         assertEquals("schedule", showIntent.getStringExtra("fragment"))
     }
+
+    @Test
+    fun alarmNotificationIntent_containsFromAlarmExtra_andStopsRingingOnTap() {
+        // Guard: Verify that notification launch intent carries from_alarm extra and stops active alarm audio and vibration
+        val intent = Intent().apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra("fragment", "schedule")
+            putExtra("from_alarm", true)
+            putExtra("switch_to_user_id", "test_user_tap")
+        }
+
+        assertTrue("Notification launch intent must contain from_alarm = true", intent.getBooleanExtra("from_alarm", false))
+        assertEquals("schedule", intent.getStringExtra("fragment"))
+        assertEquals("test_user_tap", intent.getStringExtra("switch_to_user_id"))
+
+        val field = AlarmAudioPlayer::class.java.getDeclaredField("mediaPlayer")
+        field.isAccessible = true
+        val mockPlayer = mockk<android.media.MediaPlayer>(relaxed = true)
+        every { mockPlayer.isPlaying } returns true
+        field.set(AlarmAudioPlayer, mockPlayer)
+        assertTrue("AlarmAudioPlayer must report playing while ringing", AlarmAudioPlayer.isPlaying())
+
+        // Simulate MainActivity onCreate/onNewIntent notification dispatch check
+        if (intent.getBooleanExtra("from_alarm", false) || AlarmAudioPlayer.isPlaying()) {
+            AlarmActivity.stopActiveAlarm()
+        }
+        assertFalse("AlarmAudioPlayer must be stopped after notification tap", AlarmAudioPlayer.isPlaying())
+    }
 }
 

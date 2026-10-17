@@ -895,6 +895,51 @@ class IntakeSafeguardManagerLifecycleTest {
         // Cleanup
         IntakeSafeguardManager.cancelCountdown(context)
     }
+
+    @Test
+    fun testConfirmIntake_reconcilesMultiSlotEntriesAndDisarmsAlarms() = runBlocking {
+        val now = LocalDateTime.now()
+        val entry1 = ScheduleEntry(
+            entryId = "entry_multislot_1",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = now.minusMinutes(10),
+            status = MedicationStatus.PENDING
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_multislot_2",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = now.minusMinutes(5),
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entry1)
+        database.scheduleDao().insertScheduleEntry(entry2)
+
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entry1.entryId,
+            entryIds = listOf(entry1.entryId, entry2.entryId),
+            medicineName = testMedicine.medicationName,
+            medicineNames = listOf(testMedicine.medicationName),
+            scheduledTime = "08:00 AM",
+            durationSeconds = 60,
+            userId = testUser.userId
+        )
+
+        val success = IntakeSafeguardManager.confirmIntake(context, database)
+        assertTrue("Intake confirmation should succeed", success)
+
+        assertNull("Active countdown state must be cleared after confirmation", IntakeSafeguardManager.activeCountdown.value)
+
+        val updated1 = database.scheduleDao().getScheduleEntryById(entry1.entryId)
+        val updated2 = database.scheduleDao().getScheduleEntryById(entry2.entryId)
+
+        assertNotNull(updated1)
+        assertNotNull(updated2)
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, updated1?.status)
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, updated2?.status)
+    }
 }
 
 

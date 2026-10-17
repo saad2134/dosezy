@@ -389,9 +389,11 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         }
 
         // Guard: Use SINGLE_TOP/CLEAR_TOP with profile switch and route so clicking notification switches user and displays schedule
+        // Guard: Pass from_alarm flag so tapping notification stops continuous alarm audio and vibration in MainActivity (#BUG-ALARM-TAP-STOP)
         val mainIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra("fragment", "schedule")
+            putExtra("from_alarm", true)
             userId?.let { putExtra("switch_to_user_id", it) }
         }
 
