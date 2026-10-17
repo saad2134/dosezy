@@ -245,22 +245,26 @@ data class Medicine(
             }
         }
 
-        // Guard: Calculate unit consumption using Double precision and respect customDosages per slot without truncating decimal doses (e.g. 1.5 tablets)
-        val dosesPerIntake: Double = if (!customDosages.isNullOrEmpty() && scheduledTimes.isNotEmpty()) {
-            val totalCustom = scheduledTimes.sumOf { getDosageForTime(it) }
-            totalCustom / scheduledTimes.size.toDouble()
-        } else {
-            when (dosageUnit) {
-                DosageUnit.TABLET, DosageUnit.CAPSULE, DosageUnit.ML, DosageUnit.PUFF, DosageUnit.AMPULE -> {
+        // Guard: Calculate unit consumption respecting customDosages for countable units while anchoring chemical strength (MG, MCG, MEQ) to 1.0 unit per intake
+        val dosesPerIntake: Double = when (dosageUnit) {
+            DosageUnit.MG, DosageUnit.MCG, DosageUnit.MEQ -> 1.0
+            DosageUnit.DROP -> 1.0
+            DosageUnit.TABLET, DosageUnit.CAPSULE, DosageUnit.ML, DosageUnit.PUFF, DosageUnit.AMPULE -> {
+                if (!customDosages.isNullOrEmpty() && scheduledTimes.isNotEmpty()) {
+                    val totalCustom = scheduledTimes.sumOf { getDosageForTime(it) }
+                    totalCustom / scheduledTimes.size.toDouble()
+                } else {
                     if (dosage > 0) dosage else 1.0
                 }
-                DosageUnit.MG, DosageUnit.MCG, DosageUnit.DROP, DosageUnit.MEQ -> 1.0
             }
         }
 
         if (isDrop) {
             val dropsPerIntake = if (dosage > 0) dosage else 1.0
-            val effectiveDropsPerIntake = if (!customDosages.isNullOrEmpty() && scheduledTimes.isNotEmpty()) dosesPerIntake else dropsPerIntake
+            val effectiveDropsPerIntake = if (!customDosages.isNullOrEmpty() && scheduledTimes.isNotEmpty()) {
+                val totalCustom = scheduledTimes.sumOf { getDosageForTime(it) }
+                totalCustom / scheduledTimes.size.toDouble()
+            } else dropsPerIntake
             val totalDrops = totalIntakes * effectiveDropsPerIntake
             return kotlin.math.ceil(totalDrops / 100.0).toInt().coerceAtLeast(1)
         }

@@ -144,6 +144,12 @@ abstract class DosezyDatabase : RoomDatabase() {
             }
         }
 
+        // Guard: Visible for testing to inject in-memory database instance into broadcast receivers and static managers
+        @androidx.annotation.VisibleForTesting
+        fun setInstance(db: DosezyDatabase?) {
+            INSTANCE = db
+        }
+
         fun getInstance(context: Context): DosezyDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(

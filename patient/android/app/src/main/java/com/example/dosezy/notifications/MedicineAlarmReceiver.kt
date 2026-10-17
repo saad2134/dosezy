@@ -402,6 +402,9 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             if (entryIds != null) {
                 putStringArrayListExtra(EXTRA_ENTRY_IDS, entryIds)
             }
+            // Guard: Pass isIntakeReAlert and scheduledTime to prevent re-entering safeguard countdown buffer (#104)
+            putExtra(EXTRA_IS_INTAKE_REALERT, isIntakeReAlert)
+            putExtra(EXTRA_SCHEDULED_TIME, scheduledTime ?: "")
         }
 
         val snoozeIntent = Intent(context, NotificationActionReceiver::class.java).apply {

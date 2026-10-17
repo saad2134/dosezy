@@ -6,6 +6,7 @@
 package com.example.dosezy.notifications
 
 import android.content.Context
+import android.content.Intent
 import androidx.room.Room
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.test.core.app.ApplicationProvider
@@ -88,6 +89,7 @@ class IntakeSafeguardManagerLifecycleTest {
         database = Room.inMemoryDatabaseBuilder(context, DosezyDatabase::class.java)
             .allowMainThreadQueries()
             .build()
+        DosezyDatabase.setInstance(database)
         scheduleRepository = ScheduleRepository(database)
         medicineRepository = MedicineRepository(database, scheduleRepository, context)
         userRepository = UserRepository(database)
@@ -101,6 +103,7 @@ class IntakeSafeguardManagerLifecycleTest {
     @After
     fun tearDown() {
         IntakeSafeguardManager.cancelCountdown(context)
+        DosezyDatabase.setInstance(null)
         database.close()
     }
 
@@ -538,6 +541,81 @@ class IntakeSafeguardManagerLifecycleTest {
         )
 
         assertNull("Snooze coordination member must be cancelled upon countdown start", prefs.getString("snooze_member_$entryId", null))
+
+        IntakeSafeguardManager.cancelCountdown(context)
+    }
+
+    @Test
+    fun testNotificationActionReceiver_takenAction_withIntakeReAlert_recordsDoseTakenDirectly() = runBlocking {
+        val entry = ScheduleEntry(
+            entryId = "entry_realert_taken",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = LocalDateTime.now(),
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entry)
+
+        val receiver = NotificationActionReceiver()
+        val intent = Intent().apply {
+            action = "TAKEN_ACTION"
+            putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, entry.entryId)
+            putExtra(MedicineAlarmReceiver.EXTRA_IS_INTAKE_REALERT, true)
+        }
+
+        receiver.onReceive(context, intent)
+
+        // Wait for Dispatchers.IO coroutine in receiver to finish writing dose
+        var updated: ScheduleEntry? = null
+        for (i in 1..20) {
+            kotlinx.coroutines.delay(50)
+            updated = database.scheduleDao().getScheduleEntryById(entry.entryId)
+            if (updated?.status == MedicationStatus.TAKEN_ON_TIME) break
+        }
+
+        // Must NOT start another intake countdown
+        assertNull("Responding to intake safeguard re-alert must not start another countdown buffer", IntakeSafeguardManager.activeCountdown.value)
+
+        // Must record dose as taken
+        assertNotNull(updated)
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, updated?.status)
+    }
+
+    @Test
+    fun testNotificationActionReceiver_takenAction_withoutIntakeReAlert_startsCountdown() = runBlocking {
+        val entry = ScheduleEntry(
+            entryId = "entry_first_taken",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = LocalDateTime.now(),
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entry)
+
+        val receiver = NotificationActionReceiver()
+        val intent = Intent().apply {
+            action = "TAKEN_ACTION"
+            putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, entry.entryId)
+            putExtra(MedicineAlarmReceiver.EXTRA_IS_INTAKE_REALERT, false)
+        }
+
+        receiver.onReceive(context, intent)
+
+        // Wait for Dispatchers.IO coroutine to start countdown
+        var active: IntakeSafeguardManager.IntakeCountdownState? = null
+        for (i in 1..20) {
+            kotlinx.coroutines.delay(50)
+            active = IntakeSafeguardManager.activeCountdown.value
+            if (active != null) break
+        }
+
+        // Must start intake countdown
+        assertNotNull("First take action must start intake safeguard countdown", active)
+        assertEquals(entry.entryId, active?.entryId)
+
+        // Must remain pending until countdown is confirmed
+        val updated = database.scheduleDao().getScheduleEntryById(entry.entryId)
+        assertEquals(MedicationStatus.PENDING, updated?.status)
 
         IntakeSafeguardManager.cancelCountdown(context)
     }

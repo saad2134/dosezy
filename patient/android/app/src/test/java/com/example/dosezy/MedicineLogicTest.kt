@@ -640,6 +640,41 @@ class MedicineLogicTest {
         assertEquals(3, m.calculateRefillQuantity(30))
     }
 
+    @Test
+    fun refillQuantity_chemicalStrengthWithCustomDosages_anchorsToOneUnitPerIntake() {
+        // Guard: Chemical strength units (mg, mcg, mEq) represent active drug strength per pill/unit, not count.
+        // Even when customDosages map is present, daily requirement is 1 unit per slot (60 units for 30 days).
+        val customMg = mapOf("08:00" to 250.0, "20:00" to 500.0)
+        val mgMed = med(
+            dosage = 250.0,
+            unit = DosageUnit.MG,
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
+            customDosages = customMg
+        )
+        assertEquals(60, mgMed.calculateRefillQuantity(30))
+
+        val customMcg = mapOf("08:00" to 50.0, "20:00" to 100.0)
+        val mcgMed = med(
+            dosage = 50.0,
+            unit = DosageUnit.MCG,
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
+            customDosages = customMcg
+        )
+        assertEquals(60, mcgMed.calculateRefillQuantity(30))
+
+        val customMeq = mapOf("08:00" to 20.0, "20:00" to 40.0)
+        val meqMed = med(
+            dosage = 20.0,
+            unit = DosageUnit.MEQ,
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
+            customDosages = customMeq
+        )
+        assertEquals(60, meqMed.calculateRefillQuantity(30))
+    }
+
     // ───────────────────────────────────────────────────────────────
     // 12. Image URI normalization (raw path vs file://)
     // ───────────────────────────────────────────────────────────────

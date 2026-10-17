@@ -112,8 +112,9 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 val firstEntry = database.scheduleDao().getScheduleEntryById(primaryEntryId)
                 val user = firstEntry?.let { database.userDao().getUserByIdDirect(it.userId) }
 
-                // Guard: If intake safeguard is enabled, start countdown timer instead of immediately marking taken (#104)
-                if (user?.intakeSafeguardEnabled == true) {
+                // Guard: Only start intake countdown safeguard if not responding to an expired safeguard re-alert to prevent infinite notification loops (#104)
+                val isIntakeReAlert = intent?.getBooleanExtra(MedicineAlarmReceiver.EXTRA_IS_INTAKE_REALERT, false) ?: false
+                if (user?.intakeSafeguardEnabled == true && !isIntakeReAlert) {
                     val medicineNames = allIds.mapNotNull { id ->
                         val entry = database.scheduleDao().getScheduleEntryById(id)
                         val med = entry?.let { database.medicineDao().getMedicineByIdDirect(it.medicineId) }
@@ -128,8 +129,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
                     val locale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLang)
                     val scheduledTimeStr = intent?.getStringExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME)
                         ?.takeIf { it.isNotBlank() }
-                        ?: firstEntry?.scheduledDateTime?.let { it.format(java.time.format.DateTimeFormatter.ofPattern(timePattern, locale)) }
-                        ?: ""
+                        ?: firstEntry.scheduledDateTime.let { it.format(java.time.format.DateTimeFormatter.ofPattern(timePattern, locale)) }
                     IntakeSafeguardManager.startCountdown(
                         context = context,
                         entryId = primaryEntryId,

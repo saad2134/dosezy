@@ -348,6 +348,15 @@ class AlarmScheduler(private val context: Context) {
                         sIntent.cancel()
                     }
                 } else {
+                    // Guard: Resolve user profile's explicit timeFormat preference to prevent format flipping between 12h and 24h during snooze group transfers
+                    val userTimeFormat = try {
+                        val db = com.example.dosezy.data.DosezyDatabase.getInstance(context)
+                        val entry = kotlinx.coroutines.runBlocking {
+                            kotlinx.coroutines.withTimeoutOrNull(500L) { db.scheduleDao().getScheduleEntryById(primaryId) }
+                        }
+                        entry?.let { kotlinx.coroutines.runBlocking { db.userDao().getUserByIdDirect(it.userId) } }?.timeFormat
+                    } catch (_: Exception) { null }
+
                     if (entryId == primaryId) {
                         val newPrimary = currentIds.first()
                         editor.remove("snooze_group_ids_$primaryId")
@@ -363,7 +372,7 @@ class AlarmScheduler(private val context: Context) {
 
                         if (triggerTime > System.currentTimeMillis()) {
                             val remMins = ((triggerTime - System.currentTimeMillis()) / (60 * 1000)).toInt().coerceAtLeast(1)
-                            scheduleGroupedSnooze(currentIds, remMins, currentNames, triggerTime)
+                            scheduleGroupedSnooze(currentIds, remMins, currentNames, triggerTime, timeFormat = userTimeFormat)
                         }
                     } else {
                         editor.putString("snooze_group_ids_$primaryId", currentIds.joinToString(","))
@@ -372,7 +381,8 @@ class AlarmScheduler(private val context: Context) {
 
                         val medNameSummary = if (currentNames.isNotEmpty()) currentNames.joinToString(", ") else "Medicine"
                         // Guard: Format snooze time respecting 24h vs 12h user preference and active locale instead of hardcoded 12h pattern
-                        val is24 = android.text.format.DateFormat.is24HourFormat(context)
+                        val is24 = userTimeFormat == TimeFormat.HOUR_24 ||
+                                (userTimeFormat == null && android.text.format.DateFormat.is24HourFormat(context))
                         val pattern = if (is24) "HH:mm" else "h:mm a"
                         val savedLang = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
                         val locale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLang)

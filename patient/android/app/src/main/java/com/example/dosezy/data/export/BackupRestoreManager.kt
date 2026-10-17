@@ -975,14 +975,13 @@ class BackupRestoreManager(
         return list
     }
 
-    // Guard: Generate deterministic entryId formatted as <medicineId>_YYYY_MM_DD_HH_MM so AlarmScheduler and ScheduleRepository can extract timestamps without blocking DB queries
-    private fun createRestoredEntryId(medicineId: String, originalEntryId: String, scheduledDateTime: LocalDateTime): String {
+    // Guard: Generate deterministic entryId identical to ScheduleRecurrenceEngine to prevent duplicate schedule entries on auto-extend or medication update
+    internal fun createRestoredEntryId(medicineId: String, originalEntryId: String, scheduledDateTime: LocalDateTime): String {
         return if (originalEntryId.startsWith("PRN_")) {
             "PRN_${UUID.randomUUID()}"
         } else {
-            val datePart = scheduledDateTime.toLocalDate().toString().replace("-", "_")
-            val timePart = scheduledDateTime.toLocalTime().withSecond(0).withNano(0).toString().replace(":", "_")
-            "${medicineId}_${datePart}_${timePart}"
+            val cleanTime = scheduledDateTime.toLocalTime().withSecond(0).withNano(0)
+            "${medicineId}_${scheduledDateTime.toLocalDate()}_$cleanTime".replace(":", "_").replace("-", "_")
         }
     }
 }

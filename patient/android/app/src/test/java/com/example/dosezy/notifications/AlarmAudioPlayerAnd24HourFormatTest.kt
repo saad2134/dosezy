@@ -182,6 +182,57 @@ class AlarmAudioPlayerAnd24HourFormatTest {
         assertEquals("20:00", scheduledTimeExtra)
     }
 
+    @Test
+    fun issue2_alarmScheduler_cancelSnooze_transferPreserves24HourFormat() {
+        // Guard: Set system setting to 24-hour format so fallback logic respects 24h mode
+        android.provider.Settings.System.putString(context.contentResolver, android.provider.Settings.System.TIME_12_24, "24")
+
+        val scheduler = AlarmScheduler(context)
+        val entryIds = listOf("entry_transfer_1", "entry_transfer_2", "entry_transfer_3")
+        val medNames = listOf("Aspirin", "Metformin", "Lisinopril")
+
+        // 8:30 PM = 20:30 (set 1 day in the future so triggerTime is guaranteed > System.currentTimeMillis())
+        val futureEvening = LocalDateTime.now().plusDays(1).withHour(20).withMinute(30).withSecond(0).withNano(0)
+        val explicitTrigger = futureEvening
+            .atZone(java.time.ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
+
+        scheduler.scheduleGroupedSnooze(
+            entryIds = entryIds,
+            minutes = 10,
+            medicineNames = medNames,
+            explicitTriggerTime = explicitTrigger,
+            timeFormat = TimeFormat.HOUR_24
+        )
+
+        // When primary entry_transfer_1 is cancelled/taken, transfer to entry_transfer_2 must preserve 24-hour format
+        scheduler.cancelSnooze("entry_transfer_1")
+
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val shadow = shadowOf(alarmManager)
+        val scheduledAlarms = shadow.scheduledAlarms
+        assertFalse("Transferred alarm should be scheduled", scheduledAlarms.isEmpty())
+
+        val lastAlarm = scheduledAlarms.last()
+        val shadowIntent = shadowOf(lastAlarm.operation)
+        val intent = shadowIntent.savedIntent
+
+        val scheduledTimeExtra = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME)
+        assertNotNull(scheduledTimeExtra)
+        assertEquals("20:30", scheduledTimeExtra)
+        assertFalse("Must not format in 12-hour format containing AM/PM", scheduledTimeExtra!!.contains("PM") || scheduledTimeExtra.contains("AM"))
+
+        // When secondary entry_transfer_3 is cancelled, update to primary entry_transfer_2 must also preserve 24-hour format
+        scheduler.cancelSnooze("entry_transfer_3")
+        val updatedAlarm = shadow.scheduledAlarms.last()
+        val updatedIntent = shadowOf(updatedAlarm.operation).savedIntent
+        val updatedTimeExtra = updatedIntent.getStringExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME)
+        assertNotNull(updatedTimeExtra)
+        assertEquals("20:30", updatedTimeExtra)
+        assertFalse("Must not format in 12-hour format containing AM/PM", updatedTimeExtra!!.contains("PM") || updatedTimeExtra.contains("AM"))
+    }
+
     // ───────────────────────────────────────────────────────────────
     // Issue 3: Profile Age, Gender, and Fallback String Localization
     // ───────────────────────────────────────────────────────────────

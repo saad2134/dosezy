@@ -1,4 +1,4 @@
-﻿package com.example.dosezy.export
+package com.example.dosezy.export
 
 import android.content.Context
 import com.example.dosezy.data.DosezyDatabase
@@ -351,5 +351,41 @@ class BackupFrequencyFormatAndProfileSelectionTest {
         val emptyRoster = emptyList<User>()
         val fallbackTheme = if (emptyRoster.isEmpty()) "system" else emptyRoster.first().theme.name.lowercase()
         assertEquals("system", fallbackTheme)
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 5. Restored EntryId Alignment with ScheduleRecurrenceEngine
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testRestoredEntryId_matchesScheduleRecurrenceEngineFormat() {
+        val medId = "45f69d30-b19e-4c74-9ec4-33b1e7fae44f"
+        val targetDate = LocalDate.now().plusDays(2)
+        val schedDateTime = targetDate.atTime(8, 0, 0)
+        val medicine = Medicine(
+            medicineId = medId,
+            userId = "test-user",
+            medicationName = "Aspirin",
+            dosage = 1.0,
+            dosageUnit = DosageUnit.TABLET,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+
+        // Generate schedule entry from ScheduleRecurrenceEngine
+        val engineEntries = com.example.dosezy.domain.ScheduleRecurrenceEngine.generateScheduleEntries(
+            medicine = medicine,
+            startDateRange = targetDate,
+            days = 1
+        )
+        val expectedEntryId = engineEntries.first().entryId
+
+        // Restored entry ID from BackupRestoreManager
+        val restoredEntryId = backupRestoreManager.createRestoredEntryId(medId, "orig_entry_1", schedDateTime)
+
+        // Both IDs must match exactly to prevent duplicate schedule entries on restore and auto-extend
+        assertEquals(expectedEntryId, restoredEntryId)
+        assertTrue("Entry ID must replace hyphens with underscores matching ScheduleRecurrenceEngine", restoredEntryId.startsWith("45f69d30_b19e_4c74_9ec4_33b1e7fae44f"))
     }
 }
