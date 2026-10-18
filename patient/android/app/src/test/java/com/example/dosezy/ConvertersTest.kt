@@ -384,5 +384,23 @@ class ConvertersTest {
 
         assertEquals(com.example.dosezy.data.model.AlarmSound.GENTLE_CHIME, converters.toAlarmSound("gentle_chime"))
         assertEquals(com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT, converters.toAlarmSound("UNKNOWN_SOUND"))
+
+        // Guard: Verify case-insensitive parsing and trimmed handling for PillShape
+        assertEquals(PillShape.CAPSULE, converters.toPillShape("capsule"))
+        assertEquals(PillShape.OVAL, converters.toPillShape("oval"))
+        assertEquals(PillShape.ROUND, converters.toPillShape("  round  "))
+        assertEquals(PillShape.ROUND, converters.toPillShape("UNKNOWN_SHAPE"))
+
+        // Guard: Verify case-insensitive pattern parsing in Frequency JSON converter
+        val everyXDaysJson = """{"pattern": "every_x_days", "intervalDays": 3}"""
+        val parsedEveryXDays = converters.toFrequency(everyXDaysJson)
+        assertNotNull(parsedEveryXDays)
+        assertEquals(FrequencyPattern.EVERY_X_DAYS, parsedEveryXDays!!.pattern)
+        assertEquals(3, parsedEveryXDays.intervalDays)
+
+        val weeklyJson = """{"pattern": "weekly", "daysPerWeek": 4}"""
+        val parsedWeekly = converters.toFrequency(weeklyJson)
+        assertNotNull(parsedWeekly)
+        assertEquals(FrequencyPattern.WEEKLY, parsedWeekly!!.pattern)
     }
 }

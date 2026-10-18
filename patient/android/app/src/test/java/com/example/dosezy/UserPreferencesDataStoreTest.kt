@@ -66,4 +66,22 @@ class UserPreferencesDataStoreTest {
         dataStore.setOverlayPromptDismissed(true)
         assertTrue(dataStore.overlayPromptDismissedFlow.first())
     }
+
+    @Test
+    fun testLocaleHelperSavedLanguage_handlesLowercasedAndPaddedValues() {
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+
+        // Guard: Verify case-insensitive and trimmed language resolution in LocaleHelper.getSavedLanguage
+        prefs.edit().putString("selected_language", "arabic").apply()
+        assertEquals(com.example.dosezy.data.model.Language.ARABIC, com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context))
+
+        prefs.edit().putString("selected_language", "  spanish  ").apply()
+        assertEquals(com.example.dosezy.data.model.Language.SPANISH, com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context))
+
+        prefs.edit().putString("selected_language", "french").apply()
+        assertEquals(com.example.dosezy.data.model.Language.FRENCH, com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context))
+
+        prefs.edit().putString("selected_language", "unknown_invalid").apply()
+        assertEquals(com.example.dosezy.data.model.Language.SYSTEM, com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context))
+    }
 }

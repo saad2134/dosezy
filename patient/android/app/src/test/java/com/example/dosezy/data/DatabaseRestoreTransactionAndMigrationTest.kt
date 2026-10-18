@@ -948,5 +948,77 @@ class DatabaseRestoreTransactionAndMigrationTest {
         assertFalse("Entry reminder must be dismissed from shade on overwrite", nManager.activeNotifications.any { it.id == existingEntry.entryId.hashCode() })
         assertFalse("Refill alert must be dismissed from shade on overwrite", nManager.activeNotifications.any { it.id == (existingMed.medicineId + "_refill").hashCode() })
     }
+
+    @Test
+    fun backupRestoreManager_deserializesLowercasedAndTrimmedEnumsResiliently() {
+        val userJson = """
+            {
+              "userId": "usr_lower_01",
+              "fullName": "Lower Case User",
+              "gender": "female",
+              "theme": "dark",
+              "timeFormat": "hour_24",
+              "language": "spanish",
+              "alarmSound": "gentle_chime"
+            }
+        """.trimIndent()
+
+        // Guard: Verify lowercased user profile enums correctly deserialize without falling back to defaults
+        val parsedUser = backupManager.parseUserFromJson(userJson)
+        assertEquals(Gender.FEMALE, parsedUser.gender)
+        assertEquals(Theme.DARK, parsedUser.theme)
+        assertEquals(TimeFormat.HOUR_24, parsedUser.timeFormat)
+        assertEquals(Language.SPANISH, parsedUser.language)
+        assertEquals(AlarmSound.GENTLE_CHIME, parsedUser.alarmSound)
+
+        val medJson = """
+            [
+              {
+                "medicineId": "med_lower_01",
+                "userId": "usr_lower_01",
+                "medicationName": "Metformin",
+                "dosage": 500.0,
+                "dosageUnit": "tablet",
+                "frequency": {
+                  "pattern": "every_x_days",
+                  "intervalDays": 2
+                },
+                "pillShape": "capsule"
+              }
+            ]
+        """.trimIndent()
+
+        // Guard: Verify lowercased medicine frequency pattern and pill shape correctly deserialize without falling back to defaults
+        val parsedMeds = backupManager.parseMedicinesFromJson(medJson)
+        assertEquals(1, parsedMeds.size)
+        assertEquals(DosageUnit.TABLET, parsedMeds[0].dosageUnit)
+        assertEquals(FrequencyPattern.EVERY_X_DAYS, parsedMeds[0].frequency.pattern)
+        assertEquals(PillShape.CAPSULE, parsedMeds[0].pillShape)
+
+        val schedJson = """
+            [
+              {
+                "entryId": "entry_lower_01",
+                "userId": "usr_lower_01",
+                "medicineId": "med_lower_01",
+                "scheduledDateTime": "2026-10-18T08:00:00",
+                "status": "taken_on_time"
+              },
+              {
+                "entryId": "entry_lower_02",
+                "userId": "usr_lower_01",
+                "medicineId": "med_lower_01",
+                "scheduledDateTime": "2026-10-18T20:00:00",
+                "status": "skipped"
+              }
+            ]
+        """.trimIndent()
+
+        // Guard: Verify lowercased schedule entry status correctly deserializes without resetting to PENDING
+        val parsedSchedules = backupManager.parseSchedulesFromJson(schedJson)
+        assertEquals(2, parsedSchedules.size)
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, parsedSchedules[0].status)
+        assertEquals(MedicationStatus.SKIPPED, parsedSchedules[1].status)
+    }
 }
 

@@ -114,9 +114,10 @@ class Converters {
     @TypeConverter
     fun fromPillShape(shape: com.example.dosezy.data.model.PillShape?): String = (shape ?: com.example.dosezy.data.model.PillShape.ROUND).name
 
+    // Guard: Prevent IllegalArgumentException fallback to ROUND on legacy, malformed, or lowercased pill shape strings
     @TypeConverter
     fun toPillShape(value: String?): com.example.dosezy.data.model.PillShape = try {
-        if (value != null) com.example.dosezy.data.model.PillShape.valueOf(value) else com.example.dosezy.data.model.PillShape.ROUND
+        if (value != null) com.example.dosezy.data.model.PillShape.valueOf(value.trim().uppercase()) else com.example.dosezy.data.model.PillShape.ROUND
     } catch (_: Exception) {
         com.example.dosezy.data.model.PillShape.ROUND
     }
@@ -153,8 +154,9 @@ class Converters {
         } else {
             try {
                 val jsonObject = JSONObject(value)
+                // Guard: Trim and uppercase pattern to prevent IllegalArgumentException fallback to DAILY on lowercased pattern strings
                 val pattern = try {
-                    FrequencyPattern.valueOf(jsonObject.getString("pattern"))
+                    FrequencyPattern.valueOf(jsonObject.getString("pattern").trim().uppercase())
                 } catch (_: Exception) {
                     FrequencyPattern.DAILY
                 }

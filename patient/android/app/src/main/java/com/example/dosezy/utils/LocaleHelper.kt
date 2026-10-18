@@ -74,11 +74,12 @@ object LocaleHelper {
         }
     }
 
+    // Guard: Trim and uppercase langName to prevent IllegalArgumentException resetting language to SYSTEM on lowercased or padded preference values
     fun getSavedLanguage(context: Context): Language {
         return try {
             val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
             val langName = prefs.getString("selected_language", Language.SYSTEM.name) ?: Language.SYSTEM.name
-            Language.valueOf(langName)
+            Language.valueOf(langName.trim().uppercase())
         } catch (e: Exception) {
             Language.SYSTEM
         }

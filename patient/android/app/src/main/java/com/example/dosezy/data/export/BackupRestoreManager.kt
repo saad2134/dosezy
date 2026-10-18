@@ -828,12 +828,12 @@ class BackupRestoreManager(
 
     internal fun parseUserFromJson(jsonStr: String): User {
         val json = JsonParser.parseString(jsonStr).asJsonObject
-        // Guard: Defensively parse user enums and fields to prevent NullPointerException or IllegalArgumentException from aborting backup restore
-        val genderVal = json.get("gender")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { Gender.valueOf(it) }.getOrNull() } ?: Gender.DO_NOT_SPECIFY
-        val themeVal = json.get("theme")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { Theme.valueOf(it) }.getOrNull() } ?: Theme.SYSTEM
-        val timeFormatVal = json.get("timeFormat")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { TimeFormat.valueOf(it) }.getOrNull() } ?: TimeFormat.HOUR_12
-        val languageVal = json.get("language")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { Language.valueOf(it) }.getOrNull() } ?: Language.SYSTEM
-        val alarmSoundVal = json.get("alarmSound")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { AlarmSound.valueOf(it) }.getOrNull() } ?: AlarmSound.SYSTEM_DEFAULT
+        // Guard: Defensively parse user enums with .trim().uppercase() to prevent IllegalArgumentException resetting preferences to defaults on lowercase or padded values
+        val genderVal = json.get("gender")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { Gender.valueOf(it.trim().uppercase()) }.getOrNull() } ?: Gender.DO_NOT_SPECIFY
+        val themeVal = json.get("theme")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { Theme.valueOf(it.trim().uppercase()) }.getOrNull() } ?: Theme.SYSTEM
+        val timeFormatVal = json.get("timeFormat")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { TimeFormat.valueOf(it.trim().uppercase()) }.getOrNull() } ?: TimeFormat.HOUR_12
+        val languageVal = json.get("language")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { Language.valueOf(it.trim().uppercase()) }.getOrNull() } ?: Language.SYSTEM
+        val alarmSoundVal = json.get("alarmSound")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { AlarmSound.valueOf(it.trim().uppercase()) }.getOrNull() } ?: AlarmSound.SYSTEM_DEFAULT
 
         return User(
             userId = json.get("userId")?.takeUnless { it.isJsonNull }?.asString ?: UUID.randomUUID().toString(),
@@ -893,7 +893,7 @@ class BackupRestoreManager(
 
             val frequency = if (freqObj != null) {
                 val freqPattern = try {
-                    FrequencyPattern.valueOf(freqObj.get("pattern")?.takeUnless { it.isJsonNull }?.asString ?: "DAILY")
+                    FrequencyPattern.valueOf((freqObj.get("pattern")?.takeUnless { it.isJsonNull }?.asString ?: "DAILY").trim().uppercase())
                 } catch (_: Exception) {
                     FrequencyPattern.DAILY
                 }
@@ -913,7 +913,7 @@ class BackupRestoreManager(
                 // Guard: Support flattened frequency attributes from DataExporter exports and legacy backups to prevent silent schedule corruption
                 val rawPattern = (obj.get("frequencyPattern") ?: obj.get("pattern"))?.takeUnless { it.isJsonNull }?.asString ?: "DAILY"
                 val freqPattern = try {
-                    FrequencyPattern.valueOf(rawPattern)
+                    FrequencyPattern.valueOf(rawPattern.trim().uppercase())
                 } catch (_: Exception) {
                     FrequencyPattern.DAILY
                 }
@@ -933,7 +933,8 @@ class BackupRestoreManager(
                 Frequency(FrequencyPattern.DAILY)
             }
 
-            val pillShape = obj.get("pillShape")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { PillShape.valueOf(it) }.getOrNull() } ?: PillShape.ROUND
+            // Guard: Defensively parse pill shape with .trim().uppercase() to prevent silent fallback to ROUND on lowercase strings
+            val pillShape = obj.get("pillShape")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { PillShape.valueOf(it.trim().uppercase()) }.getOrNull() } ?: PillShape.ROUND
             val pillColor = obj.get("pillColor")?.takeUnless { it.isJsonNull }?.asString ?: "#1193D4"
             // Guard: Parse epoch-millis and ISO-8601 date strings to prevent dropping course bounds on restore
             val startDate = obj.get("startDate")?.takeUnless { it.isJsonNull }?.asString?.let { raw ->
@@ -1025,7 +1026,8 @@ class BackupRestoreManager(
             val entryIdVal = obj.get("entryId")?.takeUnless { it.isJsonNull }?.asString ?: UUID.randomUUID().toString()
             val userIdVal = obj.get("userId")?.takeUnless { it.isJsonNull }?.asString ?: ""
             val medicineIdVal = obj.get("medicineId")?.takeUnless { it.isJsonNull }?.asString ?: continue
-            val statusVal = obj.get("status")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { MedicationStatus.valueOf(it) }.getOrNull() } ?: MedicationStatus.PENDING
+            // Guard: Defensively parse medication status with .trim().uppercase() to prevent resetting completed or skipped history to PENDING on lowercase values
+            val statusVal = obj.get("status")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { MedicationStatus.valueOf(it.trim().uppercase()) }.getOrNull() } ?: MedicationStatus.PENDING
 
             val entry = ScheduleEntry(
                 entryId = entryIdVal,
