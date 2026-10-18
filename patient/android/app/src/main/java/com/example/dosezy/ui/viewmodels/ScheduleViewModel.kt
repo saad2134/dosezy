@@ -224,12 +224,14 @@ class ScheduleViewModel @Inject constructor(
     fun markCohortAsTaken(
         entryIds: List<String>,
         takenAt: String,
-        lateAfter: Int = 3
+        lateAfter: Int = 3,
+        notes: String? = null
     ) {
         viewModelScope.launch {
             if (takeCohortUseCase != null) {
                 val now = try { LocalDateTime.parse(takenAt) } catch (_: Exception) { LocalDateTime.now() }
-                takeCohortUseCase.invoke(entryIds, now)
+                // Guard: Pass notes to takeCohortUseCase to persist clinical dose notes for cohort intakes (#BUG-COHORT-DOSE-NOTES)
+                takeCohortUseCase.invoke(entryIds, now, notes = notes)
             } else {
                 val now = try { LocalDateTime.parse(takenAt) } catch (_: Exception) { LocalDateTime.now() }
                 entryIds.forEach { entryId ->
@@ -239,8 +241,8 @@ class ScheduleViewModel @Inject constructor(
                     } else {
                         "TAKEN_ON_TIME"
                     }
-                    // Guard: Record each cohort dose taken to ensure atomic stock decrement and alarm cancellation (#102)
-                    scheduleRepository.recordDoseTaken(entryId, status, takenAt, context, null)
+                    // Guard: Record each cohort dose taken with notes to ensure atomic stock decrement, alarm cancellation, and clinical notes persistence (#102, #BUG-COHORT-DOSE-NOTES)
+                    scheduleRepository.recordDoseTaken(entryId, status, takenAt, context, notes)
                 }
             }
             currentCalendarUserId = null

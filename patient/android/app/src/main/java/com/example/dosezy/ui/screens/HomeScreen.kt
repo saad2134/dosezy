@@ -120,6 +120,8 @@ fun HomeScreen(
     var notePromptEntry by remember { mutableStateOf<ScheduleWithMedicine?>(null) }
     var noteEditEntry by remember { mutableStateOf<ScheduleWithMedicine?>(null) }
     var markAllConfirmSlot by remember { mutableStateOf<Pair<String, List<ScheduleWithMedicine>>?>(null) }
+    var markAllRecordTimeSlot by remember { mutableStateOf<Pair<String, List<ScheduleWithMedicine>>?>(null) }
+    var markAllNotePromptSlot by remember { mutableStateOf<Pair<String, List<ScheduleWithMedicine>>?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
@@ -680,10 +682,17 @@ fun HomeScreen(
                         val entryIds = slotEntries.map { it.scheduleEntry.entryId }
                         val medNames = slotEntries.mapNotNull { it.medicine?.medicationName }
                         val count = slotEntries.size
+                        val capturedSlot = markAllConfirmSlot
                         markAllConfirmSlot = null
 
                         val user = currentUser
-                        if (user?.intakeSafeguardEnabled == true) {
+                        if (user?.allowCustomDoseTime == true) {
+                            // Guard: Route batch take through custom dose time dialog when user configured allowCustomDoseTime (#BUG-COHORT-CUSTOM-TIME)
+                            markAllRecordTimeSlot = capturedSlot
+                        } else if (user?.allowDoseNotes == true && user.promptDoseNotes) {
+                            // Guard: Route batch take through dose note dialog when user configured promptDoseNotes (#BUG-COHORT-DOSE-NOTES)
+                            markAllNotePromptSlot = capturedSlot
+                        } else if (user?.intakeSafeguardEnabled == true) {
                             val compositeMedName = if (medNames.size > 1) {
                                 medNames.joinToString(", ")
                             } else {
@@ -723,6 +732,117 @@ fun HomeScreen(
                 ) {
                     Text(stringResource(android.R.string.cancel))
                 }
+            }
+        )
+    }
+
+    if (markAllRecordTimeSlot != null) {
+        val (slotTime, slotEntries) = markAllRecordTimeSlot!!
+        val entryIds = slotEntries.map { it.scheduleEntry.entryId }
+        val medNames = slotEntries.mapNotNull { it.medicine?.medicationName }
+        val compositeMedName = if (medNames.size > 1) medNames.joinToString(", ") else (medNames.firstOrNull() ?: "")
+        val firstEntry = slotEntries.first().scheduleEntry
+        val count = slotEntries.size
+
+        RecordDoseTimeDialog(
+            entry = firstEntry,
+            medicineName = compositeMedName,
+            timeFormat = currentUser?.timeFormat ?: TimeFormat.HOUR_12,
+            allowDoseNotes = currentUser?.allowDoseNotes == true,
+            onDismiss = { markAllRecordTimeSlot = null },
+            onConfirm = { resolvedDateTime, note ->
+                markAllRecordTimeSlot = null
+                val trimmedNote = note?.takeIf { it.isNotBlank() }
+                val isRecent = !resolvedDateTime.isBefore(LocalDateTime.now().minusMinutes(5))
+                if (currentUser?.intakeSafeguardEnabled == true && isRecent) {
+                    IntakeSafeguardManager.startCountdown(
+                        context = context,
+                        entryId = entryIds.first(),
+                        entryIds = entryIds,
+                        medicineName = compositeMedName,
+                        medicineNames = medNames,
+                        scheduledTime = slotTime,
+                        durationSeconds = currentUser?.intakeCountdownSeconds ?: 120,
+                        userId = currentUser?.userId,
+                        notes = trimmedNote
+                    )
+                } else {
+                    val lateAfter = currentUser?.considerLateAfter ?: 3
+                    scheduleViewModel.markCohortAsTaken(entryIds, resolvedDateTime.toString(), lateAfter, notes = trimmedNote)
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = context.getString(R.string.take_all_success_toast, count),
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                }
+            }
+        )
+    }
+
+    if (markAllNotePromptSlot != null) {
+        val (slotTime, slotEntries) = markAllNotePromptSlot!!
+        val entryIds = slotEntries.map { it.scheduleEntry.entryId }
+        val medNames = slotEntries.mapNotNull { it.medicine?.medicationName }
+        val compositeMedName = if (medNames.size > 1) medNames.joinToString(", ") else (medNames.firstOrNull() ?: "")
+        val count = slotEntries.size
+
+        DoseNoteDialog(
+            medicationName = compositeMedName,
+            isEditing = false,
+            onConfirm = { note ->
+                markAllNotePromptSlot = null
+                val trimmedNote = note.takeIf { it.isNotBlank() }
+                if (currentUser?.intakeSafeguardEnabled == true) {
+                    IntakeSafeguardManager.startCountdown(
+                        context = context,
+                        entryId = entryIds.first(),
+                        entryIds = entryIds,
+                        medicineName = compositeMedName,
+                        medicineNames = medNames,
+                        scheduledTime = slotTime,
+                        durationSeconds = currentUser?.intakeCountdownSeconds ?: 120,
+                        userId = currentUser?.userId,
+                        notes = trimmedNote
+                    )
+                } else {
+                    val lateAfter = currentUser?.considerLateAfter ?: 3
+                    scheduleViewModel.markCohortAsTaken(entryIds, LocalDateTime.now().toString(), lateAfter, notes = trimmedNote)
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = context.getString(R.string.take_all_success_toast, count),
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                }
+            },
+            onSkip = {
+                markAllNotePromptSlot = null
+                if (currentUser?.intakeSafeguardEnabled == true) {
+                    IntakeSafeguardManager.startCountdown(
+                        context = context,
+                        entryId = entryIds.first(),
+                        entryIds = entryIds,
+                        medicineName = compositeMedName,
+                        medicineNames = medNames,
+                        scheduledTime = slotTime,
+                        durationSeconds = currentUser?.intakeCountdownSeconds ?: 120,
+                        userId = currentUser?.userId,
+                        notes = null
+                    )
+                } else {
+                    val lateAfter = currentUser?.considerLateAfter ?: 3
+                    scheduleViewModel.markCohortAsTaken(entryIds, LocalDateTime.now().toString(), lateAfter, notes = null)
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = context.getString(R.string.take_all_success_toast, count),
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                }
+            },
+            onDismiss = {
+                markAllNotePromptSlot = null
             }
         )
     }

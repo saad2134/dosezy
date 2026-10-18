@@ -317,7 +317,6 @@ class AdherenceAndAnalyticsTest {
         val missed = entries.count { isEntryMissed(it) }
         val skipped = entries.count { it.status == MedicationStatus.SKIPPED }
         val overduePending = entries.count {
-            it.scheduledDateTime.toLocalDate() == today &&
             it.status == MedicationStatus.PENDING &&
             it.scheduledDateTime.isBefore(now) &&
             !isEntryMissed(it)
@@ -332,6 +331,71 @@ class AdherenceAndAnalyticsTest {
         assertEquals(2, decided)
         // Rate is 50%, accurately penalizing overdue pending doses and matching daily chart
         assertEquals(50, rate)
+    }
+
+    @Test
+    fun computeAdherence_postMidnightYesterdayOverduePendingDoses_penalizesAdherenceRate() {
+        // Guard: Verify overdue pending doses from yesterday (e.g. 23:30 when evaluated at 01:00 AM) are counted in overduePending and dayOverduePending without disappearing (#BUG-ANALYTICS-RANGE-OVERDUE, #BUG-ANALYTICS-OVERDUE)
+        val today = LocalDate.of(2026, 10, 18)
+        val now = today.atTime(1, 0, 0) // 01:00 AM today
+        val missedAfterHours = 6 // 6 hours threshold: 23:30 to 01:00 is 1.5 hours (< 6 hours, so not yet missed)
+
+        val yesterdayTakenMorning = ScheduleEntry(
+            entryId = "entry_yesterday_morning_taken",
+            userId = "usr_1",
+            medicineId = "med_1",
+            scheduledDateTime = today.minusDays(1).atTime(9, 0),
+            status = MedicationStatus.TAKEN_ON_TIME
+        )
+        val yesterdayLateNightPending = ScheduleEntry(
+            entryId = "entry_yesterday_nocturnal_pending",
+            userId = "usr_1",
+            medicineId = "med_2",
+            scheduledDateTime = today.minusDays(1).atTime(23, 30),
+            status = MedicationStatus.PENDING
+        )
+
+        val entries = listOf(yesterdayTakenMorning, yesterdayLateNightPending)
+
+        fun isEntryMissed(entry: ScheduleEntry): Boolean =
+            entry.status == MedicationStatus.MISSED ||
+            (entry.status == MedicationStatus.PENDING && now.isAfter(entry.scheduledDateTime) &&
+                com.example.dosezy.utils.TimeCalculationUtils.isMissed(entry.scheduledDateTime, now, missedAfterHours))
+
+        // Adherence for Range
+        val taken = entries.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
+        val missed = entries.count { isEntryMissed(it) }
+        val overduePending = entries.count {
+            it.status == MedicationStatus.PENDING &&
+            it.scheduledDateTime.isBefore(now) &&
+            !isEntryMissed(it)
+        }
+        val decided = taken + missed + overduePending
+        val rate = if (decided > 0) ((taken.toDouble() / decided.toDouble()) * 100).toInt() else 0
+
+        assertEquals(1, taken)
+        assertEquals(0, missed)
+        assertEquals(1, overduePending) // Correctly identified as overdue pending across midnight
+        assertEquals(2, decided)        // 1 taken + 1 overdue = 2 decided, NOT 1
+        assertEquals(50, rate)         // 1 / 2 = 50%, NOT falsely 100%
+
+        // Adherence for Yesterday's DayStat in past7Days
+        val yesterdayEntries = entries.filter { it.scheduledDateTime.toLocalDate() == today.minusDays(1) }
+        val dayTaken = yesterdayEntries.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
+        val dayMissed = yesterdayEntries.count { isEntryMissed(it) }
+        val dayOverduePending = yesterdayEntries.count {
+            it.status == MedicationStatus.PENDING &&
+            it.scheduledDateTime.isBefore(now) &&
+            !isEntryMissed(it)
+        }
+        val dayDecided = dayTaken + dayMissed + dayOverduePending
+        val dayRate = if (dayDecided > 0) ((dayTaken.toDouble() / dayDecided.toDouble()) * 100).toInt() else 0
+
+        assertEquals(1, dayTaken)
+        assertEquals(0, dayMissed)
+        assertEquals(1, dayOverduePending)
+        assertEquals(2, dayDecided)
+        assertEquals(50, dayRate) // 50% for yesterday rather than false 100%
     }
 }
 

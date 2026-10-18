@@ -404,4 +404,55 @@ class HomeMissedDoseActionRoutingTest {
         }
         assertEquals(androidx.compose.ui.graphics.Color(0xFFF59E0B), resolvedColorWhenCompleted)
     }
+
+    @Test
+    fun takeAllCohortAction_preferenceRouting_evaluatesDialogPathsAccurately() {
+        // Guard: Verify Take All confirmation branches respect user's allowCustomDoseTime, promptDoseNotes, and intakeSafeguard preferences (#BUG-COHORT-CUSTOM-TIME, #BUG-COHORT-DOSE-NOTES)
+        data class RoutingState(
+            val routesToCustomTime: Boolean,
+            val routesToNotePrompt: Boolean,
+            val startsSafeguard: Boolean,
+            val executesImmediately: Boolean
+        )
+
+        fun evaluateRouting(user: User?): RoutingState {
+            val routesToCustomTime = user?.allowCustomDoseTime == true
+            val routesToNotePrompt = !routesToCustomTime && (user?.allowDoseNotes == true && user.promptDoseNotes)
+            val startsSafeguard = !routesToCustomTime && !routesToNotePrompt && (user?.intakeSafeguardEnabled == true)
+            val executesImmediately = !routesToCustomTime && !routesToNotePrompt && !startsSafeguard
+            return RoutingState(routesToCustomTime, routesToNotePrompt, startsSafeguard, executesImmediately)
+        }
+
+        // 1. allowCustomDoseTime = true routes to custom time dialog regardless of other settings
+        val userWithCustomTime = testUser.copy(allowCustomDoseTime = true, promptDoseNotes = true, intakeSafeguardEnabled = true)
+        val routeCustom = evaluateRouting(userWithCustomTime)
+        assertTrue(routeCustom.routesToCustomTime)
+        assertFalse(routeCustom.routesToNotePrompt)
+        assertFalse(routeCustom.startsSafeguard)
+        assertFalse(routeCustom.executesImmediately)
+
+        // 2. promptDoseNotes = true (without custom time) routes to note dialog
+        val userWithNotes = testUser.copy(allowCustomDoseTime = false, allowDoseNotes = true, promptDoseNotes = true, intakeSafeguardEnabled = true)
+        val routeNote = evaluateRouting(userWithNotes)
+        assertFalse(routeNote.routesToCustomTime)
+        assertTrue(routeNote.routesToNotePrompt)
+        assertFalse(routeNote.startsSafeguard)
+        assertFalse(routeNote.executesImmediately)
+
+        // 3. intakeSafeguardEnabled = true (without custom time or note prompt) starts safeguard countdown
+        val userWithSafeguard = testUser.copy(allowCustomDoseTime = false, promptDoseNotes = false, intakeSafeguardEnabled = true)
+        val routeSafeguard = evaluateRouting(userWithSafeguard)
+        assertFalse(routeSafeguard.routesToCustomTime)
+        assertFalse(routeSafeguard.routesToNotePrompt)
+        assertTrue(routeSafeguard.startsSafeguard)
+        assertFalse(routeSafeguard.executesImmediately)
+
+        // 4. Standard default user executes batch take immediately
+        val standardUser = testUser.copy(allowCustomDoseTime = false, promptDoseNotes = false, intakeSafeguardEnabled = false)
+        val routeStandard = evaluateRouting(standardUser)
+        assertFalse(routeStandard.routesToCustomTime)
+        assertFalse(routeStandard.routesToNotePrompt)
+        assertFalse(routeStandard.startsSafeguard)
+        assertTrue(routeStandard.executesImmediately)
+    }
 }

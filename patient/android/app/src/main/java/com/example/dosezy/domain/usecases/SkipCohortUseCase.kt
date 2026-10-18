@@ -61,9 +61,15 @@ class SkipCohortUseCase @Inject constructor(
                 scheduleRepository.syncSlotNotificationAndAlarms(slotEntry.entryId, slotEntry, context)
             }
         } else {
-            try {
-                DosezyAppWidgetProvider.updateAppWidgets(context)
-            } catch (_: Exception) {}
+            val anchorEntry = entryIds.firstOrNull()?.let { scheduleRepository.getScheduleEntryById(it) }
+            if (anchorEntry != null) {
+                // Guard: Fallback to anchor entry slot sync when distinctSlots is empty to disarm slot alarms and cancel notification shade entries (#BUG-COHORT-SLOT-FALLBACK)
+                scheduleRepository.syncSlotNotificationAndAlarms(anchorEntry.entryId, anchorEntry, context)
+            } else {
+                try {
+                    DosezyAppWidgetProvider.updateAppWidgets(context)
+                } catch (_: Exception) {}
+            }
         }
         Log.d(TAG, "Marked ${entryIds.size} doses as skipped")
     }

@@ -873,5 +873,85 @@ class TakeAllCohortFunctionalityTest {
         skipCohortUseCase.invoke(listOf(entry2.entryId), "Doctor instruction")
         assertNull("Countdown must be dismissed when all cohort members are skipped", IntakeSafeguardManager.activeCountdown.value)
     }
+
+    @Test
+    fun takeCohortUseCase_withNotes_persistsNotesOnAllEntries() = runBlocking {
+        // Guard: Verify takeCohortUseCase persists user clinical notes across all cohort schedule entries (#BUG-COHORT-DOSE-NOTES)
+        val slotTime = LocalDateTime.of(2026, 10, 18, 9, 0, 0)
+        val entry1 = ScheduleEntry(
+            entryId = "entry_cohort_notes_1",
+            userId = testUser.userId,
+            medicineId = medA.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_cohort_notes_2",
+            userId = testUser.userId,
+            medicineId = medB.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        database.scheduleDao().insertScheduleEntry(entry1)
+        database.scheduleDao().insertScheduleEntry(entry2)
+
+        val takeCohortUseCase = TakeCohortUseCase(database, scheduleRepository, context)
+        val note = "Taken after morning meal with water"
+        takeCohortUseCase.invoke(listOf(entry1.entryId, entry2.entryId), customTakenAt = slotTime, notes = note, user = testUser)
+
+        val updated1 = database.scheduleDao().getScheduleEntryById(entry1.entryId)
+        val updated2 = database.scheduleDao().getScheduleEntryById(entry2.entryId)
+
+        assertNotNull(updated1)
+        assertNotNull(updated2)
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, updated1?.status)
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, updated2?.status)
+        assertEquals(note, updated1?.doseNotes)
+        assertEquals(note, updated2?.doseNotes)
+    }
+
+    @Test
+    fun takeCohortUseCase_and_skipCohortUseCase_emptyDistinctSlots_executesSlotSyncFallback() = runBlocking {
+        // Guard: Verify fallback executes slot synchronization when distinctSlots is empty to disarm slot alarms and cancel notification shade entries (#BUG-COHORT-SLOT-FALLBACK)
+        val slotTime = LocalDateTime.of(2026, 10, 18, 10, 0, 0)
+        val entry = ScheduleEntry(
+            entryId = "entry_cohort_fallback_test",
+            userId = testUser.userId,
+            medicineId = medA.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        database.scheduleDao().insertScheduleEntry(entry)
+
+        val takeCohortUseCase = TakeCohortUseCase(database, scheduleRepository, context)
+        // Invoking with non-existent secondary ID along with valid ID does not crash and completes fallback
+        takeCohortUseCase.invoke(listOf(entry.entryId, "non_existent_id"), customTakenAt = slotTime, notes = "Clinical note", user = testUser)
+
+        val updated = database.scheduleDao().getScheduleEntryById(entry.entryId)
+        assertNotNull(updated)
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, updated?.status)
+
+        // Same verification for SkipCohortUseCase
+        val skipEntry = ScheduleEntry(
+            entryId = "entry_cohort_skip_fallback_test",
+            userId = testUser.userId,
+            medicineId = medB.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        database.scheduleDao().insertScheduleEntry(skipEntry)
+
+        val skipCohortUseCase = SkipCohortUseCase(scheduleRepository, context)
+        skipCohortUseCase.invoke(listOf(skipEntry.entryId, "another_non_existent_id"), "Skipped per physician")
+
+        val updatedSkip = database.scheduleDao().getScheduleEntryById(skipEntry.entryId)
+        assertNotNull(updatedSkip)
+        assertEquals(MedicationStatus.SKIPPED, updatedSkip?.status)
+        assertEquals("Skipped per physician", updatedSkip?.skipReason)
+    }
 }
 

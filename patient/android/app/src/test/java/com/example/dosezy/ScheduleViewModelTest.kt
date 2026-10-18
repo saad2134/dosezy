@@ -273,4 +273,48 @@ class ScheduleViewModelTest {
         assertEquals(0, viewModel.scheduleWithMedicine.value.size)
         assertEquals(0, viewModel.scheduleEntries.value.size)
     }
+
+    @Test
+    fun markCohortAsTaken_fallbackBranch_forwardsNotesToRepository() = runTest {
+        // Guard: Verify markCohortAsTaken passes clinical dose notes to scheduleRepository in fallback branch (#BUG-COHORT-DOSE-NOTES)
+        val viewModel = createViewModel()
+        val takenAt = "2026-09-21T08:05:00"
+        val notes = "Took with breakfast and glass of water"
+
+        viewModel.markCohortAsTaken(listOf("entry_1"), takenAt, lateAfter = 3, notes = notes)
+
+        coVerify {
+            scheduleRepository.recordDoseTaken(
+                entryId = "entry_1",
+                status = "TAKEN_ON_TIME",
+                takenAtStr = takenAt,
+                context = context,
+                notes = notes
+            )
+        }
+    }
+
+    @Test
+    fun markCohortAsTaken_withUseCase_forwardsNotesToUseCase() = runTest {
+        // Guard: Verify markCohortAsTaken passes clinical dose notes to takeCohortUseCase (#BUG-COHORT-DOSE-NOTES)
+        val mockUseCase: com.example.dosezy.domain.usecases.TakeCohortUseCase = mockk(relaxed = true)
+        val viewModel = ScheduleViewModel(
+            scheduleRepository = scheduleRepository,
+            userRepository = userRepository,
+            context = context,
+            takeCohortUseCase = mockUseCase
+        )
+        val takenAt = "2026-09-21T08:05:00"
+        val notes = "Mild nausea observed"
+
+        viewModel.markCohortAsTaken(listOf("entry_1"), takenAt, lateAfter = 3, notes = notes)
+
+        coVerify {
+            mockUseCase.invoke(
+                entryIds = listOf("entry_1"),
+                customTakenAt = LocalDateTime.parse(takenAt),
+                notes = notes
+            )
+        }
+    }
 }
