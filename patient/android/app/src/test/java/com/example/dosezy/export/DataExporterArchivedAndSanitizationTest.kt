@@ -3,6 +3,7 @@ package com.example.dosezy.export
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.example.dosezy.data.export.DataExporter
+import com.example.dosezy.ui.components.ExportFormat
 import com.example.dosezy.data.model.DosageUnit
 import com.example.dosezy.data.model.FrequencyPattern
 import com.example.dosezy.data.model.Gender
@@ -238,5 +239,36 @@ class DataExporterArchivedAndSanitizationTest {
         assertTrue("Order must contain patient name", orderText.contains("John Doe"))
         assertTrue("Order must contain medication name", orderText.contains("Amoxicillin"))
         assertTrue("Order must contain dosage", orderText.contains("500 mg"))
+    }
+
+    @Test
+    fun testExportUserData_whenNoProfileEntriesCanBeGenerated_deletesZipAndThrowsIllegalStateException() = runTest {
+        // Guard: Verify empty zip exports are deleted and throw IllegalStateException instead of silently producing corrupt 22-byte files (#BUG-ZIP-EMPTY-EXPORT)
+        val mockUserRepo = mockk<UserRepository>(relaxed = true)
+        val mockMedRepo = mockk<MedicineRepository>(relaxed = true)
+        val mockSchedRepo = mockk<ScheduleRepository>(relaxed = true)
+
+        val user1 = User(userId = "user_fail_1", fullName = "User One", age = 40, gender = Gender.MALE, contactNumber = "111")
+        val user2 = User(userId = "user_fail_2", fullName = "User Two", age = 42, gender = Gender.FEMALE, contactNumber = "222")
+
+        coEvery { mockUserRepo.getAllUsersList() } returns listOf(user1, user2)
+        // Simulate data access failure for all profiles
+        coEvery { mockMedRepo.getMedicinesByUserDirect(any()) } throws RuntimeException("Simulated I/O failure")
+
+        val exporter = DataExporter(context, mockUserRepo, mockMedRepo, mockSchedRepo)
+        val exportDir = exporter.getExportDirectory()
+        val zipFilesBefore = exportDir.listFiles { _, name -> name.endsWith(".zip") }?.toList() ?: emptyList()
+
+        try {
+            exporter.exportUserData(null, ExportFormat.CSV)
+            org.junit.Assert.fail("Expected IllegalStateException when no profile entries could be generated")
+        } catch (e: IllegalStateException) {
+            assertTrue("Exception message must indicate export data failure", e.message?.contains("Failed to export data") == true)
+            assertNotNull("Underlying exception must be preserved as cause", e.cause)
+        }
+
+        // Verify no empty or corrupt zip file remained in export directory
+        val zipFilesAfter = exportDir.listFiles { _, name -> name.endsWith(".zip") }?.toList() ?: emptyList()
+        assertEquals("No empty zip file should be left behind after failure", zipFilesBefore.size, zipFilesAfter.size)
     }
 }

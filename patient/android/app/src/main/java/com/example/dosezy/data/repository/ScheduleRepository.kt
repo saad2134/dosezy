@@ -353,7 +353,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                             android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
                         )
 
-                        val builder = androidx.core.app.NotificationCompat.Builder(context, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
+                        // Guard: Instantiate NotificationCompat.Builder with localizedContext so internal resource inflation and layout direction align with target profile locale (#BUG-REFILL-NOTIF-BUILDER)
+                        val builder = androidx.core.app.NotificationCompat.Builder(localizedContext, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
                             .setSmallIcon(com.example.dosezy.R.drawable.ic_medicine_notification)
                             .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
                             .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, newStock))
@@ -733,7 +734,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     },
                     android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
                 )
-                val builder = androidx.core.app.NotificationCompat.Builder(context, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
+                // Guard: Instantiate NotificationCompat.Builder with localizedContext so internal resource inflation and layout direction align with target profile locale (#BUG-REFILL-NOTIF-BUILDER)
+                val builder = androidx.core.app.NotificationCompat.Builder(localizedContext, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
                     .setSmallIcon(com.example.dosezy.R.drawable.ic_medicine_notification)
                     .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, freshMedicine.medicationName))
                     .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, newStock))

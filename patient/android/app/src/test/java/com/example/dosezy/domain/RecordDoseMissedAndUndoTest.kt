@@ -841,4 +841,72 @@ class RecordDoseMissedAndUndoTest {
             pendingNagging
         )
     }
+
+    @Test
+    fun recordDoseTaken_and_logAsNeededDose_refillAlert_usesTargetProfileLocalizedContext() = runBlocking {
+        // Guard: Verify refill alert NotificationCompat.Builder uses localizedContext matching profile language (#BUG-REFILL-NOTIF-BUILDER)
+        MedicineAlarmReceiver.createNotificationChannels(context)
+
+        val esUser = testUser.copy(
+            userId = "user_es_refill",
+            fullName = "Carlos",
+            language = Language.SPANISH
+        )
+        val esMed = testMedicine.copy(
+            medicineId = "med_es_refill",
+            userId = esUser.userId,
+            medicationName = "Ibuprofeno",
+            currentStock = 2,
+            refillThreshold = 1,
+            autoDeductOnTake = true
+        )
+        db.userDao().insertUser(esUser)
+        db.medicineDao().insertMedicine(esMed)
+
+        val entry = ScheduleEntry(
+            entryId = "entry_es_refill_1",
+            userId = esUser.userId,
+            medicineId = esMed.medicineId,
+            scheduledDateTime = LocalDateTime.now(),
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        db.scheduleDao().insertScheduleEntry(entry)
+
+        // 1. Test recordDoseTaken creates localized refill notification
+        scheduleRepository.recordDoseTaken(entry.entryId, context = context)
+
+        val localizedCtx = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, Language.SPANISH)
+        val expectedTitle = localizedCtx.getString(R.string.notif_refill_alert_title, esMed.medicationName)
+        val expectedText = localizedCtx.getString(R.string.notif_refill_alert_text, 1)
+
+        val sbn1 = notificationManager.activeNotifications.firstOrNull { it.id == (esMed.medicineId + "_refill").hashCode() }
+        assertNotNull("Refill alert notification must be posted", sbn1)
+        val notif1 = sbn1!!.notification
+        assertEquals(expectedTitle, notif1.extras.getCharSequence(android.app.Notification.EXTRA_TITLE)?.toString())
+        assertEquals(expectedText, notif1.extras.getCharSequence(android.app.Notification.EXTRA_TEXT)?.toString())
+
+        // 2. Test logAsNeededDose also creates localized refill notification
+        val prnMed = testMedicine.copy(
+            medicineId = "med_es_prn_refill",
+            userId = esUser.userId,
+            medicationName = "Paracetamol",
+            currentStock = 2,
+            refillThreshold = 1,
+            autoDeductOnTake = true,
+            frequency = Frequency(FrequencyPattern.AS_NEEDED)
+        )
+        db.medicineDao().insertMedicine(prnMed)
+
+        scheduleRepository.logAsNeededDose(prnMed, esUser.userId, context = context)
+
+        val expectedPrnTitle = localizedCtx.getString(R.string.notif_refill_alert_title, prnMed.medicationName)
+        val expectedPrnText = localizedCtx.getString(R.string.notif_refill_alert_text, 1)
+
+        val sbn2 = notificationManager.activeNotifications.firstOrNull { it.id == (prnMed.medicineId + "_refill").hashCode() }
+        assertNotNull("PRN refill alert notification must be posted", sbn2)
+        val notif2 = sbn2!!.notification
+        assertEquals(expectedPrnTitle, notif2.extras.getCharSequence(android.app.Notification.EXTRA_TITLE)?.toString())
+        assertEquals(expectedPrnText, notif2.extras.getCharSequence(android.app.Notification.EXTRA_TEXT)?.toString())
+    }
 }

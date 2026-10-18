@@ -394,14 +394,17 @@ class AlarmScheduler(private val context: Context) {
                         sIntent.cancel()
                     }
                 } else {
-                    // Guard: Resolve user profile's explicit timeFormat preference to prevent format flipping between 12h and 24h during snooze group transfers
-                    val userTimeFormat = try {
+                    // Guard: Resolve user profile's explicit timeFormat and language to prevent format and locale flipping during snooze group transfers (#BUG-SNOOZE-CANCEL-LOCALE)
+                    val targetUser = try {
                         val db = com.example.dosezy.data.DosezyDatabase.getInstance(context)
                         val entry = kotlinx.coroutines.runBlocking {
                             kotlinx.coroutines.withTimeoutOrNull(500L) { db.scheduleDao().getScheduleEntryById(primaryId) }
                         }
-                        entry?.let { kotlinx.coroutines.runBlocking { db.userDao().getUserByIdDirect(it.userId) } }?.timeFormat
+                        val uId = entry?.userId ?: resolveUserId(primaryId)
+                        uId?.let { uid -> kotlinx.coroutines.runBlocking { db.userDao().getUserByIdDirect(uid) } }
                     } catch (_: Exception) { null }
+                    val userTimeFormat = targetUser?.timeFormat
+                    val targetUserId = targetUser?.userId ?: resolveUserId(primaryId)
 
                     if (entryId == primaryId) {
                         val newPrimary = currentIds.first()
@@ -418,7 +421,7 @@ class AlarmScheduler(private val context: Context) {
 
                         if (triggerTime > System.currentTimeMillis()) {
                             val remMins = ((triggerTime - System.currentTimeMillis()) / (60 * 1000)).toInt().coerceAtLeast(1)
-                            scheduleGroupedSnooze(currentIds, remMins, currentNames, triggerTime, timeFormat = userTimeFormat)
+                            scheduleGroupedSnooze(currentIds, remMins, currentNames, triggerTime, timeFormat = userTimeFormat, userId = targetUserId)
                         }
                     } else {
                         editor.putString("snooze_group_ids_$primaryId", currentIds.joinToString(","))
@@ -430,8 +433,9 @@ class AlarmScheduler(private val context: Context) {
                         val is24 = userTimeFormat == TimeFormat.HOUR_24 ||
                                 (userTimeFormat == null && android.text.format.DateFormat.is24HourFormat(context))
                         val pattern = if (is24) "HH:mm" else "h:mm a"
-                        val savedLang = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
-                        val locale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLang)
+                        // Guard: Format snooze time with target profile language rather than global app language to prevent locale flipping on partial snooze cancellation (#BUG-SNOOZE-CANCEL-LOCALE)
+                        val targetLang = targetUser?.language ?: resolveUserLanguage(targetUserId)
+                        val locale = com.example.dosezy.utils.LocaleHelper.getLocale(targetLang)
                         val snoozeTimeFormatted = java.text.SimpleDateFormat(pattern, locale).format(java.util.Date(triggerTime))
                         val updateIntent = Intent(context, MedicineAlarmReceiver::class.java).apply {
                             putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, primaryId)

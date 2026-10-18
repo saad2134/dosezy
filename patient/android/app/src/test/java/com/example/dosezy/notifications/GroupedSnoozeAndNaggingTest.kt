@@ -1,6 +1,8 @@
 package com.example.dosezy.notifications
 
 import android.content.Context
+import android.app.PendingIntent
+import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import com.example.dosezy.ui.viewmodels.AdherenceRange
 import com.example.dosezy.data.model.MedicationStatus
@@ -230,6 +232,117 @@ class GroupedSnoozeAndNaggingTest {
             val prefs = context.getSharedPreferences(AlarmScheduler.PREFS_COORDINATION, Context.MODE_PRIVATE)
             assertEquals("entry-snooze-ar", prefs.getString("snooze_member_entry-snooze-ar", null))
             assertEquals(fixedTriggerTime, prefs.getLong("snooze_group_trigger_entry-snooze-ar", 0L))
+        } finally {
+            com.example.dosezy.data.DosezyDatabase.setInstance(null)
+            testDb.close()
+        }
+    }
+
+    @Test
+    fun cancelSnooze_onSecondaryAndPrimary_preservesTargetProfileLocaleAndTransfersGroup() {
+        // Guard: Verify cancelSnooze preserves target profile language when updating notification and transferring primary (#BUG-SNOOZE-CANCEL-LOCALE)
+        val testDb = androidx.room.Room.inMemoryDatabaseBuilder(context, com.example.dosezy.data.DosezyDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+        com.example.dosezy.data.DosezyDatabase.setInstance(testDb)
+        try {
+            val scheduler = AlarmScheduler(context)
+            val arabicUser = com.example.dosezy.data.model.User(
+                userId = "user_ar_cancel",
+                fullName = "Fatima",
+                age = 35,
+                gender = com.example.dosezy.data.model.Gender.FEMALE,
+                contactNumber = "+971502222222",
+                language = com.example.dosezy.data.model.Language.ARABIC,
+                timeFormat = com.example.dosezy.data.model.TimeFormat.HOUR_12
+            )
+            val entry1 = ScheduleEntry(
+                entryId = "entry-snooze-ar-1",
+                userId = arabicUser.userId,
+                medicineId = "med_1",
+                scheduledDateTime = LocalDateTime.now().plusHours(1),
+                status = MedicationStatus.PENDING
+            )
+            val entry2 = ScheduleEntry(
+                entryId = "entry-snooze-ar-2",
+                userId = arabicUser.userId,
+                medicineId = "med_2",
+                scheduledDateTime = LocalDateTime.now().plusHours(1),
+                status = MedicationStatus.PENDING
+            )
+            val med1 = com.example.dosezy.data.model.Medicine(
+                medicineId = "med_1",
+                userId = arabicUser.userId,
+                medicationName = "Amoxicillin",
+                dosage = 500.0,
+                dosageUnit = com.example.dosezy.data.model.DosageUnit.MG,
+                timesPerDay = 1,
+                frequency = com.example.dosezy.data.model.Frequency(com.example.dosezy.data.model.FrequencyPattern.DAILY),
+                scheduledTimes = listOf(java.time.LocalTime.of(9, 0)),
+                currentStock = 10
+            )
+            val med2 = com.example.dosezy.data.model.Medicine(
+                medicineId = "med_2",
+                userId = arabicUser.userId,
+                medicationName = "Ibuprofen",
+                dosage = 200.0,
+                dosageUnit = com.example.dosezy.data.model.DosageUnit.MG,
+                timesPerDay = 1,
+                frequency = com.example.dosezy.data.model.Frequency(com.example.dosezy.data.model.FrequencyPattern.DAILY),
+                scheduledTimes = listOf(java.time.LocalTime.of(9, 0)),
+                currentStock = 10
+            )
+            kotlinx.coroutines.runBlocking {
+                testDb.userDao().insertUser(arabicUser)
+                testDb.medicineDao().insertMedicine(med1)
+                testDb.medicineDao().insertMedicine(med2)
+                testDb.scheduleDao().insertScheduleEntry(entry1)
+                testDb.scheduleDao().insertScheduleEntry(entry2)
+            }
+
+            val futureTriggerTime = System.currentTimeMillis() + 600_000L // 10 minutes from now
+            scheduler.scheduleGroupedSnooze(
+                entryIds = listOf(entry1.entryId, entry2.entryId),
+                minutes = 10,
+                medicineNames = listOf("Amoxicillin", "Ibuprofen"),
+                explicitTriggerTime = futureTriggerTime,
+                timeFormat = arabicUser.timeFormat,
+                userId = arabicUser.userId
+            )
+
+            // Test 1: Secondary cancellation updates notification formatted in Arabic locale
+            scheduler.cancelSnooze(entry2.entryId)
+
+            val pendingIntent = PendingIntent.getBroadcast(
+                context,
+                entry1.entryId.hashCode() + 1000,
+                Intent(context, MedicineAlarmReceiver::class.java),
+                PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+            )
+            assertNotNull("Update snooze PendingIntent must exist in AlarmManager", pendingIntent)
+            val shadowPi = org.robolectric.Shadows.shadowOf(pendingIntent)
+            val savedIntent = shadowPi.savedIntent
+            val expectedArabicFormatted = java.text.SimpleDateFormat(
+                "h:mm a",
+                com.example.dosezy.utils.LocaleHelper.getLocale(com.example.dosezy.data.model.Language.ARABIC)
+            ).format(java.util.Date(futureTriggerTime))
+            assertEquals(expectedArabicFormatted, savedIntent.getStringExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME))
+
+            // Test 2: Primary cancellation transfers primary to remaining entry with target profile settings
+            scheduler.scheduleGroupedSnooze(
+                entryIds = listOf(entry1.entryId, entry2.entryId),
+                minutes = 10,
+                medicineNames = listOf("Amoxicillin", "Ibuprofen"),
+                explicitTriggerTime = futureTriggerTime,
+                timeFormat = arabicUser.timeFormat,
+                userId = arabicUser.userId
+            )
+            scheduler.cancelSnooze(entry1.entryId)
+
+            val prefs = context.getSharedPreferences(AlarmScheduler.PREFS_COORDINATION, Context.MODE_PRIVATE)
+            assertEquals(entry2.entryId, prefs.getString("snooze_member_${entry2.entryId}", null))
+            assertEquals(entry2.entryId, prefs.getString("snooze_group_ids_${entry2.entryId}", null))
+            assertNull(prefs.getString("snooze_member_${entry1.entryId}", null))
         } finally {
             com.example.dosezy.data.DosezyDatabase.setInstance(null)
             testDb.close()

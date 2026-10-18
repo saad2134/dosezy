@@ -133,6 +133,8 @@ class DataExporter(
         val zipFile = File(exportDir, "dosezy_export_$timestamp.zip")
 
         val usedFolders = mutableSetOf<String>()
+        var writtenCount = 0
+        var lastException: Exception? = null
         FileOutputStream(zipFile).use { fileOutputStream ->
             ZipOutputStream(fileOutputStream).use { zipOutputStream ->
                 users.forEach { user ->
@@ -157,6 +159,7 @@ class DataExporter(
                                 // Guard: Explicitly specify UTF-8 charset to prevent corrupted non-ASCII characters in zip exports on devices with non-UTF-8 default charsets
                                 zipOutputStream.write(content.toByteArray(Charsets.UTF_8))
                                 zipOutputStream.closeEntry()
+                                writtenCount++
                             }
                             ExportFormat.JSON -> {
                                 val content = buildJsonContent(user, medicines, schedules)
@@ -165,6 +168,7 @@ class DataExporter(
                                 // Guard: Explicitly specify UTF-8 charset to prevent corrupted non-ASCII characters in zip exports on devices with non-UTF-8 default charsets
                                 zipOutputStream.write(content.toByteArray(Charsets.UTF_8))
                                 zipOutputStream.closeEntry()
+                                writtenCount++
                             }
                             ExportFormat.PDF -> {
                                 val pdfDoc = pdfReportGenerator.buildPdfDocument(user, medicines, schedules)
@@ -181,6 +185,7 @@ class DataExporter(
                                         input.copyTo(zipOutputStream)
                                     }
                                     zipOutputStream.closeEntry()
+                                    writtenCount++
                                 } finally {
                                     // Guard: Ensure native Skia PdfDocument is closed to prevent memory leaks on exception
                                     try {
@@ -193,9 +198,16 @@ class DataExporter(
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
+                        lastException = e
                     }
                 }
             }
+        }
+
+        // Guard: Verify at least one profile was written; delete empty zip and throw exception to prevent silent export failure (#BUG-ZIP-EMPTY-EXPORT)
+        if (writtenCount == 0) {
+            try { zipFile.delete() } catch (_: Exception) {}
+            throw IllegalStateException("Failed to export data: no profile entries could be generated", lastException)
         }
 
         return@withContext zipFile
