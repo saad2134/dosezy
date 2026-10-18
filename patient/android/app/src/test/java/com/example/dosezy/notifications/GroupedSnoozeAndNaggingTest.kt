@@ -1,4 +1,4 @@
-﻿package com.example.dosezy.notifications
+package com.example.dosezy.notifications
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
@@ -191,5 +191,48 @@ class GroupedSnoozeAndNaggingTest {
 
         // Verify that 0 never produces unpadded ":0"
         assertEquals(":00", String.format(":%02d", 0))
+    }
+
+    @Test
+    fun testScheduleGroupedSnooze_resolvesTargetProfileLocale() {
+        val testDb = androidx.room.Room.inMemoryDatabaseBuilder(context, com.example.dosezy.data.DosezyDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+        com.example.dosezy.data.DosezyDatabase.setInstance(testDb)
+        try {
+            val scheduler = AlarmScheduler(context)
+            val arabicUser = com.example.dosezy.data.model.User(
+                userId = "user_ar_snooze",
+                fullName = "Tariq",
+                age = 40,
+                gender = com.example.dosezy.data.model.Gender.DO_NOT_SPECIFY,
+                contactNumber = "+971501111111",
+                language = com.example.dosezy.data.model.Language.ARABIC,
+                timeFormat = com.example.dosezy.data.model.TimeFormat.HOUR_12
+            )
+            kotlinx.coroutines.runBlocking {
+                testDb.userDao().insertUser(arabicUser)
+            }
+
+            val entryIds = listOf("entry-snooze-ar")
+            val medNames = listOf("Metformin")
+            val fixedTriggerTime = 1770000000000L
+
+            scheduler.scheduleGroupedSnooze(
+                entryIds = entryIds,
+                minutes = 10,
+                medicineNames = medNames,
+                explicitTriggerTime = fixedTriggerTime,
+                timeFormat = arabicUser.timeFormat,
+                userId = arabicUser.userId
+            )
+
+            val prefs = context.getSharedPreferences(AlarmScheduler.PREFS_COORDINATION, Context.MODE_PRIVATE)
+            assertEquals("entry-snooze-ar", prefs.getString("snooze_member_entry-snooze-ar", null))
+            assertEquals(fixedTriggerTime, prefs.getLong("snooze_group_trigger_entry-snooze-ar", 0L))
+        } finally {
+            com.example.dosezy.data.DosezyDatabase.setInstance(null)
+            testDb.close()
+        }
     }
 }

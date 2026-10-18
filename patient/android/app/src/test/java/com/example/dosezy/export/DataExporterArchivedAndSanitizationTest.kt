@@ -1,4 +1,4 @@
-﻿package com.example.dosezy.export
+package com.example.dosezy.export
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
@@ -196,5 +196,47 @@ class DataExporterArchivedAndSanitizationTest {
 
         // Deleting from cutoff onwards (scheduledDateTime >= cutoffEpochMillis) preserves the morning dose
         assertTrue(morningEpochMillis < cutoffEpochMillis)
+    }
+
+    @Test
+    fun testPharmacyOrder_formatsConsistentlyWithOrderingContext() {
+        // Guard: Verify pharmacy order formats with the ordering context without errors and contains expected medication details
+        val mockUserRepo = mockk<UserRepository>()
+        val mockMedRepo = mockk<MedicineRepository>()
+        val mockSchedRepo = mockk<ScheduleRepository>()
+
+        val userEn = User(
+            userId = "user_order_en",
+            fullName = "John Doe",
+            age = 45,
+            gender = Gender.MALE,
+            contactNumber = "555-1234",
+            language = com.example.dosezy.data.model.Language.ENGLISH
+        )
+        val med = Medicine(
+            medicineId = "med_order_1",
+            userId = userEn.userId,
+            medicationName = "Amoxicillin",
+            dosage = 500.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 3,
+            frequency = com.example.dosezy.data.model.Frequency(com.example.dosezy.data.model.FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0), LocalTime.of(14, 0), LocalTime.of(20, 0)),
+            currentStock = 10,
+            refillThreshold = 5
+        )
+
+        val exporter = DataExporter(context, mockUserRepo, mockMedRepo, mockSchedRepo)
+        val orderText = exporter.generateConsolidatedPharmacyOrderText(
+            profilesWithMedicines = listOf(Pair(userEn, listOf(med))),
+            supplyDays = 30,
+            includeStock = true,
+            includeDosage = true
+        )
+
+        assertTrue("Order must contain pharmacy order title", orderText.contains(context.getString(com.example.dosezy.R.string.pharmacy_order_header_title)))
+        assertTrue("Order must contain patient name", orderText.contains("John Doe"))
+        assertTrue("Order must contain medication name", orderText.contains("Amoxicillin"))
+        assertTrue("Order must contain dosage", orderText.contains("500 mg"))
     }
 }

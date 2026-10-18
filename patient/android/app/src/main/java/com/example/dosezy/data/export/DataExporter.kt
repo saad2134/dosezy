@@ -488,6 +488,7 @@ class DataExporter(
         )
     }
 
+    // Guard: Intentionally format pharmacy orders using the passed context (representing the active ordering user or caregiver) so refill order text remains in the active user's and local pharmacy's expected language without switching per-profile in multi-user orders
     fun generateConsolidatedPharmacyOrderText(
         profilesWithMedicines: List<Pair<User, List<Medicine>>>,
         supplyDays: Int = 30,

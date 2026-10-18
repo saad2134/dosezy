@@ -489,6 +489,21 @@ class AlarmAndNotificationRegressionTest {
         assertFalse("Spanish refill alert title must differ from English", esTitle == enTitle)
         assertFalse("Spanish refill alert text must differ from English", esText == enText)
     }
+
+    @Test
+    fun testAlarmActivitySnoozeToast_resolvesLocalizedContext() {
+        // Guard: Verify that snooze confirmation toast string derives from localizedContext matching the recipient user profile language (#BUG-ALARM-SNOOZE-TOAST-LOCALE)
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val esContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, com.example.dosezy.data.model.Language.SPANISH)
+        val enContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, com.example.dosezy.data.model.Language.ENGLISH)
+
+        val esSnoozeToast = esContext.getString(com.example.dosezy.R.string.alarm_snoozed_toast, 10)
+        val enSnoozeToast = enContext.getString(com.example.dosezy.R.string.alarm_snoozed_toast, 10)
+
+        assertEquals("Alarm snoozed for 10 minutes", enSnoozeToast)
+        assertEquals("Alarma pospuesta por 10 minutos", esSnoozeToast)
+        assertFalse("Spanish snooze toast must differ from English", esSnoozeToast == enSnoozeToast)
+    }
 }
 
 

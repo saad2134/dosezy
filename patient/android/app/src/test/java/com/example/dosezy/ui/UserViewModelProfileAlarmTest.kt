@@ -542,5 +542,19 @@ class UserViewModelProfileAlarmTest {
         // Verify app widget user binding is cleared
         assertNull(com.example.dosezy.widget.DosezyWidgetPrefs.getAppWidgetUser(context, 777))
     }
+
+    @Test
+    fun testUpdateContextLocale_providesLocalizedResourcesForProfile() {
+        // Guard: Verify that updateContextLocale correctly provides localized resources for Compose LocalContext matching the active profile (#BUG-MAIN-LOCALIZED-CONTEXT)
+        val esContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, Language.SPANISH)
+        val enContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, Language.ENGLISH)
+
+        val esTitle = esContext.getString(com.example.dosezy.R.string.notif_perm_title)
+        val enTitle = enContext.getString(com.example.dosezy.R.string.notif_perm_title)
+
+        assertFalse("Spanish title must differ from English", esTitle == enTitle)
+        assertTrue(esTitle.isNotBlank())
+        assertTrue(enTitle.isNotBlank())
+    }
 }
 

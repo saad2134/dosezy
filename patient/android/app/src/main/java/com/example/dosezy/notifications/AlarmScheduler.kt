@@ -66,6 +66,20 @@ class AlarmScheduler(private val context: Context) {
         }
     }
 
+    private fun resolveUserLanguage(userId: String?): com.example.dosezy.data.model.Language {
+        if (userId == null) return com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+        return try {
+            val db = com.example.dosezy.data.DosezyDatabase.getInstance(context)
+            runBlocking {
+                withTimeoutOrNull(300L) {
+                    db.userDao().getUserByIdDirect(userId)?.language
+                }
+            } ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+        } catch (_: Exception) {
+            com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+        }
+    }
+
     @SuppressLint("ScheduleExactAlarm")
     @RequiresApi(Build.VERSION_CODES.O)
     fun scheduleMedicineAlarm(entry: ScheduleEntry, medicineName: String, timeFormat: TimeFormat? = null) {
@@ -91,11 +105,11 @@ class AlarmScheduler(private val context: Context) {
         val medNames = ArrayList(medicineNames)
         val cleanDateTime = scheduledDateTime.withSecond(0).withNano(0)
 
-        // Guard: Format scheduled time respecting 24h vs 12h user preference and active locale instead of hardcoded 12h pattern
+        // Guard: Format scheduled time respecting 24h vs 12h user preference and active profile locale instead of hardcoded 12h pattern
         val is24 = timeFormat == TimeFormat.HOUR_24 || (timeFormat == null && android.text.format.DateFormat.is24HourFormat(context))
         val pattern = if (is24) "HH:mm" else "h:mm a"
-        val savedLang = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
-        val locale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLang)
+        val targetLang = resolveUserLanguage(entries.firstOrNull()?.userId)
+        val locale = com.example.dosezy.utils.LocaleHelper.getLocale(targetLang)
         val timeFormatted = cleanDateTime.format(java.time.format.DateTimeFormatter.ofPattern(pattern, locale))
         val slotKey = "${entries.first().userId}_${cleanDateTime}"
 
@@ -173,11 +187,13 @@ class AlarmScheduler(private val context: Context) {
 
         // Guard: Support explicitTriggerTime so transferred group alarms preserve exact original target timestamp
         val triggerTime = explicitTriggerTime ?: (System.currentTimeMillis() + (minutes * 60 * 1000))
-        // Guard: Format snooze time respecting 24h vs 12h user preference and active locale instead of hardcoded 12h pattern
+        // Guard: Format snooze time respecting 24h vs 12h user preference and active profile locale instead of hardcoded 12h pattern
         val is24 = timeFormat == TimeFormat.HOUR_24 || (timeFormat == null && android.text.format.DateFormat.is24HourFormat(context))
         val pattern = if (is24) "HH:mm" else "h:mm a"
-        val savedLang = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
-        val locale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLang)
+        // Guard: Resolve profile language when userId or entryId is available so snooze time formatting matches profile locale (#BUG-SNOOZE-TIME-LOCALE)
+        val targetUserId = userId ?: resolveUserId(primaryId)
+        val targetLang = resolveUserLanguage(targetUserId)
+        val locale = com.example.dosezy.utils.LocaleHelper.getLocale(targetLang)
         val snoozeTimeFormatted = java.text.SimpleDateFormat(pattern, locale).format(java.util.Date(triggerTime))
 
         val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {

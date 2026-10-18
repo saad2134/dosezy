@@ -217,9 +217,10 @@ class AlarmActivity : ComponentActivity() {
                         // Guard: Support dynamic snooze duration chosen directly on alarm screen (#103)
                         onSnoozeAction = { minutes ->
                             try {
+                                // Guard: Use localizedContext so snooze confirmation toast renders in the active alarm recipient's language (#BUG-ALARM-SNOOZE-TOAST-LOCALE)
                                 Toast.makeText(
                                     context,
-                                    context.getString(R.string.alarm_snoozed_toast, minutes),
+                                    localizedContext.getString(R.string.alarm_snoozed_toast, minutes),
                                     Toast.LENGTH_SHORT
                                 ).show()
                             } catch (_: Exception) {}
