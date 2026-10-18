@@ -133,8 +133,9 @@ class NotificationActionReceiver : BroadcastReceiver() {
                     val is24 = user.timeFormat == com.example.dosezy.data.model.TimeFormat.HOUR_24 ||
                             android.text.format.DateFormat.is24HourFormat(context)
                     val timePattern = if (is24) "HH:mm" else "h:mm a"
-                    val savedLang = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
-                    val locale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLang)
+                    // Guard: Derive locale from user's explicit profile language to ensure safeguard notification time matches profile locale (#BUG-NOTIF-LOCALE)
+                    val targetLang = user.language
+                    val locale = com.example.dosezy.utils.LocaleHelper.getLocale(targetLang)
                     val scheduledTimeStr = intent?.getStringExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME)
                         ?.takeIf { it.isNotBlank() }
                         ?: firstEntry.scheduledDateTime.let { it.format(java.time.format.DateTimeFormatter.ofPattern(timePattern, locale)) }

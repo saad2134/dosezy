@@ -185,4 +185,41 @@ class PdfReportGeneratorTest {
         val formattedWhole = if (wholeDose % 1 == 0.0) "${wholeDose.toInt()} $unitAbbr" else "$wholeDose $unitAbbr"
         assertEquals("3 tablet", formattedWhole)
     }
+
+    @Test
+    fun testCalculateAdherence_factorsOverduePendingDosesIntoDecidedCount() {
+        // Guard: Verify that pending doses scheduled earlier today whose scheduled time has passed are factored into decidedCount and reduce adherence (#BUG-PDF-OVERDUE-ADHERENCE)
+        val evalToday = LocalDate.of(2026, 10, 16)
+        val evalNow = LocalDateTime.of(2026, 10, 16, 10, 0)
+        val missedAfterHours = 4
+
+        val schedules = listOf(
+            // Dose 1: Taken on time earlier today
+            ScheduleEntry("1", "u1", "m1", evalNow.minusHours(4), MedicationStatus.TAKEN_ON_TIME),
+            // Dose 2: Pending dose scheduled 2 hours ago (overdue, but < 4h so not yet marked MISSED)
+            ScheduleEntry("2", "u1", "m1", evalNow.minusHours(2), MedicationStatus.PENDING),
+            // Dose 3: Pending dose scheduled for tonight (future today -> neutral, not overdue)
+            ScheduleEntry("3", "u1", "m1", evalNow.plusHours(8), MedicationStatus.PENDING)
+        )
+
+        val summary = generator.calculateAdherence(
+            schedules = schedules,
+            evalNow = evalNow,
+            evalToday = evalToday,
+            missedAfterHours = missedAfterHours
+        )
+
+        // Total today count = 3
+        assertEquals(3, summary.totalCount)
+        assertEquals(1, summary.takenOnTimeCount)
+        assertEquals(0, summary.takenLateCount)
+        assertEquals(0, summary.missedCount)
+        assertEquals(2, summary.pendingCount)
+
+        // Taken = 1. Overdue pending = 1 (entry 2). Future pending = 1 (entry 3, excluded from decided).
+        // Decided = 1 taken + 0 missed + 1 overduePending = 2.
+        // Adherence rate = 1 / 2 * 100.0 = 50.0% (not 100.0%!)
+        assertEquals(50.0, summary.adherenceRate, 0.01)
+        assertEquals("50.0%", summary.rateFormatted)
+    }
 }

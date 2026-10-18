@@ -200,11 +200,13 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                     views.setTextViewText(R.id.widget_date_text, dateString)
 
                     val defaultMedIcon = if (isDark) R.drawable.ic_widget_medication_dark else R.drawable.ic_widget_medication_light
+                    // Guard: Wrap context in user profile's chosen language so widget status messages match the profile locale (#BUG-WIDGET-LOCALE)
+                    val localizedContext = user?.language?.let { com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, it) } ?: context
 
                     if (user == null) {
                         views.setViewVisibility(R.id.widget_status_container, View.VISIBLE)
                         views.setImageViewResource(R.id.widget_status_icon, defaultMedIcon)
-                        views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_no_profile))
+                        views.setTextViewText(R.id.widget_status_message, localizedContext.getString(R.string.widget_no_profile))
                     } else {
                         val todayEntries = db.scheduleDao().getScheduleForDateRangeDirect(user.userId, startOfDay, endOfDay)
                         // Guard: Exclude ad-hoc PRN doses from widget scheduled progress counts to prevent inflating totalToday or falsely reporting all scheduled doses taken
@@ -217,20 +219,20 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                             when {
                                 takenToday == totalToday -> {
                                     views.setImageViewResource(R.id.widget_status_icon, R.drawable.ic_widget_check_circle)
-                                    views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_all_taken))
+                                    views.setTextViewText(R.id.widget_status_message, localizedContext.getString(R.string.widget_all_taken))
                                 }
                                 takenToday + skippedToday == totalToday -> {
                                     views.setImageViewResource(R.id.widget_status_icon, R.drawable.ic_widget_check_circle)
-                                    views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_all_completed))
+                                    views.setTextViewText(R.id.widget_status_message, localizedContext.getString(R.string.widget_all_completed))
                                 }
                                 else -> {
                                     views.setImageViewResource(R.id.widget_status_icon, defaultMedIcon)
-                                    views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_taken_summary, takenToday, totalToday))
+                                    views.setTextViewText(R.id.widget_status_message, localizedContext.getString(R.string.widget_taken_summary, takenToday, totalToday))
                                 }
                             }
                         } else {
                             views.setImageViewResource(R.id.widget_status_icon, defaultMedIcon)
-                            views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_no_meds))
+                            views.setTextViewText(R.id.widget_status_message, localizedContext.getString(R.string.widget_no_meds))
                         }
                     }
 

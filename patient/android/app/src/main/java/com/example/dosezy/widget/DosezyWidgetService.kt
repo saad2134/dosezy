@@ -97,7 +97,9 @@ class DosezyRemoteViewsFactory(
                     }.sortedBy { it.scheduledDateTime }
                 }
 
-                val tomorrowLabel = context.getString(R.string.widget_tomorrow)
+                // Guard: Wrap context in user profile's chosen language to ensure widget strings and labels match profile locale (#BUG-WIDGET-LOCALE)
+                val localizedContext = LocaleHelper.updateContextLocale(context, user.language)
+                val tomorrowLabel = localizedContext.getString(R.string.widget_tomorrow)
                 fun formatTimeLabel(entry: ScheduleEntry): String {
                     val itemDate = entry.scheduledDateTime.toLocalDate()
                     val formattedTime = entry.scheduledDateTime.format(userTimeFormatter)
@@ -118,7 +120,7 @@ class DosezyRemoteViewsFactory(
                         WidgetItem(
                             entryId = entry.entryId,
                             timeLabel = formatTimeLabel(entry),
-                            medName = med?.medicationName ?: context.getString(R.string.nav_medicines),
+                            medName = med?.medicationName ?: localizedContext.getString(R.string.nav_medicines),
                             doseLabel = doseStr,
                             userId = user.userId
                         )

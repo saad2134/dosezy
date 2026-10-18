@@ -95,7 +95,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             medicineDetails: List<Pair<String, String>> = emptyList(),
             scheduledTime: String?,
             snoozeMinutes: Int = 10,
-            userId: String? = null
+            userId: String? = null,
+            userLanguage: com.example.dosezy.data.model.Language? = null
         ) {
             MedicineAlarmReceiver().showNotification(
                 context = context,
@@ -110,7 +111,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 maxNagging = 3,
                 snoozeMinutes = snoozeMinutes,
                 isUpdateOnly = true,
-                userId = userId
+                userId = userId,
+                userLanguage = userLanguage
             )
         }
 
@@ -148,7 +150,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 maxNagging = user?.naggingMaxRepeats ?: 3,
                 snoozeMinutes = user?.snoozeDuration ?: 10,
                 isIntakeReAlert = true,
-                userId = user?.userId
+                userId = user?.userId,
+                userLanguage = user?.language
             )
         }
     }
@@ -279,8 +282,9 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                         autoSilenceSeconds = duration
                     )
 
-                    val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
-                    val currentLocale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLanguage)
+                    // Guard: Derive locale from user's explicit profile language so scheduled time matches profile preferences (#BUG-NOTIF-LOCALE)
+                    val targetLanguage = user?.language ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+                    val currentLocale = com.example.dosezy.utils.LocaleHelper.getLocale(targetLanguage)
 
                     // Guard: Core library desugaring enables java.time on API 24+; format scheduled time with user's preferred 12h/24h mode and locale across all supported OS versions
                     val formattedScheduledTime = if (user != null) {
@@ -305,7 +309,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                         naggingCount = naggingCount,
                         maxNagging = user?.naggingMaxRepeats ?: 3,
                         snoozeMinutes = user?.snoozeDuration ?: 10,
-                        userId = primaryEntry.userId
+                        userId = primaryEntry.userId,
+                        userLanguage = user?.language
                     )
 
                     // Schedule next follow-up nagging reminder if enabled and below limit
@@ -361,10 +366,12 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         snoozeMinutes: Int = 10,
         isUpdateOnly: Boolean = false,
         isIntakeReAlert: Boolean = false,
-        userId: String? = null
+        userId: String? = null,
+        userLanguage: com.example.dosezy.data.model.Language? = null
     ) {
-        val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
-        val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
+        // Guard: Resolve notification strings and actions using user profile language or fallback to globally saved app language (#BUG-NOTIF-LOCALE)
+        val targetLanguage = userLanguage ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+        val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, targetLanguage)
 
         createNotificationChannels(localizedContext)
 

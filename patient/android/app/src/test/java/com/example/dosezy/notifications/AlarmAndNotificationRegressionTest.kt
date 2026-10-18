@@ -3,6 +3,7 @@ package com.example.dosezy.notifications
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import androidx.test.core.app.ApplicationProvider
 import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.utils.ImageUtils
@@ -413,6 +414,44 @@ class AlarmAndNotificationRegressionTest {
 
         // Under user custom 5h threshold, 4 hours difference is on time
         assertFalse("4 hours difference is on time under user custom 5h threshold", TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, customLateThreshold))
+    }
+
+    @Test
+    fun testNotificationLocaleResolution_resolvesProfileLanguageOverGlobalLanguage() {
+        // Guard: Verify that notification action strings and scheduled time formatting resolve profile language rather than global app_prefs language (#BUG-NOTIF-LOCALE)
+        val spanishProfile = com.example.dosezy.data.model.User(
+            userId = "user_es",
+            fullName = "Carlos",
+            age = 40,
+            gender = com.example.dosezy.data.model.Gender.DO_NOT_SPECIFY,
+            contactNumber = "+34600000000",
+            language = com.example.dosezy.data.model.Language.SPANISH,
+            timeFormat = com.example.dosezy.data.model.TimeFormat.HOUR_24
+        )
+        val englishProfile = com.example.dosezy.data.model.User(
+            userId = "user_en",
+            fullName = "Alice",
+            age = 30,
+            gender = com.example.dosezy.data.model.Gender.DO_NOT_SPECIFY,
+            contactNumber = "+12025550123",
+            language = com.example.dosezy.data.model.Language.ENGLISH,
+            timeFormat = com.example.dosezy.data.model.TimeFormat.HOUR_12
+        )
+
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val esContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, spanishProfile.language)
+        val enContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, englishProfile.language)
+
+        val esTaken = esContext.getString(com.example.dosezy.R.string.home_action_taken)
+        val enTaken = enContext.getString(com.example.dosezy.R.string.home_action_taken)
+
+        val esSnooze = esContext.getString(com.example.dosezy.R.string.notif_action_snooze_format, 10)
+        val enSnooze = enContext.getString(com.example.dosezy.R.string.notif_action_snooze_format, 10)
+
+        assertEquals("Taken", enTaken)
+        assertEquals("Snooze (10 min)", enSnooze)
+        assertFalse("Spanish taken action string must differ from English", esTaken == enTaken)
+        assertFalse("Spanish snooze action string must differ from English", esSnooze == enSnooze)
     }
 }
 

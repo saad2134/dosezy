@@ -224,5 +224,23 @@ class DosezyAppWidgetProviderTest {
         assertFalse("French widget date should differ from English", frenchDate == englishDate)
         assertFalse("Arabic widget date should differ from English", arabicDate == englishDate)
     }
+
+    @Test
+    fun testWidgetLocalizedContext_resolvesProfileSpecificStrings() {
+        // Guard: Verify that wrapping context with user profile language resolves localized widget strings (#BUG-WIDGET-LOCALE)
+        val spanishContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, com.example.dosezy.data.model.Language.SPANISH)
+        val englishContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, com.example.dosezy.data.model.Language.ENGLISH)
+
+        val spanishTomorrow = spanishContext.getString(com.example.dosezy.R.string.widget_tomorrow)
+        val englishTomorrow = englishContext.getString(com.example.dosezy.R.string.widget_tomorrow)
+
+        val spanishAllTaken = spanishContext.getString(com.example.dosezy.R.string.widget_all_taken)
+        val englishAllTaken = englishContext.getString(com.example.dosezy.R.string.widget_all_taken)
+
+        assertEquals("Tmrw", englishTomorrow.trim())
+        assertEquals("All doses taken today! 🎉", englishAllTaken)
+        assertFalse("Spanish tomorrow label must differ from English", spanishTomorrow == englishTomorrow)
+        assertFalse("Spanish all-taken status must differ from English", spanishAllTaken == englishAllTaken)
+    }
 }
 

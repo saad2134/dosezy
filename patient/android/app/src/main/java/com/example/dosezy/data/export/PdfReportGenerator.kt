@@ -67,7 +67,13 @@ class PdfReportGenerator(private val context: Context) {
         val pendingCount = adherenceEntries.count { it.status == MedicationStatus.PENDING && !isEntryMissed(it, evalNow, missedAfterHours) }
 
         val takenTotal = takenOnTimeCount + takenLateCount
-        val decidedCount = takenTotal + missedCount
+        // Guard: Factor overdue pending doses on or before today into decidedCount matching AnalyticsViewModel so overdue unlogged doses accurately decrease compliance (#BUG-PDF-OVERDUE-ADHERENCE)
+        val overduePendingCount = adherenceEntries.count {
+            it.status == MedicationStatus.PENDING &&
+            it.scheduledDateTime.isBefore(evalNow) &&
+            !isEntryMissed(it, evalNow, missedAfterHours)
+        }
+        val decidedCount = takenTotal + missedCount + overduePendingCount
         val adherenceRate = if (decidedCount > 0) (takenTotal.toDouble() / decidedCount * 100.0) else 0.0
         val rateFormatted = String.format(Locale.US, "%.1f%%", adherenceRate)
         val breakdownText = "On-Time: $takenOnTimeCount   |   Late: $takenLateCount   |   Skipped: $skippedCount   |   Missed: $missedCount   |   Pending: $pendingCount   |   Total: $totalCount"

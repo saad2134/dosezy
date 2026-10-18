@@ -519,8 +519,9 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                             val activeEntryIds = ArrayList(remainingPending.map { it.entryId })
 
                             val user = database.userDao().getUserByIdDirect(entry.userId)
-                            val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
-                            val currentLocale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLanguage)
+                            // Guard: Derive locale from user's explicit profile language so scheduled time matches profile preferences (#BUG-NOTIF-LOCALE)
+                            val targetLanguage = user?.language ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+                            val currentLocale = com.example.dosezy.utils.LocaleHelper.getLocale(targetLanguage)
                             val formattedScheduledTime = if (user != null) {
                                 try {
                                     com.example.dosezy.utils.TimeFormatUtils.formatTime(newPrimary.scheduledDateTime, user.timeFormat, currentLocale)
@@ -536,7 +537,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                                 medicineDetails = medDetails,
                                 scheduledTime = formattedScheduledTime,
                                 snoozeMinutes = user?.snoozeDuration ?: 10,
-                                userId = entry.userId
+                                userId = entry.userId,
+                                userLanguage = user?.language
                             )
 
                             // Guard: Re-arm nagging reminder only if undone dose belongs to today's schedule and nagging reminders are enabled to prevent phantom alarms for historical past-date doses (#BUG-03, #BUG-UNDO-PAST-DATE)
