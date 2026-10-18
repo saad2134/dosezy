@@ -222,39 +222,48 @@ fun HomeScreen(
         }
     }
 
+    val startIntakeSafeguard: (String, ScheduleWithMedicine?, String?) -> Unit = { entryId, target, note ->
+        // Guard: Start intake countdown timer with re-alert safeguard for ADHD support (#104, #BUG-SAFEGUARD-BYPASS)
+        val medName = target?.medicine?.medicationName ?: context.getString(R.string.form_med_name)
+        val is24 = currentUser?.timeFormat == com.example.dosezy.data.model.TimeFormat.HOUR_24 ||
+            android.text.format.DateFormat.is24HourFormat(context)
+        val timePattern = if (is24) "HH:mm" else "h:mm a"
+        val scheduledTimeStr = target?.scheduleEntry?.scheduledDateTime?.format(
+            java.time.format.DateTimeFormatter.ofPattern(timePattern, activeLocale)
+        ) ?: ""
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entryId,
+            entryIds = listOf(entryId),
+            medicineName = medName,
+            medicineNames = listOf(medName),
+            scheduledTime = scheduledTimeStr,
+            durationSeconds = currentUser?.intakeCountdownSeconds ?: 120,
+            userId = currentUser?.userId,
+            notes = note
+        )
+    }
+
     val handleMarkAsTaken: (String) -> Unit = { entryId ->
         val target = todayEntries.find { it.scheduleEntry.entryId == entryId }
         if (currentUser?.allowCustomDoseTime == true) {
             if (target != null) {
                 manualRecordEntry = target
+            } else if (currentUser?.intakeSafeguardEnabled == true) {
+                startIntakeSafeguard(entryId, target, null)
             } else {
                 executeTakeDose(entryId, LocalDateTime.now(), null)
             }
         } else if (currentUser?.allowDoseNotes == true && currentUser?.promptDoseNotes == true) {
             if (target != null) {
                 notePromptEntry = target
+            } else if (currentUser?.intakeSafeguardEnabled == true) {
+                startIntakeSafeguard(entryId, target, null)
             } else {
                 executeTakeDose(entryId, LocalDateTime.now(), null)
             }
         } else if (currentUser?.intakeSafeguardEnabled == true) {
-            // Guard: Start intake countdown timer with re-alert safeguard for ADHD support (#104)
-            val medName = target?.medicine?.medicationName ?: context.getString(R.string.form_med_name)
-            val is24 = currentUser?.timeFormat == com.example.dosezy.data.model.TimeFormat.HOUR_24 ||
-                android.text.format.DateFormat.is24HourFormat(context)
-            val timePattern = if (is24) "HH:mm" else "h:mm a"
-            val scheduledTimeStr = target?.scheduleEntry?.scheduledDateTime?.format(
-                java.time.format.DateTimeFormatter.ofPattern(timePattern, activeLocale)
-            ) ?: ""
-            IntakeSafeguardManager.startCountdown(
-                context = context,
-                entryId = entryId,
-                entryIds = listOf(entryId),
-                medicineName = medName,
-                medicineNames = listOf(medName),
-                scheduledTime = scheduledTimeStr,
-                durationSeconds = currentUser?.intakeCountdownSeconds ?: 120,
-                userId = currentUser?.userId
-            )
+            startIntakeSafeguard(entryId, target, null)
         } else {
             executeTakeDose(entryId, LocalDateTime.now(), null)
         }
@@ -265,34 +274,21 @@ fun HomeScreen(
         if (currentUser?.allowCustomDoseTime == true) {
             if (target != null) {
                 manualRecordEntry = target
+            } else if (currentUser?.intakeSafeguardEnabled == true) {
+                startIntakeSafeguard(entryId, target, null)
             } else {
                 executeTakeDose(entryId, LocalDateTime.now(), null)
             }
         } else if (currentUser?.allowDoseNotes == true && currentUser?.promptDoseNotes == true) {
             if (target != null) {
                 notePromptEntry = target
+            } else if (currentUser?.intakeSafeguardEnabled == true) {
+                startIntakeSafeguard(entryId, target, null)
             } else {
                 executeTakeDose(entryId, LocalDateTime.now(), null)
             }
         } else if (currentUser?.intakeSafeguardEnabled == true) {
-            // Guard: Start intake countdown timer with re-alert safeguard for ADHD support (#104)
-            val medName = target?.medicine?.medicationName ?: context.getString(R.string.form_med_name)
-            val is24 = currentUser?.timeFormat == com.example.dosezy.data.model.TimeFormat.HOUR_24 ||
-                android.text.format.DateFormat.is24HourFormat(context)
-            val timePattern = if (is24) "HH:mm" else "h:mm a"
-            val scheduledTimeStr = target?.scheduleEntry?.scheduledDateTime?.format(
-                java.time.format.DateTimeFormatter.ofPattern(timePattern, activeLocale)
-            ) ?: ""
-            IntakeSafeguardManager.startCountdown(
-                context = context,
-                entryId = entryId,
-                entryIds = listOf(entryId),
-                medicineName = medName,
-                medicineNames = listOf(medName),
-                scheduledTime = scheduledTimeStr,
-                durationSeconds = currentUser?.intakeCountdownSeconds ?: 120,
-                userId = currentUser?.userId
-            )
+            startIntakeSafeguard(entryId, target, null)
         } else {
             executeTakeDose(entryId, LocalDateTime.now(), null)
         }
@@ -445,8 +441,15 @@ fun HomeScreen(
                 onConfirm = {
                     coroutineScope.launch {
                         val medName = activeIntake?.medicineName ?: ""
+                        val entryCount = activeIntake?.entryIds?.size ?: 1
                         IntakeSafeguardManager.confirmIntake(context, database)
-                        if (medName.isNotBlank()) {
+                        if (entryCount > 1) {
+                            // Guard: Display cohort take all success toast when multiple medicines in cohort are confirmed via safeguard (#BUG-SAFEGUARD-COHORT-NAMES)
+                            snackbarHostState.showSnackbar(
+                                message = context.getString(R.string.take_all_success_toast, entryCount),
+                                duration = SnackbarDuration.Short
+                            )
+                        } else if (medName.isNotBlank()) {
                             snackbarHostState.showSnackbar(
                                 message = context.getString(R.string.home_intake_confirmed, medName),
                                 duration = SnackbarDuration.Short
@@ -558,7 +561,13 @@ fun HomeScreen(
             onConfirm = { resolvedDateTime, note ->
                 val targetId = target.scheduleEntry.entryId
                 manualRecordEntry = null
-                executeTakeDose(targetId, resolvedDateTime, note)
+                // Guard: If ADHD safeguard is enabled and resolved dose time is current (within 5 min of now), start countdown buffer with note instead of bypassing safeguard (#BUG-SAFEGUARD-BYPASS)
+                val isRecent = !resolvedDateTime.isBefore(LocalDateTime.now().minusMinutes(5))
+                if (currentUser?.intakeSafeguardEnabled == true && isRecent) {
+                    startIntakeSafeguard(targetId, target, note?.takeIf { it.isNotBlank() })
+                } else {
+                    executeTakeDose(targetId, resolvedDateTime, note)
+                }
             }
         )
     }
@@ -599,11 +608,22 @@ fun HomeScreen(
             isEditing = false,
             onConfirm = { note ->
                 notePromptEntry = null
-                executeTakeDose(entryId, LocalDateTime.now(), note.takeIf { it.isNotBlank() })
+                val trimmedNote = note.takeIf { it.isNotBlank() }
+                // Guard: If ADHD safeguard is enabled, start countdown with entered note instead of bypassing safeguard (#BUG-SAFEGUARD-BYPASS)
+                if (currentUser?.intakeSafeguardEnabled == true) {
+                    startIntakeSafeguard(entryId, target, trimmedNote)
+                } else {
+                    executeTakeDose(entryId, LocalDateTime.now(), trimmedNote)
+                }
             },
             onSkip = {
                 notePromptEntry = null
-                executeTakeDose(entryId, LocalDateTime.now(), null)
+                // Guard: If ADHD safeguard is enabled, start countdown buffer upon skipping note prompt instead of bypassing safeguard (#BUG-SAFEGUARD-BYPASS)
+                if (currentUser?.intakeSafeguardEnabled == true) {
+                    startIntakeSafeguard(entryId, target, null)
+                } else {
+                    executeTakeDose(entryId, LocalDateTime.now(), null)
+                }
             },
             onDismiss = {
                 notePromptEntry = null
@@ -664,12 +684,17 @@ fun HomeScreen(
 
                         val user = currentUser
                         if (user?.intakeSafeguardEnabled == true) {
-                            // Guard: Start intake countdown timer for ADHD support when cohort take is confirmed (#104, #102)
+                            val compositeMedName = if (medNames.size > 1) {
+                                medNames.joinToString(", ")
+                            } else {
+                                medNames.firstOrNull() ?: "Medicine"
+                            }
+                            // Guard: Pass composite medication names to IntakeSafeguardManager so countdown banner, notifications, and confirmation toasts accurately reflect all cohort medicines (#BUG-SAFEGUARD-COHORT-NAMES)
                             IntakeSafeguardManager.startCountdown(
                                 context = context,
                                 entryId = entryIds.first(),
                                 entryIds = entryIds,
-                                medicineName = medNames.firstOrNull() ?: "Medicine",
+                                medicineName = compositeMedName,
                                 medicineNames = medNames,
                                 scheduledTime = slotTime,
                                 durationSeconds = user.intakeCountdownSeconds,

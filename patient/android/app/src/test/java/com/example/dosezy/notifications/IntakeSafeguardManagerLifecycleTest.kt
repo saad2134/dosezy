@@ -991,6 +991,72 @@ class IntakeSafeguardManagerLifecycleTest {
             activeNotifs.any { it.id == entry2.entryId.hashCode() }
         )
     }
+
+    @Test
+    fun testIntakeSafeguard_persistsNotes_andPassesToScheduleRepositoryOnConfirm() = runBlocking {
+        // Guard: Verify notes are captured in countdown state, persisted to preferences, and written to Room on confirmation (#BUG-SAFEGUARD-BYPASS)
+        val now = LocalDateTime.now()
+        val entry = ScheduleEntry(
+            entryId = "entry_safeguard_notes_test",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = now.minusMinutes(2),
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entry)
+
+        val noteText = "Taken with full glass of water and food"
+        val state = IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entry.entryId,
+            entryIds = listOf(entry.entryId),
+            medicineName = testMedicine.medicationName,
+            medicineNames = listOf(testMedicine.medicationName),
+            scheduledTime = "08:00 AM",
+            durationSeconds = 60,
+            userId = testUser.userId,
+            notes = noteText
+        )
+
+        assertEquals("Countdown state must retain clinical note", noteText, state.notes)
+        assertEquals("Active countdown StateFlow must retain clinical note", noteText, IntakeSafeguardManager.activeCountdown.value?.notes)
+
+        val prefs = context.getSharedPreferences("dosezy_intake_safeguard", Context.MODE_PRIVATE)
+        assertEquals("Preferences must persist clinical note", noteText, prefs.getString("notes", null))
+
+        val success = IntakeSafeguardManager.confirmIntake(context, database)
+        assertTrue("Confirm intake must succeed", success)
+
+        val updatedEntry = database.scheduleDao().getScheduleEntryById(entry.entryId)
+        assertNotNull(updatedEntry)
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, updatedEntry?.status)
+        assertEquals("Dose notes in Room must match note passed to safeguard countdown", noteText, updatedEntry?.doseNotes)
+    }
+
+    @Test
+    fun testIntakeSafeguard_startCountdown_compositeMedNamesPersisted() {
+        // Guard: Verify composite medicine names are stored in state for multi-medication cohorts (#BUG-SAFEGUARD-COHORT-NAMES)
+        val compositeName = "Metformin, Atorvastatin, Lisinopril"
+        val medList = listOf("Metformin", "Atorvastatin", "Lisinopril")
+        val ids = listOf("id_1", "id_2", "id_3")
+
+        val state = IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = ids.first(),
+            entryIds = ids,
+            medicineName = compositeName,
+            medicineNames = medList,
+            scheduledTime = "09:00 AM",
+            durationSeconds = 90,
+            userId = testUser.userId
+        )
+
+        assertEquals("State must store composite medicine name", compositeName, state.medicineName)
+        assertEquals(3, state.medicineNames.size)
+        assertEquals(compositeName, state.medicineNames.joinToString(", "))
+
+        IntakeSafeguardManager.cancelCountdown(context)
+    }
 }
 
 

@@ -797,4 +797,48 @@ class RecordDoseMissedAndUndoTest {
         )
         assertNull("Sibling snooze PendingIntent must be disarmed when all slot doses are taken", cancelledSnooze)
     }
+
+    @Test
+    fun undoDoseTaken_onHistoricalPastDate_revertsStatusWithoutPostingNotificationOrNaggingAlarm() = runBlocking {
+        // Guard: Verify that undoing a historical dose from a past calendar date reverts status to PENDING without re-posting shade notifications or arming nagging alarms (#BUG-UNDO-PAST-DATE)
+        val pastDate = LocalDateTime.now().minusDays(2).withHour(8).withMinute(0).withSecond(0).withNano(0)
+        val pastEntry = ScheduleEntry(
+            entryId = "entry_past_date_undo",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = pastDate,
+            status = MedicationStatus.TAKEN_ON_TIME
+        )
+        db.scheduleDao().insertScheduleEntry(pastEntry)
+
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        nm.cancelAll()
+
+        scheduleRepository.undoDoseTaken(pastEntry.entryId, context)
+
+        // Verify status reverted in Room
+        val reverted = db.scheduleDao().getScheduleEntryById(pastEntry.entryId)
+        assertNotNull(reverted)
+        assertEquals(MedicationStatus.PENDING, reverted?.status)
+
+        // Verify NO active notification is posted for historical past date dose
+        val activeNotifs = nm.activeNotifications
+        assertFalse(
+            "Historical past date dose must NOT post an active notification in shade on undo",
+            activeNotifs.any { it.id == pastEntry.entryId.hashCode() }
+        )
+
+        // Verify NO nagging reminder is scheduled in AlarmManager
+        val naggingIntent = Intent(context, MedicineAlarmReceiver::class.java)
+        val pendingNagging = PendingIntent.getBroadcast(
+            context,
+            pastEntry.entryId.hashCode() + 2000,
+            naggingIntent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+        )
+        assertNull(
+            "Historical past date dose must NOT schedule a nagging alarm on undo",
+            pendingNagging
+        )
+    }
 }

@@ -266,11 +266,21 @@ class AlarmAndNotificationRegressionTest {
         )
         assertEquals("entry_past_undo", remainingPending.first().entryId)
 
-        // Verify that hasActiveNotification evaluates to true on undo to force shade alert re-issue
-        val hasActiveNotification = (pendingEntry.status == MedicationStatus.PENDING)
+        // Verify that hasActiveNotification evaluates to true on undo to force shade alert re-issue for today's dose (#BUG-03, #BUG-UNDO-PAST-DATE)
+        val isScheduledToday = pastEntry.scheduledDateTime.toLocalDate() == java.time.LocalDate.now()
+        val hasActiveNotification = (pendingEntry.status == MedicationStatus.PENDING && isScheduledToday)
         assertTrue(
-            "Undoing dose must force active notification restoration to shade",
+            "Undoing dose on today's schedule must force active notification restoration to shade",
             hasActiveNotification
+        )
+
+        // Guard: Historical past date dose (e.g. 2 days ago) must NOT evaluate hasActiveNotification to true (#BUG-UNDO-PAST-DATE)
+        val historicalEntry = pastEntry.copy(scheduledDateTime = pastEntry.scheduledDateTime.minusDays(2))
+        val isHistoricalToday = historicalEntry.scheduledDateTime.toLocalDate() == java.time.LocalDate.now()
+        val hasActiveNotificationHistorical = (historicalEntry.status == MedicationStatus.PENDING && isHistoricalToday)
+        assertFalse(
+            "Undoing dose on historical past date must NOT force active notification restoration",
+            hasActiveNotificationHistorical
         )
     }
 

@@ -489,8 +489,9 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                         slotEntries.forEach { nManager.cancel(it.entryId.hashCode()) }
                     } else {
                         // Other medications remain pending in this slot; update active notification to remove taken medication
-                        // Guard: Check active notifications against all slot entry IDs and stored primaryId; if entry is PENDING (undo), force active alert restoration (#BUG-03)
-                        val hasActiveNotification = (entry.status == MedicationStatus.PENDING) || try {
+                        // Guard: Check active notifications against all slot entry IDs and stored primaryId; if entry is PENDING on today's schedule, force active alert restoration (#BUG-03, #BUG-UNDO-PAST-DATE)
+                        val isScheduledToday = entry.scheduledDateTime.toLocalDate() == java.time.LocalDate.now()
+                        val hasActiveNotification = (entry.status == MedicationStatus.PENDING && isScheduledToday) || try {
                             val active = nManager.activeNotifications
                             active.any { notif ->
                                 slotEntries.any { it.entryId.hashCode() == notif.id } || (primaryId != null && notif.id == primaryId.hashCode())
@@ -538,8 +539,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                                 userId = entry.userId
                             )
 
-                            // Guard: Re-arm nagging reminder if undone dose is overdue and nagging reminders are enabled (#BUG-03)
-                            if (entry.status == MedicationStatus.PENDING && user != null && user.naggingRemindersEnabled && entry.scheduledDateTime.isBefore(LocalDateTime.now())) {
+                            // Guard: Re-arm nagging reminder only if undone dose belongs to today's schedule and nagging reminders are enabled to prevent phantom alarms for historical past-date doses (#BUG-03, #BUG-UNDO-PAST-DATE)
+                            if (entry.status == MedicationStatus.PENDING && isScheduledToday && user != null && user.naggingRemindersEnabled && entry.scheduledDateTime.isBefore(LocalDateTime.now())) {
                                 try {
                                     val alarmScheduler = AlarmScheduler(context)
                                     alarmScheduler.scheduleNaggingReminder(
@@ -634,6 +635,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         // 3. Update app widgets and alarms
         if (context != null && previousEntry != null) {
             val now = LocalDateTime.now()
+            val isScheduledToday = previousEntry.scheduledDateTime.toLocalDate() == java.time.LocalDate.now()
             if (previousEntry.scheduledDateTime.isAfter(now)) {
                 // Guard: Reschedule alarms for upcoming doses so undoing a mistakenly marked future dose restores future AlarmManager reminders
                 try {
@@ -641,13 +643,24 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 } catch (e: Exception) {
                     Log.e(TAG, "Error rescheduling alarms on undoDoseTaken", e)
                 }
-            } else {
-                // Guard: Re-post shade notification and re-arm reminder for current or overdue undone dose (#BUG-03)
+            } else if (isScheduledToday) {
+                // Guard: Re-post shade notification and re-arm reminder for current or overdue undone dose on today's schedule (#BUG-03, #BUG-UNDO-PAST-DATE)
                 try {
                     syncSlotNotificationAndAlarms(entryId, previousEntry.copy(status = MedicationStatus.PENDING), context)
                 } catch (e: Exception) {
                     Log.e(TAG, "Error resyncing slot notification on undoDoseTaken", e)
                 }
+            } else {
+                // Guard: For historical past-date doses, disarm any lingering notifications or alarms without posting new ones (#BUG-UNDO-PAST-DATE)
+                try {
+                    val alarmScheduler = AlarmScheduler(context)
+                    alarmScheduler.cancelAlarm(previousEntry)
+                    alarmScheduler.cancelNagging(previousEntry.entryId)
+                    alarmScheduler.cancelSnooze(previousEntry.entryId)
+                    alarmScheduler.cancelIntakeSafeguardAlarm(previousEntry.entryId)
+                    val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
+                    nManager?.cancel(previousEntry.entryId.hashCode())
+                } catch (_: Exception) {}
             }
             try {
                 com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)

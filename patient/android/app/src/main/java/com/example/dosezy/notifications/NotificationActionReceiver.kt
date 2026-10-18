@@ -124,8 +124,12 @@ class NotificationActionReceiver : BroadcastReceiver() {
                         val med = entry?.let { database.medicineDao().getMedicineByIdDirect(it.medicineId) }
                         med?.medicationName
                     }
-                    val primaryMedName = medicineNames.firstOrNull() ?: "Medicine"
-                    // Guard: Pass formatted scheduled time to IntakeSafeguardManager so safeguard notifications and expiry re-alerts display accurate time
+                    val compositeMedName = if (medicineNames.size > 1) {
+                        medicineNames.joinToString(", ")
+                    } else {
+                        medicineNames.firstOrNull() ?: "Medicine"
+                    }
+                    // Guard: Pass formatted scheduled time and composite names so safeguard notifications and expiry re-alerts display accurate time and all cohort medicines (#BUG-SAFEGUARD-COHORT-NAMES)
                     val is24 = user.timeFormat == com.example.dosezy.data.model.TimeFormat.HOUR_24 ||
                             android.text.format.DateFormat.is24HourFormat(context)
                     val timePattern = if (is24) "HH:mm" else "h:mm a"
@@ -138,13 +142,13 @@ class NotificationActionReceiver : BroadcastReceiver() {
                         context = context,
                         entryId = primaryEntryId,
                         entryIds = allIds,
-                        medicineName = primaryMedName,
+                        medicineName = compositeMedName,
                         medicineNames = medicineNames,
                         scheduledTime = scheduledTimeStr,
                         durationSeconds = user.intakeCountdownSeconds,
                         userId = firstEntry.userId
                     )
-                    Log.d(TAG, "Started intake countdown safeguard for ${allIds.size} medicines")
+                    Log.d(TAG, "Started intake countdown safeguard for ${allIds.size} medicines ($compositeMedName)")
                     return
                 }
 

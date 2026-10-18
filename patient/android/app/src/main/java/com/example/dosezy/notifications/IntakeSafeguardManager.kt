@@ -51,7 +51,8 @@ object IntakeSafeguardManager {
         val startTimestamp: Long,
         val targetTimestamp: Long,
         val totalDurationSeconds: Int,
-        val userId: String? = null
+        val userId: String? = null,
+        val notes: String? = null
     )
 
     private val _activeCountdown = MutableStateFlow<IntakeCountdownState?>(null)
@@ -85,7 +86,8 @@ object IntakeSafeguardManager {
         medicineNames: List<String>,
         scheduledTime: String,
         durationSeconds: Int,
-        userId: String? = null
+        userId: String? = null,
+        notes: String? = null
     ): IntakeCountdownState {
         val scheduler = AlarmScheduler(context)
 
@@ -115,7 +117,8 @@ object IntakeSafeguardManager {
             startTimestamp = now,
             targetTimestamp = target,
             totalDurationSeconds = durationSeconds,
-            userId = userId
+            userId = userId,
+            notes = notes
         )
 
         saveState(context, state)
@@ -192,7 +195,7 @@ object IntakeSafeguardManager {
             }
             Log.d(TAG, "Recording confirmed dose intake ($status) for entry: $id")
             // Guard: Pass context with syncSlotNotification = false so stock deduction triggers refill notification while intermediate slot synchronization is deferred (#BUG-01)
-            scheduleRepository.recordDoseTaken(id, status, takenAt, context, null, syncSlotNotification = false)
+            scheduleRepository.recordDoseTaken(id, status, takenAt, context, current.notes, syncSlotNotification = false)
             scheduler.cancelNagging(id)
             scheduler.cancelSnooze(id)
         }
@@ -446,7 +449,7 @@ object IntakeSafeguardManager {
 
     private fun saveState(context: Context, state: IntakeCountdownState) {
         val prefs = context.getSharedPreferences(PREFS_SAFEGUARD, Context.MODE_PRIVATE)
-        prefs.edit()
+        val editor = prefs.edit()
             .putString("entry_id", state.entryId)
             .putString("entry_ids", state.entryIds.joinToString(","))
             .putString("med_name", state.medicineName)
@@ -456,7 +459,12 @@ object IntakeSafeguardManager {
             .putLong("target_time", state.targetTimestamp)
             .putInt("duration_sec", state.totalDurationSeconds)
             .putString("user_id", state.userId)
-            .apply()
+        if (state.notes != null) {
+            editor.putString("notes", state.notes)
+        } else {
+            editor.remove("notes")
+        }
+        editor.apply()
     }
 
     private fun restoreState(context: Context): IntakeCountdownState? {
@@ -470,6 +478,7 @@ object IntakeSafeguardManager {
         val targetTime = prefs.getLong("target_time", 0L)
         val durationSec = prefs.getInt("duration_sec", 120)
         val userId = prefs.getString("user_id", null)
+        val notes = prefs.getString("notes", null)
 
         val entryIds = entryIdsStr.split(",").filter { it.isNotBlank() }
         val medNames = medNamesStr.split("|||").filter { it.isNotBlank() }
@@ -483,7 +492,8 @@ object IntakeSafeguardManager {
             startTimestamp = startTime,
             targetTimestamp = targetTime,
             totalDurationSeconds = durationSec,
-            userId = userId
+            userId = userId,
+            notes = notes
         )
     }
 
