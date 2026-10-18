@@ -128,11 +128,12 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         }
         // Guard: Dismiss any active refill alert notification for deleted/archived medicine
         nManager?.cancel((medicineId + "_refill").hashCode())
-        // Guard: Dismiss active ADHD intake countdown notification if active countdown references deleted medicine
+        // Guard: Reconcile active ADHD intake countdown notification if active countdown references deleted medicine (#BUG-SAFEGUARD-PARTIAL-COHORT)
         try {
             val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
             if (activeCountdown != null && (scheduleEntries.any { it.entryId == activeCountdown.entryId } || activeCountdown.entryIds.any { id -> scheduleEntries.any { it.entryId == id } })) {
-                com.example.dosezy.notifications.IntakeSafeguardManager.cancelCountdown(context)
+                val matchingIds = scheduleEntries.map { it.entryId }.filter { activeCountdown.entryIds.contains(it) || it == activeCountdown.entryId }
+                com.example.dosezy.notifications.IntakeSafeguardManager.reconcileCountdown(context, matchingIds)
             }
         } catch (_: Exception) {}
         Log.d(TAG, "Cancelled active alarms for medicine ID: $medicineId (${entriesToCancel.size} active entries)")
@@ -431,6 +432,17 @@ class ScheduleRepository(private val database: DosezyDatabase) {
     ) {
         val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
 
+        // Guard: Resolve primary cohort ID before cancelling snooze/nagging alarms to prevent wiping membership mapping before notification dismissal (#BUG-SLOT-NULL-ENTRY)
+        val prefs = try {
+            context.getSharedPreferences(
+                AlarmScheduler.PREFS_COORDINATION,
+                Context.MODE_PRIVATE
+            )
+        } catch (_: Exception) { null }
+        val primaryNagging = prefs?.getString("nagging_member_$entryId", null)
+        val primarySnooze = prefs?.getString("snooze_member_$entryId", null)
+        val primaryId = primaryNagging ?: primarySnooze
+
         // Cancel armed snooze, nagging, and intake safeguard alarms so taking in-app prevents phantom alarms from ringing later
         try {
             val alarmScheduler = AlarmScheduler(context)
@@ -440,24 +452,16 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             alarmScheduler.cancelIntakeSafeguardAlarm(entryId)
         } catch (_: Exception) {}
 
-        // Guard: Reconcile and dismiss active ADHD intake countdown notification if confirmed entry matches active countdown
+        // Guard: Reconcile active ADHD intake countdown notification if confirmed entry matches active countdown to prevent dropping remaining pending medications (#BUG-SAFEGUARD-PARTIAL-COHORT)
         try {
             val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
             if (activeCountdown != null && (activeCountdown.entryId == entryId || activeCountdown.entryIds.contains(entryId))) {
-                com.example.dosezy.notifications.IntakeSafeguardManager.cancelCountdown(context)
+                com.example.dosezy.notifications.IntakeSafeguardManager.reconcileCountdown(context, listOf(entryId))
             }
         } catch (_: Exception) {}
 
         if (nManager != null) {
             try {
-                val prefs = context.getSharedPreferences(
-                    AlarmScheduler.PREFS_COORDINATION,
-                    Context.MODE_PRIVATE
-                )
-                val primaryNagging = prefs.getString("nagging_member_$entryId", null)
-                val primarySnooze = prefs.getString("snooze_member_$entryId", null)
-                val primaryId = primaryNagging ?: primarySnooze
-
                 if (entry != null) {
                     val slotMillis = entry.scheduledDateTime.withSecond(0).withNano(0)
                         .atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
@@ -555,12 +559,27 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                         }
                     }
                 } else {
+                    // Guard: When entry is null (deleted or invalid), disarm alarms and cancel notification (#BUG-SLOT-NULL-ENTRY)
+                    try {
+                        val alarmScheduler = AlarmScheduler(context)
+                        alarmScheduler.cancelAlarm(entryId)
+                        alarmScheduler.cancelSnooze(entryId)
+                        alarmScheduler.cancelNagging(entryId)
+                        alarmScheduler.cancelIntakeSafeguardAlarm(entryId)
+                        if (primaryId != null) {
+                            alarmScheduler.cancelAlarm(primaryId)
+                            alarmScheduler.cancelSnooze(primaryId)
+                            alarmScheduler.cancelNagging(primaryId)
+                            alarmScheduler.cancelIntakeSafeguardAlarm(primaryId)
+                        }
+                    } catch (_: Exception) {}
                     nManager.cancel(entryId.hashCode())
                     if (primaryId != null) nManager.cancel(primaryId.hashCode())
                 }
             } catch (ex: Exception) {
                 Log.e(TAG, "Error synchronizing slot notification in ScheduleRepository", ex)
                 try { nManager.cancel(entryId.hashCode()) } catch (_: Exception) {}
+                if (primaryId != null) try { nManager.cancel(primaryId.hashCode()) } catch (_: Exception) {}
             }
         }
 

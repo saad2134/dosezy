@@ -190,11 +190,22 @@ class ScheduleViewModel @Inject constructor(
 
     fun markAsTaken(entryId: String, takenAt: String, notes: String? = null) {
         viewModelScope.launch {
-            scheduleRepository.recordDoseTaken(entryId, "TAKEN_ON_TIME", takenAt, context, notes)
+            val entry = scheduleRepository.getScheduleEntryById(entryId)
+            val userId = entry?.userId ?: _currentUserId.value
+            val user = userId?.let { userRepository.getUserByIdSync(it) } ?: userRepository.getAllUsersList().find { it.isCurrentUser }
+            val lateAfter = user?.considerLateAfter ?: 3
+            val parsedTakenAt = try { LocalDateTime.parse(takenAt) } catch (_: Exception) { LocalDateTime.now() }
+            // Guard: Evaluate isTakenLate so overdue doses marked taken via ScheduleViewModel are accurately recorded as TAKEN_LATE rather than TAKEN_ON_TIME (#BUG-VM-LATE-STATUS)
+            val status = if (entry != null && TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, parsedTakenAt, lateAfter)) {
+                "TAKEN_LATE"
+            } else {
+                "TAKEN_ON_TIME"
+            }
+            scheduleRepository.recordDoseTaken(entryId, status, takenAt, context, notes)
             currentCalendarUserId = null
             // Refresh the schedule after updating status
-            _currentUserId.value?.let { userId ->
-                loadScheduleForDate(userId, _selectedDate.value)
+            _currentUserId.value?.let { activeUserId ->
+                loadScheduleForDate(activeUserId, _selectedDate.value)
             }
         }
     }

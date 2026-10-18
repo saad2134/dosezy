@@ -788,6 +788,13 @@ class BackupRestoreManager(
 
             tempDir.deleteRecursively()
 
+            // Guard: Update active home screen app widgets upon successful restore so restored schedules and profiles are immediately visible (#BUG-RESTORE-WIDGET-REFRESH)
+            if (totalProfiles > 0) {
+                try {
+                    com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+                } catch (_: Exception) {}
+            }
+
             // Guard: Require totalProfiles > 0 for success to prevent zero-profile imports from falsely reporting success or advancing onboarding
             return@withContext BackupResult(
                 success = totalProfiles > 0,

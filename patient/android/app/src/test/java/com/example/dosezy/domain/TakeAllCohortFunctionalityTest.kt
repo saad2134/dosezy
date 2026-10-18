@@ -516,6 +516,43 @@ class TakeAllCohortFunctionalityTest {
     }
 
     @Test
+    fun testSnoozeCohortUseCase_withExplicitMinutesAndNullUser_resolvesUserPreferences() = runBlocking {
+        val customUser = User(
+            userId = "user_snooze_explicit_test",
+            fullName = "Explicit Snooze User",
+            age = 40,
+            gender = Gender.MALE,
+            contactNumber = "555-1234",
+            timeFormat = com.example.dosezy.data.model.TimeFormat.HOUR_24,
+            snoozeDuration = 5
+        )
+        database.userDao().insertUser(customUser)
+
+        val entry = ScheduleEntry(
+            entryId = "entry_snooze_explicit_user_null",
+            userId = customUser.userId,
+            medicineId = medA.medicineId,
+            scheduledDateTime = LocalDateTime.now(),
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        database.scheduleDao().insertScheduleEntry(entry)
+
+        val snoozeCohortUseCase = SnoozeCohortUseCase(database, context)
+        // Guard: Call with user = null and explicitSnoozeMinutes to verify user entity resolution (#BUG-SNOOZE-USER-RESOLVE)
+        snoozeCohortUseCase.invoke(listOf(entry.entryId), explicitSnoozeMinutes = 20, user = null)
+
+        val prefs = context.getSharedPreferences(com.example.dosezy.notifications.AlarmScheduler.PREFS_COORDINATION, Context.MODE_PRIVATE)
+        assertEquals(entry.entryId, prefs.getString("snooze_member_${entry.entryId}", null))
+        assertEquals(entry.entryId, prefs.getString("snooze_group_ids_${entry.entryId}", null))
+
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
+        val shadowAm = org.robolectric.Shadows.shadowOf(alarmManager)
+        val nextAlarm = shadowAm.nextScheduledAlarm
+        assertNotNull("Snooze alarm must be scheduled in AlarmManager", nextAlarm)
+    }
+
+    @Test
     fun testTakeCohortUseCase_multiMedicationCohort_coordinatesSingleSync() = runBlocking {
         val slotTime = LocalDateTime.now().plusHours(2).withSecond(0).withNano(0)
         val entry1 = ScheduleEntry(
@@ -736,6 +773,105 @@ class TakeAllCohortFunctionalityTest {
             "Slot 2 alarm must be cancelled after multi-slot batch skip",
             android.app.PendingIntent.getBroadcast(context, slotKey2.hashCode(), alarmIntent, android.app.PendingIntent.FLAG_NO_CREATE or android.app.PendingIntent.FLAG_IMMUTABLE)
         )
+    }
+
+    @Test
+    fun partialTakeCohort_preservesIntakeCountdownForRemainingEntries() = runBlocking {
+        // Guard: Taking one medication in a cohort must not drop intake countdown for remaining pending medications (#BUG-SAFEGUARD-PARTIAL-COHORT)
+        val slotTime = LocalDateTime.of(2026, 10, 18, 8, 0, 0)
+        val entry1 = ScheduleEntry(
+            entryId = "entry_cohort_safeguard_take_1",
+            userId = testUser.userId,
+            medicineId = medA.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_cohort_safeguard_take_2",
+            userId = testUser.userId,
+            medicineId = medB.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        database.scheduleDao().insertScheduleEntry(entry1)
+        database.scheduleDao().insertScheduleEntry(entry2)
+
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entry1.entryId,
+            medicineName = "${medA.medicationName}, ${medB.medicationName}",
+            entryIds = listOf(entry1.entryId, entry2.entryId),
+            medicineNames = listOf(medA.medicationName, medB.medicationName),
+            scheduledTime = "08:00 AM",
+            userId = testUser.userId,
+            durationSeconds = 180
+        )
+
+        assertNotNull(IntakeSafeguardManager.activeCountdown.value)
+        assertEquals(2, IntakeSafeguardManager.activeCountdown.value?.entryIds?.size)
+
+        val takeCohortUseCase = TakeCohortUseCase(database, scheduleRepository, context)
+        takeCohortUseCase.invoke(listOf(entry1.entryId), customTakenAt = slotTime, notes = null, user = testUser)
+
+        val activeAfterPartial = IntakeSafeguardManager.activeCountdown.value
+        assertNotNull("Countdown must remain active after taking only one cohort member", activeAfterPartial)
+        assertEquals(entry2.entryId, activeAfterPartial?.entryId)
+        assertEquals(listOf(entry2.entryId), activeAfterPartial?.entryIds)
+
+        // Resolving the final remaining entry must dismiss the countdown
+        takeCohortUseCase.invoke(listOf(entry2.entryId), customTakenAt = slotTime, notes = null, user = testUser)
+        assertNull("Countdown must be dismissed when all cohort members are resolved", IntakeSafeguardManager.activeCountdown.value)
+    }
+
+    @Test
+    fun partialSkipCohort_preservesIntakeCountdownForRemainingEntries() = runBlocking {
+        // Guard: Skipping one medication in a cohort must not drop intake countdown for remaining pending medications (#BUG-SAFEGUARD-PARTIAL-COHORT)
+        val slotTime = LocalDateTime.of(2026, 10, 18, 8, 0, 0)
+        val entry1 = ScheduleEntry(
+            entryId = "entry_cohort_safeguard_skip_1",
+            userId = testUser.userId,
+            medicineId = medA.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_cohort_safeguard_skip_2",
+            userId = testUser.userId,
+            medicineId = medB.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        database.scheduleDao().insertScheduleEntry(entry1)
+        database.scheduleDao().insertScheduleEntry(entry2)
+
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entry1.entryId,
+            medicineName = "${medA.medicationName}, ${medB.medicationName}",
+            entryIds = listOf(entry1.entryId, entry2.entryId),
+            medicineNames = listOf(medA.medicationName, medB.medicationName),
+            scheduledTime = "08:00 AM",
+            userId = testUser.userId,
+            durationSeconds = 180
+        )
+
+        assertNotNull(IntakeSafeguardManager.activeCountdown.value)
+        assertEquals(2, IntakeSafeguardManager.activeCountdown.value?.entryIds?.size)
+
+        val skipCohortUseCase = SkipCohortUseCase(scheduleRepository, context)
+        skipCohortUseCase.invoke(listOf(entry1.entryId), "Nausea")
+
+        val activeAfterPartial = IntakeSafeguardManager.activeCountdown.value
+        assertNotNull("Countdown must remain active after skipping only one cohort member", activeAfterPartial)
+        assertEquals(entry2.entryId, activeAfterPartial?.entryId)
+        assertEquals(listOf(entry2.entryId), activeAfterPartial?.entryIds)
+
+        skipCohortUseCase.invoke(listOf(entry2.entryId), "Doctor instruction")
+        assertNull("Countdown must be dismissed when all cohort members are skipped", IntakeSafeguardManager.activeCountdown.value)
     }
 }
 

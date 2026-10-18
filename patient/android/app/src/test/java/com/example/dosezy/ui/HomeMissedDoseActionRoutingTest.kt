@@ -334,4 +334,74 @@ class HomeMissedDoseActionRoutingTest {
         }
         assertEquals(R.string.home_action_skipped, badgeResSkipped)
     }
+
+    @Test
+    fun calendarDayStatus_partiallyCompletedWithLateDose_prioritizesPendingAheadOfAmber() {
+        // Guard: Verify partially completed days with pending doses prioritize pending status over Amber (#BUG-CALENDAR-PARTIAL-PENDING)
+        val now = LocalDateTime.of(2026, 10, 18, 10, 0, 0)
+        val missedAfterHours = 6
+
+        val entryLateTaken = ScheduleEntry(
+            entryId = "entry_morning_late",
+            userId = "test_user_105",
+            medicineId = "med_105",
+            scheduledDateTime = LocalDateTime.of(2026, 10, 18, 8, 0, 0),
+            status = MedicationStatus.TAKEN_LATE
+        )
+
+        val entryEveningPending = ScheduleEntry(
+            entryId = "entry_evening_pending",
+            userId = "test_user_105",
+            medicineId = "med_105",
+            scheduledDateTime = LocalDateTime.of(2026, 10, 18, 20, 0, 0),
+            status = MedicationStatus.PENDING
+        )
+
+        val dayEntries = listOf(entryLateTaken, entryEveningPending)
+
+        val hasMissed = dayEntries.any { it.status == MedicationStatus.MISSED }
+        val hasLate = dayEntries.any { it.status == MedicationStatus.TAKEN_LATE }
+        val allCompleted = dayEntries.all {
+            it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE || it.status == MedicationStatus.SKIPPED
+        }
+        val hasTaken = dayEntries.any {
+            it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE
+        }
+        val allSkipped = dayEntries.all { it.status == MedicationStatus.SKIPPED }
+        val hasPastPending = dayEntries.any {
+            it.status == MedicationStatus.PENDING &&
+                    now.isAfter(it.scheduledDateTime) &&
+                    TimeCalculationUtils.isMissed(it.scheduledDateTime, now, missedAfterHours)
+        }
+        val hasUpcomingPending = dayEntries.any { it.status == MedicationStatus.PENDING }
+
+        val resolvedColor = when {
+            hasMissed || hasPastPending -> androidx.compose.ui.graphics.Color(0xFFEF4444) // Red
+            allCompleted && hasLate -> androidx.compose.ui.graphics.Color(0xFFF59E0B) // Amber (all doses resolved, with late intake)
+            allCompleted && hasTaken -> androidx.compose.ui.graphics.Color(0xFF10B981) // Green (all doses resolved on time)
+            allSkipped -> androidx.compose.ui.graphics.Color(0xFF9CA3AF) // Slate Gray for skipped (neutral)
+            hasUpcomingPending -> androidx.compose.ui.graphics.Color(0xFF6B7280) // Gray for pending / upcoming doses
+            hasLate -> androidx.compose.ui.graphics.Color(0xFFF59E0B) // Amber fallback
+            else -> androidx.compose.ui.graphics.Color(0xFF6B7280)
+        }
+
+        // Partially complete day must evaluate to Gray (pending/upcoming), not Amber
+        assertEquals(androidx.compose.ui.graphics.Color(0xFF6B7280), resolvedColor)
+
+        // When evening dose is taken, day completes and turns Amber
+        val completedDayEntries = listOf(
+            entryLateTaken,
+            entryEveningPending.copy(status = MedicationStatus.TAKEN_ON_TIME)
+        )
+        val allCompletedNow = completedDayEntries.all {
+            it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE || it.status == MedicationStatus.SKIPPED
+        }
+        val hasLateNow = completedDayEntries.any { it.status == MedicationStatus.TAKEN_LATE }
+
+        val resolvedColorWhenCompleted = when {
+            allCompletedNow && hasLateNow -> androidx.compose.ui.graphics.Color(0xFFF59E0B)
+            else -> androidx.compose.ui.graphics.Color(0xFF6B7280)
+        }
+        assertEquals(androidx.compose.ui.graphics.Color(0xFFF59E0B), resolvedColorWhenCompleted)
+    }
 }

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2026 Saad <reach.saad@outlook.com> (@saad2134)
  * Licensed under the MIT License. See LICENSE in the project root for license information.
  */
@@ -28,7 +28,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -238,16 +240,26 @@ class DynamicSnoozeOptionsSelectorTest {
 
         val viewModel = AlarmViewModel(database, scheduleRepository, context, testDispatcher)
         viewModel.loadCohort(listOf(entry.entryId))
-        testDispatcher.scheduler.advanceUntilIdle()
+        val loadDeadline = System.currentTimeMillis() + 3000
+        while (!viewModel.uiState.value.isLoaded && System.currentTimeMillis() < loadDeadline) {
+            testDispatcher.scheduler.advanceUntilIdle()
+            org.robolectric.shadows.ShadowLooper.idleMainLooper()
+            Thread.sleep(20)
+        }
 
         var completed = false
         // Snooze with dynamic 30 minutes
         viewModel.snoozeCohort(listOf(entry.entryId), 30, testMed.medicationName) {
             completed = true
         }
-        testDispatcher.scheduler.advanceUntilIdle()
+        val snoozeDeadline = System.currentTimeMillis() + 3000
+        while (!completed && System.currentTimeMillis() < snoozeDeadline) {
+            testDispatcher.scheduler.advanceUntilIdle()
+            org.robolectric.shadows.ShadowLooper.idleMainLooper()
+            Thread.sleep(20)
+        }
 
-        assertTrue(completed)
+        assertTrue("Expected completed to be true", completed)
         // User's default snooze preference in database is untouched
         val userAfter = database.userDao().getUserByIdDirect(testUser.userId)
         assertEquals(10, userAfter!!.snoozeDuration)

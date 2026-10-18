@@ -675,6 +675,54 @@ class MedicineLogicTest {
         assertEquals(60, meqMed.calculateRefillQuantity(30))
     }
 
+    @Test
+    fun refillQuantity_countableUnitsWithMilligramStrength_clampsToOneUnitPerIntake() {
+        // Guard: Prevent 500x inflation when users enter active chemical strength (e.g. 500) for countable units (#BUG-REFILL-STRENGTH-INFLATION)
+        val tabletMed = med(
+            dosage = 500.0,
+            unit = DosageUnit.TABLET,
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0))
+        )
+        // 2 intakes per day * 30 days * 1 tablet per intake = 60 tablets (NOT 30,000 tablets)
+        assertEquals(60, tabletMed.calculateRefillQuantity(30))
+
+        val capsuleMed = med(
+            dosage = 250.0,
+            unit = DosageUnit.CAPSULE,
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0))
+        )
+        assertEquals(60, capsuleMed.calculateRefillQuantity(30))
+
+        val ampuleMed = med(
+            dosage = 100.0,
+            unit = DosageUnit.AMPULE,
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0))
+        )
+        assertEquals(30, ampuleMed.calculateRefillQuantity(30))
+
+        // Custom dosages with strength numbers (500mg morning, 1000mg night)
+        val customTabletMed = med(
+            dosage = 500.0,
+            unit = DosageUnit.TABLET,
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
+            customDosages = mapOf("08:00" to 500.0, "20:00" to 1000.0)
+        )
+        assertEquals(60, customTabletMed.calculateRefillQuantity(30))
+
+        // Legitimate count within 1..10 range (e.g. 2 tablets per intake)
+        val twoTabletsMed = med(
+            dosage = 2.0,
+            unit = DosageUnit.TABLET,
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0))
+        )
+        assertEquals(120, twoTabletsMed.calculateRefillQuantity(30))
+    }
+
     // ───────────────────────────────────────────────────────────────
     // 12. Image URI normalization (raw path vs file://)
     // ───────────────────────────────────────────────────────────────

@@ -48,22 +48,25 @@ class SnoozeCohortUseCase @Inject constructor(
             notificationManager?.cancel(id.hashCode())
         }
 
-        // Guard: Reconcile and dismiss active ADHD intake countdown notification if snoozed entries match active countdown
+        // Guard: Reconcile active ADHD intake countdown notification if snoozed entries match active countdown to prevent dropping remaining pending medications (#BUG-SAFEGUARD-PARTIAL-COHORT)
         try {
             val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
             if (activeCountdown != null && (entryIds.contains(activeCountdown.entryId) || activeCountdown.entryIds.any { entryIds.contains(it) })) {
-                com.example.dosezy.notifications.IntakeSafeguardManager.cancelCountdown(context)
+                com.example.dosezy.notifications.IntakeSafeguardManager.reconcileCountdown(context, entryIds)
             }
         } catch (_: Exception) {}
+
+        // Guard: Resolve user entity upfront if null so explicit snooze durations preserve user's preferred timeFormat and userId (#BUG-SNOOZE-USER-RESOLVE)
+        val resolvedUser = user ?: entryIds.firstNotNullOfOrNull { id ->
+            database.scheduleDao().getScheduleEntryById(id)?.let { entry ->
+                database.userDao().getUserByIdDirect(entry.userId)
+            }
+        }
 
         val finalSnoozeMinutes = if (explicitSnoozeMinutes != null && explicitSnoozeMinutes > 0) {
             explicitSnoozeMinutes
         } else {
-            user?.snoozeDuration ?: run {
-                val firstEntry = database.scheduleDao().getScheduleEntryById(entryIds.first())
-                val u = firstEntry?.let { database.userDao().getUserByIdDirect(it.userId) }
-                u?.snoozeDuration ?: 10
-            }
+            resolvedUser?.snoozeDuration ?: 10
         }
 
         val names = if (!medicineNames.isNullOrEmpty()) {
@@ -83,8 +86,8 @@ class SnoozeCohortUseCase @Inject constructor(
             entryIds = entryIds,
             minutes = finalSnoozeMinutes,
             medicineNames = names,
-            timeFormat = user?.timeFormat,
-            userId = user?.userId
+            timeFormat = resolvedUser?.timeFormat,
+            userId = resolvedUser?.userId
         )
         // Guard: Refresh app widgets to reflect updated snooze status immediately
         try {

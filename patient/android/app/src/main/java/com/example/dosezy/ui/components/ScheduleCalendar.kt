@@ -355,12 +355,16 @@ private fun getDateStatusColor(entries: List<ScheduleEntry>, missedAfterHours: I
                 now.isAfter(it.scheduledDateTime) &&
                 TimeCalculationUtils.isMissed(it.scheduledDateTime, now, missedAfterHours)
     }
+    val hasUpcomingPending = entries.any { it.status == MedicationStatus.PENDING }
 
+    // Guard: Prioritize pending doses ahead of partial hasLate to prevent partially complete days from rendering Amber settled indicators while untaken doses remain (#BUG-CALENDAR-PARTIAL-PENDING)
     return when {
         hasMissed || hasPastPending -> Color(0xFFEF4444) // Red
-        hasLate -> Color(0xFFF59E0B) // Amber
-        allCompleted && hasTaken -> Color(0xFF10B981) // Green
+        allCompleted && hasLate -> Color(0xFFF59E0B) // Amber (all doses resolved, with late intake)
+        allCompleted && hasTaken -> Color(0xFF10B981) // Green (all doses resolved on time)
         allSkipped -> Color(0xFF9CA3AF) // Slate Gray for skipped (neutral)
+        hasUpcomingPending -> Color(0xFF6B7280) // Gray for pending / upcoming doses
+        hasLate -> Color(0xFFF59E0B) // Amber fallback if day is otherwise resolved
         else -> Color(0xFF6B7280) // Gray for pending
     }
 }

@@ -232,4 +232,106 @@ class AdherenceAndAnalyticsTest {
         assertEquals(2, dayDecided)
         assertEquals(50, dayRate) // 1 taken out of 2 past doses = 50%, NOT false 100%
     }
+
+    @Test
+    fun adherenceRate_todayPendingDoseExceedingMissedAfter_notDoubleCountedInDecided() {
+        val today = LocalDate.now()
+        val now = LocalDateTime.now()
+        val missedAfterHours = 3
+
+        val morningTaken = ScheduleEntry(
+            entryId = "entry_today_taken_1",
+            userId = "usr_1",
+            medicineId = "med_1",
+            scheduledDateTime = today.atTime(8, 0),
+            status = MedicationStatus.TAKEN_ON_TIME
+        )
+        // Dose scheduled 5 hours ago: pending, in past, and past considerMissedAfter (3h)
+        val pastPendingExceedingMissed = ScheduleEntry(
+            entryId = "entry_today_pending_missed",
+            userId = "usr_1",
+            medicineId = "med_2",
+            scheduledDateTime = now.minusHours(5),
+            status = MedicationStatus.PENDING
+        )
+
+        fun isEntryMissed(entry: ScheduleEntry): Boolean =
+            entry.status == MedicationStatus.MISSED ||
+            (entry.status == MedicationStatus.PENDING && now.isAfter(entry.scheduledDateTime) &&
+                com.example.dosezy.utils.TimeCalculationUtils.isMissed(entry.scheduledDateTime, now, missedAfterHours))
+
+        val dayEntries = listOf(morningTaken, pastPendingExceedingMissed)
+        val dayTaken = dayEntries.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
+        val dayMissed = dayEntries.count { isEntryMissed(it) }
+        // Guard: Factor overdue pending doses into decided counts without double-counting entries already in dayMissed (#BUG-ANALYTICS-OVERDUE)
+        val dayOverduePending = dayEntries.count { it.status == MedicationStatus.PENDING && it.scheduledDateTime.isBefore(now) && !isEntryMissed(it) }
+        val dayDecided = dayTaken + dayMissed + dayOverduePending
+        val dayRate = if (dayDecided > 0) ((dayTaken.toDouble() / dayDecided.toDouble()) * 100).toInt() else 0
+
+        assertEquals(1, dayTaken)
+        assertEquals(1, dayMissed)
+        assertEquals(0, dayOverduePending) // Must be 0 to prevent double-counting with dayMissed
+        assertEquals(2, dayDecided)        // 1 taken + 1 missed = 2 decided, NOT 3
+        assertEquals(50, dayRate)          // 1 / 2 = 50%, NOT 1 / 3 = 33%
+    }
+
+    @Test
+    fun computeAdherence_todayOverduePendingDoses_penalizesRangeDecidedCountAndAdherenceRate() {
+        // Guard: Verify computeAdherence includes today's overdue pending doses in decidedCount and rate (#BUG-ANALYTICS-RANGE-OVERDUE)
+        val today = LocalDate.now()
+        val now = LocalDateTime.now()
+        val missedAfterHours = 6
+
+        val morningTaken = ScheduleEntry(
+            entryId = "entry_range_taken",
+            userId = "usr_1",
+            medicineId = "med_1",
+            scheduledDateTime = today.atTime(8, 0),
+            status = MedicationStatus.TAKEN_ON_TIME
+        )
+        val afternoonOverduePending = ScheduleEntry(
+            entryId = "entry_range_overdue_pending",
+            userId = "usr_1",
+            medicineId = "med_2",
+            scheduledDateTime = now.minusHours(2),
+            status = MedicationStatus.PENDING
+        )
+        val eveningFuturePending = ScheduleEntry(
+            entryId = "entry_range_future_pending",
+            userId = "usr_1",
+            medicineId = "med_3",
+            scheduledDateTime = now.plusHours(4),
+            status = MedicationStatus.PENDING
+        )
+
+        val entries = listOf(morningTaken, afternoonOverduePending, eveningFuturePending)
+
+        fun isEntryMissed(entry: ScheduleEntry): Boolean =
+            entry.status == MedicationStatus.MISSED ||
+            (entry.status == MedicationStatus.PENDING && now.isAfter(entry.scheduledDateTime) &&
+                com.example.dosezy.utils.TimeCalculationUtils.isMissed(entry.scheduledDateTime, now, missedAfterHours))
+
+        val takenOnTime = entries.count { it.status == MedicationStatus.TAKEN_ON_TIME }
+        val takenLate = entries.count { it.status == MedicationStatus.TAKEN_LATE }
+        val taken = takenOnTime + takenLate
+        val missed = entries.count { isEntryMissed(it) }
+        val skipped = entries.count { it.status == MedicationStatus.SKIPPED }
+        val overduePending = entries.count {
+            it.scheduledDateTime.toLocalDate() == today &&
+            it.status == MedicationStatus.PENDING &&
+            it.scheduledDateTime.isBefore(now) &&
+            !isEntryMissed(it)
+        }
+        val decided = taken + missed + overduePending
+        val rate = if (decided > 0) ((taken.toDouble() / decided.toDouble()) * 100).toInt() else 0
+
+        assertEquals(1, taken)
+        assertEquals(0, missed)
+        assertEquals(0, skipped)
+        assertEquals(1, overduePending)
+        assertEquals(2, decided)
+        // Rate is 50%, accurately penalizing overdue pending doses and matching daily chart
+        assertEquals(50, rate)
+    }
 }
+

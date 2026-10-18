@@ -5,6 +5,7 @@
 
 package com.example.dosezy.notifications
 
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import androidx.room.Room
@@ -940,6 +941,57 @@ class IntakeSafeguardManagerLifecycleTest {
         assertEquals(MedicationStatus.TAKEN_ON_TIME, updated1?.status)
         assertEquals(MedicationStatus.TAKEN_ON_TIME, updated2?.status)
     }
+
+    @Test
+    fun testHandleCountdownExpired_whenAnchorTaken_reAlertsRemainingPendingCohortSiblings() = runBlocking {
+        val now = LocalDateTime.now()
+        val entry1 = ScheduleEntry(
+            entryId = "entry_safeguard_anchor_taken",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = now.minusMinutes(10),
+            status = MedicationStatus.TAKEN_ON_TIME
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_safeguard_sibling_pending",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = now.minusMinutes(10),
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entry1)
+        database.scheduleDao().insertScheduleEntry(entry2)
+
+        var onCompleteCalled = false
+        IntakeSafeguardManager.handleCountdownExpired(
+            context = context,
+            entryId = entry1.entryId,
+            medicineName = testMedicine.medicationName,
+            entryIds = listOf(entry1.entryId, entry2.entryId),
+            medicineNames = listOf(testMedicine.medicationName, testMedicine.medicationName),
+            scheduledTime = "08:00 AM",
+            onComplete = {
+                onCompleteCalled = true
+            }
+        )
+
+        val deadline = System.currentTimeMillis() + 3000
+        while (!onCompleteCalled && System.currentTimeMillis() < deadline) {
+            org.robolectric.shadows.ShadowLooper.idleMainLooper()
+            Thread.sleep(20)
+        }
+
+        assertTrue("onComplete must be invoked when handleCountdownExpired completes", onCompleteCalled)
+
+        // Guard: Verify re-alert notification is posted for the active pending sibling entry (#BUG-SAFEGUARD-COHORT-ALERT)
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val activeNotifs = nm.activeNotifications
+        assertTrue(
+            "Notification for sibling entry must be posted when anchor entry was taken",
+            activeNotifs.any { it.id == entry2.entryId.hashCode() }
+        )
+    }
 }
+
 
 

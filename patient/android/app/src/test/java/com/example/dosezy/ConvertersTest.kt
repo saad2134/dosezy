@@ -354,4 +354,35 @@ class ConvertersTest {
     fun pillShape_invalidStringDefaultsToRound() {
         assertEquals(PillShape.ROUND, converters.toPillShape("NONEXISTENT"))
     }
+
+    @Test
+    fun converters_caseInsensitiveAndLegacyFallbacks() {
+        // Guard: Verify case-insensitive parsing and resilient defaults across all enum converters (#BUG-CONVERTER-ENUM-FALLBACK)
+        assertEquals(Theme.DARK, converters.toTheme("dark"))
+        assertEquals(Theme.LIGHT, converters.toTheme("light"))
+        assertEquals(Theme.SYSTEM, converters.toTheme("system"))
+        assertEquals(Theme.SYSTEM, converters.toTheme("UNKNOWN_THEME"))
+
+        assertEquals(TimeFormat.HOUR_24, converters.toTimeFormat("hour_24"))
+        assertEquals(TimeFormat.HOUR_12, converters.toTimeFormat("hour_12"))
+        assertEquals(TimeFormat.HOUR_12, converters.toTimeFormat("INVALID_FORMAT"))
+
+        assertEquals(Gender.MALE, converters.toGender("male"))
+        assertEquals(Gender.FEMALE, converters.toGender("female"))
+        assertEquals(Gender.DO_NOT_SPECIFY, converters.toGender("do_not_specify"))
+        assertEquals(Gender.DO_NOT_SPECIFY, converters.toGender("UNKNOWN_GENDER"))
+
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, converters.toMedicationStatus("taken_on_time"))
+        assertEquals(MedicationStatus.TAKEN_LATE, converters.toMedicationStatus("taken_late"))
+        assertEquals(MedicationStatus.SKIPPED, converters.toMedicationStatus("skipped"))
+        assertEquals(MedicationStatus.PENDING, converters.toMedicationStatus("pending"))
+        assertEquals(MedicationStatus.PENDING, converters.toMedicationStatus("UNKNOWN_STATUS"))
+
+        assertEquals(DosageUnit.TABLET, converters.toDosageUnit("tablet"))
+        assertEquals(DosageUnit.CAPSULE, converters.toDosageUnit("capsule"))
+        assertEquals(DosageUnit.TABLET, converters.toDosageUnit("UNKNOWN_UNIT"))
+
+        assertEquals(com.example.dosezy.data.model.AlarmSound.GENTLE_CHIME, converters.toAlarmSound("gentle_chime"))
+        assertEquals(com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT, converters.toAlarmSound("UNKNOWN_SOUND"))
+    }
 }

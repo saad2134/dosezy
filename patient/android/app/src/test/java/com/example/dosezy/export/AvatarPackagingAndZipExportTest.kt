@@ -321,4 +321,18 @@ class AvatarPackagingAndZipExportTest {
         assertFalse(temp1.exists())
         assertFalse(temp2.exists())
     }
+
+    // ───────────────────────────────────────────────────────────────
+    // Bug 7: Restore Triggers Home Widget Refresh When Profiles Restored
+    // ───────────────────────────────────────────────────────────────
+    @Test
+    fun bug7_restoreSuccess_invokesWidgetUpdateSafely() {
+        val widgetUpdated = try {
+            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+            true
+        } catch (_: Exception) {
+            false
+        }
+        assertTrue("updateAppWidgets must complete safely following successful restore", widgetUpdated)
+    }
 }

@@ -5,8 +5,10 @@
 
 package com.example.dosezy.data
 
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import androidx.core.app.NotificationCompat
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -559,6 +561,55 @@ class ScheduleStatusAndUserRepositoryDirectTest {
             undoneEntry.doseNotes?.contains("[Partial Stock:") == true
         )
     }
+
+    // ---------------------------------------------------------------------------------------------
+    // Disarm Alarms and Cancel Notifications when Entry is Null (BUG-SLOT-NULL-ENTRY)
+    // ---------------------------------------------------------------------------------------------
+
+    @Test
+    fun testSyncSlotNotificationAndAlarms_whenEntryIsNull_disarmsAlarmsAndCancelsNotifications() = runBlocking {
+        val nonExistentEntryId = "non_existent_entry_12345"
+        val nonExistentPrimaryId = "non_existent_primary_67890"
+
+        // Set up coordination preference linking entry to primary
+        val prefs = context.getSharedPreferences(
+            com.example.dosezy.notifications.AlarmScheduler.PREFS_COORDINATION,
+            Context.MODE_PRIVATE
+        )
+        prefs.edit().putString("snooze_member_$nonExistentEntryId", nonExistentPrimaryId).apply()
+
+        val scheduleRepository = com.example.dosezy.data.repository.ScheduleRepository(db)
+
+        // Seed an active notification for nonExistentEntryId and nonExistentPrimaryId
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val builder = NotificationCompat.Builder(context, "default")
+            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+            .setContentTitle("Test Alarm")
+            .setContentText("Pending dose")
+        nm.notify(nonExistentEntryId.hashCode(), builder.build())
+        nm.notify(nonExistentPrimaryId.hashCode(), builder.build())
+
+        assertTrue(nm.activeNotifications.any { it.id == nonExistentEntryId.hashCode() })
+        assertTrue(nm.activeNotifications.any { it.id == nonExistentPrimaryId.hashCode() })
+
+        // Execute syncSlotNotificationAndAlarms on missing entry
+        scheduleRepository.syncSlotNotificationAndAlarms(
+            entryId = nonExistentEntryId,
+            entry = null,
+            context = context
+        )
+
+        // Guard: Verify notifications are dismissed and alarms disarmed when entry is null (#BUG-SLOT-NULL-ENTRY)
+        assertFalse(
+            "Notification for entryId must be cancelled when entry is null",
+            nm.activeNotifications.any { it.id == nonExistentEntryId.hashCode() }
+        )
+        assertFalse(
+            "Notification for primaryId must be cancelled when entry is null",
+            nm.activeNotifications.any { it.id == nonExistentPrimaryId.hashCode() }
+        )
+    }
 }
+
 
 

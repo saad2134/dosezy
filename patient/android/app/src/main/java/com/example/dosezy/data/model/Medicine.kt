@@ -249,7 +249,19 @@ data class Medicine(
         val dosesPerIntake: Double = when (dosageUnit) {
             DosageUnit.MG, DosageUnit.MCG, DosageUnit.MEQ -> 1.0
             DosageUnit.DROP -> 1.0
-            DosageUnit.TABLET, DosageUnit.CAPSULE, DosageUnit.ML, DosageUnit.PUFF, DosageUnit.AMPULE -> {
+            // Guard: Clamp countable units (TABLET, CAPSULE, AMPULE) to 0.1..10.0 range to preserve decimal doses (e.g. 0.5, 1.5, 2.5) while preventing 500x inflation when milligram strength is entered (#BUG-REFILL-STRENGTH-INFLATION)
+            DosageUnit.TABLET, DosageUnit.CAPSULE, DosageUnit.AMPULE -> {
+                if (!customDosages.isNullOrEmpty() && scheduledTimes.isNotEmpty()) {
+                    val totalCustom = scheduledTimes.sumOf {
+                        val d = getDosageForTime(it)
+                        if (d in 0.1..10.0) d else 1.0
+                    }
+                    totalCustom / scheduledTimes.size.toDouble()
+                } else {
+                    if (dosage in 0.1..10.0) dosage else 1.0
+                }
+            }
+            DosageUnit.ML, DosageUnit.PUFF -> {
                 if (!customDosages.isNullOrEmpty() && scheduledTimes.isNotEmpty()) {
                     val totalCustom = scheduledTimes.sumOf { getDosageForTime(it) }
                     totalCustom / scheduledTimes.size.toDouble()

@@ -25,8 +25,9 @@ class Converters {
     @TypeConverter
     fun fromGender(gender: Gender): String = gender.name
 
+    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or lowercased enum strings (#BUG-CONVERTER-ENUM-FALLBACK)
     @TypeConverter
-    fun toGender(gender: String): Gender = enumValueOf(gender)
+    fun toGender(gender: String): Gender = runCatching { enumValueOf<Gender>(gender.uppercase()) }.getOrDefault(Gender.DO_NOT_SPECIFY)
 
     // DosageUnit converters
     @TypeConverter
@@ -34,14 +35,15 @@ class Converters {
 
     // Guard: Prevent IllegalArgumentException crash on legacy or malformed enum strings; fallback to TABLET
     @TypeConverter
-    fun toDosageUnit(unit: String): DosageUnit = runCatching { enumValueOf<DosageUnit>(unit) }.getOrDefault(DosageUnit.TABLET)
+    fun toDosageUnit(unit: String): DosageUnit = runCatching { enumValueOf<DosageUnit>(unit.uppercase()) }.getOrDefault(DosageUnit.TABLET)
 
     // MedicationStatus converters
     @TypeConverter
     fun fromMedicationStatus(status: MedicationStatus): String = status.name
 
+    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or lowercased enum strings (#BUG-CONVERTER-ENUM-FALLBACK)
     @TypeConverter
-    fun toMedicationStatus(status: String): MedicationStatus = enumValueOf(status)
+    fun toMedicationStatus(status: String): MedicationStatus = runCatching { enumValueOf<MedicationStatus>(status.uppercase()) }.getOrDefault(MedicationStatus.PENDING)
 
     // LocalDateTime converters
     @RequiresApi(Build.VERSION_CODES.O)
@@ -180,21 +182,23 @@ class Converters {
     @TypeConverter
     fun fromTheme(theme: Theme): String = theme.name
 
+    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or lowercased enum strings (#BUG-CONVERTER-ENUM-FALLBACK)
     @TypeConverter
-    fun toTheme(themeString: String): Theme = Theme.valueOf(themeString)
+    fun toTheme(themeString: String): Theme = runCatching { Theme.valueOf(themeString.uppercase()) }.getOrDefault(Theme.SYSTEM)
 
     @TypeConverter
     fun fromTimeFormat(timeFormat: TimeFormat): String = timeFormat.name
 
+    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or lowercased enum strings (#BUG-CONVERTER-ENUM-FALLBACK)
     @TypeConverter
-    fun toTimeFormat(timeFormatString: String): TimeFormat = TimeFormat.valueOf(timeFormatString)
+    fun toTimeFormat(timeFormatString: String): TimeFormat = runCatching { TimeFormat.valueOf(timeFormatString.uppercase()) }.getOrDefault(TimeFormat.HOUR_12)
 
     @TypeConverter
     fun fromLanguage(language: Language): String = language.name
 
     @TypeConverter
     fun toLanguage(languageString: String): Language = try {
-        Language.valueOf(languageString)
+        Language.valueOf(languageString.uppercase())
     } catch (e: Exception) {
         Language.SYSTEM
     }
@@ -204,7 +208,7 @@ class Converters {
 
     @TypeConverter
     fun toAlarmSound(alarmSoundString: String): com.example.dosezy.data.model.AlarmSound = try {
-        com.example.dosezy.data.model.AlarmSound.valueOf(alarmSoundString)
+        com.example.dosezy.data.model.AlarmSound.valueOf(alarmSoundString.uppercase())
     } catch (_: Exception) {
         com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT
     }

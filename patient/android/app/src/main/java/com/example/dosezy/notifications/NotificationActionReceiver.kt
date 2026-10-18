@@ -153,7 +153,8 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 val notifAlarmScheduler = AlarmScheduler(context)
                 allIds.forEach { id ->
                     val entry = database.scheduleDao().getScheduleEntryById(id)
-                    val lateAfter = user?.considerLateAfter ?: 3
+                    val entryUser = user ?: entry?.let { database.userDao().getUserByIdDirect(it.userId) }
+                    val lateAfter = entryUser?.considerLateAfter ?: 3
                     // Guard: Use isTakenLate so doses taken past missedAfter are recorded as TAKEN_LATE rather than TAKEN_ON_TIME
                     val status = if (entry != null && com.example.dosezy.utils.TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, lateAfter)) {
                         "TAKEN_LATE"
@@ -168,24 +169,32 @@ class NotificationActionReceiver : BroadcastReceiver() {
                     scheduleRepository.recordDoseTaken(id, status, takenAt, context, notes = null, syncSlotNotification = false)
                 }
 
-                // Guard: Perform coordinated single slot sync and widget update after all cohort entries in SQLite are updated to prevent shade notification flickering and duplicate widget updates
-                val updatedFirstEntry = database.scheduleDao().getScheduleEntryById(primaryEntryId) ?: firstEntry
-                if (updatedFirstEntry != null) {
-                    scheduleRepository.syncSlotNotificationAndAlarms(primaryEntryId, updatedFirstEntry, context)
+                // Guard: Coordinate slot notification sync and disarm alarms across each distinct time slot in allIds to prevent leaking alarms or shade entries (#BUG-RECEIVER-MULTI-SLOT)
+                val entries = allIds.mapNotNull { database.scheduleDao().getScheduleEntryById(it) }
+                val distinctSlots = entries.distinctBy { it.scheduledDateTime.withSecond(0).withNano(0) }
+                if (distinctSlots.isNotEmpty()) {
+                    distinctSlots.forEach { slotEntry ->
+                        scheduleRepository.syncSlotNotificationAndAlarms(slotEntry.entryId, slotEntry, context)
+                    }
                 } else {
-                    try {
-                        com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
-                    } catch (_: Exception) {}
+                    val updatedFirstEntry = database.scheduleDao().getScheduleEntryById(primaryEntryId) ?: firstEntry
+                    if (updatedFirstEntry != null) {
+                        scheduleRepository.syncSlotNotificationAndAlarms(primaryEntryId, updatedFirstEntry, context)
+                    } else {
+                        try {
+                            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+                        } catch (_: Exception) {}
+                    }
                 }
                 Log.d(TAG, "Marked ${allIds.size} medicines as taken and processed")
             }
             "SNOOZE_ACTION" -> {
                 Log.d(TAG, "Snoozing medicine reminder for ${allIds.size} entries")
-                // Guard: Reconcile and dismiss active ADHD intake countdown notification if snoozed entries match active countdown (#104)
+                // Guard: Reconcile active ADHD intake countdown notification if snoozed entries match active countdown to prevent dropping remaining pending medications (#BUG-SAFEGUARD-PARTIAL-COHORT)
                 try {
                     val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
                     if (activeCountdown != null && (allIds.contains(activeCountdown.entryId) || activeCountdown.entryIds.any { allIds.contains(it) })) {
-                        com.example.dosezy.notifications.IntakeSafeguardManager.cancelCountdown(context)
+                        com.example.dosezy.notifications.IntakeSafeguardManager.reconcileCountdown(context, allIds)
                     }
                 } catch (_: Exception) {}
 

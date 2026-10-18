@@ -191,7 +191,14 @@ class AnalyticsViewModel @Inject constructor(
             val taken = takenOnTime + takenLate
             val missed = entries.count { isEntryMissed(it) }
             val skipped = entries.count { it.status == MedicationStatus.SKIPPED }
-            val decided = taken + missed
+            // Guard: Factor overdue pending doses on current day into range adherence decided count without double-counting missed entries (#BUG-ANALYTICS-RANGE-OVERDUE)
+            val overduePending = entries.count {
+                it.scheduledDateTime.toLocalDate() == today &&
+                it.status == MedicationStatus.PENDING &&
+                it.scheduledDateTime.isBefore(now) &&
+                !isEntryMissed(it)
+            }
+            val decided = taken + missed + overduePending
             val rate = if (decided > 0) ((taken.toDouble() / decided.toDouble()) * 100).toInt() else 0
             // Guard: Compute range-specific breakdown so metric cards dynamically match the selected time window
             val rangeBreakdown = AnalyticsBreakdown(
@@ -231,9 +238,9 @@ class AnalyticsViewModel @Inject constructor(
             }
             val dayMissed = dayEntries.count { isEntryMissed(it) }
             val isToday = date.isEqual(today)
-            // Guard: Factor overdue pending doses on the current day into decided counts so today's adherence rate is not falsely reported as 100% while untaken past doses remain (#BUG-ANALYTICS-OVERDUE)
+            // Guard: Factor overdue pending doses on the current day into decided counts without double-counting entries already in dayMissed (#BUG-ANALYTICS-OVERDUE)
             val dayOverduePending = if (isToday) {
-                dayEntries.count { it.status == MedicationStatus.PENDING && it.scheduledDateTime.isBefore(now) }
+                dayEntries.count { it.status == MedicationStatus.PENDING && it.scheduledDateTime.isBefore(now) && !isEntryMissed(it) }
             } else 0
             val dayDecided = dayTaken + dayMissed + dayOverduePending
             val dayRate = if (dayDecided > 0) ((dayTaken.toDouble() / dayDecided.toDouble()) * 100).toInt() else 0

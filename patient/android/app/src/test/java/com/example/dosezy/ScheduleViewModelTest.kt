@@ -92,6 +92,9 @@ class ScheduleViewModelTest {
         every { userRepository.getAllUsers() } returns flowOf(listOf(testUser))
         every { scheduleRepository.getScheduleForUser("user_123") } returns flowOf(listOf(testScheduleEntry))
         every { scheduleRepository.getScheduleWithMedicineForDate("user_123", any()) } returns flowOf(listOf(testScheduleWithMedicine))
+        coEvery { scheduleRepository.getScheduleEntryById("entry_1") } returns testScheduleEntry
+        coEvery { userRepository.getUserByIdSync("user_123") } returns testUser
+        coEvery { userRepository.getAllUsersList() } returns listOf(testUser)
     }
 
     @After
@@ -147,6 +150,25 @@ class ScheduleViewModelTest {
             )
         }
         coVerify(atLeast = 1) { scheduleRepository.getScheduleWithMedicineForDate("user_123", any()) }
+    }
+
+    @Test
+    fun markAsTaken_pastLateThreshold_recordsTakenLate() = runTest {
+        // Guard: Verify that doses taken past considerLateAfter threshold (3 hours) record TAKEN_LATE status (#BUG-VM-LATE-STATUS)
+        val viewModel = createViewModel()
+        val takenAt = "2026-09-21T12:15:00" // 4 hours 15 mins after 08:00 AM scheduled dose
+
+        viewModel.markAsTaken("entry_1", takenAt)
+
+        coVerify {
+            scheduleRepository.recordDoseTaken(
+                entryId = "entry_1",
+                status = "TAKEN_LATE",
+                takenAtStr = takenAt,
+                context = context,
+                notes = null
+            )
+        }
     }
 
     @Test

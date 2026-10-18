@@ -238,6 +238,63 @@ object IntakeSafeguardManager {
         Log.d(TAG, "Cancelled intake countdown")
     }
 
+    // Guard: Reconcile active intake countdown when individual cohort members are resolved to prevent cancelling countdown for remaining pending medicines (#BUG-SAFEGUARD-PARTIAL-COHORT)
+    fun reconcileCountdown(context: Context, resolvedEntryIds: List<String>) {
+        val current = _activeCountdown.value ?: restoreState(context) ?: return
+        if (resolvedEntryIds.none { current.entryIds.contains(it) || it == current.entryId }) {
+            return
+        }
+        val remainingIds = current.entryIds.filterNot { resolvedEntryIds.contains(it) }
+        if (remainingIds.isEmpty()) {
+            cancelCountdown(context)
+            return
+        }
+
+        val remainingMedNames = if (current.medicineNames.size == current.entryIds.size) {
+            current.entryIds.indices
+                .filter { !resolvedEntryIds.contains(current.entryIds[it]) }
+                .map { current.medicineNames[it] }
+        } else {
+            current.medicineNames
+        }.ifEmpty { listOf(current.medicineName) }
+        val newPrimary = remainingIds.first()
+        val newMedName = remainingMedNames.joinToString(", ")
+
+        val updatedState = current.copy(
+            entryId = newPrimary,
+            entryIds = remainingIds,
+            medicineName = newMedName,
+            medicineNames = remainingMedNames
+        )
+        saveState(context, updatedState)
+        _activeCountdown.value = updatedState
+
+        try {
+            val scheduler = AlarmScheduler(context)
+            if (current.entryId != newPrimary) {
+                scheduler.cancelIntakeSafeguardAlarm(current.entryId)
+                scheduler.scheduleIntakeSafeguardAlarm(
+                    entryId = newPrimary,
+                    triggerTime = current.targetTimestamp,
+                    medicineName = newMedName,
+                    entryIds = ArrayList(remainingIds),
+                    medicineNames = ArrayList(remainingMedNames),
+                    scheduledTime = current.scheduledTime,
+                    userId = current.userId
+                )
+                dismissIntakeNotification(context, current.entryId)
+            }
+            showIntakeNotification(context, updatedState)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error updating safeguard alarm or notification during reconcile: ${e.message}", e)
+        }
+
+        try {
+            com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+        } catch (_: Exception) {}
+        Log.d(TAG, "Reconciled intake countdown: removed $resolvedEntryIds, remaining: $remainingIds (newPrimary=$newPrimary)")
+    }
+
     fun handleCountdownExpired(
         context: Context,
         entryId: String,
@@ -258,19 +315,26 @@ object IntakeSafeguardManager {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val db = DosezyDatabase.getInstance(context)
-                val entry = db.scheduleDao().getScheduleEntryById(entryId)
-                // Guard: Only re-alert if entry still exists in database; do not fire ghost alarms if medication was deleted
-                val isStillPending = entry != null && (entry.status == com.example.dosezy.data.model.MedicationStatus.PENDING || entry.status == com.example.dosezy.data.model.MedicationStatus.MISSED)
+                val allTargetIds = if (!entryIds.isNullOrEmpty()) entryIds else listOf(entryId)
+                val validPendingEntries = allTargetIds.mapNotNull { db.scheduleDao().getScheduleEntryById(it) }
+                    .filter { it.status == com.example.dosezy.data.model.MedicationStatus.PENDING || it.status == com.example.dosezy.data.model.MedicationStatus.MISSED }
 
-                if (isStillPending) {
-                    Log.d(TAG, "Safeguard timer expired for unconfirmed entry $entryId; re-alerting user")
-                    val user = entry?.let { db.userDao().getUserByIdDirect(it.userId) }
+                // Guard: Re-alert if any cohort entry remains unconfirmed to prevent silent cancellation when anchor entry is taken or deleted (#BUG-SAFEGUARD-COHORT-ALERT)
+                if (validPendingEntries.isNotEmpty()) {
+                    val activePrimary = validPendingEntries.first()
+                    val activeEntryIds = ArrayList(validPendingEntries.map { it.entryId })
+                    val activeNames = ArrayList(validPendingEntries.mapNotNull { e ->
+                        db.medicineDao().getMedicineByIdDirect(e.medicineId)?.medicationName
+                    }.ifEmpty { if (!medicineNames.isNullOrEmpty()) medicineNames else listOf(medicineName) })
+                    val effectiveName = if (activeNames.isNotEmpty()) activeNames.joinToString(", ") else medicineName
+                    Log.d(TAG, "Safeguard timer expired for unconfirmed entries: $activeEntryIds; re-alerting user")
+                    val user = db.userDao().getUserByIdDirect(activePrimary.userId)
                     MedicineAlarmReceiver.triggerReAlert(
                         context = context,
-                        entryId = entryId,
-                        medicineName = medicineName,
-                        entryIds = if (!entryIds.isNullOrEmpty()) ArrayList(entryIds) else null,
-                        medicineNames = if (!medicineNames.isNullOrEmpty()) ArrayList(medicineNames) else null,
+                        entryId = activePrimary.entryId,
+                        medicineName = effectiveName,
+                        entryIds = activeEntryIds,
+                        medicineNames = activeNames,
                         scheduledTime = scheduledTime,
                         user = user
                     )

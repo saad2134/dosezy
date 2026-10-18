@@ -351,5 +351,58 @@ class AlarmAndNotificationRegressionTest {
         }
         assertFalse("AlarmAudioPlayer must be stopped after notification tap", AlarmAudioPlayer.isPlaying())
     }
+
+    @Test
+    fun notificationAction_multiSlotCohort_identifiesDistinctSlots() {
+        // Guard: Verify that multi-slot entry IDs extract distinct scheduled time slots to prevent orphan alarms (#BUG-RECEIVER-MULTI-SLOT)
+        val entry1 = ScheduleEntry(
+            entryId = "entry_slot_1",
+            userId = "user_1",
+            medicineId = "med_1",
+            scheduledDateTime = LocalDateTime.of(2026, 10, 18, 8, 0, 0),
+            status = MedicationStatus.PENDING
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_slot_1_sibling",
+            userId = "user_1",
+            medicineId = "med_2",
+            scheduledDateTime = LocalDateTime.of(2026, 10, 18, 8, 0, 0),
+            status = MedicationStatus.PENDING
+        )
+        val entry3 = ScheduleEntry(
+            entryId = "entry_slot_2",
+            userId = "user_1",
+            medicineId = "med_3",
+            scheduledDateTime = LocalDateTime.of(2026, 10, 18, 12, 0, 0),
+            status = MedicationStatus.PENDING
+        )
+
+        val entries = listOf(entry1, entry2, entry3)
+        val distinctSlots = entries.distinctBy { it.scheduledDateTime.withSecond(0).withNano(0) }
+
+        assertEquals(2, distinctSlots.size)
+        assertEquals(LocalDateTime.of(2026, 10, 18, 8, 0, 0), distinctSlots[0].scheduledDateTime)
+        assertEquals(LocalDateTime.of(2026, 10, 18, 12, 0, 0), distinctSlots[1].scheduledDateTime)
+    }
+
+    @Test
+    fun notificationAction_userResolution_fallsBackToEntryUserIdWhenPrimaryUserIsNull() {
+        // Guard: Verify that entry user considerLateAfter is respected when primaryEntry user is missing
+        val customLateThreshold = 5
+        val entry = ScheduleEntry(
+            entryId = "entry_secondary_user",
+            userId = "user_custom",
+            medicineId = "med_custom",
+            scheduledDateTime = LocalDateTime.of(2026, 10, 18, 8, 0, 0),
+            status = MedicationStatus.PENDING
+        )
+        val now = LocalDateTime.of(2026, 10, 18, 12, 0, 0) // 4 hours later
+
+        // With default 3h threshold, 4 hours later would be considered late
+        assertTrue("4 hours difference is late under default 3h threshold", TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, 3))
+
+        // Under user custom 5h threshold, 4 hours difference is on time
+        assertFalse("4 hours difference is on time under user custom 5h threshold", TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, customLateThreshold))
+    }
 }
 

@@ -45,11 +45,11 @@ class SkipCohortUseCase @Inject constructor(
             scheduleRepository.recordDoseSkipped(id, reason, null)
         }
 
-        // Guard: Reconcile and dismiss active ADHD intake countdown notification if skipped entries match active countdown
+        // Guard: Reconcile active ADHD intake countdown notification if skipped entries match active countdown to prevent dropping remaining pending medications (#BUG-SAFEGUARD-PARTIAL-COHORT)
         try {
             val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
             if (activeCountdown != null && (entryIds.contains(activeCountdown.entryId) || activeCountdown.entryIds.any { entryIds.contains(it) })) {
-                com.example.dosezy.notifications.IntakeSafeguardManager.cancelCountdown(context)
+                com.example.dosezy.notifications.IntakeSafeguardManager.reconcileCountdown(context, entryIds)
             }
         } catch (_: Exception) {}
 
