@@ -63,6 +63,13 @@ class ConvertersTest {
         assertEquals(59, restored?.second)
     }
 
+    @Test
+    fun localDateTime_extremeEpochMillis_doesNotThrow() {
+        // Guard: Verify extreme epoch millis convert safely without throwing DateTimeException
+        assertNotNull(converters.toLocalDateTime(Long.MAX_VALUE))
+        assertNotNull(converters.toLocalDateTime(Long.MIN_VALUE))
+    }
+
     // ───────────────────────────────────────────────────────────────
     // 2. LocalDate ⟷ Long? (epoch millis UTC at start of day)
     // ───────────────────────────────────────────────────────────────
@@ -87,6 +94,13 @@ class ConvertersTest {
         val leapDay = LocalDate.of(2028, 2, 29)
         val restored = converters.toLocalDate(converters.fromLocalDate(leapDay))
         assertEquals(leapDay, restored)
+    }
+
+    @Test
+    fun localDate_extremeEpochMillis_doesNotThrow() {
+        // Guard: Verify extreme epoch millis convert safely without throwing DateTimeException
+        assertNotNull(converters.toLocalDate(Long.MAX_VALUE))
+        assertNotNull(converters.toLocalDate(Long.MIN_VALUE))
     }
 
     // ───────────────────────────────────────────────────────────────
@@ -122,6 +136,15 @@ class ConvertersTest {
         assertNull(converters.toLocalTime(null))
     }
 
+    @Test
+    fun localTime_invalidOrBlankString_returnsNull() {
+        // Guard: Verify blank and unparseable strings return null rather than throwing DateTimeParseException
+        assertNull(converters.toLocalTime(""))
+        assertNull(converters.toLocalTime("   "))
+        assertNull(converters.toLocalTime("invalid_time"))
+        assertNull(converters.toLocalTime("25:99"))
+    }
+
     // ───────────────────────────────────────────────────────────────
     // 4. List<LocalTime> ⟷ String? (JSON array)
     // ───────────────────────────────────────────────────────────────
@@ -155,6 +178,22 @@ class ConvertersTest {
     fun localTimeList_nullRoundTrips() {
         assertNull(converters.fromLocalTimeList(null))
         assertNull(converters.toLocalTimeList(null))
+    }
+
+    @Test
+    fun localTimeList_invalidOrBlankString_returnsNullOrSafeFallback() {
+        // Guard: Verify blank strings return null
+        assertNull(converters.toLocalTimeList(""))
+        assertNull(converters.toLocalTimeList("   "))
+
+        // Guard: Verify non-array JSON and malformed text safely return emptyList rather than throwing JSONException
+        assertEquals(emptyList<LocalTime>(), converters.toLocalTimeList("not_a_json_array"))
+        assertEquals(emptyList<LocalTime>(), converters.toLocalTimeList("{}"))
+
+        // Guard: Verify array with invalid entries filters out malformed items and preserves valid times
+        val mixedJson = "[\"08:00\", \"invalid_entry\", \"21:30\"]"
+        val restored = converters.toLocalTimeList(mixedJson)
+        assertEquals(listOf(LocalTime.of(8, 0), LocalTime.of(21, 30)), restored)
     }
 
     // ───────────────────────────────────────────────────────────────

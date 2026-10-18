@@ -60,11 +60,16 @@ data class Medicine(
         val directMatch = customDosages[key]
         if (directMatch != null) return directMatch
 
+        // Guard: Support unpadded single-digit hours ("H:mm", e.g. "8:00") to prevent falling back to base dosage on legacy or imported keys
+        val unpaddedKey = String.format(java.util.Locale.US, "%d:%02d", time.hour, time.minute)
+        val unpaddedMatch = customDosages[unpaddedKey]
+        if (unpaddedMatch != null) return unpaddedMatch
+
         // Backward-compatibility fallback if medicine was saved previously with localized Arabic-Indic numerals
         val normalizedMap = customDosages.entries.associate { (k, v) ->
             k.normalizeArabicDigits() to v
         }
-        return normalizedMap[key] ?: dosage
+        return normalizedMap[key] ?: normalizedMap[unpaddedKey] ?: dosage
     }
 
     /**

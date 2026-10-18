@@ -114,6 +114,14 @@ class MedicineLogicTest {
         assertEquals(75.0, m.getDosageForTime(LocalTime.of(9, 5)), 0.001)
     }
 
+    @Test
+    fun getDosageForTime_matchesUnpaddedTimeKey() {
+        // Guard: Verify that time 8:00 matches unpadded single-digit key "8:00" from legacy or external custom maps
+        val custom = mapOf("8:00" to 25.0)
+        val m = med(dosage = 10.0, customDosages = custom)
+        assertEquals(25.0, m.getDosageForTime(LocalTime.of(8, 0)), 0.001)
+    }
+
     // ───────────────────────────────────────────────────────────────
     // 3. getFrequencyDisplay - text output for all patterns
     // ───────────────────────────────────────────────────────────────
