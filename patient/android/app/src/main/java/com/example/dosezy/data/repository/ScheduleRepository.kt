@@ -335,8 +335,10 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     if (context != null && shouldNotifyRefill) {
                         // Guard: Ensure notification channels are registered before posting refill alerts to prevent Android 8.0+ (API 26+) from dropping notifications
                         com.example.dosezy.notifications.MedicineAlarmReceiver.createNotificationChannels(context)
-                        val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
-                        val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
+                        // Guard: Resolve notification strings using target profile language to prevent English or mismatched language in multi-profile refill alerts (#BUG-REFILL-LOCALE)
+                        val userLang = database.userDao().getUserByIdDirect(previousEntry.userId)?.language
+                            ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+                        val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, userLang)
                         val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
 
                         val contentIntent = android.app.PendingIntent.getActivity(
@@ -715,8 +717,10 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             if (context != null && shouldNotifyRefill) {
                 // Guard: Ensure notification channels are registered before posting refill alerts to prevent Android 8.0+ (API 26+) from dropping notifications
                 com.example.dosezy.notifications.MedicineAlarmReceiver.createNotificationChannels(context)
-                val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
-                val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
+                // Guard: Resolve notification strings using target profile language to prevent English or mismatched language in multi-profile refill alerts (#BUG-REFILL-LOCALE)
+                val userLang = database.userDao().getUserByIdDirect(freshMedicine.userId)?.language
+                    ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+                val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, userLang)
                 val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
                 val contentIntent = android.app.PendingIntent.getActivity(
                     context,

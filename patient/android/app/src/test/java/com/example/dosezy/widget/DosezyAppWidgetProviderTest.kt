@@ -242,5 +242,31 @@ class DosezyAppWidgetProviderTest {
         assertFalse("Spanish tomorrow label must differ from English", spanishTomorrow == englishTomorrow)
         assertFalse("Spanish all-taken status must differ from English", spanishAllTaken == englishAllTaken)
     }
+
+    @Test
+    fun testWidgetDateAndStatus_whenUserIsNull_resolvesSavedAppLanguage() {
+        // Guard: When user profile is null, widget date format and status strings fall back to saved app language rather than OS default (#BUG-WIDGET-LOCALE)
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        prefs.edit().putString("selected_language", "SPANISH").commit()
+
+        val savedLang = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+        assertEquals(com.example.dosezy.data.model.Language.SPANISH, savedLang)
+
+        val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLang)
+        val statusMessage = localizedContext.getString(com.example.dosezy.R.string.widget_no_profile)
+        val englishContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, com.example.dosezy.data.model.Language.ENGLISH)
+        val englishStatus = englishContext.getString(com.example.dosezy.R.string.widget_no_profile)
+
+        assertEquals("No profile created", englishStatus)
+        assertFalse("Spanish unselected profile widget status must differ from English", statusMessage == englishStatus)
+
+        // Verify updateWidget with null user executes cleanly under Spanish saved language
+        val appWidgetManager = android.appwidget.AppWidgetManager.getInstance(context)
+        DosezyAppWidgetProvider.updateWidget(context, appWidgetManager, appWidgetId = 77)
+
+        // Restore global preference
+        prefs.edit().putString("selected_language", "ENGLISH").commit()
+    }
 }
+
 

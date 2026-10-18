@@ -1057,7 +1057,59 @@ class IntakeSafeguardManagerLifecycleTest {
 
         IntakeSafeguardManager.cancelCountdown(context)
     }
+
+    @Test
+    fun testIntakeSafeguard_notificationLocalization_resolvesProfileLanguage() = runBlocking {
+        // Guard: Verify ADHD countdown notification title and action button strings match target profile language (#BUG-INTAKE-LOCALE)
+        val spanishUser = User(
+            userId = "user_es_safeguard",
+            fullName = "Sofia",
+            age = 28,
+            gender = Gender.DO_NOT_SPECIFY,
+            contactNumber = "+34655555555",
+            language = com.example.dosezy.data.model.Language.SPANISH,
+            intakeSafeguardEnabled = true,
+            intakeCountdownSeconds = 90
+        )
+        database.userDao().insertUser(spanishUser)
+
+        val esContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, spanishUser.language)
+        val enContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, com.example.dosezy.data.model.Language.ENGLISH)
+
+        val expectedEsTitle = esContext.getString(com.example.dosezy.R.string.notif_intake_in_progress_title)
+        val expectedEnTitle = enContext.getString(com.example.dosezy.R.string.notif_intake_in_progress_title)
+        val expectedEsConfirm = esContext.getString(com.example.dosezy.R.string.notif_intake_action_confirm)
+        val expectedEnConfirm = enContext.getString(com.example.dosezy.R.string.notif_intake_action_confirm)
+
+        assertFalse("Spanish intake safeguard title must differ from English", expectedEsTitle == expectedEnTitle)
+        assertFalse("Spanish confirm action must differ from English", expectedEsConfirm == expectedEnConfirm)
+
+        val state = IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = "entry_spanish_safeguard",
+            entryIds = listOf("entry_spanish_safeguard"),
+            medicineName = "Amoxicilina",
+            medicineNames = listOf("Amoxicilina"),
+            scheduledTime = "08:00 AM",
+            durationSeconds = 60,
+            userId = spanishUser.userId
+        )
+        assertNotNull("Countdown state must be active", state)
+
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val safeguardNotif = nm.activeNotifications.firstOrNull { it.id == IntakeSafeguardManager.INTAKE_NOTIFICATION_BASE_ID }?.notification
+        assertNotNull("Safeguard countdown notification must be posted", safeguardNotif)
+
+        val actualTitle = safeguardNotif?.extras?.getCharSequence(android.app.Notification.EXTRA_TITLE)?.toString()
+        assertEquals("Safeguard notification title must be localized in Spanish", expectedEsTitle, actualTitle)
+
+        val actionTitles = safeguardNotif?.actions?.map { it.title.toString() } ?: emptyList()
+        assertTrue("Notification actions must contain localized Spanish confirm button", actionTitles.contains(expectedEsConfirm))
+
+        IntakeSafeguardManager.cancelCountdown(context)
+    }
 }
+
 
 
 

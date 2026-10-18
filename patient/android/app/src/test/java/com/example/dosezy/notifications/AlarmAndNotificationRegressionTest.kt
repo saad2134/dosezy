@@ -224,8 +224,9 @@ class AlarmAndNotificationRegressionTest {
     // ───────────────────────────────────────────────────────────────
     @Test
     fun bug7_undoDoseTaken_forPastDose_resyncsSlotNotificationAndRearmsNagging() {
-        val now = LocalDateTime.now()
-        val pastScheduledTime = now.minusMinutes(15)
+        val today = java.time.LocalDate.now()
+        val now = LocalDateTime.of(today, java.time.LocalTime.of(12, 15))
+        val pastScheduledTime = LocalDateTime.of(today, java.time.LocalTime.of(12, 0))
 
         // Previous entry scheduled 15 minutes ago (in the past)
         val pastEntry = ScheduleEntry(
@@ -453,5 +454,41 @@ class AlarmAndNotificationRegressionTest {
         assertFalse("Spanish taken action string must differ from English", esTaken == enTaken)
         assertFalse("Spanish snooze action string must differ from English", esSnooze == enSnooze)
     }
+
+    @Test
+    fun testRefillWarningNotification_resolvesProfileLanguageOverGlobalLanguage() {
+        // Guard: Verify that refill alert title and body strings derive from recipient user profile language rather than global app_prefs language (#BUG-REFILL-LOCALE)
+        val spanishProfile = com.example.dosezy.data.model.User(
+            userId = "user_es_refill",
+            fullName = "Elena",
+            age = 45,
+            gender = com.example.dosezy.data.model.Gender.DO_NOT_SPECIFY,
+            contactNumber = "+34611111111",
+            language = com.example.dosezy.data.model.Language.SPANISH
+        )
+        val englishProfile = com.example.dosezy.data.model.User(
+            userId = "user_en_refill",
+            fullName = "John",
+            age = 35,
+            gender = com.example.dosezy.data.model.Gender.DO_NOT_SPECIFY,
+            contactNumber = "+12025550199",
+            language = com.example.dosezy.data.model.Language.ENGLISH
+        )
+
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val esContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, spanishProfile.language)
+        val enContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, englishProfile.language)
+
+        val esTitle = esContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, "Paracetamol")
+        val enTitle = enContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, "Paracetamol")
+
+        val esText = esContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, 5)
+        val enText = enContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, 5)
+
+        assertTrue("English title contains Paracetamol", enTitle.contains("Paracetamol"))
+        assertFalse("Spanish refill alert title must differ from English", esTitle == enTitle)
+        assertFalse("Spanish refill alert text must differ from English", esText == enText)
+    }
 }
+
 

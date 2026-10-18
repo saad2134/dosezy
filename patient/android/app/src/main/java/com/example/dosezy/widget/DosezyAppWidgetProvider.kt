@@ -192,16 +192,17 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                     } else {
                         appName
                     }
-                    // Guard: Format header date using the user profile's explicit language preference to match widget content locale (#BUG-WIDGET-LOCALE)
-                    val widgetLocale = user?.language?.let { com.example.dosezy.utils.LocaleHelper.getLocale(it) } ?: Locale.getDefault()
+                    // Guard: Derive target language from user profile or fallback to global saved language so header date and status messages match app locale even if user is null (#BUG-WIDGET-LOCALE)
+                    val targetLang = user?.language ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+                    val widgetLocale = com.example.dosezy.utils.LocaleHelper.getLocale(targetLang)
                     val dateFormat = SimpleDateFormat("EEE, MMM d", widgetLocale)
                     val dateString = dateFormat.format(System.currentTimeMillis())
                     views.setTextViewText(R.id.widget_title_text, titleText)
                     views.setTextViewText(R.id.widget_date_text, dateString)
 
                     val defaultMedIcon = if (isDark) R.drawable.ic_widget_medication_dark else R.drawable.ic_widget_medication_light
-                    // Guard: Wrap context in user profile's chosen language so widget status messages match the profile locale (#BUG-WIDGET-LOCALE)
-                    val localizedContext = user?.language?.let { com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, it) } ?: context
+                    // Guard: Wrap context in user profile or saved app language so widget status messages match the profile locale (#BUG-WIDGET-LOCALE)
+                    val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, targetLang)
 
                     if (user == null) {
                         views.setViewVisibility(R.id.widget_status_container, View.VISIBLE)

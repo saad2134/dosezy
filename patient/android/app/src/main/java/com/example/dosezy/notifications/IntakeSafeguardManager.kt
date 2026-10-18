@@ -402,11 +402,23 @@ object IntakeSafeguardManager {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        // Guard: Resolve profile or app language context so countdown shade title, description, and action buttons match user profile locale (#BUG-INTAKE-LOCALE)
+        val targetLanguage = state.userId?.let { uid ->
+            try {
+                kotlinx.coroutines.runBlocking(Dispatchers.IO) {
+                    kotlinx.coroutines.withTimeoutOrNull(500L) {
+                        DosezyDatabase.getInstance(context).userDao().getUserByIdDirect(uid)?.language
+                    }
+                }
+            } catch (_: Exception) { null }
+        } ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+        val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, targetLanguage)
+
         // Guard: Use setUsesChronometer and setChronometerCountDown so Android natively counts down in shade without continuous waking
-        val builder = NotificationCompat.Builder(context, MedicineAlarmReceiver.CHANNEL_ID)
+        val builder = NotificationCompat.Builder(localizedContext, MedicineAlarmReceiver.CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_medicine_notification)
-            .setContentTitle(context.getString(R.string.notif_intake_in_progress_title))
-            .setContentText(context.getString(R.string.notif_intake_in_progress_desc, state.medicineName))
+            .setContentTitle(localizedContext.getString(R.string.notif_intake_in_progress_title))
+            .setContentText(localizedContext.getString(R.string.notif_intake_in_progress_desc, state.medicineName))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -419,17 +431,17 @@ object IntakeSafeguardManager {
             .setShowWhen(true)
             .addAction(
                 android.R.drawable.ic_menu_agenda,
-                context.getString(R.string.notif_intake_action_confirm),
+                localizedContext.getString(R.string.notif_intake_action_confirm),
                 confirmPendingIntent
             )
             .addAction(
                 android.R.drawable.ic_input_add,
-                context.getString(R.string.notif_intake_action_extend),
+                localizedContext.getString(R.string.notif_intake_action_extend),
                 extendPendingIntent
             )
             .addAction(
                 android.R.drawable.ic_menu_close_clear_cancel,
-                context.getString(R.string.notif_intake_action_cancel),
+                localizedContext.getString(R.string.notif_intake_action_cancel),
                 cancelPendingIntent
             )
 

@@ -816,4 +816,34 @@
     <!-- Dynamic Snooze Duration Selector (#103) -->
     <string name="alarm_snooze_duration_label">Posponer por:</string>
     <string name="snooze_duration_chip_format">%1$d min</string>
+
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">Protección de Cuenta Regresiva de Toma</string>
+    <string name="pref_intake_safeguard_desc">Soporte TDAH: intervalo de cuenta regresiva antes de confirmar la toma con reaviso si hay distracción.</string>
+    <string name="pref_intake_duration_title">Duración de Protección</string>
+    <string name="pref_intake_duration_format">%1$d minutos</string>
+    <string name="dialog_intake_duration_title">Seleccionar Duración de Protección</string>
+    <string name="notif_intake_in_progress_title">Toma en Progreso</string>
+    <string name="notif_intake_in_progress_desc">%1$s: Confirma una vez tomado</string>
+    <string name="notif_intake_action_confirm">Confirmar Toma</string>
+    <string name="notif_intake_action_extend">+1 min</string>
+    <string name="notif_intake_action_cancel">Cancelar</string>
+    <string name="notif_intake_realert_title">Medicamento No Confirmado</string>
+    <string name="notif_intake_realert_desc">¿Tomaste %1$s? Pulsa para confirmar la toma o posponer.</string>
+    <string name="home_intake_in_progress">Toma en progreso para %1$s</string>
+    <string name="home_intake_time_remaining">%1$s restante</string>
+    <string name="home_intake_confirm">Confirmar Toma</string>
+    <string name="home_intake_extend">+1 min</string>
+    <string name="home_intake_cancel">Cancelar</string>
+    <string name="home_intake_confirmed">Toma registrada para %1$s</string>
+    <string name="home_intake_cancelled">Protección de toma cancelada</string>
+    <string name="alarm_realert_badge">REAVISO DE TOMA TDAH</string>
+    <string name="alarm_realert_subtitle">Pulsaste Tomar antes, pero la toma no fue confirmada. ¿Tomaste tu medicamento?</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">Tomar Todo</string>
+    <string name="take_all_count">Tomar Todo (%1$d)</string>
+    <string name="dialog_take_all_title">¿Tomar Todos los Medicamentos?</string>
+    <string name="dialog_take_all_message">¿Marcar todos los %1$d medicamentos programados para las %2$s como tomados?</string>
+    <string name="take_all_success_toast">Se marcaron los %1$d medicamentos como tomados</string>
 </resources>
