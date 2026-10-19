@@ -1,36 +1,60 @@
 <en-IN>
-<!-- In development -->
+• Added ADHD intake countdown buffer with re-alert safeguards, home progress pill, and interactive notifications
+• Added Take All cohort actions for multi-dose slots and dynamic per-alarm snooze duration selectors
+• Reached 100% complete translation parity across all 12 supported languages, with core architecture improvements
 </en-IN>
 <en-US>
-<!-- In development -->
+• Added ADHD intake countdown buffer with re-alert safeguards, home progress pill, and interactive notifications
+• Added Take All cohort actions for multi-dose slots and dynamic per-alarm snooze duration selectors
+• Reached 100% complete translation parity across all 12 supported languages, with core architecture improvements
 </en-US>
 <ar>
-<!-- In development -->
+• إضافة مؤقت حماية تنازلي لمرضى تشتت الانتباه (ADHD) مع تنبيهات متابعة وإشعارات تفاعلية
+• إضافة إجراء «تناول الكل» لمواعيد الجرعات المتعددة وخيارات تخصيص مدة التأجيل الفورية
+• اكتمال التوافق اللغوي والترجمة بنسبة 100% لجميع اللغات الـ12 مع تحسينات معمارية شاملة
 </ar>
 <de-DE>
-<!-- In development -->
+• ADHS-Einnahme-Countdown mit Wiederholungsschutz, Fortschrittsanzeige und interaktiven Benachrichtigungen
+• „Alle einnehmen“-Aktion für zeitgleiche Dosen und dynamische Schlummerauswahl direkt im Wecker
+• 100% vollständige Übersetzungen in allen 12 Sprachen sowie umfassende Architektur- und Stabilitätsverbesserungen
 </de-DE>
 <es-419>
-<!-- In development -->
+• Temporizador de protección para TDAH con reavisos, indicador en Inicio y notificaciones interactivas
+• Acción «Tomar Todo» para múltiples medicamentos y selector dinámico de duración para posponer
+• Paridad de traducción al 100% en los 12 idiomas admitidos y mejoras en la arquitectura interna
 </es-419>
 <fr-FR>
-<!-- In development -->
+• Compte à rebours de prise pour TDAH avec réalerte de sécurité et notifications interactives
+• Action « Tout prendre » pour les prises multiples et sélecteur dynamique de durée de report
+• Traduction complète à 100% dans les 12 langues prises en charge et optimisations d'architecture
 </fr-FR>
 <hi-IN>
-<!-- In development -->
+• ADHD दवा सेवन उलटी गिनती सुरक्षा, होम स्क्रीन प्रोग्रेस पिल और इंटरैक्टिव सूचनाएं जोड़ी गईं
+• एक समय की कई दवाओं के लिए «सभी लें» क्रिया और अलार्म में तुरंत स्नूज़ अवधि चुनने की सुविधा
+• सभी 12 भाषाओं में 100% अनुवाद समानता और कोर आर्किटेक्चर व स्थिरता में महत्वपूर्ण सुधार
 </hi-IN>
 <it-IT>
-<!-- In development -->
+• Timer di protezione assunzione per ADHD con nuovo avviso di sicurezza e notifiche interattive
+• Azione «Assumi tutto» per farmaci simultanei e selettore dinamico della durata di posticipo
+• Parità di traduzione al 100% in tutte le 12 lingue supportate e ottimizzazioni dell'architettura
 </it-IT>
 <ja-JP>
-<!-- In development -->
+• ADHD服薬カウントダウン保護、再アラート機能、ホーム画面の進行状況表示と対話型通知を追加
+• 同時服用薬の「すべて服用」一括操作と、アラーム画面でのスヌーズ時間選択に対応
+• 対応する全12言語で100%の翻訳同期を達成し、コアアーキテクチャと安定性を大幅に改善
 </ja-JP>
 <pt-BR>
-<!-- In development -->
+• Temporizador de proteção para TDAH com novos alertas, progresso no Início e notificações interativas
+• Ação «Tomar Todos» para doses simultâneas e seletor dinâmico de tempo para adiar alarmes
+• 100% de paridade de tradução nos 12 idiomas suportados e melhorias na arquitetura principal
 </pt-BR>
 <ru-RU>
-<!-- In development -->
+• Таймер защиты приема при СДВГ с повторными оповещениями, индикатором на главном и уведомлениями
+• Действие «Принять все» для одновременных лекарств и динамический выбор времени откладывания
+• 100% паритет перевода во всех 12 поддерживаемых языках и улучшение внутренней архитектуры
 </ru-RU>
 <zh-CN>
-<!-- In development -->
+• 新增ADHD服药倒计时保护、再次提醒机制、主页进度卡片与可交互通知
+• 新增同时间段多药「全部服用」快捷操作，支持在闹钟界面动态选择稍后提醒时长
+• 实现全部12种支持语言的100%完整翻译同步，并对底层核心架构进行了重构优化
 </zh-CN>
