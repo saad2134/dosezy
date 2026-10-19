@@ -94,9 +94,12 @@ class MedicineViewModel @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun updateMedicine(medicine: Medicine) {
+    fun updateMedicine(
+        medicine: Medicine,
+        effectiveDate: com.example.dosezy.data.model.ScheduleEffectiveDate = com.example.dosezy.data.model.ScheduleEffectiveDate.TODAY
+    ) {
         viewModelScope.launch {
-            medicineRepository.updateMedicine(medicine)
+            medicineRepository.updateMedicine(medicine, effectiveDate)
         }
     }
 

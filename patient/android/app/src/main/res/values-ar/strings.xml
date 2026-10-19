@@ -849,4 +849,12 @@
     <string name="pharmacy_refill_estimation_disclaimer">ملاحظة: كميات إعادة التعبئة هي تقديرات تقريبية بناءً على وتيرة التناول. تحقق مع الصيدلي أو الطبيب.</string>
     <string name="alarm_unlock_to_view_details">قم بإلغاء القفل لعرض التفاصيل</string>
     <string name="alarm_lockscreen_details_hidden">يتم إخفاء أسماء الأدوية والجرعات أثناء قفل الجهاز.</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">تطبيق تغييرات الجدول</string>
+    <string name="schedule_effective_dialog_message">متى يجب أن يبدأ سريان هذا الجدول المحدث؟</string>
+    <string name="schedule_effective_today_title">بدءاً من اليوم</string>
+    <string name="schedule_effective_today_desc">تطبيق المواعيد الجديدة اليوم. ستتم إزالة الجرعات السابقة غير المأخوذة اليوم.</string>
+    <string name="schedule_effective_tomorrow_title">بدءاً من الغد</string>
+    <string name="schedule_effective_tomorrow_desc">الحفاظ على جدول اليوم كما هو. سيبدأ الجدول الجديد غداً.</string>
 </resources>

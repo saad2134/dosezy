@@ -849,4 +849,12 @@
     <string name="pharmacy_refill_estimation_disclaimer">注：補充薬の数量は登録された頻度に基づく概算です。正確な数量は薬剤師または医師にご確認ください。</string>
     <string name="alarm_unlock_to_view_details">ロックを解除して詳細を表示</string>
     <string name="alarm_lockscreen_details_hidden">端末のロック中は薬の名前と用量が非表示になります。</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">スケジュールの変更を適用</string>
+    <string name="schedule_effective_dialog_message">この更新されたスケジュールはいつから有効にしますか？</string>
+    <string name="schedule_effective_today_title">今日から適用</string>
+    <string name="schedule_effective_today_desc">今日から新しい時間を適用します。今日の過去の未服薬分は削除されます。</string>
+    <string name="schedule_effective_tomorrow_title">明日から適用</string>
+    <string name="schedule_effective_tomorrow_desc">今日のスケジュールをそのまま維持します。新しいスケジュールは明日から始まります。</string>
 </resources>

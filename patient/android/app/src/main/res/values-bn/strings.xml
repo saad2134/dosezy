@@ -848,4 +848,12 @@
     <string name="pharmacy_refill_estimation_disclaimer">বিজ্ঞপ্তি: রিফিল পরিমাণ নির্ধারিত ফ্রিকোয়েন্সির উপর ভিত্তি করে আনুমানিক গণনা। আপনার ফার্মাসিস্ট বা ডাক্তারের সাথে যাচাই করুন।</string>
     <string name="alarm_unlock_to_view_details">বিস্তারিত দেখতে আনলক করুন</string>
     <string name="alarm_lockscreen_details_hidden">ডিভাইস লক থাকা অবস্থায় ওষুধের নাম ও ডোজ লুকানো থাকে।</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">সময়সূচীর পরিবর্তন প্রয়োগ করুন</string>
+    <string name="schedule_effective_dialog_message">এই আপডেট করা সময়সূচী কখন থেকে কার্যকর হবে?</string>
+    <string name="schedule_effective_today_title">আজ থেকেই শুরু</string>
+    <string name="schedule_effective_today_desc">আজকের নতুন সময় প্রয়োগ করুন। আজকের অতীতের না নেওয়া ডোজ মুছে ফেলা হবে।</string>
+    <string name="schedule_effective_tomorrow_title">আগামীকাল থেকে শুরু</string>
+    <string name="schedule_effective_tomorrow_desc">আজকের সময়সূচী অপরিবর্তিত রাখুন। নতুন সময়সূচী আগামীকাল থেকে শুরু হবে।</string>
 </resources>

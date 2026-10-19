@@ -849,4 +849,12 @@
     <string name="pharmacy_refill_estimation_disclaimer">Примечание: Количество для пополнения является приблизительным на основе частоты приема. Уточняйте у врача или фармацевта.</string>
     <string name="alarm_unlock_to_view_details">Разблокируйте для просмотра деталей</string>
     <string name="alarm_lockscreen_details_hidden">Названия препаратов и дозировки скрыты, пока устройство заблокировано.</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">Применить изменения расписания</string>
+    <string name="schedule_effective_dialog_message">Когда обновленное расписание должно вступить в силу?</string>
+    <string name="schedule_effective_today_title">Начиная с сегодняшнего дня</string>
+    <string name="schedule_effective_today_desc">Применить новое время сегодня. Устаревшие непринятые дозы за сегодня будут удалены.</string>
+    <string name="schedule_effective_tomorrow_title">Начиная с завтрашнего дня</string>
+    <string name="schedule_effective_tomorrow_desc">Сохранить сегодняшнее расписание без изменений. Новое расписание начнется завтра.</string>
 </resources>

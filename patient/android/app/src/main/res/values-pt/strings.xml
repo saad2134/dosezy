@@ -848,4 +848,12 @@ Deseja continuar?</string>
     <string name="pharmacy_refill_estimation_disclaimer">Aviso: As quantidades de reposição são estimativas aproximadas baseadas na frequência registrada. Confirme com seu farmacêutico ou médico.</string>
     <string name="alarm_unlock_to_view_details">Desbloquear para ver detalhes</string>
     <string name="alarm_lockscreen_details_hidden">Os nomes dos medicamentos e as dosagens ficam ocultos enquanto o dispositivo estiver bloqueado.</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">Aplicar alterações de horário</string>
+    <string name="schedule_effective_dialog_message">Quando este horário atualizado deve entrar em vigor?</string>
+    <string name="schedule_effective_today_title">A partir de hoje</string>
+    <string name="schedule_effective_today_desc">Aplica os novos horários hoje. As doses não tomadas obsoletas de hoje serão removidas.</string>
+    <string name="schedule_effective_tomorrow_title">A partir de amanhã</string>
+    <string name="schedule_effective_tomorrow_desc">Mantém o horário de hoje intacto. O novo horário começará amanhã.</string>
 </resources>

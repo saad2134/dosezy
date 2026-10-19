@@ -849,4 +849,12 @@ Voulez-vous continuer ?</string>
     <string name="pharmacy_refill_estimation_disclaimer">Remarque : Les quantités de renouvellement sont des estimations basées sur la fréquence enregistrée. Vérifiez auprès de votre pharmacien ou médecin.</string>
     <string name="alarm_unlock_to_view_details">Déverrouiller pour voir les détails</string>
     <string name="alarm_lockscreen_details_hidden">Les noms et dosages des médicaments sont masqués lorsque l\'appareil est verrouillé.</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">Appliquer les modifications d\'horaire</string>
+    <string name="schedule_effective_dialog_message">Quand ce nouvel horaire doit-il prendre effet ?</string>
+    <string name="schedule_effective_today_title">À partir d\'aujourd\'hui</string>
+    <string name="schedule_effective_today_desc">Applique les nouvelles heures dès aujourd\'hui. Les doses non prises obsolètes d\'aujourd\'hui seront supprimées.</string>
+    <string name="schedule_effective_tomorrow_title">À partir de demain</string>
+    <string name="schedule_effective_tomorrow_desc">Conserve l\'horaire d\'aujourd\'hui. Le nouvel horaire commencera demain.</string>
 </resources>

@@ -849,4 +849,12 @@ Möchten Sie fortfahren?</string>
     <string name="pharmacy_refill_estimation_disclaimer">Hinweis: Nachfüllmengen sind Näherungswerte basierend auf der Einnahmehäufigkeit. Stimmen Sie sich mit Arzt oder Apotheker ab.</string>
     <string name="alarm_unlock_to_view_details">Entsperren, um Details anzuzeigen</string>
     <string name="alarm_lockscreen_details_hidden">Medikamentennamen und Dosierungen sind bei gesperrtem Gerät ausgeblendet.</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">Planänderungen anwenden</string>
+    <string name="schedule_effective_dialog_message">Wann soll der aktualisierte Plan in Kraft treten?</string>
+    <string name="schedule_effective_today_title">Ab heute</string>
+    <string name="schedule_effective_today_desc">Neue Zeiten ab heute anwenden. Veraltete, nicht eingenommene Dosen von heute werden entfernt.</string>
+    <string name="schedule_effective_tomorrow_title">Ab morgen</string>
+    <string name="schedule_effective_tomorrow_desc">Heutigen Plan beibehalten. Der neue Plan beginnt morgen.</string>
 </resources>

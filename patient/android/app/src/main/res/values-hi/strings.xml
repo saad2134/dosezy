@@ -865,4 +865,12 @@
     <string name="pharmacy_refill_estimation_disclaimer">सूचना: रिफिल मात्रा दर्ज आवृत्ति पर आधारित अनुमान है। अपने फार्मासिस्ट या चिकित्सक से सत्यापित करें।</string>
     <string name="alarm_unlock_to_view_details">विवरण देखने के लिए अनलॉक करें</string>
     <string name="alarm_lockscreen_details_hidden">डिवाइस लॉक होने पर दवा का नाम और खुराक छिपी रहती है।</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">शेड्यूल परिवर्तन लागू करें</string>
+    <string name="schedule_effective_dialog_message">यह अपडेट किया गया शेड्यूल कब से प्रभावी होना चाहिए?</string>
+    <string name="schedule_effective_today_title">आज से शुरू करें</string>
+    <string name="schedule_effective_today_desc">आज से नए समय लागू करें। आज की पुरानी बिना ली गई खुराकें हटा दी जाएंगी।</string>
+    <string name="schedule_effective_tomorrow_title">कल से शुरू करें</string>
+    <string name="schedule_effective_tomorrow_desc">आज का शेड्यूल वैसा ही रखें। नया शेड्यूल कल से शुरू होगा।</string>
 </resources>

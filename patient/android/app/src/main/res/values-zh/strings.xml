@@ -865,4 +865,12 @@
     <string name="pharmacy_refill_estimation_disclaimer">注意：补充药品数量为根据记录频度计算的参考估算值。请务必咨询您的药师或医生核准。</string>
     <string name="alarm_unlock_to_view_details">解锁以查看详情</string>
     <string name="alarm_lockscreen_details_hidden">设备锁定时隐藏药品名称和用量。</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">应用服药时间更改</string>
+    <string name="schedule_effective_dialog_message">更新后的服药计划应从何时生效？</string>
+    <string name="schedule_effective_today_title">从今天开始生效</string>
+    <string name="schedule_effective_today_desc">今天立即应用新时间。今天早前已过期的未服药记录将被移除。</string>
+    <string name="schedule_effective_tomorrow_title">从明天开始生效</string>
+    <string name="schedule_effective_tomorrow_desc">保留今天的计划不变，新服药时间将从明天开始生效。</string>
 </resources>

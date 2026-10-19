@@ -94,6 +94,7 @@ fun EditMedScreen(
     var editingTimeIndex by remember { mutableStateOf<Int?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showPermanentDeleteConfirmDialog by remember { mutableStateOf(false) }
+    var pendingScheduleUpdateMedicine by remember { mutableStateOf<Medicine?>(null) }
     var selectedDaysOfWeek by remember { mutableStateOf(listOf<Int>()) }
     var selectedDaysOfMonth by remember { mutableStateOf(listOf<Int>()) }
 
@@ -388,11 +389,26 @@ fun EditMedScreen(
                                 )
 
                                 if (medicineToEdit != null) {
+                                    val timingOrScheduleChanged = (
+                                        medicineToEdit.scheduledTimes != updatedMedicine.scheduledTimes ||
+                                        medicineToEdit.frequency != updatedMedicine.frequency ||
+                                        medicineToEdit.timesPerDay != updatedMedicine.timesPerDay ||
+                                        medicineToEdit.customDosages != updatedMedicine.customDosages ||
+                                        medicineToEdit.startDate != updatedMedicine.startDate ||
+                                        medicineToEdit.endDate != updatedMedicine.endDate ||
+                                        medicineToEdit.durationDays != updatedMedicine.durationDays
+                                    ) && updatedMedicine.frequency.pattern != FrequencyPattern.AS_NEEDED
+
+                                    if (timingOrScheduleChanged) {
+                                        pendingScheduleUpdateMedicine = updatedMedicine
+                                        return@Button
+                                    }
+
                                     // Guard: Clean up previous active medicine image when saving a new image to prevent disk storage leaks and avoid deleting during uncommitted drafts
                                     if (!medicineToEdit.imageUri.isNullOrBlank() && medicineToEdit.imageUri != medicineImagePath) {
                                         com.example.dosezy.ui.components.deleteOldImage(context, medicineToEdit.imageUri)
                                     }
-                                    medicineViewModel.updateMedicine(updatedMedicine)
+                                    medicineViewModel.updateMedicine(updatedMedicine, com.example.dosezy.data.model.ScheduleEffectiveDate.TODAY)
                                     navController.previousBackStackEntry?.savedStateHandle?.set(
                                         "snackbar_message",
                                         context.getString(R.string.medication_updated_success)
@@ -649,4 +665,28 @@ fun EditMedScreen(
             }
         )
     }
+
+    if (pendingScheduleUpdateMedicine != null) {
+        val targetMedicine = pendingScheduleUpdateMedicine!!
+        com.example.dosezy.ui.components.ScheduleEffectiveDateDialog(
+            medicationName = targetMedicine.medicationName,
+            onDismiss = { pendingScheduleUpdateMedicine = null },
+            onConfirm = { effectiveDate ->
+                val medToSave = targetMedicine
+                pendingScheduleUpdateMedicine = null
+
+                if (medicineToEdit != null && !medicineToEdit.imageUri.isNullOrBlank() && medicineToEdit.imageUri != medicineImagePath) {
+                    com.example.dosezy.ui.components.deleteOldImage(context, medicineToEdit.imageUri)
+                }
+
+                medicineViewModel.updateMedicine(medToSave, effectiveDate)
+                navController.previousBackStackEntry?.savedStateHandle?.set(
+                    "snackbar_message",
+                    context.getString(R.string.medication_updated_success)
+                )
+                navController.popBackStack()
+            }
+        )
+    }
 }
+

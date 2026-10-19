@@ -849,4 +849,12 @@ Vuoi continuare?</string>
     <string name="pharmacy_refill_estimation_disclaimer">Nota: Le quantità di ricarica sono stime approssimative basate sulla frequenza. Verifica con il tuo farmacista o medico.</string>
     <string name="alarm_unlock_to_view_details">Sblocca per visualizzare i dettagli</string>
     <string name="alarm_lockscreen_details_hidden">I nomi dei farmaci e i dosaggi sono nascosti quando il dispositivo è bloccato.</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">Applica modifiche all\'orario</string>
+    <string name="schedule_effective_dialog_message">Quando deve entrare in vigore questo orario aggiornato?</string>
+    <string name="schedule_effective_today_title">A partire da oggi</string>
+    <string name="schedule_effective_today_desc">Applica i nuovi orari oggi. Le dosi non assunte obsolete di oggi verranno rimosse.</string>
+    <string name="schedule_effective_tomorrow_title">A partire da domani</string>
+    <string name="schedule_effective_tomorrow_desc">Mantieni intatto il programma di oggi. Il nuovo programma inizierà domani.</string>
 </resources>

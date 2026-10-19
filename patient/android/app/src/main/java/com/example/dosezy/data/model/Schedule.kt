@@ -48,3 +48,8 @@ data class ScheduleEntry(
 enum class MedicationStatus {
     PENDING, TAKEN_ON_TIME, TAKEN_LATE, MISSED, SKIPPED
 }
+
+enum class ScheduleEffectiveDate {
+    TODAY,
+    TOMORROW
+}
