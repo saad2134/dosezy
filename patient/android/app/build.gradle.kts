@@ -22,8 +22,8 @@ android {
         applicationId = "com.saad2134.dosezy"
         minSdk = 24
         targetSdk = 36
-        versionCode = 35
-        versionName = "2.5.10"
+        versionCode = 36
+        versionName = "2.5.11"
         buildConfigField("String", "VERSION_NAME", "\"$versionName\"")
         buildConfigField("int", "VERSION_CODE", "$versionCode")
 
@@ -115,6 +115,15 @@ android {
         unitTests.isReturnDefaultValues = true
         unitTests.isIncludeAndroidResources = true
     }
+}
+
+tasks.withType<Test>().configureEach {
+    maxHeapSize = "1536m"
+    jvmArgs(
+        "-Djdk.attach.allowAttachSelf=true",
+        "-XX:-UseCompressedOops",
+        "-XX:TieredStopAtLevel=1"
+    )
 }
 
 dependencies {

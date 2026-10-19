@@ -435,6 +435,7 @@ Voulez-vous continuer ?</string>
     <string name="to_be_taken_in">À prendre dans %1$dh %2$dmin</string>
     <string name="time_diff_ago">Il y a %1$dh %2$dmin</string>
     <string name="status_all_medications_taken">Tous les médicaments sont pris</string>
+    <string name="status_slot_completed_with_skipped">Terminé (certains ignorés)</string>
     <string name="status_scheduled_for_this_time">Programmé pour cette heure</string>
     <string name="daily_frequency_presets_title">Préréglages de fréquence quotidienne</string>
     <string name="action_edit_medicine_cd">Modifier le médicament</string>
@@ -569,7 +570,7 @@ Voulez-vous continuer ?</string>
     <string name="alarm_duration_1m">1 minute</string>
     <string name="alarm_duration_2m">2 minutes</string>
     <string name="alarm_duration_5m">5 minutes</string>
-    <string name="alarm_silenced_auto_banner">Alarme arrêtée automatiquement — confirmez vos prises dès que possible</string>
+    <string name="alarm_silenced_auto_banner">Alarme arrêtée automatiquement - confirmez vos prises dès que possible</string>
 
     <string name="alarm_sound_custom">Fichier audio personnalisé</string>
     <string name="alarm_sound_select_file">Choisir un fichier audio</string>
@@ -785,7 +786,7 @@ Voulez-vous continuer ?</string>
     <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
     <string name="pref_section_appearance">Apparence</string>
     <string name="pref_slide_actions_title">Glisser pour Prendre et Reporter</string>
-    <string name="pref_slide_actions_desc">Nécessite de faire glisser au lieu d\'appuyer pour prendre ou reporter les doses.</string>
+    <string name="pref_slide_actions_desc">Glisser au lieu d\'appuyer pour prendre ou répéter.</string>
     <string name="pref_timeline_mode_title">Vue Chronologique</string>
     <string name="pref_timeline_mode_desc">Affiche le planning du jour dans une chronologie verticale claire.</string>
     <string name="pref_calendar_thicker_highlight_title">Cadre Complet des Jours</string>
@@ -795,4 +796,65 @@ Voulez-vous continuer ?</string>
     <string name="alarm_slide_to_snooze">Glisser pour reporter (%1$d min)</string>
     <string name="home_view_standard">Standard</string>
     <string name="home_view_timeline">Chronologie</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">Reporter pour :</string>
+    <string name="snooze_duration_chip_format">%1$d min</string>
+    <string name="pref_custom_snooze_title">Options de répétition personnalisées</string>
+    <string name="pref_custom_snooze_desc">Choisissez la durée du rappel quand l\'alarme sonne.</string>
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">Protection du compte à rebours de prise</string>
+    <string name="pref_intake_safeguard_desc">Soutien TDAH : temps de compte à rebours avant confirmation avec réalerte en cas de distraction.</string>
+    <string name="pref_intake_duration_title">Durée de protection</string>
+    <string name="pref_intake_duration_format">%1$d minutes</string>
+    <string name="dialog_intake_duration_title">Sélectionner la durée de protection</string>
+    <string name="notif_intake_in_progress_title">Prise en cours</string>
+    <string name="notif_intake_in_progress_desc">%1$s : Confirmez après la prise</string>
+    <string name="notif_intake_action_confirm">Confirmer la prise</string>
+    <string name="notif_intake_action_extend">+1 min</string>
+    <string name="notif_intake_action_cancel">Annuler</string>
+    <string name="notif_intake_realert_title">Médicament non confirmé</string>
+    <string name="notif_intake_realert_desc">Avez-vous pris %1$s ? Appuyez pour confirmer ou reporter.</string>
+    <string name="home_intake_in_progress">Prise en cours pour %1$s</string>
+    <string name="home_intake_time_remaining">%1$s restant</string>
+    <string name="home_intake_confirm">Confirmer la prise</string>
+    <string name="home_intake_extend">+1 min</string>
+    <string name="home_intake_cancel">Annuler</string>
+    <string name="home_intake_confirmed">Prise enregistrée pour %1$s</string>
+    <string name="home_intake_cancelled">Protection de prise annulée</string>
+    <string name="alarm_realert_badge">RÉALERTE DE PRISE TDAH</string>
+    <string name="alarm_realert_subtitle">Vous avez appuyé sur Prendre plus tôt, mais la prise n\'a pas été confirmée. Avez-vous pris votre médicament ?</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">Tout prendre</string>
+    <string name="take_all_count">Tout prendre (%1$d)</string>
+    <string name="dialog_take_all_title">Prendre tous les médicaments ?</string>
+    <string name="dialog_take_all_message">Marquer les %1$d médicaments prévus à %2$s comme pris ?</string>
+    <string name="take_all_success_toast">%1$d médicaments marqués comme pris</string>
+
+    <!-- Legal, Privacy & Compliance Safeguards -->
+    <string name="notif_generic_lockscreen_reminder">Rappel de médicament programmé</string>
+    <string name="pref_lockscreen_details_title">Afficher les détails sur l\'écran de verrouillage</string>
+    <string name="pref_lockscreen_details_desc">Masquer noms et dosages jusqu\'au déverrouillage de l\'appareil.</string>
+    <string name="disclaimer_dialog_title">Avis de non-responsabilité médicale et légale</string>
+    <string name="disclaimer_dialog_summary">Dosezy est un outil numérique de rappel automatisé et N\'EST PAS un dispositif médical réglementé. Il ne fournit aucun diagnostic, calcul de posologie ou conseil clinique. Consultez toujours votre médecin ou pharmacien pour les instructions d\'ordonnance.</string>
+    <string name="disclaimer_checkbox_consent">Je comprends et j\'accepte l\'avis médical et les conditions d\'utilisation.</string>
+    <string name="disclaimer_action_agree">Accepter et continuer</string>
+    <string name="disclaimer_link_medical">Avis médical</string>
+    <string name="disclaimer_link_privacy">Politique de confidentialité</string>
+    <string name="disclaimer_link_terms">Conditions d\'utilisation</string>
+    <string name="emergency_dispatch_warning_title">Avis d\'urgence</string>
+    <string name="emergency_dispatch_warning_desc">Dosezy n\'est pas un service d\'urgence ni un substitut du 112/911. En cas d\'urgence vitale, composez directement les services de secours locaux. Vérifiez que le numéro affiché correspond à votre juridiction.</string>
+    <string name="pdf_report_disclaimer_footer">Dosezy Suivi des Médicaments • Journal informatif autodéclaré (Non clinique)</string>
+    <string name="pharmacy_refill_estimation_disclaimer">Remarque : Les quantités de renouvellement sont des estimations basées sur la fréquence enregistrée. Vérifiez auprès de votre pharmacien ou médecin.</string>
+    <string name="alarm_unlock_to_view_details">Déverrouiller pour voir les détails</string>
+    <string name="alarm_lockscreen_details_hidden">Les noms et dosages des médicaments sont masqués lorsque l\'appareil est verrouillé.</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">Appliquer les modifications d\'horaire</string>
+    <string name="schedule_effective_dialog_message">Quand ce nouvel horaire doit-il prendre effet ?</string>
+    <string name="schedule_effective_today_title">À partir d\'aujourd\'hui</string>
+    <string name="schedule_effective_today_desc">Applique les nouvelles heures dès aujourd\'hui. Les doses non prises obsolètes d\'aujourd\'hui seront supprimées.</string>
+    <string name="schedule_effective_tomorrow_title">À partir de demain</string>
+    <string name="schedule_effective_tomorrow_desc">Conserve l\'horaire d\'aujourd\'hui. Le nouvel horaire commencera demain.</string>
 </resources>

@@ -77,6 +77,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.dosezy.ui.viewmodels.BackupRestoreViewModel
 import androidx.navigation.NavController
 import com.example.dosezy.R
 import com.example.dosezy.data.DosezyDatabase
@@ -91,10 +93,10 @@ import kotlinx.coroutines.withContext
 // Guard: Keep available on API 24+; BackupRestoreManager uses canonicalPath for full Android 7.0+ compatibility
 @Composable
 fun BackupRestoreScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: BackupRestoreViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     
     // Detect dark theme directly from current MaterialTheme color scheme background luminance
     val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
@@ -102,37 +104,22 @@ fun BackupRestoreScreen(
     val userViewModel = sharedUserViewModel()
     val currentUser by userViewModel.currentUser.collectAsState()
 
-    val database = remember { DosezyDatabase.getInstance(context) }
-    val scheduleRepository = remember { ScheduleRepository(database) }
-    val backupManager = remember { BackupRestoreManager(context, database, scheduleRepository) }
+    val uiState by viewModel.uiState.collectAsState()
+    val isLoading = uiState.isLoading
+    val loadingMessage = uiState.loadingMessage
+    val statusMessage = uiState.statusMessage
+    val isStatusSuccess = uiState.isStatusSuccess
+    val inspectionResult = uiState.inspectionResult
+    val exportedBackupFile = uiState.exportedBackupFile
+    val showBackupSuccessDialog = uiState.showBackupSuccessDialog
 
-    var isLoading by remember { mutableStateOf(false) }
-    var loadingMessage by remember { mutableStateOf<String?>(null) }
-    var statusMessage by remember { mutableStateOf<String?>(null) }
-    var isStatusSuccess by remember { mutableStateOf(false) }
-    var inspectionResult by remember { mutableStateOf<ZipInspectionResult?>(null) }
-    var exportedBackupFile by remember { mutableStateOf<java.io.File?>(null) }
-    var showBackupSuccessDialog by remember { mutableStateOf(false) }
     var selectedTabIndex by rememberSaveable { mutableStateOf(0) }
 
     val importLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
         if (uri != null) {
-            scope.launch {
-                isLoading = true
-                loadingMessage = context.getString(R.string.backup_status_inspecting)
-                val inspect = backupManager.inspectBackupZip(uri)
-                isLoading = false
-                loadingMessage = null
-                if (inspect.success && inspect.profiles.isNotEmpty()) {
-                    statusMessage = null
-                    inspectionResult = inspect
-                } else {
-                    isStatusSuccess = false
-                    statusMessage = inspect.message.ifEmpty { context.getString(R.string.backup_status_no_profiles) }
-                }
-            }
+            viewModel.inspectBackupZip(uri)
         }
     }
 
@@ -532,23 +519,7 @@ fun BackupRestoreScreen(
 
                                         Button(
                                             onClick = {
-                                                scope.launch {
-                                                    isLoading = true
-                                                    loadingMessage = context.getString(R.string.backup_status_packaging)
-                                                    try {
-                                                        val zipFile = backupManager.createFullBackupZip()
-                                                        isLoading = false
-                                                        loadingMessage = null
-                                                        statusMessage = null
-                                                        exportedBackupFile = zipFile
-                                                        showBackupSuccessDialog = true
-                                                    } catch (e: Exception) {
-                                                        isLoading = false
-                                                        loadingMessage = null
-                                                        isStatusSuccess = false
-                                                        statusMessage = context.getString(R.string.backup_export_failed, e.localizedMessage ?: "")
-                                                    }
-                                                }
+                                                viewModel.createFullBackup()
                                             },
                                             modifier = Modifier
                                                 .fillMaxWidth()
@@ -716,34 +687,22 @@ fun BackupRestoreScreen(
 
             if (inspectionResult != null) {
                 ProfileImportDialog(
-                    inspectionResult = inspectionResult!!,
+                    inspectionResult = inspectionResult,
                     onDismiss = {
-                        inspectionResult?.tempDir?.deleteRecursively()
-                        inspectionResult = null
-                        statusMessage = null
+                        viewModel.dismissInspection()
                     },
                     onConfirmImport = { decisions ->
-                        val tempDir = inspectionResult!!.tempDir!!
-                        inspectionResult = null
-                        statusMessage = null
-                        scope.launch {
-                            isLoading = true
-                            loadingMessage = context.getString(R.string.backup_status_restoring)
-                            val result = backupManager.executeSelectiveRestore(tempDir, decisions)
-                            isLoading = false
-                            loadingMessage = null
-                            isStatusSuccess = result.success
-                            statusMessage = result.message
-                            if (result.success) {
-                                Toast.makeText(context, result.message, Toast.LENGTH_LONG).show()
-                                // Guard: Synchronize active UserViewModel profile and widgets after restore to prevent stale in-memory state
-                                withContext(Dispatchers.IO) {
-                                    val updatedUsers = database.userDao().getAllUsersDirect()
-                                    if (updatedUsers.isNotEmpty()) {
-                                        val targetUser = updatedUsers.find { it.isCurrentUser } ?: updatedUsers.first()
-                                        withContext(Dispatchers.Main) {
-                                            userViewModel.setCurrentUser(targetUser)
-                                        }
+                        val tempDir = inspectionResult.tempDir!!
+                        viewModel.executeSelectiveRestore(tempDir, decisions) { result ->
+                            Toast.makeText(context, result.message, Toast.LENGTH_LONG).show()
+                            // Guard: Synchronize active UserViewModel profile and widgets after restore to prevent stale in-memory state
+                            withContext(Dispatchers.IO) {
+                                val database = DosezyDatabase.getInstance(context)
+                                val updatedUsers = database.userDao().getAllUsersDirect()
+                                if (updatedUsers.isNotEmpty()) {
+                                    val targetUser = updatedUsers.find { it.isCurrentUser } ?: updatedUsers.first()
+                                    withContext(Dispatchers.Main) {
+                                        userViewModel.setCurrentUser(targetUser)
                                     }
                                 }
                             }
@@ -791,8 +750,8 @@ fun BackupRestoreScreen(
 }
 
     if (showBackupSuccessDialog && exportedBackupFile != null) {
-        val file = exportedBackupFile!!
-        androidx.compose.ui.window.Dialog(onDismissRequest = { showBackupSuccessDialog = false }) {
+        val file = exportedBackupFile
+        androidx.compose.ui.window.Dialog(onDismissRequest = { viewModel.dismissBackupSuccessDialog() }) {
             Surface(
                 shape = RoundedCornerShape(24.dp),
                 color = MaterialTheme.colorScheme.surface
@@ -897,7 +856,7 @@ fun BackupRestoreScreen(
                             } catch (e: Exception) {
                                 Toast.makeText(context, context.getString(R.string.err_share_failed, e.message ?: ""), Toast.LENGTH_SHORT).show()
                             }
-                            showBackupSuccessDialog = false
+                            viewModel.dismissBackupSuccessDialog()
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -924,7 +883,7 @@ fun BackupRestoreScreen(
 
                     // Close Button
                     OutlinedButton(
-                        onClick = { showBackupSuccessDialog = false },
+                        onClick = { viewModel.dismissBackupSuccessDialog() },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),

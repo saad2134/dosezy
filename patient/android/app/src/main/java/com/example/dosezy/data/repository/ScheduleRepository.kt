@@ -3,6 +3,7 @@ package com.example.dosezy.data.repository
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -85,28 +86,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
     suspend fun autoExtendSchedules(userId: String) {
         try {
             reconcileLegacyScheduleEntries(userId)
-            val medicines = database.medicineDao().getActiveMedicinesByUser(userId).first()
-            medicines.forEach { medicine ->
-                if (!medicine.isArchived) {
-                    val scheduleEntries = database.scheduleDao().getScheduleEntriesByMedicine(medicine.medicineId)
-                    val latestEntry = scheduleEntries.maxByOrNull { it.scheduledDateTime }
-
-                    // If no entries exist, or the latest entry is less than 15 days in the future,
-                    // auto-generate/append next 30 days of schedules
-                    if (latestEntry == null || latestEntry.scheduledDateTime.isBefore(LocalDateTime.now().plusDays(15))) {
-                        val today = LocalDate.now()
-                        val latestDate = latestEntry?.scheduledDateTime?.toLocalDate()
-                        // Guard: Anchor to latestDate rather than plusDays(1) and filter by latestEntry.scheduledDateTime to prevent dropping evening or nocturnal doses
-                        val startGenerateFrom = if (latestDate == null || latestDate.isBefore(today)) today else latestDate
-                        val newEntries = medicine.generateScheduleEntries(startGenerateFrom, 30)
-                            .filter { latestEntry == null || it.scheduledDateTime.isAfter(latestEntry.scheduledDateTime) }
-                        if (newEntries.isNotEmpty()) {
-                            database.scheduleDao().insertScheduleEntries(newEntries)
-                            Log.d(TAG, "Auto-extended schedule for medicine: ${medicine.medicationName} by 30 days starting from $startGenerateFrom")
-                        }
-                    }
-                }
-            }
+            com.example.dosezy.domain.usecases.GenerateSchedulesUseCase(database).autoExtendSchedules(userId)
         } catch (e: Exception) {
             Log.e(TAG, "Error auto-extending schedules for user: $userId", e)
         }
@@ -135,12 +115,28 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             entry.scheduledDateTime.isAfter(activeWindowStart) &&
             entry.scheduledDateTime.isBefore(activeWindowEnd)
         }
+        val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
         entriesToCancel.forEach { entry ->
-            alarmScheduler.cancelAlarm(entry.entryId)
+            // Guard: Pass entry directly to cancelAlarm to bypass sequential blocking DB lookups
+            alarmScheduler.cancelAlarm(entry)
             alarmScheduler.cancelSnooze(entry.entryId)
             alarmScheduler.cancelNagging(entry.entryId)
             alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
+            // Guard: Cancel any active intake safeguard alarms for this entry to prevent orphaned re-alerts
+            alarmScheduler.cancelIntakeSafeguardAlarm(entry.entryId)
+            // Guard: Dismiss active reminder notifications from shade when cancelling medicine alarms
+            nManager?.cancel(entry.entryId.hashCode())
         }
+        // Guard: Dismiss any active refill alert notification for deleted/archived medicine
+        nManager?.cancel((medicineId + "_refill").hashCode())
+        // Guard: Reconcile active ADHD intake countdown notification if active countdown references deleted medicine (#BUG-SAFEGUARD-PARTIAL-COHORT)
+        try {
+            val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
+            if (activeCountdown != null && (scheduleEntries.any { it.entryId == activeCountdown.entryId } || activeCountdown.entryIds.any { id -> scheduleEntries.any { it.entryId == id } })) {
+                val matchingIds = scheduleEntries.map { it.entryId }.filter { activeCountdown.entryIds.contains(it) || it == activeCountdown.entryId }
+                com.example.dosezy.notifications.IntakeSafeguardManager.reconcileCountdown(context, matchingIds)
+            }
+        } catch (_: Exception) {}
         Log.d(TAG, "Cancelled active alarms for medicine ID: $medicineId (${entriesToCancel.size} active entries)")
     }
 
@@ -160,15 +156,14 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             val activeWindowStart = now.minusHours(24)
             val activeWindowEnd = limitTime.plusDays(1)
 
-            // Guard: Only cancel alarms within the active window; looping over months of past history triggers thousands of redundant Binder IPC calls
+            // Guard: Only cancel slot alarms within active window; preserve active snoozes and nagging reminders so rebuilding alarms does not wipe out active snooze timers
             val entriesToCancel = allEntries.filter { entry ->
                 entry.scheduledDateTime.isAfter(activeWindowStart) &&
                 entry.scheduledDateTime.isBefore(activeWindowEnd)
             }
             entriesToCancel.forEach { entry ->
-                alarmScheduler.cancelAlarm(entry.entryId)
-                alarmScheduler.cancelSnooze(entry.entryId)
-                alarmScheduler.cancelNagging(entry.entryId)
+                // Guard: Pass entry directly to cancelAlarm to bypass sequential blocking DB lookups
+                alarmScheduler.cancelAlarm(entry)
                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
             }
 
@@ -257,9 +252,9 @@ class ScheduleRepository(private val database: DosezyDatabase) {
     fun getScheduleForUser(userId: String): Flow<List<ScheduleEntry>> =
         database.scheduleDao().getScheduleForUser(userId)
 
-    // method to get schedules as list (not Flow)
+    // Guard: Use getAllScheduleEntries to execute one-shot query directly without InvalidationTracker Flow observer overhead
     suspend fun getSchedulesByUserSync(userId: String): List<ScheduleEntry> =
-        database.scheduleDao().getScheduleForUser(userId).first()
+        database.scheduleDao().getAllScheduleEntries(userId)
 
     suspend fun insertScheduleEntry(entry: ScheduleEntry) =
         database.scheduleDao().insertScheduleEntry(entry)
@@ -277,6 +272,10 @@ class ScheduleRepository(private val database: DosezyDatabase) {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getScheduleEntryById(entryId: String): ScheduleEntry? {
+        return database.scheduleDao().getScheduleEntryById(entryId)
+    }
+
     suspend fun updateMedicationStatus(entryId: String, status: String, takenAtStr: String?) {
         val takenAt = takenAtStr?.let {
             try { LocalDateTime.parse(it) } catch (_: Exception) { LocalDateTime.now() }
@@ -292,7 +291,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         status: String = "TAKEN_ON_TIME",
         takenAt: LocalDateTime = LocalDateTime.now(),
         context: Context? = null,
-        notes: String? = null
+        notes: String? = null,
+        syncSlotNotification: Boolean = true
     ) {
         // Inspect previous status to prevent double stock deduction
         val previousEntry = database.scheduleDao().getScheduleEntryById(entryId)
@@ -314,18 +314,32 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             try {
                 val medicine = database.medicineDao().getMedicineByIdDirect(previousEntry.medicineId)
                 if (medicine != null && medicine.currentStock != null && medicine.autoDeductOnTake) {
-                    val deductAmount = medicine.getStockDeductionAmount(previousEntry.scheduledDateTime.toLocalTime())
+                    // Guard: Pass previousEntry.dosage to getStockDeductionAmount to prevent inventory calculation drift on custom dose overrides
+                    val deductAmount = medicine.getStockDeductionAmount(previousEntry.scheduledDateTime.toLocalTime(), previousEntry.dosage)
+                    val actualDeducted = minOf(deductAmount, medicine.currentStock)
                     val newStock = (medicine.currentStock - deductAmount).coerceAtLeast(0)
                     val updatedMedicine = medicine.copy(currentStock = newStock)
                     database.medicineDao().updateMedicine(updatedMedicine)
-                    Log.d(TAG, "Decremented stock for ${medicine.medicationName}: ${medicine.currentStock} -> $newStock (deducted $deductAmount)")
+                    Log.d(TAG, "Decremented stock for ${medicine.medicationName}: ${medicine.currentStock} -> $newStock (deducted $actualDeducted of $deductAmount)")
+
+                    // Guard: If partial stock was consumed due to stock exhaustion, record note to inform medical reports and preserve inventory symmetry on undo
+                    if (actualDeducted < deductAmount) {
+                        val partialTag = "[Partial Stock: Took $actualDeducted of $deductAmount]"
+                        val mergedNotes = if (!notes.isNullOrBlank()) "$notes | $partialTag" else partialTag
+                        database.scheduleDao().updateDoseNotes(entryId, mergedNotes)
+                    }
 
                     // Trigger refill warning notification when crossing threshold boundary or running out
                     val threshold = medicine.refillThreshold
-                    val shouldNotifyRefill = threshold != null && ((medicine.currentStock > threshold && newStock <= threshold) || (medicine.currentStock > 0 && newStock == 0))
+                    // Guard: Check medicine.currentStock >= threshold and currentStock > newStock to catch boundary crossings when initial stock equals threshold
+                    val shouldNotifyRefill = threshold != null && ((medicine.currentStock >= threshold && newStock <= threshold && medicine.currentStock > newStock) || (medicine.currentStock > 0 && newStock == 0))
                     if (context != null && shouldNotifyRefill) {
-                        val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
-                        val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
+                        // Guard: Ensure notification channels are registered before posting refill alerts to prevent Android 8.0+ (API 26+) from dropping notifications
+                        com.example.dosezy.notifications.MedicineAlarmReceiver.createNotificationChannels(context)
+                        // Guard: Resolve notification strings using target profile language to prevent English or mismatched language in multi-profile refill alerts (#BUG-REFILL-LOCALE)
+                        val userLang = database.userDao().getUserByIdDirect(previousEntry.userId)?.language
+                            ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+                        val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, userLang)
                         val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
 
                         val contentIntent = android.app.PendingIntent.getActivity(
@@ -333,12 +347,25 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                             (previousEntry.medicineId + "_refill_click").hashCode(),
                             Intent(context, com.example.dosezy.MainActivity::class.java).apply {
                                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                // Guard: Pass target user ID and route to medicines screen so tapping refill alert switches profile and navigates to medication list
+                                putExtra("switch_to_user_id", previousEntry.userId)
+                                putExtra("fragment", "medicines")
                             },
                             android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
                         )
 
-                        val builder = androidx.core.app.NotificationCompat.Builder(context, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
-                            .setSmallIcon(com.example.dosezy.R.drawable.ic_medicine_notification)
+                        // Guard: Instantiate NotificationCompat.Builder with localizedContext so internal resource inflation and layout direction align with target profile locale (#BUG-REFILL-NOTIF-BUILDER)
+                        val refillIconBitmap = if (context != null) {
+                            runCatching { BitmapFactory.decodeResource(context.resources, com.example.dosezy.R.mipmap.ic_launcher) }.getOrNull()
+                        } else null
+
+                        val builder = androidx.core.app.NotificationCompat.Builder(localizedContext, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
+                            .setSmallIcon(com.example.dosezy.R.mipmap.ic_launcher)
+                            .apply {
+                                if (refillIconBitmap != null) {
+                                    setLargeIcon(refillIconBitmap)
+                                }
+                            }
                             .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
                             .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, newStock))
                             .setPriority(androidx.core.app.NotificationCompat.PRIORITY_DEFAULT)
@@ -353,7 +380,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         }
 
         // 4. Synchronize active slot notifications, cancel armed alarms, and update widgets
-        if (context != null) {
+        // Guard: Allow suppressing intermediate slot synchronization during coordinated batch processing (e.g. IntakeSafeguardManager) to avoid redundant notification churn (#BUG-01)
+        if (context != null && syncSlotNotification) {
             syncSlotNotificationAndAlarms(entryId, previousEntry, context)
         }
     }
@@ -364,10 +392,11 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         status: String,
         takenAtStr: String,
         context: Context? = null,
-        notes: String? = null
+        notes: String? = null,
+        syncSlotNotification: Boolean = true
     ) {
         val takenAt = try { LocalDateTime.parse(takenAtStr) } catch (_: Exception) { LocalDateTime.now() }
-        recordDoseTaken(entryId, status, takenAt, context, notes)
+        recordDoseTaken(entryId, status, takenAt, context, notes, syncSlotNotification)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -409,52 +438,85 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
     // Guard: Synchronize slot notification when taking/skipping/missing a dose to prevent dropping cohort reminders or leaving stale shade entries
     @RequiresApi(Build.VERSION_CODES.O)
-    private suspend fun syncSlotNotificationAndAlarms(
+    suspend fun syncSlotNotificationAndAlarms(
         entryId: String,
         entry: ScheduleEntry?,
         context: Context
     ) {
         val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
 
-        // Cancel armed snooze and nagging alarms so taking in-app prevents phantom alarms from ringing later
+        // Guard: Resolve primary cohort ID before cancelling snooze/nagging alarms to prevent wiping membership mapping before notification dismissal (#BUG-SLOT-NULL-ENTRY)
+        val prefs = try {
+            context.getSharedPreferences(
+                AlarmScheduler.PREFS_COORDINATION,
+                Context.MODE_PRIVATE
+            )
+        } catch (_: Exception) { null }
+        val primaryNagging = prefs?.getString("nagging_member_$entryId", null)
+        val primarySnooze = prefs?.getString("snooze_member_$entryId", null)
+        val primaryId = primaryNagging ?: primarySnooze
+
+        // Cancel armed snooze, nagging, and intake safeguard alarms so taking in-app prevents phantom alarms from ringing later
         try {
             val alarmScheduler = AlarmScheduler(context)
             alarmScheduler.cancelSnooze(entryId)
             alarmScheduler.cancelNagging(entryId)
+            // Guard: Cancel intake safeguard re-alert alarm for this entry to prevent sounding alarm after dose was taken (#104)
+            alarmScheduler.cancelIntakeSafeguardAlarm(entryId)
+        } catch (_: Exception) {}
+
+        // Guard: Reconcile active ADHD intake countdown notification if confirmed entry matches active countdown to prevent dropping remaining pending medications (#BUG-SAFEGUARD-PARTIAL-COHORT)
+        try {
+            val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
+            if (activeCountdown != null && (activeCountdown.entryId == entryId || activeCountdown.entryIds.contains(entryId))) {
+                com.example.dosezy.notifications.IntakeSafeguardManager.reconcileCountdown(context, listOf(entryId))
+            }
         } catch (_: Exception) {}
 
         if (nManager != null) {
             try {
-                val prefs = context.getSharedPreferences(
-                    AlarmScheduler.PREFS_COORDINATION,
-                    Context.MODE_PRIVATE
-                )
-                val primaryNagging = prefs.getString("nagging_member_$entryId", null)
-                val primarySnooze = prefs.getString("snooze_member_$entryId", null)
-                val primaryId = primaryNagging ?: primarySnooze
-
                 if (entry != null) {
                     val slotMillis = entry.scheduledDateTime.withSecond(0).withNano(0)
                         .atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
                     val slotEntries = database.scheduleDao().getScheduleForDateRangeDirect(entry.userId, slotMillis, slotMillis + 59999L)
-                    val remainingPending = slotEntries.filter { it.status == MedicationStatus.PENDING && it.entryId != entryId }
+                    // Guard: Include entry in remainingPending if its status is PENDING (e.g. on undo) so cohort notification is restored (#BUG-03)
+                    val remainingPending = slotEntries.filter { !it.entryId.startsWith("PRN_") && it.status == MedicationStatus.PENDING && (entry.status == MedicationStatus.PENDING || it.entryId != entryId) }
 
                     if (remainingPending.isEmpty()) {
+                        // Guard: Cancel exact slot alarm and entry alarms from AlarmManager when all slot doses are resolved to remove lockscreen alarm icon and prevent phantom CPU wakeups
+                        // Guard: Disarm snooze, nagging, and intake safeguard alarms for all sibling slot entries to prevent phantom Doze wakeups (#BUG-SIBLING-CLEANUP)
+                        try {
+                            val alarmScheduler = AlarmScheduler(context)
+                            alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
+                            slotEntries.forEach { slotEntry ->
+                                alarmScheduler.cancelAlarm(slotEntry)
+                                alarmScheduler.cancelSnooze(slotEntry.entryId)
+                                alarmScheduler.cancelNagging(slotEntry.entryId)
+                                alarmScheduler.cancelIntakeSafeguardAlarm(slotEntry.entryId)
+                            }
+                        } catch (_: Exception) {}
+
                         // All medications in this slot are handled: cancel notification for entry, primary, and all slot items
                         nManager.cancel(entryId.hashCode())
                         if (primaryId != null) nManager.cancel(primaryId.hashCode())
                         slotEntries.forEach { nManager.cancel(it.entryId.hashCode()) }
                     } else {
                         // Other medications remain pending in this slot; update active notification to remove taken medication
-                        val hasActiveNotification = try {
+                        // Guard: Check active notifications against all slot entry IDs and stored primaryId; if entry is PENDING on today's schedule, force active alert restoration (#BUG-03, #BUG-UNDO-PAST-DATE)
+                        val isScheduledToday = entry.scheduledDateTime.toLocalDate() == java.time.LocalDate.now()
+                        val hasActiveNotification = (entry.status == MedicationStatus.PENDING && isScheduledToday) || try {
                             val active = nManager.activeNotifications
-                            active.any { it.id == entryId.hashCode() || (primaryId != null && it.id == primaryId.hashCode()) }
+                            active.any { notif ->
+                                slotEntries.any { it.entryId.hashCode() == notif.id } || (primaryId != null && notif.id == primaryId.hashCode())
+                            }
                         } catch (_: Exception) { false }
 
+                        // Guard: Cancel prior notifications for the taken entry, stored primary, and all slot items before re-issuing cohort notification to prevent orphan/duplicate notifications in shade
                         nManager.cancel(entryId.hashCode())
-                        if (primaryId != null && primaryId == entryId) {
+                        if (primaryId != null) {
                             nManager.cancel(primaryId.hashCode())
                         }
+                        slotEntries.forEach { nManager.cancel(it.entryId.hashCode()) }
 
                         if (hasActiveNotification) {
                             val newPrimary = remainingPending.first()
@@ -470,8 +532,9 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                             val activeEntryIds = ArrayList(remainingPending.map { it.entryId })
 
                             val user = database.userDao().getUserByIdDirect(entry.userId)
-                            val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
-                            val currentLocale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLanguage)
+                            // Guard: Derive locale from user's explicit profile language so scheduled time matches profile preferences (#BUG-NOTIF-LOCALE)
+                            val targetLanguage = user?.language ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+                            val currentLocale = com.example.dosezy.utils.LocaleHelper.getLocale(targetLanguage)
                             val formattedScheduledTime = if (user != null) {
                                 try {
                                     com.example.dosezy.utils.TimeFormatUtils.formatTime(newPrimary.scheduledDateTime, user.timeFormat, currentLocale)
@@ -486,17 +549,53 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                                 medicineNames = activeMedNames,
                                 medicineDetails = medDetails,
                                 scheduledTime = formattedScheduledTime,
-                                snoozeMinutes = user?.snoozeDuration ?: 10
+                                snoozeMinutes = user?.snoozeDuration ?: 10,
+                                userId = entry.userId,
+                                userLanguage = user?.language
                             )
+
+                            // Guard: Re-arm nagging reminder only if undone dose belongs to today's schedule and nagging reminders are enabled to prevent phantom alarms for historical past-date doses (#BUG-03, #BUG-UNDO-PAST-DATE)
+                            if (entry.status == MedicationStatus.PENDING && isScheduledToday && user != null && user.naggingRemindersEnabled && entry.scheduledDateTime.isBefore(LocalDateTime.now())) {
+                                try {
+                                    val alarmScheduler = AlarmScheduler(context)
+                                    alarmScheduler.scheduleNaggingReminder(
+                                        entryId = newPrimary.entryId,
+                                        minutes = user.naggingIntervalMinutes,
+                                        medicineName = effectiveMedName,
+                                        naggingCount = 1,
+                                        entryIds = activeEntryIds,
+                                        medicineNames = activeMedNames,
+                                        scheduledTime = formattedScheduledTime,
+                                        userId = newPrimary.userId
+                                    )
+                                } catch (ex: Exception) {
+                                    Log.e(TAG, "Error scheduling nagging reminder on undoDoseTaken", ex)
+                                }
+                            }
                         }
                     }
                 } else {
+                    // Guard: When entry is null (deleted or invalid), disarm alarms and cancel notification (#BUG-SLOT-NULL-ENTRY)
+                    try {
+                        val alarmScheduler = AlarmScheduler(context)
+                        alarmScheduler.cancelAlarm(entryId)
+                        alarmScheduler.cancelSnooze(entryId)
+                        alarmScheduler.cancelNagging(entryId)
+                        alarmScheduler.cancelIntakeSafeguardAlarm(entryId)
+                        if (primaryId != null) {
+                            alarmScheduler.cancelAlarm(primaryId)
+                            alarmScheduler.cancelSnooze(primaryId)
+                            alarmScheduler.cancelNagging(primaryId)
+                            alarmScheduler.cancelIntakeSafeguardAlarm(primaryId)
+                        }
+                    } catch (_: Exception) {}
                     nManager.cancel(entryId.hashCode())
                     if (primaryId != null) nManager.cancel(primaryId.hashCode())
                 }
             } catch (ex: Exception) {
                 Log.e(TAG, "Error synchronizing slot notification in ScheduleRepository", ex)
                 try { nManager.cancel(entryId.hashCode()) } catch (_: Exception) {}
+                if (primaryId != null) try { nManager.cancel(primaryId.hashCode()) } catch (_: Exception) {}
             }
         }
 
@@ -515,7 +614,12 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         if (entryId.startsWith("PRN_")) {
             database.scheduleDao().deleteScheduleEntry(entryId)
         } else {
-            database.scheduleDao().resetScheduleEntryToPending(entryId)
+            // Guard: Strip automated partial stock tag while preserving user-authored clinical notes (#BUG-04)
+            val cleanedNotes = previousEntry?.doseNotes
+                ?.replace(Regex("\\[Partial Stock: Took \\d+ of \\d+\\]"), "")
+                ?.trim(' ', '|', '-')
+                ?.ifBlank { null }
+            database.scheduleDao().resetScheduleEntryToPendingWithNotes(entryId, cleanedNotes)
         }
 
         // 2. Revert stock auto-decrement only if previously taken
@@ -523,26 +627,55 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             try {
                 val medicine = database.medicineDao().getMedicineByIdDirect(previousEntry.medicineId)
                 if (medicine != null && medicine.currentStock != null && medicine.autoDeductOnTake) {
-                    val addAmount = medicine.getStockDeductionAmount(previousEntry.scheduledDateTime.toLocalTime())
+                    // Guard: Check for partial stock tag in doseNotes to restore only the quantity actually consumed and prevent artificial inventory inflation
+                    val partialMatch = previousEntry.doseNotes?.let { Regex("\\[Partial Stock: Took (\\d+) of (\\d+)\\]").find(it) }
+                    val actualConsumed = partialMatch?.groupValues?.getOrNull(1)?.toIntOrNull()
+                    val addAmount = actualConsumed ?: medicine.getStockDeductionAmount(previousEntry.scheduledDateTime.toLocalTime(), previousEntry.dosage)
                     val restoredStock = medicine.currentStock + addAmount
                     val updatedMedicine = medicine.copy(currentStock = restoredStock)
                     database.medicineDao().updateMedicine(updatedMedicine)
                     Log.d(TAG, "Restored stock for ${medicine.medicationName}: ${medicine.currentStock} -> $restoredStock on undo (restored $addAmount)")
+
+                    // Guard: Dismiss active refill alert notification from shade when undo restores inventory above refill threshold
+                    if (restoredStock > (medicine.refillThreshold ?: 0)) {
+                        val nManager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
+                        nManager?.cancel((previousEntry.medicineId + "_refill").hashCode())
+                    }
                 }
             } catch (ex: Exception) {
                 Log.e(TAG, "Error reverting stock in undoDoseTaken", ex)
             }
         }
 
-        // 3. Update app widgets
-        if (context != null) {
-            // Guard: Reschedule alarms for upcoming doses so undoing a mistakenly marked dose restores future AlarmManager reminders
-            if (previousEntry != null && previousEntry.scheduledDateTime.isAfter(LocalDateTime.now())) {
+        // 3. Update app widgets and alarms
+        if (context != null && previousEntry != null) {
+            val now = LocalDateTime.now()
+            val isScheduledToday = previousEntry.scheduledDateTime.toLocalDate() == java.time.LocalDate.now()
+            if (previousEntry.scheduledDateTime.isAfter(now)) {
+                // Guard: Reschedule alarms for upcoming doses so undoing a mistakenly marked future dose restores future AlarmManager reminders
                 try {
                     rescheduleAllAlarms(previousEntry.userId, context)
                 } catch (e: Exception) {
                     Log.e(TAG, "Error rescheduling alarms on undoDoseTaken", e)
                 }
+            } else if (isScheduledToday) {
+                // Guard: Re-post shade notification and re-arm reminder for current or overdue undone dose on today's schedule (#BUG-03, #BUG-UNDO-PAST-DATE)
+                try {
+                    syncSlotNotificationAndAlarms(entryId, previousEntry.copy(status = MedicationStatus.PENDING), context)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error resyncing slot notification on undoDoseTaken", e)
+                }
+            } else {
+                // Guard: For historical past-date doses, disarm any lingering notifications or alarms without posting new ones (#BUG-UNDO-PAST-DATE)
+                try {
+                    val alarmScheduler = AlarmScheduler(context)
+                    alarmScheduler.cancelAlarm(previousEntry)
+                    alarmScheduler.cancelNagging(previousEntry.entryId)
+                    alarmScheduler.cancelSnooze(previousEntry.entryId)
+                    alarmScheduler.cancelIntakeSafeguardAlarm(previousEntry.entryId)
+                    val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
+                    nManager?.cancel(previousEntry.entryId.hashCode())
+                } catch (_: Exception) {}
             }
             try {
                 com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
@@ -561,7 +694,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         dateTime: LocalDateTime = LocalDateTime.now(),
         context: Context? = null
     ) {
-        val entryId = "PRN_${medicine.medicineId}_${System.currentTimeMillis()}"
+        // Guard: Append random UUID suffix to prevent primary key collision and silent record overwrite on rapid PRN logging
+        val entryId = "PRN_${medicine.medicineId}_${System.currentTimeMillis()}_${java.util.UUID.randomUUID().toString().take(8)}"
         val entry = ScheduleEntry(
             entryId = entryId,
             userId = userId,
@@ -577,26 +711,51 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         val freshMedicine = database.medicineDao().getMedicineByIdDirect(medicine.medicineId) ?: medicine
         if (freshMedicine.currentStock != null && freshMedicine.autoDeductOnTake) {
             val deductAmount = freshMedicine.getStockDeductionAmount(dateTime.toLocalTime())
+            val actualDeducted = minOf(deductAmount, freshMedicine.currentStock)
             val newStock = (freshMedicine.currentStock - deductAmount).coerceAtLeast(0)
             val updatedMedicine = freshMedicine.copy(currentStock = newStock)
             database.medicineDao().updateMedicine(updatedMedicine)
 
+            // Guard: Record partial stock tag on as-needed dose when stock is exhausted to preserve inventory audit trail
+            if (actualDeducted < deductAmount) {
+                val partialTag = "[Partial Stock: Took $actualDeducted of $deductAmount]"
+                database.scheduleDao().updateDoseNotes(entryId, partialTag)
+            }
+
             val threshold = freshMedicine.refillThreshold
-            val shouldNotifyRefill = threshold != null && ((freshMedicine.currentStock > threshold && newStock <= threshold) || (freshMedicine.currentStock > 0 && newStock == 0))
+            // Guard: Check freshMedicine.currentStock >= threshold and currentStock > newStock to catch boundary crossings when initial stock equals threshold
+            val shouldNotifyRefill = threshold != null && ((freshMedicine.currentStock >= threshold && newStock <= threshold && freshMedicine.currentStock > newStock) || (freshMedicine.currentStock > 0 && newStock == 0))
             if (context != null && shouldNotifyRefill) {
-                val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
-                val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, savedLanguage)
+                // Guard: Ensure notification channels are registered before posting refill alerts to prevent Android 8.0+ (API 26+) from dropping notifications
+                com.example.dosezy.notifications.MedicineAlarmReceiver.createNotificationChannels(context)
+                // Guard: Resolve notification strings using target profile language to prevent English or mismatched language in multi-profile refill alerts (#BUG-REFILL-LOCALE)
+                val userLang = database.userDao().getUserByIdDirect(freshMedicine.userId)?.language
+                    ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+                val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, userLang)
                 val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
                 val contentIntent = android.app.PendingIntent.getActivity(
                     context,
                     (freshMedicine.medicineId + "_refill_click").hashCode(),
                     Intent(context, com.example.dosezy.MainActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        // Guard: Pass target user ID and route to medicines screen so tapping refill alert switches profile and navigates to medication list
+                        putExtra("switch_to_user_id", freshMedicine.userId)
+                        putExtra("fragment", "medicines")
                     },
                     android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
                 )
-                val builder = androidx.core.app.NotificationCompat.Builder(context, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
-                    .setSmallIcon(com.example.dosezy.R.drawable.ic_medicine_notification)
+                // Guard: Instantiate NotificationCompat.Builder with localizedContext so internal resource inflation and layout direction align with target profile locale (#BUG-REFILL-NOTIF-BUILDER)
+                val refillIconBitmap = if (context != null) {
+                    runCatching { BitmapFactory.decodeResource(context.resources, com.example.dosezy.R.mipmap.ic_launcher) }.getOrNull()
+                } else null
+
+                val builder = androidx.core.app.NotificationCompat.Builder(localizedContext, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
+                    .setSmallIcon(com.example.dosezy.R.mipmap.ic_launcher)
+                    .apply {
+                        if (refillIconBitmap != null) {
+                            setLargeIcon(refillIconBitmap)
+                        }
+                    }
                     .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, freshMedicine.medicationName))
                     .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, newStock))
                     .setPriority(androidx.core.app.NotificationCompat.PRIORITY_DEFAULT)

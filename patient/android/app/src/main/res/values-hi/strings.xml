@@ -451,6 +451,7 @@
     <string name="to_be_taken_in">%1$dघंटे %2$dमिनट में लेनी है</string>
     <string name="time_diff_ago">%1$dघंटे %2$dमिनट पहले</string>
     <string name="status_all_medications_taken">सभी दवाएं ले ली गईं</string>
+    <string name="status_slot_completed_with_skipped">पूर्ण (कुछ छोड़ दिए गए)</string>
     <string name="status_scheduled_for_this_time">इस समय के लिए निर्धारित</string>
     <string name="daily_frequency_presets_title">दैनिक आवृत्ति प्रीसेट</string>
     <string name="action_edit_medicine_cd">दवा संपादित करें</string>
@@ -585,7 +586,7 @@
     <string name="alarm_duration_1m">1 मिनट</string>
     <string name="alarm_duration_2m">2 मिनट</string>
     <string name="alarm_duration_5m">5 मिनट</string>
-    <string name="alarm_silenced_auto_banner">अलार्म स्वतः म्यूट हो गया — तैयार होने पर अपनी दवाएं दर्ज करें</string>
+    <string name="alarm_silenced_auto_banner">अलार्म स्वतः म्यूट हो गया - तैयार होने पर अपनी दवाएं दर्ज करें</string>
 
     <string name="alarm_sound_custom">कस्टम ऑडियो फ़ाइल</string>
     <string name="alarm_sound_select_file">ऑडियो फ़ाइल चुनें</string>
@@ -801,7 +802,7 @@
     <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
     <string name="pref_section_appearance">रूप-रंग</string>
     <string name="pref_slide_actions_title">दवा लेने और स्नूज़ के लिए स्लाइड करें</string>
-    <string name="pref_slide_actions_desc">अलार्म में खुराक लेने या स्नूज़ करने के लिए टैप के बजाय स्लाइड करना आवश्यक है।</string>
+    <string name="pref_slide_actions_desc">दवा लेने या स्नूज़ करने के लिए टैप करने के बजाय स्लाइड करें।</string>
     <string name="pref_timeline_mode_title">टाइमलाइन दृश्य</string>
     <string name="pref_timeline_mode_desc">आज का शेड्यूल एक स्पष्ट लंबवत टाइमलाइन में देखें।</string>
     <string name="pref_calendar_thicker_highlight_title">पूर्ण फ्रेम दिवस हाइलाइट</string>
@@ -811,4 +812,65 @@
     <string name="alarm_slide_to_snooze">स्नूज़ के लिए स्लाइड करें (%1$d मि)</string>
     <string name="home_view_standard">मानक</string>
     <string name="home_view_timeline">टाइमलाइन</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">स्नूज़ करें:</string>
+    <string name="snooze_duration_chip_format">%1$d मि</string>
+    <string name="pref_custom_snooze_title">कस्टम स्नूज़ विकल्प</string>
+    <string name="pref_custom_snooze_desc">अलार्म बजने पर विभिन्न स्नूज़ अवधि में से चुनें।</string>
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">दवा सेवन उलटी गिनती सुरक्षा</string>
+    <string name="pref_intake_safeguard_desc">ADHD सहायता: दवा सेवन पुष्टि से पहले उलटी गिनती बफर और ध्यान भटकने पर पुनः चेतावनी।</string>
+    <string name="pref_intake_duration_title">सुरक्षा अवधि</string>
+    <string name="pref_intake_duration_format">%1$d मिनट</string>
+    <string name="dialog_intake_duration_title">सुरक्षा अवधि चुनें</string>
+    <string name="notif_intake_in_progress_title">दवा सेवन प्रगति पर है</string>
+    <string name="notif_intake_in_progress_desc">%1$s: लेने के बाद पुष्टि करें</string>
+    <string name="notif_intake_action_confirm">पुष्टि करें</string>
+    <string name="notif_intake_action_extend">+1 मिनट</string>
+    <string name="notif_intake_action_cancel">रद्द करें</string>
+    <string name="notif_intake_realert_title">दवा की पुष्टि नहीं हुई</string>
+    <string name="notif_intake_realert_desc">क्या आपने %1$s ली? सेवन की पुष्टि करने या स्नूज़ करने के लिए टैप करें।</string>
+    <string name="home_intake_in_progress">%1$s का सेवन प्रगति पर है</string>
+    <string name="home_intake_time_remaining">%1$s शेष</string>
+    <string name="home_intake_confirm">पुष्टि करें</string>
+    <string name="home_intake_extend">+1 मिनट</string>
+    <string name="home_intake_cancel">रद्द करें</string>
+    <string name="home_intake_confirmed">%1$s का सेवन दर्ज किया गया</string>
+    <string name="home_intake_cancelled">दवा सेवन सुरक्षा रद्द की गई</string>
+    <string name="alarm_realert_badge">ADHD दवा सेवन पुनः चेतावनी</string>
+    <string name="alarm_realert_subtitle">आपने पहले लिया पर टैप किया था, लेकिन सेवन की पुष्टि नहीं हुई। क्या आपने अपनी दवा ली?</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">सभी लें</string>
+    <string name="take_all_count">सभी लें (%1$d)</string>
+    <string name="dialog_take_all_title">सभी दवाएं लें?</string>
+    <string name="dialog_take_all_message">%2$s के लिए निर्धारित सभी %1$d दवाओं को लिया गया चिह्नित करें?</string>
+    <string name="take_all_success_toast">सभी %1$d दवाओं को लिया गया चिह्नित किया गया</string>
+
+    <!-- Legal, Privacy & Compliance Safeguards -->
+    <string name="notif_generic_lockscreen_reminder">निर्धारित दवा अनुस्मारक</string>
+    <string name="pref_lockscreen_details_title">लॉक स्क्रीन पर विवरण दिखाएं</string>
+    <string name="pref_lockscreen_details_desc">डिवाइस अनलॉक होने तक दवा का नाम और खुराक छिपाएं।</string>
+    <string name="disclaimer_dialog_title">चिकित्सा एवं कानूनी अस्वीकरण</string>
+    <string name="disclaimer_dialog_summary">डोज़ीज़ी एक स्वचालित डिजिटल रिमाइंडर उपकरण है और यह कोई प्रमाणित मेडिकल डिवाइस नहीं है। यह नैदानिक परामर्श, खुराक गणना या चिकित्सा सलाह प्रदान नहीं करता है। दवा संबंधी निर्देशों के लिए हमेशा अपने चिकित्सक से परामर्श लें।</string>
+    <string name="disclaimer_checkbox_consent">मैं चिकित्सा अस्वीकरण और सेवा की शर्तों को समझता/समझती हूं और स्वीकार करता/करती हूं।</string>
+    <string name="disclaimer_action_agree">स्वीकार करें और जारी रखें</string>
+    <string name="disclaimer_link_medical">चिकित्सा अस्वीकरण</string>
+    <string name="disclaimer_link_privacy">गोपनीयता नीति</string>
+    <string name="disclaimer_link_terms">सेवा की शर्तें</string>
+    <string name="emergency_dispatch_warning_title">आपातकालीन सूचना</string>
+    <string name="emergency_dispatch_warning_desc">डोज़ीज़ी कोई आपातकालीन सेवा प्रदाता नहीं है और 112/911 का विकल्प नहीं है। गंभीर स्थिति में सीधे स्थानीय आपातकालीन सेवाओं को कॉल करें। जांचें कि नंबर आपके क्षेत्र से मेल खाता है।</string>
+    <string name="pdf_report_disclaimer_footer">डोज़ीज़ी दवा ट्रैकर • स्व-रिपोर्टेड सूचनात्मक लॉग (गैर-चिकित्सकीय)</string>
+    <string name="pharmacy_refill_estimation_disclaimer">सूचना: रिफिल मात्रा दर्ज आवृत्ति पर आधारित अनुमान है। अपने फार्मासिस्ट या चिकित्सक से सत्यापित करें।</string>
+    <string name="alarm_unlock_to_view_details">विवरण देखने के लिए अनलॉक करें</string>
+    <string name="alarm_lockscreen_details_hidden">डिवाइस लॉक होने पर दवा का नाम और खुराक छिपी रहती है।</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">शेड्यूल परिवर्तन लागू करें</string>
+    <string name="schedule_effective_dialog_message">यह अपडेट किया गया शेड्यूल कब से प्रभावी होना चाहिए?</string>
+    <string name="schedule_effective_today_title">आज से शुरू करें</string>
+    <string name="schedule_effective_today_desc">आज से नए समय लागू करें। आज की पुरानी बिना ली गई खुराकें हटा दी जाएंगी।</string>
+    <string name="schedule_effective_tomorrow_title">कल से शुरू करें</string>
+    <string name="schedule_effective_tomorrow_desc">आज का शेड्यूल वैसा ही रखें। नया शेड्यूल कल से शुरू होगा।</string>
 </resources>

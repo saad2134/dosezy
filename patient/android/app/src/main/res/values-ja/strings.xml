@@ -435,6 +435,7 @@
     <string name="to_be_taken_in">%1$d時間%2$d分後に服用</string>
     <string name="time_diff_ago">%1$d時間%2$d分前</string>
     <string name="status_all_medications_taken">すべての薬を服用済み</string>
+    <string name="status_slot_completed_with_skipped">完了 (一部スキップ)</string>
     <string name="status_scheduled_for_this_time">この時間に予定されています</string>
     <string name="daily_frequency_presets_title">1日の服用頻度プリセット</string>
     <string name="action_edit_medicine_cd">薬を編集</string>
@@ -569,7 +570,7 @@
     <string name="alarm_duration_1m">1 分</string>
     <string name="alarm_duration_2m">2 分</string>
     <string name="alarm_duration_5m">5 分</string>
-    <string name="alarm_silenced_auto_banner">アラームは自動停止しました — 準備ができたら服薬を記録してください</string>
+    <string name="alarm_silenced_auto_banner">アラームは自動停止しました - 準備ができたら服薬を記録してください</string>
 
     <string name="alarm_sound_custom">カスタム音声ファイル</string>
     <string name="alarm_sound_select_file">音声ファイルを選択</string>
@@ -785,7 +786,7 @@
     <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
     <string name="pref_section_appearance">外観</string>
     <string name="pref_slide_actions_title">スライドして服用・スヌーズ</string>
-    <string name="pref_slide_actions_desc">アラーム時に誤タップを防ぐため、スライド操作で服用またはスヌーズを実行します。</string>
+    <string name="pref_slide_actions_desc">タップの代わりにスライドして服用またはスヌーズします。</string>
     <string name="pref_timeline_mode_title">タイムライン表示</string>
     <string name="pref_timeline_mode_desc">今日のスケジュールを見やすい縦型タイムライン形式で表示します。</string>
     <string name="pref_calendar_thicker_highlight_title">カレンダーの日枠表示</string>
@@ -795,4 +796,65 @@
     <string name="alarm_slide_to_snooze">スライドしてスヌーズ (%1$d分)</string>
     <string name="home_view_standard">標準</string>
     <string name="home_view_timeline">タイムライン</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">スヌーズ時間:</string>
+    <string name="snooze_duration_chip_format">%1$d分</string>
+    <string name="pref_custom_snooze_title">カスタムスヌーズ設定</string>
+    <string name="pref_custom_snooze_desc">アラーム鳴動時に複数のスヌーズ時間から選択できます。</string>
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">服用カウントダウン保護</string>
+    <string name="pref_intake_safeguard_desc">ADHD支援: 服用確認前のカウントダウン待機時間と注意散漫時の再アラート機能。</string>
+    <string name="pref_intake_duration_title">保護時間</string>
+    <string name="pref_intake_duration_format">%1$d分</string>
+    <string name="dialog_intake_duration_title">保護時間の選択</string>
+    <string name="notif_intake_in_progress_title">服用進行中</string>
+    <string name="notif_intake_in_progress_desc">%1$s: 服用後に確認してください</string>
+    <string name="notif_intake_action_confirm">服用を確認</string>
+    <string name="notif_intake_action_extend">+1分</string>
+    <string name="notif_intake_action_cancel">キャンセル</string>
+    <string name="notif_intake_realert_title">薬の服用が未確認です</string>
+    <string name="notif_intake_realert_desc">%1$sを服用しましたか？タップして確認またはスヌーズしてください。</string>
+    <string name="home_intake_in_progress">%1$sの服用が進行中</string>
+    <string name="home_intake_time_remaining">残り %1$s</string>
+    <string name="home_intake_confirm">服用を確認</string>
+    <string name="home_intake_extend">+1分</string>
+    <string name="home_intake_cancel">キャンセル</string>
+    <string name="home_intake_confirmed">%1$sの服用を記録しました</string>
+    <string name="home_intake_cancelled">服用保護をキャンセルしました</string>
+    <string name="alarm_realert_badge">ADHD服用再アラート</string>
+    <string name="alarm_realert_subtitle">先ほど「服用」をタップしましたが、服用が確認されていません。薬を飲みましたか？</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">すべて服用</string>
+    <string name="take_all_count">すべて服用 (%1$d)</string>
+    <string name="dialog_take_all_title">すべての薬を服用しますか？</string>
+    <string name="dialog_take_all_message">%2$sに予定されているすべての薬 (%1$d件) を服用済みにしますか？</string>
+    <string name="take_all_success_toast">すべての薬 (%1$d件) を服用済みにしました</string>
+
+    <!-- Legal, Privacy & Compliance Safeguards -->
+    <string name="notif_generic_lockscreen_reminder">予定された服薬リマインダー</string>
+    <string name="pref_lockscreen_details_title">ロック画面に詳細を表示</string>
+    <string name="pref_lockscreen_details_desc">端末のロック解除まで薬の名前と用量を非表示にします。</string>
+    <string name="disclaimer_dialog_title">医療および法的免責事項</string>
+    <string name="disclaimer_dialog_summary">Dosezyは自動服薬スケジュール補助ツールであり、医療機器ではありません。診断、用量計算、または医学的アドバイスは提供しません。処方薬の服用指示については必ず医師または薬剤師にご相談ください。</string>
+    <string name="disclaimer_checkbox_consent">医療免責事項および利用規約を理解し、同意します。</string>
+    <string name="disclaimer_action_agree">同意して続行</string>
+    <string name="disclaimer_link_medical">医療免責事項</string>
+    <string name="disclaimer_link_privacy">プライバシーポリシー</string>
+    <string name="disclaimer_link_terms">利用規約</string>
+    <string name="emergency_dispatch_warning_title">緊急連絡に関する注意事項</string>
+    <string name="emergency_dispatch_warning_desc">Dosezyは緊急通報機関ではなく、110/119等の代替手段ではありません。生命の危険がある場合は直ちに地域の緊急通報を行ってください。表示番号が現在地に対応しているかご確認ください。</string>
+    <string name="pdf_report_disclaimer_footer">Dosezy 服薬トラッカー • 自己申告情報ログ（非臨床記録）</string>
+    <string name="pharmacy_refill_estimation_disclaimer">注：補充薬の数量は登録された頻度に基づく概算です。正確な数量は薬剤師または医師にご確認ください。</string>
+    <string name="alarm_unlock_to_view_details">ロックを解除して詳細を表示</string>
+    <string name="alarm_lockscreen_details_hidden">端末のロック中は薬の名前と用量が非表示になります。</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">スケジュールの変更を適用</string>
+    <string name="schedule_effective_dialog_message">この更新されたスケジュールはいつから有効にしますか？</string>
+    <string name="schedule_effective_today_title">今日から適用</string>
+    <string name="schedule_effective_today_desc">今日から新しい時間を適用します。今日の過去の未服薬分は削除されます。</string>
+    <string name="schedule_effective_tomorrow_title">明日から適用</string>
+    <string name="schedule_effective_tomorrow_desc">今日のスケジュールをそのまま維持します。新しいスケジュールは明日から始まります。</string>
 </resources>

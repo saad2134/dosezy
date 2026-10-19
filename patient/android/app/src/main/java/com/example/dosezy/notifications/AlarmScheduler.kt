@@ -14,6 +14,8 @@ import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.data.model.TimeFormat
 import java.time.LocalDateTime
 import java.time.ZoneId
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 
 class AlarmScheduler(private val context: Context) {
 
@@ -30,6 +32,51 @@ class AlarmScheduler(private val context: Context) {
             alarmManager.canScheduleExactAlarms()
         } else {
             true
+        }
+    }
+
+    // Guard: Route alarm clock click to schedule screen under the specific target user profile to prevent taking medicines under the wrong user
+    private fun createAlarmClockShowIntent(
+        requestCode: Int,
+        targetUserId: String? = null
+    ): PendingIntent {
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            targetUserId?.let { putExtra("switch_to_user_id", it) }
+            putExtra("fragment", "schedule")
+        }
+        return PendingIntent.getActivity(
+            context,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+
+    private fun resolveUserId(entryId: String): String? {
+        return try {
+            val db = com.example.dosezy.data.DosezyDatabase.getInstance(context)
+            runBlocking {
+                withTimeoutOrNull(300L) {
+                    db.scheduleDao().getScheduleEntryById(entryId)?.userId
+                }
+            }
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun resolveUserLanguage(userId: String?): com.example.dosezy.data.model.Language {
+        if (userId == null) return com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+        return try {
+            val db = com.example.dosezy.data.DosezyDatabase.getInstance(context)
+            runBlocking {
+                withTimeoutOrNull(300L) {
+                    db.userDao().getUserByIdDirect(userId)?.language
+                }
+            } ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+        } catch (_: Exception) {
+            com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
         }
     }
 
@@ -58,11 +105,11 @@ class AlarmScheduler(private val context: Context) {
         val medNames = ArrayList(medicineNames)
         val cleanDateTime = scheduledDateTime.withSecond(0).withNano(0)
 
-        // Guard: Format scheduled time respecting 24h vs 12h user preference and active locale instead of hardcoded 12h pattern
+        // Guard: Format scheduled time respecting 24h vs 12h user preference and active profile locale instead of hardcoded 12h pattern
         val is24 = timeFormat == TimeFormat.HOUR_24 || (timeFormat == null && android.text.format.DateFormat.is24HourFormat(context))
         val pattern = if (is24) "HH:mm" else "h:mm a"
-        val savedLang = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
-        val locale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLang)
+        val targetLang = resolveUserLanguage(entries.firstOrNull()?.userId)
+        val locale = com.example.dosezy.utils.LocaleHelper.getLocale(targetLang)
         val timeFormatted = cleanDateTime.format(java.time.format.DateTimeFormatter.ofPattern(pattern, locale))
         val slotKey = "${entries.first().userId}_${cleanDateTime}"
 
@@ -89,11 +136,9 @@ class AlarmScheduler(private val context: Context) {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
-            val showIntent = PendingIntent.getActivity(
-                context,
+            val showIntent = createAlarmClockShowIntent(
                 slotKey.hashCode() + 500,
-                Intent(context, MainActivity::class.java),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                entries.firstOrNull()?.userId
             )
             alarmManager.setAlarmClock(
                 AlarmManager.AlarmClockInfo(triggerTime, showIntent),
@@ -123,8 +168,8 @@ class AlarmScheduler(private val context: Context) {
     }
 
     @SuppressLint("ScheduleExactAlarm")
-    fun scheduleSnooze(entryId: String, minutes: Int, medicineName: String, timeFormat: TimeFormat? = null) {
-        scheduleGroupedSnooze(listOf(entryId), minutes, listOf(medicineName), timeFormat = timeFormat)
+    fun scheduleSnooze(entryId: String, minutes: Int, medicineName: String, timeFormat: TimeFormat? = null, userId: String? = null) {
+        scheduleGroupedSnooze(listOf(entryId), minutes, listOf(medicineName), timeFormat = timeFormat, userId = userId)
     }
 
     @SuppressLint("ScheduleExactAlarm")
@@ -133,7 +178,8 @@ class AlarmScheduler(private val context: Context) {
         minutes: Int,
         medicineNames: List<String>,
         explicitTriggerTime: Long? = null,
-        timeFormat: TimeFormat? = null
+        timeFormat: TimeFormat? = null,
+        userId: String? = null
     ) {
         if (entryIds.isEmpty()) return
         val primaryId = entryIds.first()
@@ -141,11 +187,13 @@ class AlarmScheduler(private val context: Context) {
 
         // Guard: Support explicitTriggerTime so transferred group alarms preserve exact original target timestamp
         val triggerTime = explicitTriggerTime ?: (System.currentTimeMillis() + (minutes * 60 * 1000))
-        // Guard: Format snooze time respecting 24h vs 12h user preference and active locale instead of hardcoded 12h pattern
+        // Guard: Format snooze time respecting 24h vs 12h user preference and active profile locale instead of hardcoded 12h pattern
         val is24 = timeFormat == TimeFormat.HOUR_24 || (timeFormat == null && android.text.format.DateFormat.is24HourFormat(context))
         val pattern = if (is24) "HH:mm" else "h:mm a"
-        val savedLang = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
-        val locale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLang)
+        // Guard: Resolve profile language when userId or entryId is available so snooze time formatting matches profile locale (#BUG-SNOOZE-TIME-LOCALE)
+        val targetUserId = userId ?: resolveUserId(primaryId)
+        val targetLang = resolveUserLanguage(targetUserId)
+        val locale = com.example.dosezy.utils.LocaleHelper.getLocale(targetLang)
         val snoozeTimeFormatted = java.text.SimpleDateFormat(pattern, locale).format(java.util.Date(triggerTime))
 
         val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
@@ -180,11 +228,9 @@ class AlarmScheduler(private val context: Context) {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
-            val showIntent = PendingIntent.getActivity(
-                context,
+            val showIntent = createAlarmClockShowIntent(
                 primaryId.hashCode() + 1500,
-                Intent(context, MainActivity::class.java),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                userId ?: resolveUserId(primaryId)
             )
             alarmManager.setAlarmClock(
                 AlarmManager.AlarmClockInfo(triggerTime, showIntent),
@@ -224,12 +270,58 @@ class AlarmScheduler(private val context: Context) {
         pendingIntent.cancel()
         Log.d(TAG, "Cancelled alarm for entry: $entryId")
 
-        if (userId != null && scheduledDateTime != null) {
-            cancelSlotAlarm(userId, scheduledDateTime)
-        } else {
-            val parsed = com.example.dosezy.data.repository.ScheduleRepository.parseDateTimeFromEntryId(entryId)
-            if (parsed != null && userId != null) {
-                cancelSlotAlarm(userId, parsed)
+        var resolvedUserId = userId
+        var resolvedDateTime = scheduledDateTime
+
+        // Guard: Fast-path parse dateTime from entryId to avoid blocking database queries whenever possible
+        if (resolvedDateTime == null) {
+            resolvedDateTime = com.example.dosezy.data.repository.ScheduleRepository.parseDateTimeFromEntryId(entryId)
+        }
+
+        // Guard: Resolve userId and scheduledDateTime from database only if still omitted to ensure slot alarm is unhooked
+        if (resolvedUserId == null || resolvedDateTime == null) {
+            try {
+                val db = com.example.dosezy.data.DosezyDatabase.getInstance(context)
+                val entry = kotlinx.coroutines.runBlocking {
+                    kotlinx.coroutines.withTimeoutOrNull(500L) {
+                        db.scheduleDao().getScheduleEntryById(entryId)
+                    }
+                }
+                if (entry != null) {
+                    if (resolvedUserId == null) resolvedUserId = entry.userId
+                    if (resolvedDateTime == null) resolvedDateTime = entry.scheduledDateTime
+                }
+            } catch (_: Exception) {}
+        }
+
+        if (resolvedUserId != null && resolvedDateTime != null) {
+            var rearmedSibling = false
+            // Guard: Re-arm slot alarm if sibling pending medications share time slot; unconditionally cancelling drops sibling alarms (#BUG-SLOT-CANCEL-SIBLING)
+            try {
+                val db = com.example.dosezy.data.DosezyDatabase.getInstance(context)
+                val cleanDt = resolvedDateTime.withSecond(0).withNano(0)
+                val slotMillis = cleanDt.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+                val remaining = kotlinx.coroutines.runBlocking {
+                    kotlinx.coroutines.withTimeoutOrNull(500L) {
+                        db.scheduleDao().getScheduleForDateRangeDirect(resolvedUserId, slotMillis, slotMillis + 59999L)
+                    }
+                }?.filter { it.entryId != entryId && it.status == com.example.dosezy.data.model.MedicationStatus.PENDING } ?: emptyList()
+
+                if (remaining.isNotEmpty()) {
+                    val medNames = kotlinx.coroutines.runBlocking {
+                        kotlinx.coroutines.withTimeoutOrNull(500L) {
+                            remaining.mapNotNull { db.medicineDao().getMedicineByIdDirect(it.medicineId)?.medicationName }
+                        }
+                    } ?: emptyList()
+                    if (medNames.isNotEmpty() && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        scheduleGroupedMedicineAlarm(cleanDt, remaining, medNames)
+                        rearmedSibling = true
+                    }
+                }
+            } catch (_: Exception) {}
+
+            if (!rearmedSibling) {
+                cancelSlotAlarm(resolvedUserId, resolvedDateTime)
             }
         }
     }
@@ -329,6 +421,18 @@ class AlarmScheduler(private val context: Context) {
                         sIntent.cancel()
                     }
                 } else {
+                    // Guard: Resolve user profile's explicit timeFormat and language to prevent format and locale flipping during snooze group transfers (#BUG-SNOOZE-CANCEL-LOCALE)
+                    val targetUser = try {
+                        val db = com.example.dosezy.data.DosezyDatabase.getInstance(context)
+                        val entry = kotlinx.coroutines.runBlocking {
+                            kotlinx.coroutines.withTimeoutOrNull(500L) { db.scheduleDao().getScheduleEntryById(primaryId) }
+                        }
+                        val uId = entry?.userId ?: resolveUserId(primaryId)
+                        uId?.let { uid -> kotlinx.coroutines.runBlocking { db.userDao().getUserByIdDirect(uid) } }
+                    } catch (_: Exception) { null }
+                    val userTimeFormat = targetUser?.timeFormat
+                    val targetUserId = targetUser?.userId ?: resolveUserId(primaryId)
+
                     if (entryId == primaryId) {
                         val newPrimary = currentIds.first()
                         editor.remove("snooze_group_ids_$primaryId")
@@ -344,7 +448,7 @@ class AlarmScheduler(private val context: Context) {
 
                         if (triggerTime > System.currentTimeMillis()) {
                             val remMins = ((triggerTime - System.currentTimeMillis()) / (60 * 1000)).toInt().coerceAtLeast(1)
-                            scheduleGroupedSnooze(currentIds, remMins, currentNames, triggerTime)
+                            scheduleGroupedSnooze(currentIds, remMins, currentNames, triggerTime, timeFormat = userTimeFormat, userId = targetUserId)
                         }
                     } else {
                         editor.putString("snooze_group_ids_$primaryId", currentIds.joinToString(","))
@@ -353,10 +457,12 @@ class AlarmScheduler(private val context: Context) {
 
                         val medNameSummary = if (currentNames.isNotEmpty()) currentNames.joinToString(", ") else "Medicine"
                         // Guard: Format snooze time respecting 24h vs 12h user preference and active locale instead of hardcoded 12h pattern
-                        val is24 = android.text.format.DateFormat.is24HourFormat(context)
+                        val is24 = userTimeFormat == TimeFormat.HOUR_24 ||
+                                (userTimeFormat == null && android.text.format.DateFormat.is24HourFormat(context))
                         val pattern = if (is24) "HH:mm" else "h:mm a"
-                        val savedLang = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
-                        val locale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLang)
+                        // Guard: Format snooze time with target profile language rather than global app language to prevent locale flipping on partial snooze cancellation (#BUG-SNOOZE-CANCEL-LOCALE)
+                        val targetLang = targetUser?.language ?: resolveUserLanguage(targetUserId)
+                        val locale = com.example.dosezy.utils.LocaleHelper.getLocale(targetLang)
                         val snoozeTimeFormatted = java.text.SimpleDateFormat(pattern, locale).format(java.util.Date(triggerTime))
                         val updateIntent = Intent(context, MedicineAlarmReceiver::class.java).apply {
                             putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, primaryId)
@@ -390,7 +496,8 @@ class AlarmScheduler(private val context: Context) {
         entryIds: ArrayList<String>? = null,
         medicineNames: ArrayList<String>? = null,
         scheduledTime: String? = null,
-        explicitTriggerTime: Long? = null
+        explicitTriggerTime: Long? = null,
+        userId: String? = null
     ) {
         val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
             putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, entryId)
@@ -435,11 +542,9 @@ class AlarmScheduler(private val context: Context) {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
-            val showIntent = PendingIntent.getActivity(
-                context,
+            val showIntent = createAlarmClockShowIntent(
                 entryId.hashCode() + 2500,
-                Intent(context, MainActivity::class.java),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                userId ?: resolveUserId(entryId)
             )
             alarmManager.setAlarmClock(
                 AlarmManager.AlarmClockInfo(triggerTime, showIntent),
@@ -588,5 +693,83 @@ class AlarmScheduler(private val context: Context) {
         }
 
         Log.d(TAG, "Cancelled nagging reminder for entry: $entryId")
+    }
+
+    // Guard: Schedule exact re-alert alarm for ADHD intake safeguard expiration (#104)
+    @SuppressLint("ScheduleExactAlarm")
+    fun scheduleIntakeSafeguardAlarm(
+        entryId: String,
+        triggerTime: Long,
+        medicineName: String,
+        entryIds: ArrayList<String>? = null,
+        medicineNames: ArrayList<String>? = null,
+        scheduledTime: String? = null,
+        userId: String? = null
+    ) {
+        val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
+            action = MedicineAlarmReceiver.ACTION_INTAKE_SAFEGUARD_EXPIRED
+            putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, entryId)
+            putExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME, medicineName)
+            putExtra(MedicineAlarmReceiver.EXTRA_IS_INTAKE_SAFEGUARD, true)
+            if (!entryIds.isNullOrEmpty()) {
+                putStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS, entryIds)
+            }
+            if (!medicineNames.isNullOrEmpty()) {
+                putStringArrayListExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAMES, medicineNames)
+            }
+            if (!scheduledTime.isNullOrBlank()) {
+                putExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME, scheduledTime)
+            }
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            entryId.hashCode() + 3000,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
+            val showIntent = createAlarmClockShowIntent(
+                entryId.hashCode() + 3500,
+                userId ?: resolveUserId(entryId)
+            )
+            alarmManager.setAlarmClock(
+                AlarmManager.AlarmClockInfo(triggerTime, showIntent),
+                pendingIntent
+            )
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (canScheduleExact()) {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+            } else {
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+            }
+        } else {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+        }
+        Log.d(TAG, "Scheduled intake safeguard re-alert for entry: $entryId at $triggerTime")
+    }
+
+    // Guard: Cancel intake safeguard re-alert alarm and release PendingIntent tokens (#104)
+    fun cancelIntakeSafeguardAlarm(entryId: String) {
+        val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
+            action = MedicineAlarmReceiver.ACTION_INTAKE_SAFEGUARD_EXPIRED
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            entryId.hashCode() + 3000,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        alarmManager.cancel(pendingIntent)
+        pendingIntent.cancel()
+
+        val showIntent = PendingIntent.getActivity(
+            context,
+            entryId.hashCode() + 3500,
+            Intent(context, MainActivity::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        showIntent.cancel()
+        Log.d(TAG, "Cancelled intake safeguard alarm for entry: $entryId")
     }
 }

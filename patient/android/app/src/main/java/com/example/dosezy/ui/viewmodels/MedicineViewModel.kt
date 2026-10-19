@@ -46,6 +46,11 @@ class MedicineViewModel @Inject constructor(
                 currentUser?.let { user ->
                     loadUserMedicines(user.userId)
                 } ?: run {
+                    // Guard: Cancel observation jobs and flush cached StateFlow lists when no active user exists to prevent stale patient data leakage across profile lifecycles
+                    medicinesJob?.cancel()
+                    archivedMedicinesJob?.cancel()
+                    _medicines.value = emptyList()
+                    _archivedMedicines.value = emptyList()
                     _isLoading.value = false
                 }
             }
@@ -89,9 +94,12 @@ class MedicineViewModel @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun updateMedicine(medicine: Medicine) {
+    fun updateMedicine(
+        medicine: Medicine,
+        effectiveDate: com.example.dosezy.data.model.ScheduleEffectiveDate = com.example.dosezy.data.model.ScheduleEffectiveDate.TODAY
+    ) {
         viewModelScope.launch {
-            medicineRepository.updateMedicine(medicine)
+            medicineRepository.updateMedicine(medicine, effectiveDate)
         }
     }
 

@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.dosezy.data.DosezyDatabase
 import com.example.dosezy.data.model.Medicine
+import com.example.dosezy.data.model.ScheduleEffectiveDate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import java.time.LocalDate
@@ -18,7 +19,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 class MedicineRepository @Inject constructor(
     private val database: DosezyDatabase,
     private val scheduleRepository: ScheduleRepository,
-    @ApplicationContext val context: Context
+    @ApplicationContext internal val context: Context
 ) {
 
     companion object {
@@ -37,9 +38,9 @@ class MedicineRepository @Inject constructor(
     fun getArchivedMedicinesByUser(userId: String): Flow<List<Medicine>> =
         database.medicineDao().getArchivedMedicinesByUser(userId)
 
-    // Get active medicines as list (not Flow)
+    // Guard: Use getActiveMedicinesByUserDirect to execute one-shot query without InvalidationTracker Flow observer overhead
     suspend fun getMedicinesByUserSync(userId: String): List<Medicine> =
-        database.medicineDao().getActiveMedicinesByUser(userId).first()
+        database.medicineDao().getActiveMedicinesByUserDirect(userId)
 
     // Get all medicines (active + archived) directly for cleanup / export
     suspend fun getMedicinesByUserDirect(userId: String): List<Medicine> =
@@ -80,11 +81,22 @@ class MedicineRepository @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun updateMedicine(medicine: Medicine) {
+    suspend fun updateMedicine(
+        medicine: Medicine,
+        effectiveDate: ScheduleEffectiveDate = ScheduleEffectiveDate.TODAY
+    ) {
         val oldMedicine = database.medicineDao().getMedicineByIdDirect(medicine.medicineId)
 
         // Update the medicine metadata
         database.medicineDao().updateMedicine(medicine)
+
+        // Guard: Dismiss active refill warning notification from shade when stock is replenished above refill threshold
+        val currentStock = medicine.currentStock
+        val threshold = medicine.refillThreshold ?: 0
+        if (currentStock != null && currentStock > threshold) {
+            val nManager = this.context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
+            nManager?.cancel((medicine.medicineId + "_refill").hashCode())
+        }
 
         if (oldMedicine != null) {
             val scheduleChanged = oldMedicine.scheduledTimes != medicine.scheduledTimes ||
@@ -100,18 +112,29 @@ class MedicineRepository @Inject constructor(
                 // Cancel existing alarms for this medicine BEFORE modifying or deleting schedule entries
                 scheduleRepository.cancelAlarmsForMedicine(medicine.medicineId, this.context)
 
-                // Guard: Align deletion cutoff with generateScheduleEntries (now - 15m) so untaken doses from earlier today are not deleted and lost from adherence history
-                val cutoff = LocalDateTime.now().minusMinutes(15)
-                val cutoffEpochMillis = cutoff.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+                if (effectiveDate == ScheduleEffectiveDate.TOMORROW) {
+                    // Guard: When applying schedule change starting tomorrow, keep today's schedule entries intact and only delete untaken entries from tomorrow 00:00 onwards
+                    val tomorrowStart = LocalDate.now().plusDays(1).atStartOfDay()
+                    val tomorrowEpochMillis = tomorrowStart.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+                    database.scheduleDao().deleteUntakenScheduleEntriesFrom(medicine.medicineId, tomorrowEpochMillis)
 
-                // Delete untaken schedule entries from cutoff onwards for this medicine
-                database.scheduleDao().deleteUntakenScheduleEntriesFrom(medicine.medicineId, cutoffEpochMillis)
+                    // Generate new schedule entries starting from tomorrow for 30 days
+                    val newEntries = medicine.generateScheduleEntries(LocalDate.now().plusDays(1), 30)
+                    database.scheduleDao().insertScheduleEntries(newEntries)
+                } else {
+                    // Guard: Clamp deletion cutoff to start of today so updating schedules shortly after midnight (00:00-00:15) does not delete yesterday's untaken evening doses (#BUG-MIDNIGHT-CUTOFF)
+                    val startOfToday = LocalDate.now().atStartOfDay()
+                    val startOfTodayEpochMillis = startOfToday.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
 
-                // Generate new schedule entries starting from today for 30 days
-                val newEntries = medicine.generateScheduleEntries(LocalDate.now(), 30)
+                    // Delete untaken schedule entries from start of today onwards for this medicine
+                    database.scheduleDao().deleteUntakenScheduleEntriesFrom(medicine.medicineId, startOfTodayEpochMillis)
 
-                // Insert the new entries (already taken entries are preserved by OnConflictStrategy.IGNORE)
-                database.scheduleDao().insertScheduleEntries(newEntries)
+                    // Generate new schedule entries starting from today for 30 days
+                    val newEntries = medicine.generateScheduleEntries(LocalDate.now(), 30)
+
+                    // Insert the new entries (already taken entries are preserved by OnConflictStrategy.IGNORE)
+                    database.scheduleDao().insertScheduleEntries(newEntries)
+                }
             }
         } else {
             // Fallback if old medicine wasn't in DB: cancel existing alarms first
@@ -150,10 +173,27 @@ class MedicineRepository @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun unarchiveMedicine(medicine: Medicine) {
-        // 1. Mark medicine as active (unarchived)
-        database.medicineDao().setArchivedStatus(medicine.medicineId, false)
+        val today = LocalDate.now()
+        // Guard: If unarchiving a finite course with an expired endDate, reset dates starting from today to prevent generating 0 schedules and ghost active medicines
+        val activeMedicine = if (medicine.endDate != null && medicine.endDate.isBefore(today)) {
+            val duration = medicine.durationDays?.toLong()
+                ?: if (medicine.startDate != null) java.time.temporal.ChronoUnit.DAYS.between(medicine.startDate, medicine.endDate).coerceAtLeast(1L)
+                else 30L
+            val updated = medicine.copy(
+                isArchived = false,
+                startDate = today,
+                endDate = today.plusDays(duration),
+                durationDays = duration.toInt()
+            )
+            database.medicineDao().updateMedicine(updated)
+            updated
+        } else {
+            database.medicineDao().setArchivedStatus(medicine.medicineId, false)
+            medicine.copy(isArchived = false)
+        }
+
         // 2. Generate new schedule entries starting from today for 30 days
-        val newEntries = medicine.copy(isArchived = false).generateScheduleEntries(LocalDate.now(), 30)
+        val newEntries = activeMedicine.generateScheduleEntries(today, 30)
         database.scheduleDao().insertScheduleEntries(newEntries)
         // 3. Reschedule all alarms for user so grouped slots are safely reconstructed
         scheduleRepository.rescheduleAllAlarms(medicine.userId, this.context)
@@ -204,9 +244,14 @@ class MedicineRepository @Inject constructor(
         if (med != null) {
             deleteMedicinePermanently(med)
         } else {
-            // Guard: Clean up orphaned schedule entries and alarms if medicine record was already deleted
+            // Guard: Retrieve userId from orphaned entries before deletion to reschedule sibling alarms for shared time slots
+            val orphanedEntries = database.scheduleDao().getScheduleEntriesByMedicine(medicineId)
+            val affectedUserId = orphanedEntries.firstOrNull()?.userId
             scheduleRepository.cancelAlarmsForMedicine(medicineId, this.context)
             database.scheduleDao().deleteScheduleEntriesByMedicine(medicineId)
+            if (affectedUserId != null) {
+                scheduleRepository.rescheduleAllAlarms(affectedUserId, this.context)
+            }
         }
     }
 
@@ -220,9 +265,13 @@ class MedicineRepository @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun updateMedicineWithAlarms(medicine: Medicine, context: Context) {
+    suspend fun updateMedicineWithAlarms(
+        medicine: Medicine,
+        context: Context,
+        effectiveDate: ScheduleEffectiveDate = ScheduleEffectiveDate.TODAY
+    ) {
         // Update the medicine
-        updateMedicine(medicine)
+        updateMedicine(medicine, effectiveDate)
 
         // Cancel existing alarms and reschedule
         scheduleRepository.cancelAlarmsForMedicine(medicine.medicineId, context)
@@ -236,9 +285,14 @@ class MedicineRepository @Inject constructor(
             // Guard: Delegate to deleteMedicinePermanently to ensure alarms are rescheduled for remaining sibling medications
             deleteMedicinePermanently(med)
         } else {
-            // Guard: Cancel alarms, clean up orphaned entries, and reschedule remaining alarms
+            // Guard: Retrieve userId from orphaned entries to reschedule sibling alarms for shared time slots before deleting
+            val orphanedEntries = database.scheduleDao().getScheduleEntriesByMedicine(medicineId)
+            val affectedUserId = orphanedEntries.firstOrNull()?.userId
             scheduleRepository.cancelAlarmsForMedicine(medicineId, context)
             database.scheduleDao().deleteScheduleEntriesByMedicine(medicineId)
+            if (affectedUserId != null) {
+                scheduleRepository.rescheduleAllAlarms(affectedUserId, context)
+            }
         }
     }
 }

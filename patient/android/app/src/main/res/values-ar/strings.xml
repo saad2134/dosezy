@@ -435,6 +435,7 @@
     <string name="to_be_taken_in">يجب تناوله خلال %1$d س و %2$d د</string>
     <string name="time_diff_ago">منذ %1$d س و %2$d د</string>
     <string name="status_all_medications_taken">تم تناول جميع الأدوية</string>
+    <string name="status_slot_completed_with_skipped">مكتمل (تم تخطي البعض)</string>
     <string name="status_scheduled_for_this_time">مجدول لهذا الوقت</string>
     <string name="daily_frequency_presets_title">الإعدادات المسبقة للتكرار اليومي</string>
     <string name="action_edit_medicine_cd">تعديل الدواء</string>
@@ -569,7 +570,7 @@
     <string name="alarm_duration_1m">دقيقة واحدة</string>
     <string name="alarm_duration_2m">دقيقتان</string>
     <string name="alarm_duration_5m">5 دقائق</string>
-    <string name="alarm_silenced_auto_banner">تم إيقاف المنبه تلقائياً — سجّل جرعاتك عندما تكون جاهزاً</string>
+    <string name="alarm_silenced_auto_banner">تم إيقاف المنبه تلقائياً - سجّل جرعاتك عندما تكون جاهزاً</string>
 
     <string name="alarm_sound_custom">ملف صوتي مخصص</string>
     <string name="alarm_sound_select_file">اختيار ملف صوتي</string>
@@ -785,7 +786,7 @@
     <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
     <string name="pref_section_appearance">المظهر</string>
     <string name="pref_slide_actions_title">السحب للتناول والتأجيل</string>
-    <string name="pref_slide_actions_desc">يتطلب السحب بدلاً من الضغط لتناول الجرعة أو تأجيلها في التنبيهات.</string>
+    <string name="pref_slide_actions_desc">السحب بدلاً من النقر لتناول الجرعات أو تأجيلها.</string>
     <string name="pref_timeline_mode_title">عرض المخطط الزمني</string>
     <string name="pref_timeline_mode_desc">عرض جدول اليوم في مخطط زمني عمودي واسع.</string>
     <string name="pref_calendar_thicker_highlight_title">إطار كامل للأيام المجدولة</string>
@@ -795,4 +796,65 @@
     <string name="alarm_slide_to_snooze">اسحب للتأجيل (%1$d دقيقة)</string>
     <string name="home_view_standard">قياسي</string>
     <string name="home_view_timeline">مخطط زمني</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">تأجيل لمدة:</string>
+    <string name="snooze_duration_chip_format">%1$d د</string>
+    <string name="pref_custom_snooze_title">خيارات تأجيل مخصصة</string>
+    <string name="pref_custom_snooze_desc">اختر مدد تأجيل مختلفة مباشرة عند رنين المنبه.</string>
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">حماية العد التنازلي لتناول الدواء</string>
+    <string name="pref_intake_safeguard_desc">دعم فرط الحركة وتشتت الانتباه: مهلة عد تنازلي قبل تأكيد التناول مع إعادة التنبيه عند التشتت.</string>
+    <string name="pref_intake_duration_title">مدة الحماية</string>
+    <string name="pref_intake_duration_format">%1$d دقائق</string>
+    <string name="dialog_intake_duration_title">اختر مدة الحماية</string>
+    <string name="notif_intake_in_progress_title">تناول الدواء قيد التنفيذ</string>
+    <string name="notif_intake_in_progress_desc">%1$s: أكد بعد التناول</string>
+    <string name="notif_intake_action_confirm">تأكيد التناول</string>
+    <string name="notif_intake_action_extend">+1 دقيقة</string>
+    <string name="notif_intake_action_cancel">إلغاء</string>
+    <string name="notif_intake_realert_title">لم يتم تأكيد الدواء</string>
+    <string name="notif_intake_realert_desc">هل تناولت %1$s؟ انقر لتأكيد التناول أو التأجيل.</string>
+    <string name="home_intake_in_progress">التناول قيد التنفيذ لـ %1$s</string>
+    <string name="home_intake_time_remaining">متبقي %1$s</string>
+    <string name="home_intake_confirm">تأكيد التناول</string>
+    <string name="home_intake_extend">+1 دقيقة</string>
+    <string name="home_intake_cancel">إلغاء</string>
+    <string name="home_intake_confirmed">تم تسجيل التناول لـ %1$s</string>
+    <string name="home_intake_cancelled">تم إلغاء حماية التناول</string>
+    <string name="alarm_realert_badge">إعادة تنبيه التناول ADHD</string>
+    <string name="alarm_realert_subtitle">لقد نقرت على تناول مسبقاً، لكن لم يتم تأكيد التناول. هل تناولت دواءك؟</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">تناول الكل</string>
+    <string name="take_all_count">تناول الكل (%1$d)</string>
+    <string name="dialog_take_all_title">تناول جميع الأدوية؟</string>
+    <string name="dialog_take_all_message">تحديد جميع الـ %1$d أدوية المجدولة لـ %2$s كأدوية تم تناولها؟</string>
+    <string name="take_all_success_toast">تم تحديد جميع الـ %1$d أدوية كأدوية تم تناولها</string>
+
+    <!-- Legal, Privacy & Compliance Safeguards -->
+    <string name="notif_generic_lockscreen_reminder">تذكير بموعد الدواء المجدول</string>
+    <string name="pref_lockscreen_details_title">إظهار التفاصيل على شاشة القفل</string>
+    <string name="pref_lockscreen_details_desc">إخفاء أسماء الأدوية والجرعات حتى يتم إلغاء قفل الجهاز.</string>
+    <string name="disclaimer_dialog_title">إخلاء المسؤولية الطبية والقانونية</string>
+    <string name="disclaimer_dialog_summary">تطبيق دوزيزي هو أداة تذكير رقمية آلية وليس جهازاً طبياً معتمداً. لا يقدم التطبيق تشخيصاً طبياً أو حسابات جرعات أو نصائح سريرية. استشر دائماً طبيبك أو مقدم الرعاية الصحية للحصول على تعليمات الوصفة الطبية.</string>
+    <string name="disclaimer_checkbox_consent">أفهم وأوافق على إخلاء المسؤولية الطبية وشروط الخدمة.</string>
+    <string name="disclaimer_action_agree">قبول ومتابعة</string>
+    <string name="disclaimer_link_medical">إخلاء المسؤولية الطبية</string>
+    <string name="disclaimer_link_privacy">سياسة الخصوصية</string>
+    <string name="disclaimer_link_terms">شروط الخدمة</string>
+    <string name="emergency_dispatch_warning_title">تنبيه الطوارئ</string>
+    <string name="emergency_dispatch_warning_desc">دوزيزي ليس خدمة طوارئ أو بديلاً عن أرقام الطوارئ 911/112. في الحالات الحرجة، اتصل بخدمات الطوارئ المحلية مباشرة. يرجى التحقق من مطابقة الرقم لمنطقتك.</string>
+    <string name="pdf_report_disclaimer_footer">متتبع الأدوية دوزيزي • سجل معلوماتي مسجل ذاتياً (غير سريري)</string>
+    <string name="pharmacy_refill_estimation_disclaimer">ملاحظة: كميات إعادة التعبئة هي تقديرات تقريبية بناءً على وتيرة التناول. تحقق مع الصيدلي أو الطبيب.</string>
+    <string name="alarm_unlock_to_view_details">قم بإلغاء القفل لعرض التفاصيل</string>
+    <string name="alarm_lockscreen_details_hidden">يتم إخفاء أسماء الأدوية والجرعات أثناء قفل الجهاز.</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">تطبيق تغييرات الجدول</string>
+    <string name="schedule_effective_dialog_message">متى يجب أن يبدأ سريان هذا الجدول المحدث؟</string>
+    <string name="schedule_effective_today_title">بدءاً من اليوم</string>
+    <string name="schedule_effective_today_desc">تطبيق المواعيد الجديدة اليوم. ستتم إزالة الجرعات السابقة غير المأخوذة اليوم.</string>
+    <string name="schedule_effective_tomorrow_title">بدءاً من الغد</string>
+    <string name="schedule_effective_tomorrow_desc">الحفاظ على جدول اليوم كما هو. سيبدأ الجدول الجديد غداً.</string>
 </resources>

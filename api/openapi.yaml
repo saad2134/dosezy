@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Dosezy API
   description: |
-    Official OpenAPI 3.0 specification for **Dosezy** — Open-Source, Offline-First Medicine Tracking & Caregiver Cloud Platform.
+    Official OpenAPI 3.0 specification for **Dosezy** - Open-Source, Offline-First Medicine Tracking & Caregiver Cloud Platform.
     
     ### Domain Alignment
     - **API Base URL:** `https://api.dosezy.app`
@@ -10,7 +10,7 @@ info:
     - **Documentation:** `https://docs.dosezy.app`
     - **Patient Web App:** `https://patient.dosezy.app`
     - **Caregiver Portal:** `https://caregiver.dosezy.app`
-  version: 2.5.9
+  version: 2.5.11
   contact:
     name: Dosezy Maintainers
     email: reach.saad@outlook.com
@@ -63,7 +63,7 @@ paths:
                     example: ok
                   version:
                     type: string
-                    example: 2.5.9
+                    example: 2.5.11
                   timestamp:
                     type: string
                     format: date-time
@@ -632,6 +632,16 @@ components:
           description: Whether schedule calendar renders a full colored border frame around each scheduled day
           default: false
           example: false
+        intakeSafeguardEnabled:
+          type: boolean
+          description: Whether ADHD intake countdown timer safeguard with automatic re-alert is enabled
+          default: false
+          example: false
+        intakeCountdownSeconds:
+          type: integer
+          description: Countdown timer duration in seconds for intake confirmation before re-alerting (60, 120, 180, 300)
+          default: 120
+          example: 120
 
     UserCreateInput:
       type: object
@@ -714,6 +724,10 @@ components:
           type: boolean
         thickerCalendarDayHighlight:
           type: boolean
+        intakeSafeguardEnabled:
+          type: boolean
+        intakeCountdownSeconds:
+          type: integer
 
     Medicine:
       type: object

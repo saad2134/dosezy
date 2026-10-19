@@ -191,7 +191,8 @@ fun AddMedScreen(
                 // --- Card 3: Course Duration Card ---
                 val durationDaysInt = durationDaysText.normalizeArabicDigits().toIntOrNull()
                 val calcStartDate = selectedStartDate
-                val calcEndDate = if (isFiniteCourse && durationDaysInt != null) {
+                // Guard: Calculate finite course end date only when duration is positive to avoid creating invalid zero-day or negative courses
+                val calcEndDate = if (isFiniteCourse && durationDaysInt != null && durationDaysInt > 0) {
                     selectedStartDate.plusDays((durationDaysInt - 1).toLong().coerceAtLeast(0L))
                 } else null
 
@@ -243,12 +244,16 @@ fun AddMedScreen(
                     selectedFrequency = selectedFrequency,
                     selectedDaysOfWeek = selectedDaysOfWeek,
                     selectedDaysOfMonth = selectedDaysOfMonth,
-                    intervalWeeksText = intervalWeeksText
+                    intervalWeeksText = intervalWeeksText,
+                    isFiniteCourse = isFiniteCourse,
+                    durationDaysText = durationDaysText
                 )
 
                 Button(
                     onClick = {
                         if (!isFormValid) return@Button
+                        // Guard: Abort save if target active user is null or blank to prevent SQLiteConstraintException foreign key crash
+                        val targetUserId = currentUser?.userId?.takeIf { it.isNotBlank() } ?: return@Button
 
                         val baseDose = if (hasDifferentDosages && scheduledTimesList.size > 1) {
                             val firstKey = scheduledTimesList.firstOrNull()?.let { String.format(java.util.Locale.US, "%02d:%02d", it.hour, it.minute) }
@@ -270,7 +275,7 @@ fun AddMedScreen(
 
                         val newMedicine = Medicine(
                             medicineId = UUID.randomUUID().toString(),
-                            userId = currentUser?.userId ?: "",
+                            userId = targetUserId,
                             medicationName = medicationName.trim(),
                             dosage = baseDose,
                             dosageUnit = selectedDosageUnit,
@@ -295,14 +300,16 @@ fun AddMedScreen(
                             pillColor = selectedPillColor,
                             startDate = calcStartDate,
                             endDate = calcEndDate,
-                            durationDays = if (isFiniteCourse) durationDaysInt else null,
-                            customDosages = finalCustomDosages
+                            // Guard: Assign durationDays only when finite course and duration is positive to avoid invalid zero-day courses
+                            durationDays = if (isFiniteCourse && durationDaysInt != null && durationDaysInt > 0) durationDaysInt else null,
+                            // Guard: Clear customDosages if frequency is AS_NEEDED to prevent leaking orphaned scheduled custom dosages into PRN doses and reports
+                            customDosages = if (selectedFrequency == FrequencyPattern.AS_NEEDED) null else finalCustomDosages
                         )
                         medicineViewModel.addMedicine(newMedicine)
                         navController.previousBackStackEntry?.savedStateHandle?.set("snackbar_message", context.getString(R.string.medication_added_success))
                         navController.popBackStack()
                     },
-                    enabled = isFormValid,
+                    enabled = isFormValid && !currentUser?.userId.isNullOrBlank(),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),

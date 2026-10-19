@@ -151,4 +151,96 @@ class MedicineFormValidationTest {
         assertEquals("tablet", DosageUnit.TABLET.displayName)
         assertEquals("capsule", DosageUnit.CAPSULE.displayName)
     }
+
+    @Test
+    fun testFormValidation_medicationNameWhitespaceTrimming() {
+        val rawName = "   Lisinopril   "
+        val trimmed = rawName.trim()
+        assertEquals("Lisinopril", trimmed)
+        val isValid = isMedicineFormValid(
+            medicationName = rawName,
+            isDosageValid = true,
+            selectedFrequency = FrequencyPattern.DAILY,
+            selectedDaysOfWeek = emptyList(),
+            selectedDaysOfMonth = emptyList(),
+            intervalWeeksText = "1"
+        )
+        assertTrue("Name with surrounding whitespace is valid and normalizes when trimmed", isValid)
+    }
+
+    @Test
+    fun testFormValidation_finiteCourse_requiresPositiveDuration() {
+        // Finite course toggled on with empty or 0 duration must be invalid
+        val invalidEmptyFinite = isMedicineFormValid(
+            medicationName = "Amoxicillin",
+            isDosageValid = true,
+            selectedFrequency = FrequencyPattern.DAILY,
+            selectedDaysOfWeek = emptyList(),
+            selectedDaysOfMonth = emptyList(),
+            intervalWeeksText = "",
+            isFiniteCourse = true,
+            durationDaysText = ""
+        )
+        assertFalse("Finite course with empty duration must be invalid", invalidEmptyFinite)
+
+        val invalidZeroFinite = isMedicineFormValid(
+            medicationName = "Amoxicillin",
+            isDosageValid = true,
+            selectedFrequency = FrequencyPattern.DAILY,
+            selectedDaysOfWeek = emptyList(),
+            selectedDaysOfMonth = emptyList(),
+            intervalWeeksText = "",
+            isFiniteCourse = true,
+            durationDaysText = "0"
+        )
+        assertFalse("Finite course with 0 duration must be invalid", invalidZeroFinite)
+
+        val validFinite = isMedicineFormValid(
+            medicationName = "Amoxicillin",
+            isDosageValid = true,
+            selectedFrequency = FrequencyPattern.DAILY,
+            selectedDaysOfWeek = emptyList(),
+            selectedDaysOfMonth = emptyList(),
+            intervalWeeksText = "",
+            isFiniteCourse = true,
+            durationDaysText = "7"
+        )
+        assertTrue("Finite course with positive duration must be valid", validFinite)
+
+        val validRetainedEndDate = isMedicineFormValid(
+            medicationName = "Amoxicillin",
+            isDosageValid = true,
+            selectedFrequency = FrequencyPattern.DAILY,
+            selectedDaysOfWeek = emptyList(),
+            selectedDaysOfMonth = emptyList(),
+            intervalWeeksText = "",
+            isFiniteCourse = true,
+            durationDaysText = "",
+            hasExistingEndDate = true
+        )
+        assertTrue("Finite course with existing end date on edit must be valid", validRetainedEndDate)
+    }
+
+    @Test
+    fun testFiniteCourse_durationCalculationAndPreservationOnEdit() {
+        val start = java.time.LocalDate.of(2026, 10, 10)
+        val end = java.time.LocalDate.of(2026, 10, 16) // Exactly 7 days inclusive
+
+        // Precompute durationDays when durationDays is null but start and end dates are present
+        val computedDays = java.time.temporal.ChronoUnit.DAYS.between(start, end) + 1
+        assertEquals("Calculated inclusive course duration must be 7 days", 7L, computedDays)
+
+        // When duration text is empty but existing end date exists, retain existing end date
+        val durationDaysInt: Int? = null
+        val isFiniteCourse = true
+        val calcEndDate = if (isFiniteCourse) {
+            if (durationDaysInt != null) {
+                start.plusDays((durationDaysInt - 1).toLong().coerceAtLeast(0L))
+            } else {
+                end
+            }
+        } else null
+
+        assertEquals("calcEndDate must preserve existing end date when duration text is unmodified", end, calcEndDate)
+    }
 }

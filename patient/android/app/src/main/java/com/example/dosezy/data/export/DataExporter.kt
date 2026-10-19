@@ -2,8 +2,6 @@ package com.example.dosezy.data.export
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -30,7 +28,8 @@ class DataExporter(
     private val context: Context,
     private val userRepository: UserRepository,
     private val medicineRepository: MedicineRepository,
-    private val scheduleRepository: ScheduleRepository
+    private val scheduleRepository: ScheduleRepository,
+    private val pdfReportGenerator: PdfReportGenerator = PdfReportGenerator(context)
 ) {
 
     suspend fun getActiveMedicinesForUser(userId: String): List<Medicine> {
@@ -111,15 +110,19 @@ class DataExporter(
         val safeName = sanitizeFileName(user.fullName)
         val fileName = "dosezy_report_${safeName}_$timestamp.pdf"
 
-        val pdfDoc = buildPdfDocument(user, medicines, schedules)
-        // Guard: Use getExportDirectory() fallback to filesDir when externalFilesDir is null/unmounted to prevent NPE
-        val exportDir = getExportDirectory()
-        val file = File(exportDir, fileName)
-        FileOutputStream(file).use { out ->
-            pdfDoc.writeTo(out)
+        val pdfDoc = pdfReportGenerator.buildPdfDocument(user, medicines, schedules)
+        // Guard: Close native Skia PdfDocument in finally block to prevent C++ memory and file descriptor leaks on I/O failures
+        try {
+            // Guard: Use getExportDirectory() fallback to filesDir when externalFilesDir is null/unmounted to prevent NPE
+            val exportDir = getExportDirectory()
+            val file = File(exportDir, fileName)
+            FileOutputStream(file).use { out ->
+                pdfDoc.writeTo(out)
+            }
+            return@withContext file
+        } finally {
+            pdfDoc.close()
         }
-        pdfDoc.close()
-        return@withContext file
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -130,6 +133,8 @@ class DataExporter(
         val zipFile = File(exportDir, "dosezy_export_$timestamp.zip")
 
         val usedFolders = mutableSetOf<String>()
+        var writtenCount = 0
+        var lastException: Exception? = null
         FileOutputStream(zipFile).use { fileOutputStream ->
             ZipOutputStream(fileOutputStream).use { zipOutputStream ->
                 users.forEach { user ->
@@ -154,6 +159,7 @@ class DataExporter(
                                 // Guard: Explicitly specify UTF-8 charset to prevent corrupted non-ASCII characters in zip exports on devices with non-UTF-8 default charsets
                                 zipOutputStream.write(content.toByteArray(Charsets.UTF_8))
                                 zipOutputStream.closeEntry()
+                                writtenCount++
                             }
                             ExportFormat.JSON -> {
                                 val content = buildJsonContent(user, medicines, schedules)
@@ -162,19 +168,29 @@ class DataExporter(
                                 // Guard: Explicitly specify UTF-8 charset to prevent corrupted non-ASCII characters in zip exports on devices with non-UTF-8 default charsets
                                 zipOutputStream.write(content.toByteArray(Charsets.UTF_8))
                                 zipOutputStream.closeEntry()
+                                writtenCount++
                             }
                             ExportFormat.PDF -> {
-                                val pdfDoc = buildPdfDocument(user, medicines, schedules)
-                                val tempPdf = File(context.cacheDir, "${user.userId}.pdf")
+                                val pdfDoc = pdfReportGenerator.buildPdfDocument(user, medicines, schedules)
+                                // Guard: Create collision-free temporary PDF file with deleteOnExit to prevent concurrent export file lock collisions and uncollected cache files (#BUG-EXPORT-TEMP-FILE)
+                                val tempPdf = File.createTempFile("dosezy_export_${user.userId}_", ".pdf", context.cacheDir)
+                                tempPdf.deleteOnExit()
                                 try {
                                     FileOutputStream(tempPdf).use { pdfDoc.writeTo(it) }
-                                    pdfDoc.close()
 
                                     val entry = ZipEntry("$userFolder/health_report.pdf")
                                     zipOutputStream.putNextEntry(entry)
-                                    zipOutputStream.write(tempPdf.readBytes())
+                                    // Guard: Stream tempPdf to zipOutputStream to prevent high heap byte array allocation and OOM on low-memory devices
+                                    tempPdf.inputStream().use { input ->
+                                        input.copyTo(zipOutputStream)
+                                    }
                                     zipOutputStream.closeEntry()
+                                    writtenCount++
                                 } finally {
+                                    // Guard: Ensure native Skia PdfDocument is closed to prevent memory leaks on exception
+                                    try {
+                                        pdfDoc.close()
+                                    } catch (_: Exception) {}
                                     // Guard: Ensure temporary PDF file in cacheDir is deleted even if zip write throws an exception to prevent cache leak
                                     tempPdf.delete()
                                 }
@@ -182,9 +198,16 @@ class DataExporter(
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
+                        lastException = e
                     }
                 }
             }
+        }
+
+        // Guard: Verify at least one profile was written; delete empty zip and throw exception to prevent silent export failure (#BUG-ZIP-EMPTY-EXPORT)
+        if (writtenCount == 0) {
+            try { zipFile.delete() } catch (_: Exception) {}
+            throw IllegalStateException("Failed to export data: no profile entries could be generated", lastException)
         }
 
         return@withContext zipFile
@@ -230,6 +253,12 @@ class DataExporter(
         userObj.put("slideActionsEnabled", user.slideActionsEnabled)
         userObj.put("timelineModeEnabled", user.timelineModeEnabled)
         userObj.put("thickerCalendarDayHighlight", user.thickerCalendarDayHighlight)
+        // Guard: Explicitly serialize intake safeguard preferences to retain ADHD support settings on backup restore (#104)
+        userObj.put("intakeSafeguardEnabled", user.intakeSafeguardEnabled)
+        userObj.put("intakeCountdownSeconds", user.intakeCountdownSeconds)
+        // Guard: Explicitly serialize lockscreen privacy and custom snooze popup settings on backup restore
+        userObj.put("lockscreenDetailsEnabled", user.lockscreenDetailsEnabled)
+        userObj.put("customSnoozePopupEnabled", user.customSnoozePopupEnabled)
         root.put("user", userObj)
 
         val medArray = JSONArray()
@@ -325,255 +354,8 @@ class DataExporter(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun buildPdfDocument(user: User, medicines: List<Medicine>, schedules: List<ScheduleEntry>): PdfDocument {
-        val pdfDocument = PdfDocument()
-        var pageNumber = 1
-        var pageInfo = PdfDocument.PageInfo.Builder(595, 842, pageNumber).create()
-        var page = pdfDocument.startPage(pageInfo)
-        var canvas = page.canvas
-
-        val titlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.parseColor("#1193D4")
-            textSize = 18f
-            isFakeBoldText = true
-        }
-        val subtitlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.parseColor("#4B5563")
-            textSize = 10f
-        }
-        val headerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.parseColor("#1F2937")
-            textSize = 12f
-            isFakeBoldText = true
-        }
-        val alertHeaderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.parseColor("#DC2626")
-            textSize = 10f
-            isFakeBoldText = true
-        }
-        val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.parseColor("#374151")
-            textSize = 10f
-        }
-        val linePaint = Paint().apply {
-            color = Color.parseColor("#E5E7EB")
-            strokeWidth = 1f
-        }
-
-        fun drawFooter(c: android.graphics.Canvas, pNum: Int) {
-            c.drawLine(40f, 800f, 555f, 800f, linePaint)
-            c.drawText("Dosezy Medicine Tracker • Confidential Patient Record", 40f, 816f, subtitlePaint)
-            c.drawText("Page $pNum", 520f, 816f, subtitlePaint)
-        }
-
-        var y = 38f
-
-        fun checkPageBreak(neededHeight: Float) {
-            if (y + neededHeight > 780f) {
-                drawFooter(canvas, pageNumber)
-                pdfDocument.finishPage(page)
-                pageNumber++
-                pageInfo = PdfDocument.PageInfo.Builder(595, 842, pageNumber).create()
-                page = pdfDocument.startPage(pageInfo)
-                canvas = page.canvas
-                y = 40f
-                canvas.drawText("Dosezy Report - ${user.fullName}", 40f, y, subtitlePaint)
-                y += 12f
-                canvas.drawLine(40f, y, 555f, y, linePaint)
-                y += 20f
-            }
-        }
-
-        // Top-left App Brand Icon (matching New User & Alarm popup brand icon)
-        val brandIcon = androidx.core.content.ContextCompat.getDrawable(context, com.example.dosezy.R.drawable.loader_icon)
-        if (brandIcon != null) {
-            brandIcon.setBounds(40, 24, 68, 52) // 28x28 pt at top-left
-            brandIcon.draw(canvas)
-        }
-
-        canvas.drawText("DOSEZY - Patient Health & Medication Report", 76f, y, titlePaint)
-        y += 16f
-        val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
-        canvas.drawText("Generated: $timestamp | Private & Offline Export", 76f, y, subtitlePaint)
-        y += 15f
-        canvas.drawLine(40f, y, 555f, y, linePaint)
-        y += 22f
-
-        // Patient Info
-        canvas.drawText("Patient Profile", 40f, y, headerPaint)
-        y += 15f
-        canvas.drawText("Name: ${user.fullName}", 40f, y, textPaint)
-        canvas.drawText("Age: ${user.age}", 240f, y, textPaint)
-        // Guard: Format gender with displayName to prevent drawing raw uppercase enum identifier (e.g. DO_NOT_SPECIFY) in patient medical report
-        canvas.drawText("Gender: ${user.gender.displayName}", 360f, y, textPaint)
-        y += 15f
-
-        // Allergies & Medical Conditions in PDF
-        val allergiesText = if (!user.allergies.isNullOrBlank()) user.allergies else "None recorded"
-        val conditionsText = if (!user.medicalConditions.isNullOrBlank()) user.medicalConditions else "None recorded"
-
-        if (!user.allergies.isNullOrBlank()) {
-            canvas.drawText("Allergies: $allergiesText", 40f, y, alertHeaderPaint)
-        } else {
-            canvas.drawText("Allergies: $allergiesText", 40f, y, textPaint)
-        }
-        y += 15f
-        canvas.drawText("Chronic Conditions: $conditionsText", 40f, y, textPaint)
-        y += 18f
-        canvas.drawLine(40f, y, 555f, y, linePaint)
-        y += 20f
-
-        // Analytics & Adherence Summary Section (Calculated from past decided doses)
-        val evalNow = LocalDateTime.now()
-        val evalToday = java.time.LocalDate.now()
-        val missedAfterHours = user.considerMissedAfter
-
-        // Guard: Dynamically evaluate stale PENDING entries past considerMissedAfter as MISSED, matching AnalyticsViewModel logic to prevent adherence inflation in exported reports
-        fun isEntryMissed(entry: ScheduleEntry): Boolean =
-            entry.status == com.example.dosezy.data.model.MedicationStatus.MISSED ||
-            (entry.status == com.example.dosezy.data.model.MedicationStatus.PENDING && evalNow.isAfter(entry.scheduledDateTime) &&
-                java.time.Duration.between(entry.scheduledDateTime, evalNow).toHours() >= missedAfterHours.toLong())
-
-        // Guard: Exclude PRN ad-hoc doses and future entries from adherence calculation to match in-app analytics
-        val adherenceEntries = schedules.filter {
-            !it.entryId.startsWith("PRN_") && it.scheduledDateTime.toLocalDate() <= evalToday
-        }
-
-        val totalCount = adherenceEntries.size
-        val takenOnTimeCount = adherenceEntries.count { it.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_ON_TIME }
-        val takenLateCount = adherenceEntries.count { it.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_LATE }
-        val skippedCount = adherenceEntries.count { it.status == com.example.dosezy.data.model.MedicationStatus.SKIPPED }
-        val missedCount = adherenceEntries.count { isEntryMissed(it) }
-        val pendingCount = adherenceEntries.count { it.status == com.example.dosezy.data.model.MedicationStatus.PENDING && !isEntryMissed(it) }
-
-        val takenTotal = takenOnTimeCount + takenLateCount
-        val decidedCount = takenTotal + missedCount
-        val adherenceRate = if (decidedCount > 0) (takenTotal.toDouble() / decidedCount * 100.0) else 0.0
-        val rateFormatted = String.format(java.util.Locale.US, "%.1f%%", adherenceRate)
-
-        canvas.drawText("Adherence & Analytics Summary", 40f, y, headerPaint)
-        y += 16f
-
-        val cardRect = android.graphics.RectF(40f, y, 555f, y + 46f)
-        val cardPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.parseColor("#F3F4F6")
-        }
-        canvas.drawRoundRect(cardRect, 8f, 8f, cardPaint)
-
-        val rateColor = if (adherenceRate >= 90.0) Color.parseColor("#10B981")
-                        else if (adherenceRate >= 70.0) Color.parseColor("#1193D4")
-                        else Color.parseColor("#EF4444")
-
-        val ratePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = rateColor
-            textSize = 15f
-            isFakeBoldText = true
-        }
-        canvas.drawText("Overall Adherence: $rateFormatted", 52f, y + 20f, ratePaint)
-
-        val cardSubPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.parseColor("#4B5563")
-            textSize = 9.5f
-        }
-        val breakdownText = "On-Time: $takenOnTimeCount   |   Late: $takenLateCount   |   Skipped: $skippedCount   |   Missed: $missedCount   |   Pending: $pendingCount   |   Total: $totalCount"
-        canvas.drawText(breakdownText, 52f, y + 36f, cardSubPaint)
-
-        y += 56f
-        canvas.drawLine(40f, y, 555f, y, linePaint)
-        y += 20f
-
-        // Active Medications Table
-        checkPageBreak(50f)
-        canvas.drawText("Active Medications (${medicines.size})", 40f, y, headerPaint)
-        y += 18f
-
-        subtitlePaint.isFakeBoldText = true
-        canvas.drawText("Medication", 40f, y, subtitlePaint)
-        canvas.drawText("Dosage", 220f, y, subtitlePaint)
-        canvas.drawText("Frequency", 360f, y, subtitlePaint)
-        y += 12f
-        canvas.drawLine(40f, y, 555f, y, linePaint)
-        y += 16f
-
-        subtitlePaint.isFakeBoldText = false
-        medicines.forEach { med ->
-            checkPageBreak(20f)
-            canvas.drawText(med.medicationName, 40f, y, textPaint)
-            canvas.drawText("${med.dosage} ${med.dosageUnit}", 220f, y, textPaint)
-            val freqLabel = med.getFrequencyDisplay()
-            canvas.drawText(freqLabel, 360f, y, textPaint)
-            y += 16f
-        }
-        if (medicines.isEmpty()) {
-            canvas.drawText("No active medications recorded.", 40f, y, textPaint)
-            y += 16f
-        }
-
-        y += 10f
-        canvas.drawLine(40f, y, 555f, y, linePaint)
-        y += 25f
-
-        // Schedule Logs Table
-        checkPageBreak(50f)
-        val sortedSchedules = schedules.sortedByDescending { it.scheduledDateTime }
-        val medMap = medicines.associateBy { it.medicineId }
-        // Guard: Explicitly clarify entry count in dose history header when total schedules exceed the 150-item PDF page limit
-        val historyHeaderText = if (sortedSchedules.size > 150) {
-            "Recent Dose History (Latest 150 of ${sortedSchedules.size} entries)"
-        } else {
-            "Recent Dose History (${sortedSchedules.size} entries)"
-        }
-        canvas.drawText(historyHeaderText, 40f, y, headerPaint)
-        y += 18f
-
-        subtitlePaint.isFakeBoldText = true
-        canvas.drawText("Scheduled Date/Time", 40f, y, subtitlePaint)
-        canvas.drawText("Medication", 155f, y, subtitlePaint)
-        canvas.drawText("Status", 340f, y, subtitlePaint)
-        canvas.drawText("Recorded Time", 440f, y, subtitlePaint)
-        y += 12f
-        canvas.drawLine(40f, y, 555f, y, linePaint)
-        y += 16f
-
-        subtitlePaint.isFakeBoldText = false
-        sortedSchedules.take(150).forEach { sch ->
-            checkPageBreak(20f)
-            val dateStr = sch.scheduledDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
-            canvas.drawText(dateStr, 40f, y, textPaint)
-
-            val med = medMap[sch.medicineId]
-            val medName = med?.medicationName ?: "Unknown"
-            val doseStr = med?.let { " (${it.getDosageDisplay(sch.scheduledDateTime.toLocalTime())})" } ?: ""
-            val fullMed = "$medName$doseStr"
-            val truncatedMed = if (fullMed.length > 28) fullMed.take(25) + "..." else fullMed
-            canvas.drawText(truncatedMed, 155f, y, textPaint)
-
-            val statusLabel = when (sch.status) {
-                com.example.dosezy.data.model.MedicationStatus.TAKEN_ON_TIME -> "Taken On Time"
-                com.example.dosezy.data.model.MedicationStatus.TAKEN_LATE -> "Taken Late"
-                com.example.dosezy.data.model.MedicationStatus.MISSED -> "Missed"
-                com.example.dosezy.data.model.MedicationStatus.SKIPPED -> "Skipped"
-                com.example.dosezy.data.model.MedicationStatus.PENDING -> "Pending"
-            }
-            canvas.drawText(statusLabel, 340f, y, textPaint)
-            val takenStr = if (sch.takenAt != null && sch.takenAt.year > 1970) {
-                sch.takenAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
-            } else if (sch.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_ON_TIME || sch.status == com.example.dosezy.data.model.MedicationStatus.TAKEN_LATE) {
-                sch.scheduledDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
-            } else {
-                "-"
-            }
-            canvas.drawText(takenStr, 440f, y, textPaint)
-            y += 16f
-        }
-        if (schedules.isEmpty()) {
-            canvas.drawText("No schedule history recorded.", 40f, y, textPaint)
-            y += 16f
-        }
-
-        drawFooter(canvas, pageNumber)
-        pdfDocument.finishPage(page)
-        return pdfDocument
+    internal fun buildPdfDocument(user: User, medicines: List<Medicine>, schedules: List<ScheduleEntry>): PdfDocument {
+        return pdfReportGenerator.buildPdfDocument(user, medicines, schedules)
     }
 
     companion object {
@@ -673,7 +455,12 @@ class DataExporter(
 
     suspend fun getExportDirectory(): File {
         return withContext(Dispatchers.IO) {
-            context.getExternalFilesDir(null) ?: context.filesDir
+            // Guard: Prefer internal cache directory for exports to prevent cleartext PHI exposure over USB MTP (#HIPAA, #GDPR)
+            val dir = File(context.cacheDir, "exports")
+            if (!dir.exists()) {
+                dir.mkdirs()
+            }
+            dir
         }
     }
 
@@ -721,6 +508,7 @@ class DataExporter(
         )
     }
 
+    // Guard: Intentionally format pharmacy orders using the passed context (representing the active ordering user or caregiver) so refill order text remains in the active user's and local pharmacy's expected language without switching per-profile in multi-user orders
     fun generateConsolidatedPharmacyOrderText(
         profilesWithMedicines: List<Pair<User, List<Medicine>>>,
         supplyDays: Int = 30,
@@ -826,10 +614,13 @@ class DataExporter(
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
         val clip = android.content.ClipData.newPlainText(context.getString(com.example.dosezy.R.string.pharmacy_order_title), text)
         clipboard.setPrimaryClip(clip)
-        android.widget.Toast.makeText(
-            context,
-            context.getString(com.example.dosezy.R.string.pharmacy_order_copied),
-            android.widget.Toast.LENGTH_SHORT
-        ).show()
+        // Guard: Android 13+ (API 33+) provides system-level clipboard UI confirmation; suppress redundant Toast to prevent duplicate notifications
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            android.widget.Toast.makeText(
+                context,
+                context.getString(com.example.dosezy.R.string.pharmacy_order_copied),
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 }

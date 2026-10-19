@@ -121,28 +121,32 @@ fun detectDeviceEmergencyCountry(context: android.content.Context, userLanguage:
         com.example.dosezy.data.model.Language.CHINESE -> emergencyCountries.find { it.code == "CN" }
         com.example.dosezy.data.model.Language.JAPANESE -> emergencyCountries.find { it.code == "JP" }
         com.example.dosezy.data.model.Language.RUSSIAN -> emergencyCountries.find { it.code == "RU" }
+        // Guard: Portuguese language fallback favors Brazil profile over generic EU
+        com.example.dosezy.data.model.Language.PORTUGUESE -> emergencyCountries.find { it.code == "BR" } ?: emergencyCountries.find { it.code == "EU" }
         com.example.dosezy.data.model.Language.SPANISH,
         com.example.dosezy.data.model.Language.FRENCH,
         com.example.dosezy.data.model.Language.GERMAN,
-        com.example.dosezy.data.model.Language.ITALIAN,
-        com.example.dosezy.data.model.Language.PORTUGUESE -> emergencyCountries.find { it.code == "EU" }
+        com.example.dosezy.data.model.Language.ITALIAN -> emergencyCountries.find { it.code == "EU" }
         com.example.dosezy.data.model.Language.HINDI -> emergencyCountries.find { it.code == "IN" }
         else -> emergencyCountries.find { it.code == "US" }
     } ?: emergencyCountries.find { it.code == "GB" } ?: emergencyCountries.first()
 }
 
-private fun matchEmergencyCountryByIso(iso: String): CountryEmergency? {
+internal fun matchEmergencyCountryByIso(iso: String): CountryEmergency? {
     return when (iso) {
         "GB" -> emergencyCountries.find { it.code == "GB" }
-        "US", "CA" -> emergencyCountries.find { it.code == "US" }
+        // Guard: Map North and Central American 911 jurisdictions (e.g. Mexico MX) to US/CA 911 profile
+        "US", "CA", "MX", "CR", "PA", "DO", "EC", "UY" -> emergencyCountries.find { it.code == "US" }
         "IN" -> emergencyCountries.find { it.code == "IN" }
-        "AU" -> emergencyCountries.find { it.code == "AU" }
+        // Guard: Map Oceania jurisdictions using 000/111 to AU profile
+        "AU", "NZ" -> emergencyCountries.find { it.code == "AU" }
         "BD" -> emergencyCountries.find { it.code == "BD" }
         "BR" -> emergencyCountries.find { it.code == "BR" }
         "CN" -> emergencyCountries.find { it.code == "CN" }
         "JP" -> emergencyCountries.find { it.code == "JP" }
         "RU" -> emergencyCountries.find { it.code == "RU" }
-        "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "NO", "CH", "IS", "LI" -> emergencyCountries.find { it.code == "EU" }
+        // Guard: Map European 112 member and affiliated states to EU profile
+        "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "NO", "CH", "IS", "LI", "UA", "TR" -> emergencyCountries.find { it.code == "EU" }
         else -> null
     }
 }
@@ -203,14 +207,14 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
     // Persist personal contacts via SharedPreferences, namespaced per user profile
     val prefs = context.getSharedPreferences("emergency_contacts", android.content.Context.MODE_PRIVATE)
     val customContacts = remember(currentUser?.userId) {
-        val userKey = "contacts_json_${currentUser?.userId ?: "default"}"
-        var saved = prefs.getString(userKey, null)
-        // Fallback to legacy un-namespaced key if userKey is not set yet
-        if (saved == null && prefs.contains("contacts_json")) {
+        val currentUserId = currentUser?.userId
+        val userKey = if (currentUserId != null) "contacts_json_$currentUserId" else null
+        var saved = if (userKey != null) prefs.getString(userKey, null) else null
+        // Guard: Migrate legacy contacts_json only once into active profile; never fall back to contacts_json_default to prevent leaking contacts to newly created profiles
+        if (currentUserId != null && saved == null) {
             saved = prefs.getString("contacts_json", null)
             if (saved != null) {
-                // Guard: Remove legacy un-namespaced key upon migration to prevent newly created profiles from inheriting another user's contacts
-                prefs.edit().putString(userKey, saved).remove("contacts_json").apply()
+                prefs.edit().putString(userKey, saved).remove("contacts_json").remove("contacts_json_default").apply()
             }
         }
         val list = androidx.compose.runtime.mutableStateListOf<Pair<String, String>>()
@@ -228,6 +232,8 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
 
     // Helper to persist contacts
     fun saveContacts() {
+        // Guard: Prevent saving to unisolated default key when currentUser is null to prevent cross-profile contact leakage
+        val userId = currentUser?.userId ?: return
         val arr = org.json.JSONArray()
         customContacts.forEach { (name, phone) ->
             val obj = org.json.JSONObject()
@@ -235,8 +241,8 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
             obj.put("phone", phone)
             arr.put(obj)
         }
-        val userKey = "contacts_json_${currentUser?.userId ?: "default"}"
-        prefs.edit().putString(userKey, arr.toString()).apply()
+        val userKey = "contacts_json_$userId"
+        prefs.edit().putString(userKey, arr.toString()).remove("contacts_json_default").apply()
     }
 
     var showAddContactDialog by remember { mutableStateOf(false) }
@@ -248,6 +254,39 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
             .verticalScroll(scrollState)
             .padding(16.dp)
     ) {
+        // Guard: Prominent emergency dispatch disclaimer to prevent wrongful reliance during life-threatening crises (#FCC, #Torts)
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            shape = RoundedCornerShape(14.dp),
+            color = Color(0xFFEF4444).copy(alpha = 0.08f),
+            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFEF4444).copy(alpha = 0.25f))
+        ) {
+            Row(
+                modifier = Modifier.padding(14.dp),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Text("⚠️", fontSize = 16.sp)
+                Column {
+                    Text(
+                        text = stringResource(com.example.dosezy.R.string.emergency_dispatch_warning_title),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp,
+                        color = Color(0xFFEF4444)
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = stringResource(com.example.dosezy.R.string.emergency_dispatch_warning_desc),
+                        fontSize = 12.sp,
+                        lineHeight = 17.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+
         // Patient Medical Alert & Emergency Profile Card
         val user = currentUser
         if (user != null) {
@@ -356,7 +395,7 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
             }
         }
 
-        // Country Dropdown Picker (no redundant header — TopBar already shows title)
+        // Country Dropdown Picker (no redundant header - TopBar already shows title)
         ExposedDropdownMenuBox(
             expanded = countryDropdownExpanded,
             onExpandedChange = { countryDropdownExpanded = !countryDropdownExpanded }
@@ -392,11 +431,12 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
                         onClick = {
                             selectedCountry = country
                             savedCountryCode = country.code
-                            // Guard: Save namespaced preference and global fallback so profile switches maintain respective country selection
-                            emergencyPrefs.edit()
-                                .putString(userCountryKey, country.code)
-                                .putString("selected_country_code", country.code)
-                                .apply()
+                            // Guard: Save namespaced preference, and only update global fallback for primary user to prevent secondary profiles from polluting default emergency country
+                            val editor = emergencyPrefs.edit().putString(userCountryKey, country.code)
+                            if (currentUser == null || currentUser.isCurrentUser) {
+                                editor.putString("selected_country_code", country.code)
+                            }
+                            editor.apply()
                             countryDropdownExpanded = false
                         },
                         modifier = Modifier.background(MaterialTheme.colorScheme.surface)

@@ -20,8 +20,10 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -91,6 +93,9 @@ class ScheduleViewModelTest {
         every { userRepository.getAllUsers() } returns flowOf(listOf(testUser))
         every { scheduleRepository.getScheduleForUser("user_123") } returns flowOf(listOf(testScheduleEntry))
         every { scheduleRepository.getScheduleWithMedicineForDate("user_123", any()) } returns flowOf(listOf(testScheduleWithMedicine))
+        coEvery { scheduleRepository.getScheduleEntryById("entry_1") } returns testScheduleEntry
+        coEvery { userRepository.getUserByIdSync("user_123") } returns testUser
+        coEvery { userRepository.getAllUsersList() } returns listOf(testUser)
     }
 
     @After
@@ -146,6 +151,25 @@ class ScheduleViewModelTest {
             )
         }
         coVerify(atLeast = 1) { scheduleRepository.getScheduleWithMedicineForDate("user_123", any()) }
+    }
+
+    @Test
+    fun markAsTaken_pastLateThreshold_recordsTakenLate() = runTest {
+        // Guard: Verify that doses taken past considerLateAfter threshold (3 hours) record TAKEN_LATE status (#BUG-VM-LATE-STATUS)
+        val viewModel = createViewModel()
+        val takenAt = "2026-09-21T12:15:00" // 4 hours 15 mins after 08:00 AM scheduled dose
+
+        viewModel.markAsTaken("entry_1", takenAt)
+
+        coVerify {
+            scheduleRepository.recordDoseTaken(
+                entryId = "entry_1",
+                status = "TAKEN_LATE",
+                takenAtStr = takenAt,
+                context = context,
+                notes = null
+            )
+        }
     }
 
     @Test
@@ -232,5 +256,83 @@ class ScheduleViewModelTest {
         viewModel.refreshAfterMedicineAdded()
 
         coVerify(atLeast = 2) { scheduleRepository.getScheduleWithMedicineForDate("user_123", any()) }
+    }
+
+    @Test
+    fun userLoggedOutOrDeleted_clearsScheduleAndStateFlows() = runTest {
+        // Guard: Verify schedule entries and flows are flushed and background jobs cancelled when user becomes null
+        val usersFlow = MutableStateFlow(listOf(testUser))
+        every { userRepository.getAllUsers() } returns usersFlow
+        val viewModel = createViewModel()
+
+        assertEquals(1, viewModel.todayScheduleWithMedicine.value.size)
+
+        // Simulate user logged out or profile deleted
+        usersFlow.value = emptyList()
+
+        assertEquals(0, viewModel.todayScheduleWithMedicine.value.size)
+        assertEquals(0, viewModel.scheduleWithMedicine.value.size)
+        assertEquals(0, viewModel.scheduleEntries.value.size)
+    }
+
+    @Test
+    fun markCohortAsTaken_fallbackBranch_forwardsNotesToRepository() = runTest {
+        // Guard: Verify markCohortAsTaken passes clinical dose notes to scheduleRepository in fallback branch (#BUG-COHORT-DOSE-NOTES)
+        val viewModel = createViewModel()
+        val takenAt = "2026-09-21T08:05:00"
+        val notes = "Took with breakfast and glass of water"
+
+        viewModel.markCohortAsTaken(listOf("entry_1"), takenAt, lateAfter = 3, notes = notes)
+
+        coVerify {
+            scheduleRepository.recordDoseTaken(
+                entryId = "entry_1",
+                status = "TAKEN_ON_TIME",
+                takenAtStr = takenAt,
+                context = context,
+                notes = notes
+            )
+        }
+    }
+
+    @Test
+    fun markCohortAsTaken_withUseCase_forwardsNotesToUseCase() = runTest {
+        // Guard: Verify markCohortAsTaken passes clinical dose notes to takeCohortUseCase (#BUG-COHORT-DOSE-NOTES)
+        val mockUseCase: com.example.dosezy.domain.usecases.TakeCohortUseCase = mockk(relaxed = true)
+        val viewModel = ScheduleViewModel(
+            scheduleRepository = scheduleRepository,
+            userRepository = userRepository,
+            context = context,
+            takeCohortUseCase = mockUseCase
+        )
+        val takenAt = "2026-09-21T08:05:00"
+        val notes = "Mild nausea observed"
+
+        viewModel.markCohortAsTaken(listOf("entry_1"), takenAt, lateAfter = 3, notes = notes)
+
+        coVerify {
+            mockUseCase.invoke(
+                entryIds = listOf("entry_1"),
+                customTakenAt = LocalDateTime.parse(takenAt),
+                notes = notes
+            )
+        }
+    }
+
+    @Test
+    fun logAsNeededDose_invokesRepositoryAndRefreshesCalendarIndicatorCache() = runTest {
+        // Guard: Verify that logging an as-needed dose re-queries schedule entries to update month-wide calendar indicators
+        val viewModel = createViewModel()
+        coEvery { scheduleRepository.logAsNeededDose(any(), any(), any(), any()) } returns mockk(relaxed = true)
+
+        viewModel.logAsNeededDose(testMedicine)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        coVerify(exactly = 1) {
+            scheduleRepository.logAsNeededDose(testMedicine, "user_123", any(), context)
+        }
+        verify(atLeast = 1) {
+            scheduleRepository.getScheduleForUser("user_123")
+        }
     }
 }

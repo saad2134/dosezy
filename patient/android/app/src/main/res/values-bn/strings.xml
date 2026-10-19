@@ -435,6 +435,7 @@
     <string name="to_be_taken_in">%1$dঘণ্টা %2$dমিনিটের মধ্যে সেব্য</string>
     <string name="time_diff_ago">%1$dঘণ্টা %2$dমিনিট আগে</string>
     <string name="status_all_medications_taken">সমস্ত ওষুধ গ্রহণ করা হয়েছে</string>
+    <string name="status_slot_completed_with_skipped">সম্পূর্ণ (কিছু বাদ দেওয়া হয়েছে)</string>
     <string name="status_scheduled_for_this_time">এই সময়ের জন্য নির্ধারিত</string>
     <string name="daily_frequency_presets_title">দৈনিক ফ্রিকোয়েন্সি প্রিসেট</string>
     <string name="action_edit_medicine_cd">ওষুধ সম্পাদনা করুন</string>
@@ -569,7 +570,7 @@
     <string name="alarm_duration_1m">১ মিনিট</string>
     <string name="alarm_duration_2m">২ মিনিট</string>
     <string name="alarm_duration_5m">৫ মিনিট</string>
-    <string name="alarm_silenced_auto_banner">অ্যালার্ম স্বয়ংক্রিয়ভাবে বন্ধ হয়েছে — সুবিধামতো ওষুধের হিসাব লিপিবদ্ধ করুন</string>
+    <string name="alarm_silenced_auto_banner">অ্যালার্ম স্বয়ংক্রিয়ভাবে বন্ধ হয়েছে - সুবিধামতো ওষুধের হিসাব লিপিবদ্ধ করুন</string>
     <string name="notif_exact_alarm_title">সঠিক সময়ের অ্যালার্ম</string>
     <string name="notif_exact_alarm_granted">অ্যালার্ম যথাসময়ে বাজবে।</string>
     <string name="notif_exact_alarm_desc">অ্যালার্ম সঠিক সময়ে বাজার জন্য প্রয়োজনীয়।</string>
@@ -784,7 +785,7 @@
     <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
     <string name="pref_section_appearance">রূপ ও প্রদর্শন</string>
     <string name="pref_slide_actions_title">গ্রহণ ও স্নুজ করতে স্লাইড করুন</string>
-    <string name="pref_slide_actions_desc">অ্যালার্মে ওষুধ গ্রহণ বা স্নুজ করতে ট্যাপ করার পরিবর্তে স্লাইড করার প্রয়োজন।</string>
+    <string name="pref_slide_actions_desc">অ্যালার্মে ট্যাপের বদলে স্লাইড করে ওষুধ গ্রহণ বা স্নুজ করুন।</string>
     <string name="pref_timeline_mode_title">টাইমলাইন ভিউ</string>
     <string name="pref_timeline_mode_desc">আজকের সময়সূচি একটি বিস্তারিত উল্লম্ব টাইমলাইনে প্রদর্শন করুন।</string>
     <string name="pref_calendar_thicker_highlight_title">পূর্ণ ফ্রেম বিশিষ্ট দিন</string>
@@ -794,4 +795,65 @@
     <string name="alarm_slide_to_snooze">স্নুজ করতে স্লাইড করুন (%1$d মি)</string>
     <string name="home_view_standard">সাধারণ</string>
     <string name="home_view_timeline">টাইমলাইন</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">স্নুজ করুন:</string>
+    <string name="snooze_duration_chip_format">%1$d মি</string>
+    <string name="pref_custom_snooze_title">কাস্টম স্নুজ বিকল্প</string>
+    <string name="pref_custom_snooze_desc">অ্যালার্ম বাজার সময় বিভিন্ন স্নুজ সময়কাল বেছে নিন।</string>
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">ওষুধ গ্রহণের কাউন্টডাউন সুরক্ষা</string>
+    <string name="pref_intake_safeguard_desc">ADHD সহায়তা: ওষুধ গ্রহণের নিশ্চিতকরণের আগে কাউন্টডাউন বাফার এবং বিভ্রান্ত হলে পুনরায় সতর্কবার্তা।</string>
+    <string name="pref_intake_duration_title">সুরক্ষার সময়কাল</string>
+    <string name="pref_intake_duration_format">%1$d মিনিট</string>
+    <string name="dialog_intake_duration_title">সুরক্ষার সময়কাল নির্বাচন করুন</string>
+    <string name="notif_intake_in_progress_title">ওষুধ গ্রহণ প্রক্রিয়াধীন</string>
+    <string name="notif_intake_in_progress_desc">%1$s: গ্রহণের পর নিশ্চিত করুন</string>
+    <string name="notif_intake_action_confirm">গ্রহণ নিশ্চিত করুন</string>
+    <string name="notif_intake_action_extend">+১ মিনিট</string>
+    <string name="notif_intake_action_cancel">বাতিল</string>
+    <string name="notif_intake_realert_title">ওষুধ গ্রহণ নিশ্চিত হয়নি</string>
+    <string name="notif_intake_realert_desc">আপনি কি %1$s গ্রহণ করেছেন? গ্রহণ নিশ্চিত করতে বা স্নুজ করতে আলতো চাপুন।</string>
+    <string name="home_intake_in_progress">%1$s গ্রহণ প্রক্রিয়াধীন রয়েছে</string>
+    <string name="home_intake_time_remaining">%1$s বাকি</string>
+    <string name="home_intake_confirm">গ্রহণ নিশ্চিত করুন</string>
+    <string name="home_intake_extend">+১ মিনিট</string>
+    <string name="home_intake_cancel">বাতিল</string>
+    <string name="home_intake_confirmed">%1$s গ্রহণ রেকর্ড করা হয়েছে</string>
+    <string name="home_intake_cancelled">ওষুধ গ্রহণের সুরক্ষা বাতিল করা হয়েছে</string>
+    <string name="alarm_realert_badge">ADHD ওষুধ গ্রহণ পুনরায় সতর্কতা</string>
+    <string name="alarm_realert_subtitle">আপনি পূর্বে গ্রহণ করেছি চাপলেও নিশ্চিত করেননি। আপনি কি ওষুধ গ্রহণ করেছেন?</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">সবগুলো গ্রহণ করুন</string>
+    <string name="take_all_count">সবগুলো গ্রহণ করুন (%1$d)</string>
+    <string name="dialog_take_all_title">সবগুলো ওষুধ গ্রহণ করবেন?</string>
+    <string name="dialog_take_all_message">%2$s সময়ের নির্ধারিত সমস্ত %1$dটি ওষুধ গৃহীত হিসেবে চিহ্নিত করবেন?</string>
+    <string name="take_all_success_toast">সমস্ত %1$dটি ওষুধ গৃহীত হিসেবে চিহ্নিত করা হয়েছে</string>
+
+    <!-- Legal, Privacy & Compliance Safeguards -->
+    <string name="notif_generic_lockscreen_reminder">নির্ধারিত ওষুধের অনুস্মারক</string>
+    <string name="pref_lockscreen_details_title">লক স্ক্রিনে বিবরণ দেখান</string>
+    <string name="pref_lockscreen_details_desc">ডিভাইস আনলক না করা পর্যন্ত ওষুধের নাম ও ডোজ লুকান।</string>
+    <string name="disclaimer_dialog_title">চিকিৎসা ও আইনি দাবিত্যাগ</string>
+    <string name="disclaimer_dialog_summary">ডোজইজি একটি স্বয়ংক্রিয় ডিজিটাল রিমাইন্ডার এবং কোনো নিয়ন্ত্রিত চিকিৎসা ডিভাইস নয়। এটি চিকিৎসা নির্ণয়, ডোজ গণনা বা ক্লিনিকাল পরামর্শ প্রদান করে না। প্রেসক্রিপশন নির্দেশাবলীর জন্য সর্বদা আপনার চিকিৎসকের পরামর্শ নিন।</string>
+    <string name="disclaimer_checkbox_consent">আমি চিকিৎসা দাবিত্যাগ এবং পরিষেবার শর্তাবলী বুঝতে পেরেছি এবং গ্রহণ করছি।</string>
+    <string name="disclaimer_action_agree">স্বীকার করুন ও এগিয়ে যান</string>
+    <string name="disclaimer_link_medical">চিকিৎসা দাবিত্যাগ</string>
+    <string name="disclaimer_link_privacy">গোপনীয়তা নীতি</string>
+    <string name="disclaimer_link_terms">পরিষেবার শর্তাবলী</string>
+    <string name="emergency_dispatch_warning_title">জরুরী নোটিশ</string>
+    <string name="emergency_dispatch_warning_desc">ডোজইজি কোনো জরুরী পরিষেবা প্রদানকারী বা ৯১১/১১২ এর বিকল্প নয়। জীবন-হুমকিপূর্ণ পরিস্থিতিতে সরাসরি আপনার স্থানীয় জরুরী সেবায় কল করুন। প্রদর্শিত নম্বরটি আপনার এলাকার সাথে মিলছে কিনা তা যাচাই করুন।</string>
+    <string name="pdf_report_disclaimer_footer">ডোজইজি মেডিসিন ট্র্যাকার • স্ব-প্রতিবেদিত তথ্যমূলক লগ (নন-ক্লিনিকাল)</string>
+    <string name="pharmacy_refill_estimation_disclaimer">বিজ্ঞপ্তি: রিফিল পরিমাণ নির্ধারিত ফ্রিকোয়েন্সির উপর ভিত্তি করে আনুমানিক গণনা। আপনার ফার্মাসিস্ট বা ডাক্তারের সাথে যাচাই করুন।</string>
+    <string name="alarm_unlock_to_view_details">বিস্তারিত দেখতে আনলক করুন</string>
+    <string name="alarm_lockscreen_details_hidden">ডিভাইস লক থাকা অবস্থায় ওষুধের নাম ও ডোজ লুকানো থাকে।</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">সময়সূচীর পরিবর্তন প্রয়োগ করুন</string>
+    <string name="schedule_effective_dialog_message">এই আপডেট করা সময়সূচী কখন থেকে কার্যকর হবে?</string>
+    <string name="schedule_effective_today_title">আজ থেকেই শুরু</string>
+    <string name="schedule_effective_today_desc">আজকের নতুন সময় প্রয়োগ করুন। আজকের অতীতের না নেওয়া ডোজ মুছে ফেলা হবে।</string>
+    <string name="schedule_effective_tomorrow_title">আগামীকাল থেকে শুরু</string>
+    <string name="schedule_effective_tomorrow_desc">আজকের সময়সূচী অপরিবর্তিত রাখুন। নতুন সময়সূচী আগামীকাল থেকে শুরু হবে।</string>
 </resources>

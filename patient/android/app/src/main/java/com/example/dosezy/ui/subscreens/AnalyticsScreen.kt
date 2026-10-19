@@ -365,7 +365,8 @@ fun UnifiedAdherenceCard(
                             horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            rangeDataList.filter { it.range != AdherenceRange.ALL }.forEach { rData ->
+                            // Guard: Exclude AdherenceRange.TOTAL so only distinct sub-periods are rendered without duplicate all-time ring (#BUG-ANALYTICS-TOTAL-RING)
+                            rangeDataList.filter { it.range != AdherenceRange.ALL && it.range != AdherenceRange.TOTAL }.forEach { rData ->
                                 val ringColor = when {
                                     rData.rate >= 80 -> Color(0xFF10B981)
                                     rData.rate >= 50 -> Color(0xFFF59E0B)

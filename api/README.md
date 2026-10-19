@@ -69,7 +69,7 @@ npx @openapitools/openapi-generator-cli generate \
 
 | Domain Entity | Room DB Model (`com.example.dosezy.data.model`) | Generated Network DTO (`com.example.dosezy.network.models`) | Match Status |
 | :--- | :--- | :--- | :--- |
-| **User** | `userId`, `fullName`, `age`, `gender`, `contactNumber`, `profilePicPath`, `isCurrentUser`, `theme`, `timeFormat`, `language`, `considerLateAfter`, `considerMissedAfter`, `snoozeDuration`, `allergies`, `medicalConditions`, `naggingRemindersEnabled`, `naggingIntervalMinutes`, `naggingMaxRepeats`, `alarmSound`, `customAlarmSoundPath`, `customAlarmSoundTitle`, `alarmDurationSeconds`, `allowDoseSkipping`, `allowCustomDoseTime`, `hideAddMedicineNavButton`, `allowDoseUndo`, `allowDoseNotes`, `promptDoseNotes` | `userId`, `fullName`, `age`, `gender`, `contactNumber`, `profilePicPath`, `isCurrentUser`, `theme`, `timeFormat`, `language`, `considerLateAfter`, `considerMissedAfter`, `snoozeDuration`, `allergies`, `medicalConditions`, `naggingRemindersEnabled`, `naggingIntervalMinutes`, `naggingMaxRepeats`, `alarmSound`, `customAlarmSoundPath`, `customAlarmSoundTitle`, `alarmDurationSeconds`, `allowDoseSkipping`, `allowCustomDoseTime`, `hideAddMedicineNavButton`, `allowDoseUndo`, `allowDoseNotes`, `promptDoseNotes` | **100% Match** |
+| **User** | `userId`, `fullName`, `age`, `gender`, `contactNumber`, `profilePicPath`, `isCurrentUser`, `theme`, `timeFormat`, `language`, `considerLateAfter`, `considerMissedAfter`, `snoozeDuration`, `allergies`, `medicalConditions`, `naggingRemindersEnabled`, `naggingIntervalMinutes`, `naggingMaxRepeats`, `alarmSound`, `customAlarmSoundPath`, `customAlarmSoundTitle`, `alarmDurationSeconds`, `allowDoseSkipping`, `allowCustomDoseTime`, `hideAddMedicineNavButton`, `allowDoseUndo`, `allowDoseNotes`, `promptDoseNotes`, `slideActionsEnabled`, `timelineModeEnabled`, `thickerCalendarDayHighlight`, `intakeSafeguardEnabled`, `intakeCountdownSeconds` | `userId`, `fullName`, `age`, `gender`, `contactNumber`, `profilePicPath`, `isCurrentUser`, `theme`, `timeFormat`, `language`, `considerLateAfter`, `considerMissedAfter`, `snoozeDuration`, `allergies`, `medicalConditions`, `naggingRemindersEnabled`, `naggingIntervalMinutes`, `naggingMaxRepeats`, `alarmSound`, `customAlarmSoundPath`, `customAlarmSoundTitle`, `alarmDurationSeconds`, `allowDoseSkipping`, `allowCustomDoseTime`, `hideAddMedicineNavButton`, `allowDoseUndo`, `allowDoseNotes`, `promptDoseNotes`, `slideActionsEnabled`, `timelineModeEnabled`, `thickerCalendarDayHighlight`, `intakeSafeguardEnabled`, `intakeCountdownSeconds` | **100% Match** |
 | **Medicine** | `medicineId`, `userId`, `medicationName`, `dosage`, `dosageUnit`, `timesPerDay`, `frequency`, `scheduledTimes`, `imageUri`, `pillShape`, `pillColor`, `startDate`, `endDate`, `durationDays`, `isArchived`, `notes`, `currentStock`, `refillThreshold`, `autoDeductOnTake`, `customDosages` | `medicineId`, `userId`, `medicationName`, `dosage`, `dosageUnit`, `timesPerDay`, `frequency`, `scheduledTimes`, `imageUri`, `pillShape`, `pillColor`, `startDate`, `endDate`, `durationDays`, `isArchived`, `notes`, `currentStock`, `refillThreshold`, `autoDeductOnTake`, `customDosages` | **100% Match** |
 | **ScheduleEntry** | `entryId`, `userId`, `medicineId`, `scheduledDateTime`, `status`, `takenAt`, `skipReason`, `dosage`, `doseNotes` | `entryId`, `userId`, `medicineId`, `scheduledDateTime`, `status`, `takenAt`, `skipReason`, `dosage`, `doseNotes` | **100% Match** |
 
@@ -127,7 +127,12 @@ fun User.toNetworkDto(): com.example.dosezy.network.models.User {
         hideAddMedicineNavButton = this.hideAddMedicineNavButton,
         allowDoseUndo = this.allowDoseUndo,
         allowDoseNotes = this.allowDoseNotes,
-        promptDoseNotes = this.promptDoseNotes
+        promptDoseNotes = this.promptDoseNotes,
+        slideActionsEnabled = this.slideActionsEnabled,
+        timelineModeEnabled = this.timelineModeEnabled,
+        thickerCalendarDayHighlight = this.thickerCalendarDayHighlight,
+        intakeSafeguardEnabled = this.intakeSafeguardEnabled,
+        intakeCountdownSeconds = this.intakeCountdownSeconds
     )
 }
 
@@ -161,7 +166,12 @@ fun com.example.dosezy.network.models.User.toRoomEntity(): User {
         hideAddMedicineNavButton = this.hideAddMedicineNavButton ?: false,
         allowDoseUndo = this.allowDoseUndo ?: false,
         allowDoseNotes = this.allowDoseNotes ?: false,
-        promptDoseNotes = this.promptDoseNotes ?: false
+        promptDoseNotes = this.promptDoseNotes ?: false,
+        slideActionsEnabled = this.slideActionsEnabled ?: true,
+        timelineModeEnabled = this.timelineModeEnabled ?: false,
+        thickerCalendarDayHighlight = this.thickerCalendarDayHighlight ?: false,
+        intakeSafeguardEnabled = this.intakeSafeguardEnabled ?: false,
+        intakeCountdownSeconds = this.intakeCountdownSeconds ?: 120
     )
 }
 

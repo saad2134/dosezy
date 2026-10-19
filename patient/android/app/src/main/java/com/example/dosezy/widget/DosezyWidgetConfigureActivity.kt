@@ -132,24 +132,32 @@ class DosezyWidgetConfigureActivity : ComponentActivity() {
                 WidgetConfigureScreen(
                     appWidgetId = appWidgetId,
                     onDismiss = { finish() },
-                    onProfileConfirmed = { selectedUserId ->
-                        confirmWidgetProfile(selectedUserId)
+                    onProfileConfirmed = { selectedUserId, selectedTheme ->
+                        confirmWidgetProfile(selectedUserId, selectedTheme)
                     }
                 )
             }
         }
     }
 
-    private fun confirmWidgetProfile(selectedUserId: String) {
+    private fun confirmWidgetProfile(selectedUserId: String, selectedUserTheme: String? = null) {
         DosezyWidgetPrefs.saveWidgetProfile(this, appWidgetId, selectedUserId)
 
         try {
-            val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-            val spTheme = prefs.getString("theme", "system") ?: "system"
+            // Guard: Resolve target user's configured theme when binding a specific profile so widget does not inherit active app's theme
+            val resolvedTheme = if (selectedUserId == DosezyWidgetPrefs.ACTIVE_PROFILE_ID) {
+                val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                prefs.getString("theme", "system") ?: "system"
+            } else {
+                selectedUserTheme ?: run {
+                    val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                    prefs.getString("theme", "system") ?: "system"
+                }
+            }
             DosezyWidgetPrefs.saveWidgetProfileTheme(
                 this,
                 selectedUserId,
-                spTheme,
+                resolvedTheme,
                 isCurrentProfile = (selectedUserId == DosezyWidgetPrefs.ACTIVE_PROFILE_ID)
             )
         } catch (_: Exception) {}
@@ -171,7 +179,7 @@ class DosezyWidgetConfigureActivity : ComponentActivity() {
 private fun WidgetConfigureScreen(
     appWidgetId: Int,
     onDismiss: () -> Unit,
-    onProfileConfirmed: (String) -> Unit
+    onProfileConfirmed: (String, String?) -> Unit
 ) {
     val context = LocalContext.current
     val db = remember { DosezyDatabase.getInstance(context) }
@@ -323,7 +331,11 @@ private fun WidgetConfigureScreen(
                         .padding(horizontal = 20.dp, vertical = 14.dp)
                 ) {
                     Button(
-                        onClick = { onProfileConfirmed(selectedProfileId) },
+                        onClick = {
+                            val selectedUser = users.find { it.userId == selectedProfileId }
+                            val selectedTheme = selectedUser?.theme?.name?.lowercase()
+                            onProfileConfirmed(selectedProfileId, selectedTheme)
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp),

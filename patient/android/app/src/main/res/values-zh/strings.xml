@@ -451,6 +451,7 @@
     <string name="to_be_taken_in">%1$d 小时 %2$d 分钟后服用</string>
     <string name="time_diff_ago">%1$d 小时 %2$d 分钟前</string>
     <string name="status_all_medications_taken">所有药物均已服用</string>
+    <string name="status_slot_completed_with_skipped">已完成 (部分已跳过)</string>
     <string name="status_scheduled_for_this_time">已安排在此时间</string>
     <string name="daily_frequency_presets_title">每日服药频率预设</string>
     <string name="action_edit_medicine_cd">编辑药物</string>
@@ -585,7 +586,7 @@
     <string name="alarm_duration_1m">1 分钟</string>
     <string name="alarm_duration_2m">2 分钟</string>
     <string name="alarm_duration_5m">5 分钟</string>
-    <string name="alarm_silenced_auto_banner">已自动停止响铃 — 方便时请确认用药</string>
+    <string name="alarm_silenced_auto_banner">已自动停止响铃 - 方便时请确认用药</string>
 
     <string name="alarm_sound_custom">自定义音频文件</string>
     <string name="alarm_sound_select_file">选择音频文件</string>
@@ -801,7 +802,7 @@
     <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
     <string name="pref_section_appearance">外观与界面</string>
     <string name="pref_slide_actions_title">滑动以服药和稍后提醒</string>
-    <string name="pref_slide_actions_desc">在闹钟提醒中要求通过滑动而不是点击来服药或稍后提醒。</string>
+    <string name="pref_slide_actions_desc">滑动而非点击以确认服药或推迟提醒。</string>
     <string name="pref_timeline_mode_title">时间轴视图</string>
     <string name="pref_timeline_mode_desc">以展开的垂直时间轴显示当天的服药计划。</string>
     <string name="pref_calendar_thicker_highlight_title">日程日全框高亮</string>
@@ -811,4 +812,65 @@
     <string name="alarm_slide_to_snooze">滑动以稍后提醒 (%1$d分钟)</string>
     <string name="home_view_standard">标准</string>
     <string name="home_view_timeline">时间轴</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">稍后提醒:</string>
+    <string name="snooze_duration_chip_format">%1$d分钟</string>
+    <string name="pref_custom_snooze_title">自定义再响选项</string>
+    <string name="pref_custom_snooze_desc">闹钟响起时可选择不同的再响时长。</string>
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">服药倒计时保护</string>
+    <string name="pref_intake_safeguard_desc">ADHD支持：确认服药前的倒计时缓冲期，并在分心时再次发出提醒。</string>
+    <string name="pref_intake_duration_title">保护时长</string>
+    <string name="pref_intake_duration_format">%1$d分钟</string>
+    <string name="dialog_intake_duration_title">选择保护时长</string>
+    <string name="notif_intake_in_progress_title">服药进行中</string>
+    <string name="notif_intake_in_progress_desc">%1$s：服药后请确认</string>
+    <string name="notif_intake_action_confirm">确认服药</string>
+    <string name="notif_intake_action_extend">+1分钟</string>
+    <string name="notif_intake_action_cancel">取消</string>
+    <string name="notif_intake_realert_title">药品未确认</string>
+    <string name="notif_intake_realert_desc">您服用了 %1$s 吗？点击以确认服药或稍后提醒。</string>
+    <string name="home_intake_in_progress">%1$s 服药进行中</string>
+    <string name="home_intake_time_remaining">剩余 %1$s</string>
+    <string name="home_intake_confirm">确认服药</string>
+    <string name="home_intake_extend">+1分钟</string>
+    <string name="home_intake_cancel">取消</string>
+    <string name="home_intake_confirmed">已记录 %1$s 的服药</string>
+    <string name="home_intake_cancelled">已取消服药保护</string>
+    <string name="alarm_realert_badge">ADHD服药再次提醒</string>
+    <string name="alarm_realert_subtitle">您刚才点击了服药，但尚未确认。您吃药了吗？</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">全部服用</string>
+    <string name="take_all_count">全部服用 (%1$d)</string>
+    <string name="dialog_take_all_title">服用所有药品吗？</string>
+    <string name="dialog_take_all_message">将计划于 %2$s 的全部 %1$d 种药品标记为已服用？</string>
+    <string name="take_all_success_toast">已将全部 %1$d 种药品标记为已服用</string>
+
+    <!-- Legal, Privacy & Compliance Safeguards -->
+    <string name="notif_generic_lockscreen_reminder">已计划的服药提醒</string>
+    <string name="pref_lockscreen_details_title">在锁定屏幕上显示详情</string>
+    <string name="pref_lockscreen_details_desc">解锁设备前在锁定屏幕上隐藏药品名称和剂量。</string>
+    <string name="disclaimer_dialog_title">医疗与法律免责声明</string>
+    <string name="disclaimer_dialog_summary">Dosezy 是一款自动化数字服药日程提醒工具，并非受监管的医疗器械。本应用不提供医疗诊断、剂量计算或临床建议。用药说明请务必遵从您的医生或药剂师指导。</string>
+    <string name="disclaimer_checkbox_consent">我已理解并同意医疗免责声明和用户服务协议。</string>
+    <string name="disclaimer_action_agree">同意并继续</string>
+    <string name="disclaimer_link_medical">医疗免责声明</string>
+    <string name="disclaimer_link_privacy">隐私政策</string>
+    <string name="disclaimer_link_terms">用户服务协议</string>
+    <string name="emergency_dispatch_warning_title">紧急救援提示</string>
+    <string name="emergency_dispatch_warning_desc">Dosezy 不是紧急调度机构，不能替代 120/110/911 等急救电话。如遇生命危险，请直接拨打当地急救电话。请核对显示的急救号码是否符合您当前所在地区。</string>
+    <string name="pdf_report_disclaimer_footer">Dosezy 药品追踪器 • 自主申报信息日志（非临床诊断记录）</string>
+    <string name="pharmacy_refill_estimation_disclaimer">注意：补充药品数量为根据记录频度计算的参考估算值。请务必咨询您的药师或医生核准。</string>
+    <string name="alarm_unlock_to_view_details">解锁以查看详情</string>
+    <string name="alarm_lockscreen_details_hidden">设备锁定时隐藏药品名称和用量。</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">应用服药时间更改</string>
+    <string name="schedule_effective_dialog_message">更新后的服药计划应从何时生效？</string>
+    <string name="schedule_effective_today_title">从今天开始生效</string>
+    <string name="schedule_effective_today_desc">今天立即应用新时间。今天早前已过期的未服药记录将被移除。</string>
+    <string name="schedule_effective_tomorrow_title">从明天开始生效</string>
+    <string name="schedule_effective_tomorrow_desc">保留今天的计划不变，新服药时间将从明天开始生效。</string>
 </resources>

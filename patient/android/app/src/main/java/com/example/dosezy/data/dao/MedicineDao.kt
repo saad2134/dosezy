@@ -40,6 +40,10 @@ interface MedicineDao {
     @Query("SELECT * FROM medicines WHERE userId = :userId AND isArchived = 0")
     fun getActiveMedicinesByUser(userId: String): Flow<List<Medicine>>
 
+    // Guard: Direct suspend query bypasses InvalidationTracker Flow observer allocation and thread churn for one-shot reads
+    @Query("SELECT * FROM medicines WHERE userId = :userId AND isArchived = 0")
+    suspend fun getActiveMedicinesByUserDirect(userId: String): List<Medicine>
+
     @Query("SELECT * FROM medicines WHERE userId = :userId AND isArchived = 1")
     fun getArchivedMedicinesByUser(userId: String): Flow<List<Medicine>>
 

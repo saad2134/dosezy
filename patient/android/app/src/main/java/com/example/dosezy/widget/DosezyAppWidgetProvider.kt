@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
+import android.os.Build
 import android.view.View
 import android.widget.RemoteViews
 import com.example.dosezy.MainActivity
@@ -88,19 +89,38 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
             }
         }
 
+        // Guard: Execute immediate synchronous widget update for configure activity or targeted widget ID without 150ms debounce delay so widget renders populated layout before launcher binding and Android 12+ background suspension
         fun updateWidget(
             context: Context,
             @Suppress("UNUSED_PARAMETER") appWidgetManager: AppWidgetManager? = null,
-            @Suppress("UNUSED_PARAMETER") appWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID
+            appWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID
         ) {
-            updateAppWidgets(context)
+            val appContext = context.applicationContext
+            if (appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                try {
+                    kotlinx.coroutines.runBlocking {
+                        kotlinx.coroutines.withTimeoutOrNull(2000L) {
+                            performUpdateAllWidgets(appContext, targetWidgetId = appWidgetId)
+                        }
+                    }
+                } catch (_: Exception) {
+                    updateAppWidgets(appContext)
+                }
+            } else {
+                updateAppWidgets(appContext)
+            }
         }
 
-        private suspend fun performUpdateAllWidgets(context: Context) {
+        private suspend fun performUpdateAllWidgets(context: Context, targetWidgetId: Int? = null) {
             try {
                 val appWidgetManager = AppWidgetManager.getInstance(context)
                 val thisWidget = ComponentName(context, DosezyAppWidgetProvider::class.java)
-                val appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
+                val allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
+                val appWidgetIds = if (targetWidgetId != null && targetWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                    intArrayOf(targetWidgetId)
+                } else {
+                    allWidgetIds
+                }
                 if (appWidgetIds.isEmpty()) return
 
                 val db = DosezyDatabase.getInstance(context)
@@ -113,8 +133,6 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                 val startOfDay = today.atStartOfDay(zoneUtc).toInstant().toEpochMilli()
                 val endOfDay = today.plusDays(1).atStartOfDay(zoneUtc).toInstant().toEpochMilli() - 1
 
-                val dateFormat = SimpleDateFormat("EEE, MMM d", Locale.getDefault())
-                val dateString = dateFormat.format(System.currentTimeMillis())
                 val appName = context.getString(R.string.app_name)
 
                 for (appWidgetId in appWidgetIds) {
@@ -131,7 +149,8 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
 
                     // Header click opens MainActivity (switches to bound profile if specific)
                     val clickIntent = Intent(context, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        // Guard: Use SINGLE_TOP to bring existing instance to foreground without destroying in-progress UI state
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                         if (targetUserId != DosezyWidgetPrefs.ACTIVE_PROFILE_ID && user != null) {
                             putExtra("switch_to_user_id", user.userId)
                         }
@@ -157,13 +176,20 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
 
                     // Template PendingIntent for items in the scrollable ListView
                     val itemClickIntent = Intent(context, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        // Guard: Use SINGLE_TOP to bring existing instance to foreground and deliver extras to onNewIntent without wiping task state
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    }
+                    // Guard: FLAG_MUTABLE is mandatory on API 31+ (Android 12+) for ListView fillInIntent templates but undefined on API 24-30; guard bitmask to prevent OEM ROM incompatibilities
+                    val mutableFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        PendingIntent.FLAG_MUTABLE
+                    } else {
+                        0
                     }
                     val itemPendingIntent = PendingIntent.getActivity(
                         context,
                         appWidgetId + 100000,
                         itemClickIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                        PendingIntent.FLAG_UPDATE_CURRENT or mutableFlag
                     )
                     views.setPendingIntentTemplate(R.id.widget_medicine_list, itemPendingIntent)
 
@@ -173,39 +199,48 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                     } else {
                         appName
                     }
+                    // Guard: Derive target language from user profile or fallback to global saved language so header date and status messages match app locale even if user is null (#BUG-WIDGET-LOCALE)
+                    val targetLang = user?.language ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+                    val widgetLocale = com.example.dosezy.utils.LocaleHelper.getLocale(targetLang)
+                    val dateFormat = SimpleDateFormat("EEE, MMM d", widgetLocale)
+                    val dateString = dateFormat.format(System.currentTimeMillis())
                     views.setTextViewText(R.id.widget_title_text, titleText)
                     views.setTextViewText(R.id.widget_date_text, dateString)
 
                     val defaultMedIcon = if (isDark) R.drawable.ic_widget_medication_dark else R.drawable.ic_widget_medication_light
+                    // Guard: Wrap context in user profile or saved app language so widget status messages match the profile locale (#BUG-WIDGET-LOCALE)
+                    val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, targetLang)
 
                     if (user == null) {
                         views.setViewVisibility(R.id.widget_status_container, View.VISIBLE)
                         views.setImageViewResource(R.id.widget_status_icon, defaultMedIcon)
-                        views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_no_profile))
+                        views.setTextViewText(R.id.widget_status_message, localizedContext.getString(R.string.widget_no_profile))
                     } else {
                         val todayEntries = db.scheduleDao().getScheduleForDateRangeDirect(user.userId, startOfDay, endOfDay)
-                        val totalToday = todayEntries.size
-                        val takenToday = todayEntries.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
-                        val skippedToday = todayEntries.count { it.status == MedicationStatus.SKIPPED }
+                        // Guard: Exclude ad-hoc PRN doses from widget scheduled progress counts to prevent inflating totalToday or falsely reporting all scheduled doses taken
+                        val scheduledToday = todayEntries.filter { !it.entryId.startsWith("PRN_") }
+                        val totalToday = scheduledToday.size
+                        val takenToday = scheduledToday.count { it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE }
+                        val skippedToday = scheduledToday.count { it.status == MedicationStatus.SKIPPED }
 
-                        if (todayEntries.isNotEmpty()) {
+                        if (scheduledToday.isNotEmpty()) {
                             when {
                                 takenToday == totalToday -> {
                                     views.setImageViewResource(R.id.widget_status_icon, R.drawable.ic_widget_check_circle)
-                                    views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_all_taken))
+                                    views.setTextViewText(R.id.widget_status_message, localizedContext.getString(R.string.widget_all_taken))
                                 }
                                 takenToday + skippedToday == totalToday -> {
                                     views.setImageViewResource(R.id.widget_status_icon, R.drawable.ic_widget_check_circle)
-                                    views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_all_completed))
+                                    views.setTextViewText(R.id.widget_status_message, localizedContext.getString(R.string.widget_all_completed))
                                 }
                                 else -> {
                                     views.setImageViewResource(R.id.widget_status_icon, defaultMedIcon)
-                                    views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_taken_summary, takenToday, totalToday))
+                                    views.setTextViewText(R.id.widget_status_message, localizedContext.getString(R.string.widget_taken_summary, takenToday, totalToday))
                                 }
                             }
                         } else {
                             views.setImageViewResource(R.id.widget_status_icon, defaultMedIcon)
-                            views.setTextViewText(R.id.widget_status_message, context.getString(R.string.widget_no_meds))
+                            views.setTextViewText(R.id.widget_status_message, localizedContext.getString(R.string.widget_no_meds))
                         }
                     }
 

@@ -63,6 +63,13 @@ class ConvertersTest {
         assertEquals(59, restored?.second)
     }
 
+    @Test
+    fun localDateTime_extremeEpochMillis_doesNotThrow() {
+        // Guard: Verify extreme epoch millis convert safely without throwing DateTimeException
+        assertNotNull(converters.toLocalDateTime(Long.MAX_VALUE))
+        assertNotNull(converters.toLocalDateTime(Long.MIN_VALUE))
+    }
+
     // ───────────────────────────────────────────────────────────────
     // 2. LocalDate ⟷ Long? (epoch millis UTC at start of day)
     // ───────────────────────────────────────────────────────────────
@@ -87,6 +94,13 @@ class ConvertersTest {
         val leapDay = LocalDate.of(2028, 2, 29)
         val restored = converters.toLocalDate(converters.fromLocalDate(leapDay))
         assertEquals(leapDay, restored)
+    }
+
+    @Test
+    fun localDate_extremeEpochMillis_doesNotThrow() {
+        // Guard: Verify extreme epoch millis convert safely without throwing DateTimeException
+        assertNotNull(converters.toLocalDate(Long.MAX_VALUE))
+        assertNotNull(converters.toLocalDate(Long.MIN_VALUE))
     }
 
     // ───────────────────────────────────────────────────────────────
@@ -122,6 +136,15 @@ class ConvertersTest {
         assertNull(converters.toLocalTime(null))
     }
 
+    @Test
+    fun localTime_invalidOrBlankString_returnsNull() {
+        // Guard: Verify blank and unparseable strings return null rather than throwing DateTimeParseException
+        assertNull(converters.toLocalTime(""))
+        assertNull(converters.toLocalTime("   "))
+        assertNull(converters.toLocalTime("invalid_time"))
+        assertNull(converters.toLocalTime("25:99"))
+    }
+
     // ───────────────────────────────────────────────────────────────
     // 4. List<LocalTime> ⟷ String? (JSON array)
     // ───────────────────────────────────────────────────────────────
@@ -155,6 +178,22 @@ class ConvertersTest {
     fun localTimeList_nullRoundTrips() {
         assertNull(converters.fromLocalTimeList(null))
         assertNull(converters.toLocalTimeList(null))
+    }
+
+    @Test
+    fun localTimeList_invalidOrBlankString_returnsNullOrSafeFallback() {
+        // Guard: Verify blank strings return null
+        assertNull(converters.toLocalTimeList(""))
+        assertNull(converters.toLocalTimeList("   "))
+
+        // Guard: Verify non-array JSON and malformed text safely return emptyList rather than throwing JSONException
+        assertEquals(emptyList<LocalTime>(), converters.toLocalTimeList("not_a_json_array"))
+        assertEquals(emptyList<LocalTime>(), converters.toLocalTimeList("{}"))
+
+        // Guard: Verify array with invalid entries filters out malformed items and preserves valid times
+        val mixedJson = "[\"08:00\", \"invalid_entry\", \"21:30\"]"
+        val restored = converters.toLocalTimeList(mixedJson)
+        assertEquals(listOf(LocalTime.of(8, 0), LocalTime.of(21, 30)), restored)
     }
 
     // ───────────────────────────────────────────────────────────────
@@ -353,5 +392,54 @@ class ConvertersTest {
     @Test
     fun pillShape_invalidStringDefaultsToRound() {
         assertEquals(PillShape.ROUND, converters.toPillShape("NONEXISTENT"))
+    }
+
+    @Test
+    fun converters_caseInsensitiveAndLegacyFallbacks() {
+        // Guard: Verify case-insensitive parsing and resilient defaults across all enum converters (#BUG-CONVERTER-ENUM-FALLBACK)
+        assertEquals(Theme.DARK, converters.toTheme("dark"))
+        assertEquals(Theme.LIGHT, converters.toTheme("light"))
+        assertEquals(Theme.SYSTEM, converters.toTheme("system"))
+        assertEquals(Theme.SYSTEM, converters.toTheme("UNKNOWN_THEME"))
+
+        assertEquals(TimeFormat.HOUR_24, converters.toTimeFormat("hour_24"))
+        assertEquals(TimeFormat.HOUR_12, converters.toTimeFormat("hour_12"))
+        assertEquals(TimeFormat.HOUR_12, converters.toTimeFormat("INVALID_FORMAT"))
+
+        assertEquals(Gender.MALE, converters.toGender("male"))
+        assertEquals(Gender.FEMALE, converters.toGender("female"))
+        assertEquals(Gender.DO_NOT_SPECIFY, converters.toGender("do_not_specify"))
+        assertEquals(Gender.DO_NOT_SPECIFY, converters.toGender("UNKNOWN_GENDER"))
+
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, converters.toMedicationStatus("taken_on_time"))
+        assertEquals(MedicationStatus.TAKEN_LATE, converters.toMedicationStatus("taken_late"))
+        assertEquals(MedicationStatus.SKIPPED, converters.toMedicationStatus("skipped"))
+        assertEquals(MedicationStatus.PENDING, converters.toMedicationStatus("pending"))
+        assertEquals(MedicationStatus.PENDING, converters.toMedicationStatus("UNKNOWN_STATUS"))
+
+        assertEquals(DosageUnit.TABLET, converters.toDosageUnit("tablet"))
+        assertEquals(DosageUnit.CAPSULE, converters.toDosageUnit("capsule"))
+        assertEquals(DosageUnit.TABLET, converters.toDosageUnit("UNKNOWN_UNIT"))
+
+        assertEquals(com.example.dosezy.data.model.AlarmSound.GENTLE_CHIME, converters.toAlarmSound("gentle_chime"))
+        assertEquals(com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT, converters.toAlarmSound("UNKNOWN_SOUND"))
+
+        // Guard: Verify case-insensitive parsing and trimmed handling for PillShape
+        assertEquals(PillShape.CAPSULE, converters.toPillShape("capsule"))
+        assertEquals(PillShape.OVAL, converters.toPillShape("oval"))
+        assertEquals(PillShape.ROUND, converters.toPillShape("  round  "))
+        assertEquals(PillShape.ROUND, converters.toPillShape("UNKNOWN_SHAPE"))
+
+        // Guard: Verify case-insensitive pattern parsing in Frequency JSON converter
+        val everyXDaysJson = """{"pattern": "every_x_days", "intervalDays": 3}"""
+        val parsedEveryXDays = converters.toFrequency(everyXDaysJson)
+        assertNotNull(parsedEveryXDays)
+        assertEquals(FrequencyPattern.EVERY_X_DAYS, parsedEveryXDays!!.pattern)
+        assertEquals(3, parsedEveryXDays.intervalDays)
+
+        val weeklyJson = """{"pattern": "weekly", "daysPerWeek": 4}"""
+        val parsedWeekly = converters.toFrequency(weeklyJson)
+        assertNotNull(parsedWeekly)
+        assertEquals(FrequencyPattern.WEEKLY, parsedWeekly!!.pattern)
     }
 }

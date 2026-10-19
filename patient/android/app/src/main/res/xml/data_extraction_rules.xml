@@ -1,19 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-   Sample data extraction rules file; uncomment and customize as necessary.
-   See https://developer.android.com/about/versions/12/backup-restore#xml-changes
-   for details.
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Dosezy Data Extraction Rules (API >= 31)
+   Excludes unencrypted local SQLite database from cloud auto-backup while permitting direct device-to-device migration.
 -->
 <data-extraction-rules>
     <cloud-backup>
-        <!-- TODO: Use <include> and <exclude> to control what is backed up.
-        <include .../>
-        <exclude .../>
-        -->
+        <!-- Guard: Prevent patient medical database from leaking to Google Drive cloud backups (#HIPAA, #GDPR) -->
+        <exclude domain="database" path="dosezy_database"/>
+        <exclude domain="database" path="dosezy_database-shm"/>
+        <exclude domain="database" path="dosezy_database-wal"/>
     </cloud-backup>
-    <!--
     <device-transfer>
-        <include .../>
-        <exclude .../>
+        <!-- Allow direct encrypted local device-to-device migration for device switching -->
+        <include domain="database" path="dosezy_database"/>
+        <include domain="database" path="dosezy_database-shm"/>
+        <include domain="database" path="dosezy_database-wal"/>
+        <include domain="sharedpref" path="."/>
     </device-transfer>
-    -->
 </data-extraction-rules>
