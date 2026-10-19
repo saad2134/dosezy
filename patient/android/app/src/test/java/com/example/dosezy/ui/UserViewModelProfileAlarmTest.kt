@@ -556,5 +556,44 @@ class UserViewModelProfileAlarmTest {
         assertTrue(esTitle.isNotBlank())
         assertTrue(enTitle.isNotBlank())
     }
+
+    @Test
+    fun testDeleteUser_enforcesSingleActiveUserExclusivityInDatabase() = runTest(testDispatcher) {
+        // Guard: Verify deleteUser uses atomic setCurrentUser so remaining profiles have exactly 1 active user in SQLite
+        val userViewModel = UserViewModel(userRepository, medicineRepository, scheduleRepository, medicineNotificationManager)
+
+        val userToDelete = testUser.copy(userId = "user_delete_primary", isCurrentUser = true)
+        val userToPromote = User(
+            userId = "user_promote_candidate",
+            fullName = "Promote Candidate",
+            age = 30,
+            gender = Gender.FEMALE,
+            contactNumber = "+1111111111",
+            isCurrentUser = false
+        )
+        val userThird = User(
+            userId = "user_third_stale",
+            fullName = "Third Stale User",
+            age = 40,
+            gender = Gender.MALE,
+            contactNumber = "+2222222222",
+            isCurrentUser = true
+        )
+
+        userRepository.insertUser(userToDelete)
+        userRepository.insertUser(userToPromote)
+        userRepository.insertUser(userThird)
+
+        userViewModel.deleteUser(userToDelete)
+        advanceUntilIdle()
+
+        val remaining = userRepository.getAllUsersList().filter { it.userId != userToDelete.userId }
+        assertEquals(2, remaining.size)
+        assertEquals("Exactly one user must be marked as current user after deletion", 1, remaining.count { it.isCurrentUser })
+        val current = remaining.first { it.isCurrentUser }
+        val nonCurrent = remaining.first { !it.isCurrentUser }
+        assertTrue("Promoted user must be one of the remaining users", current.userId == userToPromote.userId || current.userId == userThird.userId)
+        assertTrue("Non-current user must be the other remaining user", nonCurrent.userId != current.userId)
+    }
 }
 

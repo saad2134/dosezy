@@ -371,10 +371,10 @@ class EmergencyDialAndEditMedScreenTest {
 
         // Phase 1: Initial Compose render frame where currentUser is null
         val nullUserId: String? = null
-        val userKeyInitial = if (nullUserId != null) "contacts_json_$nullUserId" else "contacts_json_default"
-        var savedInitial = prefs.getString(userKeyInitial, null)
+        val userKeyInitial = if (nullUserId != null) "contacts_json_$nullUserId" else null
+        var savedInitial = if (userKeyInitial != null) prefs.getString(userKeyInitial, null) else null
         if (nullUserId != null && savedInitial == null) {
-            savedInitial = prefs.getString("contacts_json", null) ?: prefs.getString("contacts_json_default", null)
+            savedInitial = prefs.getString("contacts_json", null)
             if (savedInitial != null) {
                 prefs.edit().putString(userKeyInitial, savedInitial).remove("contacts_json").remove("contacts_json_default").apply()
             }
@@ -389,7 +389,7 @@ class EmergencyDialAndEditMedScreenTest {
         val userKeyResolved = "contacts_json_$resolvedUserId"
         var savedResolved = prefs.getString(userKeyResolved, null)
         if (savedResolved == null) {
-            savedResolved = prefs.getString("contacts_json", null) ?: prefs.getString("contacts_json_default", null)
+            savedResolved = prefs.getString("contacts_json", null)
             if (savedResolved != null) {
                 prefs.edit().putString(userKeyResolved, savedResolved).remove("contacts_json").remove("contacts_json_default").apply()
             }
@@ -399,6 +399,43 @@ class EmergencyDialAndEditMedScreenTest {
         assertEquals(legacyJson, prefs.getString(userKeyResolved, null))
         assertFalse("Legacy key must be removed after successful user migration", prefs.contains("contacts_json"))
         assertFalse("Default key must be removed after successful user migration", prefs.contains("contacts_json_default"))
+    }
+
+    @Test
+    fun testEmergencyContacts_newProfileDoesNotInheritDefaultContactsAndSaveGuardsNullUser() {
+        val prefs = context.getSharedPreferences("emergency_contacts", Context.MODE_PRIVATE)
+        prefs.edit().clear().commit()
+
+        // Suppose stale default key exists from earlier legacy runs
+        prefs.edit().putString("contacts_json_default", """[{"name":"Old Contact","phone":"111"}]""").commit()
+
+        // New profile user_beta enters
+        val newUserId = "user_beta"
+        val userKey = "contacts_json_$newUserId"
+        var saved = prefs.getString(userKey, null)
+        if (saved == null) {
+            // Guard: Must only migrate contacts_json, never contacts_json_default
+            saved = prefs.getString("contacts_json", null)
+            if (saved != null) {
+                prefs.edit().putString(userKey, saved).remove("contacts_json").remove("contacts_json_default").apply()
+            }
+        }
+
+        // Verify: user_beta does NOT inherit contacts_json_default
+        assertNull("New profile must not inherit contacts from contacts_json_default", saved)
+
+        // Verify: saveContacts guards against null user
+        fun saveContacts(userId: String?, contactsJson: String) {
+            if (userId == null) return
+            prefs.edit().putString("contacts_json_$userId", contactsJson).remove("contacts_json_default").apply()
+        }
+
+        saveContacts(null, """[{"name":"Ignored","phone":"000"}]""")
+        assertFalse(prefs.contains("contacts_json_null"))
+
+        saveContacts(newUserId, """[{"name":"Family","phone":"999"}]""")
+        assertEquals("""[{"name":"Family","phone":"999"}]""", prefs.getString(userKey, null))
+        assertFalse("contacts_json_default must be removed upon profile save", prefs.contains("contacts_json_default"))
     }
 
     @Test

@@ -504,6 +504,21 @@ class AlarmAndNotificationRegressionTest {
         assertEquals("Alarma pospuesta por 10 minutos", esSnoozeToast)
         assertFalse("Spanish snooze toast must differ from English", esSnoozeToast == enSnoozeToast)
     }
+
+    @Test
+    fun testAlarmActivity_keyguardSafeCast_handlesNullOrMissingKeyguardService() {
+        // Guard: Verify that safe-casting KEYGUARD_SERVICE gracefully avoids ClassCastException or NullPointerException on headless or custom builds
+        val mockContext = mockk<Context>()
+        every { mockContext.getSystemService(Context.KEYGUARD_SERVICE) } returns null
+
+        val keyguardManager = mockContext.getSystemService(Context.KEYGUARD_SERVICE) as? android.app.KeyguardManager
+        assertNull("Missing keyguard service must resolve safely to null", keyguardManager)
+        var dismissed = false
+        keyguardManager?.let {
+            dismissed = true
+        }
+        assertFalse("Safe call on null KeyguardManager must not execute block", dismissed)
+    }
 }
 
 

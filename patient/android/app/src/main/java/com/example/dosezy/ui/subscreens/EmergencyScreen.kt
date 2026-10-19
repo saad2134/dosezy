@@ -208,13 +208,12 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
     val prefs = context.getSharedPreferences("emergency_contacts", android.content.Context.MODE_PRIVATE)
     val customContacts = remember(currentUser?.userId) {
         val currentUserId = currentUser?.userId
-        val userKey = if (currentUserId != null) "contacts_json_$currentUserId" else "contacts_json_default"
-        var saved = prefs.getString(userKey, null)
-        // Guard: Only migrate legacy contacts when currentUser is non-null to prevent migrating into default key during initial null Compose frame
+        val userKey = if (currentUserId != null) "contacts_json_$currentUserId" else null
+        var saved = if (userKey != null) prefs.getString(userKey, null) else null
+        // Guard: Migrate legacy contacts_json only once into active profile; never fall back to contacts_json_default to prevent leaking contacts to newly created profiles
         if (currentUserId != null && saved == null) {
-            saved = prefs.getString("contacts_json", null) ?: prefs.getString("contacts_json_default", null)
+            saved = prefs.getString("contacts_json", null)
             if (saved != null) {
-                // Guard: Remove legacy un-namespaced key and default key upon migration to prevent newly created profiles from inheriting another user's contacts
                 prefs.edit().putString(userKey, saved).remove("contacts_json").remove("contacts_json_default").apply()
             }
         }
@@ -233,6 +232,8 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
 
     // Helper to persist contacts
     fun saveContacts() {
+        // Guard: Prevent saving to unisolated default key when currentUser is null to prevent cross-profile contact leakage
+        val userId = currentUser?.userId ?: return
         val arr = org.json.JSONArray()
         customContacts.forEach { (name, phone) ->
             val obj = org.json.JSONObject()
@@ -240,8 +241,8 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
             obj.put("phone", phone)
             arr.put(obj)
         }
-        val userKey = "contacts_json_${currentUser?.userId ?: "default"}"
-        prefs.edit().putString(userKey, arr.toString()).apply()
+        val userKey = "contacts_json_$userId"
+        prefs.edit().putString(userKey, arr.toString()).remove("contacts_json_default").apply()
     }
 
     var showAddContactDialog by remember { mutableStateOf(false) }

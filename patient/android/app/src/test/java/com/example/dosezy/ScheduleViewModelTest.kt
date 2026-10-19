@@ -20,6 +20,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -315,6 +316,23 @@ class ScheduleViewModelTest {
                 customTakenAt = LocalDateTime.parse(takenAt),
                 notes = notes
             )
+        }
+    }
+
+    @Test
+    fun logAsNeededDose_invokesRepositoryAndRefreshesCalendarIndicatorCache() = runTest {
+        // Guard: Verify that logging an as-needed dose re-queries schedule entries to update month-wide calendar indicators
+        val viewModel = createViewModel()
+        coEvery { scheduleRepository.logAsNeededDose(any(), any(), any(), any()) } returns mockk(relaxed = true)
+
+        viewModel.logAsNeededDose(testMedicine)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        coVerify(exactly = 1) {
+            scheduleRepository.logAsNeededDose(testMedicine, "user_123", any(), context)
+        }
+        verify(atLeast = 1) {
+            scheduleRepository.getScheduleForUser("user_123")
         }
     }
 }

@@ -389,13 +389,15 @@ class BackupRestoreManager(
                         }
 
                         val existingUsers = database.userDao().getAllUsersDirect()
+                        // Guard: Promote first restored user if no existing local profile is currently active to prevent leaving app with 0 active users
+                        val shouldBeCurrent = existingUsers.none { it.isCurrentUser } && totalProfiles == 0
                         val newUser = originalUser.copy(
                             userId = newUserId,
                             fullName = newName,
                             profilePicPath = finalPicPath,
                             customAlarmSoundPath = finalSoundPath,
                             alarmSound = resolvedAlarmSound,
-                            isCurrentUser = (existingUsers.isEmpty() && totalProfiles == 0)
+                            isCurrentUser = shouldBeCurrent
                         )
 
                         val medIdMap = mutableMapOf<String, String>()

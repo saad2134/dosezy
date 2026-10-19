@@ -1020,5 +1020,57 @@ class DatabaseRestoreTransactionAndMigrationTest {
         assertEquals(MedicationStatus.TAKEN_ON_TIME, parsedSchedules[0].status)
         assertEquals(MedicationStatus.SKIPPED, parsedSchedules[1].status)
     }
+
+    @Test
+    fun testBackupRestoreManager_createNewPromotesActiveUserWhenExistingUsersAreInactive() = runBlocking {
+        // Guard: Verify that CREATE_NEW promotes the first restored profile when local database contains profiles but none are active
+        val inactiveLocalUser = User(
+            userId = "local_inactive_usr",
+            fullName = "Inactive Local User",
+            age = 50,
+            gender = Gender.MALE,
+            contactNumber = "+1000000000",
+            isCurrentUser = false
+        )
+        db.userDao().insertUser(inactiveLocalUser)
+
+        val tempDir = File(context.cacheDir, "test_create_new_inactive_${System.currentTimeMillis()}").apply { mkdirs() }
+        val profileFolder = File(tempDir, "profiles/backup_new_profile").apply { mkdirs() }
+        val backupUser = User(
+            userId = "backup_new_profile",
+            fullName = "Restored Patient",
+            age = 35,
+            gender = Gender.FEMALE,
+            contactNumber = "+1999999999",
+            isCurrentUser = false
+        )
+        File(profileFolder, "profile.json").writeText(testGson.toJson(backupUser))
+
+        val decision = ProfileImportDecision(
+            summary = ImportableProfileSummary(
+                originalUserId = "backup_new_profile",
+                name = backupUser.fullName,
+                age = backupUser.age,
+                gender = backupUser.gender.name,
+                medicineCount = 0,
+                scheduleCount = 0,
+                avatarTempPath = null,
+                isConflict = false,
+                existingLocalUserId = null,
+                profileFolder = profileFolder
+            ),
+            isSelected = true,
+            conflictStrategy = ConflictStrategy.CREATE_NEW
+        )
+
+        val result = backupManager.executeSelectiveRestore(tempDir, listOf(decision))
+        assertTrue(result.success)
+
+        val allUsers = db.userDao().getAllUsersDirect()
+        assertEquals(2, allUsers.size)
+        val restoredUser = allUsers.first { u -> u.fullName == backupUser.fullName }
+        assertTrue("Newly restored profile must be promoted to active current user when local profiles are all inactive", restoredUser.isCurrentUser)
+        assertEquals("Exactly one user must be marked active", 1, allUsers.count { u -> u.isCurrentUser })
+    }
 }
 

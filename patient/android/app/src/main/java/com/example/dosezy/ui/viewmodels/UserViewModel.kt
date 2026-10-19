@@ -277,7 +277,8 @@ class UserViewModel @Inject constructor(
                     if (user.isCurrentUser && remainingUsers.isNotEmpty()) {
                         // Pick next available user and set as current
                         val nextUser = remainingUsers.first().copy(isCurrentUser = true)
-                        userRepository.updateUser(nextUser)
+                        // Guard: Atomically set nextUser as current to reset all other profiles to inactive and prevent multiple active profiles in SQLite
+                        userRepository.setCurrentUser(nextUser.userId)
 
                         withContext(Dispatchers.Main) {
                             _currentUser.value = nextUser

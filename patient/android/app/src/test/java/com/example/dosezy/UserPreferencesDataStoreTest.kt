@@ -9,7 +9,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.example.dosezy.data.preferences.UserPreferencesDataStore
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -33,7 +33,7 @@ class UserPreferencesDataStoreTest {
     }
 
     @Test
-    fun testDefaultPreferences() = runTest {
+    fun testDefaultPreferences() = runBlocking {
         assertEquals("system", dataStore.themeFlow.first())
         assertEquals("SYSTEM", dataStore.languageFlow.first())
         assertFalse(dataStore.timelineModeFlow.first())
@@ -44,7 +44,7 @@ class UserPreferencesDataStoreTest {
     }
 
     @Test
-    fun testUpdatingPreferences() = runTest {
+    fun testUpdatingPreferences() = runBlocking {
         dataStore.setTheme("dark")
         assertEquals("dark", dataStore.themeFlow.first())
 

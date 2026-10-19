@@ -345,6 +345,8 @@ class ScheduleViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     fun logAsNeededDose(medicine: com.example.dosezy.data.model.Medicine) {
         viewModelScope.launch {
+            // Guard: Invalidate cached calendar user ID so month-wide calendar indicators re-query and reflect logged PRN doses
+            currentCalendarUserId = null
             _currentUserId.value?.let { userId ->
                 scheduleRepository.logAsNeededDose(medicine, userId, LocalDateTime.now(), context)
                 loadScheduleForDate(userId, _selectedDate.value)
