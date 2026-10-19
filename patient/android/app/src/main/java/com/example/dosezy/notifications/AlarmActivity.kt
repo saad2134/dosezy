@@ -239,6 +239,7 @@ class AlarmActivity : ComponentActivity() {
                         isLoaded = uiState.isLoaded,
                         isDarkTheme = isDark,
                         isDetailsMasked = isDetailsMasked,
+                        isIntakeReAlert = intent?.getBooleanExtra(MedicineAlarmReceiver.EXTRA_IS_INTAKE_REALERT, false) ?: false,
                         onUnlockRequest = { requestDeviceUnlock() },
                         onTakeAction = {
                             val isIntakeReAlert = intent?.getBooleanExtra(MedicineAlarmReceiver.EXTRA_IS_INTAKE_REALERT, false) ?: false

@@ -55,6 +55,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -81,6 +82,7 @@ fun AlarmScreenContent(
     isLoaded: Boolean,
     isDarkTheme: Boolean,
     isDetailsMasked: Boolean = false,
+    isIntakeReAlert: Boolean = false,
     onUnlockRequest: () -> Unit = {},
     onTakeAction: () -> Unit,
     onSnoozeAction: (Int) -> Unit,
@@ -239,17 +241,49 @@ fun AlarmScreenContent(
                     }
                 }
 
+                if (isIntakeReAlert) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.errorContainer,
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.5f)),
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.alarm_realert_badge),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                        )
+                    }
+                }
+
                 Text(
                     text = if (isDetailsMasked) {
                         stringResource(R.string.notif_generic_lockscreen_reminder)
+                    } else if (isIntakeReAlert) {
+                        stringResource(R.string.notif_intake_realert_title)
                     } else if (medicinesList.size > 1) {
                         stringResource(R.string.alarm_medication_reminder_multi, medicinesList.size)
                     } else {
                         stringResource(R.string.alarm_medication_reminder)
                     },
                     style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center
                 )
+
+                if (isIntakeReAlert && !isDetailsMasked) {
+                    Text(
+                        text = stringResource(R.string.alarm_realert_subtitle),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f)
+                            .padding(top = 4.dp, bottom = 4.dp)
+                    )
+                }
 
                 // Enlarged Time with Alarm Icon
                 Row(

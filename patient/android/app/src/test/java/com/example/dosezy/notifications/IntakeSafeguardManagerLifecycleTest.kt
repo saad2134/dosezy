@@ -1108,6 +1108,43 @@ class IntakeSafeguardManagerLifecycleTest {
 
         IntakeSafeguardManager.cancelCountdown(context)
     }
+
+    @Test
+    fun testTriggerReAlert_setsIntakeReAlertTitleAndBigTextPrompt() = runBlocking {
+        val entry = ScheduleEntry(
+            entryId = "entry_realert_verify",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = LocalDateTime.now().minusHours(2),
+            status = MedicationStatus.MISSED
+        )
+        database.scheduleDao().insertScheduleEntry(entry)
+
+        // Guard: Verify triggerReAlert posts notification with Medication Not Confirmed title and description prompt in bigText (#104)
+        MedicineAlarmReceiver.triggerReAlert(
+            context = context,
+            entryId = entry.entryId,
+            medicineName = testMedicine.medicationName,
+            entryIds = arrayListOf(entry.entryId),
+            medicineNames = arrayListOf(testMedicine.medicationName),
+            scheduledTime = "10:00 AM",
+            user = testUser
+        )
+
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val realertNotif = nm.activeNotifications.firstOrNull { it.id == entry.entryId.hashCode() }?.notification
+        assertNotNull("Re-alert notification must be posted", realertNotif)
+
+        val title = realertNotif?.extras?.getCharSequence(android.app.Notification.EXTRA_TITLE)?.toString()
+        val expectedTitle = context.getString(com.example.dosezy.R.string.notif_intake_realert_title)
+        assertEquals("Title must be Medication Not Confirmed", expectedTitle, title)
+
+        val bigText = realertNotif?.extras?.getCharSequence(android.app.Notification.EXTRA_BIG_TEXT)?.toString()
+        assertNotNull("BigText must be set on re-alert notification", bigText)
+        val expectedPrompt = context.getString(com.example.dosezy.R.string.notif_intake_realert_desc, testMedicine.medicationName)
+        assertTrue("BigText must contain unconfirmed intake prompt", bigText!!.contains(expectedPrompt))
+        assertTrue("BigText must include scheduled time info", bigText.contains("10:00 AM"))
+    }
 }
 
 

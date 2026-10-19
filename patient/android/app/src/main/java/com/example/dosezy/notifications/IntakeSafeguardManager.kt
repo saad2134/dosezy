@@ -107,6 +107,9 @@ object IntakeSafeguardManager {
             scheduler.cancelSnooze(id)
         }
 
+        // Guard: Silence active alarm audio across cohort entries when starting countdown buffer
+        AlarmAudioPlayer.stop()
+
         val now = System.currentTimeMillis()
         val target = now + (durationSeconds * 1000L)
         val state = IntakeCountdownState(

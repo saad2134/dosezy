@@ -560,7 +560,20 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             "$summary • $scheduledTimeStr"
         }
 
-        val bigText = if (isNagging) {
+        val bigText = if (isIntakeReAlert) {
+            buildString {
+                append(notificationText)
+                append("\n\n")
+                effectiveDetails.forEach { (name, dose) ->
+                    append("• ").append(name)
+                    if (dose.isNotEmpty()) {
+                        append(" (").append(dose).append(")")
+                    }
+                    append("\n")
+                }
+                append(scheduledTimeStr)
+            }.trimEnd()
+        } else if (isNagging) {
             notificationText
         } else {
             buildString {
