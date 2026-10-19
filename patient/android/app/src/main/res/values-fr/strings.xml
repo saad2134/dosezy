@@ -800,4 +800,33 @@ Voulez-vous continuer ?</string>
     <!-- Dynamic Snooze Duration Selector (#103) -->
     <string name="alarm_snooze_duration_label">Reporter pour :</string>
     <string name="snooze_duration_chip_format">%1$d min</string>
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">Protection du compte à rebours de prise</string>
+    <string name="pref_intake_safeguard_desc">Soutien TDAH : temps de compte à rebours avant confirmation avec réalerte en cas de distraction.</string>
+    <string name="pref_intake_duration_title">Durée de protection</string>
+    <string name="pref_intake_duration_format">%1$d minutes</string>
+    <string name="dialog_intake_duration_title">Sélectionner la durée de protection</string>
+    <string name="notif_intake_in_progress_title">Prise en cours</string>
+    <string name="notif_intake_in_progress_desc">%1$s : Confirmez après la prise</string>
+    <string name="notif_intake_action_confirm">Confirmer la prise</string>
+    <string name="notif_intake_action_extend">+1 min</string>
+    <string name="notif_intake_action_cancel">Annuler</string>
+    <string name="notif_intake_realert_title">Médicament non confirmé</string>
+    <string name="notif_intake_realert_desc">Avez-vous pris %1$s ? Appuyez pour confirmer ou reporter.</string>
+    <string name="home_intake_in_progress">Prise en cours pour %1$s</string>
+    <string name="home_intake_time_remaining">%1$s restant</string>
+    <string name="home_intake_confirm">Confirmer la prise</string>
+    <string name="home_intake_extend">+1 min</string>
+    <string name="home_intake_cancel">Annuler</string>
+    <string name="home_intake_confirmed">Prise enregistrée pour %1$s</string>
+    <string name="home_intake_cancelled">Protection de prise annulée</string>
+    <string name="alarm_realert_badge">RÉALERTE DE PRISE TDAH</string>
+    <string name="alarm_realert_subtitle">Vous avez appuyé sur Prendre plus tôt, mais la prise n\'a pas été confirmée. Avez-vous pris votre médicament ?</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">Tout prendre</string>
+    <string name="take_all_count">Tout prendre (%1$d)</string>
+    <string name="dialog_take_all_title">Prendre tous les médicaments ?</string>
+    <string name="dialog_take_all_message">Marquer les %1$d médicaments prévus à %2$s comme pris ?</string>
+    <string name="take_all_success_toast">%1$d médicaments marqués comme pris</string>
 </resources>

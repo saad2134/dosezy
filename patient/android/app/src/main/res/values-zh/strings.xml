@@ -816,4 +816,33 @@
     <!-- Dynamic Snooze Duration Selector (#103) -->
     <string name="alarm_snooze_duration_label">稍后提醒:</string>
     <string name="snooze_duration_chip_format">%1$d分钟</string>
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">服药倒计时保护</string>
+    <string name="pref_intake_safeguard_desc">ADHD支持：确认服药前的倒计时缓冲期，并在分心时再次发出提醒。</string>
+    <string name="pref_intake_duration_title">保护时长</string>
+    <string name="pref_intake_duration_format">%1$d分钟</string>
+    <string name="dialog_intake_duration_title">选择保护时长</string>
+    <string name="notif_intake_in_progress_title">服药进行中</string>
+    <string name="notif_intake_in_progress_desc">%1$s：服药后请确认</string>
+    <string name="notif_intake_action_confirm">确认服药</string>
+    <string name="notif_intake_action_extend">+1分钟</string>
+    <string name="notif_intake_action_cancel">取消</string>
+    <string name="notif_intake_realert_title">药品未确认</string>
+    <string name="notif_intake_realert_desc">您服用了 %1$s 吗？点击以确认服药或稍后提醒。</string>
+    <string name="home_intake_in_progress">%1$s 服药进行中</string>
+    <string name="home_intake_time_remaining">剩余 %1$s</string>
+    <string name="home_intake_confirm">确认服药</string>
+    <string name="home_intake_extend">+1分钟</string>
+    <string name="home_intake_cancel">取消</string>
+    <string name="home_intake_confirmed">已记录 %1$s 的服药</string>
+    <string name="home_intake_cancelled">已取消服药保护</string>
+    <string name="alarm_realert_badge">ADHD服药再次提醒</string>
+    <string name="alarm_realert_subtitle">您刚才点击了服药，但尚未确认。您吃药了吗？</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">全部服用</string>
+    <string name="take_all_count">全部服用 (%1$d)</string>
+    <string name="dialog_take_all_title">服用所有药品吗？</string>
+    <string name="dialog_take_all_message">将计划于 %2$s 的全部 %1$d 种药品标记为已服用？</string>
+    <string name="take_all_success_toast">已将全部 %1$d 种药品标记为已服用</string>
 </resources>

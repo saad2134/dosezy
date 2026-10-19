@@ -800,4 +800,33 @@
     <!-- Dynamic Snooze Duration Selector (#103) -->
     <string name="alarm_snooze_duration_label">Отложить на:</string>
     <string name="snooze_duration_chip_format">%1$d мин</string>
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">Защита с обратным отсчетом приема</string>
+    <string name="pref_intake_safeguard_desc">Поддержка при СДВГ: буфер обратного отсчета перед подтверждением с повторным оповещением при отвлечении.</string>
+    <string name="pref_intake_duration_title">Длительность защиты</string>
+    <string name="pref_intake_duration_format">%1$d мин</string>
+    <string name="dialog_intake_duration_title">Выбор длительности защиты</string>
+    <string name="notif_intake_in_progress_title">Прием в процессе</string>
+    <string name="notif_intake_in_progress_desc">%1$s: Подтвердите после приема</string>
+    <string name="notif_intake_action_confirm">Подтвердить прием</string>
+    <string name="notif_intake_action_extend">+1 мин</string>
+    <string name="notif_intake_action_cancel">Отмена</string>
+    <string name="notif_intake_realert_title">Лекарство не подтверждено</string>
+    <string name="notif_intake_realert_desc">Вы приняли %1$s? Нажмите, чтобы подтвердить прием или отложить.</string>
+    <string name="home_intake_in_progress">Прием в процессе для %1$s</string>
+    <string name="home_intake_time_remaining">Осталось %1$s</string>
+    <string name="home_intake_confirm">Подтвердить прием</string>
+    <string name="home_intake_extend">+1 мин</string>
+    <string name="home_intake_cancel">Отмена</string>
+    <string name="home_intake_confirmed">Прием записан для %1$s</string>
+    <string name="home_intake_cancelled">Защита приема отменена</string>
+    <string name="alarm_realert_badge">ПОВТОРНОЕ ОПОВЕЩЕНИЕ СДВГ</string>
+    <string name="alarm_realert_subtitle">Вы ранее нажали Принять, но прием не был подтвержден. Вы приняли лекарство?</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">Принять все</string>
+    <string name="take_all_count">Принять все (%1$d)</string>
+    <string name="dialog_take_all_title">Принять все лекарства?</string>
+    <string name="dialog_take_all_message">Отметить все %1$d лекарств, запланированных на %2$s, как принятые?</string>
+    <string name="take_all_success_toast">Все %1$d лекарств отмечены как принятые</string>
 </resources>

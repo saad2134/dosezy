@@ -799,4 +799,33 @@
     <!-- Dynamic Snooze Duration Selector (#103) -->
     <string name="alarm_snooze_duration_label">স্নুজ করুন:</string>
     <string name="snooze_duration_chip_format">%1$d মি</string>
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">ওষুধ গ্রহণের কাউন্টডাউন সুরক্ষা</string>
+    <string name="pref_intake_safeguard_desc">ADHD সহায়তা: ওষুধ গ্রহণের নিশ্চিতকরণের আগে কাউন্টডাউন বাফার এবং বিভ্রান্ত হলে পুনরায় সতর্কবার্তা।</string>
+    <string name="pref_intake_duration_title">সুরক্ষার সময়কাল</string>
+    <string name="pref_intake_duration_format">%1$d মিনিট</string>
+    <string name="dialog_intake_duration_title">সুরক্ষার সময়কাল নির্বাচন করুন</string>
+    <string name="notif_intake_in_progress_title">ওষুধ গ্রহণ প্রক্রিয়াধীন</string>
+    <string name="notif_intake_in_progress_desc">%1$s: গ্রহণের পর নিশ্চিত করুন</string>
+    <string name="notif_intake_action_confirm">গ্রহণ নিশ্চিত করুন</string>
+    <string name="notif_intake_action_extend">+১ মিনিট</string>
+    <string name="notif_intake_action_cancel">বাতিল</string>
+    <string name="notif_intake_realert_title">ওষুধ গ্রহণ নিশ্চিত হয়নি</string>
+    <string name="notif_intake_realert_desc">আপনি কি %1$s গ্রহণ করেছেন? গ্রহণ নিশ্চিত করতে বা স্নুজ করতে আলতো চাপুন।</string>
+    <string name="home_intake_in_progress">%1$s গ্রহণ প্রক্রিয়াধীন রয়েছে</string>
+    <string name="home_intake_time_remaining">%1$s বাকি</string>
+    <string name="home_intake_confirm">গ্রহণ নিশ্চিত করুন</string>
+    <string name="home_intake_extend">+১ মিনিট</string>
+    <string name="home_intake_cancel">বাতিল</string>
+    <string name="home_intake_confirmed">%1$s গ্রহণ রেকর্ড করা হয়েছে</string>
+    <string name="home_intake_cancelled">ওষুধ গ্রহণের সুরক্ষা বাতিল করা হয়েছে</string>
+    <string name="alarm_realert_badge">ADHD ওষুধ গ্রহণ পুনরায় সতর্কতা</string>
+    <string name="alarm_realert_subtitle">আপনি পূর্বে গ্রহণ করেছি চাপলেও নিশ্চিত করেননি। আপনি কি ওষুধ গ্রহণ করেছেন?</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">সবগুলো গ্রহণ করুন</string>
+    <string name="take_all_count">সবগুলো গ্রহণ করুন (%1$d)</string>
+    <string name="dialog_take_all_title">সবগুলো ওষুধ গ্রহণ করবেন?</string>
+    <string name="dialog_take_all_message">%2$s সময়ের নির্ধারিত সমস্ত %1$dটি ওষুধ গৃহীত হিসেবে চিহ্নিত করবেন?</string>
+    <string name="take_all_success_toast">সমস্ত %1$dটি ওষুধ গৃহীত হিসেবে চিহ্নিত করা হয়েছে</string>
 </resources>

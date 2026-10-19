@@ -800,4 +800,33 @@
     <!-- Dynamic Snooze Duration Selector (#103) -->
     <string name="alarm_snooze_duration_label">スヌーズ時間:</string>
     <string name="snooze_duration_chip_format">%1$d分</string>
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">服用カウントダウン保護</string>
+    <string name="pref_intake_safeguard_desc">ADHD支援: 服用確認前のカウントダウン待機時間と注意散漫時の再アラート機能。</string>
+    <string name="pref_intake_duration_title">保護時間</string>
+    <string name="pref_intake_duration_format">%1$d分</string>
+    <string name="dialog_intake_duration_title">保護時間の選択</string>
+    <string name="notif_intake_in_progress_title">服用進行中</string>
+    <string name="notif_intake_in_progress_desc">%1$s: 服用後に確認してください</string>
+    <string name="notif_intake_action_confirm">服用を確認</string>
+    <string name="notif_intake_action_extend">+1分</string>
+    <string name="notif_intake_action_cancel">キャンセル</string>
+    <string name="notif_intake_realert_title">薬の服用が未確認です</string>
+    <string name="notif_intake_realert_desc">%1$sを服用しましたか？タップして確認またはスヌーズしてください。</string>
+    <string name="home_intake_in_progress">%1$sの服用が進行中</string>
+    <string name="home_intake_time_remaining">残り %1$s</string>
+    <string name="home_intake_confirm">服用を確認</string>
+    <string name="home_intake_extend">+1分</string>
+    <string name="home_intake_cancel">キャンセル</string>
+    <string name="home_intake_confirmed">%1$sの服用を記録しました</string>
+    <string name="home_intake_cancelled">服用保護をキャンセルしました</string>
+    <string name="alarm_realert_badge">ADHD服用再アラート</string>
+    <string name="alarm_realert_subtitle">先ほど「服用」をタップしましたが、服用が確認されていません。薬を飲みましたか？</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">すべて服用</string>
+    <string name="take_all_count">すべて服用 (%1$d)</string>
+    <string name="dialog_take_all_title">すべての薬を服用しますか？</string>
+    <string name="dialog_take_all_message">%2$sに予定されているすべての薬 (%1$d件) を服用済みにしますか？</string>
+    <string name="take_all_success_toast">すべての薬 (%1$d件) を服用済みにしました</string>
 </resources>

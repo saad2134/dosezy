@@ -800,4 +800,33 @@
     <!-- Dynamic Snooze Duration Selector (#103) -->
     <string name="alarm_snooze_duration_label">تأجيل لمدة:</string>
     <string name="snooze_duration_chip_format">%1$d د</string>
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">حماية العد التنازلي لتناول الدواء</string>
+    <string name="pref_intake_safeguard_desc">دعم فرط الحركة وتشتت الانتباه: مهلة عد تنازلي قبل تأكيد التناول مع إعادة التنبيه عند التشتت.</string>
+    <string name="pref_intake_duration_title">مدة الحماية</string>
+    <string name="pref_intake_duration_format">%1$d دقائق</string>
+    <string name="dialog_intake_duration_title">اختر مدة الحماية</string>
+    <string name="notif_intake_in_progress_title">تناول الدواء قيد التنفيذ</string>
+    <string name="notif_intake_in_progress_desc">%1$s: أكد بعد التناول</string>
+    <string name="notif_intake_action_confirm">تأكيد التناول</string>
+    <string name="notif_intake_action_extend">+1 دقيقة</string>
+    <string name="notif_intake_action_cancel">إلغاء</string>
+    <string name="notif_intake_realert_title">لم يتم تأكيد الدواء</string>
+    <string name="notif_intake_realert_desc">هل تناولت %1$s؟ انقر لتأكيد التناول أو التأجيل.</string>
+    <string name="home_intake_in_progress">التناول قيد التنفيذ لـ %1$s</string>
+    <string name="home_intake_time_remaining">متبقي %1$s</string>
+    <string name="home_intake_confirm">تأكيد التناول</string>
+    <string name="home_intake_extend">+1 دقيقة</string>
+    <string name="home_intake_cancel">إلغاء</string>
+    <string name="home_intake_confirmed">تم تسجيل التناول لـ %1$s</string>
+    <string name="home_intake_cancelled">تم إلغاء حماية التناول</string>
+    <string name="alarm_realert_badge">إعادة تنبيه التناول ADHD</string>
+    <string name="alarm_realert_subtitle">لقد نقرت على تناول مسبقاً، لكن لم يتم تأكيد التناول. هل تناولت دواءك؟</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">تناول الكل</string>
+    <string name="take_all_count">تناول الكل (%1$d)</string>
+    <string name="dialog_take_all_title">تناول جميع الأدوية؟</string>
+    <string name="dialog_take_all_message">تحديد جميع الـ %1$d أدوية المجدولة لـ %2$s كأدوية تم تناولها؟</string>
+    <string name="take_all_success_toast">تم تحديد جميع الـ %1$d أدوية كأدوية تم تناولها</string>
 </resources>

@@ -800,4 +800,33 @@ Vuoi continuare?</string>
     <!-- Dynamic Snooze Duration Selector (#103) -->
     <string name="alarm_snooze_duration_label">Posticipa di:</string>
     <string name="snooze_duration_chip_format">%1$d min</string>
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">Protezione conto alla rovescia assunzione</string>
+    <string name="pref_intake_safeguard_desc">Supporto ADHD: intervallo con conto alla rovescia prima della conferma con nuovo avviso se distratti.</string>
+    <string name="pref_intake_duration_title">Durata protezione</string>
+    <string name="pref_intake_duration_format">%1$d minuti</string>
+    <string name="dialog_intake_duration_title">Seleziona durata protezione</string>
+    <string name="notif_intake_in_progress_title">Assunzione in corso</string>
+    <string name="notif_intake_in_progress_desc">%1$s: Conferma dopo l\'assunzione</string>
+    <string name="notif_intake_action_confirm">Conferma assunzione</string>
+    <string name="notif_intake_action_extend">+1 min</string>
+    <string name="notif_intake_action_cancel">Annulla</string>
+    <string name="notif_intake_realert_title">Farmaco non confermato</string>
+    <string name="notif_intake_realert_desc">Hai assunto %1$s? Tocca per confermare l\'assunzione o posponi.</string>
+    <string name="home_intake_in_progress">Assunzione in corso per %1$s</string>
+    <string name="home_intake_time_remaining">%1$s rimanenti</string>
+    <string name="home_intake_confirm">Conferma assunzione</string>
+    <string name="home_intake_extend">+1 min</string>
+    <string name="home_intake_cancel">Annulla</string>
+    <string name="home_intake_confirmed">Assunzione registrata per %1$s</string>
+    <string name="home_intake_cancelled">Protezione assunzione annullata</string>
+    <string name="alarm_realert_badge">NUOVO AVVISO ASSUNZIONE ADHD</string>
+    <string name="alarm_realert_subtitle">Hai toccato Assumi in precedenza, ma l\'assunzione non è stata confermata. Hai preso il tuo farmaco?</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">Assumi tutto</string>
+    <string name="take_all_count">Assumi tutto (%1$d)</string>
+    <string name="dialog_take_all_title">Assumere tutti i farmaci?</string>
+    <string name="dialog_take_all_message">Contrassegnare tutti i %1$d farmaci programmati per le %2$s come assunti?</string>
+    <string name="take_all_success_toast">Contrassegnati tutti i %1$d farmaci come assunti</string>
 </resources>

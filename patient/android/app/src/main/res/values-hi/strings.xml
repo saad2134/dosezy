@@ -816,4 +816,33 @@
     <!-- Dynamic Snooze Duration Selector (#103) -->
     <string name="alarm_snooze_duration_label">स्नूज़ करें:</string>
     <string name="snooze_duration_chip_format">%1$d मि</string>
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">दवा सेवन उलटी गिनती सुरक्षा</string>
+    <string name="pref_intake_safeguard_desc">ADHD सहायता: दवा सेवन पुष्टि से पहले उलटी गिनती बफर और ध्यान भटकने पर पुनः चेतावनी।</string>
+    <string name="pref_intake_duration_title">सुरक्षा अवधि</string>
+    <string name="pref_intake_duration_format">%1$d मिनट</string>
+    <string name="dialog_intake_duration_title">सुरक्षा अवधि चुनें</string>
+    <string name="notif_intake_in_progress_title">दवा सेवन प्रगति पर है</string>
+    <string name="notif_intake_in_progress_desc">%1$s: लेने के बाद पुष्टि करें</string>
+    <string name="notif_intake_action_confirm">पुष्टि करें</string>
+    <string name="notif_intake_action_extend">+1 मिनट</string>
+    <string name="notif_intake_action_cancel">रद्द करें</string>
+    <string name="notif_intake_realert_title">दवा की पुष्टि नहीं हुई</string>
+    <string name="notif_intake_realert_desc">क्या आपने %1$s ली? सेवन की पुष्टि करने या स्नूज़ करने के लिए टैप करें।</string>
+    <string name="home_intake_in_progress">%1$s का सेवन प्रगति पर है</string>
+    <string name="home_intake_time_remaining">%1$s शेष</string>
+    <string name="home_intake_confirm">पुष्टि करें</string>
+    <string name="home_intake_extend">+1 मिनट</string>
+    <string name="home_intake_cancel">रद्द करें</string>
+    <string name="home_intake_confirmed">%1$s का सेवन दर्ज किया गया</string>
+    <string name="home_intake_cancelled">दवा सेवन सुरक्षा रद्द की गई</string>
+    <string name="alarm_realert_badge">ADHD दवा सेवन पुनः चेतावनी</string>
+    <string name="alarm_realert_subtitle">आपने पहले लिया पर टैप किया था, लेकिन सेवन की पुष्टि नहीं हुई। क्या आपने अपनी दवा ली?</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">सभी लें</string>
+    <string name="take_all_count">सभी लें (%1$d)</string>
+    <string name="dialog_take_all_title">सभी दवाएं लें?</string>
+    <string name="dialog_take_all_message">%2$s के लिए निर्धारित सभी %1$d दवाओं को लिया गया चिह्नित करें?</string>
+    <string name="take_all_success_toast">सभी %1$d दवाओं को लिया गया चिह्नित किया गया</string>
 </resources>
