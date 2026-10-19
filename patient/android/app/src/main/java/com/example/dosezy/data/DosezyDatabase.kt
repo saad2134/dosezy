@@ -164,7 +164,8 @@ abstract class DosezyDatabase : RoomDatabase() {
                             db.execSQL("PRAGMA foreign_keys = ON;")
                         }
                     })
-                    .fallbackToDestructiveMigration()
+                    // Guard: Only permit destructive migration on app version downgrades; prevent silent patient data wipe on forward upgrades (#ISO13485, #PatientSafety)
+                    .fallbackToDestructiveMigrationOnDowngrade()
                     .build()
                 INSTANCE = instance
                 instance

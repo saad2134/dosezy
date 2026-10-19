@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Snooze
 import androidx.compose.material.icons.filled.Swipe
 import androidx.compose.material3.Divider
@@ -33,6 +34,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -111,6 +117,67 @@ fun LazyListScope.notificationAlarmPreferencesSection(
                 Switch(
                     checked = currentUser?.slideActionsEnabled != false,
                     onCheckedChange = onSlideActionsChange
+                )
+            }
+        }
+    }
+
+    // Lock Screen Details Privacy Switch (#HIPAA, #GDPR)
+    item {
+        val context = LocalContext.current
+        val prefs = remember { context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE) }
+        var lockscreenDetailsEnabled by remember {
+            mutableStateOf(prefs.getBoolean("lockscreen_details_enabled", true))
+        }
+
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 0.dp,
+            shadowElevation = 2.dp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 6.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    modifier = Modifier.weight(1f).padding(end = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Security,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(36.dp)
+                    )
+                    Column {
+                        Text(
+                            text = stringResource(R.string.pref_lockscreen_details_title),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = stringResource(R.string.pref_lockscreen_details_desc),
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                Switch(
+                    checked = lockscreenDetailsEnabled,
+                    onCheckedChange = { isChecked ->
+                        lockscreenDetailsEnabled = isChecked
+                        // Guard: Persist lock screen privacy toggle immediately to app_prefs
+                        prefs.edit().putBoolean("lockscreen_details_enabled", isChecked).apply()
+                    }
                 )
             }
         }

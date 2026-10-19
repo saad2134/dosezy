@@ -117,6 +117,30 @@ fun HelpSupportContent(navController: NavController) {
             }
         )
 
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Medical Disclaimer Card (#FDA, #MDR)
+        SupportCard(
+            icon = Icons.Outlined.Info,
+            title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.disclaimer_link_medical),
+            description = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.disclaimer_dialog_title),
+            onClick = {
+                openUrl(context, "https://dosezy.attenomy.com/disclaimer")
+            }
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Privacy Policy & Terms Card (#GDPR, #HIPAA)
+        SupportCard(
+            icon = Icons.Outlined.Info,
+            title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.disclaimer_link_privacy),
+            description = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.disclaimer_link_terms),
+            onClick = {
+                openUrl(context, "https://dosezy.attenomy.com/privacy")
+            }
+        )
+
         Spacer(modifier = Modifier.height(24.dp))
 
         // Contact Support Section

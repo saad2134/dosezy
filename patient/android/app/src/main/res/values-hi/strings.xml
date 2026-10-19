@@ -845,4 +845,20 @@
     <string name="dialog_take_all_title">सभी दवाएं लें?</string>
     <string name="dialog_take_all_message">%2$s के लिए निर्धारित सभी %1$d दवाओं को लिया गया चिह्नित करें?</string>
     <string name="take_all_success_toast">सभी %1$d दवाओं को लिया गया चिह्नित किया गया</string>
+
+    <!-- Legal, Privacy & Compliance Safeguards -->
+    <string name="notif_generic_lockscreen_reminder">निर्धारित दवा अनुस्मारक</string>
+    <string name="pref_lockscreen_details_title">लॉक स्क्रीन पर विवरण दिखाएं</string>
+    <string name="pref_lockscreen_details_desc">अक्षम होने पर, गोपनीयता के लिए डिवाइस अनलॉक होने तक लॉक स्क्रीन पर दवा का नाम और खुराक छिपी रहेगी।</string>
+    <string name="disclaimer_dialog_title">चिकित्सा एवं कानूनी अस्वीकरण</string>
+    <string name="disclaimer_dialog_summary">डोज़ीज़ी एक स्वचालित डिजिटल रिमाइंडर उपकरण है और यह कोई प्रमाणित मेडिकल डिवाइस नहीं है। यह नैदानिक परामर्श, खुराक गणना या चिकित्सा सलाह प्रदान नहीं करता है। दवा संबंधी निर्देशों के लिए हमेशा अपने चिकित्सक से परामर्श लें।</string>
+    <string name="disclaimer_checkbox_consent">मैं चिकित्सा अस्वीकरण और सेवा की शर्तों को समझता/समझती हूं और स्वीकार करता/करती हूं।</string>
+    <string name="disclaimer_action_agree">स्वीकार करें और जारी रखें</string>
+    <string name="disclaimer_link_medical">चिकित्सा अस्वीकरण</string>
+    <string name="disclaimer_link_privacy">गोपनीयता नीति</string>
+    <string name="disclaimer_link_terms">सेवा की शर्तें</string>
+    <string name="emergency_dispatch_warning_title">आपातकालीन सूचना</string>
+    <string name="emergency_dispatch_warning_desc">डोज़ीज़ी कोई आपातकालीन सेवा प्रदाता नहीं है और 112/911 का विकल्प नहीं है। गंभीर स्थिति में सीधे स्थानीय आपातकालीन सेवाओं को कॉल करें। जांचें कि नंबर आपके क्षेत्र से मेल खाता है।</string>
+    <string name="pdf_report_disclaimer_footer">डोज़ीज़ी दवा ट्रैकर • स्व-रिपोर्टेड सूचनात्मक लॉग (गैर-चिकित्सकीय)</string>
+    <string name="pharmacy_refill_estimation_disclaimer">सूचना: रिफिल मात्रा दर्ज आवृत्ति पर आधारित अनुमान है। अपने फार्मासिस्ट या चिकित्सक से सत्यापित करें।</string>
 </resources>

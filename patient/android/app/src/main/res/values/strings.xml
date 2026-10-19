@@ -858,4 +858,20 @@ Do you want to continue?</string>
     <!-- Dynamic Snooze Duration Selector (#103) -->
     <string name="alarm_snooze_duration_label">Snooze for:</string>
     <string name="snooze_duration_chip_format">%1$dm</string>
+
+    <!-- Legal, Privacy & Compliance Safeguards -->
+    <string name="notif_generic_lockscreen_reminder">Scheduled medication reminder</string>
+    <string name="pref_lockscreen_details_title">Show Details on Lock Screen</string>
+    <string name="pref_lockscreen_details_desc">When off, medication names and dosages are hidden on the lock screen for privacy until your device is unlocked.</string>
+    <string name="disclaimer_dialog_title">Medical &amp; Legal Disclaimer</string>
+    <string name="disclaimer_dialog_summary">Dosezy is an automated digital reminder utility and is NOT a regulated medical device. It does not provide medical diagnosis, dosage calculations, or clinical advice. Always consult your physician or healthcare provider for prescription instructions.</string>
+    <string name="disclaimer_checkbox_consent">I understand and accept the Medical Disclaimer and Terms of Service.</string>
+    <string name="disclaimer_action_agree">Accept &amp; Continue</string>
+    <string name="disclaimer_link_medical">Medical Disclaimer</string>
+    <string name="disclaimer_link_privacy">Privacy Policy</string>
+    <string name="disclaimer_link_terms">Terms of Service</string>
+    <string name="emergency_dispatch_warning_title">Emergency Notice</string>
+    <string name="emergency_dispatch_warning_desc">Dosezy is not an emergency dispatch provider or substitute for 911/112. In a life-threatening crisis, dial your local emergency services directly. Verify that the displayed emergency number matches your physical location.</string>
+    <string name="pdf_report_disclaimer_footer">Dosezy Medicine Tracker • Self-Reported Informational Log (Non-Clinical)</string>
+    <string name="pharmacy_refill_estimation_disclaimer">Notice: Refill quantities are estimated approximations based on logged frequency. Verify with your pharmacist or physician.</string>
 </resources>

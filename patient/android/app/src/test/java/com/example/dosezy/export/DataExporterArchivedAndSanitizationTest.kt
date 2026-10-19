@@ -177,6 +177,8 @@ class DataExporterArchivedAndSanitizationTest {
         val exportDir = exporter.getExportDirectory()
         assertNotNull(exportDir)
         assertTrue(exportDir.exists() || exportDir.mkdirs())
+        // Guard: Verify export directory is confined to private internal cache to prevent USB MTP exposure (#HIPAA, #GDPR)
+        assertTrue("Export directory must reside inside app cacheDir", exportDir.canonicalPath.startsWith(context.cacheDir.canonicalPath))
     }
 
     // ───────────────────────────────────────────────────────────────

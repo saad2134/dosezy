@@ -179,7 +179,9 @@ class PdfReportGenerator(private val context: Context) {
 
         fun drawFooter(c: android.graphics.Canvas, pNum: Int) {
             c.drawLine(40f, 800f, 555f, 800f, linePaint)
-            c.drawText("Dosezy Medicine Tracker • Confidential Patient Record", 40f, 816f, subtitlePaint)
+            // Guard: Non-clinical self-reported log disclaimer to prevent SaMD/MDR misclassification (#FDA, #MDR)
+            val footerText = context.getString(R.string.pdf_report_disclaimer_footer)
+            c.drawText(footerText, 40f, 816f, subtitlePaint)
             c.drawText("Page $pNum", 520f, 816f, subtitlePaint)
         }
 

@@ -829,4 +829,20 @@
     <string name="dialog_take_all_title">تناول جميع الأدوية؟</string>
     <string name="dialog_take_all_message">تحديد جميع الـ %1$d أدوية المجدولة لـ %2$s كأدوية تم تناولها؟</string>
     <string name="take_all_success_toast">تم تحديد جميع الـ %1$d أدوية كأدوية تم تناولها</string>
+
+    <!-- Legal, Privacy & Compliance Safeguards -->
+    <string name="notif_generic_lockscreen_reminder">تذكير بموعد الدواء المجدول</string>
+    <string name="pref_lockscreen_details_title">إظهار التفاصيل على شاشة القفل</string>
+    <string name="pref_lockscreen_details_desc">عند التعطيل، يتم إخفاء أسماء الأدوية والجرعات على شاشة القفل للخصوصية حتى فتح قفل الجهاز.</string>
+    <string name="disclaimer_dialog_title">إخلاء المسؤولية الطبية والقانونية</string>
+    <string name="disclaimer_dialog_summary">تطبيق دوزيزي هو أداة تذكير رقمية آلية وليس جهازاً طبياً معتمداً. لا يقدم التطبيق تشخيصاً طبياً أو حسابات جرعات أو نصائح سريرية. استشر دائماً طبيبك أو مقدم الرعاية الصحية للحصول على تعليمات الوصفة الطبية.</string>
+    <string name="disclaimer_checkbox_consent">أفهم وأوافق على إخلاء المسؤولية الطبية وشروط الخدمة.</string>
+    <string name="disclaimer_action_agree">قبول ومتابعة</string>
+    <string name="disclaimer_link_medical">إخلاء المسؤولية الطبية</string>
+    <string name="disclaimer_link_privacy">سياسة الخصوصية</string>
+    <string name="disclaimer_link_terms">شروط الخدمة</string>
+    <string name="emergency_dispatch_warning_title">تنبيه الطوارئ</string>
+    <string name="emergency_dispatch_warning_desc">دوزيزي ليس خدمة طوارئ أو بديلاً عن أرقام الطوارئ 911/112. في الحالات الحرجة، اتصل بخدمات الطوارئ المحلية مباشرة. يرجى التحقق من مطابقة الرقم لمنطقتك.</string>
+    <string name="pdf_report_disclaimer_footer">متتبع الأدوية دوزيزي • سجل معلوماتي مسجل ذاتياً (غير سريري)</string>
+    <string name="pharmacy_refill_estimation_disclaimer">ملاحظة: كميات إعادة التعبئة هي تقديرات تقريبية بناءً على وتيرة التناول. تحقق مع الصيدلي أو الطبيب.</string>
 </resources>

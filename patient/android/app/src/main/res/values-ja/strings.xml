@@ -829,4 +829,20 @@
     <string name="dialog_take_all_title">すべての薬を服用しますか？</string>
     <string name="dialog_take_all_message">%2$sに予定されているすべての薬 (%1$d件) を服用済みにしますか？</string>
     <string name="take_all_success_toast">すべての薬 (%1$d件) を服用済みにしました</string>
+
+    <!-- Legal, Privacy & Compliance Safeguards -->
+    <string name="notif_generic_lockscreen_reminder">予定された服薬リマインダー</string>
+    <string name="pref_lockscreen_details_title">ロック画面に詳細を表示</string>
+    <string name="pref_lockscreen_details_desc">オフにすると、端末のロックを解除するまでプライバシー保護のため薬品名と用量が非表示になります。</string>
+    <string name="disclaimer_dialog_title">医療および法的免責事項</string>
+    <string name="disclaimer_dialog_summary">Dosezyは自動服薬スケジュール補助ツールであり、医療機器ではありません。診断、用量計算、または医学的アドバイスは提供しません。処方薬の服用指示については必ず医師または薬剤師にご相談ください。</string>
+    <string name="disclaimer_checkbox_consent">医療免責事項および利用規約を理解し、同意します。</string>
+    <string name="disclaimer_action_agree">同意して続行</string>
+    <string name="disclaimer_link_medical">医療免責事項</string>
+    <string name="disclaimer_link_privacy">プライバシーポリシー</string>
+    <string name="disclaimer_link_terms">利用規約</string>
+    <string name="emergency_dispatch_warning_title">緊急連絡に関する注意事項</string>
+    <string name="emergency_dispatch_warning_desc">Dosezyは緊急通報機関ではなく、110/119等の代替手段ではありません。生命の危険がある場合は直ちに地域の緊急通報を行ってください。表示番号が現在地に対応しているかご確認ください。</string>
+    <string name="pdf_report_disclaimer_footer">Dosezy 服薬トラッカー • 自己申告情報ログ（非臨床記録）</string>
+    <string name="pharmacy_refill_estimation_disclaimer">注：補充薬の数量は登録された頻度に基づく概算です。正確な数量は薬剤師または医師にご確認ください。</string>
 </resources>

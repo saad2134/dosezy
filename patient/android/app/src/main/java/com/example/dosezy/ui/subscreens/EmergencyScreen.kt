@@ -254,6 +254,39 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
             .verticalScroll(scrollState)
             .padding(16.dp)
     ) {
+        // Guard: Prominent emergency dispatch disclaimer to prevent wrongful reliance during life-threatening crises (#FCC, #Torts)
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            shape = RoundedCornerShape(14.dp),
+            color = Color(0xFFEF4444).copy(alpha = 0.08f),
+            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFEF4444).copy(alpha = 0.25f))
+        ) {
+            Row(
+                modifier = Modifier.padding(14.dp),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Text("⚠️", fontSize = 16.sp)
+                Column {
+                    Text(
+                        text = stringResource(com.example.dosezy.R.string.emergency_dispatch_warning_title),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp,
+                        color = Color(0xFFEF4444)
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = stringResource(com.example.dosezy.R.string.emergency_dispatch_warning_desc),
+                        fontSize = 12.sp,
+                        lineHeight = 17.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+
         // Patient Medical Alert & Emergency Profile Card
         val user = currentUser
         if (user != null) {

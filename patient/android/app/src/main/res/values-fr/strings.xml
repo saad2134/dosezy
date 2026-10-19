@@ -829,4 +829,20 @@ Voulez-vous continuer ?</string>
     <string name="dialog_take_all_title">Prendre tous les médicaments ?</string>
     <string name="dialog_take_all_message">Marquer les %1$d médicaments prévus à %2$s comme pris ?</string>
     <string name="take_all_success_toast">%1$d médicaments marqués comme pris</string>
+
+    <!-- Legal, Privacy & Compliance Safeguards -->
+    <string name="notif_generic_lockscreen_reminder">Rappel de médicament programmé</string>
+    <string name="pref_lockscreen_details_title">Afficher les détails sur l\'écran de verrouillage</string>
+    <string name="pref_lockscreen_details_desc">Si désactivé, les noms et dosages sont masqués sur l\'écran de verrouillage par confidentialité jusqu\'au déverrouillage.</string>
+    <string name="disclaimer_dialog_title">Avis de non-responsabilité médicale et légale</string>
+    <string name="disclaimer_dialog_summary">Dosezy est un outil numérique de rappel automatisé et N\'EST PAS un dispositif médical réglementé. Il ne fournit aucun diagnostic, calcul de posologie ou conseil clinique. Consultez toujours votre médecin ou pharmacien pour les instructions d\'ordonnance.</string>
+    <string name="disclaimer_checkbox_consent">Je comprends et j\'accepte l\'avis médical et les conditions d\'utilisation.</string>
+    <string name="disclaimer_action_agree">Accepter et continuer</string>
+    <string name="disclaimer_link_medical">Avis médical</string>
+    <string name="disclaimer_link_privacy">Politique de confidentialité</string>
+    <string name="disclaimer_link_terms">Conditions d\'utilisation</string>
+    <string name="emergency_dispatch_warning_title">Avis d\'urgence</string>
+    <string name="emergency_dispatch_warning_desc">Dosezy n\'est pas un service d\'urgence ni un substitut du 112/911. En cas d\'urgence vitale, composez directement les services de secours locaux. Vérifiez que le numéro affiché correspond à votre juridiction.</string>
+    <string name="pdf_report_disclaimer_footer">Dosezy Suivi des Médicaments • Journal informatif autodéclaré (Non clinique)</string>
+    <string name="pharmacy_refill_estimation_disclaimer">Remarque : Les quantités de renouvellement sont des estimations basées sur la fréquence enregistrée. Vérifiez auprès de votre pharmacien ou médecin.</string>
 </resources>

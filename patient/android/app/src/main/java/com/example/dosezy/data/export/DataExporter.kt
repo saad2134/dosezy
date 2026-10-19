@@ -452,7 +452,12 @@ class DataExporter(
 
     suspend fun getExportDirectory(): File {
         return withContext(Dispatchers.IO) {
-            context.getExternalFilesDir(null) ?: context.filesDir
+            // Guard: Prefer internal cache directory for exports to prevent cleartext PHI exposure over USB MTP (#HIPAA, #GDPR)
+            val dir = File(context.cacheDir, "exports")
+            if (!dir.exists()) {
+                dir.mkdirs()
+            }
+            dir
         }
     }
 

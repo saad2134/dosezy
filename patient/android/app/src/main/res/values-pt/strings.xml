@@ -828,4 +828,20 @@ Deseja continuar?</string>
     <string name="dialog_take_all_title">Tomar Todos os Medicamentos?</string>
     <string name="dialog_take_all_message">Marcar todos os %1$d medicamentos agendados para às %2$s como tomados?</string>
     <string name="take_all_success_toast">Marcados todos os %1$d medicamentos como tomados</string>
+
+    <!-- Legal, Privacy & Compliance Safeguards -->
+    <string name="notif_generic_lockscreen_reminder">Lembrete de medicamento agendado</string>
+    <string name="pref_lockscreen_details_title">Mostrar detalhes na tela de bloqueio</string>
+    <string name="pref_lockscreen_details_desc">Quando desativado, os nomes e dosagens são ocultados na tela de bloqueio por privacidade até desbloquear o aparelho.</string>
+    <string name="disclaimer_dialog_title">Aviso médico e legal</string>
+    <string name="disclaimer_dialog_summary">O Dosezy é um utilitário digital automatizado e NÃO é um dispositivo médico regulamentado. Não fornece diagnóstico clínico, cálculo de dosagem ou aconselhamento médico. Consulte sempre o seu médico ou farmacêutico para orientações de prescrição.</string>
+    <string name="disclaimer_checkbox_consent">Entendo e aceito o aviso médico e os termos de serviço.</string>
+    <string name="disclaimer_action_agree">Aceitar e continuar</string>
+    <string name="disclaimer_link_medical">Aviso médico</string>
+    <string name="disclaimer_link_privacy">Política de privacidade</string>
+    <string name="disclaimer_link_terms">Termos de serviço</string>
+    <string name="emergency_dispatch_warning_title">Aviso de emergência</string>
+    <string name="emergency_dispatch_warning_desc">O Dosezy não é um serviço de emergência nem substituto do 192/112/911. Em situações críticas, ligue diretamente para os serviços de emergência locais. Verifique se o número exibido corresponde à sua região.</string>
+    <string name="pdf_report_disclaimer_footer">Dosezy Rastreador de Medicamentos • Registro informativo autorrelatado (Não clínico)</string>
+    <string name="pharmacy_refill_estimation_disclaimer">Aviso: As quantidades de reposição são estimativas aproximadas baseadas na frequência registrada. Confirme com seu farmacêutico ou médico.</string>
 </resources>

@@ -66,6 +66,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                     setSound(null, null)  // Silent channel: eliminates duplicate system ringtone
                     setBypassDnd(true)
                     setShowBadge(true)
+                    // Guard: Default channel lockscreen visibility to PUBLIC while supporting user opt-out in preferences
                     lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
                 }
 
@@ -560,6 +561,9 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             }.trimEnd()
         }
 
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val allowLockscreenDetails = prefs.getBoolean("lockscreen_details_enabled", true)
+
         // Create silent notification: AlarmAudioPlayer is the single source of sound & vibration
         val notificationBuilder = NotificationCompat.Builder(localizedContext, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_medicine_notification)
@@ -567,9 +571,21 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             .setContentText(notificationText)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setAutoCancel(true)
             .setSilent(true)
+
+        // Guard: Mask sensitive medication names/dosages on lock screen by default to prevent PHI leakage (#HIPAA, #GDPR)
+        if (allowLockscreenDetails) {
+            notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        } else {
+            val publicNotification = NotificationCompat.Builder(localizedContext, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_medicine_notification)
+                .setContentTitle(localizedContext.getString(R.string.app_name))
+                .setContentText(localizedContext.getString(R.string.notif_generic_lockscreen_reminder))
+                .build()
+            notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                .setPublicVersion(publicNotification)
+        }
             .setContentIntent(pendingIntent)
             .addAction(
                 getNotificationIcon(Icons.Filled.Check),

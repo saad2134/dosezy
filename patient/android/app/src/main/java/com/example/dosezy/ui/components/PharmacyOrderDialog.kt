@@ -249,7 +249,24 @@ fun PharmacyOrderDialog(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Guard: Non-clinical estimation notice to prevent clinical dosage assumptions (#FDA, #MDR)
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = stringResource(R.string.pharmacy_refill_estimation_disclaimer),
+                        fontSize = 11.sp,
+                        lineHeight = 15.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
 
                 // Multi-Profile Selection (if multiple users exist)
                 if (allUsers.size > 1) {

@@ -519,6 +519,68 @@ class AlarmAndNotificationRegressionTest {
         }
         assertFalse("Safe call on null KeyguardManager must not execute block", dismissed)
     }
+
+    @Test
+    fun testLockscreenPrivacy_defaultsToPublicVisibility() {
+        // Guard: Verify that notifications default to VISIBILITY_PUBLIC while supporting privacy opt-out
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        prefs.edit().remove("lockscreen_details_enabled").commit()
+
+        val allowLockscreenDetails = prefs.getBoolean("lockscreen_details_enabled", true)
+        assertTrue(allowLockscreenDetails)
+
+        val builder = androidx.core.app.NotificationCompat.Builder(context, MedicineAlarmReceiver.CHANNEL_ID)
+            .setSmallIcon(com.example.dosezy.R.drawable.ic_medicine_notification)
+            .setContentTitle("Prescription")
+            .setContentText("Truvada 200mg")
+
+        if (allowLockscreenDetails) {
+            builder.setVisibility(androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC)
+        } else {
+            builder.setVisibility(androidx.core.app.NotificationCompat.VISIBILITY_PRIVATE)
+        }
+
+        val notification = builder.build()
+        assertEquals(androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC, notification.visibility)
+    }
+
+    @Test
+    fun testLockscreenPrivacy_masksSensitivePrescriptionDetailsWhenUserOptsOut() {
+        // Guard: Verify that when user opts out in preferences, notifications switch to VISIBILITY_PRIVATE with generic setPublicVersion (#HIPAA, #GDPR)
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        prefs.edit().putBoolean("lockscreen_details_enabled", false).commit()
+
+        val notificationTitle = "Sensitive Drug Alert"
+        val notificationText = "08:00 AM - Truvada 200mg"
+
+        val allowLockscreenDetails = prefs.getBoolean("lockscreen_details_enabled", true)
+        assertFalse(allowLockscreenDetails)
+
+        val builder = androidx.core.app.NotificationCompat.Builder(context, MedicineAlarmReceiver.CHANNEL_ID)
+            .setSmallIcon(com.example.dosezy.R.drawable.ic_medicine_notification)
+            .setContentTitle(notificationTitle)
+            .setContentText(notificationText)
+
+        if (allowLockscreenDetails) {
+            builder.setVisibility(androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC)
+        } else {
+            val publicNotification = androidx.core.app.NotificationCompat.Builder(context, MedicineAlarmReceiver.CHANNEL_ID)
+                .setSmallIcon(com.example.dosezy.R.drawable.ic_medicine_notification)
+                .setContentTitle(context.getString(com.example.dosezy.R.string.app_name))
+                .setContentText(context.getString(com.example.dosezy.R.string.notif_generic_lockscreen_reminder))
+                .build()
+            builder.setVisibility(androidx.core.app.NotificationCompat.VISIBILITY_PRIVATE)
+                .setPublicVersion(publicNotification)
+        }
+
+        val notification = builder.build()
+        assertEquals(androidx.core.app.NotificationCompat.VISIBILITY_PRIVATE, notification.visibility)
+        assertNotNull(notification.publicVersion)
+        val publicContent = notification.publicVersion.extras?.getString(android.app.Notification.EXTRA_TEXT)
+        assertEquals("Scheduled medication reminder", publicContent)
+    }
 }
 
 

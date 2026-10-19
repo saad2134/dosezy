@@ -6,7 +6,7 @@ version: 2.5.11
 date-released: 2026-10-19
 url: "https://github.com/saad2134/dosezy"
 repository-code: "https://github.com/saad2134/dosezy"
-license: GPL-3.0
+license: MIT
 keywords:
   - medication-reminder
   - accessibility

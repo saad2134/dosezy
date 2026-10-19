@@ -845,4 +845,20 @@
     <string name="dialog_take_all_title">服用所有药品吗？</string>
     <string name="dialog_take_all_message">将计划于 %2$s 的全部 %1$d 种药品标记为已服用？</string>
     <string name="take_all_success_toast">已将全部 %1$d 种药品标记为已服用</string>
+
+    <!-- Legal, Privacy & Compliance Safeguards -->
+    <string name="notif_generic_lockscreen_reminder">已计划的服药提醒</string>
+    <string name="pref_lockscreen_details_title">在锁定屏幕上显示详情</string>
+    <string name="pref_lockscreen_details_desc">关闭后，锁定屏幕上将隐藏药品名称和剂量以保护隐私，直至解锁设备。</string>
+    <string name="disclaimer_dialog_title">医疗与法律免责声明</string>
+    <string name="disclaimer_dialog_summary">Dosezy 是一款自动化数字服药日程提醒工具，并非受监管的医疗器械。本应用不提供医疗诊断、剂量计算或临床建议。用药说明请务必遵从您的医生或药剂师指导。</string>
+    <string name="disclaimer_checkbox_consent">我已理解并同意医疗免责声明和用户服务协议。</string>
+    <string name="disclaimer_action_agree">同意并继续</string>
+    <string name="disclaimer_link_medical">医疗免责声明</string>
+    <string name="disclaimer_link_privacy">隐私政策</string>
+    <string name="disclaimer_link_terms">用户服务协议</string>
+    <string name="emergency_dispatch_warning_title">紧急救援提示</string>
+    <string name="emergency_dispatch_warning_desc">Dosezy 不是紧急调度机构，不能替代 120/110/911 等急救电话。如遇生命危险，请直接拨打当地急救电话。请核对显示的急救号码是否符合您当前所在地区。</string>
+    <string name="pdf_report_disclaimer_footer">Dosezy 药品追踪器 • 自主申报信息日志（非临床诊断记录）</string>
+    <string name="pharmacy_refill_estimation_disclaimer">注意：补充药品数量为根据记录频度计算的参考估算值。请务必咨询您的药师或医生核准。</string>
 </resources>

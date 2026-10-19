@@ -829,4 +829,20 @@ Möchten Sie fortfahren?</string>
     <string name="dialog_take_all_title">Alle Medikamente einnehmen?</string>
     <string name="dialog_take_all_message">Alle %1$d für %2$s geplanten Medikamente als eingenommen markieren?</string>
     <string name="take_all_success_toast">Alle %1$d Medikamente als eingenommen markiert</string>
+
+    <!-- Legal, Privacy & Compliance Safeguards -->
+    <string name="notif_generic_lockscreen_reminder">Geplante Medikamentenerinnerung</string>
+    <string name="pref_lockscreen_details_title">Details auf Sperrbildschirm anzeigen</string>
+    <string name="pref_lockscreen_details_desc">Wenn deaktiviert, werden Medikamentennamen und Dosierungen zum Schutz der Privatsphäre bis zum Entsperren ausgeblendet.</string>
+    <string name="disclaimer_dialog_title">Medizinischer &amp; rechtlicher Haftungsausschluss</string>
+    <string name="disclaimer_dialog_summary">Dosezy ist eine automatisierte digitale Erinnerungshilfe und KEIN reguliertes Medizinprodukt. Es bietet keine Diagnosen, Dosisberechnungen oder medizinische Beratung. Konsultieren Sie bei Fragen zur Einnahme stets Ihren Arzt oder Apotheker.</string>
+    <string name="disclaimer_checkbox_consent">Ich verstehe und akzeptiere den medizinischen Haftungsausschluss und die Nutzungsbedingungen.</string>
+    <string name="disclaimer_action_agree">Akzeptieren &amp; Fortfahren</string>
+    <string name="disclaimer_link_medical">Medizinischer Haftungsausschluss</string>
+    <string name="disclaimer_link_privacy">Datenschutzerklärung</string>
+    <string name="disclaimer_link_terms">Nutzungsbedingungen</string>
+    <string name="emergency_dispatch_warning_title">Notfallhinweis</string>
+    <string name="emergency_dispatch_warning_desc">Dosezy ist kein Notrufdienst und kein Ersatz für 112/911. Wählen Sie in lebensbedrohlichen Situationen direkt den örtlichen Notruf. Prüfen Sie, ob die angezeigte Nummer für Ihre Region gilt.</string>
+    <string name="pdf_report_disclaimer_footer">Dosezy Medikamenten-Tracker • Selbstauskunft-Informationsprotokoll (Nicht-Klinisch)</string>
+    <string name="pharmacy_refill_estimation_disclaimer">Hinweis: Nachfüllmengen sind Näherungswerte basierend auf der Einnahmehäufigkeit. Stimmen Sie sich mit Arzt oder Apotheker ab.</string>
 </resources>

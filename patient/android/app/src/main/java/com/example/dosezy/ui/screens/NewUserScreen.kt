@@ -90,6 +90,11 @@ fun NewUserScreen(
     var showExistingProfiles by remember { mutableStateOf(false) }
     var showImportSourceDialog by remember { mutableStateOf(false) }
 
+    val prefs = remember { context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE) }
+    var isDisclaimerAccepted by remember {
+        mutableStateOf(prefs.getBoolean("legal_disclaimer_accepted_v1", false))
+    }
+
     val importLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
@@ -170,6 +175,15 @@ fun NewUserScreen(
                     },
                     setCompleteAction = { action ->
                         completeProfileSetup = action
+                    }
+                )
+            }
+            if (!isDisclaimerAccepted) {
+                // Guard: Require explicit legal and medical disclaimer acceptance before user creates health profile (#FDA, #MDR)
+                com.example.dosezy.ui.components.MedicalDisclaimerDialog(
+                    onAccept = {
+                        prefs.edit().putBoolean("legal_disclaimer_accepted_v1", true).apply()
+                        isDisclaimerAccepted = true
                     }
                 )
             }

@@ -829,4 +829,20 @@
     <string name="dialog_take_all_title">Принять все лекарства?</string>
     <string name="dialog_take_all_message">Отметить все %1$d лекарств, запланированных на %2$s, как принятые?</string>
     <string name="take_all_success_toast">Все %1$d лекарств отмечены как принятые</string>
+
+    <!-- Legal, Privacy & Compliance Safeguards -->
+    <string name="notif_generic_lockscreen_reminder">Запланированное напоминание о приеме лекарств</string>
+    <string name="pref_lockscreen_details_title">Показывать подробности на экране блокировки</string>
+    <string name="pref_lockscreen_details_desc">Если отключено, названия лекарств и дозировки скрыты на экране блокировки для конфиденциальности до разблокировки устройства.</string>
+    <string name="disclaimer_dialog_title">Медицинский и юридический отказ от ответственности</string>
+    <string name="disclaimer_dialog_summary">Dosezy - это цифровая утилита напоминаний, которая НЕ является медицинским изделием. Приложение не ставит диагнозы, не рассчитывает дозировки и не дает клинических рекомендаций. Всегда консультируйтесь с лечащим врачом или фармацевтом.</string>
+    <string name="disclaimer_checkbox_consent">Я понимаю и принимаю медицинский отказ от ответственности и условия обслуживания.</string>
+    <string name="disclaimer_action_agree">Принять и продолжить</string>
+    <string name="disclaimer_link_medical">Медицинский отказ</string>
+    <string name="disclaimer_link_privacy">Политика конфиденциальности</string>
+    <string name="disclaimer_link_terms">Условия обслуживания</string>
+    <string name="emergency_dispatch_warning_title">Экстренное уведомление</string>
+    <string name="emergency_dispatch_warning_desc">Dosezy не является диспетчерской службой и не заменяет вызов 112/911. При угрозе жизни немедленно звоните в местную службу экстренной помощи. Убедитесь, что номер соответствует вашему региону.</string>
+    <string name="pdf_report_disclaimer_footer">Dosezy Трекер Лекарств • Информационный журнал самоотчета (Неклинический)</string>
+    <string name="pharmacy_refill_estimation_disclaimer">Примечание: Количество для пополнения является приблизительным на основе частоты приема. Уточняйте у врача или фармацевта.</string>
 </resources>

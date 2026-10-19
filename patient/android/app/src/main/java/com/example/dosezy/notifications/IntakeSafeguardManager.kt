@@ -414,6 +414,9 @@ object IntakeSafeguardManager {
         } ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
         val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, targetLanguage)
 
+        val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+        val allowLockscreenDetails = prefs.getBoolean("lockscreen_details_enabled", true)
+
         // Guard: Use setUsesChronometer and setChronometerCountDown so Android natively counts down in shade without continuous waking
         val builder = NotificationCompat.Builder(localizedContext, MedicineAlarmReceiver.CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_medicine_notification)
@@ -421,10 +424,22 @@ object IntakeSafeguardManager {
             .setContentText(localizedContext.getString(R.string.notif_intake_in_progress_desc, state.medicineName))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setOngoing(true)
             .setAutoCancel(false)
             .setSilent(true)
+
+        // Guard: Mask sensitive medication name in progress countdown on locked screen unless user permitted details (#HIPAA, #GDPR)
+        if (allowLockscreenDetails) {
+            builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        } else {
+            val publicSafeguard = NotificationCompat.Builder(localizedContext, MedicineAlarmReceiver.CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_medicine_notification)
+                .setContentTitle(localizedContext.getString(R.string.app_name))
+                .setContentText(localizedContext.getString(R.string.notif_intake_in_progress_title))
+                .build()
+            builder.setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                .setPublicVersion(publicSafeguard)
+        }
             .setContentIntent(contentPendingIntent)
             .setWhen(state.targetTimestamp)
             .setUsesChronometer(true)
