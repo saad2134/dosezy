@@ -313,51 +313,6 @@ fun AboutScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Legal & Policies Section (#FDA, #MDR, #HIPAA, #PlayStore)
-            Text(
-                text = "Legal & Policies",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            AboutLinkCard(
-                icon = Icons.Default.Security,
-                iconTint = Color(0xFFF59E0B),
-                title = stringResource(R.string.disclaimer_link_medical),
-                description = "Non-clinical software utility disclaimer",
-                onClick = {
-                    openUrl(context, "https://dosezy.attenomy.com/disclaimer")
-                }
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            AboutLinkCard(
-                icon = Icons.Default.Security,
-                iconTint = Color(0xFF10B981),
-                title = stringResource(R.string.disclaimer_link_privacy),
-                description = "Data protection and privacy policy",
-                onClick = {
-                    openUrl(context, "https://dosezy.attenomy.com/privacy")
-                }
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            AboutLinkCard(
-                icon = Icons.Default.Security,
-                iconTint = Color(0xFF0284C7),
-                title = stringResource(R.string.disclaimer_link_terms),
-                description = "Terms of service and software license",
-                onClick = {
-                    openUrl(context, "https://dosezy.attenomy.com/terms")
-                }
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
             // Support Development Section
             Text(
                 text = stringResource(R.string.about_support_dev_title),
@@ -523,6 +478,51 @@ fun AboutScreen(navController: NavController) {
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Legal & Policies Section (#FDA, #MDR, #HIPAA, #PlayStore)
+            Text(
+                text = "Legal & Policies",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            AboutLinkCard(
+                icon = Icons.Default.Security,
+                iconTint = Color(0xFFF59E0B),
+                title = stringResource(R.string.disclaimer_link_medical),
+                description = "Non-clinical software utility disclaimer",
+                onClick = {
+                    openUrl(context, "https://dosezy.attenomy.com/disclaimer")
+                }
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            AboutLinkCard(
+                icon = Icons.Default.Security,
+                iconTint = Color(0xFF10B981),
+                title = stringResource(R.string.disclaimer_link_privacy),
+                description = "Data protection and privacy policy",
+                onClick = {
+                    openUrl(context, "https://dosezy.attenomy.com/privacy")
+                }
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            AboutLinkCard(
+                icon = Icons.Default.Security,
+                iconTint = Color(0xFF0284C7),
+                title = stringResource(R.string.disclaimer_link_terms),
+                description = "Terms of service and software license",
+                onClick = {
+                    openUrl(context, "https://dosezy.attenomy.com/terms")
+                }
+            )
 
             Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
             Spacer(modifier = Modifier.height(32.dp))
