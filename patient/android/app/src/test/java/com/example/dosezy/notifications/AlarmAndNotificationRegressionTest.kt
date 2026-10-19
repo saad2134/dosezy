@@ -531,7 +531,7 @@ class AlarmAndNotificationRegressionTest {
         assertTrue(allowLockscreenDetails)
 
         val builder = androidx.core.app.NotificationCompat.Builder(context, MedicineAlarmReceiver.CHANNEL_ID)
-            .setSmallIcon(com.example.dosezy.R.drawable.ic_medicine_notification)
+            .setSmallIcon(com.example.dosezy.R.mipmap.ic_launcher)
             .setContentTitle("Prescription")
             .setContentText("Truvada 200mg")
 
@@ -559,7 +559,7 @@ class AlarmAndNotificationRegressionTest {
         assertFalse(allowLockscreenDetails)
 
         val builder = androidx.core.app.NotificationCompat.Builder(context, MedicineAlarmReceiver.CHANNEL_ID)
-            .setSmallIcon(com.example.dosezy.R.drawable.ic_medicine_notification)
+            .setSmallIcon(com.example.dosezy.R.mipmap.ic_launcher)
             .setContentTitle(notificationTitle)
             .setContentText(notificationText)
 
@@ -567,7 +567,7 @@ class AlarmAndNotificationRegressionTest {
             builder.setVisibility(androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC)
         } else {
             val publicNotification = androidx.core.app.NotificationCompat.Builder(context, MedicineAlarmReceiver.CHANNEL_ID)
-                .setSmallIcon(com.example.dosezy.R.drawable.ic_medicine_notification)
+                .setSmallIcon(com.example.dosezy.R.mipmap.ic_launcher)
                 .setContentTitle(context.getString(com.example.dosezy.R.string.app_name))
                 .setContentText(context.getString(com.example.dosezy.R.string.notif_generic_lockscreen_reminder))
                 .build()
@@ -580,6 +580,67 @@ class AlarmAndNotificationRegressionTest {
         assertNotNull(notification.publicVersion)
         val publicContent = notification.publicVersion.extras?.getString(android.app.Notification.EXTRA_TEXT)
         assertEquals("Scheduled medication reminder", publicContent)
+    }
+
+    @Test
+    fun testCustomSnoozeOptions_whenDisabled_onlyIncludesSingleSnoozeAction() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val snoozeMinutes = 10
+        val alternateSnoozeMinutes = 30
+        val showCustomSnooze = false
+
+        val builder = androidx.core.app.NotificationCompat.Builder(context, MedicineAlarmReceiver.CHANNEL_ID)
+            .setSmallIcon(com.example.dosezy.R.mipmap.ic_launcher)
+            .setContentTitle("Dose Alert")
+            .setContentText("Aspirin 100mg")
+            .addAction(0, "Taken", null)
+            .addAction(0, "Snooze ($snoozeMinutes min)", null)
+            .apply {
+                if (showCustomSnooze) {
+                    addAction(0, "Snooze ($alternateSnoozeMinutes min)", null)
+                }
+            }
+
+        val notification = builder.build()
+        // Should have Taken + 1 Snooze action = 2 actions total
+        assertEquals(2, notification.actions?.size ?: 0)
+    }
+
+    @Test
+    fun testCustomSnoozeOptions_whenEnabled_includesMultipleSnoozeActions() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val snoozeMinutes = 10
+        val alternateSnoozeMinutes = 30
+        val showCustomSnooze = true
+
+        val builder = androidx.core.app.NotificationCompat.Builder(context, MedicineAlarmReceiver.CHANNEL_ID)
+            .setSmallIcon(com.example.dosezy.R.mipmap.ic_launcher)
+            .setContentTitle("Dose Alert")
+            .setContentText("Aspirin 100mg")
+            .addAction(0, "Taken", null)
+            .addAction(0, "Snooze ($snoozeMinutes min)", null)
+            .apply {
+                if (showCustomSnooze) {
+                    addAction(0, "Snooze ($alternateSnoozeMinutes min)", null)
+                }
+            }
+
+        val notification = builder.build()
+        // Should have Taken + 2 Snooze actions = 3 actions total
+        assertEquals(3, notification.actions?.size ?: 0)
+    }
+
+    @Test
+    fun testUserEntity_lockscreenAndCustomSnoozeDefaults() {
+        val user = com.example.dosezy.data.model.User(
+            fullName = "John Doe",
+            age = 35,
+            gender = com.example.dosezy.data.model.Gender.MALE,
+            contactNumber = "555-0100"
+        )
+        // Guard: Verify lockscreen details default is ON (true) and custom snooze timing default is OFF (false)
+        assertTrue(user.lockscreenDetailsEnabled)
+        assertFalse(user.customSnoozePopupEnabled)
     }
 }
 

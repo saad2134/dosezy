@@ -3,6 +3,7 @@ package com.example.dosezy.data.repository
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -354,8 +355,17 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                         )
 
                         // Guard: Instantiate NotificationCompat.Builder with localizedContext so internal resource inflation and layout direction align with target profile locale (#BUG-REFILL-NOTIF-BUILDER)
+                        val refillIconBitmap = if (context != null) {
+                            runCatching { BitmapFactory.decodeResource(context.resources, com.example.dosezy.R.mipmap.ic_launcher) }.getOrNull()
+                        } else null
+
                         val builder = androidx.core.app.NotificationCompat.Builder(localizedContext, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
-                            .setSmallIcon(com.example.dosezy.R.drawable.ic_medicine_notification)
+                            .setSmallIcon(com.example.dosezy.R.mipmap.ic_launcher)
+                            .apply {
+                                if (refillIconBitmap != null) {
+                                    setLargeIcon(refillIconBitmap)
+                                }
+                            }
                             .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
                             .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, newStock))
                             .setPriority(androidx.core.app.NotificationCompat.PRIORITY_DEFAULT)
@@ -735,8 +745,17 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
                 )
                 // Guard: Instantiate NotificationCompat.Builder with localizedContext so internal resource inflation and layout direction align with target profile locale (#BUG-REFILL-NOTIF-BUILDER)
+                val refillIconBitmap = if (context != null) {
+                    runCatching { BitmapFactory.decodeResource(context.resources, com.example.dosezy.R.mipmap.ic_launcher) }.getOrNull()
+                } else null
+
                 val builder = androidx.core.app.NotificationCompat.Builder(localizedContext, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
-                    .setSmallIcon(com.example.dosezy.R.drawable.ic_medicine_notification)
+                    .setSmallIcon(com.example.dosezy.R.mipmap.ic_launcher)
+                    .apply {
+                        if (refillIconBitmap != null) {
+                            setLargeIcon(refillIconBitmap)
+                        }
+                    }
                     .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, freshMedicine.medicationName))
                     .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, newStock))
                     .setPriority(androidx.core.app.NotificationCompat.PRIORITY_DEFAULT)

@@ -445,49 +445,51 @@ fun AlarmScreenContent(
                     }
                 }
 
-                // Guard: Dynamic snooze duration selector chips (#103)
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Row(
+                // Guard: Dynamic snooze duration selector chips only shown when custom snooze popup preference is enabled
+                if (user?.customSnoozePopupEnabled == true) {
+                    Column(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        Text(
-                            text = stringResource(R.string.alarm_snooze_duration_label),
-                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        snoozeOptions.forEach { minutes ->
-                            val isSelected = minutes == selectedSnoozeMinutes
-                            Surface(
-                                onClick = { selectedSnoozeMinutes = minutes },
-                                shape = RoundedCornerShape(12.dp),
-                                color = if (isSelected) Color(0xFFF59E0B) else if (isDarkTheme) Color(0xFF262A34) else MaterialTheme.colorScheme.surfaceVariant,
-                                contentColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
-                                border = if (isSelected) null else BorderStroke(1.dp, if (isDarkTheme) Color(0xFF3B404E) else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)),
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(38.dp)
-                            ) {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.alarm_snooze_duration_label),
+                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            snoozeOptions.forEach { minutes ->
+                                val isSelected = minutes == selectedSnoozeMinutes
+                                Surface(
+                                    onClick = { selectedSnoozeMinutes = minutes },
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = if (isSelected) Color(0xFFF59E0B) else if (isDarkTheme) Color(0xFF262A34) else MaterialTheme.colorScheme.surfaceVariant,
+                                    contentColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
+                                    border = if (isSelected) null else BorderStroke(1.dp, if (isDarkTheme) Color(0xFF3B404E) else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(38.dp)
                                 ) {
-                                    Text(
-                                        text = stringResource(R.string.snooze_duration_chip_format, minutes),
-                                        style = MaterialTheme.typography.labelMedium.copy(
-                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                                    Box(
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.snooze_duration_chip_format, minutes),
+                                            style = MaterialTheme.typography.labelMedium.copy(
+                                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                                            )
                                         )
-                                    )
+                                    }
                                 }
                             }
                         }

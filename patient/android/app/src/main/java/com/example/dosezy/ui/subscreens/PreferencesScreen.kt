@@ -121,6 +121,20 @@ fun PreferencesScreen(navController: NavController) {
                         userViewModel.updateUser(user.copy(slideActionsEnabled = isChecked))
                     }
                 },
+                onLockscreenDetailsChange = { isChecked ->
+                    currentUser?.let { user ->
+                        userViewModel.updateUser(user.copy(lockscreenDetailsEnabled = isChecked))
+                    }
+                    context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                        .edit()
+                        .putBoolean("lockscreen_details_enabled", isChecked)
+                        .commit()
+                },
+                onCustomSnoozePopupChange = { isChecked ->
+                    currentUser?.let { user ->
+                        userViewModel.updateUser(user.copy(customSnoozePopupEnabled = isChecked))
+                    }
+                },
                 onAlarmSoundClick = { showAlarmSoundDialog = true },
                 onAlarmDurationClick = { showAlarmDurationDialog = true },
                 onSnoozeClick = { showSnoozeDialog = true },

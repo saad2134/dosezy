@@ -54,6 +54,8 @@ import com.example.dosezy.ui.components.PreferenceItem
 fun LazyListScope.notificationAlarmPreferencesSection(
     currentUser: User?,
     onSlideActionsChange: (Boolean) -> Unit,
+    onLockscreenDetailsChange: (Boolean) -> Unit,
+    onCustomSnoozePopupChange: (Boolean) -> Unit,
     onAlarmSoundClick: () -> Unit,
     onAlarmDurationClick: () -> Unit,
     onSnoozeClick: () -> Unit,
@@ -124,12 +126,6 @@ fun LazyListScope.notificationAlarmPreferencesSection(
 
     // Lock Screen Details Privacy Switch (#HIPAA, #GDPR)
     item {
-        val context = LocalContext.current
-        val prefs = remember { context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE) }
-        var lockscreenDetailsEnabled by remember {
-            mutableStateOf(prefs.getBoolean("lockscreen_details_enabled", true))
-        }
-
         Surface(
             shape = RoundedCornerShape(16.dp),
             color = MaterialTheme.colorScheme.surface,
@@ -172,12 +168,8 @@ fun LazyListScope.notificationAlarmPreferencesSection(
                     }
                 }
                 Switch(
-                    checked = lockscreenDetailsEnabled,
-                    onCheckedChange = { isChecked ->
-                        lockscreenDetailsEnabled = isChecked
-                        // Guard: Persist lock screen privacy toggle immediately to app_prefs
-                        prefs.edit().putBoolean("lockscreen_details_enabled", isChecked).apply()
-                    }
+                    checked = currentUser?.lockscreenDetailsEnabled != false,
+                    onCheckedChange = onLockscreenDetailsChange
                 )
             }
         }
@@ -230,6 +222,57 @@ fun LazyListScope.notificationAlarmPreferencesSection(
             iconName = "snooze",
             onClick = onSnoozeClick
         )
+    }
+
+    // Custom Snooze Timings Toggle
+    item {
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 0.dp,
+            shadowElevation = 2.dp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 6.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    modifier = Modifier.weight(1f).padding(end = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Schedule,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(36.dp)
+                    )
+                    Column {
+                        Text(
+                            text = stringResource(R.string.pref_custom_snooze_title),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = stringResource(R.string.pref_custom_snooze_desc),
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                Switch(
+                    checked = currentUser?.customSnoozePopupEnabled == true,
+                    onCheckedChange = onCustomSnoozePopupChange
+                )
+            }
+        }
     }
 
     // Follow-up / Nagging Reminders Switch & Settings

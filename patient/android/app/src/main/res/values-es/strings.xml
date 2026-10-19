@@ -802,7 +802,7 @@
     <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
     <string name="pref_section_appearance">Apariencia</string>
     <string name="pref_slide_actions_title">Deslizar para Tomar y Posponer</string>
-    <string name="pref_slide_actions_desc">Requiere deslizar en lugar de pulsar para tomar o posponer dosis en las alarmas.</string>
+    <string name="pref_slide_actions_desc">Desliza en vez de tocar para tomar o posponer alarmas.</string>
     <string name="pref_timeline_mode_title">Vista de Cronograma</string>
     <string name="pref_timeline_mode_desc">Muestra el horario de hoy en una cronología vertical amplia.</string>
     <string name="pref_calendar_thicker_highlight_title">Marco Completo por Día</string>
@@ -816,6 +816,8 @@
     <!-- Dynamic Snooze Duration Selector (#103) -->
     <string name="alarm_snooze_duration_label">Posponer por:</string>
     <string name="snooze_duration_chip_format">%1$d min</string>
+    <string name="pref_custom_snooze_title">Opciones de posponer personalizadas</string>
+    <string name="pref_custom_snooze_desc">Elige distintas duraciones para posponer al sonar la alarma.</string>
 
     <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
     <string name="pref_intake_safeguard_title">Protección de Cuenta Regresiva de Toma</string>
@@ -850,7 +852,7 @@
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">Recordatorio de medicamento programado</string>
     <string name="pref_lockscreen_details_title">Mostrar detalles en pantalla de bloqueo</string>
-    <string name="pref_lockscreen_details_desc">Si está desactivado, los nombres y dosis se ocultan en la pantalla de bloqueo por privacidad hasta desbloquear el dispositivo.</string>
+    <string name="pref_lockscreen_details_desc">Ocultar nombres y dosis hasta desbloquear el dispositivo.</string>
     <string name="disclaimer_dialog_title">Descargo de responsabilidad médico y legal</string>
     <string name="disclaimer_dialog_summary">Dosezy es una utilidad digital de recordatorio automatizada y NO es un dispositivo médico regulado. No proporciona diagnósticos, cálculo de dosis ni asesoramiento clínico. Consulte siempre a su médico o farmacéutico para instrucciones de dosificación.</string>
     <string name="disclaimer_checkbox_consent">Entiendo y acepto el descargo de responsabilidad médico y los términos del servicio.</string>

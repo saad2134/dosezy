@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -152,7 +153,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 snoozeMinutes = user?.snoozeDuration ?: 10,
                 isIntakeReAlert = true,
                 userId = user?.userId,
-                userLanguage = user?.language
+                userLanguage = user?.language,
+                showCustomSnoozeOptions = user?.customSnoozePopupEnabled ?: false
             )
         }
     }
@@ -311,7 +313,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                         maxNagging = user?.naggingMaxRepeats ?: 3,
                         snoozeMinutes = user?.snoozeDuration ?: 10,
                         userId = primaryEntry.userId,
-                        userLanguage = user?.language
+                        userLanguage = user?.language,
+                        showCustomSnoozeOptions = user?.customSnoozePopupEnabled ?: false
                     )
 
                     // Schedule next follow-up nagging reminder if enabled and below limit
@@ -368,7 +371,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         isUpdateOnly: Boolean = false,
         isIntakeReAlert: Boolean = false,
         userId: String? = null,
-        userLanguage: com.example.dosezy.data.model.Language? = null
+        userLanguage: com.example.dosezy.data.model.Language? = null,
+        showCustomSnoozeOptions: Boolean = false
     ) {
         // Guard: Resolve notification strings and actions using user profile language or fallback to globally saved app language (#BUG-NOTIF-LOCALE)
         val targetLanguage = userLanguage ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
@@ -564,9 +568,19 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         val allowLockscreenDetails = prefs.getBoolean("lockscreen_details_enabled", true)
 
+        // Guard: Use direct app launcher icon for notification status icon and notification shade large icon
+        val appIconBitmap = runCatching {
+            BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)
+        }.getOrNull()
+
         // Create silent notification: AlarmAudioPlayer is the single source of sound & vibration
         val notificationBuilder = NotificationCompat.Builder(localizedContext, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_medicine_notification)
+            .setSmallIcon(R.mipmap.ic_launcher)
+            .apply {
+                if (appIconBitmap != null) {
+                    setLargeIcon(appIconBitmap)
+                }
+            }
             .setContentTitle(notificationTitle)
             .setContentText(notificationText)
             .setPriority(NotificationCompat.PRIORITY_MAX)
@@ -579,7 +593,12 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         } else {
             val publicNotification = NotificationCompat.Builder(localizedContext, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_medicine_notification)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .apply {
+                    if (appIconBitmap != null) {
+                        setLargeIcon(appIconBitmap)
+                    }
+                }
                 .setContentTitle(localizedContext.getString(R.string.app_name))
                 .setContentText(localizedContext.getString(R.string.notif_generic_lockscreen_reminder))
                 .build()
@@ -597,11 +616,16 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 localizedContext.getString(R.string.notif_action_snooze_format, snoozeMinutes),
                 snoozePendingIntent
             )
-            .addAction(
-                getNotificationIcon(Icons.Filled.Snooze),
-                localizedContext.getString(R.string.notif_action_snooze_format, alternateSnoozeMinutes),
-                alternateSnoozePendingIntent
-            )
+            .apply {
+                // Guard: Only show alternate snooze duration in notification popup if custom snooze option is enabled
+                if (showCustomSnoozeOptions) {
+                    addAction(
+                        getNotificationIcon(Icons.Filled.Snooze),
+                        localizedContext.getString(R.string.notif_action_snooze_format, alternateSnoozeMinutes),
+                        alternateSnoozePendingIntent
+                    )
+                }
+            }
             .setStyle(NotificationCompat.BigTextStyle().bigText(bigText))
 
         if (!isUpdateOnly) {

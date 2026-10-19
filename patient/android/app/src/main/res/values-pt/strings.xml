@@ -785,7 +785,7 @@ Deseja continuar?</string>
     <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
     <string name="pref_section_appearance">Aparência</string>
     <string name="pref_slide_actions_title">Deslizar para tomar e adiar</string>
-    <string name="pref_slide_actions_desc">Exigir deslizar em vez de tocar para tomar ou adiar doses nos alarmes.</string>
+    <string name="pref_slide_actions_desc">Deslize em vez de tocar para tomar ou adiar alarmes.</string>
     <string name="pref_timeline_mode_title">Modo linha do tempo</string>
     <string name="pref_timeline_mode_desc">Exibir a programação de hoje em uma linha do tempo vertical expandida.</string>
     <string name="pref_calendar_thicker_highlight_title">Destaque de moldura completa nos dias</string>
@@ -799,6 +799,8 @@ Deseja continuar?</string>
     <!-- Dynamic Snooze Duration Selector (#103) -->
     <string name="alarm_snooze_duration_label">Adiar por:</string>
     <string name="snooze_duration_chip_format">%1$d min</string>
+    <string name="pref_custom_snooze_title">Opções de soneca personalizadas</string>
+    <string name="pref_custom_snooze_desc">Escolha diferentes tempos de soneca quando o alarme tocar.</string>
     <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
     <string name="pref_intake_safeguard_title">Proteção de Contagem Regressiva de Tomada</string>
     <string name="pref_intake_safeguard_desc">Apoio ao TDAH: intervalo de contagem regressiva antes de confirmar a tomada com novo alerta se houver distração.</string>
@@ -832,7 +834,7 @@ Deseja continuar?</string>
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">Lembrete de medicamento agendado</string>
     <string name="pref_lockscreen_details_title">Mostrar detalhes na tela de bloqueio</string>
-    <string name="pref_lockscreen_details_desc">Quando desativado, os nomes e dosagens são ocultados na tela de bloqueio por privacidade até desbloquear o aparelho.</string>
+    <string name="pref_lockscreen_details_desc">Ocultar nomes e doses até desbloquear o dispositivo.</string>
     <string name="disclaimer_dialog_title">Aviso médico e legal</string>
     <string name="disclaimer_dialog_summary">O Dosezy é um utilitário digital automatizado e NÃO é um dispositivo médico regulamentado. Não fornece diagnóstico clínico, cálculo de dosagem ou aconselhamento médico. Consulte sempre o seu médico ou farmacêutico para orientações de prescrição.</string>
     <string name="disclaimer_checkbox_consent">Entendo e aceito o aviso médico e os termos de serviço.</string>

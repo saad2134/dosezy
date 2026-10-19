@@ -256,6 +256,9 @@ class DataExporter(
         // Guard: Explicitly serialize intake safeguard preferences to retain ADHD support settings on backup restore (#104)
         userObj.put("intakeSafeguardEnabled", user.intakeSafeguardEnabled)
         userObj.put("intakeCountdownSeconds", user.intakeCountdownSeconds)
+        // Guard: Explicitly serialize lockscreen privacy and custom snooze popup settings on backup restore
+        userObj.put("lockscreenDetailsEnabled", user.lockscreenDetailsEnabled)
+        userObj.put("customSnoozePopupEnabled", user.customSnoozePopupEnabled)
         root.put("user", userObj)
 
         val medArray = JSONArray()

@@ -221,6 +221,17 @@ class DatabaseRestoreTransactionAndMigrationTest {
         }
     }
 
+    @Test
+    fun migration18_19_addsLockscreenAndCustomSnoozeColumnsWithCorrectDefaults() {
+        val sqliteDb = mockk<SupportSQLiteDatabase>(relaxed = true)
+        DosezyDatabase.MIGRATION_18_19.migrate(sqliteDb)
+
+        verify(exactly = 1) {
+            sqliteDb.execSQL("ALTER TABLE users ADD COLUMN lockscreenDetailsEnabled INTEGER NOT NULL DEFAULT 1")
+            sqliteDb.execSQL("ALTER TABLE users ADD COLUMN customSnoozePopupEnabled INTEGER NOT NULL DEFAULT 0")
+        }
+    }
+
     // ───────────────────────────────────────────────────────────────
     // Issue 2: OVERWRITE Foreign-Key Filtering & ID Regeneration
     // ───────────────────────────────────────────────────────────────

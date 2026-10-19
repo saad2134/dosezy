@@ -54,7 +54,11 @@ data class User(
     val thickerCalendarDayHighlight: Boolean = false,
     // Guard: ADHD support intake countdown timer safeguard with automatic re-alert if unconfirmed (#104)
     val intakeSafeguardEnabled: Boolean = false,
-    val intakeCountdownSeconds: Int = 120
+    val intakeCountdownSeconds: Int = 120,
+    // Guard: Lock screen privacy toggle to mask sensitive prescription details until unlocked (#HIPAA, #GDPR)
+    val lockscreenDetailsEnabled: Boolean = true,
+    // Guard: Toggle to display multiple custom snooze timing options during alarm alert popup
+    val customSnoozePopupEnabled: Boolean = false
 )
 
 enum class AlarmSound(val rawResId: Int?) {

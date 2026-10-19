@@ -786,7 +786,7 @@
     <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
     <string name="pref_section_appearance">Внешний вид</string>
     <string name="pref_slide_actions_title">Свайп для приема и откладывания</string>
-    <string name="pref_slide_actions_desc">Свайп вместо нажатия для приема или откладывания доз в будильнике.</string>
+    <string name="pref_slide_actions_desc">Проводите пальцем вместо нажатия для приема или повтора.</string>
     <string name="pref_timeline_mode_title">Хронологический вид</string>
     <string name="pref_timeline_mode_desc">Отображать расписание на сегодня в виде вертикальной шкалы времени.</string>
     <string name="pref_calendar_thicker_highlight_title">Выделение дней рамкой</string>
@@ -800,6 +800,8 @@
     <!-- Dynamic Snooze Duration Selector (#103) -->
     <string name="alarm_snooze_duration_label">Отложить на:</string>
     <string name="snooze_duration_chip_format">%1$d мин</string>
+    <string name="pref_custom_snooze_title">Пользовательский повтор сигнала</string>
+    <string name="pref_custom_snooze_desc">Выбирайте разную длительность повтора при звонке будильника.</string>
     <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
     <string name="pref_intake_safeguard_title">Защита с обратным отсчетом приема</string>
     <string name="pref_intake_safeguard_desc">Поддержка при СДВГ: буфер обратного отсчета перед подтверждением с повторным оповещением при отвлечении.</string>
@@ -833,7 +835,7 @@
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">Запланированное напоминание о приеме лекарств</string>
     <string name="pref_lockscreen_details_title">Показывать подробности на экране блокировки</string>
-    <string name="pref_lockscreen_details_desc">Если отключено, названия лекарств и дозировки скрыты на экране блокировки для конфиденциальности до разблокировки устройства.</string>
+    <string name="pref_lockscreen_details_desc">Скрывать названия и дозировки до разблокировки устройства.</string>
     <string name="disclaimer_dialog_title">Медицинский и юридический отказ от ответственности</string>
     <string name="disclaimer_dialog_summary">Dosezy - это цифровая утилита напоминаний, которая НЕ является медицинским изделием. Приложение не ставит диагнозы, не рассчитывает дозировки и не дает клинических рекомендаций. Всегда консультируйтесь с лечащим врачом или фармацевтом.</string>
     <string name="disclaimer_checkbox_consent">Я понимаю и принимаю медицинский отказ от ответственности и условия обслуживания.</string>

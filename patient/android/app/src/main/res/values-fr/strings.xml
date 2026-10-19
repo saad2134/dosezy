@@ -786,7 +786,7 @@ Voulez-vous continuer ?</string>
     <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
     <string name="pref_section_appearance">Apparence</string>
     <string name="pref_slide_actions_title">Glisser pour Prendre et Reporter</string>
-    <string name="pref_slide_actions_desc">Nécessite de faire glisser au lieu d\'appuyer pour prendre ou reporter les doses.</string>
+    <string name="pref_slide_actions_desc">Glisser au lieu d\'appuyer pour prendre ou répéter.</string>
     <string name="pref_timeline_mode_title">Vue Chronologique</string>
     <string name="pref_timeline_mode_desc">Affiche le planning du jour dans une chronologie verticale claire.</string>
     <string name="pref_calendar_thicker_highlight_title">Cadre Complet des Jours</string>
@@ -800,6 +800,8 @@ Voulez-vous continuer ?</string>
     <!-- Dynamic Snooze Duration Selector (#103) -->
     <string name="alarm_snooze_duration_label">Reporter pour :</string>
     <string name="snooze_duration_chip_format">%1$d min</string>
+    <string name="pref_custom_snooze_title">Options de répétition personnalisées</string>
+    <string name="pref_custom_snooze_desc">Choisissez la durée du rappel quand l\'alarme sonne.</string>
     <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
     <string name="pref_intake_safeguard_title">Protection du compte à rebours de prise</string>
     <string name="pref_intake_safeguard_desc">Soutien TDAH : temps de compte à rebours avant confirmation avec réalerte en cas de distraction.</string>
@@ -833,7 +835,7 @@ Voulez-vous continuer ?</string>
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">Rappel de médicament programmé</string>
     <string name="pref_lockscreen_details_title">Afficher les détails sur l\'écran de verrouillage</string>
-    <string name="pref_lockscreen_details_desc">Si désactivé, les noms et dosages sont masqués sur l\'écran de verrouillage par confidentialité jusqu\'au déverrouillage.</string>
+    <string name="pref_lockscreen_details_desc">Masquer noms et dosages jusqu\'au déverrouillage de l\'appareil.</string>
     <string name="disclaimer_dialog_title">Avis de non-responsabilité médicale et légale</string>
     <string name="disclaimer_dialog_summary">Dosezy est un outil numérique de rappel automatisé et N\'EST PAS un dispositif médical réglementé. Il ne fournit aucun diagnostic, calcul de posologie ou conseil clinique. Consultez toujours votre médecin ou pharmacien pour les instructions d\'ordonnance.</string>
     <string name="disclaimer_checkbox_consent">Je comprends et j\'accepte l\'avis médical et les conditions d\'utilisation.</string>

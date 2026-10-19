@@ -89,6 +89,11 @@ class UserViewModel @Inject constructor(
                             try {
                                 syncAppTheme(current.theme.name.lowercase())
                                 com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, current.userId, current.theme.name.lowercase(), isCurrentProfile = true)
+                                // Guard: Persist lock screen privacy toggle synchronously to app_prefs for receivers
+                                context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                                    .edit()
+                                    .putBoolean("lockscreen_details_enabled", current.lockscreenDetailsEnabled)
+                                    .commit()
                             } catch (_: Exception) {}
                         }
 
@@ -195,6 +200,11 @@ class UserViewModel @Inject constructor(
                 _currentUser.value = user
                 try {
                     syncAppTheme(user.theme.name.lowercase())
+                    // Guard: Persist lock screen privacy toggle synchronously to app_prefs for receivers
+                    context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                        .edit()
+                        .putBoolean("lockscreen_details_enabled", user.lockscreenDetailsEnabled)
+                        .commit()
                 } catch (_: Exception) {}
             }
             try {

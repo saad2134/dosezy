@@ -802,7 +802,7 @@
     <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
     <string name="pref_section_appearance">रूप-रंग</string>
     <string name="pref_slide_actions_title">दवा लेने और स्नूज़ के लिए स्लाइड करें</string>
-    <string name="pref_slide_actions_desc">अलार्म में खुराक लेने या स्नूज़ करने के लिए टैप के बजाय स्लाइड करना आवश्यक है।</string>
+    <string name="pref_slide_actions_desc">दवा लेने या स्नूज़ करने के लिए टैप करने के बजाय स्लाइड करें।</string>
     <string name="pref_timeline_mode_title">टाइमलाइन दृश्य</string>
     <string name="pref_timeline_mode_desc">आज का शेड्यूल एक स्पष्ट लंबवत टाइमलाइन में देखें।</string>
     <string name="pref_calendar_thicker_highlight_title">पूर्ण फ्रेम दिवस हाइलाइट</string>
@@ -816,6 +816,8 @@
     <!-- Dynamic Snooze Duration Selector (#103) -->
     <string name="alarm_snooze_duration_label">स्नूज़ करें:</string>
     <string name="snooze_duration_chip_format">%1$d मि</string>
+    <string name="pref_custom_snooze_title">कस्टम स्नूज़ विकल्प</string>
+    <string name="pref_custom_snooze_desc">अलार्म बजने पर विभिन्न स्नूज़ अवधि में से चुनें।</string>
     <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
     <string name="pref_intake_safeguard_title">दवा सेवन उलटी गिनती सुरक्षा</string>
     <string name="pref_intake_safeguard_desc">ADHD सहायता: दवा सेवन पुष्टि से पहले उलटी गिनती बफर और ध्यान भटकने पर पुनः चेतावनी।</string>
@@ -849,7 +851,7 @@
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">निर्धारित दवा अनुस्मारक</string>
     <string name="pref_lockscreen_details_title">लॉक स्क्रीन पर विवरण दिखाएं</string>
-    <string name="pref_lockscreen_details_desc">अक्षम होने पर, गोपनीयता के लिए डिवाइस अनलॉक होने तक लॉक स्क्रीन पर दवा का नाम और खुराक छिपी रहेगी।</string>
+    <string name="pref_lockscreen_details_desc">डिवाइस अनलॉक होने तक दवा का नाम और खुराक छिपाएं।</string>
     <string name="disclaimer_dialog_title">चिकित्सा एवं कानूनी अस्वीकरण</string>
     <string name="disclaimer_dialog_summary">डोज़ीज़ी एक स्वचालित डिजिटल रिमाइंडर उपकरण है और यह कोई प्रमाणित मेडिकल डिवाइस नहीं है। यह नैदानिक परामर्श, खुराक गणना या चिकित्सा सलाह प्रदान नहीं करता है। दवा संबंधी निर्देशों के लिए हमेशा अपने चिकित्सक से परामर्श लें।</string>
     <string name="disclaimer_checkbox_consent">मैं चिकित्सा अस्वीकरण और सेवा की शर्तों को समझता/समझती हूं और स्वीकार करता/करती हूं।</string>

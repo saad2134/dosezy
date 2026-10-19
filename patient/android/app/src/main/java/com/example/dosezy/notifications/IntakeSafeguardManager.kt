@@ -9,6 +9,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -417,9 +418,18 @@ object IntakeSafeguardManager {
         val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
         val allowLockscreenDetails = prefs.getBoolean("lockscreen_details_enabled", true)
 
+        val appIconBitmap = runCatching {
+            BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)
+        }.getOrNull()
+
         // Guard: Use setUsesChronometer and setChronometerCountDown so Android natively counts down in shade without continuous waking
         val builder = NotificationCompat.Builder(localizedContext, MedicineAlarmReceiver.CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_medicine_notification)
+            .setSmallIcon(R.mipmap.ic_launcher)
+            .apply {
+                if (appIconBitmap != null) {
+                    setLargeIcon(appIconBitmap)
+                }
+            }
             .setContentTitle(localizedContext.getString(R.string.notif_intake_in_progress_title))
             .setContentText(localizedContext.getString(R.string.notif_intake_in_progress_desc, state.medicineName))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -433,7 +443,12 @@ object IntakeSafeguardManager {
             builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         } else {
             val publicSafeguard = NotificationCompat.Builder(localizedContext, MedicineAlarmReceiver.CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_medicine_notification)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .apply {
+                    if (appIconBitmap != null) {
+                        setLargeIcon(appIconBitmap)
+                    }
+                }
                 .setContentTitle(localizedContext.getString(R.string.app_name))
                 .setContentText(localizedContext.getString(R.string.notif_intake_in_progress_title))
                 .build()

@@ -885,7 +885,10 @@ class BackupRestoreManager(
             thickerCalendarDayHighlight = json.get("thickerCalendarDayHighlight")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
             // Guard: Defensively parse intake safeguard preferences with non-breaking defaults for legacy backup archives (#104)
             intakeSafeguardEnabled = json.get("intakeSafeguardEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
-            intakeCountdownSeconds = json.get("intakeCountdownSeconds")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 120
+            intakeCountdownSeconds = json.get("intakeCountdownSeconds")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 120,
+            // Guard: Defensively parse lockscreen privacy and custom snooze popup settings for legacy backup archives
+            lockscreenDetailsEnabled = json.get("lockscreenDetailsEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: true,
+            customSnoozePopupEnabled = json.get("customSnoozePopupEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false
         )
     }
 

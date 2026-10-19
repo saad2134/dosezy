@@ -25,7 +25,13 @@ import javax.inject.Singleton
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
     name = "dosezy_preferences",
     produceMigrations = { context ->
-        listOf(SharedPreferencesMigration(context, "app_prefs"))
+        listOf(
+            SharedPreferencesMigration(
+                context = context,
+                sharedPreferencesName = "app_prefs",
+                keysToMigrate = setOf("theme", "selected_language", "timeline_mode_enabled", "thicker_calendar_day_highlight", "slide_actions_enabled", "battery_prompt_dismissed", "overlay_prompt_dismissed")
+            )
+        )
     }
 )
 

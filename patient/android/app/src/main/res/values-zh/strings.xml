@@ -802,7 +802,7 @@
     <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
     <string name="pref_section_appearance">外观与界面</string>
     <string name="pref_slide_actions_title">滑动以服药和稍后提醒</string>
-    <string name="pref_slide_actions_desc">在闹钟提醒中要求通过滑动而不是点击来服药或稍后提醒。</string>
+    <string name="pref_slide_actions_desc">滑动而非点击以确认服药或推迟提醒。</string>
     <string name="pref_timeline_mode_title">时间轴视图</string>
     <string name="pref_timeline_mode_desc">以展开的垂直时间轴显示当天的服药计划。</string>
     <string name="pref_calendar_thicker_highlight_title">日程日全框高亮</string>
@@ -816,6 +816,8 @@
     <!-- Dynamic Snooze Duration Selector (#103) -->
     <string name="alarm_snooze_duration_label">稍后提醒:</string>
     <string name="snooze_duration_chip_format">%1$d分钟</string>
+    <string name="pref_custom_snooze_title">自定义再响选项</string>
+    <string name="pref_custom_snooze_desc">闹钟响起时可选择不同的再响时长。</string>
     <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
     <string name="pref_intake_safeguard_title">服药倒计时保护</string>
     <string name="pref_intake_safeguard_desc">ADHD支持：确认服药前的倒计时缓冲期，并在分心时再次发出提醒。</string>
@@ -849,7 +851,7 @@
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">已计划的服药提醒</string>
     <string name="pref_lockscreen_details_title">在锁定屏幕上显示详情</string>
-    <string name="pref_lockscreen_details_desc">关闭后，锁定屏幕上将隐藏药品名称和剂量以保护隐私，直至解锁设备。</string>
+    <string name="pref_lockscreen_details_desc">解锁设备前在锁定屏幕上隐藏药品名称和剂量。</string>
     <string name="disclaimer_dialog_title">医疗与法律免责声明</string>
     <string name="disclaimer_dialog_summary">Dosezy 是一款自动化数字服药日程提醒工具，并非受监管的医疗器械。本应用不提供医疗诊断、剂量计算或临床建议。用药说明请务必遵从您的医生或药剂师指导。</string>
     <string name="disclaimer_checkbox_consent">我已理解并同意医疗免责声明和用户服务协议。</string>

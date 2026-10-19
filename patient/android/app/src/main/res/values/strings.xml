@@ -814,7 +814,7 @@ Do you want to continue?</string>
     <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
     <string name="pref_section_appearance">Appearance</string>
     <string name="pref_slide_actions_title">Slide to Take &amp; Snooze</string>
-    <string name="pref_slide_actions_desc">Require sliding instead of tapping to take or snooze doses in alarms.</string>
+    <string name="pref_slide_actions_desc">Slide instead of tapping to take or snooze alarms.</string>
     <string name="pref_timeline_mode_title">Timeline View</string>
     <string name="pref_timeline_mode_desc">Display today\'s schedule in an expanded vertical timeline.</string>
     <string name="pref_calendar_thicker_highlight_title">Full Frame Day Highlights</string>
@@ -858,11 +858,13 @@ Do you want to continue?</string>
     <!-- Dynamic Snooze Duration Selector (#103) -->
     <string name="alarm_snooze_duration_label">Snooze for:</string>
     <string name="snooze_duration_chip_format">%1$dm</string>
+    <string name="pref_custom_snooze_title">Custom Snooze Options</string>
+    <string name="pref_custom_snooze_desc">Choose different snooze durations when an alarm rings.</string>
 
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">Scheduled medication reminder</string>
     <string name="pref_lockscreen_details_title">Show Details on Lock Screen</string>
-    <string name="pref_lockscreen_details_desc">When off, medication names and dosages are hidden on the lock screen for privacy until your device is unlocked.</string>
+    <string name="pref_lockscreen_details_desc">Hide medication names and dosages until device is unlocked.</string>
     <string name="disclaimer_dialog_title">Medical &amp; Legal Disclaimer</string>
     <string name="disclaimer_dialog_summary">Dosezy is an automated digital reminder utility and is NOT a regulated medical device. It does not provide medical diagnosis, dosage calculations, or clinical advice. Always consult your physician or healthcare provider for prescription instructions.</string>
     <string name="disclaimer_checkbox_consent">I understand and accept the Medical Disclaimer and Terms of Service.</string>

@@ -786,7 +786,7 @@
     <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
     <string name="pref_section_appearance">المظهر</string>
     <string name="pref_slide_actions_title">السحب للتناول والتأجيل</string>
-    <string name="pref_slide_actions_desc">يتطلب السحب بدلاً من الضغط لتناول الجرعة أو تأجيلها في التنبيهات.</string>
+    <string name="pref_slide_actions_desc">السحب بدلاً من النقر لتناول الجرعات أو تأجيلها.</string>
     <string name="pref_timeline_mode_title">عرض المخطط الزمني</string>
     <string name="pref_timeline_mode_desc">عرض جدول اليوم في مخطط زمني عمودي واسع.</string>
     <string name="pref_calendar_thicker_highlight_title">إطار كامل للأيام المجدولة</string>
@@ -800,6 +800,8 @@
     <!-- Dynamic Snooze Duration Selector (#103) -->
     <string name="alarm_snooze_duration_label">تأجيل لمدة:</string>
     <string name="snooze_duration_chip_format">%1$d د</string>
+    <string name="pref_custom_snooze_title">خيارات تأجيل مخصصة</string>
+    <string name="pref_custom_snooze_desc">اختر مدد تأجيل مختلفة مباشرة عند رنين المنبه.</string>
     <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
     <string name="pref_intake_safeguard_title">حماية العد التنازلي لتناول الدواء</string>
     <string name="pref_intake_safeguard_desc">دعم فرط الحركة وتشتت الانتباه: مهلة عد تنازلي قبل تأكيد التناول مع إعادة التنبيه عند التشتت.</string>
@@ -833,7 +835,7 @@
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">تذكير بموعد الدواء المجدول</string>
     <string name="pref_lockscreen_details_title">إظهار التفاصيل على شاشة القفل</string>
-    <string name="pref_lockscreen_details_desc">عند التعطيل، يتم إخفاء أسماء الأدوية والجرعات على شاشة القفل للخصوصية حتى فتح قفل الجهاز.</string>
+    <string name="pref_lockscreen_details_desc">إخفاء أسماء الأدوية والجرعات حتى يتم إلغاء قفل الجهاز.</string>
     <string name="disclaimer_dialog_title">إخلاء المسؤولية الطبية والقانونية</string>
     <string name="disclaimer_dialog_summary">تطبيق دوزيزي هو أداة تذكير رقمية آلية وليس جهازاً طبياً معتمداً. لا يقدم التطبيق تشخيصاً طبياً أو حسابات جرعات أو نصائح سريرية. استشر دائماً طبيبك أو مقدم الرعاية الصحية للحصول على تعليمات الوصفة الطبية.</string>
     <string name="disclaimer_checkbox_consent">أفهم وأوافق على إخلاء المسؤولية الطبية وشروط الخدمة.</string>
