@@ -295,7 +295,34 @@ class AlarmScheduler(private val context: Context) {
         }
 
         if (resolvedUserId != null && resolvedDateTime != null) {
-            cancelSlotAlarm(resolvedUserId, resolvedDateTime)
+            var rearmedSibling = false
+            // Guard: Re-arm slot alarm if sibling pending medications share time slot; unconditionally cancelling drops sibling alarms (#BUG-SLOT-CANCEL-SIBLING)
+            try {
+                val db = com.example.dosezy.data.DosezyDatabase.getInstance(context)
+                val cleanDt = resolvedDateTime.withSecond(0).withNano(0)
+                val slotMillis = cleanDt.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+                val remaining = kotlinx.coroutines.runBlocking {
+                    kotlinx.coroutines.withTimeoutOrNull(500L) {
+                        db.scheduleDao().getScheduleForDateRangeDirect(resolvedUserId, slotMillis, slotMillis + 59999L)
+                    }
+                }?.filter { it.entryId != entryId && it.status == com.example.dosezy.data.model.MedicationStatus.PENDING } ?: emptyList()
+
+                if (remaining.isNotEmpty()) {
+                    val medNames = kotlinx.coroutines.runBlocking {
+                        kotlinx.coroutines.withTimeoutOrNull(500L) {
+                            remaining.mapNotNull { db.medicineDao().getMedicineByIdDirect(it.medicineId)?.medicationName }
+                        }
+                    } ?: emptyList()
+                    if (medNames.isNotEmpty() && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        scheduleGroupedMedicineAlarm(cleanDt, remaining, medNames)
+                        rearmedSibling = true
+                    }
+                }
+            } catch (_: Exception) {}
+
+            if (!rearmedSibling) {
+                cancelSlotAlarm(resolvedUserId, resolvedDateTime)
+            }
         }
     }
 

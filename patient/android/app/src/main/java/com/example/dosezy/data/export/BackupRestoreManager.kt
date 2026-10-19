@@ -597,6 +597,13 @@ class BackupRestoreManager(
 
                         // Guard: Execute clear and restore within an atomic Room transaction so that if any failure occurs midway, previous profile data is rolled back rather than permanently lost
                         database.withTransaction {
+                            // Guard: Purge conflicting original user record if existingLocalUserId differs from originalUser.userId to prevent duplicate user entities and orphan foreign keys (#BUG-RESTORE-ID-COLLISION)
+                            if (decision.summary.existingLocalUserId != null && decision.summary.existingLocalUserId != originalUser.userId) {
+                                database.scheduleDao().deleteScheduleByUser(originalUser.userId)
+                                database.medicineDao().deleteMedicinesByUser(originalUser.userId)
+                                database.userDao().deleteUserById(originalUser.userId)
+                            }
+
                             database.scheduleDao().deleteScheduleByUser(targetUserId)
                             database.medicineDao().deleteMedicinesByUser(targetUserId)
 
@@ -644,6 +651,12 @@ class BackupRestoreManager(
                             }
                         } else {
                             emergencyPrefs.edit().remove("selected_country_code_$targetUserId").apply()
+                        }
+
+                        // Guard: Scrub stale preferences for conflicting original user ID when overwritten into existing local profile (#BUG-RESTORE-ID-COLLISION)
+                        if (decision.summary.existingLocalUserId != null && decision.summary.existingLocalUserId != originalUser.userId) {
+                            emPrefs.edit().remove("contacts_json_${originalUser.userId}").apply()
+                            emergencyPrefs.edit().remove("selected_country_code_${originalUser.userId}").apply()
                         }
                     }
 

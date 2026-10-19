@@ -1,4 +1,4 @@
-﻿package com.example.dosezy.notifications
+package com.example.dosezy.notifications
 
 import android.app.AlarmManager
 import android.content.Context
@@ -225,5 +225,77 @@ class AlarmRescheduleAndAudioPlaybackDeepDiveTest {
         val zipBytes = byteOut.toByteArray()
         assertTrue("Zip archive should be non-empty and valid", zipBytes.isNotEmpty())
         assertFalse("Temp file should be cleaned up", tempFile.exists())
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // Issue 7: Cancel Alarm Re-arms Slot Alarm When Sibling Meds Exist
+    // ───────────────────────────────────────────────────────────────
+
+    @Test
+    fun issue7_cancelAlarm_withSiblingPendingMedications_rearmsSlotAlarmRatherThanDisarming() = runBlocking {
+        val testDb = androidx.room.Room.inMemoryDatabaseBuilder(context, DosezyDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+        DosezyDatabase.setInstance(testDb)
+        try {
+            val now = LocalDateTime.now().withSecond(0).withNano(0)
+            val testUser = User(
+                userId = "user_sibling_test",
+                fullName = "Sibling Test User",
+                age = 30,
+                gender = com.example.dosezy.data.model.Gender.MALE,
+                contactNumber = "1234567890"
+            )
+            val med1 = Medicine(
+                medicineId = "med_sib_1",
+                userId = testUser.userId,
+                medicationName = "Aspirin",
+                dosage = 100.0,
+                dosageUnit = com.example.dosezy.data.model.DosageUnit.MG,
+                timesPerDay = 1,
+                frequency = Frequency(FrequencyPattern.DAILY),
+                scheduledTimes = listOf(now.toLocalTime())
+            )
+            val med2 = Medicine(
+                medicineId = "med_sib_2",
+                userId = testUser.userId,
+                medicationName = "Metformin",
+                dosage = 500.0,
+                dosageUnit = com.example.dosezy.data.model.DosageUnit.MG,
+                timesPerDay = 1,
+                frequency = Frequency(FrequencyPattern.DAILY),
+                scheduledTimes = listOf(now.toLocalTime())
+            )
+            val entry1 = ScheduleEntry(
+                entryId = "entry_sib_1",
+                userId = testUser.userId,
+                medicineId = med1.medicineId,
+                scheduledDateTime = now,
+                status = MedicationStatus.PENDING
+            )
+            val entry2 = ScheduleEntry(
+                entryId = "entry_sib_2",
+                userId = testUser.userId,
+                medicineId = med2.medicineId,
+                scheduledDateTime = now,
+                status = MedicationStatus.PENDING
+            )
+
+            testDb.userDao().insertUser(testUser)
+            testDb.medicineDao().insertMedicine(med1)
+            testDb.medicineDao().insertMedicine(med2)
+            testDb.scheduleDao().insertScheduleEntry(entry1)
+            testDb.scheduleDao().insertScheduleEntry(entry2)
+
+            val schedulerSpy = spyk(AlarmScheduler(context))
+            schedulerSpy.cancelAlarm(entry1)
+
+            // Sibling entry2 remains pending, so slot alarm must NOT be cancelled, and grouped alarm must be re-armed
+            verify(exactly = 0) { schedulerSpy.cancelSlotAlarm(testUser.userId, now) }
+            verify(atLeast = 1) { schedulerSpy.scheduleGroupedMedicineAlarm(now, match { it.size == 1 && it.first().entryId == entry2.entryId }, listOf("Metformin"), any()) }
+        } finally {
+            DosezyDatabase.setInstance(null)
+            testDb.close()
+        }
     }
 }

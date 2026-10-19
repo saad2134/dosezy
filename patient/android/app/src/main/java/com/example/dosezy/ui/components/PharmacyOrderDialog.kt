@@ -389,8 +389,7 @@ fun PharmacyOrderDialog(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(14.dp))
-
+                // Guard: Single 14dp vertical spacer; duplicate spacer caused layout overflow on smaller viewports
                 Spacer(modifier = Modifier.height(14.dp))
 
                 // Options: Dosage & Stock privacy toggles

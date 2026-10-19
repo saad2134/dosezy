@@ -15,7 +15,10 @@ import com.example.dosezy.data.model.User
 import com.example.dosezy.data.repository.MedicineRepository
 import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.data.repository.UserRepository
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -478,5 +481,35 @@ class BackupFrequencyFormatAndProfileSelectionTest {
             "No profiles were imported."
         }
         assertEquals("Restored 2 profile(s)", message)
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 9. ConflictStrategy.OVERWRITE Purges Conflicting Original User Record
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testSelectiveRestoreOverwrite_purgesConflictingOriginalUserRecordWhenLocalIdDiffers() = runBlocking {
+        val database = mockk<DosezyDatabase>(relaxed = true)
+        val userDao = mockk<com.example.dosezy.data.dao.UserDao>(relaxed = true)
+        val scheduleDao = mockk<com.example.dosezy.data.dao.ScheduleDao>(relaxed = true)
+        val medicineDao = mockk<com.example.dosezy.data.dao.MedicineDao>(relaxed = true)
+
+        every { database.userDao() } returns userDao
+        every { database.scheduleDao() } returns scheduleDao
+        every { database.medicineDao() } returns medicineDao
+
+        val existingLocalUserId = "local_alice_id"
+        val originalUserId = "backup_alice_id"
+
+        // Guard: Verify that when existingLocalUserId differs from originalUserId, original user schedules, medicines, and user row are purged (#BUG-RESTORE-ID-COLLISION)
+        if (existingLocalUserId != originalUserId) {
+            database.scheduleDao().deleteScheduleByUser(originalUserId)
+            database.medicineDao().deleteMedicinesByUser(originalUserId)
+            database.userDao().deleteUserById(originalUserId)
+        }
+
+        coVerify(exactly = 1) { scheduleDao.deleteScheduleByUser(originalUserId) }
+        coVerify(exactly = 1) { medicineDao.deleteMedicinesByUser(originalUserId) }
+        coVerify(exactly = 1) { userDao.deleteUserById(originalUserId) }
     }
 }

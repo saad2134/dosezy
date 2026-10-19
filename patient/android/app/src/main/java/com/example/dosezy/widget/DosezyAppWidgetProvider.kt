@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
+import android.os.Build
 import android.view.View
 import android.widget.RemoteViews
 import com.example.dosezy.MainActivity
@@ -178,11 +179,17 @@ class DosezyAppWidgetProvider : AppWidgetProvider() {
                         // Guard: Use SINGLE_TOP to bring existing instance to foreground and deliver extras to onNewIntent without wiping task state
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                     }
+                    // Guard: FLAG_MUTABLE is mandatory on API 31+ (Android 12+) for ListView fillInIntent templates but undefined on API 24-30; guard bitmask to prevent OEM ROM incompatibilities
+                    val mutableFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        PendingIntent.FLAG_MUTABLE
+                    } else {
+                        0
+                    }
                     val itemPendingIntent = PendingIntent.getActivity(
                         context,
                         appWidgetId + 100000,
                         itemClickIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                        PendingIntent.FLAG_UPDATE_CURRENT or mutableFlag
                     )
                     views.setPendingIntentTemplate(R.id.widget_medicine_list, itemPendingIntent)
 

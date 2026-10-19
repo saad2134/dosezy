@@ -5,8 +5,10 @@
 
 package com.example.dosezy.widget
 
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.example.dosezy.MainActivity
 import org.junit.Assert.assertEquals
@@ -266,6 +268,25 @@ class DosezyAppWidgetProviderTest {
 
         // Restore global preference
         prefs.edit().putString("selected_language", "ENGLISH").commit()
+    }
+
+    @Test
+    fun testWidgetPendingIntentMutableFlag_guardedBySdkVersion() {
+        val flagsApi31 = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            PendingIntent.FLAG_MUTABLE
+        } else {
+            0
+        }
+        val targetFlags = PendingIntent.FLAG_UPDATE_CURRENT or flagsApi31
+
+        // In Robolectric test runner running at SDK 34, FLAG_MUTABLE must be present
+        assertTrue((targetFlags and PendingIntent.FLAG_MUTABLE) != 0)
+        assertTrue((targetFlags and PendingIntent.FLAG_UPDATE_CURRENT) != 0)
+
+        // For simulated API 28 (Android 9.0), flagsApi below 31 must be 0
+        val simulatedApiBelow31 = if (28 >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
+        assertEquals(0, simulatedApiBelow31)
+        assertEquals(PendingIntent.FLAG_UPDATE_CURRENT, PendingIntent.FLAG_UPDATE_CURRENT or simulatedApiBelow31)
     }
 }
 

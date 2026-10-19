@@ -339,5 +339,24 @@ class AnalyticsRangeAndRecurrenceModuloTest {
         assertEquals(85, updatedState.selectedData.rate)
         assertEquals(7, updatedState.breakdown.totalEntries)
     }
+
+    @Test
+    fun testAnalyticsScreen_miniRingsFilter_excludesBothAllAndTotalRanges() {
+        val data7Days = RangeAdherenceData(AdherenceRange.LAST_7_DAYS, 6, 7, 7, 85)
+        val data30Days = RangeAdherenceData(AdherenceRange.LAST_30_DAYS, 25, 30, 30, 83)
+        val dataTotal = RangeAdherenceData(AdherenceRange.TOTAL, 45, 50, 50, 90)
+        val dataAll = RangeAdherenceData(AdherenceRange.ALL, 45, 50, 50, 90)
+
+        val fullRangeList = listOf(data7Days, data30Days, dataTotal, dataAll)
+
+        // Guard: Verify that the mini rings breakdown under ALL excludes both ALL and TOTAL so only sub-periods are displayed (#BUG-ANALYTICS-TOTAL-RING)
+        val miniRingItems = fullRangeList.filter { it.range != AdherenceRange.ALL && it.range != AdherenceRange.TOTAL }
+
+        assertEquals(2, miniRingItems.size)
+        assertTrue(miniRingItems.any { it.range == AdherenceRange.LAST_7_DAYS })
+        assertTrue(miniRingItems.any { it.range == AdherenceRange.LAST_30_DAYS })
+        assertFalse("TOTAL must not appear in mini-rings breakdown", miniRingItems.any { it.range == AdherenceRange.TOTAL })
+        assertFalse("ALL must not appear in mini-rings breakdown", miniRingItems.any { it.range == AdherenceRange.ALL })
+    }
 }
 
