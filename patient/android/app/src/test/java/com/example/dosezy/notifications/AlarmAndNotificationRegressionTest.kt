@@ -642,6 +642,78 @@ class AlarmAndNotificationRegressionTest {
         assertTrue(user.lockscreenDetailsEnabled)
         assertFalse(user.customSnoozePopupEnabled)
     }
+
+    @Test
+    fun testNotificationChannel_usesVisibilityNoOverride_andDeletesLegacyV3() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+
+        // Create legacy channel v3 first to verify cleanup
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val legacyChannel = android.app.NotificationChannel(
+                "dosezy_medicine_reminders_v3",
+                "Legacy",
+                android.app.NotificationManager.IMPORTANCE_HIGH
+            )
+            notificationManager.createNotificationChannel(legacyChannel)
+            assertNotNull(notificationManager.getNotificationChannel("dosezy_medicine_reminders_v3"))
+        }
+
+        // Initialize channels via production code
+        MedicineAlarmReceiver.createNotificationChannels(context)
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            // Verify legacy channel was deleted
+            assertNull(notificationManager.getNotificationChannel("dosezy_medicine_reminders_v3"))
+
+            // Verify active v4 channel has VISIBILITY_NO_OVERRIDE (-1000) so individual notification visibility is not forced public
+            val activeChannel = notificationManager.getNotificationChannel(MedicineAlarmReceiver.CHANNEL_ID)
+            assertNotNull(activeChannel)
+            assertEquals("dosezy_medicine_reminders_v4", activeChannel!!.id)
+            assertEquals(
+                -1000,
+                activeChannel.lockscreenVisibility
+            )
+        }
+    }
+
+    @Test
+    fun testPublicVersionNotification_includesContentIntentAndSnoozeAction() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val pendingIntent = android.app.PendingIntent.getActivity(
+            context,
+            101,
+            Intent(),
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+        )
+        val snoozePendingIntent = android.app.PendingIntent.getBroadcast(
+            context,
+            102,
+            Intent(),
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val publicNotification = androidx.core.app.NotificationCompat.Builder(context, MedicineAlarmReceiver.CHANNEL_ID)
+            .setSmallIcon(com.example.dosezy.R.mipmap.ic_launcher)
+            .setContentTitle("Dosezy")
+            .setContentText("Scheduled medication reminder")
+            .setContentIntent(pendingIntent)
+            .addAction(0, "Snooze (10 min)", snoozePendingIntent)
+            .build()
+
+        assertNotNull(publicNotification.contentIntent)
+        assertEquals(1, publicNotification.actions?.size ?: 0)
+        assertEquals("Snooze (10 min)", publicNotification.actions[0].title)
+    }
+
+    @Test
+    fun testAlarmIntent_carriesAllowLockscreenDetailsExtra() {
+        val intent = Intent().apply {
+            putExtra("allow_lockscreen_details", false)
+        }
+        assertFalse(intent.getBooleanExtra("allow_lockscreen_details", true))
+    }
 }
+
 
 

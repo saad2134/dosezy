@@ -863,4 +863,6 @@
     <string name="emergency_dispatch_warning_desc">डोज़ीज़ी कोई आपातकालीन सेवा प्रदाता नहीं है और 112/911 का विकल्प नहीं है। गंभीर स्थिति में सीधे स्थानीय आपातकालीन सेवाओं को कॉल करें। जांचें कि नंबर आपके क्षेत्र से मेल खाता है।</string>
     <string name="pdf_report_disclaimer_footer">डोज़ीज़ी दवा ट्रैकर • स्व-रिपोर्टेड सूचनात्मक लॉग (गैर-चिकित्सकीय)</string>
     <string name="pharmacy_refill_estimation_disclaimer">सूचना: रिफिल मात्रा दर्ज आवृत्ति पर आधारित अनुमान है। अपने फार्मासिस्ट या चिकित्सक से सत्यापित करें।</string>
+    <string name="alarm_unlock_to_view_details">विवरण देखने के लिए अनलॉक करें</string>
+    <string name="alarm_lockscreen_details_hidden">डिवाइस लॉक होने पर दवा का नाम और खुराक छिपी रहती है।</string>
 </resources>

@@ -847,4 +847,6 @@
     <string name="emergency_dispatch_warning_desc">دوزيزي ليس خدمة طوارئ أو بديلاً عن أرقام الطوارئ 911/112. في الحالات الحرجة، اتصل بخدمات الطوارئ المحلية مباشرة. يرجى التحقق من مطابقة الرقم لمنطقتك.</string>
     <string name="pdf_report_disclaimer_footer">متتبع الأدوية دوزيزي • سجل معلوماتي مسجل ذاتياً (غير سريري)</string>
     <string name="pharmacy_refill_estimation_disclaimer">ملاحظة: كميات إعادة التعبئة هي تقديرات تقريبية بناءً على وتيرة التناول. تحقق مع الصيدلي أو الطبيب.</string>
+    <string name="alarm_unlock_to_view_details">قم بإلغاء القفل لعرض التفاصيل</string>
+    <string name="alarm_lockscreen_details_hidden">يتم إخفاء أسماء الأدوية والجرعات أثناء قفل الجهاز.</string>
 </resources>

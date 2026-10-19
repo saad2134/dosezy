@@ -32,7 +32,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
     companion object {
         const val TAG = "MedicineAlarmReceiver"
-        const val CHANNEL_ID = "dosezy_medicine_reminders_v3"
+        const val CHANNEL_ID = "dosezy_medicine_reminders_v4"
         const val REFILL_CHANNEL_ID = "dosezy_refill_alerts"
         const val EXTRA_ENTRY_ID = "entry_id"
         const val EXTRA_MEDICINE_NAME = "medicine_name"
@@ -50,8 +50,9 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 val notificationManager =
                     context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-                // Remove legacy channels to avoid system audio caching conflicts
+                // Remove legacy channels to avoid system audio caching conflicts and enforce VISIBILITY_NO_OVERRIDE
                 try {
+                    notificationManager.deleteNotificationChannel("dosezy_medicine_reminders_v3")
                     notificationManager.deleteNotificationChannel("dosezy_medicine_reminders_v2")
                     notificationManager.deleteNotificationChannel("dosezy_medicine_reminders")
                 } catch (_: Exception) {}
@@ -67,8 +68,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                     setSound(null, null)  // Silent channel: eliminates duplicate system ringtone
                     setBypassDnd(true)
                     setShowBadge(true)
-                    // Guard: Default channel lockscreen visibility to PUBLIC while supporting user opt-out in preferences
-                    lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
+                    // Guard: Default lockscreenVisibility (-1000 / VISIBILITY_NO_OVERRIDE) allows individual notification visibility (PUBLIC vs PRIVATE) to govern lock screen privacy
                 }
 
                 notificationManager.createNotificationChannel(channel)
@@ -100,6 +100,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             userId: String? = null,
             userLanguage: com.example.dosezy.data.model.Language? = null
         ) {
+            val allowLockscreen = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE).getBoolean("lockscreen_details_enabled", true)
             MedicineAlarmReceiver().showNotification(
                 context = context,
                 entryId = entryId,
@@ -114,7 +115,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 snoozeMinutes = snoozeMinutes,
                 isUpdateOnly = true,
                 userId = userId,
-                userLanguage = userLanguage
+                userLanguage = userLanguage,
+                allowLockscreenDetails = allowLockscreen
             )
         }
 
@@ -139,6 +141,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 autoSilenceSeconds = duration
             )
 
+            val allowLockscreen = user?.lockscreenDetailsEnabled ?: context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE).getBoolean("lockscreen_details_enabled", true)
             val receiver = MedicineAlarmReceiver()
             receiver.showNotification(
                 context = context,
@@ -154,7 +157,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 isIntakeReAlert = true,
                 userId = user?.userId,
                 userLanguage = user?.language,
-                showCustomSnoozeOptions = user?.customSnoozePopupEnabled ?: false
+                showCustomSnoozeOptions = user?.customSnoozePopupEnabled ?: false,
+                allowLockscreenDetails = allowLockscreen
             )
         }
     }
@@ -314,7 +318,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                         snoozeMinutes = user?.snoozeDuration ?: 10,
                         userId = primaryEntry.userId,
                         userLanguage = user?.language,
-                        showCustomSnoozeOptions = user?.customSnoozePopupEnabled ?: false
+                        showCustomSnoozeOptions = user?.customSnoozePopupEnabled ?: false,
+                        allowLockscreenDetails = user?.lockscreenDetailsEnabled ?: true
                     )
 
                     // Schedule next follow-up nagging reminder if enabled and below limit
@@ -372,7 +377,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         isIntakeReAlert: Boolean = false,
         userId: String? = null,
         userLanguage: com.example.dosezy.data.model.Language? = null,
-        showCustomSnoozeOptions: Boolean = false
+        showCustomSnoozeOptions: Boolean = false,
+        allowLockscreenDetails: Boolean = true
     ) {
         // Guard: Resolve notification strings and actions using user profile language or fallback to globally saved app language (#BUG-NOTIF-LOCALE)
         val targetLanguage = userLanguage ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
@@ -478,6 +484,9 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val effectiveAllowLockscreen = allowLockscreenDetails && prefs.getBoolean("lockscreen_details_enabled", true)
+
         // Full screen alarm intent
         val alarmIntent = Intent(context, AlarmActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or
@@ -495,6 +504,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             }
             putExtra(EXTRA_SCHEDULED_TIME, scheduledTime ?: "")
             putExtra(EXTRA_IS_INTAKE_REALERT, isIntakeReAlert)
+            putExtra("allow_lockscreen_details", effectiveAllowLockscreen)
         }
 
         // Android 14+ background activity start options for PendingIntent creation
@@ -565,9 +575,6 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             }.trimEnd()
         }
 
-        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        val allowLockscreenDetails = prefs.getBoolean("lockscreen_details_enabled", true)
-
         // Guard: Use direct app launcher icon for notification status icon and notification shade large icon
         val appIconBitmap = runCatching {
             BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)
@@ -589,7 +596,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             .setSilent(true)
 
         // Guard: Mask sensitive medication names/dosages on lock screen by default to prevent PHI leakage (#HIPAA, #GDPR)
-        if (allowLockscreenDetails) {
+        if (effectiveAllowLockscreen) {
             notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         } else {
             val publicNotification = NotificationCompat.Builder(localizedContext, CHANNEL_ID)
@@ -601,6 +608,15 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 }
                 .setContentTitle(localizedContext.getString(R.string.app_name))
                 .setContentText(localizedContext.getString(R.string.notif_generic_lockscreen_reminder))
+                .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setAutoCancel(true)
+                .addAction(
+                    getNotificationIcon(Icons.Filled.Snooze),
+                    localizedContext.getString(R.string.notif_action_snooze_format, snoozeMinutes),
+                    snoozePendingIntent
+                )
                 .build()
             notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                 .setPublicVersion(publicNotification)

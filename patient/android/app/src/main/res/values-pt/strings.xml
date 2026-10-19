@@ -846,4 +846,6 @@ Deseja continuar?</string>
     <string name="emergency_dispatch_warning_desc">O Dosezy não é um serviço de emergência nem substituto do 192/112/911. Em situações críticas, ligue diretamente para os serviços de emergência locais. Verifique se o número exibido corresponde à sua região.</string>
     <string name="pdf_report_disclaimer_footer">Dosezy Rastreador de Medicamentos • Registro informativo autorrelatado (Não clínico)</string>
     <string name="pharmacy_refill_estimation_disclaimer">Aviso: As quantidades de reposição são estimativas aproximadas baseadas na frequência registrada. Confirme com seu farmacêutico ou médico.</string>
+    <string name="alarm_unlock_to_view_details">Desbloquear para ver detalhes</string>
+    <string name="alarm_lockscreen_details_hidden">Os nomes dos medicamentos e as dosagens ficam ocultos enquanto o dispositivo estiver bloqueado.</string>
 </resources>

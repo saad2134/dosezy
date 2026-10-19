@@ -28,6 +28,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.FastForward
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.filled.Snooze
 import androidx.compose.material3.Button
@@ -78,6 +80,8 @@ fun AlarmScreenContent(
     user: User?,
     isLoaded: Boolean,
     isDarkTheme: Boolean,
+    isDetailsMasked: Boolean = false,
+    onUnlockRequest: () -> Unit = {},
     onTakeAction: () -> Unit,
     onSnoozeAction: (Int) -> Unit,
     onSkipAction: (String) -> Unit
@@ -236,7 +240,13 @@ fun AlarmScreenContent(
                 }
 
                 Text(
-                    text = if (medicinesList.size > 1) stringResource(R.string.alarm_medication_reminder_multi, medicinesList.size) else stringResource(R.string.alarm_medication_reminder),
+                    text = if (isDetailsMasked) {
+                        stringResource(R.string.notif_generic_lockscreen_reminder)
+                    } else if (medicinesList.size > 1) {
+                        stringResource(R.string.alarm_medication_reminder_multi, medicinesList.size)
+                    } else {
+                        stringResource(R.string.alarm_medication_reminder)
+                    },
                     style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -273,7 +283,74 @@ fun AlarmScreenContent(
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                if (medicinesList.isEmpty() && isLoaded) {
+                if (isDetailsMasked) {
+                    val cardBgColor = if (isDarkTheme) Color(0xFF1A1D24) else MaterialTheme.colorScheme.surfaceVariant
+                    val cardBorder = if (isDarkTheme) BorderStroke(1.dp, Color(0xFF2D323E)) else null
+
+                    Card(
+                        shape = RoundedCornerShape(24.dp),
+                        colors = CardDefaults.cardColors(containerColor = cardBgColor),
+                        border = cardBorder,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(14.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(64.dp)
+                                    .clip(RoundedCornerShape(20.dp))
+                                    .background(Color(0xFF1193D4).copy(alpha = 0.15f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Lock,
+                                    contentDescription = null,
+                                    tint = Color(0xFF1193D4),
+                                    modifier = Modifier.size(34.dp)
+                                )
+                            }
+                            Text(
+                                text = stringResource(R.string.pref_lockscreen_details_title),
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.alarm_lockscreen_details_hidden),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
+                            Button(
+                                onClick = onUnlockRequest,
+                                shape = RoundedCornerShape(14.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF1193D4),
+                                    contentColor = Color.White
+                                ),
+                                modifier = Modifier.fillMaxWidth(0.88f)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.LockOpen,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = stringResource(R.string.alarm_unlock_to_view_details),
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 15.sp
+                                )
+                            }
+                        }
+                    }
+                } else if (medicinesList.isEmpty() && isLoaded) {
                     Card(
                         shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
@@ -403,11 +480,14 @@ fun AlarmScreenContent(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                // Guard: Support separate slide-to-confirm buttons for Take (slide left) and Snooze (slide right)
                 val useSlideActions = user?.slideActionsEnabled != false
+                // Guard: When lockscreen details are masked, require unlock verification before marking dose taken to protect patient safety
+                val effectiveTakeAction = if (isDetailsMasked) onUnlockRequest else onTakeAction
 
                 if (useSlideActions) {
-                    val slideTakeText = if (medicinesList.size > 1) {
+                    val slideTakeText = if (isDetailsMasked) {
+                        stringResource(R.string.alarm_unlock_to_view_details)
+                    } else if (medicinesList.size > 1) {
                         stringResource(R.string.alarm_slide_to_take_all, medicinesList.size)
                     } else {
                         stringResource(R.string.alarm_slide_to_take)
@@ -415,16 +495,16 @@ fun AlarmScreenContent(
                     // Guard: Mark as taken dragged left-to-right (slideToLeft = false) for natural affirmative gesture
                     SlideToConfirmButton(
                         text = slideTakeText,
-                        icon = Icons.Default.Check,
+                        icon = if (isDetailsMasked) Icons.Default.LockOpen else Icons.Default.Check,
                         trackColor = Color(0xFF10B981),
                         thumbColor = Color(0xFF10B981),
                         slideToLeft = false,
-                        onConfirmed = onTakeAction
+                        onConfirmed = effectiveTakeAction
                     )
                 } else {
                     // Standard Tap Buttons when sliding is turned off in preferences
                     Button(
-                        onClick = onTakeAction,
+                        onClick = effectiveTakeAction,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
@@ -434,10 +514,16 @@ fun AlarmScreenContent(
                             contentColor = Color.White
                         )
                     ) {
-                        Icon(imageVector = Icons.Default.Check, contentDescription = null, tint = Color.White)
+                        Icon(imageVector = if (isDetailsMasked) Icons.Default.LockOpen else Icons.Default.Check, contentDescription = null, tint = Color.White)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = if (medicinesList.size > 1) stringResource(R.string.alarm_take_all, medicinesList.size) else stringResource(R.string.alarm_take_medicine),
+                            text = if (isDetailsMasked) {
+                                stringResource(R.string.alarm_unlock_to_view_details)
+                            } else if (medicinesList.size > 1) {
+                                stringResource(R.string.alarm_take_all, medicinesList.size)
+                            } else {
+                                stringResource(R.string.alarm_take_medicine)
+                            },
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                             color = Color.White,
                             fontSize = 17.sp
@@ -533,7 +619,9 @@ fun AlarmScreenContent(
                 // Opt-in Skip Dose Button (Outlined)
                 if (user?.allowDoseSkipping == true) {
                     OutlinedButton(
-                        onClick = { showSkipReasonDialog = true },
+                        onClick = {
+                            if (isDetailsMasked) onUnlockRequest() else showSkipReasonDialog = true
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),

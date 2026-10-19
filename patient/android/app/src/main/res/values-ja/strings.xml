@@ -847,4 +847,6 @@
     <string name="emergency_dispatch_warning_desc">Dosezyは緊急通報機関ではなく、110/119等の代替手段ではありません。生命の危険がある場合は直ちに地域の緊急通報を行ってください。表示番号が現在地に対応しているかご確認ください。</string>
     <string name="pdf_report_disclaimer_footer">Dosezy 服薬トラッカー • 自己申告情報ログ（非臨床記録）</string>
     <string name="pharmacy_refill_estimation_disclaimer">注：補充薬の数量は登録された頻度に基づく概算です。正確な数量は薬剤師または医師にご確認ください。</string>
+    <string name="alarm_unlock_to_view_details">ロックを解除して詳細を表示</string>
+    <string name="alarm_lockscreen_details_hidden">端末のロック中は薬の名前と用量が非表示になります。</string>
 </resources>

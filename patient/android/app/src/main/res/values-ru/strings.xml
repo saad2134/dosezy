@@ -847,4 +847,6 @@
     <string name="emergency_dispatch_warning_desc">Dosezy не является диспетчерской службой и не заменяет вызов 112/911. При угрозе жизни немедленно звоните в местную службу экстренной помощи. Убедитесь, что номер соответствует вашему региону.</string>
     <string name="pdf_report_disclaimer_footer">Dosezy Трекер Лекарств • Информационный журнал самоотчета (Неклинический)</string>
     <string name="pharmacy_refill_estimation_disclaimer">Примечание: Количество для пополнения является приблизительным на основе частоты приема. Уточняйте у врача или фармацевта.</string>
+    <string name="alarm_unlock_to_view_details">Разблокируйте для просмотра деталей</string>
+    <string name="alarm_lockscreen_details_hidden">Названия препаратов и дозировки скрыты, пока устройство заблокировано.</string>
 </resources>

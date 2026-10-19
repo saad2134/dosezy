@@ -846,4 +846,6 @@
     <string name="emergency_dispatch_warning_desc">ডোজইজি কোনো জরুরী পরিষেবা প্রদানকারী বা ৯১১/১১২ এর বিকল্প নয়। জীবন-হুমকিপূর্ণ পরিস্থিতিতে সরাসরি আপনার স্থানীয় জরুরী সেবায় কল করুন। প্রদর্শিত নম্বরটি আপনার এলাকার সাথে মিলছে কিনা তা যাচাই করুন।</string>
     <string name="pdf_report_disclaimer_footer">ডোজইজি মেডিসিন ট্র্যাকার • স্ব-প্রতিবেদিত তথ্যমূলক লগ (নন-ক্লিনিকাল)</string>
     <string name="pharmacy_refill_estimation_disclaimer">বিজ্ঞপ্তি: রিফিল পরিমাণ নির্ধারিত ফ্রিকোয়েন্সির উপর ভিত্তি করে আনুমানিক গণনা। আপনার ফার্মাসিস্ট বা ডাক্তারের সাথে যাচাই করুন।</string>
+    <string name="alarm_unlock_to_view_details">বিস্তারিত দেখতে আনলক করুন</string>
+    <string name="alarm_lockscreen_details_hidden">ডিভাইস লক থাকা অবস্থায় ওষুধের নাম ও ডোজ লুকানো থাকে।</string>
 </resources>

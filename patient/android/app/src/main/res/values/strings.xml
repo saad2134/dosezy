@@ -876,4 +876,6 @@ Do you want to continue?</string>
     <string name="emergency_dispatch_warning_desc">Dosezy is not an emergency dispatch provider or substitute for 911/112. In a life-threatening crisis, dial your local emergency services directly. Verify that the displayed emergency number matches your physical location.</string>
     <string name="pdf_report_disclaimer_footer">Dosezy Medicine Tracker • Self-Reported Informational Log (Non-Clinical)</string>
     <string name="pharmacy_refill_estimation_disclaimer">Notice: Refill quantities are estimated approximations based on logged frequency. Verify with your pharmacist or physician.</string>
+    <string name="alarm_unlock_to_view_details">Unlock to view details</string>
+    <string name="alarm_lockscreen_details_hidden">Medication names and dosages are hidden while device is locked.</string>
 </resources>

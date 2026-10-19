@@ -864,4 +864,6 @@
     <string name="emergency_dispatch_warning_desc">Dosezy no es un servicio de emergencias ni sustituto del 911/112. En situaciones críticas, llame directamente a los servicios locales de emergencia. Verifique que el número corresponda a su ubicación actual.</string>
     <string name="pdf_report_disclaimer_footer">Dosezy Registro de Medicamentos • Historial informativo autoreportado (No clínico)</string>
     <string name="pharmacy_refill_estimation_disclaimer">Aviso: Las cantidades de reposición son estimaciones aproximadas según la frecuencia registrada. Verifique con su farmacéutico o médico.</string>
+    <string name="alarm_unlock_to_view_details">Desbloquear para ver detalles</string>
+    <string name="alarm_lockscreen_details_hidden">Los nombres de los medicamentos y las dosis están ocultos mientras el dispositivo está bloqueado.</string>
 </resources>

@@ -863,4 +863,6 @@
     <string name="emergency_dispatch_warning_desc">Dosezy 不是紧急调度机构，不能替代 120/110/911 等急救电话。如遇生命危险，请直接拨打当地急救电话。请核对显示的急救号码是否符合您当前所在地区。</string>
     <string name="pdf_report_disclaimer_footer">Dosezy 药品追踪器 • 自主申报信息日志（非临床诊断记录）</string>
     <string name="pharmacy_refill_estimation_disclaimer">注意：补充药品数量为根据记录频度计算的参考估算值。请务必咨询您的药师或医生核准。</string>
+    <string name="alarm_unlock_to_view_details">解锁以查看详情</string>
+    <string name="alarm_lockscreen_details_hidden">设备锁定时隐藏药品名称和用量。</string>
 </resources>

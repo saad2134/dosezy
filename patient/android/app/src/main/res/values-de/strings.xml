@@ -847,4 +847,6 @@ Möchten Sie fortfahren?</string>
     <string name="emergency_dispatch_warning_desc">Dosezy ist kein Notrufdienst und kein Ersatz für 112/911. Wählen Sie in lebensbedrohlichen Situationen direkt den örtlichen Notruf. Prüfen Sie, ob die angezeigte Nummer für Ihre Region gilt.</string>
     <string name="pdf_report_disclaimer_footer">Dosezy Medikamenten-Tracker • Selbstauskunft-Informationsprotokoll (Nicht-Klinisch)</string>
     <string name="pharmacy_refill_estimation_disclaimer">Hinweis: Nachfüllmengen sind Näherungswerte basierend auf der Einnahmehäufigkeit. Stimmen Sie sich mit Arzt oder Apotheker ab.</string>
+    <string name="alarm_unlock_to_view_details">Entsperren, um Details anzuzeigen</string>
+    <string name="alarm_lockscreen_details_hidden">Medikamentennamen und Dosierungen sind bei gesperrtem Gerät ausgeblendet.</string>
 </resources>

@@ -67,6 +67,34 @@ class AlarmActivity : ComponentActivity() {
     private val activeMedicineNameState = mutableStateOf("Medication")
     private val activeScheduledTimeState = mutableStateOf("")
 
+    private val isKeyguardLockedState = mutableStateOf(false)
+
+    private fun checkKeyguardState() {
+        val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager
+        isKeyguardLockedState.value = keyguardManager?.isKeyguardLocked == true
+    }
+
+    private fun isLockscreenPrivacyActive(): Boolean {
+        val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val defaultPref = prefs.getBoolean("lockscreen_details_enabled", true)
+        val intentPref = intent?.getBooleanExtra("allow_lockscreen_details", defaultPref) ?: defaultPref
+        val userPref = alarmViewModel.uiState.value.user?.lockscreenDetailsEnabled ?: intentPref
+        return !userPref
+    }
+
+    fun requestDeviceUnlock(onSuccess: (() -> Unit)? = null) {
+        val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            keyguardManager?.requestDismissKeyguard(this, object : KeyguardManager.KeyguardDismissCallback() {
+                override fun onDismissSucceeded() {
+                    super.onDismissSucceeded()
+                    isKeyguardLockedState.value = false
+                    onSuccess?.invoke()
+                }
+            })
+        }
+    }
+
     override fun applyOverrideConfiguration(overrideConfiguration: Configuration?) {
         if (overrideConfiguration != null) {
             val savedLanguage = LocaleHelper.getSavedLanguage(this)
@@ -83,6 +111,7 @@ class AlarmActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        checkKeyguardState()
         setupWindowFlags()
 
         val newId = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID) ?: ""
@@ -100,6 +129,18 @@ class AlarmActivity : ComponentActivity() {
         alarmViewModel.loadCohort(merged)
     }
 
+    override fun onResume() {
+        super.onResume()
+        checkKeyguardState()
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            checkKeyguardState()
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -107,7 +148,8 @@ class AlarmActivity : ComponentActivity() {
         requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         activeInstance = WeakReference(this)
 
-        // Turn screen on and unlock keyguard
+        checkKeyguardState()
+        // Turn screen on and setup window flags
         setupWindowFlags()
 
         val entryId = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID) ?: ""
@@ -131,6 +173,11 @@ class AlarmActivity : ComponentActivity() {
 
             val uiState by alarmViewModel.uiState.collectAsState()
             val user = uiState.user
+
+            val isKeyguardLocked by isKeyguardLockedState
+            val lockscreenDetailsAllowed = user?.lockscreenDetailsEnabled
+                ?: intent.getBooleanExtra("allow_lockscreen_details", prefs.getBoolean("lockscreen_details_enabled", true))
+            val isDetailsMasked = !lockscreenDetailsAllowed && isKeyguardLocked
 
             val systemIsDark = isSystemInDarkTheme()
             val isDark = when (spTheme) {
@@ -191,6 +238,8 @@ class AlarmActivity : ComponentActivity() {
                         user = user,
                         isLoaded = uiState.isLoaded,
                         isDarkTheme = isDark,
+                        isDetailsMasked = isDetailsMasked,
+                        onUnlockRequest = { requestDeviceUnlock() },
                         onTakeAction = {
                             val isIntakeReAlert = intent?.getBooleanExtra(MedicineAlarmReceiver.EXTRA_IS_INTAKE_REALERT, false) ?: false
                             if (user?.intakeSafeguardEnabled == true && !isIntakeReAlert) {
@@ -240,21 +289,33 @@ class AlarmActivity : ComponentActivity() {
     }
 
     private fun setupWindowFlags() {
+        val lockscreenPrivacy = isLockscreenPrivacyActive()
+        val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager
+        val isLocked = keyguardManager?.isKeyguardLocked == true
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true)
             setTurnScreenOn(true)
             // Guard: Safe-cast KeyguardManager to prevent NullPointerException or TypeCastException crash on headless or custom OEM builds
-            val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager
-            keyguardManager?.requestDismissKeyguard(this, null)
+            // Guard: Keep keyguard locked when user has disabled lockscreen details to prevent premature PHI exposure
+            if (!lockscreenPrivacy || !isLocked) {
+                keyguardManager?.requestDismissKeyguard(this, null)
+            }
         }
         @Suppress("DEPRECATION")
-        window.addFlags(
-            WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
-                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
-                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
-                    WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
-        )
+        window.apply {
+            addFlags(
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                        WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
+                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
+                        WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
+            )
+            if (!lockscreenPrivacy || !isLocked) {
+                addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
+            } else {
+                clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
+            }
+        }
     }
 
     fun stopAlarm() {

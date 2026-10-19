@@ -847,4 +847,6 @@ Voulez-vous continuer ?</string>
     <string name="emergency_dispatch_warning_desc">Dosezy n\'est pas un service d\'urgence ni un substitut du 112/911. En cas d\'urgence vitale, composez directement les services de secours locaux. Vérifiez que le numéro affiché correspond à votre juridiction.</string>
     <string name="pdf_report_disclaimer_footer">Dosezy Suivi des Médicaments • Journal informatif autodéclaré (Non clinique)</string>
     <string name="pharmacy_refill_estimation_disclaimer">Remarque : Les quantités de renouvellement sont des estimations basées sur la fréquence enregistrée. Vérifiez auprès de votre pharmacien ou médecin.</string>
+    <string name="alarm_unlock_to_view_details">Déverrouiller pour voir les détails</string>
+    <string name="alarm_lockscreen_details_hidden">Les noms et dosages des médicaments sont masqués lorsque l\'appareil est verrouillé.</string>
 </resources>
