@@ -857,4 +857,19 @@
     <string name="schedule_effective_today_desc">今日から新しい時間を適用します。今日の過去の未服薬分は削除されます。</string>
     <string name="schedule_effective_tomorrow_title">明日から適用</string>
     <string name="schedule_effective_tomorrow_desc">今日のスケジュールをそのまま維持します。新しいスケジュールは明日から始まります。</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[遡及記録済み]</string>
+    <string name="schedule_action_dialog_title">服薬を管理</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">服用済みとしてマーク</string>
+    <string name="schedule_action_skip_dose">スキップとしてマーク</string>
+    <string name="schedule_action_undo_dose">服薬アクションを取り消す</string>
+    <string name="schedule_action_edit_note">服薬メモを編集</string>
+    <string name="schedule_action_add_note">服薬メモを追加</string>
+    <string name="schedule_dose_marked_taken">%1$s を服用済みとして記録しました</string>
+    <string name="schedule_dose_marked_skipped">%1$s をスキップとして記録しました</string>
+    <string name="schedule_dose_reverted">%1$s を保留中に戻しました</string>
+    <string name="schedule_dose_locked_notice">この服薬は48時間以上前のものであり、医療記録の正確性を保つためにロックされています。</string>
+    <string name="schedule_dose_locked_badge">ロック</string>
+    <string name="schedule_tap_to_manage">タップして管理</string>
 </resources>

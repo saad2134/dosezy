@@ -857,4 +857,19 @@ Voulez-vous continuer ?</string>
     <string name="schedule_effective_today_desc">Applique les nouvelles heures dès aujourd\'hui. Les doses non prises obsolètes d\'aujourd\'hui seront supprimées.</string>
     <string name="schedule_effective_tomorrow_title">À partir de demain</string>
     <string name="schedule_effective_tomorrow_desc">Conserve l\'horaire d\'aujourd\'hui. Le nouvel horaire commencera demain.</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[Enregistré rétrospectivement]</string>
+    <string name="schedule_action_dialog_title">Gérer la prise</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">Marquer comme prise</string>
+    <string name="schedule_action_skip_dose">Marquer comme sautée</string>
+    <string name="schedule_action_undo_dose">Annuler l\'action de prise</string>
+    <string name="schedule_action_edit_note">Modifier la note de prise</string>
+    <string name="schedule_action_add_note">Ajouter une note de prise</string>
+    <string name="schedule_dose_marked_taken">%1$s marquée comme prise</string>
+    <string name="schedule_dose_marked_skipped">%1$s marquée comme sautée</string>
+    <string name="schedule_dose_reverted">%1$s remise en attente</string>
+    <string name="schedule_dose_locked_notice">Cette prise date de plus de 48 heures et est verrouillée pour préserver l\'intégrité du dossier médical.</string>
+    <string name="schedule_dose_locked_badge">Verrouillée</string>
+    <string name="schedule_tap_to_manage">Appuyer pour gérer</string>
 </resources>

@@ -1,1 +1,3 @@
-<!-- In development -->
+* Update missed doses from previous days directly on the schedule calendar within a 48-hour clinical window.
+* Medicine inventory stock automatically updates when recording missed doses.
+* Retrospective logs include audit tags to maintain doctor report transparency.

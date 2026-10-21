@@ -856,4 +856,19 @@
     <string name="schedule_effective_today_desc">আজকের নতুন সময় প্রয়োগ করুন। আজকের অতীতের না নেওয়া ডোজ মুছে ফেলা হবে।</string>
     <string name="schedule_effective_tomorrow_title">আগামীকাল থেকে শুরু</string>
     <string name="schedule_effective_tomorrow_desc">আজকের সময়সূচী অপরিবর্তিত রাখুন। নতুন সময়সূচী আগামীকাল থেকে শুরু হবে।</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[রেট্রোস্পেক্টিভভাবে নথিভুক্ত]</string>
+    <string name="schedule_action_dialog_title">ডোজ পরিচালনা করুন</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">গ্রহণ করা হয়েছে চিহ্নিত করুন</string>
+    <string name="schedule_action_skip_dose">বাদ দেওয়া হয়েছে চিহ্নিত করুন</string>
+    <string name="schedule_action_undo_dose">ডোজ ক্রিয়া পূর্বাবস্থায় ফেরান</string>
+    <string name="schedule_action_edit_note">ডোজ নোট সম্পাদনা করুন</string>
+    <string name="schedule_action_add_note">ডোজ নোট যোগ করুন</string>
+    <string name="schedule_dose_marked_taken">%1$s গ্রহণ করা হয়েছে চিহ্নিত করা হয়েছে</string>
+    <string name="schedule_dose_marked_skipped">%1$s বাদ দেওয়া হয়েছে চিহ্নিত করা হয়েছে</string>
+    <string name="schedule_dose_reverted">%1$s অপেক্ষামাণে ফিরিয়ে আনা হয়েছে</string>
+    <string name="schedule_dose_locked_notice">এই ডোজটি ৪৮ ঘণ্টার বেশি পুরানো এবং চিকিৎসা রেকর্ডের সত্যতা রক্ষার জন্য লক করা হয়েছে।</string>
+    <string name="schedule_dose_locked_badge">লক করা</string>
+    <string name="schedule_tap_to_manage">পরিচালনা করতে ট্যাপ করুন</string>
 </resources>

@@ -614,9 +614,10 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         if (entryId.startsWith("PRN_")) {
             database.scheduleDao().deleteScheduleEntry(entryId)
         } else {
-            // Guard: Strip automated partial stock tag while preserving user-authored clinical notes (#BUG-04)
+            // Guard: Strip automated partial stock tag and retrospective logging audit tags while preserving user-authored clinical notes (#BUG-04, #109)
             val cleanedNotes = previousEntry?.doseNotes
                 ?.replace(Regex("\\[Partial Stock: Took \\d+ of \\d+\\]"), "")
+                ?.replace(Regex("\\[Logged retrospectively\\]"), "")
                 ?.trim(' ', '|', '-')
                 ?.ifBlank { null }
             database.scheduleDao().resetScheduleEntryToPendingWithNotes(entryId, cleanedNotes)

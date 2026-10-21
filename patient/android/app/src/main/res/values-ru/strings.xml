@@ -857,4 +857,19 @@
     <string name="schedule_effective_today_desc">Применить новое время сегодня. Устаревшие непринятые дозы за сегодня будут удалены.</string>
     <string name="schedule_effective_tomorrow_title">Начиная с завтрашнего дня</string>
     <string name="schedule_effective_tomorrow_desc">Сохранить сегодняшнее расписание без изменений. Новое расписание начнется завтра.</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[Зарегистрировано задним числом]</string>
+    <string name="schedule_action_dialog_title">Управление дозой</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">Отметить как принятое</string>
+    <string name="schedule_action_skip_dose">Отметить как пропущенное</string>
+    <string name="schedule_action_undo_dose">Отменить действие для дозы</string>
+    <string name="schedule_action_edit_note">Редактировать заметку</string>
+    <string name="schedule_action_add_note">Добавить заметку</string>
+    <string name="schedule_dose_marked_taken">%1$s отмечен(а) как принятое</string>
+    <string name="schedule_dose_marked_skipped">%1$s отмечен(а) как пропущенное</string>
+    <string name="schedule_dose_reverted">%1$s возвращен(а) в ожидающие</string>
+    <string name="schedule_dose_locked_notice">Эта доза старше 48 часов и заблокирована для сохранения достоверности медицинской истории.</string>
+    <string name="schedule_dose_locked_badge">Заблокировано</string>
+    <string name="schedule_tap_to_manage">Нажмите для управления</string>
 </resources>

@@ -857,4 +857,19 @@
     <string name="schedule_effective_today_desc">تطبيق المواعيد الجديدة اليوم. ستتم إزالة الجرعات السابقة غير المأخوذة اليوم.</string>
     <string name="schedule_effective_tomorrow_title">بدءاً من الغد</string>
     <string name="schedule_effective_tomorrow_desc">الحفاظ على جدول اليوم كما هو. سيبدأ الجدول الجديد غداً.</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[تم التسجيل بأثر رجعي]</string>
+    <string name="schedule_action_dialog_title">إدارة الجرعة</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">تحديد كتم تناولها</string>
+    <string name="schedule_action_skip_dose">تحديد كجرعة متخطاة</string>
+    <string name="schedule_action_undo_dose">التراجع عن إجراء الجرعة</string>
+    <string name="schedule_action_edit_note">تعديل ملاحظة الجرعة</string>
+    <string name="schedule_action_add_note">إضافة ملاحظة للجرعة</string>
+    <string name="schedule_dose_marked_taken">تم تحديد %1$s كجرعة متناولة</string>
+    <string name="schedule_dose_marked_skipped">تم تحديد %1$s كجرعة متخطاة</string>
+    <string name="schedule_dose_reverted">تمت إعادة %1$s إلى معلقة</string>
+    <string name="schedule_dose_locked_notice">هذه الجرعة أقدم من 48 ساعة وتم قفلها للحفاظ على سلامة السجل الطبي.</string>
+    <string name="schedule_dose_locked_badge">مقفل</string>
+    <string name="schedule_tap_to_manage">اضغط للإدارة</string>
 </resources>

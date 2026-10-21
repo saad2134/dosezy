@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.FastForward
 import androidx.compose.material.icons.filled.HorizontalRule
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -397,6 +398,7 @@ fun ScheduleListItem(
     timeFormat: TimeFormat, // time format parameter
     targetLocale: java.util.Locale = java.util.Locale.getDefault(),
     missedAfter: Int = 6,
+    onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val entry = scheduleWithMedicine.scheduleEntry
@@ -405,6 +407,13 @@ fun ScheduleListItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .then(
+                if (onClick != null) {
+                    Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable(onClick = onClick)
+                } else Modifier
+            )
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -492,19 +501,39 @@ fun ScheduleListItem(
             MedicationStatus.PENDING -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.status_pending)
         }
 
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(color.copy(alpha = 0.2f)),
-            contentAlignment = Alignment.Center
+        val isLocked = entry.scheduledDateTime.isBefore(now.minusHours(48))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = statusDescription,
-                tint = color,
-                modifier = Modifier.size(20.dp)
-            )
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(color.copy(alpha = 0.2f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = statusDescription,
+                    tint = color,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+
+            if (onClick != null) {
+                Icon(
+                    imageVector = if (isLocked) Icons.Default.Lock else Icons.Default.ChevronRight,
+                    contentDescription = if (isLocked) {
+                        androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.schedule_dose_locked_badge)
+                    } else {
+                        androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.schedule_tap_to_manage)
+                    },
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = if (isLocked) 0.4f else 0.6f),
+                    modifier = Modifier.size(18.dp)
+                )
+            }
         }
     }
 }

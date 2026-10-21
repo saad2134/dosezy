@@ -873,4 +873,19 @@
     <string name="schedule_effective_today_desc">今天立即应用新时间。今天早前已过期的未服药记录将被移除。</string>
     <string name="schedule_effective_tomorrow_title">从明天开始生效</string>
     <string name="schedule_effective_tomorrow_desc">保留今天的计划不变，新服药时间将从明天开始生效。</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[事后补录]</string>
+    <string name="schedule_action_dialog_title">管理服药记录</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">标记为已服</string>
+    <string name="schedule_action_skip_dose">标记为跳过</string>
+    <string name="schedule_action_undo_dose">撤销服药操作</string>
+    <string name="schedule_action_edit_note">编辑服药备注</string>
+    <string name="schedule_action_add_note">添加服药备注</string>
+    <string name="schedule_dose_marked_taken">已将 %1$s 标记为已服</string>
+    <string name="schedule_dose_marked_skipped">已将 %1$s 标记为跳过</string>
+    <string name="schedule_dose_reverted">%1$s 已恢复为待服</string>
+    <string name="schedule_dose_locked_notice">此服药记录已超过48小时，为确保医疗记录的真实性已锁定。</string>
+    <string name="schedule_dose_locked_badge">已锁定</string>
+    <string name="schedule_tap_to_manage">点击以管理</string>
 </resources>

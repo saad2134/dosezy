@@ -856,4 +856,19 @@ Deseja continuar?</string>
     <string name="schedule_effective_today_desc">Aplica os novos horários hoje. As doses não tomadas obsoletas de hoje serão removidas.</string>
     <string name="schedule_effective_tomorrow_title">A partir de amanhã</string>
     <string name="schedule_effective_tomorrow_desc">Mantém o horário de hoje intacto. O novo horário começará amanhã.</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[Registrado retrospectivamente]</string>
+    <string name="schedule_action_dialog_title">Gerenciar dose</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">Marcar como tomada</string>
+    <string name="schedule_action_skip_dose">Marcar como pulada</string>
+    <string name="schedule_action_undo_dose">Desfazer ação da dose</string>
+    <string name="schedule_action_edit_note">Editar nota da dose</string>
+    <string name="schedule_action_add_note">Adicionar nota da dose</string>
+    <string name="schedule_dose_marked_taken">%1$s marcada como tomada</string>
+    <string name="schedule_dose_marked_skipped">%1$s marcada como pulada</string>
+    <string name="schedule_dose_reverted">%1$s revertida para pendente</string>
+    <string name="schedule_dose_locked_notice">Esta dose tem mais de 48 horas e está bloqueada para preservar a integridade do histórico médico.</string>
+    <string name="schedule_dose_locked_badge">Bloqueada</string>
+    <string name="schedule_tap_to_manage">Toque para gerenciar</string>
 </resources>

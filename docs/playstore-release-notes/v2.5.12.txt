@@ -1,36 +1,60 @@
 <en-IN>
-<!-- In development -->
+* Update missed doses from previous days directly on the schedule calendar within a 48-hour clinical window.
+* Medicine inventory stock automatically updates when recording missed doses.
+* Retrospective logs include audit tags to maintain doctor report transparency.
 </en-IN>
 <en-US>
-<!-- In development -->
+* Update missed doses from previous days directly on the schedule calendar within a 48-hour clinical window.
+* Medicine inventory stock automatically updates when recording missed doses.
+* Retrospective logs include audit tags to maintain doctor report transparency.
 </en-US>
 <ar>
-<!-- In development -->
+* تحديث الجرعات الفائتة من الأيام السابقة مباشرة من التقويم خلال نافذة سريرية مدتها 48 ساعة.
+* تحديث مخزون الأدوية تلقائيا عند تسجيل الجرعات الفائتة.
+* إضافة وسوم تدقيق للسجلات بأثر رجعي لضمان الشفافية في تقارير الأطباء.
 </ar>
 <de-DE>
-<!-- In development -->
+* Verpasste Dosen der Vortage direkt im Zeitplan-Kalender innerhalb eines 48-Stunden-Fensters aktualisieren.
+* Medikamentenbestand wird bei Erfassung verpasster Dosen automatisch angepasst.
+* Transparente Prüfvermerke für nachträgliche Protokolle in Arztberichten.
 </de-DE>
 <es-419>
-<!-- In development -->
+* Actualiza dosis olvidadas de días anteriores directamente en el calendario dentro de una ventana de 48 horas.
+* El inventario de medicamentos se descuenta automáticamente al registrar dosis olvidadas.
+* Etiquetas de auditoría retrospectiva para mantener la transparencia en reportes médicos.
 </es-419>
 <fr-FR>
-<!-- In development -->
+* Mettez à jour les doses manquées des jours précédents directement sur le calendrier dans une fenêtre de 48 heures.
+* Le stock de médicaments se met à jour automatiquement lors de l'enregistrement.
+* Balises d'audit rétrospectives pour préserver la transparence des rapports médicaux.
 </fr-FR>
 <hi-IN>
-<!-- In development -->
+* 48 घंटे की नैदानिक ​​अवधि के भीतर कैलेंडर से पिछले दिनों की छूटी हुई खुराक को अपडेट करें।
+* छूटी हुई खुराक दर्ज करने पर दवा का स्टॉक स्वचालित रूप से अपडेट हो जाता है।
+* डॉक्टर की रिपोर्ट में पारदर्शिता बनाए रखने के लिए पूर्वव्यापी ऑडिट टैग।
 </hi-IN>
 <it-IT>
-<!-- In development -->
+* Aggiorna le dosi dimenticate dei giorni precedenti direttamente dal calendario entro una finestra di 48 ore.
+* Le scorte dei farmaci si aggiornano automaticamente alla registrazione delle dosi perse.
+* Tag di controllo retroattivi per la massima trasparenza nei referti medici.
 </it-IT>
 <ja-JP>
-<!-- In development -->
+* 48時間以内であれば、カレンダーから前日以前の飲み忘れ分を直接記録・更新可能。
+* 飲み忘れ分の記録時に薬の在庫数が自動的に減算されます。
+* 医師向けレポートの透明性を保つため、遡及記録タグを自動付与。
 </ja-JP>
 <pt-BR>
-<!-- In development -->
+* Atualize doses perdidas de dias anteriores direto no calendário dentro de uma janela clínica de 48 horas.
+* O estoque de medicamentos é atualizado automaticamente ao registrar doses perdidas.
+* Etiquetas de auditoria retrospectiva para manter a transparência em relatórios médicos.
 </pt-BR>
 <ru-RU>
-<!-- In development -->
+* Отмечайте пропущенные дозы за прошлые дни прямо в календаре в течение 48 часов.
+* Запас медикаментов автоматически обновляется при учете пропущенных доз.
+* Автоматическая отметка о ретроспективной записи для прозрачности отчетов врачу.
 </ru-RU>
 <zh-CN>
-<!-- In development -->
+* 可在48小时临床窗口期内，直接在日程日历中更新前几天漏服的剂量。
+* 补记漏服剂量时自动扣减药品库存。
+* 追溯记录包含审计标记，确保向医生导出的健康报告清晰透明。
 </zh-CN>
