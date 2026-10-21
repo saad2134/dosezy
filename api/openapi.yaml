@@ -10,7 +10,7 @@ info:
     - **Documentation:** `https://docs.dosezy.app`
     - **Patient Web App:** `https://patient.dosezy.app`
     - **Caregiver Portal:** `https://caregiver.dosezy.app`
-  version: 2.5.11
+  version: 2.5.12
   contact:
     name: Dosezy Maintainers
     email: reach.saad@outlook.com
@@ -63,7 +63,7 @@ paths:
                     example: ok
                   version:
                     type: string
-                    example: 2.5.11
+                    example: 2.5.12
                   timestamp:
                     type: string
                     format: date-time

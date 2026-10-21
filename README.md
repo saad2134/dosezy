@@ -259,7 +259,7 @@ dosezy/
       <td><strong>Local-First Android Client & Schema Parity</strong></td>
       <td>Core Adherence & Ecosystem Parity</td>
       <td>Jetpack Compose UI, 12 native localizations, Room offline database v15, time zone travel, manual dose recording, per-dose symptom notes, dose undo confirmation, pharmacy refill orders with smart bottle supplies, full-screen alarms, emergency dialer, shared OpenAPI 3.0 contract.</td>
-      <td align="center">🟢 Released (v2.5.10)<br><sub>🟡 In Dev (v2.5.11)</sub></td>
+      <td align="center">🟢 Released (v2.5.11)<br><sub>🟡 In Dev (v2.5.12)</sub></td>
     </tr>
     <tr>
       <td><strong>v3.0 – v3.9</strong></td>
