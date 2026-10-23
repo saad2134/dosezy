@@ -77,6 +77,7 @@ import java.time.LocalTime
 fun AlarmScreenContent(
     initialMedicineName: String,
     initialScheduledTime: String,
+    initialSnoozeMinutes: Int = 10,
     medicinesList: List<Pair<ScheduleEntry, Medicine>>,
     user: User?,
     isLoaded: Boolean,
@@ -90,8 +91,9 @@ fun AlarmScreenContent(
 ) {
     val context = LocalContext.current
     var showSkipReasonDialog by remember { mutableStateOf(false) }
-    val defaultSnooze = user?.snoozeDuration ?: 10
-    var selectedSnoozeMinutes by remember(user?.snoozeDuration) { mutableStateOf(defaultSnooze) }
+    // Guard: Prioritize loaded user snooze preference, falling back to passed intent snooze duration to avoid 10m default flash (#113)
+    val defaultSnooze = user?.snoozeDuration ?: initialSnoozeMinutes
+    var selectedSnoozeMinutes by remember(user?.snoozeDuration, initialSnoozeMinutes) { mutableStateOf(defaultSnooze) }
     val snoozeOptions = remember(defaultSnooze) {
         (listOf(5, 10, 15, 30) + defaultSnooze).distinct().sorted()
     }

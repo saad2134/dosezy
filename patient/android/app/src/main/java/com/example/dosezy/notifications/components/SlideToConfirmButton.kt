@@ -41,6 +41,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -79,6 +80,9 @@ fun SlideToConfirmButton(
     val paddingPx = with(density) { thumbPaddingDp.toPx() }
     val maxTravelPx = (trackWidthPx - thumbSizePx - (2 * paddingPx)).coerceAtLeast(1f)
     var isConfirmed by remember { mutableStateOf(false) }
+
+    // Guard: Remember latest onConfirmed lambda reference so pointerInput gesture handlers never execute stale callbacks across recompositions (#113, #BUG-SLIDE-STALE-CALLBACK)
+    val currentOnConfirmed by rememberUpdatedState(onConfirmed)
 
     Box(
         modifier = modifier
@@ -192,7 +196,7 @@ fun SlideToConfirmButton(
                                 isConfirmed = true
                                 coroutineScope.launch {
                                     dragOffset.animateTo(maxTravelPx)
-                                    onConfirmed()
+                                    currentOnConfirmed()
                                 }
                             } else {
                                 coroutineScope.launch {

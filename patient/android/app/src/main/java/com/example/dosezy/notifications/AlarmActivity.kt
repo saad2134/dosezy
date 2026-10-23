@@ -66,6 +66,7 @@ class AlarmActivity : ComponentActivity() {
     private val activeEntryIdsState = mutableStateOf<List<String>>(emptyList())
     private val activeMedicineNameState = mutableStateOf("Medication")
     private val activeScheduledTimeState = mutableStateOf("")
+    private val activeSnoozeMinutesState = mutableStateOf(10)
 
     private val isKeyguardLockedState = mutableStateOf(false)
 
@@ -118,11 +119,13 @@ class AlarmActivity : ComponentActivity() {
         val newIds = intent.getStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS) ?: if (newId.isNotEmpty()) arrayListOf(newId) else arrayListOf()
         val newMedName = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME) ?: "Medication"
         val newSchedTime = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME) ?: ""
+        val newSnoozeMinutes = intent.getIntExtra(MedicineAlarmReceiver.EXTRA_SNOOZE_MINUTES, activeSnoozeMinutesState.value)
 
         val merged = (activeEntryIdsState.value + newIds + listOf(newId)).filter { it.isNotEmpty() }.distinct()
         activeEntryIdsState.value = merged
         activeMedicineNameState.value = newMedName
         activeScheduledTimeState.value = newSchedTime
+        activeSnoozeMinutesState.value = newSnoozeMinutes
 
         // Guard: Resume playback for incoming alarm if audio was silenced by volume rocker while activity remained open
         alarmViewModel.startPlaybackIfNeeded(newId)
@@ -156,11 +159,14 @@ class AlarmActivity : ComponentActivity() {
         val entryIds = intent.getStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS) ?: if (entryId.isNotEmpty()) arrayListOf(entryId) else arrayListOf()
         val initialMedicineName = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME) ?: "Medication"
         val initialScheduledTime = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME) ?: ""
+        // Guard: Retrieve passed snooze duration so initial UI frame defaults to user's setting before Room async load completes (#113)
+        val initialSnoozeMinutes = intent.getIntExtra(MedicineAlarmReceiver.EXTRA_SNOOZE_MINUTES, 10)
 
         val distinctIds = entryIds.filter { it.isNotEmpty() }.distinct()
         activeEntryIdsState.value = distinctIds
         activeMedicineNameState.value = initialMedicineName
         activeScheduledTimeState.value = initialScheduledTime
+        activeSnoozeMinutesState.value = initialSnoozeMinutes
 
         // Start playback and load medication cohort via ViewModel
         alarmViewModel.startPlaybackIfNeeded(entryId)
@@ -211,6 +217,7 @@ class AlarmActivity : ComponentActivity() {
             val currentEntryIds by activeEntryIdsState
             val currentMedName by activeMedicineNameState
             val currentSchedTime by activeScheduledTimeState
+            val currentSnoozeMinutes by activeSnoozeMinutesState
 
             val dismissAction: () -> Unit = {
                 currentEntryIds.forEach { id ->
@@ -234,6 +241,7 @@ class AlarmActivity : ComponentActivity() {
                     AlarmScreenContent(
                         initialMedicineName = currentMedName,
                         initialScheduledTime = currentSchedTime,
+                        initialSnoozeMinutes = currentSnoozeMinutes,
                         medicinesList = uiState.medicinesList,
                         user = user,
                         isLoaded = uiState.isLoaded,

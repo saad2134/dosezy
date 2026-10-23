@@ -505,6 +505,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             putExtra(EXTRA_SCHEDULED_TIME, scheduledTime ?: "")
             putExtra(EXTRA_IS_INTAKE_REALERT, isIntakeReAlert)
             putExtra("allow_lockscreen_details", effectiveAllowLockscreen)
+            // Guard: Pass user's configured snooze duration to AlarmActivity so UI defaults correctly on first composition frame (#113)
+            putExtra(EXTRA_SNOOZE_MINUTES, snoozeMinutes)
         }
 
         // Android 14+ background activity start options for PendingIntent creation

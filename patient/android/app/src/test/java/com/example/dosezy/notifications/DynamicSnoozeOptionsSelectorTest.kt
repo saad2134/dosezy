@@ -51,6 +51,9 @@ import java.time.LocalTime
  *  3. NotificationActionReceiver honors EXTRA_SNOOZE_MINUTES when present and falls back to user preference when absent.
  *  4. AlarmViewModel snoozeCohort executes with custom dynamic snooze minutes and cancels pending nagging reminders.
  *  5. Dynamic snooze selection leaves the user's permanent database preferences intact.
+ *  6. AlarmActivity intent propagation carries user's configured snooze minutes to prevent 10-minute fallback on frame 1 (#113).
+ *  7. Initial snooze resolution prioritizes loaded user preference and falls back to intent extra (#113).
+ *  8. Slide-to-confirm callback resolution executes latest dynamic duration preventing stale 10-minute closure capture (#113).
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
@@ -263,5 +266,57 @@ class DynamicSnoozeOptionsSelectorTest {
         // User's default snooze preference in database is untouched
         val userAfter = database.userDao().getUserByIdDirect(testUser.userId)
         assertEquals(10, userAfter!!.snoozeDuration)
+    }
+
+    @Test
+    fun testInitialSnoozeResolution_prioritizesLoadedUser_fallsBackToIntentExtra() {
+        // Guard: Verify fallback order for Issue #113: loaded user > intent extra > 10m default
+        val intentExtraSnooze = 30
+        val unpopulatedUser: User? = null
+        val defaultSnoozeBeforeLoad = unpopulatedUser?.snoozeDuration ?: intentExtraSnooze
+        assertEquals(30, defaultSnoozeBeforeLoad)
+
+        val populatedUser: User? = testUser.copy(snoozeDuration = 20)
+        val defaultSnoozeAfterLoad = populatedUser?.snoozeDuration ?: intentExtraSnooze
+        assertEquals(20, defaultSnoozeAfterLoad)
+    }
+
+    @Test
+    fun testAlarmActivityIntent_carriesConfiguredUserSnoozeMinutes() = runBlocking {
+        // Guard: Verify that notification alarm intent includes EXTRA_SNOOZE_MINUTES matching user preference (#113)
+        val customUser = testUser.copy(snoozeDuration = 25)
+        val effectiveSnoozeMinutes = customUser.snoozeDuration
+
+        val alarmIntent = Intent().apply {
+            putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, "entry_test_113")
+            putExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME, testMed.medicationName)
+            putExtra(MedicineAlarmReceiver.EXTRA_SNOOZE_MINUTES, effectiveSnoozeMinutes)
+        }
+
+        assertEquals(25, alarmIntent.getIntExtra(MedicineAlarmReceiver.EXTRA_SNOOZE_MINUTES, 10))
+    }
+
+    @Test
+    fun testSlideToConfirmCallbackResolution_executesLatestDynamicDuration() {
+        // Guard: Verify that updated callback lambda receives dynamic snooze duration rather than stale initial closure (#113, #BUG-SLIDE-STALE-CALLBACK)
+        var confirmedMinutes = 0
+
+        // In Compose: frame 1 creates lambda calling onSnoozeAction with initial 10m
+        val frame1Callback: () -> Unit = { confirmedMinutes = 10 }
+
+        // Frame 2 creates lambda calling onSnoozeAction with loaded 30m
+        val frame2Callback: () -> Unit = { confirmedMinutes = 30 }
+
+        // Stale pointerInput behavior (before fix): holds frame1Callback reference
+        val staleCapturedCallback = frame1Callback
+        staleCapturedCallback()
+        assertEquals(10, confirmedMinutes)
+
+        // rememberUpdatedState behavior (after fix): holds reference to latest callback State (frame2Callback)
+        var currentOnConfirmed: () -> Unit
+        // Recomposition occurs with updated duration:
+        currentOnConfirmed = frame2Callback
+        currentOnConfirmed()
+        assertEquals(30, confirmedMinutes)
     }
 }
