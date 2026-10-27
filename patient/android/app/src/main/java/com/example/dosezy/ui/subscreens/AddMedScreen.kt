@@ -44,11 +44,13 @@ import com.example.dosezy.data.model.DosageUnit
 import com.example.dosezy.data.model.FrequencyPattern
 import com.example.dosezy.data.model.Medicine
 import com.example.dosezy.data.model.PillShape
+import com.example.dosezy.data.model.ReminderType
 import com.example.dosezy.data.model.normalizeArabicDigits
 import com.example.dosezy.ui.components.GridTimePickerDialog
 import com.example.dosezy.ui.components.MedicineCourseDurationCard
 import com.example.dosezy.ui.components.MedicineIdentificationCard
 import com.example.dosezy.ui.components.MedicineNotesCard
+import com.example.dosezy.ui.components.MedicineReminderStyleCard
 import com.example.dosezy.ui.components.MedicineStockInventoryCard
 import com.example.dosezy.ui.components.MedicineTimingsAndDosagesCard
 import com.example.dosezy.ui.components.TopBar
@@ -105,6 +107,7 @@ fun AddMedScreen(
     var intervalHoursText by remember { mutableStateOf("4") }
     var intervalDaysText by remember { mutableStateOf("2") }
     var intervalWeeksText by remember { mutableStateOf("2") }
+    var selectedReminderType by remember { mutableStateOf<ReminderType?>(null) }
 
     var showValidationErrors by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
@@ -269,6 +272,15 @@ fun AddMedScreen(
                     onDoctorNotesChange = { doctorNotes = it }
                 )
 
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // --- Card 6: Reminder Style Card (Alarm vs Notification) (#111) ---
+                MedicineReminderStyleCard(
+                    selectedReminderType = selectedReminderType,
+                    onReminderTypeChange = { selectedReminderType = it },
+                    profileDefaultType = currentUser?.reminderType ?: ReminderType.ALARM
+                )
+
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
@@ -338,7 +350,8 @@ fun AddMedScreen(
                             // Guard: Assign durationDays only when finite course and duration is positive to avoid invalid zero-day courses
                             durationDays = if (isFiniteCourse && durationDaysInt != null && durationDaysInt > 0) durationDaysInt else null,
                             // Guard: Clear customDosages if frequency is AS_NEEDED to prevent leaking orphaned scheduled custom dosages into PRN doses and reports
-                            customDosages = if (selectedFrequency == FrequencyPattern.AS_NEEDED) null else finalCustomDosages
+                            customDosages = if (selectedFrequency == FrequencyPattern.AS_NEEDED) null else finalCustomDosages,
+                            reminderType = selectedReminderType
                         )
                         medicineViewModel.addMedicine(newMedicine)
                         navController.previousBackStackEntry?.savedStateHandle?.set("snackbar_message", context.getString(R.string.medication_added_success))

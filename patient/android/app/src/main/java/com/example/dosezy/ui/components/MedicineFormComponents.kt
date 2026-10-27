@@ -276,3 +276,17 @@ fun MedicineNotesCard(
     onDoctorNotesChange = onDoctorNotesChange,
     modifier = modifier
 )
+
+@Composable
+fun MedicineReminderStyleCard(
+    selectedReminderType: com.example.dosezy.data.model.ReminderType?,
+    onReminderTypeChange: (com.example.dosezy.data.model.ReminderType?) -> Unit,
+    profileDefaultType: com.example.dosezy.data.model.ReminderType = com.example.dosezy.data.model.ReminderType.ALARM,
+    modifier: Modifier = Modifier
+) = com.example.dosezy.ui.components.form.MedicineReminderStyleCard(
+    selectedReminderType = selectedReminderType,
+    onReminderTypeChange = onReminderTypeChange,
+    profileDefaultType = profileDefaultType,
+    modifier = modifier
+)
+

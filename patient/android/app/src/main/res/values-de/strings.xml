@@ -880,4 +880,18 @@ Möchten Sie fortfahren?</string>
     <string name="schedule_dose_locked_notice">Diese Dosis ist älter als 48 Stunden und gesperrt, um die Integrität der medizinischen Historie zu wahren.</string>
     <string name="schedule_dose_locked_badge">Gesperrt</string>
     <string name="schedule_tap_to_manage">Tippen zum Verwalten</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">Erinnerungsstil</string>
+    <string name="pref_reminder_type_desc">Wählen Sie, ob Erinnerungen als Alarm oder Standardbenachrichtigung ertönen</string>
+    <string name="reminder_type_alarm">Alarm</string>
+    <string name="reminder_type_alarm_desc">Vollbild-Alarm mit Dauerton. Umgeht Bitte nicht stören.</string>
+    <string name="reminder_type_notification">Benachrichtigung</string>
+    <string name="reminder_type_notification_desc">Standard-Banner mit Signalton. Respektiert Bitte nicht stören.</string>
+    <string name="reminder_type_default">Profil-Standard verwenden (%1$s)</string>
+    <string name="reminder_type_default_profile">Profil-Standard verwenden</string>
+    <string name="notif_channel_notifications_name">Medikamenten-Benachrichtigungen</string>
+    <string name="notif_channel_notifications_desc">Standard-Benachrichtigungen für Medikamentenpläne, die Bitte nicht stören beachten</string>
+    <string name="form_reminder_type">Erinnerungsstil</string>
+    <string name="form_reminder_type_desc">Wählen Sie Alarm für wichtige Medikamente oder Benachrichtigung für Nahrungsergänzungsmittel</string>
 </resources>

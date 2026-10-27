@@ -879,4 +879,18 @@ Deseja continuar?</string>
     <string name="schedule_dose_locked_notice">Esta dose tem mais de 48 horas e está bloqueada para preservar a integridade do histórico médico.</string>
     <string name="schedule_dose_locked_badge">Bloqueada</string>
     <string name="schedule_tap_to_manage">Toque para gerenciar</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">Estilo de lembrete</string>
+    <string name="pref_reminder_type_desc">Escolha se os lembretes tocam como alarme ou notificação padrão</string>
+    <string name="reminder_type_alarm">Alarme</string>
+    <string name="reminder_type_alarm_desc">Alerta em tela cheia com som contínuo. Ignora Não perturbe.</string>
+    <string name="reminder_type_notification">Notificação</string>
+    <string name="reminder_type_notification_desc">Banner de notificação padrão com som de aviso. Respeita Não perturbe.</string>
+    <string name="reminder_type_default">Usar padrão do perfil (%1$s)</string>
+    <string name="reminder_type_default_profile">Usar padrão do perfil</string>
+    <string name="notif_channel_notifications_name">Notificações de medicamentos</string>
+    <string name="notif_channel_notifications_desc">Alertas de notificação padrão para horários de medicação que respeitam Não perturbe</string>
+    <string name="form_reminder_type">Estilo de lembrete</string>
+    <string name="form_reminder_type_desc">Escolha Alarme para remédios importantes ou Notificação para suplementos</string>
 </resources>

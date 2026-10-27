@@ -880,4 +880,18 @@
     <string name="schedule_dose_locked_notice">هذه الجرعة أقدم من 48 ساعة وتم قفلها للحفاظ على سلامة السجل الطبي.</string>
     <string name="schedule_dose_locked_badge">مقفل</string>
     <string name="schedule_tap_to_manage">اضغط للإدارة</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">نمط التذكير</string>
+    <string name="pref_reminder_type_desc">اختر ما إذا كانت التذكيرات ترن كمنبه أو إشعار عادي</string>
+    <string name="reminder_type_alarm">منبه</string>
+    <string name="reminder_type_alarm_desc">تنبيه بملء الشاشة مع صوت مستمر. يتجاوز وضع عدم الإزعاج.</string>
+    <string name="reminder_type_notification">إشعار</string>
+    <string name="reminder_type_notification_desc">شريط إشعار قياسي مع نغمة تنبيه. يحترم وضع عدم الإزعاج.</string>
+    <string name="reminder_type_default">استخدام الإعداد الافتراضي للملف الشخصي (%1$s)</string>
+    <string name="reminder_type_default_profile">استخدام الافتراضي للملف الشخصي</string>
+    <string name="notif_channel_notifications_name">إشعارات الأدوية</string>
+    <string name="notif_channel_notifications_desc">تنبيهات إشعار قياسية لجداول الأدوية تحترم وضع عدم الإزعاج</string>
+    <string name="form_reminder_type">نمط التذكير</string>
+    <string name="form_reminder_type_desc">اختر منبه للأدوية الهامة أو إشعار للمكملات الغذائية</string>
 </resources>

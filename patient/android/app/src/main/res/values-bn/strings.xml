@@ -879,4 +879,18 @@
     <string name="schedule_dose_locked_notice">এই ডোজটি ৪৮ ঘণ্টার বেশি পুরানো এবং চিকিৎসা রেকর্ডের সত্যতা রক্ষার জন্য লক করা হয়েছে।</string>
     <string name="schedule_dose_locked_badge">লক করা</string>
     <string name="schedule_tap_to_manage">পরিচালনা করতে ট্যাপ করুন</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">অনুস্মারক শৈলী</string>
+    <string name="pref_reminder_type_desc">অনুস্মারকগুলি অ্যালার্ম নাকি সাধারণ বিজ্ঞপ্তি হিসেবে বাজবে তা নির্বাচন করুন</string>
+    <string name="reminder_type_alarm">অ্যালার্ম</string>
+    <string name="reminder_type_alarm_desc">একটানা শব্দসহ ফুল-স্ক্রিন সতর্কতা। বিরক্ত করবেন না মোড উপেক্ষা করে।</string>
+    <string name="reminder_type_notification">বিজ্ঞপ্তি</string>
+    <string name="reminder_type_notification_desc">সতর্কতা সুরসহ সাধারণ বিজ্ঞপ্তির ব্যানার। বিরক্ত করবেন না মোড মেনে চলে।</string>
+    <string name="reminder_type_default">প্রোফাইল ডিফল্ট ব্যবহার করুন (%1$s)</string>
+    <string name="reminder_type_default_profile">প্রোফাইল ডিফল্ট ব্যবহার করুন</string>
+    <string name="notif_channel_notifications_name">ওষুধের বিজ্ঞপ্তি</string>
+    <string name="notif_channel_notifications_desc">বিরক্ত করবেন না মোড মেনে চলা ওষুধের সময়সূচির সাধারণ বিজ্ঞপ্তি সতর্কতা</string>
+    <string name="form_reminder_type">অনুস্মারক শৈলী</string>
+    <string name="form_reminder_type_desc">জরুরি ওষুধের জন্য অ্যালার্ম অথবা সাপ্লিমেন্টের জন্য বিজ্ঞপ্তি বাছুন</string>
 </resources>

@@ -880,4 +880,18 @@
     <string name="schedule_dose_locked_notice">この服薬は48時間以上前のものであり、医療記録の正確性を保つためにロックされています。</string>
     <string name="schedule_dose_locked_badge">ロック</string>
     <string name="schedule_tap_to_manage">タップして管理</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">リマインダースタイル</string>
+    <string name="pref_reminder_type_desc">リマインダーをアラームまたは通常の通知として鳴らすかを選択します</string>
+    <string name="reminder_type_alarm">アラーム</string>
+    <string name="reminder_type_alarm_desc">連続音の全画面アラート。サイレントモードを無視します。</string>
+    <string name="reminder_type_notification">通知</string>
+    <string name="reminder_type_notification_desc">通知バナーとアラート音。サイレントモードを尊重します。</string>
+    <string name="reminder_type_default">プロファイルのデフォルトを使用 (%1$s)</string>
+    <string name="reminder_type_default_profile">プロファイルのデフォルトを使用</string>
+    <string name="notif_channel_notifications_name">服薬通知</string>
+    <string name="notif_channel_notifications_desc">サイレントモードを考慮した服薬スケジュールの標準通知アラート</string>
+    <string name="form_reminder_type">リマインダースタイル</string>
+    <string name="form_reminder_type_desc">重要な薬にはアラームを、サプリメントには通知を選択します</string>
 </resources>

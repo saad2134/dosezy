@@ -80,6 +80,49 @@ class AlarmScheduler(private val context: Context) {
         }
     }
 
+    // Guard: Resolve whether scheduled cohort requires alarm clock mode or notification mode (#111)
+    private fun resolveIsAlarm(entries: List<ScheduleEntry>): Boolean {
+        if (entries.isEmpty()) return true
+        return try {
+            val db = com.example.dosezy.data.DosezyDatabase.getInstance(context)
+            runBlocking {
+                withTimeoutOrNull(300L) {
+                    val primaryUserId = entries.first().userId
+                    val user = db.userDao().getUserByIdDirect(primaryUserId)
+                    val defaultReminderType = user?.reminderType ?: com.example.dosezy.data.model.ReminderType.ALARM
+                    entries.any { entry ->
+                        val med = db.medicineDao().getMedicineByIdDirect(entry.medicineId)
+                        val effectiveType = med?.reminderType ?: defaultReminderType
+                        effectiveType == com.example.dosezy.data.model.ReminderType.ALARM
+                    }
+                }
+            } ?: true
+        } catch (_: Exception) {
+            true
+        }
+    }
+
+    private fun resolveIsAlarmForEntryIds(entryIds: List<String>, userId: String?): Boolean {
+        if (entryIds.isEmpty()) return true
+        return try {
+            val db = com.example.dosezy.data.DosezyDatabase.getInstance(context)
+            runBlocking {
+                withTimeoutOrNull(300L) {
+                    val user = if (userId != null) db.userDao().getUserByIdDirect(userId) else null
+                    val defaultReminderType = user?.reminderType ?: com.example.dosezy.data.model.ReminderType.ALARM
+                    entryIds.any { entryId ->
+                        val entry = db.scheduleDao().getScheduleEntryById(entryId)
+                        val med = if (entry != null) db.medicineDao().getMedicineByIdDirect(entry.medicineId) else null
+                        val effectiveType = med?.reminderType ?: defaultReminderType
+                        effectiveType == com.example.dosezy.data.model.ReminderType.ALARM
+                    }
+                }
+            } ?: true
+        } catch (_: Exception) {
+            true
+        }
+    }
+
     @SuppressLint("ScheduleExactAlarm")
     @RequiresApi(Build.VERSION_CODES.O)
     fun scheduleMedicineAlarm(entry: ScheduleEntry, medicineName: String, timeFormat: TimeFormat? = null) {
@@ -135,7 +178,9 @@ class AlarmScheduler(private val context: Context) {
             return
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
+        val isAlarm = resolveIsAlarm(entries)
+
+        if (isAlarm && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
             val showIntent = createAlarmClockShowIntent(
                 slotKey.hashCode() + 500,
                 entries.firstOrNull()?.userId
@@ -227,10 +272,12 @@ class AlarmScheduler(private val context: Context) {
             Log.e(TAG, "Error saving snooze group coordination", e)
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
+        val isAlarm = resolveIsAlarmForEntryIds(entryIds, targetUserId)
+
+        if (isAlarm && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
             val showIntent = createAlarmClockShowIntent(
                 primaryId.hashCode() + 1500,
-                userId ?: resolveUserId(primaryId)
+                targetUserId
             )
             alarmManager.setAlarmClock(
                 AlarmManager.AlarmClockInfo(triggerTime, showIntent),
@@ -541,10 +588,13 @@ class AlarmScheduler(private val context: Context) {
             }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
+        val targetUserId = userId ?: resolveUserId(entryId)
+        val isAlarm = resolveIsAlarmForEntryIds(entryIds ?: arrayListOf(entryId), targetUserId)
+
+        if (isAlarm && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
             val showIntent = createAlarmClockShowIntent(
                 entryId.hashCode() + 2500,
-                userId ?: resolveUserId(entryId)
+                targetUserId
             )
             alarmManager.setAlarmClock(
                 AlarmManager.AlarmClockInfo(triggerTime, showIntent),
@@ -728,10 +778,13 @@ class AlarmScheduler(private val context: Context) {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
+        val targetUserId = userId ?: resolveUserId(entryId)
+        val isAlarm = resolveIsAlarmForEntryIds(entryIds ?: arrayListOf(entryId), targetUserId)
+
+        if (isAlarm && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
             val showIntent = createAlarmClockShowIntent(
                 entryId.hashCode() + 3500,
-                userId ?: resolveUserId(entryId)
+                targetUserId
             )
             alarmManager.setAlarmClock(
                 AlarmManager.AlarmClockInfo(triggerTime, showIntent),

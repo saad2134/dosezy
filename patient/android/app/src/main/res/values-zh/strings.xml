@@ -896,4 +896,18 @@
     <string name="schedule_dose_locked_notice">此服药记录已超过48小时，为确保医疗记录的真实性已锁定。</string>
     <string name="schedule_dose_locked_badge">已锁定</string>
     <string name="schedule_tap_to_manage">点击以管理</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">提醒方式</string>
+    <string name="pref_reminder_type_desc">选择提醒方式为闹钟还是标准通知</string>
+    <string name="reminder_type_alarm">闹钟</string>
+    <string name="reminder_type_alarm_desc">全屏提醒伴随连续铃声。绕过请勿打扰模式。</string>
+    <string name="reminder_type_notification">通知</string>
+    <string name="reminder_type_notification_desc">标准横幅通知伴随提示音。遵循请勿打扰模式。</string>
+    <string name="reminder_type_default">使用档案默认设置 (%1$s)</string>
+    <string name="reminder_type_default_profile">使用档案默认设置</string>
+    <string name="notif_channel_notifications_name">服药通知</string>
+    <string name="notif_channel_notifications_desc">遵循请勿打扰模式的标准服药计划通知提醒</string>
+    <string name="form_reminder_type">提醒方式</string>
+    <string name="form_reminder_type_desc">重要药物请选择闹钟，保健品请选择通知</string>
 </resources>

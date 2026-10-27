@@ -38,6 +38,7 @@ import com.example.dosezy.ui.subscreens.preferences.IntakeDurationSelectionDialo
 import com.example.dosezy.ui.subscreens.preferences.LanguageSelectionDialog
 import com.example.dosezy.ui.subscreens.preferences.LateAfterSelectionDialog
 import com.example.dosezy.ui.subscreens.preferences.MissedAfterSelectionDialog
+import com.example.dosezy.ui.subscreens.preferences.ReminderTypeSelectionDialog
 import com.example.dosezy.ui.subscreens.preferences.SnoozeSelectionDialog
 import com.example.dosezy.ui.subscreens.preferences.ThemeSelectionDialog
 import com.example.dosezy.ui.subscreens.preferences.TimeFormatSelectionDialog
@@ -68,6 +69,7 @@ fun PreferencesScreen(navController: NavController) {
     var showNaggingIntervalDialog by remember { mutableStateOf(false) }
     var showNaggingRepeatsDialog by remember { mutableStateOf(false) }
     var showIntakeDurationDialog by remember { mutableStateOf(false) }
+    var showReminderTypeDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -130,6 +132,7 @@ fun PreferencesScreen(navController: NavController) {
                         .putBoolean("lockscreen_details_enabled", isChecked)
                         .commit()
                 },
+                onReminderTypeClick = { showReminderTypeDialog = true },
                 onCustomSnoozePopupChange = { isChecked ->
                     currentUser?.let { user ->
                         userViewModel.updateUser(user.copy(customSnoozePopupEnabled = isChecked))
@@ -378,6 +381,20 @@ fun PreferencesScreen(navController: NavController) {
                     showIntakeDurationDialog = false
                 },
                 onDismiss = { showIntakeDurationDialog = false }
+            )
+        }
+
+        // Guard: Reminder style selection dialog (Alarm vs Notification) (#111)
+        if (showReminderTypeDialog) {
+            ReminderTypeSelectionDialog(
+                currentReminderType = currentUser?.reminderType ?: com.example.dosezy.data.model.ReminderType.ALARM,
+                onReminderTypeSelected = { newType: com.example.dosezy.data.model.ReminderType ->
+                    currentUser?.let { user ->
+                        userViewModel.updateUser(user.copy(reminderType = newType))
+                    }
+                    showReminderTypeDialog = false
+                },
+                onDismiss = { showReminderTypeDialog = false }
             )
         }
     }

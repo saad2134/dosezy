@@ -1083,5 +1083,70 @@ class DatabaseRestoreTransactionAndMigrationTest {
         assertTrue("Newly restored profile must be promoted to active current user when local profiles are all inactive", restoredUser.isCurrentUser)
         assertEquals("Exactly one user must be marked active", 1, allUsers.count { u -> u.isCurrentUser })
     }
+
+    @Test
+    fun userAndMedicine_reminderType_persistsInDatabaseAndSurvivesQuery() = runBlocking {
+        // Guard: Verify User and Medicine reminderType column persistence in Room database (#111)
+        val testUser = User(
+            userId = "usr_reminder_type_test",
+            fullName = "Reminder Type User",
+            age = 42,
+            gender = Gender.MALE,
+            contactNumber = "+1122334455",
+            reminderType = com.example.dosezy.data.model.ReminderType.NOTIFICATION,
+            isCurrentUser = true
+        )
+        db.userDao().insertUser(testUser)
+
+        val retrievedUser = db.userDao().getUserByIdDirect(testUser.userId)
+        assertNotNull(retrievedUser)
+        assertEquals(com.example.dosezy.data.model.ReminderType.NOTIFICATION, retrievedUser?.reminderType)
+
+        val med1 = Medicine(
+            medicineId = "med_reminder_type_1",
+            userId = testUser.userId,
+            medicationName = "Critical Heart Med",
+            dosage = 50.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            reminderType = com.example.dosezy.data.model.ReminderType.ALARM
+        )
+        val med2 = Medicine(
+            medicineId = "med_reminder_type_2",
+            userId = testUser.userId,
+            medicationName = "Vitamin C Supplement",
+            dosage = 500.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            reminderType = com.example.dosezy.data.model.ReminderType.NOTIFICATION
+        )
+        val med3 = Medicine(
+            medicineId = "med_reminder_type_3",
+            userId = testUser.userId,
+            medicationName = "Default Inherited Med",
+            dosage = 10.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            reminderType = null
+        )
+
+        db.medicineDao().insertMedicine(med1)
+        db.medicineDao().insertMedicine(med2)
+        db.medicineDao().insertMedicine(med3)
+
+        val q1 = db.medicineDao().getMedicineByIdDirect(med1.medicineId)
+        val q2 = db.medicineDao().getMedicineByIdDirect(med2.medicineId)
+        val q3 = db.medicineDao().getMedicineByIdDirect(med3.medicineId)
+
+        assertEquals(com.example.dosezy.data.model.ReminderType.ALARM, q1?.reminderType)
+        assertEquals(com.example.dosezy.data.model.ReminderType.NOTIFICATION, q2?.reminderType)
+        assertNull(q3?.reminderType)
+    }
 }
 

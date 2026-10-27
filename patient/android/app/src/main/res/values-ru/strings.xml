@@ -880,4 +880,18 @@
     <string name="schedule_dose_locked_notice">Эта доза старше 48 часов и заблокирована для сохранения достоверности медицинской истории.</string>
     <string name="schedule_dose_locked_badge">Заблокировано</string>
     <string name="schedule_tap_to_manage">Нажмите для управления</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">Стиль напоминания</string>
+    <string name="pref_reminder_type_desc">Выберите, как звучат напоминания: как будильник или обычное уведомление</string>
+    <string name="reminder_type_alarm">Будильник</string>
+    <string name="reminder_type_alarm_desc">Полноэкранное оповещение с непрерывным звуком. Обходит режим Не беспокоить.</string>
+    <string name="reminder_type_notification">Уведомление</string>
+    <string name="reminder_type_notification_desc">Обычный баннер уведомления со звуковым сигналом. Учитывает режим Не беспокоить.</string>
+    <string name="reminder_type_default">Использовать по умолчанию для профиля (%1$s)</string>
+    <string name="reminder_type_default_profile">Использовать по умолчанию для профиля</string>
+    <string name="notif_channel_notifications_name">Уведомления о приеме лекарств</string>
+    <string name="notif_channel_notifications_desc">Стандартные уведомления о графике приема лекарств с учетом режима Не беспокоить</string>
+    <string name="form_reminder_type">Стиль напоминания</string>
+    <string name="form_reminder_type_desc">Выберите Будильник для важных лекарств или Уведомление для добавок</string>
 </resources>

@@ -896,4 +896,18 @@
     <string name="schedule_dose_locked_notice">यह खुराक 48 घंटे से अधिक पुरानी है और मेडिकल रिकॉर्ड की अखंडता बनाए रखने के लिए लॉक है।</string>
     <string name="schedule_dose_locked_badge">लॉक</string>
     <string name="schedule_tap_to_manage">प्रबंधित करने के लिए टैप करें</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">रिमाइंडर शैली</string>
+    <string name="pref_reminder_type_desc">चुनें कि रिमाइंडर अलार्म के रूप में बजें या मानक सूचना के रूप में</string>
+    <string name="reminder_type_alarm">अलार्म</string>
+    <string name="reminder_type_alarm_desc">निरंतर ध्वनि के साथ पूर्ण-स्क्रीन अलर्ट। डू नॉट डिस्टर्ब को बायपास करता है।</string>
+    <string name="reminder_type_notification">सूचना (नोटिफिकेशन)</string>
+    <string name="reminder_type_notification_desc">अलर्ट टोन के साथ मानक सूचना बैनर। डू नॉट डिस्टर्ब का सम्मान करता है।</string>
+    <string name="reminder_type_default">प्रोफ़ाइल डिफ़ॉल्ट का उपयोग करें (%1$s)</string>
+    <string name="reminder_type_default_profile">प्रोफ़ाइल डिफ़ॉल्ट का उपयोग करें</string>
+    <string name="notif_channel_notifications_name">दवा सूचनाएं</string>
+    <string name="notif_channel_notifications_desc">दवा समय-सारणी के लिए मानक सूचनाएं जो डू नॉट डिस्टर्ब का पालन करती हैं</string>
+    <string name="form_reminder_type">रिमाइंडर शैली</string>
+    <string name="form_reminder_type_desc">महत्वपूर्ण दवाओं के लिए अलार्म या सप्लीमेंट्स के लिए सूचना चुनें</string>
 </resources>

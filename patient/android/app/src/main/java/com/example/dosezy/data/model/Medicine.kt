@@ -47,7 +47,9 @@ data class Medicine(
     val endDate: LocalDate? = null,
     val durationDays: Int? = null,
     val isArchived: Boolean = false,
-    val customDosages: Map<String, Double>? = null
+    val customDosages: Map<String, Double>? = null,
+    // Guard: Per-medication reminder type override; null inherits user profile default (#111)
+    val reminderType: ReminderType? = null
 ) {
 
     /**

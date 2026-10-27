@@ -512,3 +512,24 @@ fun IntakeDurationSelectionDialog(
         onDismiss = onDismiss
     )
 }
+
+// Guard: Dialog Composable for Reminder Style Selection (Alarm vs Notification) (#111)
+@Composable
+fun ReminderTypeSelectionDialog(
+    currentReminderType: com.example.dosezy.data.model.ReminderType,
+    onReminderTypeSelected: (com.example.dosezy.data.model.ReminderType) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val options = listOf(
+        stringResource(R.string.reminder_type_alarm) to com.example.dosezy.data.model.ReminderType.ALARM,
+        stringResource(R.string.reminder_type_notification) to com.example.dosezy.data.model.ReminderType.NOTIFICATION
+    )
+    SelectionDialog(
+        title = stringResource(R.string.pref_reminder_type_title),
+        options = options,
+        currentSelection = currentReminderType,
+        onOptionSelected = onReminderTypeSelected,
+        onDismiss = onDismiss
+    )
+}
+

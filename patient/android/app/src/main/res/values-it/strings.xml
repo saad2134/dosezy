@@ -880,4 +880,18 @@ Vuoi continuare?</string>
     <string name="schedule_dose_locked_notice">Questa dose ha più di 48 ore ed è bloccata per preservare l\'integrità della cronologia medica.</string>
     <string name="schedule_dose_locked_badge">Bloccata</string>
     <string name="schedule_tap_to_manage">Tocca per gestire</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">Stile promemoria</string>
+    <string name="pref_reminder_type_desc">Scegli se i promemoria suonano come sveglia o notifica standard</string>
+    <string name="reminder_type_alarm">Sveglia</string>
+    <string name="reminder_type_alarm_desc">Avviso a schermo intero con suono continuo. Ignora Non disturbare.</string>
+    <string name="reminder_type_notification">Notifica</string>
+    <string name="reminder_type_notification_desc">Banner di notifica standard con tono di avviso. Rispetta Non disturbare.</string>
+    <string name="reminder_type_default">Usa impostazione predefinita del profilo (%1$s)</string>
+    <string name="reminder_type_default_profile">Usa predefinito del profilo</string>
+    <string name="notif_channel_notifications_name">Notifiche farmaci</string>
+    <string name="notif_channel_notifications_desc">Avvisi di notifica standard per gli orari dei farmaci che rispettano Non disturbare</string>
+    <string name="form_reminder_type">Stile promemoria</string>
+    <string name="form_reminder_type_desc">Scegli Sveglia per i farmaci critici o Notifica per gli integratori</string>
 </resources>

@@ -909,4 +909,18 @@ Do you want to continue?</string>
     <string name="schedule_dose_locked_notice">This dose is older than 48 hours and is locked to preserve historical record integrity.</string>
     <string name="schedule_dose_locked_badge">Locked</string>
     <string name="schedule_tap_to_manage">Tap to manage</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">Reminder Style</string>
+    <string name="pref_reminder_type_desc">Choose whether reminders ring as alarms or standard notifications</string>
+    <string name="reminder_type_alarm">Alarm</string>
+    <string name="reminder_type_alarm_desc">Full-screen alert with continuous sound. Bypasses Do Not Disturb.</string>
+    <string name="reminder_type_notification">Notification</string>
+    <string name="reminder_type_notification_desc">Standard notification banner with alert tone. Respects Do Not Disturb.</string>
+    <string name="reminder_type_default">Use Profile Default (%1$s)</string>
+    <string name="reminder_type_default_profile">Use Profile Default</string>
+    <string name="notif_channel_notifications_name">Medication Notifications</string>
+    <string name="notif_channel_notifications_desc">Standard notification alerts for medication schedules respecting Do Not Disturb</string>
+    <string name="form_reminder_type">Reminder Style</string>
+    <string name="form_reminder_type_desc">Choose Alarm for critical medicines or Notification for supplements</string>
 </resources>

@@ -58,7 +58,9 @@ data class User(
     // Guard: Lock screen privacy toggle to mask sensitive prescription details until unlocked (#HIPAA, #GDPR)
     val lockscreenDetailsEnabled: Boolean = true,
     // Guard: Toggle to display multiple custom snooze timing options during alarm alert popup
-    val customSnoozePopupEnabled: Boolean = false
+    val customSnoozePopupEnabled: Boolean = false,
+    // Guard: Option to treat reminders as alarms or notifications (#111)
+    val reminderType: ReminderType = ReminderType.ALARM
 )
 
 enum class AlarmSound(val rawResId: Int?) {

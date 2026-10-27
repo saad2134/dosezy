@@ -33,6 +33,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
     companion object {
         const val TAG = "MedicineAlarmReceiver"
         const val CHANNEL_ID = "dosezy_medicine_reminders_v4"
+        const val NOTIFICATION_CHANNEL_ID = "dosezy_medicine_notifications_v1"
         const val REFILL_CHANNEL_ID = "dosezy_refill_alerts"
         const val EXTRA_ENTRY_ID = "entry_id"
         const val EXTRA_MEDICINE_NAME = "medicine_name"
@@ -73,6 +74,26 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
                 notificationManager.createNotificationChannel(channel)
 
+                // Guard: Standard notification channel for non-critical/supplement reminders respecting Do Not Disturb (#111)
+                val notifSoundUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
+                val notifAudioAttributes = android.media.AudioAttributes.Builder()
+                    .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION_EVENT)
+                    .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+                val notifChannel = NotificationChannel(
+                    NOTIFICATION_CHANNEL_ID,
+                    context.getString(com.example.dosezy.R.string.notif_channel_notifications_name),
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply {
+                    description = context.getString(com.example.dosezy.R.string.notif_channel_notifications_desc)
+                    enableLights(true)
+                    enableVibration(true)
+                    setSound(notifSoundUri, notifAudioAttributes)
+                    setBypassDnd(false) // Guard: Strictly respects Do Not Disturb (#111)
+                    setShowBadge(true)
+                }
+                notificationManager.createNotificationChannel(notifChannel)
+
                 val refillChannel = NotificationChannel(
                     REFILL_CHANNEL_ID,
                     context.getString(com.example.dosezy.R.string.notif_channel_refill_name),
@@ -98,7 +119,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             scheduledTime: String?,
             snoozeMinutes: Int = 10,
             userId: String? = null,
-            userLanguage: com.example.dosezy.data.model.Language? = null
+            userLanguage: com.example.dosezy.data.model.Language? = null,
+            isAlarmMode: Boolean = true
         ) {
             val allowLockscreen = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE).getBoolean("lockscreen_details_enabled", true)
             MedicineAlarmReceiver().showNotification(
@@ -116,7 +138,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 isUpdateOnly = true,
                 userId = userId,
                 userLanguage = userLanguage,
-                allowLockscreenDetails = allowLockscreen
+                allowLockscreenDetails = allowLockscreen,
+                isAlarmMode = isAlarmMode
             )
         }
 
@@ -130,16 +153,21 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             scheduledTime: String?,
             user: com.example.dosezy.data.model.User?
         ) {
-            val sound = user?.alarmSound ?: com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT
-            val customPath = user?.customAlarmSoundPath
-            val duration = user?.alarmDurationSeconds ?: 0
+            val userReminderType = user?.reminderType ?: com.example.dosezy.data.model.ReminderType.ALARM
+            val isAlarmMode = userReminderType == com.example.dosezy.data.model.ReminderType.ALARM
 
-            AlarmAudioPlayer.play(
-                context = context,
-                sound = sound,
-                customPath = customPath,
-                autoSilenceSeconds = duration
-            )
+            if (isAlarmMode) {
+                val sound = user?.alarmSound ?: com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT
+                val customPath = user?.customAlarmSoundPath
+                val duration = user?.alarmDurationSeconds ?: 0
+
+                AlarmAudioPlayer.play(
+                    context = context,
+                    sound = sound,
+                    customPath = customPath,
+                    autoSilenceSeconds = duration
+                )
+            }
 
             val allowLockscreen = user?.lockscreenDetailsEnabled ?: context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE).getBoolean("lockscreen_details_enabled", true)
             val receiver = MedicineAlarmReceiver()
@@ -158,7 +186,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 userId = user?.userId,
                 userLanguage = user?.language,
                 showCustomSnoozeOptions = user?.customSnoozePopupEnabled ?: false,
-                allowLockscreenDetails = allowLockscreen
+                allowLockscreenDetails = allowLockscreen,
+                isAlarmMode = isAlarmMode
             )
         }
     }
@@ -293,17 +322,27 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                     val effectiveMedicineName = if (activeMedicineNames.isNotEmpty()) activeMedicineNames.joinToString(", ") else medicineName
                     val activeEntryIds = ArrayList(validPendingEntries.map { it.entryId })
 
-                    // Immediately trigger centralized alarm audio & vibration
-                    val sound = user?.alarmSound ?: com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT
-                    val customPath = user?.customAlarmSoundPath
-                    val duration = user?.alarmDurationSeconds ?: 0
+                    // Guard: Check if any medication in the cohort requires full alarm behavior (#111)
+                    val defaultReminderType = user?.reminderType ?: com.example.dosezy.data.model.ReminderType.ALARM
+                    val isAlarmMode = validPendingEntries.any { e ->
+                        val m = database.medicineDao().getMedicineByIdDirect(e.medicineId)
+                        val effectiveType = m?.reminderType ?: defaultReminderType
+                        effectiveType == com.example.dosezy.data.model.ReminderType.ALARM
+                    }
 
-                    AlarmAudioPlayer.play(
-                        context = context,
-                        sound = sound,
-                        customPath = customPath,
-                        autoSilenceSeconds = duration
-                    )
+                    if (isAlarmMode) {
+                        // Immediately trigger centralized alarm audio & vibration
+                        val sound = user?.alarmSound ?: com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT
+                        val customPath = user?.customAlarmSoundPath
+                        val duration = user?.alarmDurationSeconds ?: 0
+
+                        AlarmAudioPlayer.play(
+                            context = context,
+                            sound = sound,
+                            customPath = customPath,
+                            autoSilenceSeconds = duration
+                        )
+                    }
 
                     // Guard: Derive locale from user's explicit profile language so scheduled time matches profile preferences (#BUG-NOTIF-LOCALE)
                     val targetLanguage = user?.language ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
@@ -335,7 +374,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                         userId = primaryEntry.userId,
                         userLanguage = user?.language,
                         showCustomSnoozeOptions = user?.customSnoozePopupEnabled ?: false,
-                        allowLockscreenDetails = user?.lockscreenDetailsEnabled ?: true
+                        allowLockscreenDetails = user?.lockscreenDetailsEnabled ?: true,
+                        isAlarmMode = isAlarmMode
                     )
 
                     // Schedule next follow-up nagging reminder if enabled and below limit
@@ -355,13 +395,17 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 } catch (ex: Exception) {
                     Log.e(TAG, "Error processing alarm in background", ex)
                     try {
-                        AlarmAudioPlayer.play(
-                            context = context,
-                            sound = com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT,
-                            customPath = null,
-                            autoSilenceSeconds = 0
-                        )
-                        showNotification(context, entryId, entryIds, medicineName, medicineNames, emptyList(), scheduledTime, false, 0, 3)
+                        val fallbackUser = try { database.userDao().getAllUsersDirect().firstOrNull { it.isCurrentUser } } catch (_: Exception) { null }
+                        val isAlarm = fallbackUser?.reminderType != com.example.dosezy.data.model.ReminderType.NOTIFICATION
+                        if (isAlarm) {
+                            AlarmAudioPlayer.play(
+                                context = context,
+                                sound = com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT,
+                                customPath = null,
+                                autoSilenceSeconds = 0
+                            )
+                        }
+                        showNotification(context, entryId, entryIds, medicineName, medicineNames, emptyList(), scheduledTime, false, 0, 3, isAlarmMode = isAlarm)
                     } catch (fallbackEx: Exception) {
                         Log.e(TAG, "Error in fallback alarm/notification handling", fallbackEx)
                     }
@@ -394,7 +438,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         userId: String? = null,
         userLanguage: com.example.dosezy.data.model.Language? = null,
         showCustomSnoozeOptions: Boolean = false,
-        allowLockscreenDetails: Boolean = true
+        allowLockscreenDetails: Boolean = true,
+        isAlarmMode: Boolean = true
     ) {
         // Guard: Resolve notification strings and actions using user profile language or fallback to globally saved app language (#BUG-NOTIF-LOCALE)
         val targetLanguage = userLanguage ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
@@ -546,8 +591,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             optionsBundle
         )
 
-        // Launch AlarmActivity directly only on full alarms, never during silent shade notification updates
-        if (!isUpdateOnly) {
+        // Guard: Launch AlarmActivity directly only on full alarms, never during silent shade updates or notification-only reminders (#111)
+        if (!isUpdateOnly && isAlarmMode) {
             try {
                 context.startActivity(alarmIntent)
             } catch (e: Exception) {
@@ -611,8 +656,12 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)
         }.getOrNull()
 
-        // Create silent notification: AlarmAudioPlayer is the single source of sound & vibration
-        val notificationBuilder = NotificationCompat.Builder(localizedContext, CHANNEL_ID)
+        val targetChannelId = if (isAlarmMode) CHANNEL_ID else NOTIFICATION_CHANNEL_ID
+        val targetPriority = if (isAlarmMode) NotificationCompat.PRIORITY_MAX else NotificationCompat.PRIORITY_HIGH
+        val targetCategory = if (isAlarmMode) NotificationCompat.CATEGORY_ALARM else NotificationCompat.CATEGORY_REMINDER
+
+        // Create notification: AlarmAudioPlayer handles audio for alarms; channel sound plays for notifications
+        val notificationBuilder = NotificationCompat.Builder(localizedContext, targetChannelId)
             .setSmallIcon(R.mipmap.ic_launcher)
             .apply {
                 if (appIconBitmap != null) {
@@ -621,16 +670,16 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             }
             .setContentTitle(notificationTitle)
             .setContentText(notificationText)
-            .setPriority(NotificationCompat.PRIORITY_MAX)
-            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setPriority(targetPriority)
+            .setCategory(targetCategory)
             .setAutoCancel(true)
-            .setSilent(true)
+            .setSilent(isAlarmMode)
 
         // Guard: Mask sensitive medication names/dosages on lock screen by default to prevent PHI leakage (#HIPAA, #GDPR)
         if (effectiveAllowLockscreen) {
             notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         } else {
-            val publicNotification = NotificationCompat.Builder(localizedContext, CHANNEL_ID)
+            val publicNotification = NotificationCompat.Builder(localizedContext, targetChannelId)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .apply {
                     if (appIconBitmap != null) {
@@ -640,8 +689,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 .setContentTitle(localizedContext.getString(R.string.app_name))
                 .setContentText(localizedContext.getString(R.string.notif_generic_lockscreen_reminder))
                 .setContentIntent(pendingIntent)
-                .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setPriority(targetPriority)
+                .setCategory(targetCategory)
                 .setAutoCancel(true)
                 .addAction(
                     getNotificationIcon(Icons.Filled.Snooze),
@@ -675,7 +724,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             }
             .setStyle(NotificationCompat.BigTextStyle().bigText(bigText))
 
-        if (!isUpdateOnly) {
+        if (!isUpdateOnly && isAlarmMode) {
             notificationBuilder.setFullScreenIntent(fullScreenPendingIntent, true)
         }
 
@@ -685,7 +734,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             val notificationManager =
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.notify(entryId.hashCode(), notification)
-            Log.d(TAG, "Showing notification and launching full-screen alarm for: $medicineName")
+            Log.d(TAG, "Showing reminder notification (isAlarm=$isAlarmMode) for: $medicineName")
         } catch (e: Exception) {
             Log.e(TAG, "Could not post alarm notification", e)
         }
