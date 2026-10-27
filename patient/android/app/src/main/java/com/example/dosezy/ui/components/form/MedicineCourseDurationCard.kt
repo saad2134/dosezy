@@ -58,7 +58,9 @@ fun MedicineCourseDurationCard(
     durationDaysText: String,
     onDurationDaysChange: (String) -> Unit,
     calculatedEndDate: LocalDate?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isDurationError: Boolean = false,
+    durationErrorMessage: String? = null
 ) {
     val context = LocalContext.current
     val dateFormatter = remember { DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM) }
@@ -194,9 +196,14 @@ fun MedicineCourseDurationCard(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 56.dp),
+                    isError = isDurationError,
+                    supportingText = if (isDurationError && !durationErrorMessage.isNullOrBlank()) {
+                        { Text(text = durationErrorMessage, color = MaterialTheme.colorScheme.error) }
+                    } else null,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF1193D4),
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                        focusedBorderColor = if (isDurationError) MaterialTheme.colorScheme.error else Color(0xFF1193D4),
+                        unfocusedBorderColor = if (isDurationError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
+                        errorBorderColor = MaterialTheme.colorScheme.error
                     )
                 )
 

@@ -51,6 +51,12 @@
     <string name="form_delete_medicine">इस दवा को हटाएं</string>
     <string name="form_upload_img">दवा की तस्वीर अपलोड करें</string>
     <string name="form_change_img">दवा की तस्वीर बदलें</string>
+    <string name="form_error_med_name_required">दवा का नाम आवश्यक है</string>
+    <string name="form_error_dosage_required">खुराक आवश्यक है</string>
+    <string name="form_error_dosage_invalid">खुराक एक धनात्मक संख्या होनी चाहिए</string>
+    <string name="form_error_select_days">कृपया कम से कम एक दिन चुनें</string>
+    <string name="form_error_course_duration">कोर्स की अवधि कम से कम 1 दिन होनी चाहिए</string>
+    <string name="form_error_fix_fields">कृपया ऊपर हाइलाइट किए गए आवश्यक फ़ील्ड भरें</string>
     <string name="freq_daily">दैनिक</string>
     <string name="freq_weekly">साप्ताहिक</string>
     <string name="freq_monthly">मासिक</string>

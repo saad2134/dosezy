@@ -162,7 +162,7 @@ fun NewUserBottomBar(
 
                         Button(
                             onClick = onCompleteProfileSetup,
-                            enabled = isProfileSetupValid,
+                            enabled = true,
                             modifier = Modifier
                                 .weight(1f)
                                 .height(56.dp),

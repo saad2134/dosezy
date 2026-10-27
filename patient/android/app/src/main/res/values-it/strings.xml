@@ -45,6 +45,12 @@
     <string name="form_delete_medicine">Elimina Farmaco</string>
     <string name="form_upload_img">Carica Immagine</string>
     <string name="form_change_img">Cambia Immagine</string>
+    <string name="form_error_med_name_required">Il nome del farmaco è obbligatorio</string>
+    <string name="form_error_dosage_required">Il dosaggio è obbligatorio</string>
+    <string name="form_error_dosage_invalid">Il dosaggio deve essere un numero positivo</string>
+    <string name="form_error_select_days">Seleziona almeno un giorno</string>
+    <string name="form_error_course_duration">La durata del ciclo deve essere di almeno 1 giorno</string>
+    <string name="form_error_fix_fields">Compila i campi obbligatori evidenziati sopra</string>
     <string name="freq_daily">Giornaliero</string>
     <string name="freq_weekly">Settimanale</string>
     <string name="freq_monthly">Mensile</string>

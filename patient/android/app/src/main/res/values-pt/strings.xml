@@ -45,6 +45,12 @@
     <string name="form_delete_medicine">Excluir Medicamento</string>
     <string name="form_upload_img">Enviar Imagem do Medicamento</string>
     <string name="form_change_img">Alterar Imagem do Medicamento</string>
+    <string name="form_error_med_name_required">O nome do medicamento é obrigatório</string>
+    <string name="form_error_dosage_required">A dosagem é obrigatória</string>
+    <string name="form_error_dosage_invalid">A dosagem deve ser um número positivo</string>
+    <string name="form_error_select_days">Selecione pelo menos um dia</string>
+    <string name="form_error_course_duration">A duração do tratamento deve ser de pelo menos 1 dia</string>
+    <string name="form_error_fix_fields">Preencha os campos obrigatórios destacados acima</string>
     <string name="freq_daily">Diariamente</string>
     <string name="freq_weekly">Semanalmente</string>
     <string name="freq_monthly">Mensalmente</string>

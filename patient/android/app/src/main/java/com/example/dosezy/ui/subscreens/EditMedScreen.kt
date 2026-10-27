@@ -35,6 +35,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,8 +60,10 @@ import com.example.dosezy.ui.components.MedicineStockInventoryCard
 import com.example.dosezy.ui.components.MedicineTimingsAndDosagesCard
 import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.components.isMedicineFormValid
+import com.example.dosezy.ui.components.validateMedicineForm
 import com.example.dosezy.ui.viewmodels.MedicineViewModel
 import com.example.dosezy.ui.viewmodels.UserViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.UUID
@@ -193,6 +196,37 @@ fun EditMedScreen(
                 if (!loaded) {
                     EditMedSkeletonView()
                 } else {
+                    val scrollState = rememberScrollState()
+                    val coroutineScope = rememberCoroutineScope()
+                    var showValidationErrors by remember { mutableStateOf(false) }
+
+                    val durationDaysInt = durationDaysText.normalizeArabicDigits().toIntOrNull()
+                    val calcStartDate = selectedStartDate
+                    // Guard: Retain medicineToEdit.endDate if durationDaysInt is null while isFiniteCourse is true to prevent silent conversion to indefinite schedule
+                    val calcEndDate = if (isFiniteCourse) {
+                        if (durationDaysInt != null) {
+                            selectedStartDate.plusDays((durationDaysInt - 1).toLong().coerceAtLeast(0L))
+                        } else {
+                            medicineToEdit?.endDate
+                        }
+                    } else null
+
+                    val validation = validateMedicineForm(
+                        medicationName = medicationName,
+                        dosage = dosage,
+                        hasDifferentDosages = hasDifferentDosages,
+                        scheduledTimesList = scheduledTimesList,
+                        perTimeDosages = perTimeDosages,
+                        selectedFrequency = selectedFrequency,
+                        selectedDaysOfWeek = selectedDaysOfWeek,
+                        selectedDaysOfMonth = selectedDaysOfMonth,
+                        intervalWeeksText = intervalWeeksText,
+                        isFiniteCourse = isFiniteCourse,
+                        durationDaysText = durationDaysText,
+                        hasExistingEndDate = medicineToEdit?.endDate != null
+                    )
+                    val isFormValid = validation.isValid
+
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -203,7 +237,7 @@ fun EditMedScreen(
                             ) {
                                 focusManager.clearFocus()
                             }
-                            .verticalScroll(rememberScrollState())
+                            .verticalScroll(scrollState)
                             .padding(16.dp)
                             .background(MaterialTheme.colorScheme.background)
                     ) {
@@ -218,7 +252,9 @@ fun EditMedScreen(
                                 selectedPillShape = shape
                                 selectedPillColor = color
                             },
-                            onMedicationNameChange = { medicationName = it }
+                            onMedicationNameChange = { medicationName = it },
+                            isNameError = showValidationErrors && !validation.isNameValid,
+                            nameErrorMessage = stringResource(R.string.form_error_med_name_required)
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -255,23 +291,20 @@ fun EditMedScreen(
                                 editingTimeIndex = index
                                 selectedTime = time
                                 showTimePicker = true
-                            }
+                            },
+                            isDosageError = showValidationErrors && !validation.isDosageValid,
+                            dosageErrorMessage = stringResource(
+                                if (dosage.isBlank() && perTimeDosages.isEmpty()) R.string.form_error_dosage_required
+                                else R.string.form_error_dosage_invalid
+                            ),
+                            invalidTimeSlotKeys = if (showValidationErrors) validation.invalidTimeSlotKeys else emptySet(),
+                            isFrequencyError = showValidationErrors && !validation.isFrequencyValid,
+                            frequencyErrorMessage = stringResource(R.string.form_error_select_days)
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
 
                         // --- Card 3: Course Duration Card ---
-                        val durationDaysInt = durationDaysText.normalizeArabicDigits().toIntOrNull()
-                        val calcStartDate = selectedStartDate
-                        // Guard: Retain medicineToEdit.endDate if durationDaysInt is null while isFiniteCourse is true to prevent silent conversion to indefinite schedule
-                        val calcEndDate = if (isFiniteCourse) {
-                            if (durationDaysInt != null) {
-                                selectedStartDate.plusDays((durationDaysInt - 1).toLong().coerceAtLeast(0L))
-                            } else {
-                                medicineToEdit?.endDate
-                            }
-                        } else null
-
                         MedicineCourseDurationCard(
                             isFiniteCourse = isFiniteCourse,
                             onIsFiniteCourseChange = { isFiniteCourse = it },
@@ -279,7 +312,9 @@ fun EditMedScreen(
                             onStartDateChange = { selectedStartDate = it },
                             durationDaysText = durationDaysText,
                             onDurationDaysChange = { durationDaysText = it },
-                            calculatedEndDate = calcEndDate
+                            calculatedEndDate = calcEndDate,
+                            isDurationError = showValidationErrors && !validation.isFiniteDurationValid,
+                            durationErrorMessage = stringResource(R.string.form_error_course_duration)
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -302,34 +337,23 @@ fun EditMedScreen(
 
                         Spacer(modifier = Modifier.height(24.dp))
 
-                        val isDosageValid = if (hasDifferentDosages && scheduledTimesList.size > 1) {
-                            scheduledTimesList.all { t ->
-                                val key = String.format(java.util.Locale.US, "%02d:%02d", t.hour, t.minute)
-                                val valueStr = perTimeDosages[key] ?: (if (dosage.isNotBlank()) dosage else null)
-                                val d = valueStr?.normalizeArabicDigits()?.toDoubleOrNull()
-                                d != null && d > 0.0
-                            }
-                        } else {
-                            val d = dosage.normalizeArabicDigits().toDoubleOrNull()
-                            d != null && d > 0.0
-                        }
-
-                        val isFormValid = isMedicineFormValid(
-                            medicationName = medicationName,
-                            isDosageValid = isDosageValid,
-                            selectedFrequency = selectedFrequency,
-                            selectedDaysOfWeek = selectedDaysOfWeek,
-                            selectedDaysOfMonth = selectedDaysOfMonth,
-                            intervalWeeksText = intervalWeeksText,
-                            isFiniteCourse = isFiniteCourse,
-                            durationDaysText = durationDaysText,
-                            hasExistingEndDate = medicineToEdit?.endDate != null
-                        )
-
                         // Save Changes Button
                         Button(
                             onClick = {
-                                if (!isFormValid) return@Button
+                                if (!isFormValid) {
+                                    showValidationErrors = true
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar(context.getString(R.string.form_error_fix_fields))
+                                    }
+                                    coroutineScope.launch {
+                                        when {
+                                            !validation.isNameValid -> scrollState.animateScrollTo(0)
+                                            !validation.isDosageValid || !validation.isFrequencyValid -> scrollState.animateScrollTo(280)
+                                            !validation.isFiniteDurationValid -> scrollState.animateScrollTo(680)
+                                        }
+                                    }
+                                    return@Button
+                                }
 
                                 val baseDose = if (hasDifferentDosages && scheduledTimesList.size > 1) {
                                     val firstKey = scheduledTimesList.firstOrNull()?.let { String.format(java.util.Locale.US, "%02d:%02d", it.hour, it.minute) }
@@ -422,7 +446,7 @@ fun EditMedScreen(
                                 }
                                 navController.popBackStack()
                             },
-                            enabled = isFormValid && (medicineToEdit != null || !currentUser?.userId.isNullOrBlank()),
+                            enabled = medicineToEdit != null || !currentUser?.userId.isNullOrBlank(),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),

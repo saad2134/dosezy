@@ -152,6 +152,9 @@ fun ManageProfileScreen(navController: NavController) {
             if (!dataReady) {
                 ManageProfileSkeletonView()
             } else {
+                val scrollState = rememberScrollState()
+                val coroutineScope = rememberCoroutineScope()
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -162,7 +165,7 @@ fun ManageProfileScreen(navController: NavController) {
                         ) {
                             focusManager.clearFocus()
                         }
-                        .verticalScroll(rememberScrollState())
+                        .verticalScroll(scrollState)
                         .padding(24.dp)
                 ) {
                     // Profile Picture Section
@@ -250,7 +253,7 @@ fun ManageProfileScreen(navController: NavController) {
                             onValueChange = {
                                 if (it.all { char -> char.isDigit() } && it.length <= 3) {
                                     age = it
-                                    ageError = it.isBlank()
+                                    ageError = it.isBlank() || (it.normalizeArabicDigits().toIntOrNull() ?: 0) <= 0
                                 }
                             },
                             label = { Text(stringResource(R.string.profile_age) + " *") },
@@ -363,28 +366,43 @@ fun ManageProfileScreen(navController: NavController) {
                     // Save Changes Button
                     Button(
                         onClick = {
-                            if (isFormValid) {
-                                currentUser?.let { user ->
-                                    // Guard: Clean up previous active profile picture file when saving a new picture to prevent disk storage leaks and avoid deleting during uncommitted drafts
-                                    if (!user.profilePicPath.isNullOrBlank() && user.profilePicPath != profilePicPath) {
-                                        com.example.dosezy.ui.components.deleteOldImage(context, user.profilePicPath)
-                                    }
-                                    val updatedUser = user.copy(
-                                        profilePicPath = profilePicPath,
-                                        fullName = fullName.trim(),
-                                        age = parsedAge,
-                                        gender = gender!!,
-                                        contactNumber = contactNumber.normalizeArabicDigits().trim(),
-                                        allergies = allergies.trim().ifBlank { null },
-                                        medicalConditions = medicalConditions.trim().ifBlank { null }
-                                    )
-                                    userViewModel.updateUser(updatedUser)
-                                    android.widget.Toast.makeText(context, updatedSuccessStr, android.widget.Toast.LENGTH_SHORT).show()
-                                    navController.popBackStack()
+                            if (!isFormValid) {
+                                fullNameError = fullName.isBlank()
+                                ageError = parsedAge <= 0
+                                genderError = gender == null
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar(context.getString(R.string.form_error_fix_fields))
                                 }
+                                coroutineScope.launch {
+                                    when {
+                                        fullName.isBlank() -> scrollState.animateScrollTo(150)
+                                        parsedAge <= 0 -> scrollState.animateScrollTo(230)
+                                        gender == null -> scrollState.animateScrollTo(320)
+                                    }
+                                }
+                                return@Button
+                            }
+
+                            currentUser?.let { user ->
+                                // Guard: Clean up previous active profile picture file when saving a new picture to prevent disk storage leaks and avoid deleting during uncommitted drafts
+                                if (!user.profilePicPath.isNullOrBlank() && user.profilePicPath != profilePicPath) {
+                                    com.example.dosezy.ui.components.deleteOldImage(context, user.profilePicPath)
+                                }
+                                val updatedUser = user.copy(
+                                    profilePicPath = profilePicPath,
+                                    fullName = fullName.trim(),
+                                    age = parsedAge,
+                                    gender = gender!!,
+                                    contactNumber = contactNumber.normalizeArabicDigits().trim(),
+                                    allergies = allergies.trim().ifBlank { null },
+                                    medicalConditions = medicalConditions.trim().ifBlank { null }
+                                )
+                                userViewModel.updateUser(updatedUser)
+                                android.widget.Toast.makeText(context, updatedSuccessStr, android.widget.Toast.LENGTH_SHORT).show()
+                                navController.popBackStack()
                             }
                         },
-                        enabled = isFormValid,
+                        enabled = true,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),

@@ -45,6 +45,12 @@
     <string name="form_delete_medicine">Удалить лекарство</string>
     <string name="form_upload_img">Загрузить изображение</string>
     <string name="form_change_img">Изменить изображение</string>
+    <string name="form_error_med_name_required">Необходимо указать название лекарства</string>
+    <string name="form_error_dosage_required">Необходимо указать дозировку</string>
+    <string name="form_error_dosage_invalid">Дозировка должна быть положительным числом</string>
+    <string name="form_error_select_days">Пожалуйста, выберите хотя бы один день</string>
+    <string name="form_error_course_duration">Длительность курса должна быть не менее 1 дня</string>
+    <string name="form_error_fix_fields">Пожалуйста, заполните обязательные поля, выделенные выше</string>
     <string name="freq_daily">Ежедневно</string>
     <string name="freq_weekly">Еженедельно</string>
     <string name="freq_monthly">Ежемесячно</string>

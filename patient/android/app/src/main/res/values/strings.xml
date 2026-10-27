@@ -51,6 +51,12 @@
     <string name="form_delete_medicine">Delete Medication</string>
     <string name="form_upload_img">Upload Medicine Image</string>
     <string name="form_change_img">Change Medicine Image</string>
+    <string name="form_error_med_name_required">Medication name is required</string>
+    <string name="form_error_dosage_required">Dosage is required</string>
+    <string name="form_error_dosage_invalid">Dosage must be a positive number</string>
+    <string name="form_error_select_days">Please select at least one day</string>
+    <string name="form_error_course_duration">Course duration must be at least 1 day</string>
+    <string name="form_error_fix_fields">Please fill in the required fields highlighted above</string>
     <string name="freq_daily">Daily</string>
     <string name="freq_weekly">Weekly</string>
     <string name="freq_monthly">Monthly</string>

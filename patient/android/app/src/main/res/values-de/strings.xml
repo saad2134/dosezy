@@ -45,6 +45,12 @@
     <string name="form_delete_medicine">Medikament löschen</string>
     <string name="form_upload_img">Bild hochladen</string>
     <string name="form_change_img">Bild ändern</string>
+    <string name="form_error_med_name_required">Medikamentenname ist erforderlich</string>
+    <string name="form_error_dosage_required">Dosierung ist erforderlich</string>
+    <string name="form_error_dosage_invalid">Dosierung muss eine positive Zahl sein</string>
+    <string name="form_error_select_days">Bitte mindestens einen Tag auswählen</string>
+    <string name="form_error_course_duration">Kursdauer muss mindestens 1 Tag betragen</string>
+    <string name="form_error_fix_fields">Bitte füllen Sie die oben markierten Pflichtfelder aus</string>
     <string name="freq_daily">Täglich</string>
     <string name="freq_weekly">Wöchentlich</string>
     <string name="freq_monthly">Monatlich</string>

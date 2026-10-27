@@ -51,6 +51,12 @@
     <string name="form_delete_medicine">删除该药物</string>
     <string name="form_upload_img">上传药物图片</string>
     <string name="form_change_img">更换药物图片</string>
+    <string name="form_error_med_name_required">药物名称为必填项</string>
+    <string name="form_error_dosage_required">用量为必填项</string>
+    <string name="form_error_dosage_invalid">用量必须为正数</string>
+    <string name="form_error_select_days">请至少选择一天</string>
+    <string name="form_error_course_duration">疗程必须至少为1天</string>
+    <string name="form_error_fix_fields">请填写上方高亮显示的必填项</string>
     <string name="freq_daily">每天</string>
     <string name="freq_weekly">每周</string>
     <string name="freq_monthly">每月</string>

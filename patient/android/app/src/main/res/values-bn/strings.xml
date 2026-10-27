@@ -45,6 +45,12 @@
     <string name="form_delete_medicine">ওষুধ মুছে ফেলুন</string>
     <string name="form_upload_img">ছবি আপলোড করুন</string>
     <string name="form_change_img">ছবি পরিবর্তন করুন</string>
+    <string name="form_error_med_name_required">ওষুধের নাম প্রয়োজন</string>
+    <string name="form_error_dosage_required">ডোজের পরিমাণ প্রয়োজন</string>
+    <string name="form_error_dosage_invalid">ডোজ অবশ্যই একটি ধনাত্মক সংখ্যা হতে হবে</string>
+    <string name="form_error_select_days">অনুগ্রহ করে অন্তত একটি দিন নির্বাচন করুন</string>
+    <string name="form_error_course_duration">কোর্সের মেয়াদ অন্তত ১ দিন হতে হবে</string>
+    <string name="form_error_fix_fields">অনুগ্রহ করে উপরে চিহ্নিত প্রয়োজনীয় তথ্য পূরণ করুন</string>
     <string name="freq_daily">প্রতিদিন</string>
     <string name="freq_weekly">সাপ্তাহিক</string>
     <string name="freq_monthly">মাসিক</string>

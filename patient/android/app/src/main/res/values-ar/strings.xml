@@ -45,6 +45,12 @@
     <string name="form_delete_medicine">حذف الدواء</string>
     <string name="form_upload_img">تحميل صورة الدواء</string>
     <string name="form_change_img">تغيير صورة الدواء</string>
+    <string name="form_error_med_name_required">اسم الدواء مطلوب</string>
+    <string name="form_error_dosage_required">الجرعة مطلوبة</string>
+    <string name="form_error_dosage_invalid">يجب أن تكون الجرعة رقماً موجباً</string>
+    <string name="form_error_select_days">يرجى تحديد يوم واحد على الأقل</string>
+    <string name="form_error_course_duration">يجب أن تكون مدة العلاج يوماً واحداً على الأقل</string>
+    <string name="form_error_fix_fields">يرجى ملء الحقول المطلوبة الموضحة أعلاه</string>
     <string name="freq_daily">يوميًا</string>
     <string name="freq_weekly">أسبوعيًا</string>
     <string name="freq_monthly">شهريًا</string>

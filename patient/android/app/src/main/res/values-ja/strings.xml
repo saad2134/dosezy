@@ -45,6 +45,12 @@
     <string name="form_delete_medicine">お薬を削除</string>
     <string name="form_upload_img">お薬画像をアップロード</string>
     <string name="form_change_img">お薬画像を変更</string>
+    <string name="form_error_med_name_required">薬の名前は必須です</string>
+    <string name="form_error_dosage_required">用量は必須です</string>
+    <string name="form_error_dosage_invalid">用量は正の数値を入力してください</string>
+    <string name="form_error_select_days">少なくとも1日を選択してください</string>
+    <string name="form_error_course_duration">服用期間は1日以上である必要があります</string>
+    <string name="form_error_fix_fields">上記で強調表示されている必須項目を入力してください</string>
     <string name="freq_daily">毎日</string>
     <string name="freq_weekly">毎週</string>
     <string name="freq_monthly">毎月</string>

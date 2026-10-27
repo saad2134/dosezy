@@ -38,6 +38,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.example.dosezy.data.model.normalizeArabicDigits
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -75,7 +76,10 @@ fun DosageInputSection(
     perTimeDosages: Map<String, String>,
     onPerTimeDosagesChange: (Map<String, String>) -> Unit,
     timeFormat: TimeFormat,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isDosageError: Boolean = false,
+    dosageErrorMessage: String? = null,
+    invalidTimeSlotKeys: Set<String> = emptySet()
 ) {
     var dosageUnitExpanded by remember { mutableStateOf(false) }
     val showDifferentDosagesOption = scheduledTimesList.size > 1 && selectedFrequency != FrequencyPattern.AS_NEEDED
@@ -210,7 +214,7 @@ fun DosageInputSection(
                         }
                     }
 
-                    // Guard: Use suffix instead of floating label and defaultMinSize(minHeight = 56.dp) so text values and decimals are vertically centered and never clipped at bottom
+                    val slotError = isDosageError && (key in invalidTimeSlotKeys || (currentVal.normalizeArabicDigits().toDoubleOrNull() ?: 0.0) <= 0.0)
                     OutlinedTextField(
                         value = currentVal,
                         onValueChange = { newVal ->
@@ -232,9 +236,11 @@ fun DosageInputSection(
                             .weight(1f)
                             .defaultMinSize(minHeight = 56.dp),
                         singleLine = true,
+                        isError = slotError,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(0xFF1193D4),
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                            focusedBorderColor = if (slotError) MaterialTheme.colorScheme.error else Color(0xFF1193D4),
+                            unfocusedBorderColor = if (slotError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
+                            errorBorderColor = MaterialTheme.colorScheme.error
                         )
                     )
                 }
@@ -255,9 +261,14 @@ fun DosageInputSection(
                     label = { Text(stringResource(R.string.form_dosage)) },
                     placeholder = { Text(stringResource(R.string.form_dosage_placeholder)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    isError = isDosageError,
+                    supportingText = if (isDosageError && !dosageErrorMessage.isNullOrBlank()) {
+                        { Text(text = dosageErrorMessage, color = MaterialTheme.colorScheme.error) }
+                    } else null,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF1193D4),
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                        focusedBorderColor = if (isDosageError) MaterialTheme.colorScheme.error else Color(0xFF1193D4),
+                        unfocusedBorderColor = if (isDosageError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
+                        errorBorderColor = MaterialTheme.colorScheme.error
                     ),
                     singleLine = true
                 )
