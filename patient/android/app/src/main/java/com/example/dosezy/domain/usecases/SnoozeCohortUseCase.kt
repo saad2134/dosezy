@@ -13,6 +13,8 @@ import com.example.dosezy.data.DosezyDatabase
 import com.example.dosezy.data.model.User
 import com.example.dosezy.notifications.AlarmScheduler
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -29,14 +31,15 @@ class SnoozeCohortUseCase @Inject constructor(
         private const val TAG = "SnoozeCohortUseCase"
     }
 
+    // Guard: Execute cohort operations in NonCancellable context so dismissing AlarmActivity or finishing UI callers does not abort subsequent medications in the cohort (#115)
     suspend operator fun invoke(
         entryIds: List<String>,
         explicitSnoozeMinutes: Int? = null,
         fallbackMedicineName: String = "Medicine",
         medicineNames: List<String>? = null,
         user: User? = null
-    ) {
-        if (entryIds.isEmpty()) return
+    ) = withContext(NonCancellable) {
+        if (entryIds.isEmpty()) return@withContext
         val alarmScheduler = AlarmScheduler(context)
 
         // Cancel nagging reminders and active safeguard alarms upfront

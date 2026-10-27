@@ -220,7 +220,8 @@ class AlarmActivity : ComponentActivity() {
             val currentSnoozeMinutes by activeSnoozeMinutesState
 
             val dismissAction: () -> Unit = {
-                currentEntryIds.forEach { id ->
+                val allTargetIds = (currentEntryIds + uiState.medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
+                allTargetIds.forEach { id ->
                     if (id.isNotEmpty()) {
                         try {
                             val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -251,14 +252,16 @@ class AlarmActivity : ComponentActivity() {
                         onUnlockRequest = { requestDeviceUnlock() },
                         onTakeAction = {
                             val isIntakeReAlert = intent?.getBooleanExtra(MedicineAlarmReceiver.EXTRA_IS_INTAKE_REALERT, false) ?: false
+                            // Guard: Ensure all cohort medication entry IDs are merged from intent and loaded UI state (#115)
+                            val allTargetIds = (currentEntryIds + uiState.medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
                             if (user?.intakeSafeguardEnabled == true && !isIntakeReAlert) {
                                 // Guard: Start intake countdown timer for ADHD support on alarm dismissal (#104, #BUG-SAFEGUARD-COHORT-NAMES)
                                 val medNames = uiState.medicinesList.map { it.second.medicationName }.ifEmpty { listOf(currentMedName) }
                                 val compositeMedName = if (medNames.size > 1) medNames.joinToString(", ") else currentMedName
                                 IntakeSafeguardManager.startCountdown(
                                     context = applicationContext,
-                                    entryId = currentEntryIds.firstOrNull() ?: "",
-                                    entryIds = currentEntryIds,
+                                    entryId = allTargetIds.firstOrNull() ?: "",
+                                    entryIds = allTargetIds,
                                     medicineName = compositeMedName,
                                     medicineNames = medNames,
                                     scheduledTime = currentSchedTime,
@@ -267,7 +270,7 @@ class AlarmActivity : ComponentActivity() {
                                 )
                                 dismissAction()
                             } else {
-                                alarmViewModel.takeCohort(currentEntryIds) {
+                                alarmViewModel.takeCohort(allTargetIds) {
                                     dismissAction()
                                 }
                             }
@@ -282,12 +285,14 @@ class AlarmActivity : ComponentActivity() {
                                     Toast.LENGTH_SHORT
                                 ).show()
                             } catch (_: Exception) {}
-                            alarmViewModel.snoozeCohort(currentEntryIds, minutes, currentMedName) {
+                            val allTargetIds = (currentEntryIds + uiState.medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
+                            alarmViewModel.snoozeCohort(allTargetIds, minutes, currentMedName) {
                                 dismissAction()
                             }
                         },
                         onSkipAction = { reason ->
-                            alarmViewModel.skipCohort(currentEntryIds, reason) {
+                            val allTargetIds = (currentEntryIds + uiState.medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
+                            alarmViewModel.skipCohort(allTargetIds, reason) {
                                 dismissAction()
                             }
                         }

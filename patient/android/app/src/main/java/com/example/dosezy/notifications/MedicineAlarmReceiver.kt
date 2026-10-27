@@ -253,11 +253,27 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                     val allEntryIds = entryIds ?: listOf(entryId)
                     val validPendingEntries = allEntryIds.mapNotNull { id ->
                         database.scheduleDao().getScheduleEntryById(id)
-                    }.filter { it.status == com.example.dosezy.data.model.MedicationStatus.PENDING }
+                    }.filter { it.status == com.example.dosezy.data.model.MedicationStatus.PENDING }.toMutableList()
 
                     if (validPendingEntries.isEmpty()) {
                         Log.d(TAG, "Ignoring alarm - no pending schedule entries found for entry IDs: $allEntryIds")
                         return@launch
+                    }
+
+                    // Guard: Reconcile all pending sibling schedule entries in the same time slot to ensure 4+ medication cohorts are fully loaded (#115)
+                    val primary = validPendingEntries.first()
+                    val slotMillis = primary.scheduledDateTime.withSecond(0).withNano(0)
+                        .atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+                    val slotEntries = database.scheduleDao().getScheduleForDateRangeDirect(
+                        primary.userId,
+                        slotMillis,
+                        slotMillis + 59999L
+                    ).filter { it.status == com.example.dosezy.data.model.MedicationStatus.PENDING && !it.entryId.startsWith("PRN_") }
+                    val existingIds = validPendingEntries.map { it.entryId }.toSet()
+                    for (sibling in slotEntries) {
+                        if (sibling.entryId !in existingIds) {
+                            validPendingEntries.add(sibling)
+                        }
                     }
 
                     val primaryEntry = validPendingEntries.first()

@@ -307,7 +307,10 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         }
 
         // 2. Stop any active alarm sound / popup
-        com.example.dosezy.notifications.AlarmActivity.stopActiveAlarm()
+        // Guard: Only dismiss AlarmActivity on single-dose actions; during batch cohort processing (syncSlotNotification == false), stopping activity cancels ViewModel scope and aborts remaining doses (#115)
+        if (syncSlotNotification) {
+            com.example.dosezy.notifications.AlarmActivity.stopActiveAlarm()
+        }
 
         // 3. Stock Auto-Decrement Logic (only if not already taken)
         if (!alreadyTaken && previousEntry != null) {

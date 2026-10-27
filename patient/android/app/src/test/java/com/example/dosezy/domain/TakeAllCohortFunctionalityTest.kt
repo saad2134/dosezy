@@ -953,5 +953,91 @@ class TakeAllCohortFunctionalityTest {
         assertEquals(MedicationStatus.SKIPPED, updatedSkip?.status)
         assertEquals("Skipped per physician", updatedSkip?.skipReason)
     }
+
+    @Test
+    fun takeCohortUseCase_largeCohortFourMedications_marksAllTakenWithoutTruncation() = runBlocking {
+        // Guard: Verify 4-medication cohorts are fully processed without loop truncation or missing doses (#115)
+        val medD = Medicine(
+            medicineId = "med_cohort_d",
+            userId = testUser.userId,
+            medicationName = "Atorvastatin",
+            dosage = 20.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            currentStock = 20,
+            autoDeductOnTake = true
+        )
+        database.medicineDao().insertMedicine(medD)
+
+        val slotTime = LocalDateTime.of(2026, 10, 19, 8, 0, 0)
+        val entries = listOf(
+            ScheduleEntry(entryId = "e_c1", userId = testUser.userId, medicineId = medA.medicineId, scheduledDateTime = slotTime, status = MedicationStatus.PENDING, dosage = 1.0),
+            ScheduleEntry(entryId = "e_c2", userId = testUser.userId, medicineId = medB.medicineId, scheduledDateTime = slotTime, status = MedicationStatus.PENDING, dosage = 1.0),
+            ScheduleEntry(entryId = "e_c3", userId = testUser.userId, medicineId = medC.medicineId, scheduledDateTime = slotTime, status = MedicationStatus.PENDING, dosage = 1.0),
+            ScheduleEntry(entryId = "e_c4", userId = testUser.userId, medicineId = medD.medicineId, scheduledDateTime = slotTime, status = MedicationStatus.PENDING, dosage = 1.0)
+        )
+        entries.forEach { database.scheduleDao().insertScheduleEntry(it) }
+
+        val takeCohortUseCase = TakeCohortUseCase(database, scheduleRepository, context)
+        takeCohortUseCase.invoke(entries.map { it.entryId }, customTakenAt = slotTime, user = testUser)
+
+        // Verify all 4 are TAKEN_ON_TIME
+        entries.forEach { entry ->
+            val updated = database.scheduleDao().getScheduleEntryById(entry.entryId)
+            assertNotNull("Entry ${entry.entryId} should exist", updated)
+            assertEquals("Entry ${entry.entryId} should be TAKEN_ON_TIME", MedicationStatus.TAKEN_ON_TIME, updated?.status)
+        }
+
+        // Verify stock decremented for auto-deduct medicines (medA: 30->29, medB: 15->14, medD: 20->19; medC no deduct: 60)
+        val updatedMedA = database.medicineDao().getMedicineByIdDirect(medA.medicineId)
+        val updatedMedB = database.medicineDao().getMedicineByIdDirect(medB.medicineId)
+        val updatedMedC = database.medicineDao().getMedicineByIdDirect(medC.medicineId)
+        val updatedMedD = database.medicineDao().getMedicineByIdDirect(medD.medicineId)
+
+        assertEquals(29, updatedMedA?.currentStock)
+        assertEquals(14, updatedMedB?.currentStock)
+        assertEquals(60, updatedMedC?.currentStock)
+        assertEquals(19, updatedMedD?.currentStock)
+    }
+
+    @Test
+    fun siblingSlotReconciliation_findsAllPendingMedicationsInSameSlot() = runBlocking {
+        // Guard: Verify sibling slot lookup retrieves all 4 cohort entries when only 1 entry ID is known (#115)
+        val medD = Medicine(
+            medicineId = "med_cohort_d_reconcile",
+            userId = testUser.userId,
+            medicationName = "Atorvastatin",
+            dosage = 20.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(9, 0)),
+            currentStock = 20,
+            autoDeductOnTake = true
+        )
+        database.medicineDao().insertMedicine(medD)
+
+        val slotTime = LocalDateTime.of(2026, 10, 19, 9, 0, 0)
+        val e1 = ScheduleEntry(entryId = "e_rec_1", userId = testUser.userId, medicineId = medA.medicineId, scheduledDateTime = slotTime, status = MedicationStatus.PENDING, dosage = 1.0)
+        val e2 = ScheduleEntry(entryId = "e_rec_2", userId = testUser.userId, medicineId = medB.medicineId, scheduledDateTime = slotTime, status = MedicationStatus.PENDING, dosage = 1.0)
+        val e3 = ScheduleEntry(entryId = "e_rec_3", userId = testUser.userId, medicineId = medC.medicineId, scheduledDateTime = slotTime, status = MedicationStatus.PENDING, dosage = 1.0)
+        val e4 = ScheduleEntry(entryId = "e_rec_4", userId = testUser.userId, medicineId = medD.medicineId, scheduledDateTime = slotTime, status = MedicationStatus.PENDING, dosage = 1.0)
+        listOf(e1, e2, e3, e4).forEach { database.scheduleDao().insertScheduleEntry(it) }
+
+        val slotMillis = slotTime.withSecond(0).withNano(0)
+            .atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+        val slotEntries = database.scheduleDao().getScheduleForDateRangeDirect(
+            testUser.userId,
+            slotMillis,
+            slotMillis + 59999L
+        ).filter { it.status == MedicationStatus.PENDING && !it.entryId.startsWith("PRN_") }
+
+        assertEquals(4, slotEntries.size)
+        val entryIds = slotEntries.map { it.entryId }.toSet()
+        assertTrue(entryIds.containsAll(listOf("e_rec_1", "e_rec_2", "e_rec_3", "e_rec_4")))
+    }
 }
+
 
