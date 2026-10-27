@@ -147,6 +147,7 @@
     <string name="unit_meq">mEq</string>
     <string name="unit_puff">吸入</string>
     <string name="unit_ampule">アンプル</string>
+    <string name="unit_spray">噴霧</string>
 
     <string name="help_title">ヘルプとサポート</string>
     <string name="help_resources">リソース</string>
@@ -459,6 +460,7 @@
     <string name="pill_shape_injection">注射 (Injection)</string>
     <string name="pill_shape_drops">点眼・点滴 (Drops)</string>
     <string name="pill_shape_patch">貼付剤・湿布 (Patch)</string>
+    <string name="pill_shape_spray">スプレー (Spray)</string>
 
     <string name="med_notes_label">医師の指示・注意事項</string>
     <string name="med_notes_placeholder">例：食後服用、グレープフルーツ禁止、処方箋 #12345</string>

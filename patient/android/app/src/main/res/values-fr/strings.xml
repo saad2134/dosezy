@@ -147,6 +147,7 @@
     <string name="unit_meq">mEq</string>
     <string name="unit_puff">bouffée</string>
     <string name="unit_ampule">ampoule</string>
+    <string name="unit_spray">pulvérisation</string>
 
     <string name="help_title">Aide &amp; Support</string>
     <string name="help_resources">Ressources</string>
@@ -459,6 +460,7 @@ Voulez-vous continuer ?</string>
     <string name="pill_shape_injection">Injection</string>
     <string name="pill_shape_drops">Gouttes</string>
     <string name="pill_shape_patch">Patch</string>
+    <string name="pill_shape_spray">Spray</string>
 
     <string name="med_notes_label">Notes du médecin et avertissements</string>
     <string name="med_notes_placeholder">ex. Prendre au cours du repas, Éviter le pamplemousse, Ordonnance #12345</string>

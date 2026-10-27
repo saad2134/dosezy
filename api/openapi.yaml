@@ -429,7 +429,7 @@ components:
 
     DosageUnit:
       type: string
-      enum: [MG, MCG, ML, DROP, TABLET, CAPSULE, MEQ, PUFF, AMPULE]
+      enum: [MG, MCG, ML, DROP, TABLET, CAPSULE, MEQ, PUFF, AMPULE, SPRAY]
 
     FrequencyPattern:
       type: string

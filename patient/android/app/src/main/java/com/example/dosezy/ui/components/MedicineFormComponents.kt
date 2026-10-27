@@ -28,6 +28,7 @@ val DosageUnit.displayName: String
         DosageUnit.MEQ -> "mEq"
         DosageUnit.PUFF -> "puff"
         DosageUnit.AMPULE -> "ampule"
+        DosageUnit.SPRAY -> "spray"
     }
 
 fun isMedicineFormValid(

@@ -978,6 +978,7 @@ class BackupRestoreManager(
                     "MEQ", "MILLIEQUIVALENT", "MILLIEQUIVALENTS" -> DosageUnit.MEQ
                     "PUFF", "PUFFS", "ACTUATION", "ACTUATIONS" -> DosageUnit.PUFF
                     "AMPULE", "AMPULES", "AMP", "AMPOULE", "AMPOULES" -> DosageUnit.AMPULE
+                    "SPRAY", "SPRAYS" -> DosageUnit.SPRAY
                     else -> runCatching { DosageUnit.valueOf(normalized) }.getOrNull()
                 }
             } ?: DosageUnit.TABLET

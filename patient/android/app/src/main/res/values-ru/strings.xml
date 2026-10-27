@@ -147,6 +147,7 @@
     <string name="unit_meq">мЭкв</string>
     <string name="unit_puff">доза (вдох)</string>
     <string name="unit_ampule">ампула</string>
+    <string name="unit_spray">спрей</string>
 
     <string name="help_title">Справка и поддержка</string>
     <string name="help_resources">Ресурсы</string>
@@ -459,6 +460,7 @@
     <string name="pill_shape_injection">Инъекция</string>
     <string name="pill_shape_drops">Капли</string>
     <string name="pill_shape_patch">Пластырь</string>
+    <string name="pill_shape_spray">Спрей</string>
 
     <string name="med_notes_label">Указания врача и предостережения</string>
     <string name="med_notes_placeholder">напр. Принимать во время еды, Избегать грейпфрута, Рецепт #12345</string>

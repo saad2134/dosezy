@@ -161,6 +161,7 @@
     <string name="unit_meq">毫克当量 (mEq)</string>
     <string name="unit_puff">喷</string>
     <string name="unit_ampule">安瓿</string>
+    <string name="unit_spray">喷</string>
 
     <!-- Help &amp; Support -->
     <string name="help_title">帮助与支持</string>
@@ -475,6 +476,7 @@
     <string name="pill_shape_injection">注射剂 (Injection)</string>
     <string name="pill_shape_drops">滴剂 (Drops)</string>
     <string name="pill_shape_patch">贴剂 (Patch)</string>
+    <string name="pill_shape_spray">喷雾剂 (Spray)</string>
 
     <string name="med_notes_label">医生嘱咐及特别警告</string>
     <string name="med_notes_placeholder">例如：饭后服用、忌食西柚、处方号 #12345</string>

@@ -147,6 +147,7 @@
     <string name="unit_meq">mEq</string>
     <string name="unit_puff">erogazione</string>
     <string name="unit_ampule">fiala</string>
+    <string name="unit_spray">spruzzo</string>
 
     <string name="help_title">Aiuto e Supporto</string>
     <string name="help_resources">Risorse</string>
@@ -459,6 +460,7 @@ Vuoi continuare?</string>
     <string name="pill_shape_injection">Iniezione</string>
     <string name="pill_shape_drops">Gocce</string>
     <string name="pill_shape_patch">Cerotto</string>
+    <string name="pill_shape_spray">Spray</string>
 
     <string name="med_notes_label">Note del medico e avvertenze</string>
     <string name="med_notes_placeholder">es. Assumere a stomaco pieno, Evitare pompelmo, Ricetta #12345</string>

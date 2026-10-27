@@ -147,6 +147,7 @@
     <string name="unit_meq">مكافئ (mEq)</string>
     <string name="unit_puff">بخة</string>
     <string name="unit_ampule">أمبولة</string>
+    <string name="unit_spray">بخة</string>
 
     <string name="help_title">المساعدة والدعم</string>
     <string name="help_resources">الموارد</string>
@@ -459,6 +460,7 @@
     <string name="pill_shape_injection">حقنة</string>
     <string name="pill_shape_drops">قطرات</string>
     <string name="pill_shape_patch">لاصقة</string>
+    <string name="pill_shape_spray">بخاخ</string>
 
     <string name="med_notes_label">ملاحظات الطبيب والتحذيرات</string>
     <string name="med_notes_placeholder">مثال: يؤخذ مع الطعام، تجنب الجريب فروت، وصفة رقم 12345</string>

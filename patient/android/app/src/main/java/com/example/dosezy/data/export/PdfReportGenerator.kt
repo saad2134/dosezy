@@ -390,6 +390,7 @@ class PdfReportGenerator(private val context: Context) {
                     DosageUnit.MEQ -> "mEq"
                     DosageUnit.PUFF -> "puff"
                     DosageUnit.AMPULE -> "ampule"
+                    DosageUnit.SPRAY -> "spray"
                 }
                 val formattedDosage = if (target % 1 == 0.0) "${target.toInt()} $unitAbbr" else "$target $unitAbbr"
                 " ($formattedDosage)"

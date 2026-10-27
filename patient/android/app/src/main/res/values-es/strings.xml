@@ -160,6 +160,7 @@
     <string name="unit_meq">mEq</string>
     <string name="unit_puff">inhalación(es)</string>
     <string name="unit_ampule">ampolla(s)</string>
+    <string name="unit_spray">pulverización</string>
 
     <!-- Help &amp; Support -->
     <string name="help_title">Ayuda y soporte</string>
@@ -475,6 +476,7 @@
     <string name="pill_shape_injection">Inyección</string>
     <string name="pill_shape_drops">Gotas</string>
     <string name="pill_shape_patch">Parche</string>
+    <string name="pill_shape_spray">Spray</string>
 
     <string name="med_notes_label">Notas del médico y advertencias</string>
     <string name="med_notes_placeholder">ej. Tomar con comida, Evitar pomelo, Receta #12345</string>

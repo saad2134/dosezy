@@ -147,6 +147,7 @@
     <string name="unit_meq">mEq</string>
     <string name="unit_puff">Hub</string>
     <string name="unit_ampule">Ampulle</string>
+    <string name="unit_spray">Sprühstoß</string>
 
     <string name="help_title">Hilfe &amp; Support</string>
     <string name="help_resources">Ressourcen</string>
@@ -459,6 +460,7 @@ Möchten Sie fortfahren?</string>
     <string name="pill_shape_injection">Injektion</string>
     <string name="pill_shape_drops">Tropfen</string>
     <string name="pill_shape_patch">Pflaster</string>
+    <string name="pill_shape_spray">Spray</string>
 
     <string name="med_notes_label">Arzthinweise &amp; Warnungen</string>
     <string name="med_notes_placeholder">z. B. Zu den Mahlzeiten, Keine Grapefruit, Rezept #12345</string>

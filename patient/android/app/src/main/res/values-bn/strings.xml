@@ -147,6 +147,7 @@
     <string name="unit_meq">mEq</string>
     <string name="unit_puff">পাফ</string>
     <string name="unit_ampule">অ্যাম্পুল</string>
+    <string name="unit_spray">স্প্রে</string>
 
     <string name="help_title">সাহায্য ও সহায়তা</string>
     <string name="help_resources">সম্পদসমূহ</string>
@@ -459,6 +460,7 @@
     <string name="pill_shape_injection">ইনজেকশন (Injection)</string>
     <string name="pill_shape_drops">ড্রপস (Drops)</string>
     <string name="pill_shape_patch">প্যাচ (Patch)</string>
+    <string name="pill_shape_spray">স্প্রে</string>
 
     <string name="med_notes_label">ডাক্তারের নির্দেশনা ও সতর্কতা</string>
     <string name="med_notes_placeholder">যেমনঃ ভরা পেটে সেব্য, বাতাবি লেবু পরিহার করুন, প্রেসক্রিপশন #12345</string>

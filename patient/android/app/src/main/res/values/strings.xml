@@ -175,6 +175,7 @@
     <string name="unit_meq">mEq</string>
     <string name="unit_puff">puff</string>
     <string name="unit_ampule">ampule</string>
+    <string name="unit_spray">spray</string>
 
     <!-- Help &amp; Support -->
     <string name="help_title">Help &amp; Support</string>
@@ -491,6 +492,7 @@ Do you want to continue?</string>
     <string name="pill_shape_injection">Injection</string>
     <string name="pill_shape_drops">Drops</string>
     <string name="pill_shape_patch">Patch</string>
+    <string name="pill_shape_spray">Spray</string>
 
     <!-- Doctor Notes (#46) -->
     <string name="med_notes_label">Doctor Notes &amp; Warnings</string>

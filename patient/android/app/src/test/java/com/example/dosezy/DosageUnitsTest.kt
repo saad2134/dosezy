@@ -44,7 +44,7 @@ class DosageUnitsTest {
 
     @Test
     fun testDosageUnitEnumCompleteness() {
-        val expectedUnits = listOf("MG", "MCG", "ML", "DROP", "TABLET", "CAPSULE", "MEQ", "PUFF", "AMPULE")
+        val expectedUnits = listOf("MG", "MCG", "ML", "DROP", "TABLET", "CAPSULE", "MEQ", "PUFF", "AMPULE", "SPRAY")
         val actualUnits = DosageUnit.values().map { it.name }
         assertEquals(expectedUnits.size, actualUnits.size)
         assertTrue(actualUnits.containsAll(expectedUnits))
@@ -61,6 +61,7 @@ class DosageUnitsTest {
         assertEquals("drop", DosageUnit.DROP.displayName)
         assertEquals("tablet", DosageUnit.TABLET.displayName)
         assertEquals("capsule", DosageUnit.CAPSULE.displayName)
+        assertEquals("spray", DosageUnit.SPRAY.displayName)
     }
 
     @Test
@@ -76,6 +77,9 @@ class DosageUnitsTest {
 
         val ampuleMed = createMedicine(1.0, DosageUnit.AMPULE)
         assertEquals("1 ampule", ampuleMed.getDosageDisplay())
+
+        val sprayMed = createMedicine(2.0, DosageUnit.SPRAY)
+        assertEquals("2 spray", sprayMed.getDosageDisplay())
     }
 
     @Test
@@ -101,6 +105,12 @@ class DosageUnitsTest {
         assertEquals(2, ampuleMed2.getStockDeductionAmount())
         val ampuleMedLarge = createMedicine(50.0, DosageUnit.AMPULE)
         assertEquals(1, ampuleMedLarge.getStockDeductionAmount())
+
+        // SPRAY: spray bottle tracks metered sprays, consume intake dosage count
+        val sprayMed1 = createMedicine(1.0, DosageUnit.SPRAY)
+        assertEquals(1, sprayMed1.getStockDeductionAmount())
+        val sprayMed2 = createMedicine(2.0, DosageUnit.SPRAY)
+        assertEquals(2, sprayMed2.getStockDeductionAmount())
     }
 
     @Test
@@ -117,6 +127,10 @@ class DosageUnitsTest {
         val ampuleMed = createMedicine(1.0, DosageUnit.AMPULE, timesPerDay = 2)
         // AMPULE: 1 ampule per intake * 2 intakes * 30 days = 60 ampules
         assertEquals(60, ampuleMed.calculateRefillQuantity(30))
+
+        val sprayMed = createMedicine(2.0, DosageUnit.SPRAY, timesPerDay = 2)
+        // SPRAY: 2 sprays per intake * 2 intakes * 30 days = 120 sprays
+        assertEquals(120, sprayMed.calculateRefillQuantity(30))
     }
 
     @Test
@@ -169,8 +183,18 @@ class DosageUnitsTest {
         assertEquals(DosageUnit.AMPULE, manager.parseMedicinesFromJson(createMedJson("ampules")).first().dosageUnit)
         assertEquals(DosageUnit.AMPULE, manager.parseMedicinesFromJson(createMedJson("amp")).first().dosageUnit)
         assertEquals(DosageUnit.AMPULE, manager.parseMedicinesFromJson(createMedJson("ampoule")).first().dosageUnit)
+        assertEquals(DosageUnit.SPRAY, manager.parseMedicinesFromJson(createMedJson("SPRAY")).first().dosageUnit)
+        assertEquals(DosageUnit.SPRAY, manager.parseMedicinesFromJson(createMedJson("spray")).first().dosageUnit)
+        assertEquals(DosageUnit.SPRAY, manager.parseMedicinesFromJson(createMedJson("sprays")).first().dosageUnit)
 
         // Test fallback on unknown string
         assertEquals(DosageUnit.TABLET, manager.parseMedicinesFromJson(createMedJson("unknown_unit")).first().dosageUnit)
+    }
+
+    @Test
+    fun testPillShapeSprayEnumCompleteness() {
+        val shapes = PillShape.values().map { it.name }
+        assertTrue(shapes.contains("SPRAY"))
+        assertEquals(9, PillShape.values().size)
     }
 }

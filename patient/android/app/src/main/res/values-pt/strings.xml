@@ -147,6 +147,7 @@
     <string name="unit_meq">mEq</string>
     <string name="unit_puff">jato</string>
     <string name="unit_ampule">ampola</string>
+    <string name="unit_spray">borrifo</string>
 
     <string name="help_title">Ajuda e Suporte</string>
     <string name="help_resources">Recursos</string>
@@ -458,6 +459,7 @@ Deseja continuar?</string>
     <string name="pill_shape_injection">Injeção</string>
     <string name="pill_shape_drops">Gotas</string>
     <string name="pill_shape_patch">Adesivo (Patch)</string>
+    <string name="pill_shape_spray">Spray</string>
 
     <string name="med_notes_label">Notas do médico e advertências</string>
     <string name="med_notes_placeholder">ex.: Tomar com alimentos, Evitar toranja, Receita #12345</string>
