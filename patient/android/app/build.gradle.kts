@@ -45,7 +45,7 @@ android {
             buildConfigField("boolean", "SHOW_DONATIONS", "false")
             buildConfigField("boolean", "SUPPORTS_OVERLAY_PERMISSION", "false")
         }
-        create("fdroid") {
+        create("foss") {
             dimension = "distribution"
             buildConfigField("boolean", "SHOW_DONATIONS", "true")
             buildConfigField("boolean", "SUPPORTS_OVERLAY_PERMISSION", "true")
