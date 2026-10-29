@@ -676,7 +676,7 @@ Vuoi continuare?</string>
     <string name="menu_pharmacy_order_desc">Genera e condividi ordini di farmaci su WhatsApp</string>
     <string name="pharmacy_order_markdown_preview">Anteprima Markdown</string>
 
-    <string name="about_community_open_source">Community &amp; Open Source</string>
+    <string name="about_community_open_source">Comunità e open source</string>
     <string name="about_version_build">Versione %1$s (Build %2$s)</string>
     <string name="crypto_bitcoin">Bitcoin (BTC)</string>
     <string name="crypto_ethereum">Ethereum (ETH)</string>

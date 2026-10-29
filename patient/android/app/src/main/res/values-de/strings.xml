@@ -276,7 +276,7 @@
     <string name="analytics_insights_start">Erfassen Sie Dosen, um detaillierte Statistiken anzuzeigen.</string>
     <string name="menu_backup_restore">Sichern &amp; Wiederherstellen</string>
     <string name="menu_sharing">Freigabe für Betreuer</string>
-    <string name="coming_soon">Soon</string>
+    <string name="coming_soon">Demnächst</string>
 
     <string name="export_file_format">Dateiformat</string>
     <string name="export_format_csv">CSV-Format</string>
@@ -676,7 +676,7 @@ Möchten Sie fortfahren?</string>
     <string name="menu_pharmacy_order_desc">Medikamentenbestellungen erstellen und über WhatsApp teilen</string>
     <string name="pharmacy_order_markdown_preview">Markdown-Vorschau</string>
 
-    <string name="about_community_open_source">Community &amp; Open Source</string>
+    <string name="about_community_open_source">Gemeinschaft &amp; Open Source</string>
     <string name="about_version_build">Version %1$s (Build %2$s)</string>
     <string name="crypto_bitcoin">Bitcoin (BTC)</string>
     <string name="crypto_ethereum">Ethereum (ETH)</string>
