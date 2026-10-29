@@ -38,6 +38,20 @@ android {
         resourceConfigurations.addAll(listOf("en", "ar", "bn", "de", "es", "fr", "hi", "it", "ja", "pt", "ru", "zh"))
     }
 
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("play") {
+            dimension = "distribution"
+            buildConfigField("boolean", "SHOW_DONATIONS", "false")
+            buildConfigField("boolean", "SUPPORTS_OVERLAY_PERMISSION", "false")
+        }
+        create("fdroid") {
+            dimension = "distribution"
+            buildConfigField("boolean", "SHOW_DONATIONS", "true")
+            buildConfigField("boolean", "SUPPORTS_OVERLAY_PERMISSION", "true")
+        }
+    }
+
     dependenciesInfo {
         // Disables dependency metadata when building APKs
         includeInApk = false

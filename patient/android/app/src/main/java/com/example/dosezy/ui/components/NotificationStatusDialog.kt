@@ -164,7 +164,7 @@ private fun createNotificationStatuses(
     val soundStatus = NotificationUtils.isPhoneNotSilent(context)
     val batteryStatus = NotificationUtils.isBatterySufficient(context)
 
-    return listOf(
+    val statuses = mutableListOf(
         // Notification Permission Item
         NotificationStatus(
             title = context.getString(com.example.dosezy.R.string.notif_perm_title),
@@ -213,33 +213,39 @@ private fun createNotificationStatuses(
                     NotificationUtils.requestExactAlarmPermission(context)
                 }
             }
-        ),
+        )
+    )
 
-        // Display Over Apps
-        NotificationStatus(
-            title = context.getString(com.example.dosezy.R.string.notif_overlay_title),
-            description = if (overlayStatus) {
-                context.getString(com.example.dosezy.R.string.notif_overlay_granted)
-            } else {
-                context.getString(com.example.dosezy.R.string.notif_overlay_desc)
-            },
-            isPassed = overlayStatus,
-            isWarning = false,
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.WorkOutline,
-                    contentDescription = "Display Over Apps",
-                    modifier = Modifier.size(30.dp),
-                    tint = if (overlayStatus) Color(0xFF10B981) else Color(0xFFEF4444)
-                )
-            },
-            onFixClick = {
-                if (!overlayStatus) {
-                    NotificationUtils.requestOverlayPermission(context)
+    if (com.example.dosezy.BuildConfig.SUPPORTS_OVERLAY_PERMISSION) {
+        // Display Over Apps (F-Droid flavor only: OEM popup assistance for Xiaomi/MIUI)
+        statuses.add(
+            NotificationStatus(
+                title = context.getString(com.example.dosezy.R.string.notif_overlay_title),
+                description = if (overlayStatus) {
+                    context.getString(com.example.dosezy.R.string.notif_overlay_granted)
+                } else {
+                    context.getString(com.example.dosezy.R.string.notif_overlay_desc)
+                },
+                isPassed = overlayStatus,
+                isWarning = false,
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.WorkOutline,
+                        contentDescription = "Display Over Apps",
+                        modifier = Modifier.size(30.dp),
+                        tint = if (overlayStatus) Color(0xFF10B981) else Color(0xFFEF4444)
+                    )
+                },
+                onFixClick = {
+                    if (!overlayStatus) {
+                        NotificationUtils.requestOverlayPermission(context)
+                    }
                 }
-            }
-        ),
+            )
+        )
+    }
 
+    statuses.addAll(listOf(
         // Battery Optimization / Background Settings (Takes user directly to OEM background settings if Samsung, etc.)
         NotificationStatus(
             title = context.getString(com.example.dosezy.R.string.notif_bg_title),
@@ -307,7 +313,9 @@ private fun createNotificationStatuses(
                 NotificationUtils.openBatteryOptimizationSettings(context)
             }
         )
-    )
+    ))
+
+    return statuses
 }
 
 @Composable
