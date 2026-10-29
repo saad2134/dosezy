@@ -9,6 +9,8 @@ import com.example.dosezy.data.model.Frequency
 import com.example.dosezy.data.model.FrequencyPattern
 import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.Medicine
+import com.example.dosezy.data.model.PillShape
+import com.example.dosezy.data.model.ReminderType
 import com.example.dosezy.data.model.Theme
 import com.example.dosezy.data.model.TimeFormat
 import com.example.dosezy.data.model.User
@@ -24,6 +26,7 @@ import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -511,5 +514,137 @@ class BackupFrequencyFormatAndProfileSelectionTest {
         coVerify(exactly = 1) { scheduleDao.deleteScheduleByUser(originalUserId) }
         coVerify(exactly = 1) { medicineDao.deleteMedicinesByUser(originalUserId) }
         coVerify(exactly = 1) { userDao.deleteUserById(originalUserId) }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 8. Cross OpenAPI and Backup Schema Parity: ReminderType and PillShape.SPRAY
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testParseUserFromJson_parsesReminderTypeAndDefaultsCorrectly() {
+        // Guard: Verify explicit NOTIFICATION reminder style is parsed from backup json (#111)
+        val notifJson = """
+            {
+                "userId": "u1",
+                "fullName": "Alert User",
+                "age": 40,
+                "gender": "MALE",
+                "contactNumber": "123",
+                "reminderType": "NOTIFICATION"
+            }
+        """.trimIndent()
+        val user1 = backupRestoreManager.parseUserFromJson(notifJson)
+        assertEquals(ReminderType.NOTIFICATION, user1.reminderType)
+
+        // Guard: Verify legacy backup archives without reminderType fallback safely to ALARM
+        val legacyJson = """
+            {
+                "userId": "u2",
+                "fullName": "Legacy User",
+                "age": 35,
+                "gender": "FEMALE",
+                "contactNumber": "456"
+            }
+        """.trimIndent()
+        val user2 = backupRestoreManager.parseUserFromJson(legacyJson)
+        assertEquals(ReminderType.ALARM, user2.reminderType)
+
+        // Guard: Verify case-insensitive trimmed parsing protects against malformed json values
+        val malformedJson = """
+            {
+                "userId": "u3",
+                "fullName": "Padded User",
+                "age": 28,
+                "gender": "MALE",
+                "contactNumber": "789",
+                "reminderType": "  notification  "
+            }
+        """.trimIndent()
+        val user3 = backupRestoreManager.parseUserFromJson(malformedJson)
+        assertEquals(ReminderType.NOTIFICATION, user3.reminderType)
+    }
+
+    @Test
+    fun testParseMedicinesFromJson_parsesReminderTypeAndPillShapeSpray() {
+        // Guard: Verify per-medication reminderType and PillShape.SPRAY parse cleanly (#111, #114)
+        val json = """
+            [
+                {
+                    "medicineId": "m_spray",
+                    "userId": "u1",
+                    "medicationName": "Fluticasone",
+                    "dosage": 2.0,
+                    "dosageUnit": "SPRAY",
+                    "timesPerDay": 1,
+                    "frequencyPattern": "DAILY",
+                    "scheduledTimes": ["08:00"],
+                    "pillShape": "SPRAY",
+                    "reminderType": "NOTIFICATION"
+                },
+                {
+                    "medicineId": "m_default",
+                    "userId": "u1",
+                    "medicationName": "Aspirin",
+                    "dosage": 100.0,
+                    "dosageUnit": "MG",
+                    "timesPerDay": 1,
+                    "frequencyPattern": "DAILY",
+                    "scheduledTimes": ["09:00"]
+                }
+            ]
+        """.trimIndent()
+
+        val parsed = backupRestoreManager.parseMedicinesFromJson(json)
+        assertEquals(2, parsed.size)
+
+        val sprayMed = parsed[0]
+        assertEquals("Fluticasone", sprayMed.medicationName)
+        assertEquals(DosageUnit.SPRAY, sprayMed.dosageUnit)
+        assertEquals(PillShape.SPRAY, sprayMed.pillShape)
+        assertEquals(ReminderType.NOTIFICATION, sprayMed.reminderType)
+
+        val defaultMed = parsed[1]
+        assertEquals("Aspirin", defaultMed.medicationName)
+        assertNull(defaultMed.reminderType)
+    }
+
+    @Test
+    fun testDataExporter_serializesReminderTypeForUserAndMedicine() {
+        val user = User(
+            userId = "u_exp",
+            fullName = "Export User",
+            age = 45,
+            gender = Gender.MALE,
+            contactNumber = "555-0199",
+            reminderType = ReminderType.NOTIFICATION
+        )
+
+        val medicine = Medicine(
+            medicineId = "m_exp",
+            userId = "u_exp",
+            medicationName = "Saline Spray",
+            dosage = 1.0,
+            dosageUnit = DosageUnit.SPRAY,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            pillShape = PillShape.SPRAY,
+            reminderType = ReminderType.ALARM
+        )
+
+        val jsonStr = dataExporter.buildJsonContent(user, listOf(medicine), emptyList())
+        val root = JSONObject(jsonStr)
+
+        val userObj = root.getJSONObject("user")
+        // Guard: Verify user reminderType is serialized into exported backup json (#111)
+        assertEquals("NOTIFICATION", userObj.getString("reminderType"))
+
+        val medsArray = root.getJSONArray("medicines")
+        assertEquals(1, medsArray.length())
+        val medObj = medsArray.getJSONObject(0)
+        // Guard: Verify per-medication reminderType override is serialized into exported backup json (#111)
+        assertEquals("ALARM", medObj.getString("reminderType"))
+        assertEquals("SPRAY", medObj.getString("pillShape"))
+        assertEquals("SPRAY", medObj.getString("dosageUnit"))
     }
 }

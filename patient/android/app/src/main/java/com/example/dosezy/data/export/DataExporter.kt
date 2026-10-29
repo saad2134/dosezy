@@ -259,6 +259,8 @@ class DataExporter(
         // Guard: Explicitly serialize lockscreen privacy and custom snooze popup settings on backup restore
         userObj.put("lockscreenDetailsEnabled", user.lockscreenDetailsEnabled)
         userObj.put("customSnoozePopupEnabled", user.customSnoozePopupEnabled)
+        // Guard: Explicitly serialize reminderType to retain user alert delivery preference on backup restore (#111)
+        userObj.put("reminderType", user.reminderType.name)
         root.put("user", userObj)
 
         val medArray = JSONArray()
@@ -319,6 +321,8 @@ class DataExporter(
             mObj.put("endDate", med.endDate?.toString() ?: "")
             mObj.put("durationDays", med.durationDays)
             mObj.put("isArchived", med.isArchived)
+            // Guard: Explicitly serialize per-medicine reminderType override to retain alert delivery settings on backup restore (#111)
+            med.reminderType?.let { mObj.put("reminderType", it.name) }
             med.customDosages?.let { cd ->
                 val cdObj = JSONObject()
                 cd.forEach { (timeStr, dosageVal) ->
