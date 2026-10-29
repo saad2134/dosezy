@@ -560,15 +560,6 @@
     <string name="about_tagline">রোগী ও পরিচর্যাকারীদের জন্য সম্পূর্ণ অফলাইন ও নিরাপদ ওষুধ সহযোগী।</string>
     <string name="about_star_github">GitHub-এ স্টার দিন</string>
     <string name="about_star_github_desc">GitHub-এ স্টার দিয়ে আমাদের ওপেন সোর্স প্রজেক্টকে সমর্থন জানান</string>
-    <string name="about_support_dev_title">উন্নয়নে সহায়তা করুন</string>
-    <string name="about_support_dev_desc" formatted="false">Dosezy সম্পূর্ণ বিনামূল্যে, নিরাপদ এবং বিজ্ঞাপনহীন। আপনার অনুদান এই প্রজেক্টকে সচল রাখতে সাহায্য করে!</string>
-    <string name="about_buymeacoffee">Buy Me a Coffee-তে সাপোর্ট করুন</string>
-    <string name="about_buymeacoffee_desc">কার্ড বা PayPal-এর মাধ্যমে অনুদান প্রদান করুন</string>
-    <string name="about_crypto_donations">ক্রিপ্টোকারেন্সি অনুদান</string>
-    <string name="about_copied_to_clipboard">%1$s ঠিকানা ক্লিপবোর্ডে কপি করা হয়েছে</string>
-    <string name="about_tap_to_copy">ঠিকানা কপি করতে ট্যাপ করুন</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">GitHub Sponsors-এর মাধ্যমে মাসিক বা এককালীন অনুদান দিন</string>
     <string name="pref_alarm_duration_title">অ্যালার্ম বাজার সময়সীমা</string>
     <string name="pref_alarm_duration_desc">নির্দিষ্ট সময় পর স্বয়ংক্রিয়ভাবে শব্দ ও কম্পন বন্ধ করুন</string>
     <string name="alarm_duration_continuous">একটানা (বন্ধ না করা পর্যন্ত)</string>
@@ -674,16 +665,6 @@
 
     <string name="about_community_open_source">কমিউনিটি ও ওপেন সোর্স</string>
     <string name="about_version_build">সংস্করণ %1$s (বিল্ড %2$s)</string>
-    <string name="crypto_bitcoin">বিটকয়েন (BTC)</string>
-    <string name="crypto_ethereum">ইথেরিয়াম (ETH)</string>
-    <string name="crypto_solana">সোলানা (SOL)</string>
-    <string name="crypto_litecoin">লাইটকয়েন (LTC)</string>
-    <string name="crypto_zcash">জেটক্যাশ (ZEC)</string>
-    <string name="crypto_name_btc">বিটকয়েন</string>
-    <string name="crypto_name_eth">ইথেরিয়াম</string>
-    <string name="crypto_name_sol">সোলানা</string>
-    <string name="crypto_name_ltc">লাইটকয়েন</string>
-    <string name="crypto_name_zec">জেটক্যাশ</string>
     <string name="country_india">ভারত</string>
     <string name="country_us_ca">যুক্তরাষ্ট্র / কানাডা</string>
     <string name="country_uk">যুক্তরাজ্য</string>

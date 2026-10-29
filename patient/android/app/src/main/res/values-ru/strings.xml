@@ -560,15 +560,6 @@
     <string name="about_tagline">Конфиденциальный оффлайн-помощник по приему лекарств для пациентов и близких.</string>
     <string name="about_star_github">Поставить звезду на GitHub</string>
     <string name="about_star_github_desc">Поддержите наш проект с открытым исходным кодом звездой на GitHub</string>
-    <string name="about_support_dev_title">Поддержать разработку</string>
-    <string name="about_support_dev_desc" formatted="false">Dosezy на 100% бесплатен, конфиденциален и без рекламы. Ваша поддержка помогает проекту развиваться!</string>
-    <string name="about_buymeacoffee">Купить кофе автору</string>
-    <string name="about_buymeacoffee_desc">Поддержать картой или через PayPal на BuyMeACoffee</string>
-    <string name="about_crypto_donations">Пожертвования в криптовалюте</string>
-    <string name="about_copied_to_clipboard">Адрес %1$s скопирован в буфер обмена</string>
-    <string name="about_tap_to_copy">Нажмите, чтобы скопировать адрес</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">Ежемесячная или разовая поддержка через GitHub Sponsors</string>
     <string name="pref_alarm_duration_title">Длительность звонка будильника</string>
     <string name="pref_alarm_duration_desc">Автоматически выключать звук и вибрацию через заданное время</string>
     <string name="alarm_duration_continuous">Непрерывно (до закрытия)</string>
@@ -678,16 +669,6 @@
 
     <string name="about_community_open_source">Сообщество и открытый исходный код</string>
     <string name="about_version_build">Версия %1$s (Сборка %2$s)</string>
-    <string name="crypto_bitcoin">Bitcoin (BTC)</string>
-    <string name="crypto_ethereum">Ethereum (ETH)</string>
-    <string name="crypto_solana">Solana (SOL)</string>
-    <string name="crypto_litecoin">Litecoin (LTC)</string>
-    <string name="crypto_zcash">Zcash (ZEC)</string>
-    <string name="crypto_name_btc">Bitcoin</string>
-    <string name="crypto_name_eth">Ethereum</string>
-    <string name="crypto_name_sol">Solana</string>
-    <string name="crypto_name_ltc">Litecoin</string>
-    <string name="crypto_name_zec">Zcash</string>
     <string name="country_india">Индия</string>
     <string name="country_us_ca">США / Канада</string>
     <string name="country_uk">Великобритания</string>

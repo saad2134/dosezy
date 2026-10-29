@@ -560,15 +560,6 @@
     <string name="about_tagline">رفيق دوائي آمن وخاص يعمل بدون إنترنت للمرضى ومقدمي الرعاية.</string>
     <string name="about_star_github">نجمة على GitHub</string>
     <string name="about_star_github_desc">ادعم مشروعنا مفتوح المصدر عبر وضع نجمة على GitHub</string>
-    <string name="about_support_dev_title">دعم التطوير</string>
-    <string name="about_support_dev_desc" formatted="false">تطبيق Dosezy مجاني 100% وخالٍ من الإعلانات تماماً. تبرعاتكم تساهم في استمرار التطوير!</string>
-    <string name="about_buymeacoffee">اشترِ لي قهوة (Buy Me a Coffee)</string>
-    <string name="about_buymeacoffee_desc">ادعمنا بواسطة البطاقة المصرفية أو PayPal</string>
-    <string name="about_crypto_donations">التبرع بالعملات المشفرة</string>
-    <string name="about_copied_to_clipboard">تم نسخ عنوان %1$s إلى الحافظة</string>
-    <string name="about_tap_to_copy">اضغط لنسخ العنوان</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">ادعم المشروع شهرياً أو لمرة واحدة عبر GitHub Sponsors</string>
     <string name="pref_alarm_duration_title">مدة رنين المنبه</string>
     <string name="pref_alarm_duration_desc">إيقاف الصوت والاهتزاز تلقائياً بعد انقضاء المدة المحددة</string>
     <string name="alarm_duration_continuous">مستمر (حتى الإلغاء)</string>
@@ -678,16 +669,6 @@
 
     <string name="about_community_open_source">المجتمع والمصدر المفتوح</string>
     <string name="about_version_build">الإصدار %1$s (بناء %2$s)</string>
-    <string name="crypto_bitcoin">بيتكوين (BTC)</string>
-    <string name="crypto_ethereum">إيثيريوم (ETH)</string>
-    <string name="crypto_solana">سولانا (SOL)</string>
-    <string name="crypto_litecoin">لايتكوين (LTC)</string>
-    <string name="crypto_zcash">زي كاش (ZEC)</string>
-    <string name="crypto_name_btc">بيتكوين</string>
-    <string name="crypto_name_eth">إيثيريوم</string>
-    <string name="crypto_name_sol">سولانا</string>
-    <string name="crypto_name_ltc">لايتكوين</string>
-    <string name="crypto_name_zec">زي كاش</string>
     <string name="country_india">الهند</string>
     <string name="country_us_ca">الولايات المتحدة / كندا</string>
     <string name="country_uk">المملكة المتحدة</string>

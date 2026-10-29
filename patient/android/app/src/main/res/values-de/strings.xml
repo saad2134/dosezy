@@ -560,15 +560,6 @@ Möchten Sie fortfahren?</string>
     <string name="about_tagline">Privater, offline-fähiger Medikamenten-Begleiter für Patienten und Pflegende.</string>
     <string name="about_star_github">Auf GitHub mit Stern bewerten</string>
     <string name="about_star_github_desc">Unterstützen Sie unser Open-Source-Projekt mit einem Stern auf GitHub</string>
-    <string name="about_support_dev_title">Entwicklung unterstützen</string>
-    <string name="about_support_dev_desc" formatted="false">Dosezy ist 100% kostenlos, werbefrei und privat. Ihre Spenden halten das Projekt am Leben!</string>
-    <string name="about_buymeacoffee">Kauf mir einen Kaffee</string>
-    <string name="about_buymeacoffee_desc">Unterstützen per Karte oder PayPal auf BuyMeACoffee</string>
-    <string name="about_crypto_donations">Krypto-Spenden</string>
-    <string name="about_copied_to_clipboard">%1$s-Adresse in die Zwischenablage kopiert</string>
-    <string name="about_tap_to_copy">Tippen zum Kopieren der Adresse</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">Monatlich oder einmalig über GitHub Sponsors unterstützen</string>
     <string name="pref_alarm_duration_title">Alarm-Klingeldauer</string>
     <string name="pref_alarm_duration_desc">Ton und Vibration nach einer festgelegten Zeit automatisch stummschalten</string>
     <string name="alarm_duration_continuous">Durchgehend (bis zum Schließen)</string>
@@ -678,16 +669,6 @@ Möchten Sie fortfahren?</string>
 
     <string name="about_community_open_source">Gemeinschaft &amp; Open Source</string>
     <string name="about_version_build">Version %1$s (Build %2$s)</string>
-    <string name="crypto_bitcoin">Bitcoin (BTC)</string>
-    <string name="crypto_ethereum">Ethereum (ETH)</string>
-    <string name="crypto_solana">Solana (SOL)</string>
-    <string name="crypto_litecoin">Litecoin (LTC)</string>
-    <string name="crypto_zcash">Zcash (ZEC)</string>
-    <string name="crypto_name_btc">Bitcoin</string>
-    <string name="crypto_name_eth">Ethereum</string>
-    <string name="crypto_name_sol">Solana</string>
-    <string name="crypto_name_ltc">Litecoin</string>
-    <string name="crypto_name_zec">Zcash</string>
     <string name="country_india">Indien</string>
     <string name="country_us_ca">Vereinigte Staaten / Kanada</string>
     <string name="country_uk">Großbritannien</string>

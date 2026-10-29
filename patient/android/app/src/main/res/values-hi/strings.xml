@@ -576,15 +576,6 @@
     <string name="about_tagline">मरीजों और देखभाल करने वालों के लिए एक सुरक्षित, ऑफ़लाइन दवा साथी।</string>
     <string name="about_star_github">GitHub पर स्टार दें</string>
     <string name="about_star_github_desc">GitHub पर स्टार देकर हमारे ओपन-सोर्स प्रोजेक्ट का समर्थन करें</string>
-    <string name="about_support_dev_title">विकास का समर्थन करें</string>
-    <string name="about_support_dev_desc" formatted="false">Dosezy पूरी तरह से मुफ़्त, सुरक्षित और विज्ञापन-मुक्त है। आपका दान प्रोजेक्ट को आगे बढ़ाने में मदद करता है!</string>
-    <string name="about_buymeacoffee">Buy Me a Coffee पर सहयोग करें</string>
-    <string name="about_buymeacoffee_desc">कार्ड या PayPal के ज़रिए BuyMeACoffee पर दान करें</string>
-    <string name="about_crypto_donations">क्रिप्टोकरेंसी दान</string>
-    <string name="about_copied_to_clipboard">%1$s पता क्लिपबोर्ड पर कॉपी किया गया</string>
-    <string name="about_tap_to_copy">पता कॉपी करने के लिए टैप करें</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">GitHub Sponsors के माध्यम से मासिक या एकमुश्त दान करें</string>
     <string name="pref_alarm_duration_title">अलार्म बजने की अवधि</string>
     <string name="pref_alarm_duration_desc">निर्धारित समय के बाद ध्वनि और कंपन को स्वचालित रूप से म्यूट करें</string>
     <string name="alarm_duration_continuous">लगातार (जब तक बंद न किया जाए)</string>
@@ -694,16 +685,6 @@
 
     <string name="about_community_open_source">समुदाय और ओपन सोर्स</string>
     <string name="about_version_build">संस्करण %1$s (बिल्ड %2$s)</string>
-    <string name="crypto_bitcoin">बिटकॉइन (BTC)</string>
-    <string name="crypto_ethereum">इथेरियम (ETH)</string>
-    <string name="crypto_solana">सोलाना (SOL)</string>
-    <string name="crypto_litecoin">लाइटकॉइन (LTC)</string>
-    <string name="crypto_zcash">ज़ीकैश (ZEC)</string>
-    <string name="crypto_name_btc">बिटकॉइन</string>
-    <string name="crypto_name_eth">इथेरियम</string>
-    <string name="crypto_name_sol">सोलाना</string>
-    <string name="crypto_name_ltc">लाइटकॉइन</string>
-    <string name="crypto_name_zec">ज़ीकैश</string>
     <string name="country_india">भारत</string>
     <string name="country_us_ca">संयुक्त राज्य अमेरिका / कनाडा</string>
     <string name="country_uk">यूनाइटेड किंगडम</string>

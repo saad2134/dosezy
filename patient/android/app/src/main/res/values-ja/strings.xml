@@ -560,15 +560,6 @@
     <string name="about_tagline">患者様とご家族のための、完全オフライン＆プライバシー重視の服薬管理アプリ。</string>
     <string name="about_star_github">GitHub でスターをつける</string>
     <string name="about_star_github_desc">GitHub でスターをつけてオープンソースプロジェクトを応援する</string>
-    <string name="about_support_dev_title">開発を支援する</string>
-    <string name="about_support_dev_desc" formatted="false">Dosezy は完全無料、広告なし、プライバシー重視です。皆様のご支援が開発の原動力です！</string>
-    <string name="about_buymeacoffee">開発者にコーヒーをおごる</string>
-    <string name="about_buymeacoffee_desc">クレジットカードや PayPal で手軽にご支援いただけます</string>
-    <string name="about_crypto_donations">暗号資産（仮想通貨）でのご支援</string>
-    <string name="about_copied_to_clipboard">%1$s アドレスをクリップボードにコピーしました</string>
-    <string name="about_tap_to_copy">タップしてアドレスをコピー</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">GitHub Sponsors で毎月または単発の支援をする</string>
     <string name="pref_alarm_duration_title">アラームの鳴動時間</string>
     <string name="pref_alarm_duration_desc">設定した時間が経過すると自動で音と振動を停止します</string>
     <string name="alarm_duration_continuous">停止するまで鳴動</string>
@@ -678,16 +669,6 @@
 
     <string name="about_community_open_source">コミュニティとオープンソース</string>
     <string name="about_version_build">バージョン %1$s (ビルド %2$s)</string>
-    <string name="crypto_bitcoin">ビットコイン (BTC)</string>
-    <string name="crypto_ethereum">イーサリアム (ETH)</string>
-    <string name="crypto_solana">ソラナ (SOL)</string>
-    <string name="crypto_litecoin">ライトコイン (LTC)</string>
-    <string name="crypto_zcash">ジーキャッシュ (ZEC)</string>
-    <string name="crypto_name_btc">ビットコイン</string>
-    <string name="crypto_name_eth">イーサリアム</string>
-    <string name="crypto_name_sol">ソラナ</string>
-    <string name="crypto_name_ltc">ライトコイン</string>
-    <string name="crypto_name_zec">ジーキャッシュ</string>
     <string name="country_india">インド</string>
     <string name="country_us_ca">アメリカ / カナダ</string>
     <string name="country_uk">イギリス</string>
