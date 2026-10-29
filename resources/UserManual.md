@@ -181,7 +181,8 @@ At the top of the **Medicines** screen, an instant search bar filters large pres
 
 ### Dosage Units & Frequency Patterns:
 - **Dosage**: Enter the quantity (e.g., `1`, `500`) and select the unit:
-  - `tablet`, `capsule`, `mg`, `mcg`, `g`, `mL`, `drops`, `puffs`, or `units`.
+  - `tablet`, `capsule`, `mg`, `mcg`, `g`, `mL`, `drops`, `puffs`, `spray`, or `units`.
+- **Pill Shape Icons**: Choose from 9 distinct medication shapes: Round, Capsule, Oval, Liquid, Inhaler, Injection, Drops, Patch, and Spray bottle.
 - **Frequency Pattern**:
   - **Daily**: Every day.
   - **Weekly**: Choose specific days of the week (e.g., Mon, Wed, Fri).
@@ -211,7 +212,7 @@ When a treatment course finishes:
 When the navigation '+' button is hidden via Preferences, an **"Add Medicine"** button appears cleanly directly below your active medications roster (and above the Discontinued Medications section). On an empty roster, the friendly initial "Add Your First Medication" button guides you.
 
 ### Form Validation Feedback & Confirmation:
-When adding or editing a medication, Dosezy highlights missing fields in red with clear guidance. Saving a medication confirms success with a brief on-screen confirmation toast.
+When adding or editing a medication or patient profile, Dosezy immediately highlights any missing or invalid required fields (such as medicine name, dosage, or scheduled days) with clear red border frames and helpful error labels. This guides you directly to the required correction instead of leaving the save button disabled without explanation.
 
 ---
 
@@ -236,6 +237,12 @@ If an alarm rings during a meeting or while resting, press the **Volume Up** or 
 
 ### Back-Gesture Snooze:
 Pressing your device's physical or gesture **Back** button during an active alarm automatically triggers a safe snooze for your configured duration, ensuring doses are never accidentally dismissed into a missed state.
+
+### Customizable Reminder Styles (Alarms vs Notifications):
+Under **Menu > Preferences > Notifications & Alarms > Reminder Style**, you can customize how reminders alert you:
+- **Full-Screen Alarm**: Rings with high-priority full-screen alerts and continuous audio that bypasses Do Not Disturb. Ideal for critical medications.
+- **Notification**: Delivers a standard notification banner with a gentle alert tone, respecting Do Not Disturb. Ideal for vitamins and supplements.
+- **Per-Medicine Override**: When adding or editing any medication, you can override your profile default to set specific medications to Alarm or Notification independently.
 
 ### Customizable Alarm Duration & Audio Volume:
 Go to **Menu > Preferences > Notifications & Alarms**:
@@ -298,7 +305,8 @@ When you need to reorder medicines from your local pharmacy or doctor:
 ## 9. Interactive Schedule Calendar & TalkBack Accessibility
 
 Tap **Schedule** in the bottom navigation bar to view your full medication calendar:
-- **Week & Month Views**: Tap any day (Mon–Sun) or date on the calendar to view past or future schedules.
+- **Week & Month Views**: Tap any day (Mon-Sun) or date on the calendar to view past or future schedules.
+- **Retrospective Missed Dose Logging & 48-Hour Clinical Guard**: Missed doses from yesterday or earlier within a 48-hour clinical window can be tapped directly on the calendar to open an interactive action sheet. You can mark the dose as taken (which automatically decrements medicine stock and tags the dose note with `[Logged retrospectively]` for physician audit transparency) or skipped with an explanation. Entries older than 48 hours are permanently locked to preserve clinical authenticity and prevent record tampering.
 - **Color-Coded Adherence Dots**:
   - 🟢 **Green**: All scheduled doses taken on time.
   - 🟧 **Orange**: Taken late.
@@ -334,6 +342,7 @@ The **Preferences** screen is organized into dedicated categories:
   - **Thicker Calendar Day Highlight**: Outlines all days with scheduled doses on the calendar with full color-coded frames instead of only bottom underlines.
   - **Hide Navigation Add Button**: Toggle to hide the center '+' button from the bottom navigation bar. When enabled, the remaining 4 tabs (`Home`, `Schedule`, `Medicines`, `Menu`) expand symmetrically across the bar (25% each), and an "Add Medicine" button is cleanly placed on the Medicines screen below your active prescriptions.
 - **Notifications & Alarms**:
+  - **Reminder Style**: Choose between Full-Screen Alarms (continuous ringtones bypassing Do Not Disturb) and standard Notifications (alert tone respecting Do Not Disturb), with per-medication overrides.
   - **Slide to Take & Snooze**: Dedicated sliding action tracks on full-screen alarms to prevent accidental dismissals (enabled by default; turn off for standard tap buttons).
   - **Default Snooze Duration**: Choose 5, 10, 15, 20, or 30 minutes.
   - **Alarm Sound**: Select custom ringtones, system alerts, or built-in chimes with audio preview.

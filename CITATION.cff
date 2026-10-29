@@ -3,7 +3,7 @@ message: "If you use Dosezy, please cite it as below."
 type: software
 title: "Dosezy"
 version: 2.5.12
-date-released: 2026-10-21
+date-released: 2026-10-30
 url: "https://github.com/saad2134/dosezy"
 repository-code: "https://github.com/saad2134/dosezy"
 license: MIT

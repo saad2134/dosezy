@@ -1,3 +1,3 @@
-* Update missed doses from previous days directly on the schedule calendar within a 48-hour clinical window.
-* Medicine inventory stock automatically updates when recording missed doses.
-* Retrospective logs include audit tags to maintain doctor report transparency.
+* Update missed doses from previous days directly on the schedule calendar within 48 hours, with automated stock sync and doctor audit tags.
+* Choose between full-screen alarms or standard notifications per profile and medication, plus support for spray formulations.
+* Enhanced form validation with clear field highlighting, improved snooze reliability, and cohort dose tracking.

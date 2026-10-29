@@ -93,7 +93,23 @@ import Footer from '../components/Footer.astro';
 					</div>
 				</details>
 
-				<!-- Question: Physical Controls & Custom Alarms -->
+								<!-- Question: Reminder Style (Alarm vs Gentle Notification) -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>Can I choose between full-screen alarms and standard notifications?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
+						<p>Yes! In <strong>Menu &gt; Preferences &gt; Notifications &amp; Alarms &gt; Reminder Style</strong>, you can configure your alerts:</p>
+						<p><strong class="text-white">Full-Screen Alarm:</strong> High-priority full-screen alerts that ring aloud, support sliding gesture confirmation, and bypass Do Not Disturb so critical medications are never missed.</p>
+						<p><strong class="text-white">Gentle Notification:</strong> Standard status bar notifications with customizable chime sounds that do not take over your screen, ideal for non-critical supplements.</p>
+						<p>You can also set this preference individually per medication when adding or editing a prescription.</p>
+					</div>
+				</details>
+
+<!-- Question: Physical Controls & Custom Alarms -->
 				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
 					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
 						<span>Can I silence alarms with volume buttons or pick custom ringtones?</span>
@@ -166,6 +182,22 @@ import Footer from '../components/Footer.astro';
 					</div>
 				</details>
 
+				
+
+				<!-- Question: Retrospective Past Dose Logging -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>Can I mark a dose from yesterday or a previous day as taken?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
+						<p>Yes! On the <strong>Schedule</strong> screen, navigate to the past date on the calendar. Dosezy allows you to tap any missed dose within a 48-hour clinical window (yesterday or today) to record it as taken or skipped with an explanation.</p>
+						<p>When recorded, your pill inventory stock is automatically decremented and an audit note is attached to ensure transparency in reports for your doctor. Entries older than 48 hours are permanently locked to preserve clinical authenticity.</p>
+					</div>
+				</details>
+
 				<!-- Question 5: Completion Banner -->
 				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
 					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
@@ -231,6 +263,22 @@ import Footer from '../components/Footer.astro';
 					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
 						<p>Yes! In <strong>Menu &gt; Preferences &gt; General</strong>, toggle on <strong>Hide Navigation Add Button</strong>.</p>
 						<p>The 4 main tabs (<em>Home</em>, <em>Schedule</em>, <em>Medicines</em>, <em>Menu</em>) expand symmetrically across the bar, and a convenient <strong>"Add Medicine"</strong> button appears directly below your active medications on the Medicines screen.</p>
+					</div>
+				</details>
+
+				
+
+				<!-- Question: Spray Formulations -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>Does Dosezy support sprays or inhalers?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
+						<p>Yes! Dosezy includes dedicated support for spray medications with a convenient <strong>spray</strong> dosage unit and an intuitive spray bottle icon.</p>
+						<p>This is perfect for nasal sprays, throat sprays, and topical medicinal mists, with full stock tracking and refill reminders.</p>
 					</div>
 				</details>
 

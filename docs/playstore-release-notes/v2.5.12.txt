@@ -1,60 +1,60 @@
 <en-IN>
-* Update missed doses from previous days directly on the schedule calendar within a 48-hour clinical window.
-* Medicine inventory stock automatically updates when recording missed doses.
-* Retrospective logs include audit tags to maintain doctor report transparency.
+* Update missed doses from previous days directly on the schedule calendar within 48 hours, with automated stock sync and doctor audit tags.
+* Choose between full-screen alarms or standard notifications per profile and medication, plus support for spray formulations.
+* Enhanced form validation with clear field highlighting, improved snooze reliability, and cohort dose tracking.
 </en-IN>
 <en-US>
-* Update missed doses from previous days directly on the schedule calendar within a 48-hour clinical window.
-* Medicine inventory stock automatically updates when recording missed doses.
-* Retrospective logs include audit tags to maintain doctor report transparency.
+* Update missed doses from previous days directly on the schedule calendar within 48 hours, with automated stock sync and doctor audit tags.
+* Choose between full-screen alarms or standard notifications per profile and medication, plus support for spray formulations.
+* Enhanced form validation with clear field highlighting, improved snooze reliability, and cohort dose tracking.
 </en-US>
 <ar>
-* تحديث الجرعات الفائتة من الأيام السابقة مباشرة من التقويم خلال نافذة سريرية مدتها 48 ساعة.
-* تحديث مخزون الأدوية تلقائيا عند تسجيل الجرعات الفائتة.
-* إضافة وسوم تدقيق للسجلات بأثر رجعي لضمان الشفافية في تقارير الأطباء.
+* تحديث الجرعات الفائتة من الأيام السابقة مباشرة من التقويم خلال 48 ساعة مع مزامنة المخزون وتوثيق التقارير.
+* اختيار نمط التذكير بين منبه بملء الشاشة أو إشعار قياسي لكل ملف شخصي ودواء، مع دعم مستحضرات البخاخ.
+* تحسين التحقق من صحة الحقول في النماذج، ودقة الغفوة، وتتبع الجرعات الجماعية.
 </ar>
 <de-DE>
-* Verpasste Dosen der Vortage direkt im Zeitplan-Kalender innerhalb eines 48-Stunden-Fensters aktualisieren.
-* Medikamentenbestand wird bei Erfassung verpasster Dosen automatisch angepasst.
-* Transparente Prüfvermerke für nachträgliche Protokolle in Arztberichten.
+* Verpasste Dosen der Vortage direkt im Zeitplan-Kalender innerhalb von 48 Stunden aktualisieren, mit automatischem Bestandsabgleich und Prüfvermerken.
+* Wahl zwischen Vollbild-Alarmen oder Standardbenachrichtigungen pro Profil und Medikament sowie Unterstützung für Sprays.
+* Verbesserte Formularvalidierung mit visueller Hervorhebung, präzisere Schlummerfunktion und zuverlässiges Dosis-Tracking.
 </de-DE>
 <es-419>
-* Actualiza dosis olvidadas de días anteriores directamente en el calendario dentro de una ventana de 48 horas.
-* El inventario de medicamentos se descuenta automáticamente al registrar dosis olvidadas.
-* Etiquetas de auditoría retrospectiva para mantener la transparencia en reportes médicos.
+* Actualiza dosis olvidadas de días anteriores directamente en el calendario dentro de 48 horas, con ajuste de stock y etiquetas de auditoría médica.
+* Elige entre alarmas a pantalla completa o notificaciones estándar por perfil y medicamento, más soporte para sprays.
+* Validación de formularios con resaltado claro de campos, repetición de alarma mejorada y registro por cohortes.
 </es-419>
 <fr-FR>
-* Mettez à jour les doses manquées des jours précédents directement sur le calendrier dans une fenêtre de 48 heures.
-* Le stock de médicaments se met à jour automatiquement lors de l'enregistrement.
-* Balises d'audit rétrospectives pour préserver la transparence des rapports médicaux.
+* Mettez à jour les doses manquées des jours précédents directement sur le calendrier sous 48 h, avec synchronisation du stock et suivi médical.
+* Choisissez entre alarmes plein écran ou notifications standard par profil et médicament, avec prise en charge des sprays.
+* Validation des formulaires avec mise en évidence claire des champs, rappel d'alarme fiabilisé et suivi de doses groupées.
 </fr-FR>
 <hi-IN>
-* 48 घंटे की नैदानिक ​​अवधि के भीतर कैलेंडर से पिछले दिनों की छूटी हुई खुराक को अपडेट करें।
-* छूटी हुई खुराक दर्ज करने पर दवा का स्टॉक स्वचालित रूप से अपडेट हो जाता है।
-* डॉक्टर की रिपोर्ट में पारदर्शिता बनाए रखने के लिए पूर्वव्यापी ऑडिट टैग।
+* 48 घंटे के भीतर कैलेंडर से पिछले दिनों की छूटी खुराक अपडेट करें, स्वचालित स्टॉक सिंक और डॉक्टर ऑडिट टैग के साथ।
+* प्रत्येक प्रोफ़ाइल और दवा के लिए फ़ुल-स्क्रीन अलार्म या मानक सूचनाओं का विकल्प, साथ ही स्प्रे दवाओं का समर्थन।
+* स्पष्ट फ़ील्ड हाइलाइटिंग के साथ बेहतर फ़ॉर्म सत्यापन, स्नूज़ विश्वसनीयता और खुराक ट्रैकिंग।
 </hi-IN>
 <it-IT>
-* Aggiorna le dosi dimenticate dei giorni precedenti direttamente dal calendario entro una finestra di 48 ore.
-* Le scorte dei farmaci si aggiornano automaticamente alla registrazione delle dosi perse.
-* Tag di controllo retroattivi per la massima trasparenza nei referti medici.
+* Aggiorna le dosi dimenticate dei giorni precedenti direttamente dal calendario entro 48 ore, con sincronizzazione scorte e note per il medico.
+* Scegli tra allarmi a schermo intero o notifiche standard per profilo e farmaco, oltre al supporto per gli spray.
+* Convalida dei moduli con evidenziazione chiara dei campi, funzione snooze più precisa e tracciamento dosi di gruppo.
 </it-IT>
 <ja-JP>
-* 48時間以内であれば、カレンダーから前日以前の飲み忘れ分を直接記録・更新可能。
-* 飲み忘れ分の記録時に薬の在庫数が自動的に減算されます。
-* 医師向けレポートの透明性を保つため、遡及記録タグを自動付与。
+* 48時間以内なら過去の飲み忘れ分をカレンダーから直接記録可能。在庫の自動減算と医師向け監査タグに対応。
+* プロファイルや薬ごとに全画面アラームまたは通常通知を選択可能。スプレー剤にも対応。
+* 入力フォームの必須項目ハイライト、スヌーズ動作の安定化、同時服用の一括記録を強化。
 </ja-JP>
 <pt-BR>
-* Atualize doses perdidas de dias anteriores direto no calendário dentro de uma janela clínica de 48 horas.
-* O estoque de medicamentos é atualizado automaticamente ao registrar doses perdidas.
-* Etiquetas de auditoria retrospectiva para manter a transparência em relatórios médicos.
+* Atualize doses perdidas de dias anteriores direto no calendário em até 48 horas, com sincronização de estoque e etiquetas médicas.
+* Escolha entre alarmes em tela cheia ou notificações padrão por perfil e medicamento, além de suporte a sprays.
+* Validação de formulários com destaque visual claro, maior precisão no adiamento e registro seguro de doses.
 </pt-BR>
 <ru-RU>
-* Отмечайте пропущенные дозы за прошлые дни прямо в календаре в течение 48 часов.
-* Запас медикаментов автоматически обновляется при учете пропущенных доз.
-* Автоматическая отметка о ретроспективной записи для прозрачности отчетов врачу.
+* Отмечайте пропущенные дозы за прошлые дни прямо в календаре в течение 48 часов с синхронизацией склада и отметками для врача.
+* Выбирайте между полноэкранными будильниками и обычными уведомлениями для каждого профиля и лекарства, плюс поддержка спреев.
+* Улучшенная проверка форм с подсветкой полей, точный повтор сигнала и надежный групповой учет.
 </ru-RU>
 <zh-CN>
-* 可在48小时临床窗口期内，直接在日程日历中更新前几天漏服的剂量。
-* 补记漏服剂量时自动扣减药品库存。
-* 追溯记录包含审计标记，确保向医生导出的健康报告清晰透明。
+* 可在48小时内在日程日历中补记前几天漏服的剂量，支持自动扣减药品库存与医生审计标记。
+* 支持按档案及药物自定义全屏闹钟或标准横幅通知，并新增喷雾剂型支持。
+* 强化表单校验与必填项高亮提示，优化稍后提醒精度与同时间段药物记录。
 </zh-CN>
