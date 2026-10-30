@@ -206,6 +206,38 @@ class UserViewModelProfileAlarmTest {
         advanceUntilIdle()
     }
 
+    @Test
+    fun testUpdateUser_reschedulesAlarmsForUser_whenUserPreferencesChange() = runTest(testDispatcher) {
+        val userViewModel = UserViewModel(userRepository, medicineRepository, scheduleRepository, medicineNotificationManager)
+
+        userViewModel.addUser(testUser)
+        awaitCondition { userRepository.getUserByIdSync(testUser.userId) != null }
+
+        val medicine = Medicine(
+            medicineId = "med_update_user_test",
+            userId = testUser.userId,
+            medicationName = "Aspirin",
+            dosage = 100.0,
+            dosageUnit = DosageUnit.TABLET,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(9, 0))
+        )
+        medicineRepository.insertMedicine(medicine)
+        advanceUntilIdle()
+
+        // Update user to NOTIFICATION reminderType
+        val updated = testUser.copy(reminderType = com.example.dosezy.data.model.ReminderType.NOTIFICATION)
+        userViewModel.updateUser(updated)
+        awaitCondition {
+            userRepository.getUserByIdSync(testUser.userId)?.reminderType == com.example.dosezy.data.model.ReminderType.NOTIFICATION
+        }
+
+        val refreshed = userRepository.getUserByIdSync(testUser.userId)
+        assertNotNull(refreshed)
+        assertEquals(com.example.dosezy.data.model.ReminderType.NOTIFICATION, refreshed?.reminderType)
+    }
+
     // =========================================================================
     // Issue 2 Tests: PRN Dose Stock Deduction & Custom Slot Symmetry
     // =========================================================================

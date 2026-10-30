@@ -222,4 +222,50 @@ class PdfReportGeneratorTest {
         assertEquals(50.0, summary.adherenceRate, 0.01)
         assertEquals("50.0%", summary.rateFormatted)
     }
+
+    @Test
+    fun testResolveDisplayStatus_evaluatesOverduePendingAsMissedForPdfTable() {
+        val now = LocalDateTime.of(2026, 10, 16, 18, 0)
+        val missedAfterHours = 4
+
+        // 1. Pending scheduled 5 hours ago (> 4h threshold) -> should evaluate as MISSED in table
+        val overdueEntry = ScheduleEntry(
+            entryId = "entry_overdue",
+            userId = "usr_1",
+            medicineId = "med_1",
+            scheduledDateTime = now.minusHours(5),
+            status = MedicationStatus.PENDING
+        )
+        assertEquals(MedicationStatus.MISSED, generator.resolveDisplayStatus(overdueEntry, now, missedAfterHours))
+
+        // 2. Pending scheduled 2 hours ago (< 4h threshold) -> should remain PENDING
+        val recentEntry = ScheduleEntry(
+            entryId = "entry_recent",
+            userId = "usr_1",
+            medicineId = "med_1",
+            scheduledDateTime = now.minusHours(2),
+            status = MedicationStatus.PENDING
+        )
+        assertEquals(MedicationStatus.PENDING, generator.resolveDisplayStatus(recentEntry, now, missedAfterHours))
+
+        // 3. Taken on time -> should remain TAKEN_ON_TIME
+        val takenEntry = ScheduleEntry(
+            entryId = "entry_taken",
+            userId = "usr_1",
+            medicineId = "med_1",
+            scheduledDateTime = now.minusHours(5),
+            status = MedicationStatus.TAKEN_ON_TIME
+        )
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, generator.resolveDisplayStatus(takenEntry, now, missedAfterHours))
+
+        // 4. Skipped -> should remain SKIPPED
+        val skippedEntry = ScheduleEntry(
+            entryId = "entry_skipped",
+            userId = "usr_1",
+            medicineId = "med_1",
+            scheduledDateTime = now.minusHours(5),
+            status = MedicationStatus.SKIPPED
+        )
+        assertEquals(MedicationStatus.SKIPPED, generator.resolveDisplayStatus(skippedEntry, now, missedAfterHours))
+    }
 }

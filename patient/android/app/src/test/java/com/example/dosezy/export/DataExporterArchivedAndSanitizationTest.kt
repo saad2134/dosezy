@@ -336,4 +336,44 @@ class DataExporterArchivedAndSanitizationTest {
         assertTrue("Doctor notes starting with = must be sanitized with single quote", csv.contains("\"'=cmd|' /C calc'!A0\""))
         assertTrue("Dose notes starting with - must be sanitized with single quote", csv.contains("\"'- Taken before breakfast\""))
     }
+
+    @Test
+    fun testBuildCsvContent_includesReminderTypeInUserAndMedicinesSections() {
+        val user = User(
+            userId = "u_reminder_csv",
+            fullName = "Jane Doe",
+            age = 42,
+            gender = Gender.FEMALE,
+            contactNumber = "9988776655",
+            reminderType = com.example.dosezy.data.model.ReminderType.NOTIFICATION
+        )
+        val med = Medicine(
+            medicineId = "m_reminder_csv",
+            userId = user.userId,
+            medicationName = "Lisinopril",
+            dosage = 10.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = com.example.dosezy.data.model.Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            reminderType = com.example.dosezy.data.model.ReminderType.ALARM
+        )
+        val sched = ScheduleEntry(
+            entryId = "s_reminder_csv",
+            userId = user.userId,
+            medicineId = med.medicineId,
+            scheduledDateTime = LocalDateTime.of(2026, 10, 30, 8, 0),
+            status = MedicationStatus.PENDING
+        )
+
+        val csv = DataExporter.buildCsvContent(user, listOf(med), listOf(sched))
+
+        // Header assertions
+        assertTrue("User section header must include Reminder Type", csv.contains("Is Current User,Reminder Type"))
+        assertTrue("Medicines section header must include Reminder Type", csv.contains("Image URI,Reminder Type"))
+
+        // Row value assertions
+        assertTrue("User row must serialize user reminder type", csv.contains("NOTIFICATION"))
+        assertTrue("Medicine row must serialize medicine reminder type override", csv.contains("ALARM"))
+    }
 }
