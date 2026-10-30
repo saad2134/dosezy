@@ -34,9 +34,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -71,12 +73,16 @@ fun ProfileSetupPage(
     var ageError by remember { mutableStateOf(false) }
     var genderError by remember { mutableStateOf(false) }
 
+    val parsedAge = age.toIntOrNull() ?: 0
+
     // Check if form is valid
-    val isFormValid = remember(fullName, age, gender) {
-        fullName.isNotBlank() && age.isNotBlank() && gender != null
+    val isFormValid = remember(fullName, parsedAge, gender) {
+        fullName.isNotBlank() && parsedAge > 0 && gender != null
     }
 
     val focusManager = LocalFocusManager.current
+    val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -87,7 +93,7 @@ fun ProfileSetupPage(
             ) {
                 focusManager.clearFocus()
             }
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(scrollState)
             .padding(24.dp)
     ) {
         // Progress Indicators
@@ -193,7 +199,7 @@ fun ProfileSetupPage(
                     onValueChange = {
                         if (it.all { char -> char.isDigit() } && it.length <= 3) {
                             age = it
-                            ageError = it.isBlank()
+                            ageError = it.isBlank() || (it.toIntOrNull() ?: 0) <= 0
                         }
                     },
                     label = { Text(stringResource(R.string.profile_age) + " *") },
@@ -311,14 +317,14 @@ fun ProfileSetupPage(
     val completeSetup: () -> Unit = {
         // Validate all fields
         fullNameError = fullName.isBlank()
-        ageError = age.isBlank()
+        ageError = age.isBlank() || parsedAge <= 0
         genderError = gender == null
 
         if (!fullNameError && !ageError && !genderError) {
             val user = User(
                 profilePicPath = profilePicPath,
                 fullName = fullName.trim(),
-                age = age.toIntOrNull() ?: 0,
+                age = parsedAge,
                 gender = gender!!,
                 contactNumber = contactNumber.trim(),
                 allergies = allergies.trim().ifBlank { null },
@@ -326,11 +332,19 @@ fun ProfileSetupPage(
                 isCurrentUser = isDefaultUser
             )
             onComplete(user)
+        } else {
+            coroutineScope.launch {
+                when {
+                    fullNameError -> scrollState.animateScrollTo(150)
+                    ageError -> scrollState.animateScrollTo(230)
+                    genderError -> scrollState.animateScrollTo(320)
+                }
+            }
         }
     }
 
     // Set the complete action for the bottom bar
-    LaunchedEffect(Unit) {
+    LaunchedEffect(completeSetup) {
         setCompleteAction(completeSetup)
     }
 }

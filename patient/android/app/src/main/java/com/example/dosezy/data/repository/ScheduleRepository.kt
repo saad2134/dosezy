@@ -307,7 +307,10 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         }
 
         // 2. Stop any active alarm sound / popup
-        com.example.dosezy.notifications.AlarmActivity.stopActiveAlarm()
+        // Guard: Only dismiss AlarmActivity on single-dose actions; during batch cohort processing (syncSlotNotification == false), stopping activity cancels ViewModel scope and aborts remaining doses (#115)
+        if (syncSlotNotification) {
+            com.example.dosezy.notifications.AlarmActivity.stopActiveAlarm()
+        }
 
         // 3. Stock Auto-Decrement Logic (only if not already taken)
         if (!alreadyTaken && previousEntry != null) {
@@ -354,10 +357,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                             android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
                         )
 
-                        // Guard: Instantiate NotificationCompat.Builder with localizedContext so internal resource inflation and layout direction align with target profile locale (#BUG-REFILL-NOTIF-BUILDER)
-                        val refillIconBitmap = if (context != null) {
-                            runCatching { BitmapFactory.decodeResource(context.resources, com.example.dosezy.R.mipmap.ic_launcher) }.getOrNull()
-                        } else null
+                        // Guard: Safely decode launcher icon bitmap to prevent crash on resource inflation failure (#BUG-REFILL-NOTIF-BUILDER)
+                        val refillIconBitmap = runCatching { BitmapFactory.decodeResource(context.resources, com.example.dosezy.R.mipmap.ic_launcher) }.getOrNull()
 
                         val builder = androidx.core.app.NotificationCompat.Builder(localizedContext, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
                             .setSmallIcon(com.example.dosezy.R.mipmap.ic_launcher)
@@ -541,6 +542,14 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                                 } catch (_: Exception) { null }
                             } else null
 
+                            // Guard: Check if any remaining medication requires full alarm behavior to prevent re-arming notification-only reminders as alarms (#BUG-NOTIF-ALARM-MODE)
+                            val defaultReminderType = user?.reminderType ?: com.example.dosezy.data.model.ReminderType.ALARM
+                            val isAlarmMode = remainingPending.any { e ->
+                                val m = database.medicineDao().getMedicineByIdDirect(e.medicineId)
+                                val effectiveType = m?.reminderType ?: defaultReminderType
+                                effectiveType == com.example.dosezy.data.model.ReminderType.ALARM
+                            }
+
                             MedicineAlarmReceiver.updateCohortNotification(
                                 context = context,
                                 entryId = newPrimary.entryId,
@@ -551,7 +560,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                                 scheduledTime = formattedScheduledTime,
                                 snoozeMinutes = user?.snoozeDuration ?: 10,
                                 userId = entry.userId,
-                                userLanguage = user?.language
+                                userLanguage = user?.language,
+                                isAlarmMode = isAlarmMode
                             )
 
                             // Guard: Re-arm nagging reminder only if undone dose belongs to today's schedule and nagging reminders are enabled to prevent phantom alarms for historical past-date doses (#BUG-03, #BUG-UNDO-PAST-DATE)
@@ -614,9 +624,10 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         if (entryId.startsWith("PRN_")) {
             database.scheduleDao().deleteScheduleEntry(entryId)
         } else {
-            // Guard: Strip automated partial stock tag while preserving user-authored clinical notes (#BUG-04)
+            // Guard: Strip automated partial stock tag and retrospective logging audit tags while preserving user-authored clinical notes (#BUG-04, #109)
             val cleanedNotes = previousEntry?.doseNotes
                 ?.replace(Regex("\\[Partial Stock: Took \\d+ of \\d+\\]"), "")
+                ?.replace(Regex("\\[Logged retrospectively\\]"), "")
                 ?.trim(' ', '|', '-')
                 ?.ifBlank { null }
             database.scheduleDao().resetScheduleEntryToPendingWithNotes(entryId, cleanedNotes)
@@ -744,10 +755,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     },
                     android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
                 )
-                // Guard: Instantiate NotificationCompat.Builder with localizedContext so internal resource inflation and layout direction align with target profile locale (#BUG-REFILL-NOTIF-BUILDER)
-                val refillIconBitmap = if (context != null) {
-                    runCatching { BitmapFactory.decodeResource(context.resources, com.example.dosezy.R.mipmap.ic_launcher) }.getOrNull()
-                } else null
+                // Guard: Safely decode launcher icon bitmap to prevent crash on resource inflation failure (#BUG-REFILL-NOTIF-BUILDER)
+                val refillIconBitmap = runCatching { BitmapFactory.decodeResource(context.resources, com.example.dosezy.R.mipmap.ic_launcher) }.getOrNull()
 
                 val builder = androidx.core.app.NotificationCompat.Builder(localizedContext, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
                     .setSmallIcon(com.example.dosezy.R.mipmap.ic_launcher)

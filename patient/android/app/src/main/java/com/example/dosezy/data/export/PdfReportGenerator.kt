@@ -48,6 +48,19 @@ class PdfReportGenerator(private val context: Context) {
         (entry.status == MedicationStatus.PENDING && evalNow.isAfter(entry.scheduledDateTime) &&
             Duration.between(entry.scheduledDateTime, evalNow).toHours() >= missedAfterHours.toLong())
 
+    // Guard: Evaluate effective status so past overdue pending doses render as Missed matching Adherence Summary (#BUG-PDF-OVERDUE-STATUS)
+    internal fun resolveDisplayStatus(
+        entry: ScheduleEntry,
+        evalNow: LocalDateTime,
+        missedAfterHours: Int
+    ): MedicationStatus {
+        return if (entry.status == MedicationStatus.PENDING && isEntryMissed(entry, evalNow, missedAfterHours)) {
+            MedicationStatus.MISSED
+        } else {
+            entry.status
+        }
+    }
+
     internal fun calculateAdherence(
         schedules: List<ScheduleEntry>,
         evalNow: LocalDateTime = LocalDateTime.now(),
@@ -390,6 +403,7 @@ class PdfReportGenerator(private val context: Context) {
                     DosageUnit.MEQ -> "mEq"
                     DosageUnit.PUFF -> "puff"
                     DosageUnit.AMPULE -> "ampule"
+                    DosageUnit.SPRAY -> "spray"
                 }
                 val formattedDosage = if (target % 1 == 0.0) "${target.toInt()} $unitAbbr" else "$target $unitAbbr"
                 " ($formattedDosage)"
@@ -401,7 +415,9 @@ class PdfReportGenerator(private val context: Context) {
             val truncatedMed = truncateTextToWidth(fullMed, textPaint, 175f)
             canvas.drawText(truncatedMed, 155f, y, textPaint)
 
-            val statusLabel = when (sch.status) {
+            // Guard: Evaluate resolveDisplayStatus so past overdue pending doses render as Missed matching Adherence Summary (#BUG-PDF-OVERDUE-STATUS)
+            val effectiveStatus = resolveDisplayStatus(sch, evalNow, missedAfterHours)
+            val statusLabel = when (effectiveStatus) {
                 MedicationStatus.TAKEN_ON_TIME -> "Taken On Time"
                 MedicationStatus.TAKEN_LATE -> "Taken Late"
                 MedicationStatus.MISSED -> "Missed"

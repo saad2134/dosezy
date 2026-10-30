@@ -194,7 +194,11 @@ class UserViewModel @Inject constructor(
 
     fun updateUser(user: User) {
         viewModelScope.launch {
-            userRepository.updateUser(user)
+            withContext(Dispatchers.IO) {
+                userRepository.updateUser(user)
+                // Guard: Reschedule alarms so updated reminderType, timeFormat, language, and snooze settings take effect immediately in AlarmManager
+                medicineNotificationManager.scheduleAlarmsForUser(user.userId)
+            }
             // Update current user state if this is the current user
             if (user.isCurrentUser) {
                 _currentUser.value = user

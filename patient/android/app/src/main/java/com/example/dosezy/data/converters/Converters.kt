@@ -266,4 +266,15 @@ class Converters {
             null
         }
     }
+
+    // ReminderType converters (#111)
+    @TypeConverter
+    fun fromReminderType(reminderType: com.example.dosezy.data.model.ReminderType?): String? = reminderType?.name
+
+    @TypeConverter
+    fun toReminderType(value: String?): com.example.dosezy.data.model.ReminderType? = try {
+        if (!value.isNullOrBlank()) com.example.dosezy.data.model.ReminderType.valueOf(value.trim().uppercase()) else null
+    } catch (_: Exception) {
+        null
+    }
 }

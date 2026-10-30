@@ -45,6 +45,12 @@
     <string name="form_delete_medicine">Удалить лекарство</string>
     <string name="form_upload_img">Загрузить изображение</string>
     <string name="form_change_img">Изменить изображение</string>
+    <string name="form_error_med_name_required">Необходимо указать название лекарства</string>
+    <string name="form_error_dosage_required">Необходимо указать дозировку</string>
+    <string name="form_error_dosage_invalid">Дозировка должна быть положительным числом</string>
+    <string name="form_error_select_days">Пожалуйста, выберите хотя бы один день</string>
+    <string name="form_error_course_duration">Длительность курса должна быть не менее 1 дня</string>
+    <string name="form_error_fix_fields">Пожалуйста, заполните обязательные поля, выделенные выше</string>
     <string name="freq_daily">Ежедневно</string>
     <string name="freq_weekly">Еженедельно</string>
     <string name="freq_monthly">Ежемесячно</string>
@@ -147,6 +153,7 @@
     <string name="unit_meq">мЭкв</string>
     <string name="unit_puff">доза (вдох)</string>
     <string name="unit_ampule">ампула</string>
+    <string name="unit_spray">спрей</string>
 
     <string name="help_title">Справка и поддержка</string>
     <string name="help_resources">Ресурсы</string>
@@ -459,6 +466,7 @@
     <string name="pill_shape_injection">Инъекция</string>
     <string name="pill_shape_drops">Капли</string>
     <string name="pill_shape_patch">Пластырь</string>
+    <string name="pill_shape_spray">Спрей</string>
 
     <string name="med_notes_label">Указания врача и предостережения</string>
     <string name="med_notes_placeholder">напр. Принимать во время еды, Избегать грейпфрута, Рецепт #12345</string>
@@ -552,15 +560,6 @@
     <string name="about_tagline">Конфиденциальный оффлайн-помощник по приему лекарств для пациентов и близких.</string>
     <string name="about_star_github">Поставить звезду на GitHub</string>
     <string name="about_star_github_desc">Поддержите наш проект с открытым исходным кодом звездой на GitHub</string>
-    <string name="about_support_dev_title">Поддержать разработку</string>
-    <string name="about_support_dev_desc" formatted="false">Dosezy на 100% бесплатен, конфиденциален и без рекламы. Ваша поддержка помогает проекту развиваться!</string>
-    <string name="about_buymeacoffee">Купить кофе автору</string>
-    <string name="about_buymeacoffee_desc">Поддержать картой или через PayPal на BuyMeACoffee</string>
-    <string name="about_crypto_donations">Пожертвования в криптовалюте</string>
-    <string name="about_copied_to_clipboard">Адрес %1$s скопирован в буфер обмена</string>
-    <string name="about_tap_to_copy">Нажмите, чтобы скопировать адрес</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">Ежемесячная или разовая поддержка через GitHub Sponsors</string>
     <string name="pref_alarm_duration_title">Длительность звонка будильника</string>
     <string name="pref_alarm_duration_desc">Автоматически выключать звук и вибрацию через заданное время</string>
     <string name="alarm_duration_continuous">Непрерывно (до закрытия)</string>
@@ -670,16 +669,6 @@
 
     <string name="about_community_open_source">Сообщество и открытый исходный код</string>
     <string name="about_version_build">Версия %1$s (Сборка %2$s)</string>
-    <string name="crypto_bitcoin">Bitcoin (BTC)</string>
-    <string name="crypto_ethereum">Ethereum (ETH)</string>
-    <string name="crypto_solana">Solana (SOL)</string>
-    <string name="crypto_litecoin">Litecoin (LTC)</string>
-    <string name="crypto_zcash">Zcash (ZEC)</string>
-    <string name="crypto_name_btc">Bitcoin</string>
-    <string name="crypto_name_eth">Ethereum</string>
-    <string name="crypto_name_sol">Solana</string>
-    <string name="crypto_name_ltc">Litecoin</string>
-    <string name="crypto_name_zec">Zcash</string>
     <string name="country_india">Индия</string>
     <string name="country_us_ca">США / Канада</string>
     <string name="country_uk">Великобритания</string>
@@ -857,4 +846,33 @@
     <string name="schedule_effective_today_desc">Применить новое время сегодня. Устаревшие непринятые дозы за сегодня будут удалены.</string>
     <string name="schedule_effective_tomorrow_title">Начиная с завтрашнего дня</string>
     <string name="schedule_effective_tomorrow_desc">Сохранить сегодняшнее расписание без изменений. Новое расписание начнется завтра.</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[Зарегистрировано задним числом]</string>
+    <string name="schedule_action_dialog_title">Управление дозой</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">Отметить как принятое</string>
+    <string name="schedule_action_skip_dose">Отметить как пропущенное</string>
+    <string name="schedule_action_undo_dose">Отменить действие для дозы</string>
+    <string name="schedule_action_edit_note">Редактировать заметку</string>
+    <string name="schedule_action_add_note">Добавить заметку</string>
+    <string name="schedule_dose_marked_taken">%1$s отмечен(а) как принятое</string>
+    <string name="schedule_dose_marked_skipped">%1$s отмечен(а) как пропущенное</string>
+    <string name="schedule_dose_reverted">%1$s возвращен(а) в ожидающие</string>
+    <string name="schedule_dose_locked_notice">Эта доза старше 48 часов и заблокирована для сохранения достоверности медицинской истории.</string>
+    <string name="schedule_dose_locked_badge">Заблокировано</string>
+    <string name="schedule_tap_to_manage">Нажмите для управления</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">Стиль напоминания</string>
+    <string name="pref_reminder_type_desc">Выберите, как звучат напоминания: как будильник или обычное уведомление</string>
+    <string name="reminder_type_alarm">Будильник</string>
+    <string name="reminder_type_alarm_desc">Полноэкранное оповещение с непрерывным звуком. Обходит режим Не беспокоить.</string>
+    <string name="reminder_type_notification">Уведомление</string>
+    <string name="reminder_type_notification_desc">Обычный баннер уведомления со звуковым сигналом. Учитывает режим Не беспокоить.</string>
+    <string name="reminder_type_default">Использовать по умолчанию для профиля (%1$s)</string>
+    <string name="reminder_type_default_profile">Использовать по умолчанию для профиля</string>
+    <string name="notif_channel_notifications_name">Уведомления о приеме лекарств</string>
+    <string name="notif_channel_notifications_desc">Стандартные уведомления о графике приема лекарств с учетом режима Не беспокоить</string>
+    <string name="form_reminder_type">Стиль напоминания</string>
+    <string name="form_reminder_type_desc">Выберите Будильник для важных лекарств или Уведомление для добавок</string>
 </resources>

@@ -45,6 +45,12 @@
     <string name="form_delete_medicine">حذف الدواء</string>
     <string name="form_upload_img">تحميل صورة الدواء</string>
     <string name="form_change_img">تغيير صورة الدواء</string>
+    <string name="form_error_med_name_required">اسم الدواء مطلوب</string>
+    <string name="form_error_dosage_required">الجرعة مطلوبة</string>
+    <string name="form_error_dosage_invalid">يجب أن تكون الجرعة رقماً موجباً</string>
+    <string name="form_error_select_days">يرجى تحديد يوم واحد على الأقل</string>
+    <string name="form_error_course_duration">يجب أن تكون مدة العلاج يوماً واحداً على الأقل</string>
+    <string name="form_error_fix_fields">يرجى ملء الحقول المطلوبة الموضحة أعلاه</string>
     <string name="freq_daily">يوميًا</string>
     <string name="freq_weekly">أسبوعيًا</string>
     <string name="freq_monthly">شهريًا</string>
@@ -147,6 +153,7 @@
     <string name="unit_meq">مكافئ (mEq)</string>
     <string name="unit_puff">بخة</string>
     <string name="unit_ampule">أمبولة</string>
+    <string name="unit_spray">بخة</string>
 
     <string name="help_title">المساعدة والدعم</string>
     <string name="help_resources">الموارد</string>
@@ -459,6 +466,7 @@
     <string name="pill_shape_injection">حقنة</string>
     <string name="pill_shape_drops">قطرات</string>
     <string name="pill_shape_patch">لاصقة</string>
+    <string name="pill_shape_spray">بخاخ</string>
 
     <string name="med_notes_label">ملاحظات الطبيب والتحذيرات</string>
     <string name="med_notes_placeholder">مثال: يؤخذ مع الطعام، تجنب الجريب فروت، وصفة رقم 12345</string>
@@ -552,15 +560,6 @@
     <string name="about_tagline">رفيق دوائي آمن وخاص يعمل بدون إنترنت للمرضى ومقدمي الرعاية.</string>
     <string name="about_star_github">نجمة على GitHub</string>
     <string name="about_star_github_desc">ادعم مشروعنا مفتوح المصدر عبر وضع نجمة على GitHub</string>
-    <string name="about_support_dev_title">دعم التطوير</string>
-    <string name="about_support_dev_desc" formatted="false">تطبيق Dosezy مجاني 100% وخالٍ من الإعلانات تماماً. تبرعاتكم تساهم في استمرار التطوير!</string>
-    <string name="about_buymeacoffee">اشترِ لي قهوة (Buy Me a Coffee)</string>
-    <string name="about_buymeacoffee_desc">ادعمنا بواسطة البطاقة المصرفية أو PayPal</string>
-    <string name="about_crypto_donations">التبرع بالعملات المشفرة</string>
-    <string name="about_copied_to_clipboard">تم نسخ عنوان %1$s إلى الحافظة</string>
-    <string name="about_tap_to_copy">اضغط لنسخ العنوان</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">ادعم المشروع شهرياً أو لمرة واحدة عبر GitHub Sponsors</string>
     <string name="pref_alarm_duration_title">مدة رنين المنبه</string>
     <string name="pref_alarm_duration_desc">إيقاف الصوت والاهتزاز تلقائياً بعد انقضاء المدة المحددة</string>
     <string name="alarm_duration_continuous">مستمر (حتى الإلغاء)</string>
@@ -670,16 +669,6 @@
 
     <string name="about_community_open_source">المجتمع والمصدر المفتوح</string>
     <string name="about_version_build">الإصدار %1$s (بناء %2$s)</string>
-    <string name="crypto_bitcoin">بيتكوين (BTC)</string>
-    <string name="crypto_ethereum">إيثيريوم (ETH)</string>
-    <string name="crypto_solana">سولانا (SOL)</string>
-    <string name="crypto_litecoin">لايتكوين (LTC)</string>
-    <string name="crypto_zcash">زي كاش (ZEC)</string>
-    <string name="crypto_name_btc">بيتكوين</string>
-    <string name="crypto_name_eth">إيثيريوم</string>
-    <string name="crypto_name_sol">سولانا</string>
-    <string name="crypto_name_ltc">لايتكوين</string>
-    <string name="crypto_name_zec">زي كاش</string>
     <string name="country_india">الهند</string>
     <string name="country_us_ca">الولايات المتحدة / كندا</string>
     <string name="country_uk">المملكة المتحدة</string>
@@ -857,4 +846,33 @@
     <string name="schedule_effective_today_desc">تطبيق المواعيد الجديدة اليوم. ستتم إزالة الجرعات السابقة غير المأخوذة اليوم.</string>
     <string name="schedule_effective_tomorrow_title">بدءاً من الغد</string>
     <string name="schedule_effective_tomorrow_desc">الحفاظ على جدول اليوم كما هو. سيبدأ الجدول الجديد غداً.</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[تم التسجيل بأثر رجعي]</string>
+    <string name="schedule_action_dialog_title">إدارة الجرعة</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">تحديد كتم تناولها</string>
+    <string name="schedule_action_skip_dose">تحديد كجرعة متخطاة</string>
+    <string name="schedule_action_undo_dose">التراجع عن إجراء الجرعة</string>
+    <string name="schedule_action_edit_note">تعديل ملاحظة الجرعة</string>
+    <string name="schedule_action_add_note">إضافة ملاحظة للجرعة</string>
+    <string name="schedule_dose_marked_taken">تم تحديد %1$s كجرعة متناولة</string>
+    <string name="schedule_dose_marked_skipped">تم تحديد %1$s كجرعة متخطاة</string>
+    <string name="schedule_dose_reverted">تمت إعادة %1$s إلى معلقة</string>
+    <string name="schedule_dose_locked_notice">هذه الجرعة أقدم من 48 ساعة وتم قفلها للحفاظ على سلامة السجل الطبي.</string>
+    <string name="schedule_dose_locked_badge">مقفل</string>
+    <string name="schedule_tap_to_manage">اضغط للإدارة</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">نمط التذكير</string>
+    <string name="pref_reminder_type_desc">اختر ما إذا كانت التذكيرات ترن كمنبه أو إشعار عادي</string>
+    <string name="reminder_type_alarm">منبه</string>
+    <string name="reminder_type_alarm_desc">تنبيه بملء الشاشة مع صوت مستمر. يتجاوز وضع عدم الإزعاج.</string>
+    <string name="reminder_type_notification">إشعار</string>
+    <string name="reminder_type_notification_desc">شريط إشعار قياسي مع نغمة تنبيه. يحترم وضع عدم الإزعاج.</string>
+    <string name="reminder_type_default">استخدام الإعداد الافتراضي للملف الشخصي (%1$s)</string>
+    <string name="reminder_type_default_profile">استخدام الافتراضي للملف الشخصي</string>
+    <string name="notif_channel_notifications_name">إشعارات الأدوية</string>
+    <string name="notif_channel_notifications_desc">تنبيهات إشعار قياسية لجداول الأدوية تحترم وضع عدم الإزعاج</string>
+    <string name="form_reminder_type">نمط التذكير</string>
+    <string name="form_reminder_type_desc">اختر منبه للأدوية الهامة أو إشعار للمكملات الغذائية</string>
 </resources>

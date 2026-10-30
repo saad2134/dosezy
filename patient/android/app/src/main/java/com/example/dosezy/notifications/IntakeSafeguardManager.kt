@@ -230,7 +230,12 @@ object IntakeSafeguardManager {
         return true
     }
 
-    fun cancelCountdown(context: Context) {
+    // Guard: Provide restoreReminderIfPending option so user-initiated countdown cancellations restore pending reminder notifications and re-arm nagging alarms (#BUG-SAFEGUARD-CANCEL-RESTORE)
+    fun cancelCountdown(
+        context: Context,
+        restoreReminderIfPending: Boolean = false,
+        onComplete: (() -> Unit)? = null
+    ) {
         val current = _activeCountdown.value ?: restoreState(context)
         if (current != null) {
             val scheduler = AlarmScheduler(context)
@@ -243,6 +248,77 @@ object IntakeSafeguardManager {
             com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
         } catch (_: Exception) {}
         Log.d(TAG, "Cancelled intake countdown")
+
+        // Guard: Re-post reminder notifications and re-arm nagging alarms for remaining pending medicines when countdown is cancelled by user (#BUG-SAFEGUARD-CANCEL-RESTORE)
+        if (restoreReminderIfPending && current != null) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    restorePendingReminders(context, current)
+                } finally {
+                    onComplete?.invoke()
+                }
+            }
+        } else {
+            onComplete?.invoke()
+        }
+    }
+
+    internal suspend fun restorePendingReminders(context: Context, current: IntakeCountdownState) {
+        try {
+            val db = DosezyDatabase.getInstance(context)
+            val pendingEntries = current.entryIds.mapNotNull { id ->
+                db.scheduleDao().getScheduleEntryById(id)
+            }.filter { it.status == MedicationStatus.PENDING }
+
+            if (pendingEntries.isNotEmpty()) {
+                val primary = pendingEntries.first()
+                val user = db.userDao().getUserByIdDirect(primary.userId)
+                val activeMedicineNames = ArrayList(pendingEntries.mapNotNull { e ->
+                    db.medicineDao().getMedicineByIdDirect(e.medicineId)?.medicationName
+                }.distinct())
+                val effectiveName = if (activeMedicineNames.isNotEmpty()) {
+                    activeMedicineNames.joinToString(", ")
+                } else {
+                    current.medicineName
+                }
+                val activeEntryIds = ArrayList(pendingEntries.map { it.entryId })
+                val defaultReminderType = user?.reminderType ?: com.example.dosezy.data.model.ReminderType.ALARM
+                val isAlarmMode = pendingEntries.any { e ->
+                    val m = db.medicineDao().getMedicineByIdDirect(e.medicineId)
+                    val effectiveType = m?.reminderType ?: defaultReminderType
+                    effectiveType == com.example.dosezy.data.model.ReminderType.ALARM
+                }
+
+                MedicineAlarmReceiver.updateCohortNotification(
+                    context = context,
+                    entryId = primary.entryId,
+                    entryIds = activeEntryIds,
+                    medicineName = effectiveName,
+                    medicineNames = activeMedicineNames,
+                    scheduledTime = current.scheduledTime,
+                    snoozeMinutes = user?.snoozeDuration ?: 10,
+                    userId = primary.userId,
+                    userLanguage = user?.language,
+                    isAlarmMode = isAlarmMode
+                )
+
+                if (user != null && user.naggingRemindersEnabled) {
+                    val scheduler = AlarmScheduler(context)
+                    scheduler.scheduleNaggingReminder(
+                        entryId = primary.entryId,
+                        minutes = user.naggingIntervalMinutes,
+                        medicineName = effectiveName,
+                        naggingCount = 1,
+                        entryIds = activeEntryIds,
+                        medicineNames = activeMedicineNames,
+                        scheduledTime = current.scheduledTime,
+                        userId = primary.userId
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error restoring reminder notification for cancelled intake safeguard", e)
+        }
     }
 
     // Guard: Reconcile active intake countdown when individual cohort members are resolved to prevent cancelling countdown for remaining pending medicines (#BUG-SAFEGUARD-PARTIAL-COHORT)

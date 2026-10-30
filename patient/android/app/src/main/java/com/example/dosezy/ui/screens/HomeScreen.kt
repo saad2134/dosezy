@@ -463,7 +463,8 @@ fun HomeScreen(
                     IntakeSafeguardManager.extendCountdown(context, 60)
                 },
                 onCancel = {
-                    IntakeSafeguardManager.cancelCountdown(context)
+                    // Guard: User explicitly cancelled countdown; restore reminder notification and nagging if still pending (#BUG-SAFEGUARD-CANCEL-RESTORE)
+                    IntakeSafeguardManager.cancelCountdown(context, restoreReminderIfPending = true)
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar(
                             message = context.getString(R.string.home_intake_cancelled),

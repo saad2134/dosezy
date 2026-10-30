@@ -45,6 +45,12 @@
     <string name="form_delete_medicine">ওষুধ মুছে ফেলুন</string>
     <string name="form_upload_img">ছবি আপলোড করুন</string>
     <string name="form_change_img">ছবি পরিবর্তন করুন</string>
+    <string name="form_error_med_name_required">ওষুধের নাম প্রয়োজন</string>
+    <string name="form_error_dosage_required">ডোজের পরিমাণ প্রয়োজন</string>
+    <string name="form_error_dosage_invalid">ডোজ অবশ্যই একটি ধনাত্মক সংখ্যা হতে হবে</string>
+    <string name="form_error_select_days">অনুগ্রহ করে অন্তত একটি দিন নির্বাচন করুন</string>
+    <string name="form_error_course_duration">কোর্সের মেয়াদ অন্তত ১ দিন হতে হবে</string>
+    <string name="form_error_fix_fields">অনুগ্রহ করে উপরে চিহ্নিত প্রয়োজনীয় তথ্য পূরণ করুন</string>
     <string name="freq_daily">প্রতিদিন</string>
     <string name="freq_weekly">সাপ্তাহিক</string>
     <string name="freq_monthly">মাসিক</string>
@@ -147,6 +153,7 @@
     <string name="unit_meq">mEq</string>
     <string name="unit_puff">পাফ</string>
     <string name="unit_ampule">অ্যাম্পুল</string>
+    <string name="unit_spray">স্প্রে</string>
 
     <string name="help_title">সাহায্য ও সহায়তা</string>
     <string name="help_resources">সম্পদসমূহ</string>
@@ -459,6 +466,7 @@
     <string name="pill_shape_injection">ইনজেকশন (Injection)</string>
     <string name="pill_shape_drops">ড্রপস (Drops)</string>
     <string name="pill_shape_patch">প্যাচ (Patch)</string>
+    <string name="pill_shape_spray">স্প্রে</string>
 
     <string name="med_notes_label">ডাক্তারের নির্দেশনা ও সতর্কতা</string>
     <string name="med_notes_placeholder">যেমনঃ ভরা পেটে সেব্য, বাতাবি লেবু পরিহার করুন, প্রেসক্রিপশন #12345</string>
@@ -552,15 +560,6 @@
     <string name="about_tagline">রোগী ও পরিচর্যাকারীদের জন্য সম্পূর্ণ অফলাইন ও নিরাপদ ওষুধ সহযোগী।</string>
     <string name="about_star_github">GitHub-এ স্টার দিন</string>
     <string name="about_star_github_desc">GitHub-এ স্টার দিয়ে আমাদের ওপেন সোর্স প্রজেক্টকে সমর্থন জানান</string>
-    <string name="about_support_dev_title">উন্নয়নে সহায়তা করুন</string>
-    <string name="about_support_dev_desc" formatted="false">Dosezy সম্পূর্ণ বিনামূল্যে, নিরাপদ এবং বিজ্ঞাপনহীন। আপনার অনুদান এই প্রজেক্টকে সচল রাখতে সাহায্য করে!</string>
-    <string name="about_buymeacoffee">Buy Me a Coffee-তে সাপোর্ট করুন</string>
-    <string name="about_buymeacoffee_desc">কার্ড বা PayPal-এর মাধ্যমে অনুদান প্রদান করুন</string>
-    <string name="about_crypto_donations">ক্রিপ্টোকারেন্সি অনুদান</string>
-    <string name="about_copied_to_clipboard">%1$s ঠিকানা ক্লিপবোর্ডে কপি করা হয়েছে</string>
-    <string name="about_tap_to_copy">ঠিকানা কপি করতে ট্যাপ করুন</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">GitHub Sponsors-এর মাধ্যমে মাসিক বা এককালীন অনুদান দিন</string>
     <string name="pref_alarm_duration_title">অ্যালার্ম বাজার সময়সীমা</string>
     <string name="pref_alarm_duration_desc">নির্দিষ্ট সময় পর স্বয়ংক্রিয়ভাবে শব্দ ও কম্পন বন্ধ করুন</string>
     <string name="alarm_duration_continuous">একটানা (বন্ধ না করা পর্যন্ত)</string>
@@ -666,16 +665,6 @@
 
     <string name="about_community_open_source">কমিউনিটি ও ওপেন সোর্স</string>
     <string name="about_version_build">সংস্করণ %1$s (বিল্ড %2$s)</string>
-    <string name="crypto_bitcoin">বিটকয়েন (BTC)</string>
-    <string name="crypto_ethereum">ইথেরিয়াম (ETH)</string>
-    <string name="crypto_solana">সোলানা (SOL)</string>
-    <string name="crypto_litecoin">লাইটকয়েন (LTC)</string>
-    <string name="crypto_zcash">জেটক্যাশ (ZEC)</string>
-    <string name="crypto_name_btc">বিটকয়েন</string>
-    <string name="crypto_name_eth">ইথেরিয়াম</string>
-    <string name="crypto_name_sol">সোলানা</string>
-    <string name="crypto_name_ltc">লাইটকয়েন</string>
-    <string name="crypto_name_zec">জেটক্যাশ</string>
     <string name="country_india">ভারত</string>
     <string name="country_us_ca">যুক্তরাষ্ট্র / কানাডা</string>
     <string name="country_uk">যুক্তরাজ্য</string>
@@ -856,4 +845,33 @@
     <string name="schedule_effective_today_desc">আজকের নতুন সময় প্রয়োগ করুন। আজকের অতীতের না নেওয়া ডোজ মুছে ফেলা হবে।</string>
     <string name="schedule_effective_tomorrow_title">আগামীকাল থেকে শুরু</string>
     <string name="schedule_effective_tomorrow_desc">আজকের সময়সূচী অপরিবর্তিত রাখুন। নতুন সময়সূচী আগামীকাল থেকে শুরু হবে।</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[রেট্রোস্পেক্টিভভাবে নথিভুক্ত]</string>
+    <string name="schedule_action_dialog_title">ডোজ পরিচালনা করুন</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">গ্রহণ করা হয়েছে চিহ্নিত করুন</string>
+    <string name="schedule_action_skip_dose">বাদ দেওয়া হয়েছে চিহ্নিত করুন</string>
+    <string name="schedule_action_undo_dose">ডোজ ক্রিয়া পূর্বাবস্থায় ফেরান</string>
+    <string name="schedule_action_edit_note">ডোজ নোট সম্পাদনা করুন</string>
+    <string name="schedule_action_add_note">ডোজ নোট যোগ করুন</string>
+    <string name="schedule_dose_marked_taken">%1$s গ্রহণ করা হয়েছে চিহ্নিত করা হয়েছে</string>
+    <string name="schedule_dose_marked_skipped">%1$s বাদ দেওয়া হয়েছে চিহ্নিত করা হয়েছে</string>
+    <string name="schedule_dose_reverted">%1$s অপেক্ষামাণে ফিরিয়ে আনা হয়েছে</string>
+    <string name="schedule_dose_locked_notice">এই ডোজটি ৪৮ ঘণ্টার বেশি পুরানো এবং চিকিৎসা রেকর্ডের সত্যতা রক্ষার জন্য লক করা হয়েছে।</string>
+    <string name="schedule_dose_locked_badge">লক করা</string>
+    <string name="schedule_tap_to_manage">পরিচালনা করতে ট্যাপ করুন</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">অনুস্মারক শৈলী</string>
+    <string name="pref_reminder_type_desc">অনুস্মারকগুলি অ্যালার্ম নাকি সাধারণ বিজ্ঞপ্তি হিসেবে বাজবে তা নির্বাচন করুন</string>
+    <string name="reminder_type_alarm">অ্যালার্ম</string>
+    <string name="reminder_type_alarm_desc">একটানা শব্দসহ ফুল-স্ক্রিন সতর্কতা। বিরক্ত করবেন না মোড উপেক্ষা করে।</string>
+    <string name="reminder_type_notification">বিজ্ঞপ্তি</string>
+    <string name="reminder_type_notification_desc">সতর্কতা সুরসহ সাধারণ বিজ্ঞপ্তির ব্যানার। বিরক্ত করবেন না মোড মেনে চলে।</string>
+    <string name="reminder_type_default">প্রোফাইল ডিফল্ট ব্যবহার করুন (%1$s)</string>
+    <string name="reminder_type_default_profile">প্রোফাইল ডিফল্ট ব্যবহার করুন</string>
+    <string name="notif_channel_notifications_name">ওষুধের বিজ্ঞপ্তি</string>
+    <string name="notif_channel_notifications_desc">বিরক্ত করবেন না মোড মেনে চলা ওষুধের সময়সূচির সাধারণ বিজ্ঞপ্তি সতর্কতা</string>
+    <string name="form_reminder_type">অনুস্মারক শৈলী</string>
+    <string name="form_reminder_type_desc">জরুরি ওষুধের জন্য অ্যালার্ম অথবা সাপ্লিমেন্টের জন্য বিজ্ঞপ্তি বাছুন</string>
 </resources>

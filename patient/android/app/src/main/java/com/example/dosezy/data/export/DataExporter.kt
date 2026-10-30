@@ -259,6 +259,8 @@ class DataExporter(
         // Guard: Explicitly serialize lockscreen privacy and custom snooze popup settings on backup restore
         userObj.put("lockscreenDetailsEnabled", user.lockscreenDetailsEnabled)
         userObj.put("customSnoozePopupEnabled", user.customSnoozePopupEnabled)
+        // Guard: Explicitly serialize reminderType to retain user alert delivery preference on backup restore (#111)
+        userObj.put("reminderType", user.reminderType.name)
         root.put("user", userObj)
 
         val medArray = JSONArray()
@@ -319,6 +321,8 @@ class DataExporter(
             mObj.put("endDate", med.endDate?.toString() ?: "")
             mObj.put("durationDays", med.durationDays)
             mObj.put("isArchived", med.isArchived)
+            // Guard: Explicitly serialize per-medicine reminderType override to retain alert delivery settings on backup restore (#111)
+            med.reminderType?.let { mObj.put("reminderType", it.name) }
             med.customDosages?.let { cd ->
                 val cdObj = JSONObject()
                 cd.forEach { (timeStr, dosageVal) ->
@@ -359,9 +363,15 @@ class DataExporter(
     }
 
     companion object {
+        // Guard: Neutralize CSV formula/DDE injection for strings starting with =, +, -, @, \t, \r to prevent remote code execution or spreadsheet formula errors (#BUG-CSV-INJECTION, CWE-1236)
         internal fun escapeCsv(value: Any?): String {
             val str = value?.toString() ?: ""
-            return "\"${str.replace("\"", "\"\"")}\""
+            val sanitized = if (str.isNotEmpty() && (str.startsWith("=") || str.startsWith("+") || str.startsWith("-") || str.startsWith("@") || str.startsWith("\t") || str.startsWith("\r"))) {
+                "'$str"
+            } else {
+                str
+            }
+            return "\"${sanitized.replace("\"", "\"\"")}\""
         }
 
         internal fun buildCsvContent(user: User, medicines: List<Medicine>, schedules: List<ScheduleEntry>): String {
@@ -369,7 +379,8 @@ class DataExporter(
 
             // User Information Section
             csvBuilder.append("USER INFORMATION\n")
-            csvBuilder.append("User ID,Full Name,Age,Gender,Contact Number,Allergies,Medical Conditions,Profile Picture Path,Is Current User\n")
+            // Guard: Include Reminder Type in user and medicine CSV sections to preserve complete reminder configuration in tabular exports (#111)
+            csvBuilder.append("User ID,Full Name,Age,Gender,Contact Number,Allergies,Medical Conditions,Profile Picture Path,Is Current User,Reminder Type\n")
             csvBuilder.append(
                 "${escapeCsv(user.userId)}," +
                 "${escapeCsv(user.fullName)}," +
@@ -379,13 +390,14 @@ class DataExporter(
                 "${escapeCsv(user.allergies ?: "")}," +
                 "${escapeCsv(user.medicalConditions ?: "")}," +
                 "${escapeCsv(user.profilePicPath ?: "")}," +
-                "${user.isCurrentUser}\n\n"
+                "${user.isCurrentUser}," +
+                "${user.reminderType.name}\n\n"
             )
 
             // Medicines Section
             csvBuilder.append("MEDICINES\n")
             // Guard: Include Refill Threshold, Auto Deduct Stock, Is Archived, Custom Dosages, and Days of Week/Month to preserve complete inventory and frequency metadata in CSV exports
-            csvBuilder.append("Medicine ID,User ID,Medication Name,Dosage,Dosage Unit,Times Per Day,Frequency Pattern,Interval Hours,Interval Days,Interval Weeks,Days Per Week,Days Per Month,Selected Days Of Week,Selected Days Of Month,Scheduled Times,Pill Shape,Pill Color,Doctor Notes,Start Date,End Date,Duration Days,Stock,Refill Threshold,Auto Deduct Stock,Is Archived,Custom Dosages,Image URI\n")
+            csvBuilder.append("Medicine ID,User ID,Medication Name,Dosage,Dosage Unit,Times Per Day,Frequency Pattern,Interval Hours,Interval Days,Interval Weeks,Days Per Week,Days Per Month,Selected Days Of Week,Selected Days Of Month,Scheduled Times,Pill Shape,Pill Color,Doctor Notes,Start Date,End Date,Duration Days,Stock,Refill Threshold,Auto Deduct Stock,Is Archived,Custom Dosages,Image URI,Reminder Type\n")
             medicines.forEach { medicine ->
                 val scheduledTimesStr = medicine.scheduledTimes.joinToString(";") { it.toString() }
                 val customDosagesStr = medicine.customDosages?.entries?.joinToString(";") { "${it.key}:${it.value}" } ?: ""
@@ -418,7 +430,8 @@ class DataExporter(
                     "${medicine.autoDeductOnTake}," +
                     "${medicine.isArchived}," +
                     "${escapeCsv(customDosagesStr)}," +
-                    "${escapeCsv(medicine.imageUri ?: "")}\n"
+                    "${escapeCsv(medicine.imageUri ?: "")}," +
+                    "${medicine.reminderType?.name ?: ""}\n"
                 )
             }
             csvBuilder.append("\n")

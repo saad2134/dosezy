@@ -53,6 +53,7 @@ import com.example.dosezy.ui.components.PreferenceItem
 
 fun LazyListScope.notificationAlarmPreferencesSection(
     currentUser: User?,
+    onReminderTypeClick: () -> Unit,
     onSlideActionsChange: (Boolean) -> Unit,
     onLockscreenDetailsChange: (Boolean) -> Unit,
     onCustomSnoozePopupChange: (Boolean) -> Unit,
@@ -70,6 +71,17 @@ fun LazyListScope.notificationAlarmPreferencesSection(
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(start = 16.dp, top = 20.dp, bottom = 4.dp)
+        )
+    }
+
+    // Reminder Style (Alarm vs Notification) (#111)
+    item {
+        val currentReminderType = currentUser?.reminderType ?: com.example.dosezy.data.model.ReminderType.ALARM
+        PreferenceItem(
+            title = stringResource(R.string.pref_reminder_type_title),
+            currentValue = stringResource(currentReminderType.titleRes),
+            iconName = "alarm_clock",
+            onClick = onReminderTypeClick
         )
     }
 

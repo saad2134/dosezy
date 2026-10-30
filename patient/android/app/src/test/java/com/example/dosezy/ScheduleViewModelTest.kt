@@ -335,4 +335,116 @@ class ScheduleViewModelTest {
             scheduleRepository.getScheduleForUser("user_123")
         }
     }
+
+    @Test
+    fun markAsTaken_onSelectedHistoricalDate_reloadsSelectedDateSchedule() = runTest {
+        // Guard: Verify marking a retrospective missed dose as taken refreshes schedule for the selected past calendar date (#109)
+        val viewModel = createViewModel()
+        val yesterday = LocalDate.now().minusDays(1)
+        viewModel.setSelectedDate(yesterday)
+
+        val scheduledTime = LocalDateTime.of(yesterday, LocalTime.of(8, 0)).toString()
+        val auditNote = "[Logged retrospectively] Took with breakfast"
+
+        viewModel.markAsTaken("entry_1", scheduledTime, auditNote)
+
+        coVerify {
+            scheduleRepository.recordDoseTaken(
+                entryId = "entry_1",
+                status = any(),
+                takenAtStr = scheduledTime,
+                context = context,
+                notes = auditNote
+            )
+        }
+        coVerify(atLeast = 1) {
+            scheduleRepository.getScheduleWithMedicineForDate("user_123", yesterday)
+        }
+    }
+
+    @Test
+    fun markAsSkipped_callsRecordDoseSkippedAndRefreshesSelectedDateSchedule() = runTest {
+        // Guard: Verify skipping a retrospective dose from calendar records skip reason and refreshes the selected date (#109)
+        val viewModel = createViewModel()
+        val yesterday = LocalDate.now().minusDays(1)
+        viewModel.setSelectedDate(yesterday)
+
+        viewModel.markAsSkipped("entry_1", "Doctor instructed to hold dose")
+
+        coVerify {
+            scheduleRepository.recordDoseSkipped(
+                entryId = "entry_1",
+                skipReason = "Doctor instructed to hold dose",
+                context = context
+            )
+        }
+        coVerify(atLeast = 1) {
+            scheduleRepository.getScheduleWithMedicineForDate("user_123", yesterday)
+        }
+    }
+
+    @Test
+    fun undoDoseTaken_onSelectedHistoricalDate_reloadsSelectedDateSchedule() = runTest {
+        // Guard: Verify reverting a historical dose triggers undo and reloads the active calendar date schedule (#109)
+        val viewModel = createViewModel()
+        val yesterday = LocalDate.now().minusDays(1)
+        viewModel.setSelectedDate(yesterday)
+
+        viewModel.undoDoseTaken("entry_1")
+
+        coVerify {
+            scheduleRepository.undoDoseTaken(
+                entryId = "entry_1",
+                context = context
+            )
+        }
+        coVerify(atLeast = 1) {
+            scheduleRepository.getScheduleWithMedicineForDate("user_123", yesterday)
+        }
+    }
+
+    @Test
+    fun markAsTaken_whenDoseTakenLate_recordsStatusAsTakenLate() = runTest {
+        // Guard: Verify overdue dose marked taken in ScheduleViewModel is recorded as TAKEN_LATE rather than TAKEN_ON_TIME (#BUG-SCHEDULE-LATE-STATUS)
+        val viewModel = createViewModel()
+        val scheduled = LocalDateTime.of(2026, 10, 30, 8, 0)
+        val overdueEntry = testScheduleEntry.copy(scheduledDateTime = scheduled)
+        coEvery { scheduleRepository.getScheduleEntryById("entry_1") } returns overdueEntry
+
+        val takenAtOverdue = "2026-10-30T14:00:00"
+        viewModel.markAsTaken("entry_1", takenAtOverdue, null)
+
+        coVerify {
+            scheduleRepository.recordDoseTaken(
+                entryId = "entry_1",
+                status = "TAKEN_LATE",
+                takenAtStr = takenAtOverdue,
+                context = context,
+                notes = null
+            )
+        }
+    }
+
+    @Test
+    fun markAsTaken_whenDoseTakenOnTime_recordsStatusAsTakenOnTime() = runTest {
+        // Guard: Verify on-time dose marked taken in ScheduleViewModel is recorded as TAKEN_ON_TIME (#BUG-SCHEDULE-LATE-STATUS)
+        val viewModel = createViewModel()
+        val scheduled = LocalDateTime.of(2026, 10, 30, 8, 0)
+        val onTimeEntry = testScheduleEntry.copy(scheduledDateTime = scheduled)
+        coEvery { scheduleRepository.getScheduleEntryById("entry_1") } returns onTimeEntry
+
+        val takenAtOnTime = "2026-10-30T08:30:00"
+        viewModel.markAsTaken("entry_1", takenAtOnTime, null)
+
+        coVerify {
+            scheduleRepository.recordDoseTaken(
+                entryId = "entry_1",
+                status = "TAKEN_ON_TIME",
+                takenAtStr = takenAtOnTime,
+                context = context,
+                notes = null
+            )
+        }
+    }
 }
+

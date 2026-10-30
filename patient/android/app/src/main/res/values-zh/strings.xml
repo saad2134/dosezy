@@ -51,6 +51,12 @@
     <string name="form_delete_medicine">删除该药物</string>
     <string name="form_upload_img">上传药物图片</string>
     <string name="form_change_img">更换药物图片</string>
+    <string name="form_error_med_name_required">药物名称为必填项</string>
+    <string name="form_error_dosage_required">用量为必填项</string>
+    <string name="form_error_dosage_invalid">用量必须为正数</string>
+    <string name="form_error_select_days">请至少选择一天</string>
+    <string name="form_error_course_duration">疗程必须至少为1天</string>
+    <string name="form_error_fix_fields">请填写上方高亮显示的必填项</string>
     <string name="freq_daily">每天</string>
     <string name="freq_weekly">每周</string>
     <string name="freq_monthly">每月</string>
@@ -161,6 +167,7 @@
     <string name="unit_meq">毫克当量 (mEq)</string>
     <string name="unit_puff">喷</string>
     <string name="unit_ampule">安瓿</string>
+    <string name="unit_spray">喷</string>
 
     <!-- Help &amp; Support -->
     <string name="help_title">帮助与支持</string>
@@ -475,6 +482,7 @@
     <string name="pill_shape_injection">注射剂 (Injection)</string>
     <string name="pill_shape_drops">滴剂 (Drops)</string>
     <string name="pill_shape_patch">贴剂 (Patch)</string>
+    <string name="pill_shape_spray">喷雾剂 (Spray)</string>
 
     <string name="med_notes_label">医生嘱咐及特别警告</string>
     <string name="med_notes_placeholder">例如：饭后服用、忌食西柚、处方号 #12345</string>
@@ -568,15 +576,6 @@
     <string name="about_tagline">专为患者与看护者打造的离线隐私用药助手。</string>
     <string name="about_star_github">在 GitHub 上点亮 Star</string>
     <string name="about_star_github_desc">在 GitHub 上为我们的开源项目点亮 Star 予以支持</string>
-    <string name="about_support_dev_title">支持独立开发</string>
-    <string name="about_support_dev_desc" formatted="false">Dosezy 完全免费、无广告、纯本地离线。您的赞助是支持持续维护的最大动力！</string>
-    <string name="about_buymeacoffee">请开发者喝杯咖啡</string>
-    <string name="about_buymeacoffee_desc">通过 BuyMeACoffee 使用银行卡或 PayPal 赞助</string>
-    <string name="about_crypto_donations">加密货币捐赠</string>
-    <string name="about_copied_to_clipboard">已复制 %1$s 地址到剪贴板</string>
-    <string name="about_tap_to_copy">点击复制地址</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">通过 GitHub Sponsors 进行每月或单次赞助</string>
     <string name="pref_alarm_duration_title">闹钟响铃时长</string>
     <string name="pref_alarm_duration_desc">在设定的时长后自动停止响铃与震动</string>
     <string name="alarm_duration_continuous">持续响铃（直到关闭）</string>
@@ -686,16 +685,6 @@
 
     <string name="about_community_open_source">社区与开源</string>
     <string name="about_version_build">版本 %1$s (构建 %2$s)</string>
-    <string name="crypto_bitcoin">比特币 (BTC)</string>
-    <string name="crypto_ethereum">以太坊 (ETH)</string>
-    <string name="crypto_solana">Solana (SOL)</string>
-    <string name="crypto_litecoin">莱特币 (LTC)</string>
-    <string name="crypto_zcash">大零币 (ZEC)</string>
-    <string name="crypto_name_btc">比特币</string>
-    <string name="crypto_name_eth">以太坊</string>
-    <string name="crypto_name_sol">Solana</string>
-    <string name="crypto_name_ltc">莱特币</string>
-    <string name="crypto_name_zec">大零币</string>
     <string name="country_india">印度</string>
     <string name="country_us_ca">美国 / 加拿大</string>
     <string name="country_uk">英国</string>
@@ -873,4 +862,33 @@
     <string name="schedule_effective_today_desc">今天立即应用新时间。今天早前已过期的未服药记录将被移除。</string>
     <string name="schedule_effective_tomorrow_title">从明天开始生效</string>
     <string name="schedule_effective_tomorrow_desc">保留今天的计划不变，新服药时间将从明天开始生效。</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[事后补录]</string>
+    <string name="schedule_action_dialog_title">管理服药记录</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">标记为已服</string>
+    <string name="schedule_action_skip_dose">标记为跳过</string>
+    <string name="schedule_action_undo_dose">撤销服药操作</string>
+    <string name="schedule_action_edit_note">编辑服药备注</string>
+    <string name="schedule_action_add_note">添加服药备注</string>
+    <string name="schedule_dose_marked_taken">已将 %1$s 标记为已服</string>
+    <string name="schedule_dose_marked_skipped">已将 %1$s 标记为跳过</string>
+    <string name="schedule_dose_reverted">%1$s 已恢复为待服</string>
+    <string name="schedule_dose_locked_notice">此服药记录已超过48小时，为确保医疗记录的真实性已锁定。</string>
+    <string name="schedule_dose_locked_badge">已锁定</string>
+    <string name="schedule_tap_to_manage">点击以管理</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">提醒方式</string>
+    <string name="pref_reminder_type_desc">选择提醒方式为闹钟还是标准通知</string>
+    <string name="reminder_type_alarm">闹钟</string>
+    <string name="reminder_type_alarm_desc">全屏提醒伴随连续铃声。绕过请勿打扰模式。</string>
+    <string name="reminder_type_notification">通知</string>
+    <string name="reminder_type_notification_desc">标准横幅通知伴随提示音。遵循请勿打扰模式。</string>
+    <string name="reminder_type_default">使用档案默认设置 (%1$s)</string>
+    <string name="reminder_type_default_profile">使用档案默认设置</string>
+    <string name="notif_channel_notifications_name">服药通知</string>
+    <string name="notif_channel_notifications_desc">遵循请勿打扰模式的标准服药计划通知提醒</string>
+    <string name="form_reminder_type">提醒方式</string>
+    <string name="form_reminder_type_desc">重要药物请选择闹钟，保健品请选择通知</string>
 </resources>

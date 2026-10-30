@@ -13,6 +13,8 @@ import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.notifications.AlarmScheduler
 import com.example.dosezy.widget.DosezyAppWidgetProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -28,11 +30,12 @@ class SkipCohortUseCase @Inject constructor(
         private const val TAG = "SkipCohortUseCase"
     }
 
+    // Guard: Execute cohort operations in NonCancellable context so dismissing AlarmActivity or finishing UI callers does not abort subsequent medications in the cohort (#115)
     suspend operator fun invoke(
         entryIds: List<String>,
         reason: String
-    ) {
-        if (entryIds.isEmpty()) return
+    ) = withContext(NonCancellable) {
+        if (entryIds.isEmpty()) return@withContext
         val alarmScheduler = AlarmScheduler(context)
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
 

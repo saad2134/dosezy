@@ -16,6 +16,8 @@ import com.example.dosezy.notifications.AlarmScheduler
 import com.example.dosezy.utils.TimeCalculationUtils
 import com.example.dosezy.widget.DosezyAppWidgetProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -35,13 +37,14 @@ class TakeCohortUseCase @Inject constructor(
         private const val TAG = "TakeCohortUseCase"
     }
 
+    // Guard: Execute cohort operations in NonCancellable context so dismissing AlarmActivity or finishing UI callers does not abort subsequent medications in the cohort (#115)
     suspend operator fun invoke(
         entryIds: List<String>,
         customTakenAt: LocalDateTime = LocalDateTime.now(),
         notes: String? = null,
         user: User? = null
-    ) {
-        if (entryIds.isEmpty()) return
+    ) = withContext(NonCancellable) {
+        if (entryIds.isEmpty()) return@withContext
         val alarmScheduler = AlarmScheduler(context)
         val nowStr = customTakenAt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
 

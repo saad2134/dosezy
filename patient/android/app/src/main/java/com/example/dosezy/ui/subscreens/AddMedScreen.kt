@@ -44,17 +44,21 @@ import com.example.dosezy.data.model.DosageUnit
 import com.example.dosezy.data.model.FrequencyPattern
 import com.example.dosezy.data.model.Medicine
 import com.example.dosezy.data.model.PillShape
+import com.example.dosezy.data.model.ReminderType
 import com.example.dosezy.data.model.normalizeArabicDigits
 import com.example.dosezy.ui.components.GridTimePickerDialog
 import com.example.dosezy.ui.components.MedicineCourseDurationCard
 import com.example.dosezy.ui.components.MedicineIdentificationCard
 import com.example.dosezy.ui.components.MedicineNotesCard
+import com.example.dosezy.ui.components.MedicineReminderStyleCard
 import com.example.dosezy.ui.components.MedicineStockInventoryCard
 import com.example.dosezy.ui.components.MedicineTimingsAndDosagesCard
 import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.components.isMedicineFormValid
+import com.example.dosezy.ui.components.validateMedicineForm
 import com.example.dosezy.ui.viewmodels.MedicineViewModel
 import com.example.dosezy.ui.viewmodels.UserViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.UUID
@@ -103,6 +107,11 @@ fun AddMedScreen(
     var intervalHoursText by remember { mutableStateOf("4") }
     var intervalDaysText by remember { mutableStateOf("2") }
     var intervalWeeksText by remember { mutableStateOf("2") }
+    var selectedReminderType by remember { mutableStateOf<ReminderType?>(null) }
+
+    var showValidationErrors by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
 
     val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -131,10 +140,40 @@ fun AddMedScreen(
                     ) {
                         focusManager.clearFocus()
                     }
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(scrollState)
                     .padding(16.dp)
                     .background(MaterialTheme.colorScheme.background)
             ) {
+                val validation = validateMedicineForm(
+                    medicationName = medicationName,
+                    dosage = dosage,
+                    hasDifferentDosages = hasDifferentDosages,
+                    scheduledTimesList = scheduledTimesList,
+                    perTimeDosages = perTimeDosages,
+                    selectedFrequency = selectedFrequency,
+                    selectedDaysOfWeek = selectedDaysOfWeek,
+                    selectedDaysOfMonth = selectedDaysOfMonth,
+                    intervalWeeksText = intervalWeeksText,
+                    isFiniteCourse = isFiniteCourse,
+                    durationDaysText = durationDaysText
+                )
+                val isFormValid = validation.isValid
+                val isNameError = showValidationErrors && !validation.isNameValid
+                val nameErrorMessage = if (isNameError) stringResource(R.string.form_error_med_name_required) else null
+
+                val isDosageError = showValidationErrors && !validation.isDosageValid
+                val dosageErrorMessage = when {
+                    !isDosageError -> null
+                    dosage.isBlank() && (!hasDifferentDosages || scheduledTimesList.size <= 1) -> stringResource(R.string.form_error_dosage_required)
+                    else -> stringResource(R.string.form_error_dosage_invalid)
+                }
+
+                val isFrequencyError = showValidationErrors && !validation.isFrequencyValid
+                val frequencyErrorMessage = if (isFrequencyError) stringResource(R.string.form_error_select_days) else null
+
+                val isDurationError = showValidationErrors && !validation.isFiniteDurationValid
+                val durationErrorMessage = if (isDurationError) stringResource(R.string.form_error_course_duration) else null
+
                 // --- Card 1: Medicine & Identification Card ---
                 MedicineIdentificationCard(
                     medicineImagePath = medicineImagePath,
@@ -146,7 +185,9 @@ fun AddMedScreen(
                         selectedPillShape = shape
                         selectedPillColor = color
                     },
-                    onMedicationNameChange = { medicationName = it }
+                    onMedicationNameChange = { medicationName = it },
+                    isNameError = isNameError,
+                    nameErrorMessage = nameErrorMessage
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -183,7 +224,12 @@ fun AddMedScreen(
                         editingTimeIndex = index
                         selectedTime = time
                         showTimePicker = true
-                    }
+                    },
+                    isDosageError = isDosageError,
+                    dosageErrorMessage = dosageErrorMessage,
+                    invalidTimeSlotKeys = validation.invalidTimeSlotKeys,
+                    isFrequencyError = isFrequencyError,
+                    frequencyErrorMessage = frequencyErrorMessage
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -203,7 +249,9 @@ fun AddMedScreen(
                     onStartDateChange = { selectedStartDate = it },
                     durationDaysText = durationDaysText,
                     onDurationDaysChange = { durationDaysText = it },
-                    calculatedEndDate = calcEndDate
+                    calculatedEndDate = calcEndDate,
+                    isDurationError = isDurationError,
+                    durationErrorMessage = durationErrorMessage
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -224,34 +272,33 @@ fun AddMedScreen(
                     onDoctorNotesChange = { doctorNotes = it }
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                val isDosageValid = if (hasDifferentDosages && scheduledTimesList.size > 1) {
-                    scheduledTimesList.all { t ->
-                        val key = String.format(java.util.Locale.US, "%02d:%02d", t.hour, t.minute)
-                        val valueStr = perTimeDosages[key] ?: (if (dosage.isNotBlank()) dosage else null)
-                        val d = valueStr?.normalizeArabicDigits()?.toDoubleOrNull()
-                        d != null && d > 0.0
-                    }
-                } else {
-                    val d = dosage.normalizeArabicDigits().toDoubleOrNull()
-                    d != null && d > 0.0
-                }
-
-                val isFormValid = isMedicineFormValid(
-                    medicationName = medicationName,
-                    isDosageValid = isDosageValid,
-                    selectedFrequency = selectedFrequency,
-                    selectedDaysOfWeek = selectedDaysOfWeek,
-                    selectedDaysOfMonth = selectedDaysOfMonth,
-                    intervalWeeksText = intervalWeeksText,
-                    isFiniteCourse = isFiniteCourse,
-                    durationDaysText = durationDaysText
+                // --- Card 6: Reminder Style Card (Alarm vs Notification) (#111) ---
+                MedicineReminderStyleCard(
+                    selectedReminderType = selectedReminderType,
+                    onReminderTypeChange = { selectedReminderType = it },
+                    profileDefaultType = currentUser?.reminderType ?: ReminderType.ALARM
                 )
+
+                Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
                     onClick = {
-                        if (!isFormValid) return@Button
+                        if (!isFormValid) {
+                            showValidationErrors = true
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(context.getString(R.string.form_error_fix_fields))
+                            }
+                            coroutineScope.launch {
+                                when {
+                                    !validation.isNameValid -> scrollState.animateScrollTo(0)
+                                    !validation.isDosageValid || !validation.isFrequencyValid -> scrollState.animateScrollTo(280)
+                                    !validation.isFiniteDurationValid -> scrollState.animateScrollTo(680)
+                                }
+                            }
+                            return@Button
+                        }
                         // Guard: Abort save if target active user is null or blank to prevent SQLiteConstraintException foreign key crash
                         val targetUserId = currentUser?.userId?.takeIf { it.isNotBlank() } ?: return@Button
 
@@ -303,13 +350,14 @@ fun AddMedScreen(
                             // Guard: Assign durationDays only when finite course and duration is positive to avoid invalid zero-day courses
                             durationDays = if (isFiniteCourse && durationDaysInt != null && durationDaysInt > 0) durationDaysInt else null,
                             // Guard: Clear customDosages if frequency is AS_NEEDED to prevent leaking orphaned scheduled custom dosages into PRN doses and reports
-                            customDosages = if (selectedFrequency == FrequencyPattern.AS_NEEDED) null else finalCustomDosages
+                            customDosages = if (selectedFrequency == FrequencyPattern.AS_NEEDED) null else finalCustomDosages,
+                            reminderType = selectedReminderType
                         )
                         medicineViewModel.addMedicine(newMedicine)
                         navController.previousBackStackEntry?.savedStateHandle?.set("snackbar_message", context.getString(R.string.medication_added_success))
                         navController.popBackStack()
                     },
-                    enabled = isFormValid && !currentUser?.userId.isNullOrBlank(),
+                    enabled = !currentUser?.userId.isNullOrBlank(),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),

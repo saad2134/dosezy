@@ -69,8 +69,8 @@ npx @openapitools/openapi-generator-cli generate \
 
 | Domain Entity | Room DB Model (`com.example.dosezy.data.model`) | Generated Network DTO (`com.example.dosezy.network.models`) | Match Status |
 | :--- | :--- | :--- | :--- |
-| **User** | `userId`, `fullName`, `age`, `gender`, `contactNumber`, `profilePicPath`, `isCurrentUser`, `theme`, `timeFormat`, `language`, `considerLateAfter`, `considerMissedAfter`, `snoozeDuration`, `allergies`, `medicalConditions`, `naggingRemindersEnabled`, `naggingIntervalMinutes`, `naggingMaxRepeats`, `alarmSound`, `customAlarmSoundPath`, `customAlarmSoundTitle`, `alarmDurationSeconds`, `allowDoseSkipping`, `allowCustomDoseTime`, `hideAddMedicineNavButton`, `allowDoseUndo`, `allowDoseNotes`, `promptDoseNotes`, `slideActionsEnabled`, `timelineModeEnabled`, `thickerCalendarDayHighlight`, `intakeSafeguardEnabled`, `intakeCountdownSeconds` | `userId`, `fullName`, `age`, `gender`, `contactNumber`, `profilePicPath`, `isCurrentUser`, `theme`, `timeFormat`, `language`, `considerLateAfter`, `considerMissedAfter`, `snoozeDuration`, `allergies`, `medicalConditions`, `naggingRemindersEnabled`, `naggingIntervalMinutes`, `naggingMaxRepeats`, `alarmSound`, `customAlarmSoundPath`, `customAlarmSoundTitle`, `alarmDurationSeconds`, `allowDoseSkipping`, `allowCustomDoseTime`, `hideAddMedicineNavButton`, `allowDoseUndo`, `allowDoseNotes`, `promptDoseNotes`, `slideActionsEnabled`, `timelineModeEnabled`, `thickerCalendarDayHighlight`, `intakeSafeguardEnabled`, `intakeCountdownSeconds` | **100% Match** |
-| **Medicine** | `medicineId`, `userId`, `medicationName`, `dosage`, `dosageUnit`, `timesPerDay`, `frequency`, `scheduledTimes`, `imageUri`, `pillShape`, `pillColor`, `startDate`, `endDate`, `durationDays`, `isArchived`, `notes`, `currentStock`, `refillThreshold`, `autoDeductOnTake`, `customDosages` | `medicineId`, `userId`, `medicationName`, `dosage`, `dosageUnit`, `timesPerDay`, `frequency`, `scheduledTimes`, `imageUri`, `pillShape`, `pillColor`, `startDate`, `endDate`, `durationDays`, `isArchived`, `notes`, `currentStock`, `refillThreshold`, `autoDeductOnTake`, `customDosages` | **100% Match** |
+| **User** | `userId`, `fullName`, `age`, `gender`, `contactNumber`, `profilePicPath`, `isCurrentUser`, `theme`, `timeFormat`, `language`, `considerLateAfter`, `considerMissedAfter`, `snoozeDuration`, `allergies`, `medicalConditions`, `naggingRemindersEnabled`, `naggingIntervalMinutes`, `naggingMaxRepeats`, `alarmSound`, `customAlarmSoundPath`, `customAlarmSoundTitle`, `alarmDurationSeconds`, `allowDoseSkipping`, `allowCustomDoseTime`, `hideAddMedicineNavButton`, `allowDoseUndo`, `allowDoseNotes`, `promptDoseNotes`, `slideActionsEnabled`, `timelineModeEnabled`, `thickerCalendarDayHighlight`, `intakeSafeguardEnabled`, `intakeCountdownSeconds`, `lockscreenDetailsEnabled`, `customSnoozePopupEnabled`, `reminderType` | `userId`, `fullName`, `age`, `gender`, `contactNumber`, `profilePicPath`, `isCurrentUser`, `theme`, `timeFormat`, `language`, `considerLateAfter`, `considerMissedAfter`, `snoozeDuration`, `allergies`, `medicalConditions`, `naggingRemindersEnabled`, `naggingIntervalMinutes`, `naggingMaxRepeats`, `alarmSound`, `customAlarmSoundPath`, `customAlarmSoundTitle`, `alarmDurationSeconds`, `allowDoseSkipping`, `allowCustomDoseTime`, `hideAddMedicineNavButton`, `allowDoseUndo`, `allowDoseNotes`, `promptDoseNotes`, `slideActionsEnabled`, `timelineModeEnabled`, `thickerCalendarDayHighlight`, `intakeSafeguardEnabled`, `intakeCountdownSeconds`, `lockscreenDetailsEnabled`, `customSnoozePopupEnabled`, `reminderType` | **100% Match** |
+| **Medicine** | `medicineId`, `userId`, `medicationName`, `dosage`, `dosageUnit`, `timesPerDay`, `frequency`, `scheduledTimes`, `imageUri`, `pillShape`, `pillColor`, `startDate`, `endDate`, `durationDays`, `isArchived`, `notes`, `currentStock`, `refillThreshold`, `autoDeductOnTake`, `customDosages`, `reminderType` | `medicineId`, `userId`, `medicationName`, `dosage`, `dosageUnit`, `timesPerDay`, `frequency`, `scheduledTimes`, `imageUri`, `pillShape`, `pillColor`, `startDate`, `endDate`, `durationDays`, `isArchived`, `notes`, `currentStock`, `refillThreshold`, `autoDeductOnTake`, `customDosages`, `reminderType` | **100% Match** |
 | **ScheduleEntry** | `entryId`, `userId`, `medicineId`, `scheduledDateTime`, `status`, `takenAt`, `skipReason`, `dosage`, `doseNotes` | `entryId`, `userId`, `medicineId`, `scheduledDateTime`, `status`, `takenAt`, `skipReason`, `dosage`, `doseNotes` | **100% Match** |
 
 ---
@@ -132,7 +132,10 @@ fun User.toNetworkDto(): com.example.dosezy.network.models.User {
         timelineModeEnabled = this.timelineModeEnabled,
         thickerCalendarDayHighlight = this.thickerCalendarDayHighlight,
         intakeSafeguardEnabled = this.intakeSafeguardEnabled,
-        intakeCountdownSeconds = this.intakeCountdownSeconds
+        intakeCountdownSeconds = this.intakeCountdownSeconds,
+        lockscreenDetailsEnabled = this.lockscreenDetailsEnabled,
+        customSnoozePopupEnabled = this.customSnoozePopupEnabled,
+        reminderType = com.example.dosezy.network.models.ReminderType.valueOf(this.reminderType.name)
     )
 }
 
@@ -171,7 +174,10 @@ fun com.example.dosezy.network.models.User.toRoomEntity(): User {
         timelineModeEnabled = this.timelineModeEnabled ?: false,
         thickerCalendarDayHighlight = this.thickerCalendarDayHighlight ?: false,
         intakeSafeguardEnabled = this.intakeSafeguardEnabled ?: false,
-        intakeCountdownSeconds = this.intakeCountdownSeconds ?: 120
+        intakeCountdownSeconds = this.intakeCountdownSeconds ?: 120,
+        lockscreenDetailsEnabled = this.lockscreenDetailsEnabled ?: true,
+        customSnoozePopupEnabled = this.customSnoozePopupEnabled ?: false,
+        reminderType = this.reminderType?.let { ReminderType.valueOf(it.name) } ?: ReminderType.ALARM
     )
 }
 
@@ -231,7 +237,8 @@ fun Medicine.toNetworkDto(): com.example.dosezy.network.models.Medicine {
         endDate = this.endDate?.toString(),
         durationDays = this.durationDays,
         isArchived = this.isArchived,
-        customDosages = this.customDosages
+        customDosages = this.customDosages,
+        reminderType = this.reminderType?.let { com.example.dosezy.network.models.ReminderType.valueOf(it.name) }
     )
 }
 
@@ -259,7 +266,8 @@ fun com.example.dosezy.network.models.Medicine.toRoomEntity(): Medicine {
         endDate = this.endDate?.let { try { LocalDate.parse(it) } catch (_: Exception) { null } },
         durationDays = this.durationDays,
         isArchived = this.isArchived ?: false,
-        customDosages = this.customDosages
+        customDosages = this.customDosages,
+        reminderType = this.reminderType?.let { ReminderType.valueOf(it.name) }
     )
 }
 

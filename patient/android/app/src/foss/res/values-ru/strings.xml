@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about_support_dev_title">Поддержать разработку</string>
+    <string name="about_support_dev_desc" formatted="false">Dosezy на 100% бесплатен, конфиденциален и без рекламы. Ваша поддержка помогает проекту развиваться!</string>
+    <string name="about_buymeacoffee">Купить кофе автору</string>
+    <string name="about_buymeacoffee_desc">Поддержать картой или через PayPal на BuyMeACoffee</string>
+    <string name="about_crypto_donations">Пожертвования в криптовалюте</string>
+    <string name="about_copied_to_clipboard">Адрес %1$s скопирован в буфер обмена</string>
+    <string name="about_tap_to_copy">Нажмите, чтобы скопировать адрес</string>
+    <string name="about_github_sponsors">GitHub Sponsors</string>
+    <string name="about_github_sponsors_desc">Ежемесячная или разовая поддержка через GitHub Sponsors</string>
+    <string name="crypto_bitcoin">Bitcoin (BTC)</string>
+    <string name="crypto_ethereum">Ethereum (ETH)</string>
+    <string name="crypto_solana">Solana (SOL)</string>
+    <string name="crypto_litecoin">Litecoin (LTC)</string>
+    <string name="crypto_zcash">Zcash (ZEC)</string>
+    <string name="crypto_name_btc">Bitcoin</string>
+    <string name="crypto_name_eth">Ethereum</string>
+    <string name="crypto_name_sol">Solana</string>
+    <string name="crypto_name_ltc">Litecoin</string>
+    <string name="crypto_name_zec">Zcash</string>
+</resources>

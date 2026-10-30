@@ -45,6 +45,12 @@
     <string name="form_delete_medicine">Supprimer le médicament</string>
     <string name="form_upload_img">Téléverser une image</string>
     <string name="form_change_img">Changer l\'image</string>
+    <string name="form_error_med_name_required">Le nom du médicament est requis</string>
+    <string name="form_error_dosage_required">Le dosage est requis</string>
+    <string name="form_error_dosage_invalid">Le dosage doit être un nombre positif</string>
+    <string name="form_error_select_days">Veuillez sélectionner au moins un jour</string>
+    <string name="form_error_course_duration">La durée du traitement doit être d\'au moins 1 jour</string>
+    <string name="form_error_fix_fields">Veuillez remplir les champs obligatoires surlignés ci-dessus</string>
     <string name="freq_daily">Quotidien</string>
     <string name="freq_weekly">Hebdomadaire</string>
     <string name="freq_monthly">Mensuel</string>
@@ -147,6 +153,7 @@
     <string name="unit_meq">mEq</string>
     <string name="unit_puff">bouffée</string>
     <string name="unit_ampule">ampoule</string>
+    <string name="unit_spray">pulvérisation</string>
 
     <string name="help_title">Aide &amp; Support</string>
     <string name="help_resources">Ressources</string>
@@ -459,6 +466,7 @@ Voulez-vous continuer ?</string>
     <string name="pill_shape_injection">Injection</string>
     <string name="pill_shape_drops">Gouttes</string>
     <string name="pill_shape_patch">Patch</string>
+    <string name="pill_shape_spray">Spray</string>
 
     <string name="med_notes_label">Notes du médecin et avertissements</string>
     <string name="med_notes_placeholder">ex. Prendre au cours du repas, Éviter le pamplemousse, Ordonnance #12345</string>
@@ -552,15 +560,6 @@ Voulez-vous continuer ?</string>
     <string name="about_tagline">Compagnon de médication privé et hors ligne pour patients et aidants.</string>
     <string name="about_star_github">Étoiler sur GitHub</string>
     <string name="about_star_github_desc">Soutenez notre projet open-source en mettant une étoile sur GitHub</string>
-    <string name="about_support_dev_title">Soutenir le développement</string>
-    <string name="about_support_dev_desc" formatted="false">Dosezy est 100% gratuit, privé et sans publicité. Vos dons font vivre le projet !</string>
-    <string name="about_buymeacoffee">M\'offrir un café</string>
-    <string name="about_buymeacoffee_desc">Soutenez par carte ou PayPal sur BuyMeACoffee</string>
-    <string name="about_crypto_donations">Dons en cryptomonnaies</string>
-    <string name="about_copied_to_clipboard">Adresse %1$s copiée dans le presse-papiers</string>
-    <string name="about_tap_to_copy">Appuyez pour copier l\'adresse</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">Soutenez mensuellement ou ponctuellement via GitHub Sponsors</string>
     <string name="pref_alarm_duration_title">Durée de sonnerie de l\'alarme</string>
     <string name="pref_alarm_duration_desc">Arrêter automatiquement le son et les vibrations après un délai</string>
     <string name="alarm_duration_continuous">Continu (jusqu\'à désactivation)</string>
@@ -670,16 +669,6 @@ Voulez-vous continuer ?</string>
 
     <string name="about_community_open_source">Communauté &amp; Open Source</string>
     <string name="about_version_build">Version %1$s (Build %2$s)</string>
-    <string name="crypto_bitcoin">Bitcoin (BTC)</string>
-    <string name="crypto_ethereum">Ethereum (ETH)</string>
-    <string name="crypto_solana">Solana (SOL)</string>
-    <string name="crypto_litecoin">Litecoin (LTC)</string>
-    <string name="crypto_zcash">Zcash (ZEC)</string>
-    <string name="crypto_name_btc">Bitcoin</string>
-    <string name="crypto_name_eth">Ethereum</string>
-    <string name="crypto_name_sol">Solana</string>
-    <string name="crypto_name_ltc">Litecoin</string>
-    <string name="crypto_name_zec">Zcash</string>
     <string name="country_india">Inde</string>
     <string name="country_us_ca">États-Unis / Canada</string>
     <string name="country_uk">Royaume-Uni</string>
@@ -857,4 +846,33 @@ Voulez-vous continuer ?</string>
     <string name="schedule_effective_today_desc">Applique les nouvelles heures dès aujourd\'hui. Les doses non prises obsolètes d\'aujourd\'hui seront supprimées.</string>
     <string name="schedule_effective_tomorrow_title">À partir de demain</string>
     <string name="schedule_effective_tomorrow_desc">Conserve l\'horaire d\'aujourd\'hui. Le nouvel horaire commencera demain.</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[Enregistré rétrospectivement]</string>
+    <string name="schedule_action_dialog_title">Gérer la prise</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">Marquer comme prise</string>
+    <string name="schedule_action_skip_dose">Marquer comme sautée</string>
+    <string name="schedule_action_undo_dose">Annuler l\'action de prise</string>
+    <string name="schedule_action_edit_note">Modifier la note de prise</string>
+    <string name="schedule_action_add_note">Ajouter une note de prise</string>
+    <string name="schedule_dose_marked_taken">%1$s marquée comme prise</string>
+    <string name="schedule_dose_marked_skipped">%1$s marquée comme sautée</string>
+    <string name="schedule_dose_reverted">%1$s remise en attente</string>
+    <string name="schedule_dose_locked_notice">Cette prise date de plus de 48 heures et est verrouillée pour préserver l\'intégrité du dossier médical.</string>
+    <string name="schedule_dose_locked_badge">Verrouillée</string>
+    <string name="schedule_tap_to_manage">Appuyer pour gérer</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">Style de rappel</string>
+    <string name="pref_reminder_type_desc">Choisissez si les rappels sonnent comme une alarme ou une notification standard</string>
+    <string name="reminder_type_alarm">Alarme</string>
+    <string name="reminder_type_alarm_desc">Alerte plein écran avec son continu. Contourne Ne pas déranger.</string>
+    <string name="reminder_type_notification">Notification</string>
+    <string name="reminder_type_notification_desc">Bannière de notification standard avec tonalité d\'alerte. Respecte Ne pas déranger.</string>
+    <string name="reminder_type_default">Utiliser la valeur par défaut du profil (%1$s)</string>
+    <string name="reminder_type_default_profile">Utiliser la valeur par défaut du profil</string>
+    <string name="notif_channel_notifications_name">Notifications de médicaments</string>
+    <string name="notif_channel_notifications_desc">Alertes de notification standard pour les prises respectant Ne pas déranger</string>
+    <string name="form_reminder_type">Style de rappel</string>
+    <string name="form_reminder_type_desc">Choisissez Alarme pour les médicaments essentiels ou Notification pour les compléments</string>
 </resources>

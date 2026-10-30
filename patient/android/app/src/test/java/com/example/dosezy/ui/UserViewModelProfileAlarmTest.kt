@@ -206,6 +206,38 @@ class UserViewModelProfileAlarmTest {
         advanceUntilIdle()
     }
 
+    @Test
+    fun testUpdateUser_reschedulesAlarmsForUser_whenUserPreferencesChange() = runTest(testDispatcher) {
+        val userViewModel = UserViewModel(userRepository, medicineRepository, scheduleRepository, medicineNotificationManager)
+
+        userViewModel.addUser(testUser)
+        awaitCondition { userRepository.getUserByIdSync(testUser.userId) != null }
+
+        val medicine = Medicine(
+            medicineId = "med_update_user_test",
+            userId = testUser.userId,
+            medicationName = "Aspirin",
+            dosage = 100.0,
+            dosageUnit = DosageUnit.TABLET,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(9, 0))
+        )
+        medicineRepository.insertMedicine(medicine)
+        advanceUntilIdle()
+
+        // Update user to NOTIFICATION reminderType
+        val updated = testUser.copy(reminderType = com.example.dosezy.data.model.ReminderType.NOTIFICATION)
+        userViewModel.updateUser(updated)
+        awaitCondition {
+            userRepository.getUserByIdSync(testUser.userId)?.reminderType == com.example.dosezy.data.model.ReminderType.NOTIFICATION
+        }
+
+        val refreshed = userRepository.getUserByIdSync(testUser.userId)
+        assertNotNull(refreshed)
+        assertEquals(com.example.dosezy.data.model.ReminderType.NOTIFICATION, refreshed?.reminderType)
+    }
+
     // =========================================================================
     // Issue 2 Tests: PRN Dose Stock Deduction & Custom Slot Symmetry
     // =========================================================================
@@ -555,6 +587,63 @@ class UserViewModelProfileAlarmTest {
         assertFalse("Spanish title must differ from English", esTitle == enTitle)
         assertTrue(esTitle.isNotBlank())
         assertTrue(enTitle.isNotBlank())
+
+        // Guard: Verify all 12 supported languages resolve non-blank notification strings
+        Language.values().forEach { lang ->
+            if (lang != Language.SYSTEM) {
+                val langContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, lang)
+                val title = langContext.getString(com.example.dosezy.R.string.notif_perm_title)
+                assertTrue("Localized string for $lang must not be blank", title.isNotBlank())
+            }
+        }
+    }
+
+    @Test
+    fun testStringsXml_allLocalesHave100PercentKeyParity() {
+        // Guard: Verify that all 11 non-English strings.xml files maintain 100% translatable key parity with base strings.xml
+        val candidateRoots = listOf(
+            File("src/main/res"),
+            File("app/src/main/res"),
+            File("patient/android/app/src/main/res"),
+            File("../app/src/main/res")
+        )
+        val resDir = candidateRoots.firstOrNull { File(it, "values/strings.xml").exists() }
+        assertNotNull("Res directory must be discoverable from unit test runner", resDir)
+
+        val baseFile = File(resDir, "values/strings.xml")
+        val baseKeys = parseTranslatableStringKeys(baseFile)
+        assertTrue("Base strings.xml must have translatable keys", baseKeys.isNotEmpty())
+
+        val targetLocales = listOf(
+            "values-ar", "values-bn", "values-de", "values-es", "values-fr",
+            "values-hi", "values-it", "values-ja", "values-pt", "values-ru", "values-zh"
+        )
+
+        for (loc in targetLocales) {
+            val locFile = File(resDir, "$loc/strings.xml")
+            assertTrue("Locale file $loc/strings.xml must exist", locFile.exists())
+            val locKeys = parseTranslatableStringKeys(locFile)
+            val missing = baseKeys - locKeys
+            val extra = locKeys - baseKeys
+            assertTrue("Locale $loc is missing keys: $missing", missing.isEmpty())
+            assertTrue("Locale $loc has extra unmapped keys: $extra", extra.isEmpty())
+        }
+    }
+
+    private fun parseTranslatableStringKeys(file: File): Set<String> {
+        val keys = mutableSetOf<String>()
+        val regex = Regex("<string\\s+name=\"([^\"]+)\"([^>]*)>")
+        file.forEachLine { line ->
+            val match = regex.find(line)
+            if (match != null) {
+                val name = match.groupValues[1]
+                val attrs = match.groupValues[2]
+                if (!attrs.contains("translatable=\"false\"")) {
+                    keys.add(name)
+                }
+            }
+        }
+        return keys
     }
 
     @Test

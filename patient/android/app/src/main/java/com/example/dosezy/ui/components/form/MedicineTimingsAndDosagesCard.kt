@@ -69,7 +69,12 @@ fun MedicineTimingsAndDosagesCard(
     timeFormat: TimeFormat,
     defaultInitialTime: LocalTime,
     onOpenTimePicker: (timeIndex: Int?, initialTime: LocalTime) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isDosageError: Boolean = false,
+    dosageErrorMessage: String? = null,
+    invalidTimeSlotKeys: Set<String> = emptySet(),
+    isFrequencyError: Boolean = false,
+    frequencyErrorMessage: String? = null
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -115,6 +120,16 @@ fun MedicineTimingsAndDosagesCard(
                 onDaysOfMonthChange = onDaysOfMonthChange
             )
 
+            if (isFrequencyError && !frequencyErrorMessage.isNullOrBlank()) {
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = frequencyErrorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+
             // 2. Scheduled times and daily presets
             ScheduledTimesSection(
                 selectedFrequency = selectedFrequency,
@@ -141,7 +156,10 @@ fun MedicineTimingsAndDosagesCard(
                 onDosageUnitChange = onDosageUnitChange,
                 perTimeDosages = perTimeDosages,
                 onPerTimeDosagesChange = onPerTimeDosagesChange,
-                timeFormat = timeFormat
+                timeFormat = timeFormat,
+                isDosageError = isDosageError,
+                dosageErrorMessage = dosageErrorMessage,
+                invalidTimeSlotKeys = invalidTimeSlotKeys
             )
         }
     }

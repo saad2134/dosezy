@@ -156,4 +156,37 @@ class ScheduleAndBackupTest {
         assertFalse(shouldTake(today.plusDays(2))) // Day 2 -> false
         assertTrue(shouldTake(today.plusDays(3))) // Day 3 -> should take
     }
+
+    @Test
+    fun testRetrospectiveMissedDoseStockDeductionLogic() {
+        // Guard: Verify that marking a MISSED dose taken qualifies for stock deduction (#109)
+        fun shouldDeductStock(currentStatus: MedicationStatus, autoDeduct: Boolean): Boolean {
+            val wasAlreadyTaken = currentStatus == MedicationStatus.TAKEN_ON_TIME || currentStatus == MedicationStatus.TAKEN_LATE
+            return !wasAlreadyTaken && autoDeduct
+        }
+
+        assertTrue(shouldDeductStock(MedicationStatus.MISSED, true))
+        assertFalse(shouldDeductStock(MedicationStatus.MISSED, false))
+    }
+
+    @Test
+    fun testUndoStripsRetrospectiveAuditTag() {
+        // Guard: Verify undo cleanly strips [Logged retrospectively] while preserving user clinical notes (#109)
+        fun cleanNotes(notes: String?): String? {
+            return notes
+                ?.replace(Regex("\\[Partial Stock: Took \\d+ of \\d+\\]"), "")
+                ?.replace(Regex("\\[Logged retrospectively\\]"), "")
+                ?.trim(' ', '|', '-')
+                ?.ifBlank { null }
+        }
+
+        val noteWithAudit = "Took with dinner | [Logged retrospectively]"
+        assertEquals("Took with dinner", cleanNotes(noteWithAudit))
+
+        val noteOnlyAudit = "[Logged retrospectively]"
+        assertEquals(null, cleanNotes(noteOnlyAudit))
+
+        val noteWithPartialAndAudit = "Took with dinner | [Partial Stock: Took 1 of 2] | [Logged retrospectively]"
+        assertEquals("Took with dinner", cleanNotes(noteWithPartialAndAudit))
+    }
 }

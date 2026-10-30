@@ -45,6 +45,12 @@
     <string name="form_delete_medicine">Elimina Farmaco</string>
     <string name="form_upload_img">Carica Immagine</string>
     <string name="form_change_img">Cambia Immagine</string>
+    <string name="form_error_med_name_required">Il nome del farmaco è obbligatorio</string>
+    <string name="form_error_dosage_required">Il dosaggio è obbligatorio</string>
+    <string name="form_error_dosage_invalid">Il dosaggio deve essere un numero positivo</string>
+    <string name="form_error_select_days">Seleziona almeno un giorno</string>
+    <string name="form_error_course_duration">La durata del ciclo deve essere di almeno 1 giorno</string>
+    <string name="form_error_fix_fields">Compila i campi obbligatori evidenziati sopra</string>
     <string name="freq_daily">Giornaliero</string>
     <string name="freq_weekly">Settimanale</string>
     <string name="freq_monthly">Mensile</string>
@@ -147,6 +153,7 @@
     <string name="unit_meq">mEq</string>
     <string name="unit_puff">erogazione</string>
     <string name="unit_ampule">fiala</string>
+    <string name="unit_spray">spruzzo</string>
 
     <string name="help_title">Aiuto e Supporto</string>
     <string name="help_resources">Risorse</string>
@@ -459,6 +466,7 @@ Vuoi continuare?</string>
     <string name="pill_shape_injection">Iniezione</string>
     <string name="pill_shape_drops">Gocce</string>
     <string name="pill_shape_patch">Cerotto</string>
+    <string name="pill_shape_spray">Spray</string>
 
     <string name="med_notes_label">Note del medico e avvertenze</string>
     <string name="med_notes_placeholder">es. Assumere a stomaco pieno, Evitare pompelmo, Ricetta #12345</string>
@@ -552,15 +560,6 @@ Vuoi continuare?</string>
     <string name="about_tagline">Compagno di terapia privato e offline per pazienti e assistenti.</string>
     <string name="about_star_github">Metti una stella su GitHub</string>
     <string name="about_star_github_desc">Supporta il nostro progetto open source mettendo una stella su GitHub</string>
-    <string name="about_support_dev_title">Supporta lo sviluppo</string>
-    <string name="about_support_dev_desc" formatted="false">Dosezy è al 100% gratuito, privato e senza pubblicità. Le tue donazioni aiutano il progetto!</string>
-    <string name="about_buymeacoffee">Offrimi un caffè</string>
-    <string name="about_buymeacoffee_desc">Supporta con carta o PayPal su BuyMeACoffee</string>
-    <string name="about_crypto_donations">Donazioni in criptovalute</string>
-    <string name="about_copied_to_clipboard">Indirizzo %1$s copiato negli appunti</string>
-    <string name="about_tap_to_copy">Tocca per copiare l\'indirizzo</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">Supporta mensilmente o una tantum tramite GitHub Sponsors</string>
     <string name="pref_alarm_duration_title">Durata suoneria allarme</string>
     <string name="pref_alarm_duration_desc">Silenzia automaticamente audio e vibrazione dopo il tempo impostato</string>
     <string name="alarm_duration_continuous">Continuo (fino a chiusura)</string>
@@ -668,18 +667,8 @@ Vuoi continuare?</string>
     <string name="menu_pharmacy_order_desc">Genera e condividi ordini di farmaci su WhatsApp</string>
     <string name="pharmacy_order_markdown_preview">Anteprima Markdown</string>
 
-    <string name="about_community_open_source">Community &amp; Open Source</string>
+    <string name="about_community_open_source">Comunità e open source</string>
     <string name="about_version_build">Versione %1$s (Build %2$s)</string>
-    <string name="crypto_bitcoin">Bitcoin (BTC)</string>
-    <string name="crypto_ethereum">Ethereum (ETH)</string>
-    <string name="crypto_solana">Solana (SOL)</string>
-    <string name="crypto_litecoin">Litecoin (LTC)</string>
-    <string name="crypto_zcash">Zcash (ZEC)</string>
-    <string name="crypto_name_btc">Bitcoin</string>
-    <string name="crypto_name_eth">Ethereum</string>
-    <string name="crypto_name_sol">Solana</string>
-    <string name="crypto_name_ltc">Litecoin</string>
-    <string name="crypto_name_zec">Zcash</string>
     <string name="country_india">India</string>
     <string name="country_us_ca">Stati Uniti / Canada</string>
     <string name="country_uk">Regno Unito</string>
@@ -857,4 +846,33 @@ Vuoi continuare?</string>
     <string name="schedule_effective_today_desc">Applica i nuovi orari oggi. Le dosi non assunte obsolete di oggi verranno rimosse.</string>
     <string name="schedule_effective_tomorrow_title">A partire da domani</string>
     <string name="schedule_effective_tomorrow_desc">Mantieni intatto il programma di oggi. Il nuovo programma inizierà domani.</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[Registrato retroattivamente]</string>
+    <string name="schedule_action_dialog_title">Gestisci dose</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">Segna come assunta</string>
+    <string name="schedule_action_skip_dose">Segna come saltata</string>
+    <string name="schedule_action_undo_dose">Annulla azione dose</string>
+    <string name="schedule_action_edit_note">Modifica nota dose</string>
+    <string name="schedule_action_add_note">Aggiungi nota dose</string>
+    <string name="schedule_dose_marked_taken">%1$s contrassegnata come assunta</string>
+    <string name="schedule_dose_marked_skipped">%1$s contrassegnata come saltata</string>
+    <string name="schedule_dose_reverted">%1$s reimpostata su in attesa</string>
+    <string name="schedule_dose_locked_notice">Questa dose ha più di 48 ore ed è bloccata per preservare l\'integrità della cronologia medica.</string>
+    <string name="schedule_dose_locked_badge">Bloccata</string>
+    <string name="schedule_tap_to_manage">Tocca per gestire</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">Stile promemoria</string>
+    <string name="pref_reminder_type_desc">Scegli se i promemoria suonano come sveglia o notifica standard</string>
+    <string name="reminder_type_alarm">Sveglia</string>
+    <string name="reminder_type_alarm_desc">Avviso a schermo intero con suono continuo. Ignora Non disturbare.</string>
+    <string name="reminder_type_notification">Notifica</string>
+    <string name="reminder_type_notification_desc">Banner di notifica standard con tono di avviso. Rispetta Non disturbare.</string>
+    <string name="reminder_type_default">Usa impostazione predefinita del profilo (%1$s)</string>
+    <string name="reminder_type_default_profile">Usa predefinito del profilo</string>
+    <string name="notif_channel_notifications_name">Notifiche farmaci</string>
+    <string name="notif_channel_notifications_desc">Avvisi di notifica standard per gli orari dei farmaci che rispettano Non disturbare</string>
+    <string name="form_reminder_type">Stile promemoria</string>
+    <string name="form_reminder_type_desc">Scegli Sveglia per i farmaci critici o Notifica per gli integratori</string>
 </resources>

@@ -45,6 +45,12 @@
     <string name="form_delete_medicine">Medikament löschen</string>
     <string name="form_upload_img">Bild hochladen</string>
     <string name="form_change_img">Bild ändern</string>
+    <string name="form_error_med_name_required">Medikamentenname ist erforderlich</string>
+    <string name="form_error_dosage_required">Dosierung ist erforderlich</string>
+    <string name="form_error_dosage_invalid">Dosierung muss eine positive Zahl sein</string>
+    <string name="form_error_select_days">Bitte mindestens einen Tag auswählen</string>
+    <string name="form_error_course_duration">Kursdauer muss mindestens 1 Tag betragen</string>
+    <string name="form_error_fix_fields">Bitte füllen Sie die oben markierten Pflichtfelder aus</string>
     <string name="freq_daily">Täglich</string>
     <string name="freq_weekly">Wöchentlich</string>
     <string name="freq_monthly">Monatlich</string>
@@ -147,6 +153,7 @@
     <string name="unit_meq">mEq</string>
     <string name="unit_puff">Hub</string>
     <string name="unit_ampule">Ampulle</string>
+    <string name="unit_spray">Sprühstoß</string>
 
     <string name="help_title">Hilfe &amp; Support</string>
     <string name="help_resources">Ressourcen</string>
@@ -269,7 +276,7 @@
     <string name="analytics_insights_start">Erfassen Sie Dosen, um detaillierte Statistiken anzuzeigen.</string>
     <string name="menu_backup_restore">Sichern &amp; Wiederherstellen</string>
     <string name="menu_sharing">Freigabe für Betreuer</string>
-    <string name="coming_soon">Soon</string>
+    <string name="coming_soon">Demnächst</string>
 
     <string name="export_file_format">Dateiformat</string>
     <string name="export_format_csv">CSV-Format</string>
@@ -459,6 +466,7 @@ Möchten Sie fortfahren?</string>
     <string name="pill_shape_injection">Injektion</string>
     <string name="pill_shape_drops">Tropfen</string>
     <string name="pill_shape_patch">Pflaster</string>
+    <string name="pill_shape_spray">Spray</string>
 
     <string name="med_notes_label">Arzthinweise &amp; Warnungen</string>
     <string name="med_notes_placeholder">z. B. Zu den Mahlzeiten, Keine Grapefruit, Rezept #12345</string>
@@ -552,15 +560,6 @@ Möchten Sie fortfahren?</string>
     <string name="about_tagline">Privater, offline-fähiger Medikamenten-Begleiter für Patienten und Pflegende.</string>
     <string name="about_star_github">Auf GitHub mit Stern bewerten</string>
     <string name="about_star_github_desc">Unterstützen Sie unser Open-Source-Projekt mit einem Stern auf GitHub</string>
-    <string name="about_support_dev_title">Entwicklung unterstützen</string>
-    <string name="about_support_dev_desc" formatted="false">Dosezy ist 100% kostenlos, werbefrei und privat. Ihre Spenden halten das Projekt am Leben!</string>
-    <string name="about_buymeacoffee">Kauf mir einen Kaffee</string>
-    <string name="about_buymeacoffee_desc">Unterstützen per Karte oder PayPal auf BuyMeACoffee</string>
-    <string name="about_crypto_donations">Krypto-Spenden</string>
-    <string name="about_copied_to_clipboard">%1$s-Adresse in die Zwischenablage kopiert</string>
-    <string name="about_tap_to_copy">Tippen zum Kopieren der Adresse</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">Monatlich oder einmalig über GitHub Sponsors unterstützen</string>
     <string name="pref_alarm_duration_title">Alarm-Klingeldauer</string>
     <string name="pref_alarm_duration_desc">Ton und Vibration nach einer festgelegten Zeit automatisch stummschalten</string>
     <string name="alarm_duration_continuous">Durchgehend (bis zum Schließen)</string>
@@ -668,18 +667,8 @@ Möchten Sie fortfahren?</string>
     <string name="menu_pharmacy_order_desc">Medikamentenbestellungen erstellen und über WhatsApp teilen</string>
     <string name="pharmacy_order_markdown_preview">Markdown-Vorschau</string>
 
-    <string name="about_community_open_source">Community &amp; Open Source</string>
+    <string name="about_community_open_source">Gemeinschaft &amp; Open Source</string>
     <string name="about_version_build">Version %1$s (Build %2$s)</string>
-    <string name="crypto_bitcoin">Bitcoin (BTC)</string>
-    <string name="crypto_ethereum">Ethereum (ETH)</string>
-    <string name="crypto_solana">Solana (SOL)</string>
-    <string name="crypto_litecoin">Litecoin (LTC)</string>
-    <string name="crypto_zcash">Zcash (ZEC)</string>
-    <string name="crypto_name_btc">Bitcoin</string>
-    <string name="crypto_name_eth">Ethereum</string>
-    <string name="crypto_name_sol">Solana</string>
-    <string name="crypto_name_ltc">Litecoin</string>
-    <string name="crypto_name_zec">Zcash</string>
     <string name="country_india">Indien</string>
     <string name="country_us_ca">Vereinigte Staaten / Kanada</string>
     <string name="country_uk">Großbritannien</string>
@@ -857,4 +846,33 @@ Möchten Sie fortfahren?</string>
     <string name="schedule_effective_today_desc">Neue Zeiten ab heute anwenden. Veraltete, nicht eingenommene Dosen von heute werden entfernt.</string>
     <string name="schedule_effective_tomorrow_title">Ab morgen</string>
     <string name="schedule_effective_tomorrow_desc">Heutigen Plan beibehalten. Der neue Plan beginnt morgen.</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[Nachträglich erfasst]</string>
+    <string name="schedule_action_dialog_title">Dosis verwalten</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">Als eingenommen markieren</string>
+    <string name="schedule_action_skip_dose">Als übersprungen markieren</string>
+    <string name="schedule_action_undo_dose">Dosis-Aktion rückgängig machen</string>
+    <string name="schedule_action_edit_note">Dosisnotiz bearbeiten</string>
+    <string name="schedule_action_add_note">Dosisnotiz hinzufügen</string>
+    <string name="schedule_dose_marked_taken">%1$s als eingenommen markiert</string>
+    <string name="schedule_dose_marked_skipped">%1$s als übersprungen markiert</string>
+    <string name="schedule_dose_reverted">%1$s auf ausstehend zurückgesetzt</string>
+    <string name="schedule_dose_locked_notice">Diese Dosis ist älter als 48 Stunden und gesperrt, um die Integrität der medizinischen Historie zu wahren.</string>
+    <string name="schedule_dose_locked_badge">Gesperrt</string>
+    <string name="schedule_tap_to_manage">Tippen zum Verwalten</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">Erinnerungsstil</string>
+    <string name="pref_reminder_type_desc">Wählen Sie, ob Erinnerungen als Alarm oder Standardbenachrichtigung ertönen</string>
+    <string name="reminder_type_alarm">Alarm</string>
+    <string name="reminder_type_alarm_desc">Vollbild-Alarm mit Dauerton. Umgeht Bitte nicht stören.</string>
+    <string name="reminder_type_notification">Benachrichtigung</string>
+    <string name="reminder_type_notification_desc">Standard-Banner mit Signalton. Respektiert Bitte nicht stören.</string>
+    <string name="reminder_type_default">Profil-Standard verwenden (%1$s)</string>
+    <string name="reminder_type_default_profile">Profil-Standard verwenden</string>
+    <string name="notif_channel_notifications_name">Medikamenten-Benachrichtigungen</string>
+    <string name="notif_channel_notifications_desc">Standard-Benachrichtigungen für Medikamentenpläne, die Bitte nicht stören beachten</string>
+    <string name="form_reminder_type">Erinnerungsstil</string>
+    <string name="form_reminder_type_desc">Wählen Sie Alarm für wichtige Medikamente oder Benachrichtigung für Nahrungsergänzungsmittel</string>
 </resources>

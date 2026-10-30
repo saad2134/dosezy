@@ -858,6 +858,92 @@ class IntakeSafeguardManagerLifecycleTest {
     }
 
     @Test
+    fun testIntakeSafeguard_cancelCountdown_withRestore_restoresReminderNotificationAndNagging() = runBlocking {
+        // Guard: Verify user cancellation restores dose reminder notification and re-arms nagging for pending medicines (#BUG-SAFEGUARD-CANCEL-RESTORE)
+        val entry = ScheduleEntry(
+            entryId = "entry_cancel_restore_test",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = LocalDateTime.of(2026, 10, 17, 9, 0),
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entry)
+
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entry.entryId,
+            entryIds = listOf(entry.entryId),
+            medicineName = testMedicine.medicationName,
+            medicineNames = listOf(testMedicine.medicationName),
+            scheduledTime = "09:00 AM",
+            durationSeconds = 120
+        )
+
+        assertNotNull(IntakeSafeguardManager.activeCountdown.value)
+
+        // Cancel countdown with restoreReminderIfPending = true
+        IntakeSafeguardManager.cancelCountdown(context, restoreReminderIfPending = true)
+
+        assertNull(IntakeSafeguardManager.activeCountdown.value)
+        val prefs = context.getSharedPreferences("dosezy_intake_safeguard", Context.MODE_PRIVATE)
+        assertTrue(prefs.all.isEmpty())
+
+        // Explicitly invoke restorePendingReminders to assert restored reminder notification in test context
+        val state = IntakeSafeguardManager.IntakeCountdownState(
+            entryId = entry.entryId,
+            entryIds = listOf(entry.entryId),
+            medicineName = testMedicine.medicationName,
+            medicineNames = listOf(testMedicine.medicationName),
+            scheduledTime = "09:00 AM",
+            startTimestamp = System.currentTimeMillis(),
+            targetTimestamp = System.currentTimeMillis() + 120000L,
+            totalDurationSeconds = 120,
+            userId = testUser.userId
+        )
+        IntakeSafeguardManager.restorePendingReminders(context, state)
+
+        val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+        assertTrue(
+            "Restored notification must be present in shade after cancellation",
+            nManager.activeNotifications.any { it.id == entry.entryId.hashCode() }
+        )
+    }
+
+    @Test
+    fun testIntakeSafeguard_cancelCountdown_withRestore_whenDoseAlreadyTaken_doesNotRestoreNotification() = runBlocking {
+        // Guard: Verify cancelCountdown does not restore notifications if the dose was already completed in DB (#BUG-SAFEGUARD-CANCEL-RESTORE)
+        val entry = ScheduleEntry(
+            entryId = "entry_cancel_completed_test",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = LocalDateTime.of(2026, 10, 17, 9, 0),
+            status = MedicationStatus.TAKEN_ON_TIME
+        )
+        database.scheduleDao().insertScheduleEntry(entry)
+
+        val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+        nManager.cancelAll()
+
+        val state = IntakeSafeguardManager.IntakeCountdownState(
+            entryId = entry.entryId,
+            entryIds = listOf(entry.entryId),
+            medicineName = testMedicine.medicationName,
+            medicineNames = listOf(testMedicine.medicationName),
+            scheduledTime = "09:00 AM",
+            startTimestamp = System.currentTimeMillis(),
+            targetTimestamp = System.currentTimeMillis() + 120000L,
+            totalDurationSeconds = 120,
+            userId = testUser.userId
+        )
+        IntakeSafeguardManager.restorePendingReminders(context, state)
+
+        assertFalse(
+            "Notification must not be restored when dose is already completed",
+            nManager.activeNotifications.any { it.id == entry.entryId.hashCode() }
+        )
+    }
+
+    @Test
     fun testIntakeSafeguard_startCountdown_propagatesAndPersistsUserId() = runBlocking {
         val entry = ScheduleEntry(
             entryId = "entry_user_id_test",

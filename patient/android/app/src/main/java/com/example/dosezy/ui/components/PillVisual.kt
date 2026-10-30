@@ -252,6 +252,41 @@ fun PillShapeVisual(
                         cornerRadius = CornerRadius(w * 0.05f, w * 0.05f)
                     )
                 }
+                PillShape.SPRAY -> {
+                    // Spray bottle: Body, neck, finger collar, spray nozzle, and mist droplets
+                    // Bottle body
+                    drawRoundRect(
+                        color = pillColor,
+                        topLeft = Offset(w * 0.28f, h * 0.44f),
+                        size = Size(w * 0.44f, h * 0.46f),
+                        cornerRadius = CornerRadius(w * 0.08f, w * 0.08f)
+                    )
+                    // Bottle neck
+                    drawRect(
+                        color = pillColor.copy(alpha = 0.85f),
+                        topLeft = Offset(w * 0.42f, h * 0.34f),
+                        size = Size(w * 0.16f, h * 0.10f)
+                    )
+                    // Finger pump flange / collar
+                    drawRoundRect(
+                        color = pillColor,
+                        topLeft = Offset(w * 0.30f, h * 0.30f),
+                        size = Size(w * 0.40f, h * 0.05f),
+                        cornerRadius = CornerRadius(w * 0.025f, w * 0.025f)
+                    )
+                    // Vertical nozzle tip
+                    drawRoundRect(
+                        color = pillColor.copy(alpha = 0.9f),
+                        topLeft = Offset(w * 0.44f, h * 0.14f),
+                        size = Size(w * 0.12f, h * 0.16f),
+                        cornerRadius = CornerRadius(w * 0.04f, w * 0.04f)
+                    )
+                    // Spray mist droplets exiting the nozzle tip
+                    val mistColor = pillColor.copy(alpha = 0.75f)
+                    drawCircle(color = mistColor, radius = w * 0.04f, center = Offset(w * 0.68f, h * 0.12f))
+                    drawCircle(color = mistColor, radius = w * 0.03f, center = Offset(w * 0.80f, h * 0.16f))
+                    drawCircle(color = mistColor, radius = w * 0.035f, center = Offset(w * 0.74f, h * 0.24f))
+                }
             }
         }
     }
@@ -274,8 +309,8 @@ fun PillShapeSelector(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // Uniform 4x2 grid of equal-sized cards
-        val chunkedShapes = PillShape.values().toList().chunked(4)
+        // Uniform 3x3 grid of equal-sized cards
+        val chunkedShapes = PillShape.values().toList().chunked(3)
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(10.dp)

@@ -45,6 +45,12 @@
     <string name="form_delete_medicine">お薬を削除</string>
     <string name="form_upload_img">お薬画像をアップロード</string>
     <string name="form_change_img">お薬画像を変更</string>
+    <string name="form_error_med_name_required">薬の名前は必須です</string>
+    <string name="form_error_dosage_required">用量は必須です</string>
+    <string name="form_error_dosage_invalid">用量は正の数値を入力してください</string>
+    <string name="form_error_select_days">少なくとも1日を選択してください</string>
+    <string name="form_error_course_duration">服用期間は1日以上である必要があります</string>
+    <string name="form_error_fix_fields">上記で強調表示されている必須項目を入力してください</string>
     <string name="freq_daily">毎日</string>
     <string name="freq_weekly">毎週</string>
     <string name="freq_monthly">毎月</string>
@@ -147,6 +153,7 @@
     <string name="unit_meq">mEq</string>
     <string name="unit_puff">吸入</string>
     <string name="unit_ampule">アンプル</string>
+    <string name="unit_spray">噴霧</string>
 
     <string name="help_title">ヘルプとサポート</string>
     <string name="help_resources">リソース</string>
@@ -459,6 +466,7 @@
     <string name="pill_shape_injection">注射 (Injection)</string>
     <string name="pill_shape_drops">点眼・点滴 (Drops)</string>
     <string name="pill_shape_patch">貼付剤・湿布 (Patch)</string>
+    <string name="pill_shape_spray">スプレー (Spray)</string>
 
     <string name="med_notes_label">医師の指示・注意事項</string>
     <string name="med_notes_placeholder">例：食後服用、グレープフルーツ禁止、処方箋 #12345</string>
@@ -552,15 +560,6 @@
     <string name="about_tagline">患者様とご家族のための、完全オフライン＆プライバシー重視の服薬管理アプリ。</string>
     <string name="about_star_github">GitHub でスターをつける</string>
     <string name="about_star_github_desc">GitHub でスターをつけてオープンソースプロジェクトを応援する</string>
-    <string name="about_support_dev_title">開発を支援する</string>
-    <string name="about_support_dev_desc" formatted="false">Dosezy は完全無料、広告なし、プライバシー重視です。皆様のご支援が開発の原動力です！</string>
-    <string name="about_buymeacoffee">開発者にコーヒーをおごる</string>
-    <string name="about_buymeacoffee_desc">クレジットカードや PayPal で手軽にご支援いただけます</string>
-    <string name="about_crypto_donations">暗号資産（仮想通貨）でのご支援</string>
-    <string name="about_copied_to_clipboard">%1$s アドレスをクリップボードにコピーしました</string>
-    <string name="about_tap_to_copy">タップしてアドレスをコピー</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">GitHub Sponsors で毎月または単発の支援をする</string>
     <string name="pref_alarm_duration_title">アラームの鳴動時間</string>
     <string name="pref_alarm_duration_desc">設定した時間が経過すると自動で音と振動を停止します</string>
     <string name="alarm_duration_continuous">停止するまで鳴動</string>
@@ -670,16 +669,6 @@
 
     <string name="about_community_open_source">コミュニティとオープンソース</string>
     <string name="about_version_build">バージョン %1$s (ビルド %2$s)</string>
-    <string name="crypto_bitcoin">ビットコイン (BTC)</string>
-    <string name="crypto_ethereum">イーサリアム (ETH)</string>
-    <string name="crypto_solana">ソラナ (SOL)</string>
-    <string name="crypto_litecoin">ライトコイン (LTC)</string>
-    <string name="crypto_zcash">ジーキャッシュ (ZEC)</string>
-    <string name="crypto_name_btc">ビットコイン</string>
-    <string name="crypto_name_eth">イーサリアム</string>
-    <string name="crypto_name_sol">ソラナ</string>
-    <string name="crypto_name_ltc">ライトコイン</string>
-    <string name="crypto_name_zec">ジーキャッシュ</string>
     <string name="country_india">インド</string>
     <string name="country_us_ca">アメリカ / カナダ</string>
     <string name="country_uk">イギリス</string>
@@ -857,4 +846,33 @@
     <string name="schedule_effective_today_desc">今日から新しい時間を適用します。今日の過去の未服薬分は削除されます。</string>
     <string name="schedule_effective_tomorrow_title">明日から適用</string>
     <string name="schedule_effective_tomorrow_desc">今日のスケジュールをそのまま維持します。新しいスケジュールは明日から始まります。</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[遡及記録済み]</string>
+    <string name="schedule_action_dialog_title">服薬を管理</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">服用済みとしてマーク</string>
+    <string name="schedule_action_skip_dose">スキップとしてマーク</string>
+    <string name="schedule_action_undo_dose">服薬アクションを取り消す</string>
+    <string name="schedule_action_edit_note">服薬メモを編集</string>
+    <string name="schedule_action_add_note">服薬メモを追加</string>
+    <string name="schedule_dose_marked_taken">%1$s を服用済みとして記録しました</string>
+    <string name="schedule_dose_marked_skipped">%1$s をスキップとして記録しました</string>
+    <string name="schedule_dose_reverted">%1$s を保留中に戻しました</string>
+    <string name="schedule_dose_locked_notice">この服薬は48時間以上前のものであり、医療記録の正確性を保つためにロックされています。</string>
+    <string name="schedule_dose_locked_badge">ロック</string>
+    <string name="schedule_tap_to_manage">タップして管理</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">リマインダースタイル</string>
+    <string name="pref_reminder_type_desc">リマインダーをアラームまたは通常の通知として鳴らすかを選択します</string>
+    <string name="reminder_type_alarm">アラーム</string>
+    <string name="reminder_type_alarm_desc">連続音の全画面アラート。サイレントモードを無視します。</string>
+    <string name="reminder_type_notification">通知</string>
+    <string name="reminder_type_notification_desc">通知バナーとアラート音。サイレントモードを尊重します。</string>
+    <string name="reminder_type_default">プロファイルのデフォルトを使用 (%1$s)</string>
+    <string name="reminder_type_default_profile">プロファイルのデフォルトを使用</string>
+    <string name="notif_channel_notifications_name">服薬通知</string>
+    <string name="notif_channel_notifications_desc">サイレントモードを考慮した服薬スケジュールの標準通知アラート</string>
+    <string name="form_reminder_type">リマインダースタイル</string>
+    <string name="form_reminder_type_desc">重要な薬にはアラームを、サプリメントには通知を選択します</string>
 </resources>

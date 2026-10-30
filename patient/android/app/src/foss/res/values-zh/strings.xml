@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about_support_dev_title">支持独立开发</string>
+    <string name="about_support_dev_desc" formatted="false">Dosezy 完全免费、无广告、纯本地离线。您的赞助是支持持续维护的最大动力！</string>
+    <string name="about_buymeacoffee">请开发者喝杯咖啡</string>
+    <string name="about_buymeacoffee_desc">通过 BuyMeACoffee 使用银行卡或 PayPal 赞助</string>
+    <string name="about_crypto_donations">加密货币捐赠</string>
+    <string name="about_copied_to_clipboard">已复制 %1$s 地址到剪贴板</string>
+    <string name="about_tap_to_copy">点击复制地址</string>
+    <string name="about_github_sponsors">GitHub Sponsors</string>
+    <string name="about_github_sponsors_desc">通过 GitHub Sponsors 进行每月或单次赞助</string>
+    <string name="crypto_bitcoin">比特币 (BTC)</string>
+    <string name="crypto_ethereum">以太坊 (ETH)</string>
+    <string name="crypto_solana">Solana (SOL)</string>
+    <string name="crypto_litecoin">莱特币 (LTC)</string>
+    <string name="crypto_zcash">大零币 (ZEC)</string>
+    <string name="crypto_name_btc">比特币</string>
+    <string name="crypto_name_eth">以太坊</string>
+    <string name="crypto_name_sol">Solana</string>
+    <string name="crypto_name_ltc">莱特币</string>
+    <string name="crypto_name_zec">大零币</string>
+</resources>

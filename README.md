@@ -1,6 +1,6 @@
 <h1 align="center">
   <a href="https://github.com/saad2134/dosezy">
-    <img width="1440" height="310" alt="💊 Dosezy – Medicine Tracking Simplified" src="https://github.com/user-attachments/assets/c57df39a-b714-4e82-8420-42c003c072f7" />
+    <img width="1440" height="310" alt="💊 Dosezy - Medicine Tracking Simplified" src="https://github.com/user-attachments/assets/c57df39a-b714-4e82-8420-42c003c072f7" />
  </a>
 </h1>
 
@@ -9,7 +9,7 @@
 
 <div align="center">
 
-[![Android Patient App](https://img.shields.io/badge/Android%20Patient-v2.5.11%20Released-1e293b?style=flat&logo=android&logoColor=white&labelColor=2ea44f)](https://github.com/saad2134/dosezy/releases)
+[![Android Patient App](https://img.shields.io/badge/Android%20Patient-v2.5.12%20Released-1e293b?style=flat&logo=android&logoColor=white&labelColor=2ea44f)](https://github.com/saad2134/dosezy/releases)
 [![iOS Patient App](https://img.shields.io/badge/iOS%20Patient-Planned-1e293b?style=flat&logo=apple&logoColor=white&labelColor=007aff)](https://github.com/saad2134/dosezy)
 [![Server Node](https://img.shields.io/badge/Server%20Node-In%20Dev-1e293b?style=flat&logo=fastify&logoColor=white&labelColor=8b5cf6)](https://github.com/saad2134/dosezy)
 [![Caregiver Web](https://img.shields.io/badge/Caregiver%20Web-In%20Dev-1e293b?style=flat&logo=astro&logoColor=white&labelColor=f59e0b)](https://github.com/saad2134/dosezy)
@@ -77,31 +77,31 @@
 
 ### 💊 Patient App (Free, Open-Source, Offline & 100% Private)
 
-Dosezy transforms daily medication management into a stress-free experience. Input your medicines, dosages, and schedules, and Dosezy handles the rest—with large, high-contrast visuals, reliable alarms, and total privacy.
+Dosezy transforms daily medication management into a stress-free experience. Input your medicines, dosages, and schedules, and Dosezy handles the rest: with large, high-contrast visuals, reliable alarms, and total privacy.
 
-- 🔔 **Critical Full-Screen Alarms** – High-visibility alarm screen rings reliably even when your phone is in deep sleep or silent mode. Intercept with physical volume keys to instantly silence audio, or snooze safely with a back gesture.
-- 🎵 **Custom Sounds & Dynamic Snooze** – Choose from gentle built-in alert tones or your own device ringtones with in-app audio previews, dedicated alarm volume controls, and customizable snooze intervals (5, 10, 15, 20, or 30 minutes).
-- 📦 **Pill Inventory & Low-Stock Warnings** – Real-time stock tracking with automatic deduction on intake. Configurable low-stock alerts notify you well before running out of essential medications.
-- 🛒 **Dosezy Pharmacy Refill Order** – Instantly compile formatted prescription refill orders for 15, 30, 60, or 90 days from active inventory or low-stock filters with multi-profile consolidation and smart bottle supply calculations for eye drops. Preview your order with live WhatsApp markdown formatting, then tap to Share via Chat or copy to clipboard.
-- 🕒 **Manually Record Dose Time** – Easily record the actual time you took medications when logging doses later to maintain accurate adherence histories.
-- 🌐 **Crossing Time Zones (Doses Shift With You)** – Traveling across time zones? Dosezy automatically keeps your reminders anchored to your local daily routine without time distortion.
-- 🧭 **Customizable Bottom Navigation** – Toggle to hide the central '+' button for a clean, symmetrical 4-tab layout, placing an "Add Medicine" button directly below active medications on the Medicines screen.
-- ↩️ **Configurable Dose Undo & Protection** – Made a mistake? Revert accidental dose taps from the reminder bar or dose card, backed by a safety confirmation dialog so your tablet stock and adherence records are never reset by accident.
-- ✍️ **Per-Dose Notes & Symptom Logging** – Keep track of meals and how you feel. Attach notes, meal context (*"With food"*), or side effects when logging a dose with quick-tap suggestions, and view or edit notes anytime from your dose cards or calendar.
-- ⏸️ **Clinical Dose Skipping** – Safely pause doses with required clinical explanations (*Doctor advised pause*, *Adverse reaction*, *Fasting*, *Illness*, *Ran out of medicine*) without penalizing your adherence streak.
-- 🕒 **12-First Grid Time Picker** – Visual, tremor-friendly grid time selector that places 12 at the top for natural morning/night scheduling, avoiding frustrating circular clock dials.
-- 📅 **Interactive Schedule Calendar** – Day, week, and month calendar views with color-coded compliance dots (taken, late, missed, skipped) and full TalkBack screen reader accessibility for visually impaired users.
-- 📊 **Adherence Analytics & Compliance Scores** – Multi-ring progress tracking across Today, 7 Days, 30 Days, 90 Days, and All-Time, plus individual medication compliance rates to keep you and your doctor informed.
-- 🔍 **Real-Time Medicine Search** – Rapidly find and filter prescriptions in large medicine rosters by name or instruction with instant empty-state guidance.
-- 💊 **Discontinued Medications Archive** – Neatly archives stopped medications into an expandable accordion at the bottom of the Medicines screen, preserving all past adherence history while keeping active prescriptions clutter-free.
-- 👥 **Multi-Family Profiles** – Manage medications for parents, children, or partners on one device with separate medicines, schedules, stock counts, personal emergency contacts, and 5-second deletion countdown safeguards.
-- 📄 **Doctor PDF Reports & Data Exports** – Generate clean, print-ready adherence summary reports for medical appointments, or export JSON backups and CSV spreadsheets anytime.
-- 🔒 **Full Encrypted ZIP Backups & Selective Restore** – Export complete encrypted archives. Restore individual profiles with intelligent conflict resolution (Merge Data, Overwrite, or Create New Profile).
-- 🚨 **Emergency Services & Personal Contacts** – 1-tap dialing for national emergency numbers across 10 regions (auto-detected via SIM/locale), plus dedicated personal doctor and family emergency contacts per profile.
-- 🎨 **Accessibility & Visual Customization** – Large touch targets, presbyopia-safe 7.8:1 high-contrast typography, 8 customizable pill shapes, 10 palette colors, and adaptive System Dark/Light themes.
-- 🌐 **12 Native Languages** – Fully translated across all screens, notifications, alarms, and settings in English, Spanish, Hindi, Chinese, Portuguese, Arabic, French, German, Japanese, Russian, Italian, and Bengali.
-- 🛡️ **Notification Reliability Shield** – Built-in diagnostic assistant that checks exact alarm permissions and battery optimization, providing 1-tap device setup guides (Samsung, Xiaomi, OnePlus, etc.) so alarms never fail.
-- 🔒 **100% Private & Offline** – No account creation, no sign-ups, and no internet permissions. All health data is encrypted and stays strictly on your phone.  
+- 🔔 **Critical Full-Screen Alarms**: High-visibility alarm screen rings reliably even when your phone is in deep sleep or silent mode. Intercept with physical volume keys to instantly silence audio, or snooze safely with a back gesture.
+- 🎵 **Custom Sounds & Dynamic Snooze**: Choose from gentle built-in alert tones or your own device ringtones with in-app audio previews, dedicated alarm volume controls, and customizable snooze intervals (5, 10, 15, 20, or 30 minutes).
+- 📦 **Pill Inventory & Low-Stock Warnings**: Real-time stock tracking with automatic deduction on intake. Configurable low-stock alerts notify you well before running out of essential medications.
+- 🛒 **Dosezy Pharmacy Refill Order**: Instantly compile formatted prescription refill orders for 15, 30, 60, or 90 days from active inventory or low-stock filters with multi-profile consolidation and smart bottle supply calculations for eye drops. Preview your order with live WhatsApp markdown formatting, then tap to Share via Chat or copy to clipboard.
+- 🕒 **Manually Record Dose Time**: Easily record the actual time you took medications when logging doses later to maintain accurate adherence histories.
+- 🌐 **Crossing Time Zones (Doses Shift With You)**: Traveling across time zones? Dosezy automatically keeps your reminders anchored to your local daily routine without time distortion.
+- 🧭 **Customizable Bottom Navigation**: Toggle to hide the central '+' button for a clean, symmetrical 4-tab layout, placing an "Add Medicine" button directly below active medications on the Medicines screen.
+- ↩️ **Configurable Dose Undo & Protection**: Made a mistake? Revert accidental dose taps from the reminder bar or dose card, backed by a safety confirmation dialog so your tablet stock and adherence records are never reset by accident.
+- ✍️ **Per-Dose Notes & Symptom Logging**: Keep track of meals and how you feel. Attach notes, meal context (*"With food"*), or side effects when logging a dose with quick-tap suggestions, and view or edit notes anytime from your dose cards or calendar.
+- ⏸️ **Clinical Dose Skipping**: Safely pause doses with required clinical explanations (*Doctor advised pause*, *Adverse reaction*, *Fasting*, *Illness*, *Ran out of medicine*) without penalizing your adherence streak.
+- 🕒 **12-First Grid Time Picker**: Visual, tremor-friendly grid time selector that places 12 at the top for natural morning/night scheduling, avoiding frustrating circular clock dials.
+- 📅 **Interactive Schedule Calendar**: Day, week, and month calendar views with color-coded compliance dots (taken, late, missed, skipped) and full TalkBack screen reader accessibility for visually impaired users.
+- 📊 **Adherence Analytics & Compliance Scores**: Multi-ring progress tracking across Today, 7 Days, 30 Days, 90 Days, and All-Time, plus individual medication compliance rates to keep you and your doctor informed.
+- 🔍 **Real-Time Medicine Search**: Rapidly find and filter prescriptions in large medicine rosters by name or instruction with instant empty-state guidance.
+- 💊 **Discontinued Medications Archive**: Neatly archives stopped medications into an expandable accordion at the bottom of the Medicines screen, preserving all past adherence history while keeping active prescriptions clutter-free.
+- 👥 **Multi-Family Profiles**: Manage medications for parents, children, or partners on one device with separate medicines, schedules, stock counts, personal emergency contacts, and 5-second deletion countdown safeguards.
+- 📄 **Doctor PDF Reports & Data Exports**: Generate clean, print-ready adherence summary reports for medical appointments, or export JSON backups and CSV spreadsheets anytime.
+- 🔒 **Full Encrypted ZIP Backups & Selective Restore**: Export complete encrypted archives. Restore individual profiles with intelligent conflict resolution (Merge Data, Overwrite, or Create New Profile).
+- 🚨 **Emergency Services & Personal Contacts**: 1-tap dialing for national emergency numbers across 10 regions (auto-detected via SIM/locale), plus dedicated personal doctor and family emergency contacts per profile.
+- 🎨 **Accessibility & Visual Customization**: Large touch targets, presbyopia-safe 7.8:1 high-contrast typography, 9 customizable pill shapes (including sprays), 10 palette colors, and adaptive System Dark/Light themes.
+- 🌐 **12 Native Languages**: Fully translated across all screens, notifications, alarms, and settings in English, Spanish, Hindi, Chinese, Portuguese, Arabic, French, German, Japanese, Russian, Italian, and Bengali.
+- 🛡️ **Notification Reliability Shield**: Built-in diagnostic assistant that checks exact alarm permissions and battery optimization, providing 1-tap device setup guides (Samsung, Xiaomi, OnePlus, etc.) so alarms never fail.
+- 🔒 **100% Private & Offline**: No account creation, no sign-ups, and no internet permissions. All health data is encrypted and stays strictly on your phone.  
 
 ### 🩺 Caregiver Cloud Platform (Optional, Self-Hostable, Coming Soon)
 
@@ -141,7 +141,7 @@ Dosezy transforms daily medication management into a stress-free experience. Inp
 
 | Module | Platform | Status | Min / Target | Tech Stack |
 | :--- | :--- | :--- | :--- | :--- |
-| **📱 Patient App** | Android | Released (v2.5.11) | Android 7.0+ (API 24+) | Kotlin, Jetpack Compose, Room |
+| **📱 Patient App** | Android | Released (v2.5.12) | Android 7.0+ (API 24+) | Kotlin, Jetpack Compose, Room |
 | **🍎 Patient App** | iOS | Planned | iOS 16+ | Swift, SwiftUI, SwiftData |
 | **☁️ Server Node** | Server / API | In Development | Docker / Self-Host | Node.js, Fastify, TypeScript, SQLite/Postgres |
 | **🩺 Caregiver Portal** | Web | In Development | Modern Browsers | Astro, TypeScript, Tailwind |
@@ -205,7 +205,7 @@ flowchart TB
     style ContractNote stroke-width:2px,stroke-dasharray: 2
 ```
 
-- **Local-First by Default:** All fundamental features—scheduling, persistent notifications, history tracking, data exports, and emergency services—operate completely offline without requiring an account or network connectivity.
+- **Local-First by Default:** All fundamental features: scheduling, persistent notifications, history tracking, data exports, and emergency services, operate completely offline without requiring an account or network connectivity.
 - **Server-Agnostic Sync:** The app supports both the official hosted service (`cloud.dosezy.app`) and Self-Hostable community servers (`server/`).
 - **Contract-Driven Development:** Client apps (`patient/android`, `patient/ios`, `caregiver/`) conform to a shared OpenAPI specification (`api/openapi.yaml`), ensuring consistent data models and seamless interoperability.
 
@@ -255,14 +255,14 @@ dosezy/
   </thead>
   <tbody>
     <tr>
-      <td><strong>v1.0 – v2.5</strong></td>
+      <td><strong>v1.0 - v2.5</strong></td>
       <td><strong>Local-First Android Client & Schema Parity</strong></td>
       <td>Core Adherence & Ecosystem Parity</td>
       <td>Jetpack Compose UI, 12 native localizations, Room offline database v15, time zone travel, manual dose recording, per-dose symptom notes, dose undo confirmation, pharmacy refill orders with smart bottle supplies, full-screen alarms, emergency dialer, shared OpenAPI 3.0 contract.</td>
-      <td align="center">🟢 Released (v2.5.10)<br><sub>🟡 In Dev (v2.5.11)</sub></td>
+      <td align="center">🟢 Released (v2.5.12)<br><sub>🟡 In Dev (v2.5.12)</sub></td>
     </tr>
     <tr>
-      <td><strong>v3.0 – v3.9</strong></td>
+      <td><strong>v3.0 - v3.9</strong></td>
       <td><strong>Self-Hostable Backend & Caregiver Platform</strong></td>
       <td>Incremental Sync & Web Portal</td>
       <td>Open-source server (<code>server/</code>), PostgreSQL DB, conflict-free sync engine, offline mutation queues, optional cloud connection, dedicated Caregiver web portal (<code>caregiver/</code> at <code>app.dosezy.com</code>), remote adherence monitoring, patient-controlled granular sharing permissions.</td>

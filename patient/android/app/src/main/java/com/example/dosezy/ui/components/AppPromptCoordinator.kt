@@ -81,7 +81,7 @@ fun AppPromptCoordinator(
             if (!isBatteryDismissed && !NotificationUtils.isIgnoringBatteryOptimizations(context)) {
                 delay(1200)
                 showBatteryPrompt = true
-            } else if (!NotificationUtils.canDrawOverlays(context)) {
+            } else if (com.example.dosezy.BuildConfig.SUPPORTS_OVERLAY_PERMISSION && !NotificationUtils.canDrawOverlays(context)) {
                 val legacyOverlayDismissed = try {
                     context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
                         .getBoolean("overlay_prompt_dismissed", false)

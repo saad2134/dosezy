@@ -12,6 +12,7 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import com.example.dosezy.BuildConfig
 import com.example.dosezy.R
 
 object NotificationUtils {
@@ -127,21 +128,27 @@ object NotificationUtils {
      * This shows a system dialog that returns immediately
      */
     fun requestBatteryOptimizationExemption(context: Context): Boolean {
+        // Guard: Use ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS instead of ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+        // to strictly comply with Google Play Device and Network Abuse policy without needing restricted permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
-                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
-                    data = Uri.parse("package:${context.packageName}")
+                val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 }
-
-                // Check if the intent can be resolved
                 if (intent.resolveActivity(context.packageManager) != null) {
                     context.startActivity(intent)
                     return true
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            } catch (_: Exception) {}
+
+            try {
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.parse("package:${context.packageName}")
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                context.startActivity(intent)
+                return true
+            } catch (_: Exception) {}
         }
         return false
     }
@@ -296,6 +303,11 @@ object NotificationUtils {
      * Check if app has permission to draw overlays / display over other apps (SYSTEM_ALERT_WINDOW)
      */
     fun canDrawOverlays(context: Context): Boolean {
+        // Guard: If current flavor does not declare or support overlay permission (Google Play),
+        // return true so reliability checklist passes and users are never prompted for undeclared permissions
+        if (!BuildConfig.SUPPORTS_OVERLAY_PERMISSION) {
+            return true
+        }
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Settings.canDrawOverlays(context)
         } else {

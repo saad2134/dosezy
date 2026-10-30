@@ -22,8 +22,8 @@ android {
         applicationId = "com.saad2134.dosezy"
         minSdk = 24
         targetSdk = 36
-        versionCode = 36
-        versionName = "2.5.11"
+        versionCode = 37
+        versionName = "2.5.12"
         buildConfigField("String", "VERSION_NAME", "\"$versionName\"")
         buildConfigField("int", "VERSION_CODE", "$versionCode")
 
@@ -36,6 +36,20 @@ android {
             useSupportLibrary = true
         }
         resourceConfigurations.addAll(listOf("en", "ar", "bn", "de", "es", "fr", "hi", "it", "ja", "pt", "ru", "zh"))
+    }
+
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("play") {
+            dimension = "distribution"
+            buildConfigField("boolean", "SHOW_DONATIONS", "false")
+            buildConfigField("boolean", "SUPPORTS_OVERLAY_PERMISSION", "false")
+        }
+        create("foss") {
+            dimension = "distribution"
+            buildConfigField("boolean", "SHOW_DONATIONS", "true")
+            buildConfigField("boolean", "SUPPORTS_OVERLAY_PERMISSION", "true")
+        }
     }
 
     dependenciesInfo {

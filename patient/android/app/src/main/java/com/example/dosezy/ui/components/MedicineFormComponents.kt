@@ -28,6 +28,7 @@ val DosageUnit.displayName: String
         DosageUnit.MEQ -> "mEq"
         DosageUnit.PUFF -> "puff"
         DosageUnit.AMPULE -> "ampule"
+        DosageUnit.SPRAY -> "spray"
     }
 
 fun isMedicineFormValid(
@@ -54,6 +55,70 @@ fun isMedicineFormValid(
     )
 }
 
+data class MedicineFormValidationResult(
+    val isValid: Boolean,
+    val isNameValid: Boolean,
+    val isDosageValid: Boolean,
+    val isFrequencyValid: Boolean,
+    val isFiniteDurationValid: Boolean,
+    val invalidTimeSlotKeys: Set<String> = emptySet()
+)
+
+fun validateMedicineForm(
+    medicationName: String,
+    dosage: String,
+    hasDifferentDosages: Boolean,
+    scheduledTimesList: List<LocalTime>,
+    perTimeDosages: Map<String, String>,
+    selectedFrequency: FrequencyPattern,
+    selectedDaysOfWeek: List<Int>,
+    selectedDaysOfMonth: List<Int>,
+    intervalWeeksText: String,
+    isFiniteCourse: Boolean = false,
+    durationDaysText: String = "",
+    hasExistingEndDate: Boolean = false
+): MedicineFormValidationResult {
+    val isNameValid = medicationName.isNotBlank()
+
+    val invalidSlots = if (hasDifferentDosages && scheduledTimesList.size > 1 && selectedFrequency != FrequencyPattern.AS_NEEDED) {
+        scheduledTimesList.mapNotNull { t ->
+            val key = String.format(java.util.Locale.US, "%02d:%02d", t.hour, t.minute)
+            val valueStr = perTimeDosages[key] ?: (if (dosage.isNotBlank()) dosage else null)
+            val d = valueStr?.normalizeArabicDigits()?.toDoubleOrNull()
+            if (d == null || d <= 0.0) key else null
+        }.toSet()
+    } else {
+        emptySet()
+    }
+
+    val isDosageValid = if (hasDifferentDosages && scheduledTimesList.size > 1 && selectedFrequency != FrequencyPattern.AS_NEEDED) {
+        invalidSlots.isEmpty()
+    } else {
+        val d = dosage.normalizeArabicDigits().toDoubleOrNull()
+        d != null && d > 0.0
+    }
+
+    val isFrequencyValid = when (selectedFrequency) {
+        FrequencyPattern.DAILY, FrequencyPattern.AS_NEEDED, FrequencyPattern.EVERY_X_HOURS, FrequencyPattern.EVERY_X_DAYS -> true
+        FrequencyPattern.WEEKLY -> selectedDaysOfWeek.isNotEmpty()
+        FrequencyPattern.MONTHLY -> selectedDaysOfMonth.isNotEmpty()
+        FrequencyPattern.CUSTOM -> selectedDaysOfWeek.isNotEmpty() && (intervalWeeksText.normalizeArabicDigits().toIntOrNull() ?: 0) >= 1
+    }
+
+    val isFiniteValid = !isFiniteCourse || hasExistingEndDate || ((durationDaysText.normalizeArabicDigits().toIntOrNull() ?: 0) > 0)
+
+    val isValid = isNameValid && isDosageValid && isFrequencyValid && isFiniteValid
+
+    return MedicineFormValidationResult(
+        isValid = isValid,
+        isNameValid = isNameValid,
+        isDosageValid = isDosageValid,
+        isFrequencyValid = isFrequencyValid,
+        isFiniteDurationValid = isFiniteValid,
+        invalidTimeSlotKeys = invalidSlots
+    )
+}
+
 // Guard: Validate that target userId is present and non-blank to prevent SQLiteConstraintException foreign key crash
 fun isMedicineFormReady(isFormValid: Boolean, userId: String?): Boolean {
     return isFormValid && !userId.isNullOrBlank()
@@ -72,7 +137,9 @@ fun MedicineIdentificationCard(
     onImageSelected: (String?) -> Unit,
     onVisualSelected: (PillShape, String) -> Unit,
     onMedicationNameChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isNameError: Boolean = false,
+    nameErrorMessage: String? = null
 ) = com.example.dosezy.ui.components.form.MedicineIdentificationCard(
     medicineImagePath = medicineImagePath,
     selectedPillShape = selectedPillShape,
@@ -81,7 +148,9 @@ fun MedicineIdentificationCard(
     onImageSelected = onImageSelected,
     onVisualSelected = onVisualSelected,
     onMedicationNameChange = onMedicationNameChange,
-    modifier = modifier
+    modifier = modifier,
+    isNameError = isNameError,
+    nameErrorMessage = nameErrorMessage
 )
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -114,7 +183,12 @@ fun MedicineTimingsAndDosagesCard(
     timeFormat: TimeFormat,
     defaultInitialTime: LocalTime,
     onOpenTimePicker: (timeIndex: Int?, initialTime: LocalTime) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isDosageError: Boolean = false,
+    dosageErrorMessage: String? = null,
+    invalidTimeSlotKeys: Set<String> = emptySet(),
+    isFrequencyError: Boolean = false,
+    frequencyErrorMessage: String? = null
 ) = com.example.dosezy.ui.components.form.MedicineTimingsAndDosagesCard(
     selectedFrequency = selectedFrequency,
     onFrequencyChange = onFrequencyChange,
@@ -143,7 +217,12 @@ fun MedicineTimingsAndDosagesCard(
     timeFormat = timeFormat,
     defaultInitialTime = defaultInitialTime,
     onOpenTimePicker = onOpenTimePicker,
-    modifier = modifier
+    modifier = modifier,
+    isDosageError = isDosageError,
+    dosageErrorMessage = dosageErrorMessage,
+    invalidTimeSlotKeys = invalidTimeSlotKeys,
+    isFrequencyError = isFrequencyError,
+    frequencyErrorMessage = frequencyErrorMessage
 )
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -156,7 +235,9 @@ fun MedicineCourseDurationCard(
     durationDaysText: String,
     onDurationDaysChange: (String) -> Unit,
     calculatedEndDate: LocalDate?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isDurationError: Boolean = false,
+    durationErrorMessage: String? = null
 ) = com.example.dosezy.ui.components.form.MedicineCourseDurationCard(
     isFiniteCourse = isFiniteCourse,
     onIsFiniteCourseChange = onIsFiniteCourseChange,
@@ -165,7 +246,9 @@ fun MedicineCourseDurationCard(
     durationDaysText = durationDaysText,
     onDurationDaysChange = onDurationDaysChange,
     calculatedEndDate = calculatedEndDate,
-    modifier = modifier
+    modifier = modifier,
+    isDurationError = isDurationError,
+    durationErrorMessage = durationErrorMessage
 )
 
 @Composable
@@ -193,3 +276,17 @@ fun MedicineNotesCard(
     onDoctorNotesChange = onDoctorNotesChange,
     modifier = modifier
 )
+
+@Composable
+fun MedicineReminderStyleCard(
+    selectedReminderType: com.example.dosezy.data.model.ReminderType?,
+    onReminderTypeChange: (com.example.dosezy.data.model.ReminderType?) -> Unit,
+    profileDefaultType: com.example.dosezy.data.model.ReminderType = com.example.dosezy.data.model.ReminderType.ALARM,
+    modifier: Modifier = Modifier
+) = com.example.dosezy.ui.components.form.MedicineReminderStyleCard(
+    selectedReminderType = selectedReminderType,
+    onReminderTypeChange = onReminderTypeChange,
+    profileDefaultType = profileDefaultType,
+    modifier = modifier
+)
+

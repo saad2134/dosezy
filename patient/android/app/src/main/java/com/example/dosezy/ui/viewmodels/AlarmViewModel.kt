@@ -24,6 +24,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -87,14 +88,36 @@ class AlarmViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             val list = mutableListOf<Pair<ScheduleEntry, Medicine>>()
             var targetUser: User? = null
+            val foundIds = mutableSetOf<String>()
             for (id in entryIds) {
                 val entry = database.scheduleDao().getScheduleEntryById(id)
-                if (entry != null) {
+                if (entry != null && entry.status == com.example.dosezy.data.model.MedicationStatus.PENDING) {
                     val med = database.medicineDao().getMedicineByIdDirect(entry.medicineId)
                     if (med != null) {
                         list.add(Pair(entry, med))
+                        foundIds.add(entry.entryId)
                         if (targetUser == null) {
                             targetUser = database.userDao().getUserByIdDirect(entry.userId)
+                        }
+                    }
+                }
+            }
+            // Guard: Reconcile all pending sibling schedule entries in the same time slot to ensure 4+ medication cohorts are fully loaded (#115)
+            val firstEntry = list.firstOrNull()?.first ?: entryIds.firstNotNullOfOrNull { database.scheduleDao().getScheduleEntryById(it) }
+            if (firstEntry != null) {
+                val slotMillis = firstEntry.scheduledDateTime.withSecond(0).withNano(0)
+                    .atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+                val slotEntries = database.scheduleDao().getScheduleForDateRangeDirect(
+                    firstEntry.userId,
+                    slotMillis,
+                    slotMillis + 59999L
+                ).filter { it.status == com.example.dosezy.data.model.MedicationStatus.PENDING && !it.entryId.startsWith("PRN_") }
+                for (sibling in slotEntries) {
+                    if (sibling.entryId !in foundIds) {
+                        val med = database.medicineDao().getMedicineByIdDirect(sibling.medicineId)
+                        if (med != null) {
+                            list.add(Pair(sibling, med))
+                            foundIds.add(sibling.entryId)
                         }
                     }
                 }
@@ -158,12 +181,11 @@ class AlarmViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             val medicinesList = _uiState.value.medicinesList
             val user = _uiState.value.user
-            val allIds = if (medicinesList.isNotEmpty()) {
-                medicinesList.map { it.first.entryId }
-            } else {
-                entryIds
+            // Guard: Merge explicit entryIds and loaded UI state list to ensure all cohort medicines are marked taken (#115)
+            val allIds = (entryIds + medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
+            withContext(NonCancellable) {
+                takeCohortUseCase(allIds, user = user)
             }
-            takeCohortUseCase(allIds, user = user)
             withContext(Dispatchers.Main) {
                 onComplete()
             }
@@ -179,23 +201,21 @@ class AlarmViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             val medicinesList = _uiState.value.medicinesList
             val user = _uiState.value.user
-            val allIds = if (medicinesList.isNotEmpty()) {
-                medicinesList.map { it.first.entryId }
-            } else {
-                entryIds
-            }
+            val allIds = (entryIds + medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
             val names = if (medicinesList.isNotEmpty()) {
                 medicinesList.map { it.second.medicationName }
             } else {
                 listOf(initialMedicineName)
             }
-            snoozeCohortUseCase(
-                entryIds = allIds,
-                explicitSnoozeMinutes = snoozeMinutes,
-                fallbackMedicineName = initialMedicineName,
-                medicineNames = names,
-                user = user
-            )
+            withContext(NonCancellable) {
+                snoozeCohortUseCase(
+                    entryIds = allIds,
+                    explicitSnoozeMinutes = snoozeMinutes,
+                    fallbackMedicineName = initialMedicineName,
+                    medicineNames = names,
+                    user = user
+                )
+            }
             withContext(Dispatchers.Main) {
                 onComplete()
             }
@@ -209,12 +229,10 @@ class AlarmViewModel @Inject constructor(
     ) {
         viewModelScope.launch(ioDispatcher) {
             val medicinesList = _uiState.value.medicinesList
-            val allIds = if (medicinesList.isNotEmpty()) {
-                medicinesList.map { it.first.entryId }
-            } else {
-                entryIds
+            val allIds = (entryIds + medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
+            withContext(NonCancellable) {
+                skipCohortUseCase(allIds, reason)
             }
-            skipCohortUseCase(allIds, reason)
             withContext(Dispatchers.Main) {
                 onComplete()
             }

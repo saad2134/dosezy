@@ -47,7 +47,9 @@ fun MedicineIdentificationCard(
     onImageSelected: (String?) -> Unit,
     onVisualSelected: (PillShape, String) -> Unit,
     onMedicationNameChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isNameError: Boolean = false,
+    nameErrorMessage: String? = null
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -112,9 +114,14 @@ fun MedicineIdentificationCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
+                isError = isNameError,
+                supportingText = if (isNameError && !nameErrorMessage.isNullOrBlank()) {
+                    { Text(text = nameErrorMessage, color = MaterialTheme.colorScheme.error) }
+                } else null,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF1193D4),
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedBorderColor = if (isNameError) MaterialTheme.colorScheme.error else Color(0xFF1193D4),
+                    unfocusedBorderColor = if (isNameError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
+                    errorBorderColor = MaterialTheme.colorScheme.error,
                     focusedLabelColor = Color(0xFF1193D4),
                     unfocusedLabelColor = Color(0xFF6B7280),
                     cursorColor = Color(0xFF1193D4)

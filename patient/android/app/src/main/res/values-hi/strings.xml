@@ -51,6 +51,12 @@
     <string name="form_delete_medicine">इस दवा को हटाएं</string>
     <string name="form_upload_img">दवा की तस्वीर अपलोड करें</string>
     <string name="form_change_img">दवा की तस्वीर बदलें</string>
+    <string name="form_error_med_name_required">दवा का नाम आवश्यक है</string>
+    <string name="form_error_dosage_required">खुराक आवश्यक है</string>
+    <string name="form_error_dosage_invalid">खुराक एक धनात्मक संख्या होनी चाहिए</string>
+    <string name="form_error_select_days">कृपया कम से कम एक दिन चुनें</string>
+    <string name="form_error_course_duration">कोर्स की अवधि कम से कम 1 दिन होनी चाहिए</string>
+    <string name="form_error_fix_fields">कृपया ऊपर हाइलाइट किए गए आवश्यक फ़ील्ड भरें</string>
     <string name="freq_daily">दैनिक</string>
     <string name="freq_weekly">साप्ताहिक</string>
     <string name="freq_monthly">मासिक</string>
@@ -160,6 +166,7 @@
     <string name="unit_meq">mEq</string>
     <string name="unit_puff">पफ (puff)</string>
     <string name="unit_ampule">एम्पुल (ampule)</string>
+    <string name="unit_spray">स्प्रे (Spray)</string>
 
     <!-- Help &amp; Support -->
     <string name="help_title">सहायता और सहायता</string>
@@ -475,6 +482,7 @@
     <string name="pill_shape_injection">इंजेक्शन (Injection)</string>
     <string name="pill_shape_drops">ड्रॉप्स (Drops)</string>
     <string name="pill_shape_patch">पैच (Patch)</string>
+    <string name="pill_shape_spray">स्प्रे (Spray)</string>
 
     <string name="med_notes_label">डॉक्टर नोट्स और विशेष चेतावनी</string>
     <string name="med_notes_placeholder">उदा. भोजन के साथ लें, चकोतरा से बचें, प्रिस्क्रिप्शन #12345</string>
@@ -568,15 +576,6 @@
     <string name="about_tagline">मरीजों और देखभाल करने वालों के लिए एक सुरक्षित, ऑफ़लाइन दवा साथी।</string>
     <string name="about_star_github">GitHub पर स्टार दें</string>
     <string name="about_star_github_desc">GitHub पर स्टार देकर हमारे ओपन-सोर्स प्रोजेक्ट का समर्थन करें</string>
-    <string name="about_support_dev_title">विकास का समर्थन करें</string>
-    <string name="about_support_dev_desc" formatted="false">Dosezy पूरी तरह से मुफ़्त, सुरक्षित और विज्ञापन-मुक्त है। आपका दान प्रोजेक्ट को आगे बढ़ाने में मदद करता है!</string>
-    <string name="about_buymeacoffee">Buy Me a Coffee पर सहयोग करें</string>
-    <string name="about_buymeacoffee_desc">कार्ड या PayPal के ज़रिए BuyMeACoffee पर दान करें</string>
-    <string name="about_crypto_donations">क्रिप्टोकरेंसी दान</string>
-    <string name="about_copied_to_clipboard">%1$s पता क्लिपबोर्ड पर कॉपी किया गया</string>
-    <string name="about_tap_to_copy">पता कॉपी करने के लिए टैप करें</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">GitHub Sponsors के माध्यम से मासिक या एकमुश्त दान करें</string>
     <string name="pref_alarm_duration_title">अलार्म बजने की अवधि</string>
     <string name="pref_alarm_duration_desc">निर्धारित समय के बाद ध्वनि और कंपन को स्वचालित रूप से म्यूट करें</string>
     <string name="alarm_duration_continuous">लगातार (जब तक बंद न किया जाए)</string>
@@ -686,16 +685,6 @@
 
     <string name="about_community_open_source">समुदाय और ओपन सोर्स</string>
     <string name="about_version_build">संस्करण %1$s (बिल्ड %2$s)</string>
-    <string name="crypto_bitcoin">बिटकॉइन (BTC)</string>
-    <string name="crypto_ethereum">इथेरियम (ETH)</string>
-    <string name="crypto_solana">सोलाना (SOL)</string>
-    <string name="crypto_litecoin">लाइटकॉइन (LTC)</string>
-    <string name="crypto_zcash">ज़ीकैश (ZEC)</string>
-    <string name="crypto_name_btc">बिटकॉइन</string>
-    <string name="crypto_name_eth">इथेरियम</string>
-    <string name="crypto_name_sol">सोलाना</string>
-    <string name="crypto_name_ltc">लाइटकॉइन</string>
-    <string name="crypto_name_zec">ज़ीकैश</string>
     <string name="country_india">भारत</string>
     <string name="country_us_ca">संयुक्त राज्य अमेरिका / कनाडा</string>
     <string name="country_uk">यूनाइटेड किंगडम</string>
@@ -873,4 +862,33 @@
     <string name="schedule_effective_today_desc">आज से नए समय लागू करें। आज की पुरानी बिना ली गई खुराकें हटा दी जाएंगी।</string>
     <string name="schedule_effective_tomorrow_title">कल से शुरू करें</string>
     <string name="schedule_effective_tomorrow_desc">आज का शेड्यूल वैसा ही रखें। नया शेड्यूल कल से शुरू होगा।</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[पूर्वव्यापी रूप से दर्ज]</string>
+    <string name="schedule_action_dialog_title">खुराक प्रबंधित करें</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">ली गई के रूप में चिह्नित करें</string>
+    <string name="schedule_action_skip_dose">छोड़ी गई के रूप में चिह्नित करें</string>
+    <string name="schedule_action_undo_dose">खुराक क्रिया पूर्ववत करें</string>
+    <string name="schedule_action_edit_note">खुराक नोट संपादित करें</string>
+    <string name="schedule_action_add_note">खुराक नोट जोड़ें</string>
+    <string name="schedule_dose_marked_taken">%1$s को ली गई के रूप में चिह्नित किया गया</string>
+    <string name="schedule_dose_marked_skipped">%1$s को छोड़ी गई के रूप में चिह्नित किया गया</string>
+    <string name="schedule_dose_reverted">%1$s को लंबित पर वापस लाया गया</string>
+    <string name="schedule_dose_locked_notice">यह खुराक 48 घंटे से अधिक पुरानी है और मेडिकल रिकॉर्ड की अखंडता बनाए रखने के लिए लॉक है।</string>
+    <string name="schedule_dose_locked_badge">लॉक</string>
+    <string name="schedule_tap_to_manage">प्रबंधित करने के लिए टैप करें</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">रिमाइंडर शैली</string>
+    <string name="pref_reminder_type_desc">चुनें कि रिमाइंडर अलार्म के रूप में बजें या मानक सूचना के रूप में</string>
+    <string name="reminder_type_alarm">अलार्म</string>
+    <string name="reminder_type_alarm_desc">निरंतर ध्वनि के साथ पूर्ण-स्क्रीन अलर्ट। डू नॉट डिस्टर्ब को बायपास करता है।</string>
+    <string name="reminder_type_notification">सूचना (नोटिफिकेशन)</string>
+    <string name="reminder_type_notification_desc">अलर्ट टोन के साथ मानक सूचना बैनर। डू नॉट डिस्टर्ब का सम्मान करता है।</string>
+    <string name="reminder_type_default">प्रोफ़ाइल डिफ़ॉल्ट का उपयोग करें (%1$s)</string>
+    <string name="reminder_type_default_profile">प्रोफ़ाइल डिफ़ॉल्ट का उपयोग करें</string>
+    <string name="notif_channel_notifications_name">दवा सूचनाएं</string>
+    <string name="notif_channel_notifications_desc">दवा समय-सारणी के लिए मानक सूचनाएं जो डू नॉट डिस्टर्ब का पालन करती हैं</string>
+    <string name="form_reminder_type">रिमाइंडर शैली</string>
+    <string name="form_reminder_type_desc">महत्वपूर्ण दवाओं के लिए अलार्म या सप्लीमेंट्स के लिए सूचना चुनें</string>
 </resources>

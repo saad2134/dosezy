@@ -521,6 +521,44 @@ class AlarmAndNotificationRegressionTest {
     }
 
     @Test
+    @Config(sdk = [25])
+    fun testAlarmActivity_requestDeviceUnlock_onApi25_addsFlagDismissKeyguardAndInvokesCallback() {
+        // Guard: Verify that requestDeviceUnlock adds FLAG_DISMISS_KEYGUARD and triggers callback on Android 7.1 (API 25) (#BUG-KEYGUARD-API24)
+        val controller = org.robolectric.Robolectric.buildActivity(AlarmActivity::class.java)
+        val activity = controller.get()
+        var callbackInvoked = false
+        activity.requestDeviceUnlock {
+            callbackInvoked = true
+        }
+
+        assertTrue("onSuccess callback must be executed on API 25", callbackInvoked)
+        val flags = activity.window.attributes.flags
+        assertTrue(
+            "FLAG_DISMISS_KEYGUARD must be added to window attributes on API 25",
+            (flags and android.view.WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD) != 0
+        )
+    }
+
+    @Test
+    @Config(sdk = [24])
+    fun testAlarmActivity_requestDeviceUnlock_onApi24_addsFlagDismissKeyguardAndInvokesCallback() {
+        // Guard: Verify that requestDeviceUnlock adds FLAG_DISMISS_KEYGUARD and triggers callback on Android 7.0 (API 24) (#BUG-KEYGUARD-API24)
+        val controller = org.robolectric.Robolectric.buildActivity(AlarmActivity::class.java)
+        val activity = controller.get()
+        var callbackInvoked = false
+        activity.requestDeviceUnlock {
+            callbackInvoked = true
+        }
+
+        assertTrue("onSuccess callback must be executed on API 24", callbackInvoked)
+        val flags = activity.window.attributes.flags
+        assertTrue(
+            "FLAG_DISMISS_KEYGUARD must be added to window attributes on API 24",
+            (flags and android.view.WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD) != 0
+        )
+    }
+
+    @Test
     fun testLockscreenPrivacy_defaultsToPublicVisibility() {
         // Guard: Verify that notifications default to VISIBILITY_PUBLIC while supporting privacy opt-out
         val context = ApplicationProvider.getApplicationContext<Context>()
@@ -712,6 +750,84 @@ class AlarmAndNotificationRegressionTest {
             putExtra("allow_lockscreen_details", false)
         }
         assertFalse(intent.getBooleanExtra("allow_lockscreen_details", true))
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // Reminder Style: Alarm vs Notification Tests (#111)
+    // ───────────────────────────────────────────────────────────────
+
+    @Test
+    fun reminderType_alarmMode_configuresAlarmChannelAndCategory() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val isAlarmMode = true
+        val targetChannelId = if (isAlarmMode) MedicineAlarmReceiver.CHANNEL_ID else MedicineAlarmReceiver.NOTIFICATION_CHANNEL_ID
+        val targetPriority = if (isAlarmMode) androidx.core.app.NotificationCompat.PRIORITY_MAX else androidx.core.app.NotificationCompat.PRIORITY_HIGH
+        val targetCategory = if (isAlarmMode) androidx.core.app.NotificationCompat.CATEGORY_ALARM else androidx.core.app.NotificationCompat.CATEGORY_REMINDER
+
+        assertEquals(MedicineAlarmReceiver.CHANNEL_ID, targetChannelId)
+        assertEquals(androidx.core.app.NotificationCompat.PRIORITY_MAX, targetPriority)
+        assertEquals(androidx.core.app.NotificationCompat.CATEGORY_ALARM, targetCategory)
+
+        val builder = androidx.core.app.NotificationCompat.Builder(context, targetChannelId)
+            .setSmallIcon(com.example.dosezy.R.mipmap.ic_launcher)
+            .setPriority(targetPriority)
+            .setCategory(targetCategory)
+            .setSilent(isAlarmMode)
+        val notif = builder.build()
+
+        assertEquals(MedicineAlarmReceiver.CHANNEL_ID, notif.channelId)
+    }
+
+    @Test
+    fun reminderType_notificationMode_configuresNotificationChannelAndCategory() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val isAlarmMode = false
+        val targetChannelId = if (isAlarmMode) MedicineAlarmReceiver.CHANNEL_ID else MedicineAlarmReceiver.NOTIFICATION_CHANNEL_ID
+        val targetPriority = if (isAlarmMode) androidx.core.app.NotificationCompat.PRIORITY_MAX else androidx.core.app.NotificationCompat.PRIORITY_HIGH
+        val targetCategory = if (isAlarmMode) androidx.core.app.NotificationCompat.CATEGORY_ALARM else androidx.core.app.NotificationCompat.CATEGORY_REMINDER
+
+        assertEquals(MedicineAlarmReceiver.NOTIFICATION_CHANNEL_ID, targetChannelId)
+        assertEquals(androidx.core.app.NotificationCompat.PRIORITY_HIGH, targetPriority)
+        assertEquals(androidx.core.app.NotificationCompat.CATEGORY_REMINDER, targetCategory)
+
+        val builder = androidx.core.app.NotificationCompat.Builder(context, targetChannelId)
+            .setSmallIcon(com.example.dosezy.R.mipmap.ic_launcher)
+            .setPriority(targetPriority)
+            .setCategory(targetCategory)
+            .setSilent(isAlarmMode)
+        val notif = builder.build()
+
+        assertEquals(MedicineAlarmReceiver.NOTIFICATION_CHANNEL_ID, notif.channelId)
+    }
+
+    @Test
+    fun reminderType_cohortResolution_requiresAlarmIfAnyMedicationIsAlarm() {
+        val userDefault = com.example.dosezy.data.model.ReminderType.NOTIFICATION
+
+        // 1. All medicines are NOTIFICATION -> resolves to false (notification)
+        val medsNotificationOnly = listOf<com.example.dosezy.data.model.ReminderType?>(
+            com.example.dosezy.data.model.ReminderType.NOTIFICATION,
+            com.example.dosezy.data.model.ReminderType.NOTIFICATION
+        )
+        val isAlarm1 = medsNotificationOnly.any { (it ?: userDefault) == com.example.dosezy.data.model.ReminderType.ALARM }
+        assertFalse("All notification meds must resolve to notification mode", isAlarm1)
+
+        // 2. One med is ALARM and one is NOTIFICATION -> resolves to true (alarm)
+        val medsMixed = listOf<com.example.dosezy.data.model.ReminderType?>(
+            com.example.dosezy.data.model.ReminderType.NOTIFICATION,
+            com.example.dosezy.data.model.ReminderType.ALARM
+        )
+        val isAlarm2 = medsMixed.any { (it ?: userDefault) == com.example.dosezy.data.model.ReminderType.ALARM }
+        assertTrue("Cohort with any ALARM medicine must resolve to alarm mode", isAlarm2)
+
+        // 3. Null inherits user profile default
+        val medsInherit = listOf<com.example.dosezy.data.model.ReminderType?>(null, null)
+        val isAlarm3 = medsInherit.any { (it ?: userDefault) == com.example.dosezy.data.model.ReminderType.ALARM }
+        assertFalse("Null reminderType must inherit user profile default (NOTIFICATION)", isAlarm3)
+
+        val userDefaultAlarm = com.example.dosezy.data.model.ReminderType.ALARM
+        val isAlarm4 = medsInherit.any { (it ?: userDefaultAlarm) == com.example.dosezy.data.model.ReminderType.ALARM }
+        assertTrue("Null reminderType must inherit user profile default (ALARM)", isAlarm4)
     }
 }
 

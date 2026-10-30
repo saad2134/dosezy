@@ -47,7 +47,9 @@ data class Medicine(
     val endDate: LocalDate? = null,
     val durationDays: Int? = null,
     val isArchived: Boolean = false,
-    val customDosages: Map<String, Double>? = null
+    val customDosages: Map<String, Double>? = null,
+    // Guard: Per-medication reminder type override; null inherits user profile default (#111)
+    val reminderType: ReminderType? = null
 ) {
 
     /**
@@ -102,10 +104,11 @@ data class Medicine(
             DosageUnit.DROP -> "drop"
             DosageUnit.TABLET -> "tablet"
             DosageUnit.CAPSULE -> "capsule"
-            // Support for mEq (electrolyte supplements), puffs/actuations (inhalers), and ampules (single-use liquid)
+            // Support for mEq (electrolyte supplements), puffs/actuations (inhalers), ampules (single-use liquid), and spray (nasal/topical)
             DosageUnit.MEQ -> "mEq"
             DosageUnit.PUFF -> "puff"
             DosageUnit.AMPULE -> "ampule"
+            DosageUnit.SPRAY -> "spray"
         }
 
         // Remove decimal if it's a whole number
@@ -191,8 +194,8 @@ data class Medicine(
                 val count = targetDosage.toInt()
                 if (count in 1..10) count else 1
             }
-            // Continuous/metered quantities (drops, liquid mL, inhaler puffs): deduct specified dose count
-            DosageUnit.DROP, DosageUnit.ML, DosageUnit.PUFF -> {
+            // Continuous/metered quantities (drops, liquid mL, inhaler puffs, spray): deduct specified dose count
+            DosageUnit.DROP, DosageUnit.ML, DosageUnit.PUFF, DosageUnit.SPRAY -> {
                 targetDosage.toInt().coerceAtLeast(1)
             }
         }
@@ -266,7 +269,7 @@ data class Medicine(
                     if (dosage in 0.1..10.0) dosage else 1.0
                 }
             }
-            DosageUnit.ML, DosageUnit.PUFF -> {
+            DosageUnit.ML, DosageUnit.PUFF, DosageUnit.SPRAY -> {
                 if (!customDosages.isNullOrEmpty() && scheduledTimes.isNotEmpty()) {
                     val totalCustom = scheduledTimes.sumOf { getDosageForTime(it) }
                     totalCustom / scheduledTimes.size.toDouble()
@@ -291,7 +294,7 @@ data class Medicine(
 }
 
 enum class DosageUnit {
-    MG, MCG, ML, DROP, TABLET, CAPSULE, MEQ, PUFF, AMPULE
+    MG, MCG, ML, DROP, TABLET, CAPSULE, MEQ, PUFF, AMPULE, SPRAY
 }
 
 @androidx.compose.runtime.Composable
@@ -306,6 +309,7 @@ fun DosageUnit.getLocalizedName(): String {
         DosageUnit.MEQ -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_meq)
         DosageUnit.PUFF -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_puff)
         DosageUnit.AMPULE -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_ampule)
+        DosageUnit.SPRAY -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_spray)
     }
 }
 
@@ -320,11 +324,12 @@ fun DosageUnit.getLocalizedName(context: android.content.Context): String {
         DosageUnit.MEQ -> context.getString(com.example.dosezy.R.string.unit_meq)
         DosageUnit.PUFF -> context.getString(com.example.dosezy.R.string.unit_puff)
         DosageUnit.AMPULE -> context.getString(com.example.dosezy.R.string.unit_ampule)
+        DosageUnit.SPRAY -> context.getString(com.example.dosezy.R.string.unit_spray)
     }
 }
 
 enum class PillShape {
-    ROUND, CAPSULE, OVAL, LIQUID, INHALER, INJECTION, DROPS, PATCH
+    ROUND, CAPSULE, OVAL, LIQUID, INHALER, INJECTION, DROPS, PATCH, SPRAY
 }
 
 @androidx.compose.runtime.Composable
@@ -338,6 +343,7 @@ fun PillShape.getLocalizedName(): String {
         PillShape.INJECTION -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.pill_shape_injection)
         PillShape.DROPS -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.pill_shape_drops)
         PillShape.PATCH -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.pill_shape_patch)
+        PillShape.SPRAY -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.pill_shape_spray)
     }
 }
 

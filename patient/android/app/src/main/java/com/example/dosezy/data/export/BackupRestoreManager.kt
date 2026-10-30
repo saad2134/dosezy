@@ -888,7 +888,9 @@ class BackupRestoreManager(
             intakeCountdownSeconds = json.get("intakeCountdownSeconds")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 120,
             // Guard: Defensively parse lockscreen privacy and custom snooze popup settings for legacy backup archives
             lockscreenDetailsEnabled = json.get("lockscreenDetailsEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: true,
-            customSnoozePopupEnabled = json.get("customSnoozePopupEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false
+            customSnoozePopupEnabled = json.get("customSnoozePopupEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+            // Guard: Defensively parse reminder delivery style with fallback to ALARM for legacy backup archives (#111)
+            reminderType = json.get("reminderType")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { com.example.dosezy.data.model.ReminderType.valueOf(it.trim().uppercase()) }.getOrNull() } ?: com.example.dosezy.data.model.ReminderType.ALARM
         )
     }
 
@@ -978,10 +980,13 @@ class BackupRestoreManager(
                     "MEQ", "MILLIEQUIVALENT", "MILLIEQUIVALENTS" -> DosageUnit.MEQ
                     "PUFF", "PUFFS", "ACTUATION", "ACTUATIONS" -> DosageUnit.PUFF
                     "AMPULE", "AMPULES", "AMP", "AMPOULE", "AMPOULES" -> DosageUnit.AMPULE
+                    "SPRAY", "SPRAYS" -> DosageUnit.SPRAY
                     else -> runCatching { DosageUnit.valueOf(normalized) }.getOrNull()
                 }
             } ?: DosageUnit.TABLET
             val timesPerDayVal = obj.get("timesPerDay")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 1
+            // Guard: Defensively parse per-medicine reminderType override with fallback to null (#111)
+            val reminderTypeVal = obj.get("reminderType")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { com.example.dosezy.data.model.ReminderType.valueOf(it.trim().uppercase()) }.getOrNull() }
 
             val med = Medicine(
                 medicineId = medId,
@@ -1010,7 +1015,8 @@ class BackupRestoreManager(
                         try { map[k] = v.asDouble } catch (_: Exception) {}
                     }
                     if (map.isNotEmpty()) map else null
-                } else null
+                } else null,
+                reminderType = reminderTypeVal
             )
             list.add(med)
         }

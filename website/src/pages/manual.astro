@@ -337,7 +337,7 @@ import Footer from '../components/Footer.astro';
 						<div class="space-y-3 text-xs text-neutral-300">
 							<ol class="list-decimal list-inside space-y-2 text-neutral-300">
 								<li>Tap <strong class="text-white">Medicines</strong> in the bottom bar, then tap <strong class="text-white">"+ Add Medicine"</strong> (or <strong class="text-white">"Add Your First Medication"</strong> on empty lists).</li>
-								<li>Enter the medicine name and dose unit (tablet, capsule, mg, mL, drops, puffs, units). Helpful validation toasts guide you if required fields are missing.</li>
+								<li>Enter the medicine name and dose unit (tablet, capsule, mg, mL, drops, puffs, spray, units). Helpful validation toasts and red input highlights guide you if required fields are missing.</li>
 								<li>(Optional) Tap the camera icon to take or crop a pill box photo.</li>
 								<li>Select meal instructions (🍽️ Before Food, 🍲 With Food, 🥗 After Food, or ⏱️ No Instructions).</li>
 								<li>Choose <strong class="text-white">Daily</strong>, <strong class="text-white">Weekly</strong>, <strong class="text-white">Monthly</strong>, or <strong class="text-white">As Needed (PRN)</strong> frequency.</li>
@@ -397,6 +397,7 @@ import Footer from '../components/Footer.astro';
 							<strong class="text-amber-400 block mb-1">Custom Sounds, Volumes & Durations:</strong>
 							<p>Under <strong class="text-white">Menu &gt; Preferences &gt; Notifications &amp; Alarms</strong>:</p>
 							<ul class="list-disc list-inside space-y-1 text-neutral-300 text-[11px]">
+								<li><strong class="text-white">Reminder Style:</strong> Choose between <strong class="text-white">Full-Screen Alarm</strong> (rings aloud with slide gestures and volume silencing) or <strong class="text-white">Gentle Notification</strong> (standard notification chime).</li>
 								<li><strong class="text-white">Custom Tones:</strong> Choose built-in alert chimes, system alarms, or your own device ringtones with in-app audio preview playback.</li>
 								<li><strong class="text-white">Alarm Duration:</strong> Choose ring length: 30 seconds, 1 minute, 2 minutes, 3 minutes, 5 minutes, or continuous loop.</li>
 								<li><strong class="text-white">Dynamic Snooze:</strong> Choose 5, 10, 15, 20, or 30 minute snooze intervals.</li>
@@ -473,6 +474,9 @@ import Footer from '../components/Footer.astro';
 						<p class="text-xs text-neutral-300 leading-relaxed">
 							Tap the <strong class="text-white">Schedule</strong> tab in the bottom bar to view your full medication calendar. Tap any date to inspect past adherence or upcoming doses. Colored dot markers on calendar days show at a glance whether medicines were taken on time, late, or missed.
 						</p>
+						<p class="text-xs text-neutral-300 leading-relaxed mt-2">
+							<strong class="text-sky-300">Retrospective Dose Logging:</strong> If you took a past dose but forgot to log it, or took it late after midnight, you can mark missed doses from the past 48 hours directly on the calendar. Taking a past dose decrements your inventory accurately and preserves your adherence streak with a transparent audit note.
+						</p>
 					</article>
 
 					<!-- Card 7: Adherence Analytics -->
@@ -527,13 +531,13 @@ import Footer from '../components/Footer.astro';
 							<ul class="list-disc list-inside space-y-1.5 text-neutral-300">
 								<li><strong class="text-white">General:</strong> App language (12 languages) and 12h/24h time format.</li>
 								<li><strong class="text-white">Appearance:</strong> Light/Dark theme, Home vertical Timeline Mode, Thicker Calendar Day Highlights, and <em>Hide Navigation Add Button</em> (hides the center '+' button for a symmetrical 4-tab bar and places an "Add Medicine" button on the Medicines screen).</li>
-								<li><strong class="text-white">Notifications &amp; Alarms:</strong> Slide to Take &amp; Snooze gestures, default snooze interval (5–30 min), custom ringtone selection, volume slider, and alarm sound duration (30s–5m/loop).</li>
+								<li><strong class="text-white">Notifications &amp; Alarms:</strong> Reminder Style (Full-Screen Alarm vs Gentle Notification), Slide to Take &amp; Snooze gestures, default snooze interval (5-30 min), custom ringtone selection, volume slider, and alarm sound duration (30s-5m/loop).</li>
 								<li><strong class="text-white">Dose Tracking:</strong>
 									<ul class="list-disc list-inside ml-3 mt-1 space-y-1 text-[11px] text-neutral-300">
 										<li><strong class="text-white">Allow Dose Undo:</strong> Toggle whether doses can be undone from cards or snackbars, with a safety confirmation dialog before restoring stock counts (default off).</li>
 										<li><strong class="text-white">Dose Notes:</strong> Master toggle to allow attaching meal context and symptom notes to doses, with optional <em>Prompt on Dose Taken</em> automation (default off; hides "+ Add Note" when disabled).</li>
 										<li><strong class="text-white">Allow Dose Skipping:</strong> Opt-in secondary "Skip" button with mandatory clinical reasons that protect your compliance streak.</li>
-										<li><strong class="text-white">Late &amp; Missed Windows:</strong> Adjust <em>Consider Late After</em> (1h–3h) and <em>Consider Missed After</em> (3h–9h).</li>
+										<li><strong class="text-white">Late &amp; Missed Windows:</strong> Adjust <em>Consider Late After</em> (1h-3h) and <em>Consider Missed After</em> (3h-9h).</li>
 									</ul>
 								</li>
 							</ul>
@@ -699,7 +703,7 @@ import Footer from '../components/Footer.astro';
 					<div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 flex items-center justify-between gap-4 print:hidden">
 						<div class="space-y-0.5">
 							<strong class="text-white font-mono uppercase text-[11px] block">🗺️ Roadmap Notice (Planned for v3.x)</strong>
-							<p class="text-neutral-300 text-[11px]">Dosezy currently operates 100% offline on your device for complete privacy. Self-hosted private server syncing is planned as an optional capability in our upcoming v3.0–v3.9 roadmap.</p>
+							<p class="text-neutral-300 text-[11px]">Dosezy currently operates 100% offline on your device for complete privacy. Self-hosted private server syncing is planned as an optional capability in our upcoming v3.0-v3.9 roadmap.</p>
 						</div>
 					</div>
 
@@ -765,7 +769,7 @@ import Footer from '../components/Footer.astro';
 					<div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 flex items-center justify-between gap-4 print:hidden">
 						<div class="space-y-0.5">
 							<strong class="text-white font-mono uppercase text-[11px] block">🗺️ Roadmap Notice (Planned for v3.x)</strong>
-							<p class="text-neutral-300 text-[11px]">The Caregiver Web Dashboard is currently in development under the v3.0–v3.9 product roadmap. In the current release, you can export PDF adherence reports directly to share with caregivers.</p>
+							<p class="text-neutral-300 text-[11px]">The Caregiver Web Dashboard is currently in development under the v3.0-v3.9 product roadmap. In the current release, you can export PDF adherence reports directly to share with caregivers.</p>
 						</div>
 					</div>
 

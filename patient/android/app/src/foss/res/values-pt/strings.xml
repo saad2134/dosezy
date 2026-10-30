@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about_support_dev_title">Apoiar o desenvolvimento</string>
+    <string name="about_support_dev_desc" formatted="false">O Dosezy é 100% gratuito, privado e sem anúncios. Suas doações mantêm o projeto vivo!</string>
+    <string name="about_buymeacoffee">Pague-me um café</string>
+    <string name="about_buymeacoffee_desc">Apoie via cartão ou PayPal no BuyMeACoffee</string>
+    <string name="about_crypto_donations">Doações em criptomoedas</string>
+    <string name="about_copied_to_clipboard">Endereço de %1$s copiado para a área de transferência</string>
+    <string name="about_tap_to_copy">Toque para copiar o endereço</string>
+    <string name="about_github_sponsors">GitHub Sponsors</string>
+    <string name="about_github_sponsors_desc">Apoie mensalmente ou pontualmente via GitHub Sponsors</string>
+    <string name="crypto_bitcoin">Bitcoin (BTC)</string>
+    <string name="crypto_ethereum">Ethereum (ETH)</string>
+    <string name="crypto_solana">Solana (SOL)</string>
+    <string name="crypto_litecoin">Litecoin (LTC)</string>
+    <string name="crypto_zcash">Zcash (ZEC)</string>
+    <string name="crypto_name_btc">Bitcoin</string>
+    <string name="crypto_name_eth">Ethereum</string>
+    <string name="crypto_name_sol">Solana</string>
+    <string name="crypto_name_ltc">Litecoin</string>
+    <string name="crypto_name_zec">Zcash</string>
+</resources>

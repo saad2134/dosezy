@@ -51,6 +51,12 @@
     <string name="form_delete_medicine">Delete Medication</string>
     <string name="form_upload_img">Upload Medicine Image</string>
     <string name="form_change_img">Change Medicine Image</string>
+    <string name="form_error_med_name_required">Medication name is required</string>
+    <string name="form_error_dosage_required">Dosage is required</string>
+    <string name="form_error_dosage_invalid">Dosage must be a positive number</string>
+    <string name="form_error_select_days">Please select at least one day</string>
+    <string name="form_error_course_duration">Course duration must be at least 1 day</string>
+    <string name="form_error_fix_fields">Please fill in the required fields highlighted above</string>
     <string name="freq_daily">Daily</string>
     <string name="freq_weekly">Weekly</string>
     <string name="freq_monthly">Monthly</string>
@@ -175,6 +181,7 @@
     <string name="unit_meq">mEq</string>
     <string name="unit_puff">puff</string>
     <string name="unit_ampule">ampule</string>
+    <string name="unit_spray">spray</string>
 
     <!-- Help &amp; Support -->
     <string name="help_title">Help &amp; Support</string>
@@ -491,6 +498,7 @@ Do you want to continue?</string>
     <string name="pill_shape_injection">Injection</string>
     <string name="pill_shape_drops">Drops</string>
     <string name="pill_shape_patch">Patch</string>
+    <string name="pill_shape_spray">Spray</string>
 
     <!-- Doctor Notes (#46) -->
     <string name="med_notes_label">Doctor Notes &amp; Warnings</string>
@@ -590,15 +598,6 @@ Do you want to continue?</string>
     <string name="about_tagline">Private, offline-first medication companion built for patients and caregivers.</string>
     <string name="about_star_github">Star on GitHub</string>
     <string name="about_star_github_desc">Support our open-source project by giving a star on GitHub</string>
-    <string name="about_support_dev_title">Support Development</string>
-    <string name="about_support_dev_desc" formatted="false">Dosezy is 100% free, private, and ad-free. Your donations keep the project thriving!</string>
-    <string name="about_buymeacoffee">Buy Me a Coffee</string>
-    <string name="about_buymeacoffee_desc">Support via card or PayPal on BuyMeACoffee</string>
-    <string name="about_crypto_donations">Cryptocurrency Donations</string>
-    <string name="about_copied_to_clipboard">%1$s address copied to clipboard</string>
-    <string name="about_tap_to_copy">Tap to copy address</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">Support monthly or one-time via GitHub Sponsors</string>
     <string name="pref_alarm_duration_title">Alarm Ring Duration</string>
     <string name="pref_alarm_duration_desc">Auto-silence audio &amp; vibration after a set duration</string>
     <string name="alarm_duration_continuous">Continuous (Until Dismissed)</string>
@@ -698,16 +697,6 @@ Do you want to continue?</string>
 
     <string name="about_community_open_source">Community &amp; Open Source</string>
     <string name="about_version_build">Version %1$s (Build %2$s)</string>
-    <string name="crypto_bitcoin">Bitcoin (BTC)</string>
-    <string name="crypto_ethereum">Ethereum (ETH)</string>
-    <string name="crypto_solana">Solana (SOL)</string>
-    <string name="crypto_litecoin">Litecoin (LTC)</string>
-    <string name="crypto_zcash">Zcash (ZEC)</string>
-    <string name="crypto_name_btc">Bitcoin</string>
-    <string name="crypto_name_eth">Ethereum</string>
-    <string name="crypto_name_sol">Solana</string>
-    <string name="crypto_name_ltc">Litecoin</string>
-    <string name="crypto_name_zec">Zcash</string>
     <string name="country_india">India</string>
     <string name="country_us_ca">United States / Canada</string>
     <string name="country_uk">United Kingdom</string>
@@ -886,4 +875,33 @@ Do you want to continue?</string>
     <string name="schedule_effective_today_desc">Apply the new times today. Obsolete untaken doses from earlier today will be removed.</string>
     <string name="schedule_effective_tomorrow_title">Starting Tomorrow</string>
     <string name="schedule_effective_tomorrow_desc">Keep today\'s schedule intact. The new schedule will begin tomorrow.</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[Logged retrospectively]</string>
+    <string name="schedule_action_dialog_title">Manage Dose</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">Mark as Taken</string>
+    <string name="schedule_action_skip_dose">Mark as Skipped</string>
+    <string name="schedule_action_undo_dose">Undo Dose Action</string>
+    <string name="schedule_action_edit_note">Edit Dose Note</string>
+    <string name="schedule_action_add_note">Add Dose Note</string>
+    <string name="schedule_dose_marked_taken">Marked %1$s as taken</string>
+    <string name="schedule_dose_marked_skipped">Marked %1$s as skipped</string>
+    <string name="schedule_dose_reverted">%1$s reverted to pending</string>
+    <string name="schedule_dose_locked_notice">This dose is older than 48 hours and is locked to preserve historical record integrity.</string>
+    <string name="schedule_dose_locked_badge">Locked</string>
+    <string name="schedule_tap_to_manage">Tap to manage</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">Reminder Style</string>
+    <string name="pref_reminder_type_desc">Choose whether reminders ring as alarms or standard notifications</string>
+    <string name="reminder_type_alarm">Alarm</string>
+    <string name="reminder_type_alarm_desc">Full-screen alert with continuous sound. Bypasses Do Not Disturb.</string>
+    <string name="reminder_type_notification">Notification</string>
+    <string name="reminder_type_notification_desc">Standard notification banner with alert tone. Respects Do Not Disturb.</string>
+    <string name="reminder_type_default">Use Profile Default (%1$s)</string>
+    <string name="reminder_type_default_profile">Use Profile Default</string>
+    <string name="notif_channel_notifications_name">Medication Notifications</string>
+    <string name="notif_channel_notifications_desc">Standard notification alerts for medication schedules respecting Do Not Disturb</string>
+    <string name="form_reminder_type">Reminder Style</string>
+    <string name="form_reminder_type_desc">Choose Alarm for critical medicines or Notification for supplements</string>
 </resources>

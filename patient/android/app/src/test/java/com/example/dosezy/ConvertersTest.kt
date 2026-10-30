@@ -441,5 +441,19 @@ class ConvertersTest {
         val parsedWeekly = converters.toFrequency(weeklyJson)
         assertNotNull(parsedWeekly)
         assertEquals(FrequencyPattern.WEEKLY, parsedWeekly!!.pattern)
+
+        // Guard: Verify ReminderType Room conversion round-trips, null safety, and case-insensitivity (#111)
+        assertEquals("ALARM", converters.fromReminderType(com.example.dosezy.data.model.ReminderType.ALARM))
+        assertEquals("NOTIFICATION", converters.fromReminderType(com.example.dosezy.data.model.ReminderType.NOTIFICATION))
+        assertNull(converters.fromReminderType(null))
+
+        assertEquals(com.example.dosezy.data.model.ReminderType.ALARM, converters.toReminderType("alarm"))
+        assertEquals(com.example.dosezy.data.model.ReminderType.NOTIFICATION, converters.toReminderType("notification"))
+        assertEquals(com.example.dosezy.data.model.ReminderType.ALARM, converters.toReminderType("ALARM"))
+        assertEquals(com.example.dosezy.data.model.ReminderType.NOTIFICATION, converters.toReminderType("  NOTIFICATION  "))
+        assertNull(converters.toReminderType(null))
+        assertNull(converters.toReminderType(""))
+        assertNull(converters.toReminderType("UNKNOWN_REMINDER_TYPE"))
     }
 }
+

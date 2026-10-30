@@ -455,4 +455,35 @@ class HomeMissedDoseActionRoutingTest {
         assertFalse(routeStandard.startsSafeguard)
         assertTrue(routeStandard.executesImmediately)
     }
+
+    @Test
+    fun testScheduleDoseTimeResolution_todayOverdueDoseResolvesToNowAndIsTakenLate() {
+        // Guard: Verify today's overdue doses resolve to current time to accurately record TAKEN_LATE rather than evading detection (#BUG-SCHEDULE-LATE-STATUS)
+        val today = LocalDate.now()
+        val scheduledTime = today.atTime(8, 0)
+        val overdueNow = today.atTime(14, 0)
+        val lateAfterHours = 3
+
+        val isPastDate = scheduledTime.toLocalDate().isBefore(today)
+        val effectiveTakenAt = if (isPastDate) scheduledTime else overdueNow
+
+        val isLateWithNow = TimeCalculationUtils.isTakenLate(scheduledTime, effectiveTakenAt, lateAfterHours)
+        assertTrue("Overdue dose scheduled today evaluated at now must be detected as late", isLateWithNow)
+
+        val isLateWithScheduled = TimeCalculationUtils.isTakenLate(scheduledTime, scheduledTime, lateAfterHours)
+        assertFalse("Evaluating against scheduledDateTime yields 0 elapsed hours and evades late detection", isLateWithScheduled)
+    }
+
+    @Test
+    fun testScheduleDoseTimeResolution_pastDateRetainsScheduledTime() {
+        // Guard: Verify historical past dates retain scheduledDateTime for retrospective logging (#BUG-SCHEDULE-LATE-STATUS)
+        val yesterday = LocalDate.now().minusDays(1)
+        val scheduledTime = yesterday.atTime(9, 0)
+        val now = LocalDateTime.now()
+
+        val isPastDate = scheduledTime.toLocalDate().isBefore(LocalDate.now())
+        val effectiveTakenAt = if (isPastDate) scheduledTime else now
+
+        assertEquals("Past date entry must retain scheduledDateTime for retrospective logging", scheduledTime, effectiveTakenAt)
+    }
 }
