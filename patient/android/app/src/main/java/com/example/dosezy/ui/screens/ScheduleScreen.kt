@@ -88,6 +88,12 @@ fun ScheduleScreen(navController: NavController) {
     val timeFormat = currentUser?.timeFormat ?: TimeFormat.HOUR_12
     val considerMissedAfter = currentUser?.considerMissedAfter ?: 6
 
+    // Guard: Past schedule entries default to scheduled time for retrospective logging while today and future entries use LocalDateTime.now() so overdue doses trigger TAKEN_LATE detection (#BUG-SCHEDULE-LATE-STATUS)
+    fun resolveDefaultDoseTime(swm: ScheduleWithMedicine): LocalDateTime {
+        val isPastDate = swm.scheduleEntry.scheduledDateTime.toLocalDate().isBefore(LocalDate.now())
+        return if (isPastDate) swm.scheduleEntry.scheduledDateTime else LocalDateTime.now()
+    }
+
     // Guard: Helper function to execute dose taking on the schedule screen with retrospective audit tagging (#109)
     fun executeTakeScheduleDose(
         swm: ScheduleWithMedicine,
@@ -300,7 +306,7 @@ fun ScheduleScreen(navController: NavController) {
                 } else if (currentUser?.promptDoseNotes == true && currentUser?.allowDoseNotes == true) {
                     notePromptEntry = swm
                 } else {
-                    executeTakeScheduleDose(swm, swm.scheduleEntry.scheduledDateTime, null)
+                    executeTakeScheduleDose(swm, resolveDefaultDoseTime(swm), null)
                 }
             },
             onSkipDose = {
@@ -372,11 +378,11 @@ fun ScheduleScreen(navController: NavController) {
             isEditing = false,
             onConfirm = { note ->
                 notePromptEntry = null
-                executeTakeScheduleDose(target, target.scheduleEntry.scheduledDateTime, note.takeIf { it.isNotBlank() })
+                executeTakeScheduleDose(target, resolveDefaultDoseTime(target), note.takeIf { it.isNotBlank() })
             },
             onSkip = {
                 notePromptEntry = null
-                executeTakeScheduleDose(target, target.scheduleEntry.scheduledDateTime, null)
+                executeTakeScheduleDose(target, resolveDefaultDoseTime(target), null)
             },
             onDismiss = {
                 notePromptEntry = null

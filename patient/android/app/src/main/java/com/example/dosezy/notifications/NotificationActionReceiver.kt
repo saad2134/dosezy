@@ -53,7 +53,11 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 return
             }
             IntakeSafeguardManager.ACTION_INTAKE_CANCEL -> {
-                IntakeSafeguardManager.cancelCountdown(context)
+                // Guard: Hold goAsync() to prevent process termination before reminder notification is restored (#BUG-SAFEGUARD-CANCEL-RESTORE)
+                val pendingResult = try { goAsync() } catch (_: Exception) { null }
+                IntakeSafeguardManager.cancelCountdown(context, restoreReminderIfPending = true) {
+                    pendingResult?.finish()
+                }
                 return
             }
         }
@@ -157,7 +161,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
                     val locale = com.example.dosezy.utils.LocaleHelper.getLocale(targetLang)
                     val scheduledTimeStr = intent?.getStringExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME)
                         ?.takeIf { it.isNotBlank() }
-                        ?: firstEntry?.scheduledDateTime?.let { it.format(java.time.format.DateTimeFormatter.ofPattern(timePattern, locale)) }
+                        ?: firstEntry.scheduledDateTime.let { it.format(java.time.format.DateTimeFormatter.ofPattern(timePattern, locale)) }
                         ?: ""
                     IntakeSafeguardManager.startCountdown(
                         context = context,
@@ -167,7 +171,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
                         medicineNames = medicineNames,
                         scheduledTime = scheduledTimeStr,
                         durationSeconds = user.intakeCountdownSeconds,
-                        userId = firstEntry?.userId
+                        userId = firstEntry.userId
                     )
                     Log.d(TAG, "Started intake countdown safeguard for ${finalAllIds.size} medicines ($compositeMedName)")
                     return

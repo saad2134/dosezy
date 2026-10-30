@@ -357,10 +357,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                             android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
                         )
 
-                        // Guard: Instantiate NotificationCompat.Builder with localizedContext so internal resource inflation and layout direction align with target profile locale (#BUG-REFILL-NOTIF-BUILDER)
-                        val refillIconBitmap = if (context != null) {
-                            runCatching { BitmapFactory.decodeResource(context.resources, com.example.dosezy.R.mipmap.ic_launcher) }.getOrNull()
-                        } else null
+                        // Guard: Safely decode launcher icon bitmap to prevent crash on resource inflation failure (#BUG-REFILL-NOTIF-BUILDER)
+                        val refillIconBitmap = runCatching { BitmapFactory.decodeResource(context.resources, com.example.dosezy.R.mipmap.ic_launcher) }.getOrNull()
 
                         val builder = androidx.core.app.NotificationCompat.Builder(localizedContext, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
                             .setSmallIcon(com.example.dosezy.R.mipmap.ic_launcher)
@@ -748,10 +746,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     },
                     android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
                 )
-                // Guard: Instantiate NotificationCompat.Builder with localizedContext so internal resource inflation and layout direction align with target profile locale (#BUG-REFILL-NOTIF-BUILDER)
-                val refillIconBitmap = if (context != null) {
-                    runCatching { BitmapFactory.decodeResource(context.resources, com.example.dosezy.R.mipmap.ic_launcher) }.getOrNull()
-                } else null
+                // Guard: Safely decode launcher icon bitmap to prevent crash on resource inflation failure (#BUG-REFILL-NOTIF-BUILDER)
+                val refillIconBitmap = runCatching { BitmapFactory.decodeResource(context.resources, com.example.dosezy.R.mipmap.ic_launcher) }.getOrNull()
 
                 val builder = androidx.core.app.NotificationCompat.Builder(localizedContext, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
                     .setSmallIcon(com.example.dosezy.R.mipmap.ic_launcher)
