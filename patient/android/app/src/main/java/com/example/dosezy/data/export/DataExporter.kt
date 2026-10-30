@@ -363,9 +363,15 @@ class DataExporter(
     }
 
     companion object {
+        // Guard: Neutralize CSV formula/DDE injection for strings starting with =, +, -, @, \t, \r to prevent remote code execution or spreadsheet formula errors (#BUG-CSV-INJECTION, CWE-1236)
         internal fun escapeCsv(value: Any?): String {
             val str = value?.toString() ?: ""
-            return "\"${str.replace("\"", "\"\"")}\""
+            val sanitized = if (str.isNotEmpty() && (str.startsWith("=") || str.startsWith("+") || str.startsWith("-") || str.startsWith("@") || str.startsWith("\t") || str.startsWith("\r"))) {
+                "'$str"
+            } else {
+                str
+            }
+            return "\"${sanitized.replace("\"", "\"\"")}\""
         }
 
         internal fun buildCsvContent(user: User, medicines: List<Medicine>, schedules: List<ScheduleEntry>): String {

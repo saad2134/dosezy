@@ -609,6 +609,63 @@ class ScheduleStatusAndUserRepositoryDirectTest {
             nm.activeNotifications.any { it.id == nonExistentPrimaryId.hashCode() }
         )
     }
+
+    // ---------------------------------------------------------------------------------------------
+    // Notification-Only Cohort Mode Preservation Guard (#BUG-NOTIF-ALARM-MODE)
+    // ---------------------------------------------------------------------------------------------
+
+    @Test
+    fun testSyncSlotNotificationAndAlarms_notificationOnlyCohort_preservesNotificationChannel() = runBlocking {
+        // Guard: Verify that taking a dose in a ReminderType.NOTIFICATION slot retains NOTIFICATION_CHANNEL_ID and does not escalate to loud CHANNEL_ID (#BUG-NOTIF-ALARM-MODE)
+        val user = sampleUser("user_notif_mode_test").copy(
+            reminderType = com.example.dosezy.data.model.ReminderType.NOTIFICATION
+        )
+        userDao.insertUser(user)
+
+        val med1 = sampleMedicine("med_notif_1", "user_notif_mode_test", "Vitamin C").copy(
+            reminderType = com.example.dosezy.data.model.ReminderType.NOTIFICATION
+        )
+        val med2 = sampleMedicine("med_notif_2", "user_notif_mode_test", "Zinc").copy(
+            reminderType = com.example.dosezy.data.model.ReminderType.NOTIFICATION
+        )
+        medicineDao.insertMedicine(med1)
+        medicineDao.insertMedicine(med2)
+
+        val slotTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 0))
+        val entry1 = sampleScheduleEntry("entry_notif_1", "user_notif_mode_test", "med_notif_1", slotTime)
+        val entry2 = sampleScheduleEntry("entry_notif_2", "user_notif_mode_test", "med_notif_2", slotTime)
+        scheduleDao.insertScheduleEntry(entry1)
+        scheduleDao.insertScheduleEntry(entry2)
+
+        val scheduleRepository = com.example.dosezy.data.repository.ScheduleRepository(db)
+
+        // Seed active notification for entry1
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val initialNotif = NotificationCompat.Builder(context, MedicineAlarmReceiver.NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+            .setContentTitle("Vitamin C")
+            .build()
+        nm.notify(entry1.entryId.hashCode(), initialNotif)
+
+        // Mark entry1 as TAKEN
+        scheduleRepository.recordDoseTaken(
+            entryId = entry1.entryId,
+            status = "TAKEN_ON_TIME",
+            takenAt = slotTime,
+            context = context,
+            syncSlotNotification = true
+        )
+
+        // Verify that updated cohort notification for remaining pending entry2 was posted to NOTIFICATION_CHANNEL_ID
+        val activeNotifs = nm.activeNotifications
+        val remainingNotif = activeNotifs.firstOrNull { it.id == entry2.entryId.hashCode() }
+        assertNotNull("Notification for remaining pending entry2 must be posted", remainingNotif)
+        assertEquals(
+            "Notification-only medication cohort must post to NOTIFICATION_CHANNEL_ID",
+            MedicineAlarmReceiver.NOTIFICATION_CHANNEL_ID,
+            remainingNotif!!.notification.channelId
+        )
+    }
 }
 
 

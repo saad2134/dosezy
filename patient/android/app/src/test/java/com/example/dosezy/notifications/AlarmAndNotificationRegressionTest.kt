@@ -521,6 +521,44 @@ class AlarmAndNotificationRegressionTest {
     }
 
     @Test
+    @Config(sdk = [25])
+    fun testAlarmActivity_requestDeviceUnlock_onApi25_addsFlagDismissKeyguardAndInvokesCallback() {
+        // Guard: Verify that requestDeviceUnlock adds FLAG_DISMISS_KEYGUARD and triggers callback on Android 7.1 (API 25) (#BUG-KEYGUARD-API24)
+        val controller = org.robolectric.Robolectric.buildActivity(AlarmActivity::class.java)
+        val activity = controller.get()
+        var callbackInvoked = false
+        activity.requestDeviceUnlock {
+            callbackInvoked = true
+        }
+
+        assertTrue("onSuccess callback must be executed on API 25", callbackInvoked)
+        val flags = activity.window.attributes.flags
+        assertTrue(
+            "FLAG_DISMISS_KEYGUARD must be added to window attributes on API 25",
+            (flags and android.view.WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD) != 0
+        )
+    }
+
+    @Test
+    @Config(sdk = [24])
+    fun testAlarmActivity_requestDeviceUnlock_onApi24_addsFlagDismissKeyguardAndInvokesCallback() {
+        // Guard: Verify that requestDeviceUnlock adds FLAG_DISMISS_KEYGUARD and triggers callback on Android 7.0 (API 24) (#BUG-KEYGUARD-API24)
+        val controller = org.robolectric.Robolectric.buildActivity(AlarmActivity::class.java)
+        val activity = controller.get()
+        var callbackInvoked = false
+        activity.requestDeviceUnlock {
+            callbackInvoked = true
+        }
+
+        assertTrue("onSuccess callback must be executed on API 24", callbackInvoked)
+        val flags = activity.window.attributes.flags
+        assertTrue(
+            "FLAG_DISMISS_KEYGUARD must be added to window attributes on API 24",
+            (flags and android.view.WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD) != 0
+        )
+    }
+
+    @Test
     fun testLockscreenPrivacy_defaultsToPublicVisibility() {
         // Guard: Verify that notifications default to VISIBILITY_PUBLIC while supporting privacy opt-out
         val context = ApplicationProvider.getApplicationContext<Context>()

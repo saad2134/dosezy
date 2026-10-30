@@ -93,6 +93,12 @@ class AlarmActivity : ComponentActivity() {
                     onSuccess?.invoke()
                 }
             })
+        } else {
+            // Guard: Android 7.0/7.1 (API 24/25) lacks requestDismissKeyguard; apply FLAG_DISMISS_KEYGUARD and update state directly (#BUG-KEYGUARD-API24)
+            @Suppress("DEPRECATION")
+            window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
+            isKeyguardLockedState.value = false
+            onSuccess?.invoke()
         }
     }
 

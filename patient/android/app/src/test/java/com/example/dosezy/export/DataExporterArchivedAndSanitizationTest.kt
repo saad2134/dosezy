@@ -273,4 +273,67 @@ class DataExporterArchivedAndSanitizationTest {
         val zipFilesAfter = exportDir.listFiles { _, name -> name.endsWith(".zip") }?.toList() ?: emptyList()
         assertEquals("No empty zip file should be left behind after failure", zipFilesBefore.size, zipFilesAfter.size)
     }
+
+    // ---------------------------------------------------------------------------------------------
+    // CSV Formula / DDE Injection Neutralization Guard (#BUG-CSV-INJECTION, CWE-1236)
+    // ---------------------------------------------------------------------------------------------
+
+    @Test
+    fun testEscapeCsv_neutralizesFormulaAndDdeInjectionCharacters() {
+        // Guard: Verify formula trigger characters =, +, -, @, \t, \r are prefixed with a single quote to prevent spreadsheet code execution
+        assertEquals("\"'=1+1\"", DataExporter.escapeCsv("=1+1"))
+        assertEquals("\"'+500mg dose\"", DataExporter.escapeCsv("+500mg dose"))
+        assertEquals("\"'- Take with milk\"", DataExporter.escapeCsv("- Take with milk"))
+        assertEquals("\"'@hospital_dept\"", DataExporter.escapeCsv("@hospital_dept"))
+        assertEquals("\"'\tTab indented\"", DataExporter.escapeCsv("\tTab indented"))
+        assertEquals("\"'\rCarriage return\"", DataExporter.escapeCsv("\rCarriage return"))
+    }
+
+    @Test
+    fun testEscapeCsv_preservesNormalTextAndQuotes() {
+        assertEquals("\"Aspirin 100mg\"", DataExporter.escapeCsv("Aspirin 100mg"))
+        assertEquals("\"Took \"\"two\"\" tablets\"", DataExporter.escapeCsv("Took \"two\" tablets"))
+        assertEquals("\"\"", DataExporter.escapeCsv(""))
+        assertEquals("\"\"", DataExporter.escapeCsv(null))
+    }
+
+    @Test
+    fun testBuildCsvContent_sanitizesUserNotesAndAllergiesContainingFormulaPrefixes() {
+        val user = User(
+            userId = "u_safe_1",
+            fullName = "John Doe",
+            age = 35,
+            gender = Gender.MALE,
+            contactNumber = "1234567890",
+            allergies = "- Penicillin\n- Sulfa drugs",
+            medicalConditions = "@Hypertension; =Asthma"
+        )
+        val med = Medicine(
+            medicineId = "m_safe_1",
+            userId = user.userId,
+            medicationName = "+Metformin ER",
+            dosage = 500.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = com.example.dosezy.data.model.Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            notes = "=cmd|' /C calc'!A0"
+        )
+        val sched = ScheduleEntry(
+            entryId = "s_safe_1",
+            userId = user.userId,
+            medicineId = med.medicineId,
+            scheduledDateTime = LocalDateTime.of(2026, 10, 30, 8, 0),
+            status = MedicationStatus.PENDING,
+            doseNotes = "- Taken before breakfast"
+        )
+
+        val csv = DataExporter.buildCsvContent(user, listOf(med), listOf(sched))
+
+        assertTrue("Allergies starting with - must be sanitized with single quote", csv.contains("\"'- Penicillin\n- Sulfa drugs\""))
+        assertTrue("Medical conditions starting with @ must be sanitized with single quote", csv.contains("\"'@Hypertension; =Asthma\""))
+        assertTrue("Medication name starting with + must be sanitized with single quote", csv.contains("\"'+Metformin ER\""))
+        assertTrue("Doctor notes starting with = must be sanitized with single quote", csv.contains("\"'=cmd|' /C calc'!A0\""))
+        assertTrue("Dose notes starting with - must be sanitized with single quote", csv.contains("\"'- Taken before breakfast\""))
+    }
 }

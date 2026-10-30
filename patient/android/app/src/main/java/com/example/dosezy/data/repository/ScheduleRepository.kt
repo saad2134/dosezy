@@ -542,6 +542,14 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                                 } catch (_: Exception) { null }
                             } else null
 
+                            // Guard: Check if any remaining medication requires full alarm behavior to prevent re-arming notification-only reminders as alarms (#BUG-NOTIF-ALARM-MODE)
+                            val defaultReminderType = user?.reminderType ?: com.example.dosezy.data.model.ReminderType.ALARM
+                            val isAlarmMode = remainingPending.any { e ->
+                                val m = database.medicineDao().getMedicineByIdDirect(e.medicineId)
+                                val effectiveType = m?.reminderType ?: defaultReminderType
+                                effectiveType == com.example.dosezy.data.model.ReminderType.ALARM
+                            }
+
                             MedicineAlarmReceiver.updateCohortNotification(
                                 context = context,
                                 entryId = newPrimary.entryId,
@@ -552,7 +560,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                                 scheduledTime = formattedScheduledTime,
                                 snoozeMinutes = user?.snoozeDuration ?: 10,
                                 userId = entry.userId,
-                                userLanguage = user?.language
+                                userLanguage = user?.language,
+                                isAlarmMode = isAlarmMode
                             )
 
                             // Guard: Re-arm nagging reminder only if undone dose belongs to today's schedule and nagging reminders are enabled to prevent phantom alarms for historical past-date doses (#BUG-03, #BUG-UNDO-PAST-DATE)
