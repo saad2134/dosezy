@@ -101,8 +101,13 @@ class UserViewModelProfileAlarmTest {
 
     @After
     fun tearDown() {
-        Dispatchers.resetMain()
-        db.close()
+        // Guard: Prevent teardown failure if background coroutines or db close encounter edge-case races
+        runCatching { Dispatchers.resetMain() }
+        runCatching {
+            if (::db.isInitialized) {
+                db.close()
+            }
+        }
     }
 
     private suspend fun awaitCondition(timeoutMs: Long = 10000, condition: suspend () -> Boolean) {

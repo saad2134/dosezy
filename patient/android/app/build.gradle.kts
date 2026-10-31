@@ -43,7 +43,7 @@ android {
         create("play") {
             dimension = "distribution"
             buildConfigField("boolean", "SHOW_DONATIONS", "false")
-            buildConfigField("boolean", "SUPPORTS_OVERLAY_PERMISSION", "false")
+            buildConfigField("boolean", "SUPPORTS_OVERLAY_PERMISSION", "true")
         }
         create("foss") {
             dimension = "distribution"

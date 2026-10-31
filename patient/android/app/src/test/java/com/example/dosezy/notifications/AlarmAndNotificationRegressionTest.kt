@@ -829,6 +829,28 @@ class AlarmAndNotificationRegressionTest {
         val isAlarm4 = medsInherit.any { (it ?: userDefaultAlarm) == com.example.dosezy.data.model.ReminderType.ALARM }
         assertTrue("Null reminderType must inherit user profile default (ALARM)", isAlarm4)
     }
+
+    // ───────────────────────────────────────────────────────────────
+    // Regression: Overlay & Full Screen Intent Permissions
+    // ───────────────────────────────────────────────────────────────
+    @Test
+    fun overlayAndFullScreenPermissions_enabledForAlarmReliability() {
+        // Guard: Verify SUPPORTS_OVERLAY_PERMISSION is true so "Display Over Apps" item is visible
+        // in NotificationStatusDialog to enable full-screen alarms over active apps and lock screen
+        assertTrue(
+            "SUPPORTS_OVERLAY_PERMISSION must be enabled so overlay permission is exposed and supported",
+            com.example.dosezy.BuildConfig.SUPPORTS_OVERLAY_PERMISSION
+        )
+
+        // Guard: Verify canUseFullScreenIntent evaluates safely on API 34+
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val canUseFsi = com.example.dosezy.utils.NotificationUtils.canUseFullScreenIntent(context)
+        // In Robolectric with SDK 34, notificationManager.canUseFullScreenIntent() defaults to false until granted
+        assertFalse(canUseFsi)
+
+        // Guard: Verify requestFullScreenIntentPermission does not crash on API 34+
+        com.example.dosezy.utils.NotificationUtils.requestFullScreenIntentPermission(context)
+    }
 }
 
 
