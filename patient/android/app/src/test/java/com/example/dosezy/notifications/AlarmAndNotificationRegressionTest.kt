@@ -851,6 +851,75 @@ class AlarmAndNotificationRegressionTest {
         // Guard: Verify requestFullScreenIntentPermission does not crash on API 34+
         com.example.dosezy.utils.NotificationUtils.requestFullScreenIntentPermission(context)
     }
+
+    // ───────────────────────────────────────────────────────────────
+    // Regression: Large Screen Resizability & Bitmap Downsampling
+    // ───────────────────────────────────────────────────────────────
+    @Test
+    fun manifest_mainActivity_supportsMultiOrientationForLargeScreens() {
+        // Guard: Verify MainActivity does not lock portrait orientation to support tablets and foldables
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val packageInfo = context.packageManager.getPackageInfo(
+            context.packageName,
+            android.content.pm.PackageManager.GET_ACTIVITIES
+        )
+        val mainActivityInfo = packageInfo.activities?.firstOrNull { it.name == "com.example.dosezy.MainActivity" }
+        assertNotNull("MainActivity must be declared in manifest", mainActivityInfo)
+        assertEquals(
+            "MainActivity must support multi-orientation for large screen devices",
+            android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,
+            mainActivityInfo?.screenOrientation
+        )
+    }
+
+    @Test
+    fun imageUtils_calculateInSampleSize_scalesPowerOfTwo() {
+        // Guard: Verify inSampleSize calculates powers of 2 for memory-efficient downsampling
+        val options = android.graphics.BitmapFactory.Options().apply {
+            outWidth = 4000
+            outHeight = 3000
+        }
+        val sampleSize = ImageUtils.calculateInSampleSize(options, 1024, 1024)
+        assertEquals(2, sampleSize)
+
+        val smallOptions = android.graphics.BitmapFactory.Options().apply {
+            outWidth = 800
+            outHeight = 600
+        }
+        assertEquals(1, ImageUtils.calculateInSampleSize(smallOptions, 1024, 1024))
+    }
+
+    @Test
+    fun imageUtils_saveDownsampledImage_downsamplesAndCompresses() {
+        // Guard: Verify saveDownsampledImage reduces dimensions and memory footprint
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val sourceFile = File(context.cacheDir, "test_source.jpg")
+        val destFile = File(context.cacheDir, "test_downsampled.jpg")
+
+        val sourceBitmap = android.graphics.Bitmap.createBitmap(2000, 2000, android.graphics.Bitmap.Config.ARGB_8888)
+        sourceFile.outputStream().use { out ->
+            sourceBitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, out)
+        }
+        sourceBitmap.recycle()
+
+        val savedPath = ImageUtils.saveDownsampledImage(
+            context,
+            android.net.Uri.fromFile(sourceFile),
+            destFile,
+            maxDimension = 512
+        )
+        assertEquals(destFile.absolutePath, savedPath)
+        assertTrue("Downsampled file must exist", destFile.exists())
+        assertTrue("Downsampled file must be non-empty", destFile.length() > 0)
+
+        val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        android.graphics.BitmapFactory.decodeFile(destFile.absolutePath, bounds)
+        assertTrue("Width must be <= 512, but was ${bounds.outWidth}", bounds.outWidth <= 512)
+        assertTrue("Height must be <= 512, but was ${bounds.outHeight}", bounds.outHeight <= 512)
+
+        sourceFile.delete()
+        destFile.delete()
+    }
 }
 
 

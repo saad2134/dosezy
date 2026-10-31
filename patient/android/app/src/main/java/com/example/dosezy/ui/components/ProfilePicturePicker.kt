@@ -394,27 +394,12 @@ internal fun createImageFile(context: Context): Pair<Uri, File>? {
 // Guard: Backward compatible helper delegating to createImageFile
 fun createImageFileUri(context: Context): Uri? = createImageFile(context)?.first
 
-// Utility function to save image to internal storage
+// Utility function to save image to internal storage with bitmap downsampling
 private fun saveImageToInternalStorage(context: Context, uri: Uri): String {
-    return try {
-        val inputStream = context.contentResolver.openInputStream(uri)
-            ?: throw IllegalStateException("Cannot open input stream")
-
-        val timeStamp = System.currentTimeMillis()
-        val file = File(context.filesDir, "profile_$timeStamp.jpg")
-
-        inputStream.use { input ->
-            file.outputStream().use { output ->
-                input.copyTo(output)
-            }
-        }
-
-        Log.d("ProfilePicturePicker", "Image saved to: ${file.absolutePath}")
-        file.absolutePath
-    } catch (e: Exception) {
-        Log.e("ProfilePicturePicker", "Error saving image: ${e.message}", e)
-        throw e
-    }
+    val timeStamp = System.currentTimeMillis()
+    val file = File(context.filesDir, "profile_$timeStamp.jpg")
+    // Guard: Downsample camera and gallery images to max 1024x1024 to prevent memory OOM and reduce storage footprint
+    return com.example.dosezy.utils.ImageUtils.saveDownsampledImage(context, uri, file)
 }
 
 // Guard: Validate canonicalPath against context.filesDir and context.cacheDir to prevent path traversal and arbitrary sandbox file deletion
