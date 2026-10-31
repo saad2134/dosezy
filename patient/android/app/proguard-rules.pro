@@ -1,20 +1,17 @@
 # ===================================================================
 # Dosezy ProGuard & R8 Optimization Rules
-# Ensures >= 25% Optimization & Obfuscation while strictly safeguarding
-# Room Database, Hilt DI, Gson Serialization, and Glance Widgets
+# Ensures high optimization, obfuscation, and shrinking (>75%)
+# while strictly safeguarding Room Database, Gson, and Glance Widgets
 # ===================================================================
 
 # 1. Preserve essential runtime attributes and stack trace line numbers for Play Console deobfuscation
 -keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod,Exceptions,SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
 
-# 2. Android Framework Components (Activities, Services, Receivers, Application, Widgets)
--keep class * extends android.app.Activity { *; }
--keep class * extends android.app.Application { *; }
--keep class * extends android.app.Service { *; }
--keep class * extends android.content.BroadcastReceiver { *; }
--keep class * extends android.content.ContentProvider { *; }
--keep class * extends android.app.backup.BackupAgent { *; }
+# 2. Android Framework & Glance App Widgets
+# Note: Activities, Services, Receivers, and Application classes are already
+# preserved by getDefaultProguardFile("proguard-android-optimize.txt").
+# Only Glance Widgets and custom widget receivers require explicit rules.
 -keep class * extends android.appwidget.AppWidgetProvider { *; }
 -keep class com.example.dosezy.widget.** { *; }
 
@@ -31,31 +28,24 @@
 -keep class com.example.dosezy.data.export.** { *; }
 
 # 5. Room Database (Database, Entities, DAOs, TypeConverters)
--keep class * extends androidx.room.RoomDatabase { *; }
+# Guard: Keep Room entities, DAOs, and TypeConverters for reflection and SQLite table schemas
+-keep class * extends androidx.room.RoomDatabase
 -keep @androidx.room.Entity class * { *; }
--keep @androidx.room.Dao class * { *; }
--keep @androidx.room.Database class * { *; }
+-keep @androidx.room.Dao interface * { *; }
 -keep @androidx.room.TypeConverter class * { *; }
 -keep @androidx.room.TypeConverters class * { *; }
--keep class androidx.room.** { *; }
 -keep class com.example.dosezy.data.database.** { *; }
 -keep class com.example.dosezy.data.dao.** { *; }
 -keep class com.example.dosezy.data.converters.** { *; }
 -dontwarn androidx.room.**
 
-# 6. Hilt & Dagger Dependency Injection
--keep class * extends androidx.lifecycle.ViewModel { *; }
--keep @dagger.hilt.android.lifecycle.HiltViewModel class * { *; }
--keep @dagger.hilt.android.HiltAndroidApp class * { *; }
--keep @dagger.hilt.android.AndroidEntryPoint class * { *; }
--keep class dagger.hilt.** { *; }
--keep class * implements dagger.hilt.** { *; }
--keep class * extends dagger.hilt.** { *; }
--keep class * extends dagger.internal.** { *; }
--keep class * implements dagger.internal.** { *; }
+# 6. Hilt Dependency Injection
+# Note: Hilt and Dagger AARs include their own consumer ProGuard rules.
+# Only app-specific DI entry points and modules are declared here.
+-keep @dagger.hilt.android.lifecycle.HiltViewModel class *
+-keep @dagger.hilt.android.HiltAndroidApp class *
+-keep @dagger.hilt.android.AndroidEntryPoint class *
 -keep class com.example.dosezy.di.** { *; }
--keep class *_HiltModules* { *; }
--keep class *_Factory { *; }
 -dontwarn dagger.hilt.**
 
 # 7. Gson Serialization
@@ -65,14 +55,7 @@
 -keep class com.google.gson.** { *; }
 -dontwarn com.google.gson.**
 
-# 8. Jetpack Compose Runtime & UI
--keep class androidx.compose.** { *; }
--keep class androidx.compose.runtime.** { *; }
--keep class androidx.compose.ui.** { *; }
--keep class androidx.compose.material3.** { *; }
--dontwarn androidx.compose.**
-
-# 9. Kotlin Coroutines & Standard Library
+# 8. Kotlin Coroutines & Standard Library
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory { *; }
 -keepnames class kotlinx.coroutines.CoroutineExceptionHandler { *; }
 -keepclassmembernames class kotlinx.** {
@@ -80,15 +63,11 @@
 }
 -dontwarn kotlinx.coroutines.**
 
-# 10. Coil (Image Loading)
--keep class io.coil-kt.** { *; }
+# 9. Suppress benign library warnings
+# Note: Compose, Coil, and DataStore package their own consumer rules inside their AARs.
+-dontwarn androidx.compose.**
 -dontwarn coil.**
-
-# 11. Datastore Preferences
--keep class androidx.datastore.** { *; }
 -dontwarn androidx.datastore.**
-
-# 12. Suppress benign library warnings
 -dontwarn okhttp3.**
 -dontwarn okio.**
 -dontwarn org.bouncycastle.**
