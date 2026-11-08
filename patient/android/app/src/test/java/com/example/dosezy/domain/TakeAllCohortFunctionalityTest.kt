@@ -1038,6 +1038,66 @@ class TakeAllCohortFunctionalityTest {
         val entryIds = slotEntries.map { it.entryId }.toSet()
         assertTrue(entryIds.containsAll(listOf("e_rec_1", "e_rec_2", "e_rec_3", "e_rec_4")))
     }
+
+    @Test
+    fun takeCohortUseCase_withMultiUserEntries_scopesLateThresholdAndSyncPerUser() = runBlocking {
+        // Guard: Verify TakeCohortUseCase correctly resolves distinct users per entry so late status evaluation and slot synchronization do not cross-contaminate profiles (#BUG-MULTIUSER-COHORT)
+        val secondUser = User(
+            userId = "user_cohort_second",
+            fullName = "Second Patient",
+            age = 45,
+            gender = Gender.DO_NOT_SPECIFY,
+            contactNumber = "+0987654321",
+            considerLateAfter = 30 // 30 minutes threshold
+        )
+        database.userDao().insertUser(secondUser)
+
+        val secondMed = Medicine(
+            medicineId = "med_second_user",
+            userId = secondUser.userId,
+            medicationName = "Metformin",
+            dosage = 500.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            currentStock = 30,
+            autoDeductOnTake = true
+        )
+        database.medicineDao().insertMedicine(secondMed)
+
+        val scheduledTime = LocalDateTime.now().minusMinutes(45)
+        val entry1 = ScheduleEntry(
+            entryId = "entry_user1",
+            userId = testUser.userId,
+            medicineId = medA.medicineId,
+            scheduledDateTime = scheduledTime,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_user2",
+            userId = secondUser.userId,
+            medicineId = secondMed.medicineId,
+            scheduledDateTime = scheduledTime,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        database.scheduleDao().insertScheduleEntry(entry1)
+        database.scheduleDao().insertScheduleEntry(entry2)
+
+        val takeCohortUseCase = TakeCohortUseCase(database, scheduleRepository, context)
+        // Invoke takeCohortUseCase passing testUser as the fallback user parameter
+        takeCohortUseCase(listOf(entry1.entryId, entry2.entryId), user = testUser)
+
+        val res1 = database.scheduleDao().getScheduleEntryById(entry1.entryId)
+        val res2 = database.scheduleDao().getScheduleEntryById(entry2.entryId)
+
+        // entry1 was scheduled 45 mins ago, testUser considerLateAfter = 2 (120 mins) -> TAKEN_ON_TIME
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, res1?.status)
+        // entry2 was scheduled 45 mins ago, secondUser considerLateAfter = 30 (30 mins) -> TAKEN_LATE
+        assertEquals(MedicationStatus.TAKEN_LATE, res2?.status)
+    }
 }
 
 

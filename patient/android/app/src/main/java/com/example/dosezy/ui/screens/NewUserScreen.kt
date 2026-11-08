@@ -135,7 +135,6 @@ fun NewUserScreen(
                     }
                 },
                 onNext = { onNext(currentFrame + 1) },
-                isProfileSetupValid = isProfileSetupValid,
                 onCompleteProfileSetup = {
                     if (isProfileSetupValid) {
                         completeProfileSetup()
@@ -312,14 +311,12 @@ fun NewUserBottomBar(
     existingUsers: List<User>,
     onBack: () -> Unit,
     onNext: () -> Unit,
-    isProfileSetupValid: Boolean = true,
     onCompleteProfileSetup: () -> Unit = {}
 ) = com.example.dosezy.ui.screens.newuser.NewUserBottomBar(
     currentFrame = currentFrame,
     existingUsers = existingUsers,
     onBack = onBack,
     onNext = onNext,
-    isProfileSetupValid = isProfileSetupValid,
     onCompleteProfileSetup = onCompleteProfileSetup
 )
 

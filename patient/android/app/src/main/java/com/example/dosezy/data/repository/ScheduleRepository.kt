@@ -13,6 +13,7 @@ import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.data.model.ScheduleWithMedicine
 import com.example.dosezy.notifications.AlarmScheduler
 import com.example.dosezy.notifications.MedicineAlarmReceiver
+import com.example.dosezy.utils.TimeCalculationUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -564,8 +565,13 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                                 isAlarmMode = isAlarmMode
                             )
 
-                            // Guard: Re-arm nagging reminder only if undone dose belongs to today's schedule and nagging reminders are enabled to prevent phantom alarms for historical past-date doses (#BUG-03, #BUG-UNDO-PAST-DATE)
-                            if (entry.status == MedicationStatus.PENDING && isScheduledToday && user != null && user.naggingRemindersEnabled && entry.scheduledDateTime.isBefore(LocalDateTime.now())) {
+                            // Guard: Re-arm nagging reminder only if undone dose belongs to today's schedule, has not exceeded missed threshold, and nagging reminders are enabled to prevent phantom alarms for historical past-date or overdue doses (#BUG-03, #BUG-UNDO-PAST-DATE, #BUG-UNDO-MISSED)
+                            val isMissed = user != null && TimeCalculationUtils.isMissed(
+                                entry.scheduledDateTime,
+                                LocalDateTime.now(),
+                                user.missedAfterMinutes
+                            )
+                            if (entry.status == MedicationStatus.PENDING && isScheduledToday && user != null && user.naggingRemindersEnabled && !isMissed && entry.scheduledDateTime.isBefore(LocalDateTime.now())) {
                                 try {
                                     val alarmScheduler = AlarmScheduler(context)
                                     alarmScheduler.scheduleNaggingReminder(

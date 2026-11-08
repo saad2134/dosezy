@@ -45,6 +45,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         const val ACTION_INTAKE_SAFEGUARD_EXPIRED = "com.example.dosezy.INTAKE_SAFEGUARD_EXPIRED"
         const val EXTRA_IS_INTAKE_REALERT = "is_intake_realert"
         const val EXTRA_SNOOZE_MINUTES = "extra_snooze_minutes"
+        const val EXTRA_USER_ID = "user_id"
 
         fun createNotificationChannels(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -574,6 +575,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             putExtra("allow_lockscreen_details", effectiveAllowLockscreen)
             // Guard: Pass user's configured snooze duration to AlarmActivity so UI defaults correctly on first composition frame (#113)
             putExtra(EXTRA_SNOOZE_MINUTES, snoozeMinutes)
+            // Guard: Pass user ID to AlarmActivity to ensure multi-profile alarms isolate cohorts without cross-patient data leakage (#BUG-MULTIUSER-ALARM-MERGE)
+            userId?.let { putExtra(EXTRA_USER_ID, it) }
         }
 
         // Android 14+ background activity start options for PendingIntent creation

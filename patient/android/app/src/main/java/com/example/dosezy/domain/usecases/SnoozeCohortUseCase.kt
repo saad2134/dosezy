@@ -59,12 +59,12 @@ class SnoozeCohortUseCase @Inject constructor(
             }
         } catch (_: Exception) {}
 
-        // Guard: Resolve user entity upfront if null so explicit snooze durations preserve user's preferred timeFormat and userId (#BUG-SNOOZE-USER-RESOLVE)
-        val resolvedUser = user ?: entryIds.firstNotNullOfOrNull { id ->
+        // Guard: Resolve user entity from entry first so snooze duration and time format match owning patient (#BUG-SNOOZE-USER-RESOLVE, #BUG-MULTIUSER-COHORT)
+        val resolvedUser = entryIds.firstNotNullOfOrNull { id ->
             database.scheduleDao().getScheduleEntryById(id)?.let { entry ->
                 database.userDao().getUserByIdDirect(entry.userId)
             }
-        }
+        } ?: user
 
         val finalSnoozeMinutes = if (explicitSnoozeMinutes != null && explicitSnoozeMinutes > 0) {
             explicitSnoozeMinutes

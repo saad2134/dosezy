@@ -67,6 +67,7 @@ class AlarmActivity : ComponentActivity() {
     private val activeMedicineNameState = mutableStateOf("Medication")
     private val activeScheduledTimeState = mutableStateOf("")
     private val activeSnoozeMinutesState = mutableStateOf(10)
+    private val activeUserIdState = mutableStateOf<String?>(null)
 
     private val isKeyguardLockedState = mutableStateOf(false)
 
@@ -123,19 +124,33 @@ class AlarmActivity : ComponentActivity() {
 
         val newId = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID) ?: ""
         val newIds = intent.getStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS) ?: if (newId.isNotEmpty()) arrayListOf(newId) else arrayListOf()
+        val newUserId = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_USER_ID)
         val newMedName = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME) ?: "Medication"
         val newSchedTime = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME) ?: ""
         val newSnoozeMinutes = intent.getIntExtra(MedicineAlarmReceiver.EXTRA_SNOOZE_MINUTES, activeSnoozeMinutesState.value)
 
-        val merged = (activeEntryIdsState.value + newIds + listOf(newId)).filter { it.isNotEmpty() }.distinct()
-        activeEntryIdsState.value = merged
+        // Guard: Isolate cohorts by user profile. Never merge entry IDs across different users to prevent cross-profile dose execution and corrupted clinical records (#BUG-MULTIUSER-ALARM-MERGE)
+        val incomingIds = (newIds + listOf(newId)).filter { it.isNotEmpty() }.distinct()
+        val currentUserId = activeUserIdState.value ?: alarmViewModel.uiState.value.user?.userId
+        val isSameUser = currentUserId == null || newUserId == null || currentUserId == newUserId
+
+        val targetIds = if (isSameUser) {
+            (activeEntryIdsState.value + incomingIds).distinct()
+        } else {
+            incomingIds
+        }
+
+        activeEntryIdsState.value = targetIds
         activeMedicineNameState.value = newMedName
         activeScheduledTimeState.value = newSchedTime
         activeSnoozeMinutesState.value = newSnoozeMinutes
+        if (newUserId != null) {
+            activeUserIdState.value = newUserId
+        }
 
         // Guard: Resume playback for incoming alarm if audio was silenced by volume rocker while activity remained open
         alarmViewModel.startPlaybackIfNeeded(newId)
-        alarmViewModel.loadCohort(merged)
+        alarmViewModel.loadCohort(targetIds)
     }
 
     override fun onResume() {
@@ -154,7 +169,7 @@ class AlarmActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        // Guard: Do not programmatically lock portrait orientation so tablets, foldables, and desktop displays resize cleanly (#120)
         activeInstance = WeakReference(this)
 
         checkKeyguardState()
@@ -163,6 +178,7 @@ class AlarmActivity : ComponentActivity() {
 
         val entryId = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID) ?: ""
         val entryIds = intent.getStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS) ?: if (entryId.isNotEmpty()) arrayListOf(entryId) else arrayListOf()
+        val initialUserId = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_USER_ID)
         val initialMedicineName = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME) ?: "Medication"
         val initialScheduledTime = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME) ?: ""
         // Guard: Retrieve passed snooze duration so initial UI frame defaults to user's setting before Room async load completes (#113)
@@ -173,6 +189,7 @@ class AlarmActivity : ComponentActivity() {
         activeMedicineNameState.value = initialMedicineName
         activeScheduledTimeState.value = initialScheduledTime
         activeSnoozeMinutesState.value = initialSnoozeMinutes
+        activeUserIdState.value = initialUserId
 
         // Start playback and load medication cohort via ViewModel
         alarmViewModel.startPlaybackIfNeeded(entryId)

@@ -856,8 +856,8 @@ class AlarmAndNotificationRegressionTest {
     // Regression: Large Screen Resizability & Bitmap Downsampling
     // ───────────────────────────────────────────────────────────────
     @Test
-    fun manifest_mainActivity_supportsMultiOrientationForLargeScreens() {
-        // Guard: Verify MainActivity does not lock portrait orientation to support tablets and foldables
+    fun manifest_activities_supportMultiOrientationForLargeScreens() {
+        // Guard: Verify MainActivity and AlarmActivity do not lock portrait orientation in manifest to support tablets and foldables (#120)
         val context = ApplicationProvider.getApplicationContext<Context>()
         val packageInfo = context.packageManager.getPackageInfo(
             context.packageName,
@@ -869,6 +869,14 @@ class AlarmAndNotificationRegressionTest {
             "MainActivity must support multi-orientation for large screen devices",
             android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,
             mainActivityInfo?.screenOrientation
+        )
+
+        val alarmActivityInfo = packageInfo.activities?.firstOrNull { it.name == "com.example.dosezy.notifications.AlarmActivity" }
+        assertNotNull("AlarmActivity must be declared in manifest", alarmActivityInfo)
+        assertEquals(
+            "AlarmActivity must support multi-orientation for large screen devices",
+            android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,
+            alarmActivityInfo?.screenOrientation
         )
     }
 
@@ -978,6 +986,26 @@ class AlarmAndNotificationRegressionTest {
         assertTrue("Formatted text should contain repeat count", formattedText.contains("4"))
         assertTrue("Formatted text should contain scheduled time", formattedText.contains("08:00 AM"))
         assertFalse("Continuous nagging text should not contain /0 ratio", formattedText.contains("/0"))
+    }
+
+    @Test
+    fun activities_doNotLockOrientationProgrammatically_forLargeScreens() {
+        // Guard: Verify activities do not lock orientation programmatically so large-screen devices can rotate freely (#120)
+        val mainController = org.robolectric.Robolectric.buildActivity(com.example.dosezy.MainActivity::class.java).setup()
+        val mainActivity = mainController.get()
+        assertEquals(
+            "MainActivity must not programmatically lock orientation",
+            android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,
+            mainActivity.requestedOrientation
+        )
+
+        val splashController = org.robolectric.Robolectric.buildActivity(com.example.dosezy.SplashActivity::class.java).setup()
+        val splashActivity = splashController.get()
+        assertEquals(
+            "SplashActivity must not programmatically lock orientation",
+            android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,
+            splashActivity.requestedOrientation
+        )
     }
 }
 

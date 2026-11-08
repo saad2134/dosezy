@@ -843,6 +843,52 @@ class RecordDoseMissedAndUndoTest {
     }
 
     @Test
+    fun undoDoseTaken_onSameDayPastMissedThreshold_revertsStatusWithoutRearmingNaggingReminder() = runBlocking {
+        // Guard: Verify that undoing a dose scheduled for earlier today that already exceeded missedAfterMinutes reverts status to PENDING without arming a nagging reminder (#BUG-UNDO-SAME-DAY-MISSED)
+        val userWithNagging = testUser.copy(
+            userId = "user_nagging_missed_test",
+            naggingRemindersEnabled = true,
+            naggingIntervalMinutes = 10,
+            considerLateAfter = 60,
+            considerMissedAfter = 120 // 2 hours
+        )
+        db.userDao().insertUser(userWithNagging)
+
+        val pastTodayTime = LocalDateTime.now().minusHours(3).withMinute(0).withSecond(0).withNano(0)
+        val pastEntry = ScheduleEntry(
+            entryId = "entry_sameday_missed_undo",
+            userId = userWithNagging.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = pastTodayTime,
+            status = MedicationStatus.TAKEN_ON_TIME
+        )
+        db.scheduleDao().insertScheduleEntry(pastEntry)
+
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        nm.cancelAll()
+
+        scheduleRepository.undoDoseTaken(pastEntry.entryId, context)
+
+        // Verify status reverted in Room
+        val reverted = db.scheduleDao().getScheduleEntryById(pastEntry.entryId)
+        assertNotNull(reverted)
+        assertEquals(MedicationStatus.PENDING, reverted?.status)
+
+        // Verify NO nagging reminder is scheduled in AlarmManager because the dose is past missed threshold
+        val naggingIntent = Intent(context, MedicineAlarmReceiver::class.java)
+        val pendingNagging = PendingIntent.getBroadcast(
+            context,
+            pastEntry.entryId.hashCode() + 2000,
+            naggingIntent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+        )
+        assertNull(
+            "Undoing dose that exceeded missedAfterMinutes must NOT schedule a nagging reminder",
+            pendingNagging
+        )
+    }
+
+    @Test
     fun recordDoseTaken_and_logAsNeededDose_refillAlert_usesTargetProfileLocalizedContext() = runBlocking {
         // Guard: Verify refill alert NotificationCompat.Builder uses localizedContext matching profile language (#BUG-REFILL-NOTIF-BUILDER)
         MedicineAlarmReceiver.createNotificationChannels(context)
