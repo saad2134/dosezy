@@ -34,17 +34,28 @@ object DosezyWidgetPrefs {
             .apply()
     }
 
-    fun saveWidgetProfileTheme(context: Context, userId: String, theme: String) {
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putString("profile_theme_" + userId, theme)
-            .putString("profile_theme_" + ACTIVE_PROFILE_ID, theme)
-            .apply()
+    // Guard: Only update ACTIVE_PROFILE_ID theme when updating the active profile to prevent non-active profiles from corrupting the active profile widget theme
+    fun saveWidgetProfileTheme(context: Context, userId: String, theme: String, isCurrentProfile: Boolean = false) {
+        val editor = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
+        editor.putString("profile_theme_" + userId, theme)
+        if (userId == ACTIVE_PROFILE_ID || isCurrentProfile) {
+            editor.putString("profile_theme_" + ACTIVE_PROFILE_ID, theme)
+        }
+        editor.apply()
     }
 
     fun getWidgetProfileTheme(context: Context, userId: String): String? {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getString("profile_theme_" + userId, null)
+    }
+
+    fun saveAppWidgetUser(context: Context, appWidgetId: Int, userId: String) {
+        saveWidgetProfile(context, appWidgetId, userId)
+    }
+
+    fun getAppWidgetUser(context: Context, appWidgetId: Int): String? {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(PREF_PREFIX_KEY + appWidgetId, null)
     }
 
     // Guard: Remove orphaned widget profile theme entries when a profile is deleted to prevent shared preference bloat
@@ -54,4 +65,30 @@ object DosezyWidgetPrefs {
             .remove("profile_theme_" + userId)
             .apply()
     }
+
+    // Guard: Unbind widget instances and delete theme preferences when a profile is deleted to prevent SharedPreferences leaks and stale bindings
+    fun deleteWidgetPreferencesForUser(context: Context, userId: String) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+        editor.remove("profile_theme_" + userId)
+        prefs.all.forEach { (key, value) ->
+            if (key.startsWith(PREF_PREFIX_KEY) && value == userId) {
+                editor.remove(key)
+            }
+        }
+        editor.commit()
+    }
+
+    // Guard: Reset widget instances bound to a deleted user back to ACTIVE_PROFILE_ID to prevent orphaned widget keys and theme desync
+    fun resetWidgetsForDeletedUser(context: Context, deletedUserId: String) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+        prefs.all.forEach { (key, value) ->
+            if (key.startsWith(PREF_PREFIX_KEY) && value == deletedUserId) {
+                editor.putString(key, ACTIVE_PROFILE_ID)
+            }
+        }
+        editor.apply()
+    }
 }
+

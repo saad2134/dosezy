@@ -29,4 +29,8 @@ interface UserDao {
 
     @Query("SELECT * FROM users")
     suspend fun getAllUsersDirect(): List<User>
+
+    // Guard: Atomically update isCurrentUser flag in a single SQLite statement to prevent Room intermediate emissions with 0 active users triggering auto-promotion
+    @Query("UPDATE users SET isCurrentUser = CASE WHEN userId = :userId THEN 1 ELSE 0 END")
+    suspend fun setCurrentUserAtomic(userId: String)
 }

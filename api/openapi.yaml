@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Dosezy API
   description: |
-    Official OpenAPI 3.0 specification for **Dosezy** — Open-Source, Offline-First Medicine Tracking & Caregiver Cloud Platform.
+    Official OpenAPI 3.0 specification for **Dosezy** - Open-Source, Offline-First Medicine Tracking & Caregiver Cloud Platform.
     
     ### Domain Alignment
     - **API Base URL:** `https://api.dosezy.app`
@@ -10,7 +10,7 @@ info:
     - **Documentation:** `https://docs.dosezy.app`
     - **Patient Web App:** `https://patient.dosezy.app`
     - **Caregiver Portal:** `https://caregiver.dosezy.app`
-  version: 2.5.9
+  version: 2.5.12
   contact:
     name: Dosezy Maintainers
     email: reach.saad@outlook.com
@@ -63,7 +63,7 @@ paths:
                     example: ok
                   version:
                     type: string
-                    example: 2.5.9
+                    example: 2.5.12
                   timestamp:
                     type: string
                     format: date-time
@@ -429,7 +429,7 @@ components:
 
     DosageUnit:
       type: string
-      enum: [MG, MCG, ML, DROP, TABLET, CAPSULE]
+      enum: [MG, MCG, ML, DROP, TABLET, CAPSULE, MEQ, PUFF, AMPULE, SPRAY]
 
     FrequencyPattern:
       type: string
@@ -487,9 +487,16 @@ components:
 
     PillShape:
       type: string
-      enum: [ROUND, CAPSULE, OVAL, LIQUID, INHALER, INJECTION, DROPS, PATCH]
+      enum: [ROUND, CAPSULE, OVAL, LIQUID, INHALER, INJECTION, DROPS, PATCH, SPRAY]
       default: ROUND
       example: ROUND
+
+    ReminderType:
+      type: string
+      description: Reminder alert delivery mechanism (ALARM for full-screen alarm activity bypassing DND, NOTIFICATION for notification shade chime respecting DND)
+      enum: [ALARM, NOTIFICATION]
+      default: ALARM
+      example: ALARM
 
     AlarmSound:
       type: string
@@ -617,6 +624,43 @@ components:
           description: Whether to prompt for an optional note or symptom log whenever a dose is marked as taken
           default: false
           example: false
+        slideActionsEnabled:
+          type: boolean
+          description: Whether sliding gestures are required to confirm taking or snoozing doses in alarms
+          default: true
+          example: true
+        timelineModeEnabled:
+          type: boolean
+          description: Whether home page displays today's schedule in an expanded vertical timeline view
+          default: false
+          example: false
+        thickerCalendarDayHighlight:
+          type: boolean
+          description: Whether schedule calendar renders a full colored border frame around each scheduled day
+          default: false
+          example: false
+        intakeSafeguardEnabled:
+          type: boolean
+          description: Whether ADHD intake countdown timer safeguard with automatic re-alert is enabled
+          default: false
+          example: false
+        intakeCountdownSeconds:
+          type: integer
+          description: Countdown timer duration in seconds for intake confirmation before re-alerting (60, 120, 180, 300)
+          default: 120
+          example: 120
+        lockscreenDetailsEnabled:
+          type: boolean
+          description: Whether sensitive prescription details are masked on the lock screen
+          default: true
+          example: true
+        customSnoozePopupEnabled:
+          type: boolean
+          description: Whether multiple custom snooze duration chips are presented in alarm alert
+          default: false
+          example: false
+        reminderType:
+          $ref: '#/components/schemas/ReminderType'
 
     UserCreateInput:
       type: object
@@ -693,6 +737,26 @@ components:
           type: boolean
         promptDoseNotes:
           type: boolean
+        slideActionsEnabled:
+          type: boolean
+        timelineModeEnabled:
+          type: boolean
+        thickerCalendarDayHighlight:
+          type: boolean
+        intakeSafeguardEnabled:
+          type: boolean
+        intakeCountdownSeconds:
+          type: integer
+        lockscreenDetailsEnabled:
+          type: boolean
+          default: true
+          example: true
+        customSnoozePopupEnabled:
+          type: boolean
+          default: false
+          example: false
+        reminderType:
+          $ref: '#/components/schemas/ReminderType'
 
     Medicine:
       type: object
@@ -792,6 +856,8 @@ components:
           example:
             "08:00": 20.0
             "20:00": 40.0
+        reminderType:
+          $ref: '#/components/schemas/ReminderType'
 
     MedicineInput:
       type: object
@@ -871,6 +937,8 @@ components:
           example:
             "08:00": 20.0
             "20:00": 40.0
+        reminderType:
+          $ref: '#/components/schemas/ReminderType'
 
     ScheduleEntry:
       type: object
@@ -1047,16 +1115,20 @@ components:
 
     # Semantic Cross-Schema Aliases
     Medication:
-      $ref: '#/components/schemas/Medicine'
+      allOf:
+        - $ref: '#/components/schemas/Medicine'
       description: Canonical alias for Medicine schema
     Schedule:
-      $ref: '#/components/schemas/Frequency'
+      allOf:
+        - $ref: '#/components/schemas/Frequency'
       description: Canonical alias for Frequency recurrence schema
     DoseEvent:
-      $ref: '#/components/schemas/ScheduleEntry'
+      allOf:
+        - $ref: '#/components/schemas/ScheduleEntry'
       description: Canonical alias for ScheduleEntry dose event history schema
     CaregiverConsent:
-      $ref: '#/components/schemas/PairingRequest'
+      allOf:
+        - $ref: '#/components/schemas/PairingRequest'
       description: Canonical alias for PairingRequest consent exchange schema
 
   securitySchemes:

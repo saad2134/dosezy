@@ -45,6 +45,12 @@
     <string name="form_delete_medicine">ওষুধ মুছে ফেলুন</string>
     <string name="form_upload_img">ছবি আপলোড করুন</string>
     <string name="form_change_img">ছবি পরিবর্তন করুন</string>
+    <string name="form_error_med_name_required">ওষুধের নাম প্রয়োজন</string>
+    <string name="form_error_dosage_required">ডোজের পরিমাণ প্রয়োজন</string>
+    <string name="form_error_dosage_invalid">ডোজ অবশ্যই একটি ধনাত্মক সংখ্যা হতে হবে</string>
+    <string name="form_error_select_days">অনুগ্রহ করে অন্তত একটি দিন নির্বাচন করুন</string>
+    <string name="form_error_course_duration">কোর্সের মেয়াদ অন্তত ১ দিন হতে হবে</string>
+    <string name="form_error_fix_fields">অনুগ্রহ করে উপরে চিহ্নিত প্রয়োজনীয় তথ্য পূরণ করুন</string>
     <string name="freq_daily">প্রতিদিন</string>
     <string name="freq_weekly">সাপ্তাহিক</string>
     <string name="freq_monthly">মাসিক</string>
@@ -144,6 +150,10 @@
     <string name="unit_drop">ফোটা</string>
     <string name="unit_tablet">ট্যাবলেট</string>
     <string name="unit_capsule">ক্যাপসুল</string>
+    <string name="unit_meq">mEq</string>
+    <string name="unit_puff">পাফ</string>
+    <string name="unit_ampule">অ্যাম্পুল</string>
+    <string name="unit_spray">স্প্রে</string>
 
     <string name="help_title">সাহায্য ও সহায়তা</string>
     <string name="help_resources">সম্পদসমূহ</string>
@@ -362,6 +372,8 @@
     <string name="backup_saved_success">ব্যাকআপটি সফলভাবে ডাউনলোড ফোল্ডারে সংরক্ষিত হয়েছে।</string>
     <string name="backup_section_automatic">স্বয়ংক্রিয়</string>
     <string name="backup_section_manual">ম্যানুয়াল</string>
+    <string name="backup_tab_automatic">স্বয়ংক্রিয়</string>
+    <string name="backup_tab_manual">ম্যানুয়াল</string>
     <string name="backup_self_hosted_title">স্ব-হোস্ট করা ব্যাকএন্ড সার্ভার</string>
     <string name="backup_self_hosted_sub" formatted="false">১০০% ওপেন সোর্স এবং ব্যক্তিগত</string>
     <string name="backup_self_hosted_desc">সম্পূর্ণ ডেটা সার্বভৌমত্ব, পারিবারিক কেয়ারগিভার ড্যাশবোর্ড এবং ব্যক্তিগত নিয়ন্ত্রণের জন্য আপনার নিজস্ব ডোজইজি সার্ভারের সাথে সরাসরি সংযোগ করুন।</string>
@@ -430,6 +442,7 @@
     <string name="to_be_taken_in">%1$dঘণ্টা %2$dমিনিটের মধ্যে সেব্য</string>
     <string name="time_diff_ago">%1$dঘণ্টা %2$dমিনিট আগে</string>
     <string name="status_all_medications_taken">সমস্ত ওষুধ গ্রহণ করা হয়েছে</string>
+    <string name="status_slot_completed_with_skipped">সম্পূর্ণ (কিছু বাদ দেওয়া হয়েছে)</string>
     <string name="status_scheduled_for_this_time">এই সময়ের জন্য নির্ধারিত</string>
     <string name="daily_frequency_presets_title">দৈনিক ফ্রিকোয়েন্সি প্রিসেট</string>
     <string name="action_edit_medicine_cd">ওষুধ সম্পাদনা করুন</string>
@@ -453,6 +466,7 @@
     <string name="pill_shape_injection">ইনজেকশন (Injection)</string>
     <string name="pill_shape_drops">ড্রপস (Drops)</string>
     <string name="pill_shape_patch">প্যাচ (Patch)</string>
+    <string name="pill_shape_spray">স্প্রে</string>
 
     <string name="med_notes_label">ডাক্তারের নির্দেশনা ও সতর্কতা</string>
     <string name="med_notes_placeholder">যেমনঃ ভরা পেটে সেব্য, বাতাবি লেবু পরিহার করুন, প্রেসক্রিপশন #12345</string>
@@ -546,15 +560,6 @@
     <string name="about_tagline">রোগী ও পরিচর্যাকারীদের জন্য সম্পূর্ণ অফলাইন ও নিরাপদ ওষুধ সহযোগী।</string>
     <string name="about_star_github">GitHub-এ স্টার দিন</string>
     <string name="about_star_github_desc">GitHub-এ স্টার দিয়ে আমাদের ওপেন সোর্স প্রজেক্টকে সমর্থন জানান</string>
-    <string name="about_support_dev_title">উন্নয়নে সহায়তা করুন</string>
-    <string name="about_support_dev_desc" formatted="false">Dosezy সম্পূর্ণ বিনামূল্যে, নিরাপদ এবং বিজ্ঞাপনহীন। আপনার অনুদান এই প্রজেক্টকে সচল রাখতে সাহায্য করে!</string>
-    <string name="about_buymeacoffee">Buy Me a Coffee-তে সাপোর্ট করুন</string>
-    <string name="about_buymeacoffee_desc">কার্ড বা PayPal-এর মাধ্যমে অনুদান প্রদান করুন</string>
-    <string name="about_crypto_donations">ক্রিপ্টোকারেন্সি অনুদান</string>
-    <string name="about_copied_to_clipboard">%1$s ঠিকানা ক্লিপবোর্ডে কপি করা হয়েছে</string>
-    <string name="about_tap_to_copy">ঠিকানা কপি করতে ট্যাপ করুন</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">GitHub Sponsors-এর মাধ্যমে মাসিক বা এককালীন অনুদান দিন</string>
     <string name="pref_alarm_duration_title">অ্যালার্ম বাজার সময়সীমা</string>
     <string name="pref_alarm_duration_desc">নির্দিষ্ট সময় পর স্বয়ংক্রিয়ভাবে শব্দ ও কম্পন বন্ধ করুন</string>
     <string name="alarm_duration_continuous">একটানা (বন্ধ না করা পর্যন্ত)</string>
@@ -564,7 +569,7 @@
     <string name="alarm_duration_1m">১ মিনিট</string>
     <string name="alarm_duration_2m">২ মিনিট</string>
     <string name="alarm_duration_5m">৫ মিনিট</string>
-    <string name="alarm_silenced_auto_banner">অ্যালার্ম স্বয়ংক্রিয়ভাবে বন্ধ হয়েছে — সুবিধামতো ওষুধের হিসাব লিপিবদ্ধ করুন</string>
+    <string name="alarm_silenced_auto_banner">অ্যালার্ম স্বয়ংক্রিয়ভাবে বন্ধ হয়েছে - সুবিধামতো ওষুধের হিসাব লিপিবদ্ধ করুন</string>
     <string name="notif_exact_alarm_title">সঠিক সময়ের অ্যালার্ম</string>
     <string name="notif_exact_alarm_granted">অ্যালার্ম যথাসময়ে বাজবে।</string>
     <string name="notif_exact_alarm_desc">অ্যালার্ম সঠিক সময়ে বাজার জন্য প্রয়োজনীয়।</string>
@@ -660,16 +665,6 @@
 
     <string name="about_community_open_source">কমিউনিটি ও ওপেন সোর্স</string>
     <string name="about_version_build">সংস্করণ %1$s (বিল্ড %2$s)</string>
-    <string name="crypto_bitcoin">বিটকয়েন (BTC)</string>
-    <string name="crypto_ethereum">ইথেরিয়াম (ETH)</string>
-    <string name="crypto_solana">সোলানা (SOL)</string>
-    <string name="crypto_litecoin">লাইটকয়েন (LTC)</string>
-    <string name="crypto_zcash">জেটক্যাশ (ZEC)</string>
-    <string name="crypto_name_btc">বিটকয়েন</string>
-    <string name="crypto_name_eth">ইথেরিয়াম</string>
-    <string name="crypto_name_sol">সোলানা</string>
-    <string name="crypto_name_ltc">লাইটকয়েন</string>
-    <string name="crypto_name_zec">জেটক্যাশ</string>
     <string name="country_india">ভারত</string>
     <string name="country_us_ca">যুক্তরাষ্ট্র / কানাডা</string>
     <string name="country_uk">যুক্তরাজ্য</string>
@@ -775,4 +770,108 @@
     <string name="stock_inventory_card_title">ওষুধের স্টক এবং ইনভেন্টরি</string>
     <string name="widget_configure_auto_badge">স্বয়ংক্রিয়</string>
     <string name="dialog_validation_title">বিজ্ঞপ্তি</string>
+
+    <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
+    <string name="pref_section_appearance">রূপ ও প্রদর্শন</string>
+    <string name="pref_slide_actions_title">গ্রহণ ও স্নুজ করতে স্লাইড করুন</string>
+    <string name="pref_slide_actions_desc">অ্যালার্মে ট্যাপের বদলে স্লাইড করে ওষুধ গ্রহণ বা স্নুজ করুন।</string>
+    <string name="pref_timeline_mode_title">টাইমলাইন ভিউ</string>
+    <string name="pref_timeline_mode_desc">আজকের সময়সূচি একটি বিস্তারিত উল্লম্ব টাইমলাইনে প্রদর্শন করুন।</string>
+    <string name="pref_calendar_thicker_highlight_title">পূর্ণ ফ্রেম বিশিষ্ট দিন</string>
+    <string name="pref_calendar_thicker_highlight_desc">ক্যালেন্ডারে প্রতিটি নির্ধারিত দিন সম্পূর্ণ রঙিন ফ্রেমে চিহ্নিত করুন।</string>
+    <string name="alarm_slide_to_take">গ্রহণ করতে স্লাইড করুন</string>
+    <string name="alarm_slide_to_take_all">সবগুলো গ্রহণ করতে স্লাইড করুন (%1$d)</string>
+    <string name="alarm_slide_to_snooze">স্নুজ করতে স্লাইড করুন (%1$d মি)</string>
+    <string name="home_view_standard">সাধারণ</string>
+    <string name="home_view_timeline">টাইমলাইন</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">স্নুজ করুন:</string>
+    <string name="snooze_duration_chip_format">%1$d মি</string>
+    <string name="pref_custom_snooze_title">কাস্টম স্নুজ বিকল্প</string>
+    <string name="pref_custom_snooze_desc">অ্যালার্ম বাজার সময় বিভিন্ন স্নুজ সময়কাল বেছে নিন।</string>
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">ওষুধ গ্রহণের কাউন্টডাউন সুরক্ষা</string>
+    <string name="pref_intake_safeguard_desc">ADHD সহায়তা: ওষুধ গ্রহণের নিশ্চিতকরণের আগে কাউন্টডাউন বাফার এবং বিভ্রান্ত হলে পুনরায় সতর্কবার্তা।</string>
+    <string name="pref_intake_duration_title">সুরক্ষার সময়কাল</string>
+    <string name="pref_intake_duration_format">%1$d মিনিট</string>
+    <string name="dialog_intake_duration_title">সুরক্ষার সময়কাল নির্বাচন করুন</string>
+    <string name="notif_intake_in_progress_title">ওষুধ গ্রহণ প্রক্রিয়াধীন</string>
+    <string name="notif_intake_in_progress_desc">%1$s: গ্রহণের পর নিশ্চিত করুন</string>
+    <string name="notif_intake_action_confirm">গ্রহণ নিশ্চিত করুন</string>
+    <string name="notif_intake_action_extend">+১ মিনিট</string>
+    <string name="notif_intake_action_cancel">বাতিল</string>
+    <string name="notif_intake_realert_title">ওষুধ গ্রহণ নিশ্চিত হয়নি</string>
+    <string name="notif_intake_realert_desc">আপনি কি %1$s গ্রহণ করেছেন? গ্রহণ নিশ্চিত করতে বা স্নুজ করতে আলতো চাপুন।</string>
+    <string name="home_intake_in_progress">%1$s গ্রহণ প্রক্রিয়াধীন রয়েছে</string>
+    <string name="home_intake_time_remaining">%1$s বাকি</string>
+    <string name="home_intake_confirm">গ্রহণ নিশ্চিত করুন</string>
+    <string name="home_intake_extend">+১ মিনিট</string>
+    <string name="home_intake_cancel">বাতিল</string>
+    <string name="home_intake_confirmed">%1$s গ্রহণ রেকর্ড করা হয়েছে</string>
+    <string name="home_intake_cancelled">ওষুধ গ্রহণের সুরক্ষা বাতিল করা হয়েছে</string>
+    <string name="alarm_realert_badge">ADHD ওষুধ গ্রহণ পুনরায় সতর্কতা</string>
+    <string name="alarm_realert_subtitle">আপনি পূর্বে গ্রহণ করেছি চাপলেও নিশ্চিত করেননি। আপনি কি ওষুধ গ্রহণ করেছেন?</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">সবগুলো গ্রহণ করুন</string>
+    <string name="take_all_count">সবগুলো গ্রহণ করুন (%1$d)</string>
+    <string name="dialog_take_all_title">সবগুলো ওষুধ গ্রহণ করবেন?</string>
+    <string name="dialog_take_all_message">%2$s সময়ের নির্ধারিত সমস্ত %1$dটি ওষুধ গৃহীত হিসেবে চিহ্নিত করবেন?</string>
+    <string name="take_all_success_toast">সমস্ত %1$dটি ওষুধ গৃহীত হিসেবে চিহ্নিত করা হয়েছে</string>
+
+    <!-- Legal, Privacy & Compliance Safeguards -->
+    <string name="notif_generic_lockscreen_reminder">নির্ধারিত ওষুধের অনুস্মারক</string>
+    <string name="pref_lockscreen_details_title">লক স্ক্রিনে বিবরণ দেখান</string>
+    <string name="pref_lockscreen_details_desc">ডিভাইস আনলক না করা পর্যন্ত ওষুধের নাম ও ডোজ লুকান।</string>
+    <string name="disclaimer_dialog_title">চিকিৎসা ও আইনি দাবিত্যাগ</string>
+    <string name="disclaimer_dialog_summary">ডোজইজি একটি স্বয়ংক্রিয় ডিজিটাল রিমাইন্ডার এবং কোনো নিয়ন্ত্রিত চিকিৎসা ডিভাইস নয়। এটি চিকিৎসা নির্ণয়, ডোজ গণনা বা ক্লিনিকাল পরামর্শ প্রদান করে না। প্রেসক্রিপশন নির্দেশাবলীর জন্য সর্বদা আপনার চিকিৎসকের পরামর্শ নিন।</string>
+    <string name="disclaimer_checkbox_consent">আমি চিকিৎসা দাবিত্যাগ এবং পরিষেবার শর্তাবলী বুঝতে পেরেছি এবং গ্রহণ করছি।</string>
+    <string name="disclaimer_action_agree">স্বীকার করুন ও এগিয়ে যান</string>
+    <string name="disclaimer_link_medical">চিকিৎসা দাবিত্যাগ</string>
+    <string name="disclaimer_link_privacy">গোপনীয়তা নীতি</string>
+    <string name="disclaimer_link_terms">পরিষেবার শর্তাবলী</string>
+    <string name="emergency_dispatch_warning_title">জরুরী নোটিশ</string>
+    <string name="emergency_dispatch_warning_desc">ডোজইজি কোনো জরুরী পরিষেবা প্রদানকারী বা ৯১১/১১২ এর বিকল্প নয়। জীবন-হুমকিপূর্ণ পরিস্থিতিতে সরাসরি আপনার স্থানীয় জরুরী সেবায় কল করুন। প্রদর্শিত নম্বরটি আপনার এলাকার সাথে মিলছে কিনা তা যাচাই করুন।</string>
+    <string name="pdf_report_disclaimer_footer">ডোজইজি মেডিসিন ট্র্যাকার • স্ব-প্রতিবেদিত তথ্যমূলক লগ (নন-ক্লিনিকাল)</string>
+    <string name="pharmacy_refill_estimation_disclaimer">বিজ্ঞপ্তি: রিফিল পরিমাণ নির্ধারিত ফ্রিকোয়েন্সির উপর ভিত্তি করে আনুমানিক গণনা। আপনার ফার্মাসিস্ট বা ডাক্তারের সাথে যাচাই করুন।</string>
+    <string name="alarm_unlock_to_view_details">বিস্তারিত দেখতে আনলক করুন</string>
+    <string name="alarm_lockscreen_details_hidden">ডিভাইস লক থাকা অবস্থায় ওষুধের নাম ও ডোজ লুকানো থাকে।</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">সময়সূচীর পরিবর্তন প্রয়োগ করুন</string>
+    <string name="schedule_effective_dialog_message">এই আপডেট করা সময়সূচী কখন থেকে কার্যকর হবে?</string>
+    <string name="schedule_effective_today_title">আজ থেকেই শুরু</string>
+    <string name="schedule_effective_today_desc">আজকের নতুন সময় প্রয়োগ করুন। আজকের অতীতের না নেওয়া ডোজ মুছে ফেলা হবে।</string>
+    <string name="schedule_effective_tomorrow_title">আগামীকাল থেকে শুরু</string>
+    <string name="schedule_effective_tomorrow_desc">আজকের সময়সূচী অপরিবর্তিত রাখুন। নতুন সময়সূচী আগামীকাল থেকে শুরু হবে।</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[রেট্রোস্পেক্টিভভাবে নথিভুক্ত]</string>
+    <string name="schedule_action_dialog_title">ডোজ পরিচালনা করুন</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">গ্রহণ করা হয়েছে চিহ্নিত করুন</string>
+    <string name="schedule_action_skip_dose">বাদ দেওয়া হয়েছে চিহ্নিত করুন</string>
+    <string name="schedule_action_undo_dose">ডোজ ক্রিয়া পূর্বাবস্থায় ফেরান</string>
+    <string name="schedule_action_edit_note">ডোজ নোট সম্পাদনা করুন</string>
+    <string name="schedule_action_add_note">ডোজ নোট যোগ করুন</string>
+    <string name="schedule_dose_marked_taken">%1$s গ্রহণ করা হয়েছে চিহ্নিত করা হয়েছে</string>
+    <string name="schedule_dose_marked_skipped">%1$s বাদ দেওয়া হয়েছে চিহ্নিত করা হয়েছে</string>
+    <string name="schedule_dose_reverted">%1$s অপেক্ষামাণে ফিরিয়ে আনা হয়েছে</string>
+    <string name="schedule_dose_locked_notice">এই ডোজটি ৪৮ ঘণ্টার বেশি পুরানো এবং চিকিৎসা রেকর্ডের সত্যতা রক্ষার জন্য লক করা হয়েছে।</string>
+    <string name="schedule_dose_locked_badge">লক করা</string>
+    <string name="schedule_tap_to_manage">পরিচালনা করতে ট্যাপ করুন</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">অনুস্মারক শৈলী</string>
+    <string name="pref_reminder_type_desc">অনুস্মারকগুলি অ্যালার্ম নাকি সাধারণ বিজ্ঞপ্তি হিসেবে বাজবে তা নির্বাচন করুন</string>
+    <string name="reminder_type_alarm">অ্যালার্ম</string>
+    <string name="reminder_type_alarm_desc">একটানা শব্দসহ ফুল-স্ক্রিন সতর্কতা। বিরক্ত করবেন না মোড উপেক্ষা করে।</string>
+    <string name="reminder_type_notification">বিজ্ঞপ্তি</string>
+    <string name="reminder_type_notification_desc">সতর্কতা সুরসহ সাধারণ বিজ্ঞপ্তির ব্যানার। বিরক্ত করবেন না মোড মেনে চলে।</string>
+    <string name="reminder_type_default">প্রোফাইল ডিফল্ট ব্যবহার করুন (%1$s)</string>
+    <string name="reminder_type_default_profile">প্রোফাইল ডিফল্ট ব্যবহার করুন</string>
+    <string name="notif_channel_notifications_name">ওষুধের বিজ্ঞপ্তি</string>
+    <string name="notif_channel_notifications_desc">বিরক্ত করবেন না মোড মেনে চলা ওষুধের সময়সূচির সাধারণ বিজ্ঞপ্তি সতর্কতা</string>
+    <string name="form_reminder_type">অনুস্মারক শৈলী</string>
+    <string name="form_reminder_type_desc">জরুরি ওষুধের জন্য অ্যালার্ম অথবা সাপ্লিমেন্টের জন্য বিজ্ঞপ্তি বাছুন</string>
 </resources>

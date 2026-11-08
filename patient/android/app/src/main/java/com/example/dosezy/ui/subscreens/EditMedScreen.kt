@@ -35,6 +35,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,18 +50,22 @@ import com.example.dosezy.data.model.DosageUnit
 import com.example.dosezy.data.model.FrequencyPattern
 import com.example.dosezy.data.model.Medicine
 import com.example.dosezy.data.model.PillShape
+import com.example.dosezy.data.model.ReminderType
 import com.example.dosezy.data.model.normalizeArabicDigits
 import com.example.dosezy.ui.components.EditMedSkeletonView
 import com.example.dosezy.ui.components.GridTimePickerDialog
 import com.example.dosezy.ui.components.MedicineCourseDurationCard
 import com.example.dosezy.ui.components.MedicineIdentificationCard
 import com.example.dosezy.ui.components.MedicineNotesCard
+import com.example.dosezy.ui.components.MedicineReminderStyleCard
 import com.example.dosezy.ui.components.MedicineStockInventoryCard
 import com.example.dosezy.ui.components.MedicineTimingsAndDosagesCard
 import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.components.isMedicineFormValid
+import com.example.dosezy.ui.components.validateMedicineForm
 import com.example.dosezy.ui.viewmodels.MedicineViewModel
 import com.example.dosezy.ui.viewmodels.UserViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.UUID
@@ -94,6 +99,7 @@ fun EditMedScreen(
     var editingTimeIndex by remember { mutableStateOf<Int?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showPermanentDeleteConfirmDialog by remember { mutableStateOf(false) }
+    var pendingScheduleUpdateMedicine by remember { mutableStateOf<Medicine?>(null) }
     var selectedDaysOfWeek by remember { mutableStateOf(listOf<Int>()) }
     var selectedDaysOfMonth by remember { mutableStateOf(listOf<Int>()) }
 
@@ -115,6 +121,7 @@ fun EditMedScreen(
     var intervalHoursText by remember { mutableStateOf("4") }
     var intervalDaysText by remember { mutableStateOf("2") }
     var intervalWeeksText by remember { mutableStateOf("2") }
+    var selectedReminderType by remember { mutableStateOf<ReminderType?>(null) }
 
     var isDataLoaded by remember { mutableStateOf(false) }
 
@@ -135,9 +142,15 @@ fun EditMedScreen(
             selectedPillShape = medicineToEdit.pillShape
             selectedPillColor = medicineToEdit.pillColor
             doctorNotes = medicineToEdit.notes ?: ""
+            selectedReminderType = medicineToEdit.reminderType
             isFiniteCourse = (medicineToEdit.endDate != null || medicineToEdit.durationDays != null)
             selectedStartDate = medicineToEdit.startDate ?: LocalDate.now()
-            durationDaysText = medicineToEdit.durationDays?.toString() ?: ""
+            // Guard: Precompute durationDays from existing startDate and endDate if durationDays is null to prevent wiping finite course duration on edit
+            val computedDays = medicineToEdit.durationDays ?: if (medicineToEdit.startDate != null && medicineToEdit.endDate != null) {
+                val days = java.time.temporal.ChronoUnit.DAYS.between(medicineToEdit.startDate, medicineToEdit.endDate) + 1
+                if (days > 0) days.toInt() else null
+            } else null
+            durationDaysText = computedDays?.toString() ?: ""
             intervalHoursText = medicineToEdit.frequency.intervalHours?.toString() ?: "4"
             intervalDaysText = medicineToEdit.frequency.intervalDays?.toString() ?: "2"
             intervalWeeksText = medicineToEdit.frequency.intervalWeeks?.toString() ?: "2"
@@ -187,6 +200,37 @@ fun EditMedScreen(
                 if (!loaded) {
                     EditMedSkeletonView()
                 } else {
+                    val scrollState = rememberScrollState()
+                    val coroutineScope = rememberCoroutineScope()
+                    var showValidationErrors by remember { mutableStateOf(false) }
+
+                    val durationDaysInt = durationDaysText.normalizeArabicDigits().toIntOrNull()
+                    val calcStartDate = selectedStartDate
+                    // Guard: Retain medicineToEdit.endDate if durationDaysInt is null while isFiniteCourse is true to prevent silent conversion to indefinite schedule
+                    val calcEndDate = if (isFiniteCourse) {
+                        if (durationDaysInt != null) {
+                            selectedStartDate.plusDays((durationDaysInt - 1).toLong().coerceAtLeast(0L))
+                        } else {
+                            medicineToEdit?.endDate
+                        }
+                    } else null
+
+                    val validation = validateMedicineForm(
+                        medicationName = medicationName,
+                        dosage = dosage,
+                        hasDifferentDosages = hasDifferentDosages,
+                        scheduledTimesList = scheduledTimesList,
+                        perTimeDosages = perTimeDosages,
+                        selectedFrequency = selectedFrequency,
+                        selectedDaysOfWeek = selectedDaysOfWeek,
+                        selectedDaysOfMonth = selectedDaysOfMonth,
+                        intervalWeeksText = intervalWeeksText,
+                        isFiniteCourse = isFiniteCourse,
+                        durationDaysText = durationDaysText,
+                        hasExistingEndDate = medicineToEdit?.endDate != null
+                    )
+                    val isFormValid = validation.isValid
+
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -197,7 +241,7 @@ fun EditMedScreen(
                             ) {
                                 focusManager.clearFocus()
                             }
-                            .verticalScroll(rememberScrollState())
+                            .verticalScroll(scrollState)
                             .padding(16.dp)
                             .background(MaterialTheme.colorScheme.background)
                     ) {
@@ -212,7 +256,9 @@ fun EditMedScreen(
                                 selectedPillShape = shape
                                 selectedPillColor = color
                             },
-                            onMedicationNameChange = { medicationName = it }
+                            onMedicationNameChange = { medicationName = it },
+                            isNameError = showValidationErrors && !validation.isNameValid,
+                            nameErrorMessage = stringResource(R.string.form_error_med_name_required)
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -249,18 +295,20 @@ fun EditMedScreen(
                                 editingTimeIndex = index
                                 selectedTime = time
                                 showTimePicker = true
-                            }
+                            },
+                            isDosageError = showValidationErrors && !validation.isDosageValid,
+                            dosageErrorMessage = stringResource(
+                                if (dosage.isBlank() && perTimeDosages.isEmpty()) R.string.form_error_dosage_required
+                                else R.string.form_error_dosage_invalid
+                            ),
+                            invalidTimeSlotKeys = if (showValidationErrors) validation.invalidTimeSlotKeys else emptySet(),
+                            isFrequencyError = showValidationErrors && !validation.isFrequencyValid,
+                            frequencyErrorMessage = stringResource(R.string.form_error_select_days)
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
 
                         // --- Card 3: Course Duration Card ---
-                        val durationDaysInt = durationDaysText.normalizeArabicDigits().toIntOrNull()
-                        val calcStartDate = selectedStartDate
-                        val calcEndDate = if (isFiniteCourse && durationDaysInt != null) {
-                            selectedStartDate.plusDays((durationDaysInt - 1).toLong().coerceAtLeast(0L))
-                        } else null
-
                         MedicineCourseDurationCard(
                             isFiniteCourse = isFiniteCourse,
                             onIsFiniteCourseChange = { isFiniteCourse = it },
@@ -268,7 +316,9 @@ fun EditMedScreen(
                             onStartDateChange = { selectedStartDate = it },
                             durationDaysText = durationDaysText,
                             onDurationDaysChange = { durationDaysText = it },
-                            calculatedEndDate = calcEndDate
+                            calculatedEndDate = calcEndDate,
+                            isDurationError = showValidationErrors && !validation.isFiniteDurationValid,
+                            durationErrorMessage = stringResource(R.string.form_error_course_duration)
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -289,33 +339,34 @@ fun EditMedScreen(
                             onDoctorNotesChange = { doctorNotes = it }
                         )
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                        val isDosageValid = if (hasDifferentDosages && scheduledTimesList.size > 1) {
-                            scheduledTimesList.all { t ->
-                                val key = String.format(java.util.Locale.US, "%02d:%02d", t.hour, t.minute)
-                                val valueStr = perTimeDosages[key] ?: (if (dosage.isNotBlank()) dosage else null)
-                                val d = valueStr?.normalizeArabicDigits()?.toDoubleOrNull()
-                                d != null && d > 0.0
-                            }
-                        } else {
-                            val d = dosage.normalizeArabicDigits().toDoubleOrNull()
-                            d != null && d > 0.0
-                        }
-
-                        val isFormValid = isMedicineFormValid(
-                            medicationName = medicationName,
-                            isDosageValid = isDosageValid,
-                            selectedFrequency = selectedFrequency,
-                            selectedDaysOfWeek = selectedDaysOfWeek,
-                            selectedDaysOfMonth = selectedDaysOfMonth,
-                            intervalWeeksText = intervalWeeksText
+                        // --- Card 6: Reminder Style Card (Alarm vs Notification) (#111) ---
+                        MedicineReminderStyleCard(
+                            selectedReminderType = selectedReminderType,
+                            onReminderTypeChange = { selectedReminderType = it },
+                            profileDefaultType = currentUser?.reminderType ?: ReminderType.ALARM
                         )
+
+                        Spacer(modifier = Modifier.height(24.dp))
 
                         // Save Changes Button
                         Button(
                             onClick = {
-                                if (!isFormValid) return@Button
+                                if (!isFormValid) {
+                                    showValidationErrors = true
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar(context.getString(R.string.form_error_fix_fields))
+                                    }
+                                    coroutineScope.launch {
+                                        when {
+                                            !validation.isNameValid -> scrollState.animateScrollTo(0)
+                                            !validation.isDosageValid || !validation.isFrequencyValid -> scrollState.animateScrollTo(280)
+                                            !validation.isFiniteDurationValid -> scrollState.animateScrollTo(680)
+                                        }
+                                    }
+                                    return@Button
+                                }
 
                                 val baseDose = if (hasDifferentDosages && scheduledTimesList.size > 1) {
                                     val firstKey = scheduledTimesList.firstOrNull()?.let { String.format(java.util.Locale.US, "%02d:%02d", it.hour, it.minute) }
@@ -334,10 +385,14 @@ fun EditMedScreen(
                                     if (map.isNotEmpty()) map else null
                                 } else null
 
+                                // Guard: Preserve original medicine owner userId or fallback to active non-blank user; abort if absent to prevent SQLiteConstraintException
+                                val targetUserId = medicineToEdit?.userId ?: currentUser?.userId?.takeIf { it.isNotBlank() } ?: return@Button
+
                                 val updatedMedicine = Medicine(
                                     medicineId = medicineToEdit?.medicineId ?: UUID.randomUUID().toString(),
-                                    userId = currentUser?.userId ?: "",
-                                    medicationName = medicationName,
+                                    userId = targetUserId,
+                                    // Guard: Trim medication name to avoid duplicate records with trailing whitespace and maintain restore matching
+                                    medicationName = medicationName.trim(),
                                     dosage = baseDose,
                                     dosageUnit = selectedDosageUnit,
                                     timesPerDay = if (selectedFrequency == FrequencyPattern.AS_NEEDED) 0 else scheduledTimesList.size,
@@ -354,20 +409,44 @@ fun EditMedScreen(
                                     scheduledTimes = if (selectedFrequency == FrequencyPattern.AS_NEEDED) emptyList() else scheduledTimesList,
                                     imageUri = medicineImagePath,
                                     currentStock = currentStockText.normalizeArabicDigits().toIntOrNull(),
+                                    // Guard: Preserve configured refillThreshold across edits so low-stock alerts are not wiped to null
                                     refillThreshold = refillThresholdText.normalizeArabicDigits().toIntOrNull(),
-                                    autoDeductOnTake = true,
+                                    // Guard: Preserve existing autoDeductOnTake preference to prevent inadvertent inventory decrements when editing medication metadata
+                                    autoDeductOnTake = medicineToEdit?.autoDeductOnTake ?: true,
                                     notes = doctorNotes.trim().ifBlank { null },
                                     pillShape = selectedPillShape,
                                     pillColor = selectedPillColor,
                                     startDate = calcStartDate,
                                     endDate = calcEndDate,
-                                    durationDays = if (isFiniteCourse) durationDaysInt else null,
+                                    // Guard: Preserve computed or existing durationDays when duration text was not modified to maintain finite course integrity
+                                    durationDays = if (isFiniteCourse) (durationDaysInt ?: medicineToEdit?.durationDays) else null,
                                     isArchived = medicineToEdit?.isArchived ?: false,
-                                    customDosages = finalCustomDosages
+                                    // Guard: Clear customDosages if frequency is AS_NEEDED to prevent leaking orphaned scheduled custom dosages into PRN doses and reports
+                                    customDosages = if (selectedFrequency == FrequencyPattern.AS_NEEDED) null else finalCustomDosages,
+                                    reminderType = selectedReminderType
                                 )
 
                                 if (medicineToEdit != null) {
-                                    medicineViewModel.updateMedicine(updatedMedicine)
+                                    val timingOrScheduleChanged = (
+                                        medicineToEdit.scheduledTimes != updatedMedicine.scheduledTimes ||
+                                        medicineToEdit.frequency != updatedMedicine.frequency ||
+                                        medicineToEdit.timesPerDay != updatedMedicine.timesPerDay ||
+                                        medicineToEdit.customDosages != updatedMedicine.customDosages ||
+                                        medicineToEdit.startDate != updatedMedicine.startDate ||
+                                        medicineToEdit.endDate != updatedMedicine.endDate ||
+                                        medicineToEdit.durationDays != updatedMedicine.durationDays
+                                    ) && updatedMedicine.frequency.pattern != FrequencyPattern.AS_NEEDED
+
+                                    if (timingOrScheduleChanged) {
+                                        pendingScheduleUpdateMedicine = updatedMedicine
+                                        return@Button
+                                    }
+
+                                    // Guard: Clean up previous active medicine image when saving a new image to prevent disk storage leaks and avoid deleting during uncommitted drafts
+                                    if (!medicineToEdit.imageUri.isNullOrBlank() && medicineToEdit.imageUri != medicineImagePath) {
+                                        com.example.dosezy.ui.components.deleteOldImage(context, medicineToEdit.imageUri)
+                                    }
+                                    medicineViewModel.updateMedicine(updatedMedicine, com.example.dosezy.data.model.ScheduleEffectiveDate.TODAY)
                                     navController.previousBackStackEntry?.savedStateHandle?.set(
                                         "snackbar_message",
                                         context.getString(R.string.medication_updated_success)
@@ -381,7 +460,7 @@ fun EditMedScreen(
                                 }
                                 navController.popBackStack()
                             },
-                            enabled = isFormValid,
+                            enabled = medicineToEdit != null || !currentUser?.userId.isNullOrBlank(),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),
@@ -624,4 +703,28 @@ fun EditMedScreen(
             }
         )
     }
+
+    if (pendingScheduleUpdateMedicine != null) {
+        val targetMedicine = pendingScheduleUpdateMedicine!!
+        com.example.dosezy.ui.components.ScheduleEffectiveDateDialog(
+            medicationName = targetMedicine.medicationName,
+            onDismiss = { pendingScheduleUpdateMedicine = null },
+            onConfirm = { effectiveDate ->
+                val medToSave = targetMedicine
+                pendingScheduleUpdateMedicine = null
+
+                if (medicineToEdit != null && !medicineToEdit.imageUri.isNullOrBlank() && medicineToEdit.imageUri != medicineImagePath) {
+                    com.example.dosezy.ui.components.deleteOldImage(context, medicineToEdit.imageUri)
+                }
+
+                medicineViewModel.updateMedicine(medToSave, effectiveDate)
+                navController.previousBackStackEntry?.savedStateHandle?.set(
+                    "snackbar_message",
+                    context.getString(R.string.medication_updated_success)
+                )
+                navController.popBackStack()
+            }
+        )
+    }
 }
+

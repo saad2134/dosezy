@@ -45,6 +45,12 @@
     <string name="form_delete_medicine">お薬を削除</string>
     <string name="form_upload_img">お薬画像をアップロード</string>
     <string name="form_change_img">お薬画像を変更</string>
+    <string name="form_error_med_name_required">薬の名前は必須です</string>
+    <string name="form_error_dosage_required">用量は必須です</string>
+    <string name="form_error_dosage_invalid">用量は正の数値を入力してください</string>
+    <string name="form_error_select_days">少なくとも1日を選択してください</string>
+    <string name="form_error_course_duration">服用期間は1日以上である必要があります</string>
+    <string name="form_error_fix_fields">上記で強調表示されている必須項目を入力してください</string>
     <string name="freq_daily">毎日</string>
     <string name="freq_weekly">毎週</string>
     <string name="freq_monthly">毎月</string>
@@ -144,6 +150,10 @@
     <string name="unit_drop">滴</string>
     <string name="unit_tablet">錠</string>
     <string name="unit_capsule">カプセル</string>
+    <string name="unit_meq">mEq</string>
+    <string name="unit_puff">吸入</string>
+    <string name="unit_ampule">アンプル</string>
+    <string name="unit_spray">噴霧</string>
 
     <string name="help_title">ヘルプとサポート</string>
     <string name="help_resources">リソース</string>
@@ -362,6 +372,8 @@
     <string name="backup_saved_success">バックアップがダウンロードフォルダに正常に保存されました。</string>
     <string name="backup_section_automatic">自動</string>
     <string name="backup_section_manual">手動</string>
+    <string name="backup_tab_automatic">自動</string>
+    <string name="backup_tab_manual">手動</string>
     <string name="backup_self_hosted_title">セルフホスト バックエンドサーバー</string>
     <string name="backup_self_hosted_sub" formatted="false">100% オープンソース＆プライベート</string>
     <string name="backup_self_hosted_desc">完全なデータ主権、家族向け介護ダッシュボード、プライベートインフラ制御のために、独自のDosezyサーバーに直接接続します。</string>
@@ -430,6 +442,7 @@
     <string name="to_be_taken_in">%1$d時間%2$d分後に服用</string>
     <string name="time_diff_ago">%1$d時間%2$d分前</string>
     <string name="status_all_medications_taken">すべての薬を服用済み</string>
+    <string name="status_slot_completed_with_skipped">完了 (一部スキップ)</string>
     <string name="status_scheduled_for_this_time">この時間に予定されています</string>
     <string name="daily_frequency_presets_title">1日の服用頻度プリセット</string>
     <string name="action_edit_medicine_cd">薬を編集</string>
@@ -453,6 +466,7 @@
     <string name="pill_shape_injection">注射 (Injection)</string>
     <string name="pill_shape_drops">点眼・点滴 (Drops)</string>
     <string name="pill_shape_patch">貼付剤・湿布 (Patch)</string>
+    <string name="pill_shape_spray">スプレー (Spray)</string>
 
     <string name="med_notes_label">医師の指示・注意事項</string>
     <string name="med_notes_placeholder">例：食後服用、グレープフルーツ禁止、処方箋 #12345</string>
@@ -546,15 +560,6 @@
     <string name="about_tagline">患者様とご家族のための、完全オフライン＆プライバシー重視の服薬管理アプリ。</string>
     <string name="about_star_github">GitHub でスターをつける</string>
     <string name="about_star_github_desc">GitHub でスターをつけてオープンソースプロジェクトを応援する</string>
-    <string name="about_support_dev_title">開発を支援する</string>
-    <string name="about_support_dev_desc" formatted="false">Dosezy は完全無料、広告なし、プライバシー重視です。皆様のご支援が開発の原動力です！</string>
-    <string name="about_buymeacoffee">開発者にコーヒーをおごる</string>
-    <string name="about_buymeacoffee_desc">クレジットカードや PayPal で手軽にご支援いただけます</string>
-    <string name="about_crypto_donations">暗号資産（仮想通貨）でのご支援</string>
-    <string name="about_copied_to_clipboard">%1$s アドレスをクリップボードにコピーしました</string>
-    <string name="about_tap_to_copy">タップしてアドレスをコピー</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">GitHub Sponsors で毎月または単発の支援をする</string>
     <string name="pref_alarm_duration_title">アラームの鳴動時間</string>
     <string name="pref_alarm_duration_desc">設定した時間が経過すると自動で音と振動を停止します</string>
     <string name="alarm_duration_continuous">停止するまで鳴動</string>
@@ -564,7 +569,7 @@
     <string name="alarm_duration_1m">1 分</string>
     <string name="alarm_duration_2m">2 分</string>
     <string name="alarm_duration_5m">5 分</string>
-    <string name="alarm_silenced_auto_banner">アラームは自動停止しました — 準備ができたら服薬を記録してください</string>
+    <string name="alarm_silenced_auto_banner">アラームは自動停止しました - 準備ができたら服薬を記録してください</string>
 
     <string name="alarm_sound_custom">カスタム音声ファイル</string>
     <string name="alarm_sound_select_file">音声ファイルを選択</string>
@@ -664,16 +669,6 @@
 
     <string name="about_community_open_source">コミュニティとオープンソース</string>
     <string name="about_version_build">バージョン %1$s (ビルド %2$s)</string>
-    <string name="crypto_bitcoin">ビットコイン (BTC)</string>
-    <string name="crypto_ethereum">イーサリアム (ETH)</string>
-    <string name="crypto_solana">ソラナ (SOL)</string>
-    <string name="crypto_litecoin">ライトコイン (LTC)</string>
-    <string name="crypto_zcash">ジーキャッシュ (ZEC)</string>
-    <string name="crypto_name_btc">ビットコイン</string>
-    <string name="crypto_name_eth">イーサリアム</string>
-    <string name="crypto_name_sol">ソラナ</string>
-    <string name="crypto_name_ltc">ライトコイン</string>
-    <string name="crypto_name_zec">ジーキャッシュ</string>
     <string name="country_india">インド</string>
     <string name="country_us_ca">アメリカ / カナダ</string>
     <string name="country_uk">イギリス</string>
@@ -776,4 +771,108 @@
     <string name="stock_inventory_card_title">薬の在庫と管理</string>
     <string name="widget_configure_auto_badge">自動</string>
     <string name="dialog_validation_title">お知らせ</string>
+
+    <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
+    <string name="pref_section_appearance">外観</string>
+    <string name="pref_slide_actions_title">スライドして服用・スヌーズ</string>
+    <string name="pref_slide_actions_desc">タップの代わりにスライドして服用またはスヌーズします。</string>
+    <string name="pref_timeline_mode_title">タイムライン表示</string>
+    <string name="pref_timeline_mode_desc">今日のスケジュールを見やすい縦型タイムライン形式で表示します。</string>
+    <string name="pref_calendar_thicker_highlight_title">カレンダーの日枠表示</string>
+    <string name="pref_calendar_thicker_highlight_desc">カレンダー上の予定がある各日を色枠で囲んで強調表示します。</string>
+    <string name="alarm_slide_to_take">スライドして服用</string>
+    <string name="alarm_slide_to_take_all">スライドしてすべて服用 (%1$d)</string>
+    <string name="alarm_slide_to_snooze">スライドしてスヌーズ (%1$d分)</string>
+    <string name="home_view_standard">標準</string>
+    <string name="home_view_timeline">タイムライン</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">スヌーズ時間:</string>
+    <string name="snooze_duration_chip_format">%1$d分</string>
+    <string name="pref_custom_snooze_title">カスタムスヌーズ設定</string>
+    <string name="pref_custom_snooze_desc">アラーム鳴動時に複数のスヌーズ時間から選択できます。</string>
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">服用カウントダウン保護</string>
+    <string name="pref_intake_safeguard_desc">ADHD支援: 服用確認前のカウントダウン待機時間と注意散漫時の再アラート機能。</string>
+    <string name="pref_intake_duration_title">保護時間</string>
+    <string name="pref_intake_duration_format">%1$d分</string>
+    <string name="dialog_intake_duration_title">保護時間の選択</string>
+    <string name="notif_intake_in_progress_title">服用進行中</string>
+    <string name="notif_intake_in_progress_desc">%1$s: 服用後に確認してください</string>
+    <string name="notif_intake_action_confirm">服用を確認</string>
+    <string name="notif_intake_action_extend">+1分</string>
+    <string name="notif_intake_action_cancel">キャンセル</string>
+    <string name="notif_intake_realert_title">薬の服用が未確認です</string>
+    <string name="notif_intake_realert_desc">%1$sを服用しましたか？タップして確認またはスヌーズしてください。</string>
+    <string name="home_intake_in_progress">%1$sの服用が進行中</string>
+    <string name="home_intake_time_remaining">残り %1$s</string>
+    <string name="home_intake_confirm">服用を確認</string>
+    <string name="home_intake_extend">+1分</string>
+    <string name="home_intake_cancel">キャンセル</string>
+    <string name="home_intake_confirmed">%1$sの服用を記録しました</string>
+    <string name="home_intake_cancelled">服用保護をキャンセルしました</string>
+    <string name="alarm_realert_badge">ADHD服用再アラート</string>
+    <string name="alarm_realert_subtitle">先ほど「服用」をタップしましたが、服用が確認されていません。薬を飲みましたか？</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">すべて服用</string>
+    <string name="take_all_count">すべて服用 (%1$d)</string>
+    <string name="dialog_take_all_title">すべての薬を服用しますか？</string>
+    <string name="dialog_take_all_message">%2$sに予定されているすべての薬 (%1$d件) を服用済みにしますか？</string>
+    <string name="take_all_success_toast">すべての薬 (%1$d件) を服用済みにしました</string>
+
+    <!-- Legal, Privacy & Compliance Safeguards -->
+    <string name="notif_generic_lockscreen_reminder">予定された服薬リマインダー</string>
+    <string name="pref_lockscreen_details_title">ロック画面に詳細を表示</string>
+    <string name="pref_lockscreen_details_desc">端末のロック解除まで薬の名前と用量を非表示にします。</string>
+    <string name="disclaimer_dialog_title">医療および法的免責事項</string>
+    <string name="disclaimer_dialog_summary">Dosezyは自動服薬スケジュール補助ツールであり、医療機器ではありません。診断、用量計算、または医学的アドバイスは提供しません。処方薬の服用指示については必ず医師または薬剤師にご相談ください。</string>
+    <string name="disclaimer_checkbox_consent">医療免責事項および利用規約を理解し、同意します。</string>
+    <string name="disclaimer_action_agree">同意して続行</string>
+    <string name="disclaimer_link_medical">医療免責事項</string>
+    <string name="disclaimer_link_privacy">プライバシーポリシー</string>
+    <string name="disclaimer_link_terms">利用規約</string>
+    <string name="emergency_dispatch_warning_title">緊急連絡に関する注意事項</string>
+    <string name="emergency_dispatch_warning_desc">Dosezyは緊急通報機関ではなく、110/119等の代替手段ではありません。生命の危険がある場合は直ちに地域の緊急通報を行ってください。表示番号が現在地に対応しているかご確認ください。</string>
+    <string name="pdf_report_disclaimer_footer">Dosezy 服薬トラッカー • 自己申告情報ログ（非臨床記録）</string>
+    <string name="pharmacy_refill_estimation_disclaimer">注：補充薬の数量は登録された頻度に基づく概算です。正確な数量は薬剤師または医師にご確認ください。</string>
+    <string name="alarm_unlock_to_view_details">ロックを解除して詳細を表示</string>
+    <string name="alarm_lockscreen_details_hidden">端末のロック中は薬の名前と用量が非表示になります。</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">スケジュールの変更を適用</string>
+    <string name="schedule_effective_dialog_message">この更新されたスケジュールはいつから有効にしますか？</string>
+    <string name="schedule_effective_today_title">今日から適用</string>
+    <string name="schedule_effective_today_desc">今日から新しい時間を適用します。今日の過去の未服薬分は削除されます。</string>
+    <string name="schedule_effective_tomorrow_title">明日から適用</string>
+    <string name="schedule_effective_tomorrow_desc">今日のスケジュールをそのまま維持します。新しいスケジュールは明日から始まります。</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[遡及記録済み]</string>
+    <string name="schedule_action_dialog_title">服薬を管理</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">服用済みとしてマーク</string>
+    <string name="schedule_action_skip_dose">スキップとしてマーク</string>
+    <string name="schedule_action_undo_dose">服薬アクションを取り消す</string>
+    <string name="schedule_action_edit_note">服薬メモを編集</string>
+    <string name="schedule_action_add_note">服薬メモを追加</string>
+    <string name="schedule_dose_marked_taken">%1$s を服用済みとして記録しました</string>
+    <string name="schedule_dose_marked_skipped">%1$s をスキップとして記録しました</string>
+    <string name="schedule_dose_reverted">%1$s を保留中に戻しました</string>
+    <string name="schedule_dose_locked_notice">この服薬は48時間以上前のものであり、医療記録の正確性を保つためにロックされています。</string>
+    <string name="schedule_dose_locked_badge">ロック</string>
+    <string name="schedule_tap_to_manage">タップして管理</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">リマインダースタイル</string>
+    <string name="pref_reminder_type_desc">リマインダーをアラームまたは通常の通知として鳴らすかを選択します</string>
+    <string name="reminder_type_alarm">アラーム</string>
+    <string name="reminder_type_alarm_desc">連続音の全画面アラート。サイレントモードを無視します。</string>
+    <string name="reminder_type_notification">通知</string>
+    <string name="reminder_type_notification_desc">通知バナーとアラート音。サイレントモードを尊重します。</string>
+    <string name="reminder_type_default">プロファイルのデフォルトを使用 (%1$s)</string>
+    <string name="reminder_type_default_profile">プロファイルのデフォルトを使用</string>
+    <string name="notif_channel_notifications_name">服薬通知</string>
+    <string name="notif_channel_notifications_desc">サイレントモードを考慮した服薬スケジュールの標準通知アラート</string>
+    <string name="form_reminder_type">リマインダースタイル</string>
+    <string name="form_reminder_type_desc">重要な薬にはアラームを、サプリメントには通知を選択します</string>
 </resources>

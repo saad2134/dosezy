@@ -1,79 +1,51 @@
+/*
+ * Copyright (c) 2026 Saad <reach.saad@outlook.com> (@saad2134)
+ * Licensed under the MIT License. See LICENSE in the project root for license information.
+ */
+
 package com.example.dosezy.notifications
 
 import android.app.KeyguardManager
+import android.app.NotificationManager
 import android.content.Context
-import android.media.AudioAttributes
-import android.media.Ringtone
-import android.media.RingtoneManager
+import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
-import android.os.Vibrator
-import android.os.VibratorManager
+import android.os.LocaleList
 import android.view.KeyEvent
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Alarm
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.FastForward
-import androidx.compose.material.icons.filled.Medication
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Snooze
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import java.io.File
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import com.example.dosezy.R
-import com.example.dosezy.data.DosezyDatabase
-import com.example.dosezy.data.model.Medicine
-import com.example.dosezy.data.model.ScheduleEntry
-import com.example.dosezy.data.model.TimeFormat
-import com.example.dosezy.data.model.User
-import com.example.dosezy.data.model.getLocalizedName
-import com.example.dosezy.data.repository.ScheduleRepository
+import com.example.dosezy.data.model.Theme
+import com.example.dosezy.notifications.components.AlarmScreenContent
 import com.example.dosezy.ui.theme.DosezyTheme
-import com.example.dosezy.utils.TimeCalculationUtils
-import com.example.dosezy.utils.TimeFormatUtils
+import com.example.dosezy.ui.viewmodels.AlarmViewModel
+import com.example.dosezy.utils.LocaleHelper
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import android.media.MediaPlayer
-import androidx.lifecycle.lifecycleScope
-import com.example.dosezy.data.model.AlarmSound
-import javax.inject.Inject
+import java.lang.ref.WeakReference
 
 @AndroidEntryPoint
 class AlarmActivity : ComponentActivity() {
 
     companion object {
-        private var activeInstance: java.lang.ref.WeakReference<AlarmActivity>? = null
+        private var activeInstance: WeakReference<AlarmActivity>? = null
 
         fun stopActiveAlarm() {
             try {
@@ -89,41 +61,93 @@ class AlarmActivity : ComponentActivity() {
         }
     }
 
-    @Inject
-    lateinit var database: DosezyDatabase
+    private val alarmViewModel: AlarmViewModel by viewModels()
 
     private val activeEntryIdsState = mutableStateOf<List<String>>(emptyList())
     private val activeMedicineNameState = mutableStateOf("Medication")
     private val activeScheduledTimeState = mutableStateOf("")
+    private val activeSnoozeMinutesState = mutableStateOf(10)
 
+    private val isKeyguardLockedState = mutableStateOf(false)
 
-    override fun applyOverrideConfiguration(overrideConfiguration: android.content.res.Configuration?) {
+    private fun checkKeyguardState() {
+        val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager
+        isKeyguardLockedState.value = keyguardManager?.isKeyguardLocked == true
+    }
+
+    private fun isLockscreenPrivacyActive(): Boolean {
+        val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val defaultPref = prefs.getBoolean("lockscreen_details_enabled", true)
+        val intentPref = intent?.getBooleanExtra("allow_lockscreen_details", defaultPref) ?: defaultPref
+        val userPref = alarmViewModel.uiState.value.user?.lockscreenDetailsEnabled ?: intentPref
+        return !userPref
+    }
+
+    fun requestDeviceUnlock(onSuccess: (() -> Unit)? = null) {
+        val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            keyguardManager?.requestDismissKeyguard(this, object : KeyguardManager.KeyguardDismissCallback() {
+                override fun onDismissSucceeded() {
+                    super.onDismissSucceeded()
+                    isKeyguardLockedState.value = false
+                    onSuccess?.invoke()
+                }
+            })
+        } else {
+            // Guard: Android 7.0/7.1 (API 24/25) lacks requestDismissKeyguard; apply FLAG_DISMISS_KEYGUARD and update state directly (#BUG-KEYGUARD-API24)
+            @Suppress("DEPRECATION")
+            window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
+            isKeyguardLockedState.value = false
+            onSuccess?.invoke()
+        }
+    }
+
+    override fun applyOverrideConfiguration(overrideConfiguration: Configuration?) {
         if (overrideConfiguration != null) {
-            val savedLanguage = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(this)
-            val targetLocale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLanguage)
+            val savedLanguage = LocaleHelper.getSavedLanguage(this)
+            val targetLocale = LocaleHelper.getLocale(savedLanguage)
             overrideConfiguration.setLocale(targetLocale)
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                overrideConfiguration.setLocales(android.os.LocaleList(targetLocale))
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                overrideConfiguration.setLocales(LocaleList(targetLocale))
             }
             overrideConfiguration.setLayoutDirection(targetLocale)
         }
         super.applyOverrideConfiguration(overrideConfiguration)
     }
 
-    override fun onNewIntent(intent: android.content.Intent) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        checkKeyguardState()
         setupWindowFlags()
 
         val newId = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID) ?: ""
         val newIds = intent.getStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS) ?: if (newId.isNotEmpty()) arrayListOf(newId) else arrayListOf()
         val newMedName = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME) ?: "Medication"
         val newSchedTime = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME) ?: ""
+        val newSnoozeMinutes = intent.getIntExtra(MedicineAlarmReceiver.EXTRA_SNOOZE_MINUTES, activeSnoozeMinutesState.value)
 
         val merged = (activeEntryIdsState.value + newIds + listOf(newId)).filter { it.isNotEmpty() }.distinct()
         activeEntryIdsState.value = merged
         activeMedicineNameState.value = newMedName
         activeScheduledTimeState.value = newSchedTime
+        activeSnoozeMinutesState.value = newSnoozeMinutes
+
+        // Guard: Resume playback for incoming alarm if audio was silenced by volume rocker while activity remained open
+        alarmViewModel.startPlaybackIfNeeded(newId)
+        alarmViewModel.loadCohort(merged)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkKeyguardState()
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            checkKeyguardState()
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -131,115 +155,66 @@ class AlarmActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        activeInstance = java.lang.ref.WeakReference(this)
+        activeInstance = WeakReference(this)
 
-        // Turn screen on and unlock keyguard
+        checkKeyguardState()
+        // Turn screen on and setup window flags
         setupWindowFlags()
 
         val entryId = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID) ?: ""
         val entryIds = intent.getStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS) ?: if (entryId.isNotEmpty()) arrayListOf(entryId) else arrayListOf()
         val initialMedicineName = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME) ?: "Medication"
         val initialScheduledTime = intent.getStringExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME) ?: ""
+        // Guard: Retrieve passed snooze duration so initial UI frame defaults to user's setting before Room async load completes (#113)
+        val initialSnoozeMinutes = intent.getIntExtra(MedicineAlarmReceiver.EXTRA_SNOOZE_MINUTES, 10)
 
-        activeEntryIdsState.value = entryIds.filter { it.isNotEmpty() }.distinct()
+        val distinctIds = entryIds.filter { it.isNotEmpty() }.distinct()
+        activeEntryIdsState.value = distinctIds
         activeMedicineNameState.value = initialMedicineName
         activeScheduledTimeState.value = initialScheduledTime
+        activeSnoozeMinutesState.value = initialSnoozeMinutes
 
-        // Fallback: If AlarmAudioPlayer is not yet playing, start playback
-        if (!AlarmAudioPlayer.isPlaying()) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                var targetSound: AlarmSound = AlarmSound.SYSTEM_DEFAULT
-                var customSoundPath: String? = null
-                var autoSilenceSeconds: Int? = null
-                try {
-                    if (entryId.isNotEmpty()) {
-                        val entry = database.scheduleDao().getScheduleEntryById(entryId)
-                        if (entry != null) {
-                            val u = database.userDao().getUserByIdDirect(entry.userId)
-                            if (u != null) {
-                                targetSound = u.alarmSound
-                                customSoundPath = u.customAlarmSoundPath
-                                autoSilenceSeconds = u.alarmDurationSeconds
-                            }
-                        }
-                    }
-                    if (autoSilenceSeconds == null) {
-                        val users = database.userDao().getAllUsersDirect()
-                        val currentUser = users.find { it.isCurrentUser } ?: users.firstOrNull()
-                        if (currentUser != null) {
-                            if (targetSound == AlarmSound.SYSTEM_DEFAULT && customSoundPath == null) {
-                                targetSound = currentUser.alarmSound
-                                customSoundPath = currentUser.customAlarmSoundPath
-                            }
-                            autoSilenceSeconds = currentUser.alarmDurationSeconds
-                        }
-                    }
-                } catch (_: Exception) {}
-
-                AlarmAudioPlayer.play(
-                    context = applicationContext,
-                    sound = targetSound,
-                    customPath = customSoundPath,
-                    autoSilenceSeconds = autoSilenceSeconds ?: 0
-                )
-            }
-        }
+        // Start playback and load medication cohort via ViewModel
+        alarmViewModel.startPlaybackIfNeeded(entryId)
+        alarmViewModel.loadCohort(distinctIds)
 
         setContent {
             val context = LocalContext.current
             val prefs = remember { context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE) }
-            var spTheme by remember { mutableStateOf(prefs.getString("theme", "system")) }
-            var user by remember { mutableStateOf<User?>(null) }
-            
-            LaunchedEffect(entryId) {
-                withContext(Dispatchers.IO) {
-                    try {
-                        var targetUser: User? = null
-                        if (entryId.isNotEmpty()) {
-                            val entry = database.scheduleDao().getScheduleEntryById(entryId)
-                            if (entry != null) {
-                                targetUser = database.userDao().getUserByIdDirect(entry.userId)
-                            }
-                        }
-                        if (targetUser == null) {
-                            val users = database.userDao().getAllUsersDirect()
-                            targetUser = users.find { it.isCurrentUser } ?: users.firstOrNull()
-                        }
-                        user = targetUser
-                        targetUser?.theme?.let { theme ->
-                            val themeStr = theme.name.lowercase()
-                            if (spTheme == "system" || spTheme != themeStr) {
-                                spTheme = themeStr
-                            }
-                        }
-                    } catch (_: Exception) {}
-                }
-            }
+            val spTheme = prefs.getString("theme", "system") ?: "system"
+
+            val uiState by alarmViewModel.uiState.collectAsState()
+            val user = uiState.user
+
+            val isKeyguardLocked by isKeyguardLockedState
+            val lockscreenDetailsAllowed = user?.lockscreenDetailsEnabled
+                ?: intent.getBooleanExtra("allow_lockscreen_details", prefs.getBoolean("lockscreen_details_enabled", true))
+            val isDetailsMasked = !lockscreenDetailsAllowed && isKeyguardLocked
 
             val systemIsDark = isSystemInDarkTheme()
             val isDark = when (spTheme) {
                 "dark" -> true
                 "light" -> false
                 else -> when (user?.theme) {
-                    com.example.dosezy.data.model.Theme.DARK -> true
-                    com.example.dosezy.data.model.Theme.LIGHT -> false
+                    Theme.DARK -> true
+                    Theme.LIGHT -> false
                     else -> systemIsDark
                 }
             }
 
-            val currentLang = user?.language ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
-            val currentLocale = com.example.dosezy.utils.LocaleHelper.getLocale(currentLang)
+            val currentLang = user?.language ?: LocaleHelper.getSavedLanguage(context)
+            val currentLocale = LocaleHelper.getLocale(currentLang)
             val isRtl = currentLocale.language == "ar"
-            val layoutDirection = if (isRtl) androidx.compose.ui.unit.LayoutDirection.Rtl else androidx.compose.ui.unit.LayoutDirection.Ltr
+            val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
 
             val localizedContext = remember(currentLang) {
-                com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, currentLang)
+                LocaleHelper.updateContextLocale(context, currentLang)
             }
             val localizedConfig = remember(currentLang) {
-                val config = android.content.res.Configuration(context.resources.configuration)
+                val config = Configuration(context.resources.configuration)
                 config.setLocale(currentLocale)
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    config.setLocales(android.os.LocaleList(currentLocale))
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    config.setLocales(LocaleList(currentLocale))
                 }
                 config.setLayoutDirection(currentLocale)
                 config
@@ -248,30 +223,84 @@ class AlarmActivity : ComponentActivity() {
             val currentEntryIds by activeEntryIdsState
             val currentMedName by activeMedicineNameState
             val currentSchedTime by activeScheduledTimeState
+            val currentSnoozeMinutes by activeSnoozeMinutesState
 
-            androidx.compose.runtime.CompositionLocalProvider(
-                androidx.compose.ui.platform.LocalLayoutDirection provides layoutDirection,
-                androidx.compose.ui.platform.LocalContext provides localizedContext,
-                androidx.compose.ui.platform.LocalConfiguration provides localizedConfig
+            val dismissAction: () -> Unit = {
+                val allTargetIds = (currentEntryIds + uiState.medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
+                allTargetIds.forEach { id ->
+                    if (id.isNotEmpty()) {
+                        try {
+                            val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                            notificationManager.cancel(id.hashCode())
+                        } catch (_: Exception) {}
+                    }
+                }
+                stopAlarm()
+                finish()
+            }
+
+            CompositionLocalProvider(
+                LocalLayoutDirection provides layoutDirection,
+                LocalContext provides localizedContext,
+                LocalConfiguration provides localizedConfig
             ) {
                 DosezyTheme(darkTheme = isDark) {
-                    GroupedAlarmScreenContent(
-                        entryIds = currentEntryIds.filter { it.isNotEmpty() },
+                    AlarmScreenContent(
                         initialMedicineName = currentMedName,
                         initialScheduledTime = currentSchedTime,
-                        database = database,
+                        initialSnoozeMinutes = currentSnoozeMinutes,
+                        medicinesList = uiState.medicinesList,
+                        user = user,
+                        isLoaded = uiState.isLoaded,
                         isDarkTheme = isDark,
-                        onDismiss = {
-                            currentEntryIds.forEach { id ->
-                                if (id.isNotEmpty()) {
-                                    try {
-                                        val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-                                        notificationManager.cancel(id.hashCode())
-                                    } catch (_: Exception) {}
+                        isDetailsMasked = isDetailsMasked,
+                        isIntakeReAlert = intent?.getBooleanExtra(MedicineAlarmReceiver.EXTRA_IS_INTAKE_REALERT, false) ?: false,
+                        onUnlockRequest = { requestDeviceUnlock() },
+                        onTakeAction = {
+                            val isIntakeReAlert = intent?.getBooleanExtra(MedicineAlarmReceiver.EXTRA_IS_INTAKE_REALERT, false) ?: false
+                            // Guard: Ensure all cohort medication entry IDs are merged from intent and loaded UI state (#115)
+                            val allTargetIds = (currentEntryIds + uiState.medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
+                            if (user?.intakeSafeguardEnabled == true && !isIntakeReAlert) {
+                                // Guard: Start intake countdown timer for ADHD support on alarm dismissal (#104, #BUG-SAFEGUARD-COHORT-NAMES)
+                                val medNames = uiState.medicinesList.map { it.second.medicationName }.ifEmpty { listOf(currentMedName) }
+                                val compositeMedName = if (medNames.size > 1) medNames.joinToString(", ") else currentMedName
+                                IntakeSafeguardManager.startCountdown(
+                                    context = applicationContext,
+                                    entryId = allTargetIds.firstOrNull() ?: "",
+                                    entryIds = allTargetIds,
+                                    medicineName = compositeMedName,
+                                    medicineNames = medNames,
+                                    scheduledTime = currentSchedTime,
+                                    durationSeconds = user.intakeCountdownSeconds,
+                                    userId = user.userId
+                                )
+                                dismissAction()
+                            } else {
+                                alarmViewModel.takeCohort(allTargetIds) {
+                                    dismissAction()
                                 }
                             }
-                            stopAlarm()
-                            finish()
+                        },
+                        // Guard: Support dynamic snooze duration chosen directly on alarm screen (#103)
+                        onSnoozeAction = { minutes ->
+                            try {
+                                // Guard: Use localizedContext so snooze confirmation toast renders in the active alarm recipient's language (#BUG-ALARM-SNOOZE-TOAST-LOCALE)
+                                Toast.makeText(
+                                    context,
+                                    localizedContext.getString(R.string.alarm_snoozed_toast, minutes),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } catch (_: Exception) {}
+                            val allTargetIds = (currentEntryIds + uiState.medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
+                            alarmViewModel.snoozeCohort(allTargetIds, minutes, currentMedName) {
+                                dismissAction()
+                            }
+                        },
+                        onSkipAction = { reason ->
+                            val allTargetIds = (currentEntryIds + uiState.medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
+                            alarmViewModel.skipCohort(allTargetIds, reason) {
+                                dismissAction()
+                            }
                         }
                     )
                 }
@@ -280,20 +309,33 @@ class AlarmActivity : ComponentActivity() {
     }
 
     private fun setupWindowFlags() {
+        val lockscreenPrivacy = isLockscreenPrivacyActive()
+        val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager
+        val isLocked = keyguardManager?.isKeyguardLocked == true
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true)
             setTurnScreenOn(true)
-            val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-            keyguardManager.requestDismissKeyguard(this, null)
+            // Guard: Safe-cast KeyguardManager to prevent NullPointerException or TypeCastException crash on headless or custom OEM builds
+            // Guard: Keep keyguard locked when user has disabled lockscreen details to prevent premature PHI exposure
+            if (!lockscreenPrivacy || !isLocked) {
+                keyguardManager?.requestDismissKeyguard(this, null)
+            }
         }
         @Suppress("DEPRECATION")
-        window.addFlags(
-            WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
-                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
-                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
-                    WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
-        )
+        window.apply {
+            addFlags(
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                        WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
+                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
+                        WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
+            )
+            if (!lockscreenPrivacy || !isLocked) {
+                addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
+            } else {
+                clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
+            }
+        }
     }
 
     fun stopAlarm() {
@@ -320,544 +362,5 @@ class AlarmActivity : ComponentActivity() {
         if (activeInstance?.get() == this) {
             activeInstance = null
         }
-    }
-}
-
-@Composable
-fun GroupedAlarmScreenContent(
-    entryIds: List<String>,
-    initialMedicineName: String,
-    initialScheduledTime: String,
-    database: DosezyDatabase,
-    isDarkTheme: Boolean,
-    onDismiss: () -> Unit
-) {
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-    val scheduleRepository = remember { ScheduleRepository(database) }
-
-    var medicinesList by remember { mutableStateOf<List<Pair<ScheduleEntry, Medicine>>>(emptyList()) }
-    var user by remember { mutableStateOf<User?>(null) }
-    var isLoaded by remember { mutableStateOf(false) }
-    var showSkipReasonDialog by remember { mutableStateOf(false) }
-
-    val snoozeMinutes = user?.snoozeDuration ?: 10
-
-    val snoozeAction = {
-        // Guard: Notify user that alarm is snoozed so back press or dismissal does not leave user uncertain
-        try {
-            Toast.makeText(
-                context,
-                context.getString(R.string.alarm_snoozed_toast, snoozeMinutes),
-                Toast.LENGTH_SHORT
-            ).show()
-        } catch (_: Exception) {}
-        coroutineScope.launch {
-            withContext(Dispatchers.IO) {
-                val alarmScheduler = AlarmScheduler(context)
-                val allIds = if (medicinesList.isNotEmpty()) {
-                    medicinesList.map { it.first.entryId }
-                } else {
-                    entryIds
-                }
-                allIds.forEach { id ->
-                    alarmScheduler.cancelNagging(id)
-                }
-                if (medicinesList.isNotEmpty()) {
-                    val ids = medicinesList.map { it.first.entryId }
-                    val names = medicinesList.map { it.second.medicationName }
-                    alarmScheduler.scheduleGroupedSnooze(ids, snoozeMinutes, names, timeFormat = user?.timeFormat)
-                } else if (entryIds.isNotEmpty()) {
-                    alarmScheduler.scheduleGroupedSnooze(entryIds, snoozeMinutes, listOf(initialMedicineName), timeFormat = user?.timeFormat)
-                }
-            }
-            onDismiss()
-        }
-    }
-
-    // Guard: Intercept hardware/system back gesture to safely trigger personalized snooze with alert feedback
-    BackHandler {
-        snoozeAction()
-    }
-
-    LaunchedEffect(entryIds) {
-        withContext(Dispatchers.IO) {
-            val list = mutableListOf<Pair<ScheduleEntry, Medicine>>()
-            for (id in entryIds) {
-                val entry = database.scheduleDao().getScheduleEntryById(id)
-                if (entry != null) {
-                    val med = database.medicineDao().getMedicineByIdDirect(entry.medicineId)
-                    if (med != null) {
-                        list.add(Pair(entry, med))
-                        if (user == null) {
-                            user = database.userDao().getUserByIdDirect(entry.userId)
-                        }
-                    }
-                }
-            }
-            medicinesList = list
-            isLoaded = true
-        }
-    }
-
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .systemBarsPadding()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Top Section: Dosezy Branding, Profile Card & Scheduled Time
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                // Dosezy Branding Header
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(bottom = 10.dp)
-                ) {
-                    androidx.compose.foundation.Image(
-                        painter = androidx.compose.ui.res.painterResource(id = R.drawable.loader_icon),
-                        contentDescription = "Dosezy Logo",
-                        modifier = Modifier.size(32.dp),
-                        contentScale = androidx.compose.ui.layout.ContentScale.Fit
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Dosezy",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 24.sp,
-                            letterSpacing = 0.5.sp
-                        ),
-                        color = Color(0xFF1193D4)
-                    )
-                }
-
-                // Profile Card with "Reminder for:"
-                Surface(
-                    shape = RoundedCornerShape(20.dp),
-                    color = Color(0xFF1193D4).copy(alpha = 0.12f),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF1193D4).copy(alpha = 0.25f)),
-                    modifier = Modifier
-                        .fillMaxWidth(0.92f)
-                        .padding(bottom = 12.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
-                    ) {
-                        val profilePicPath = user?.profilePicPath?.removePrefix("file://")
-                        if (profilePicPath != null && File(profilePicPath).exists()) {
-                            AsyncImage(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(File(profilePicPath))
-                                    .crossfade(true)
-                                    .build(),
-                                contentDescription = "Profile Picture",
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .clip(RoundedCornerShape(14.dp)),
-                                contentScale = androidx.compose.ui.layout.ContentScale.Crop
-                            )
-                        } else {
-                            Box(
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .clip(RoundedCornerShape(14.dp))
-                                    .background(Color(0xFF1193D4).copy(alpha = 0.2f)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                androidx.compose.foundation.Image(
-                                    painter = androidx.compose.ui.res.painterResource(id = R.drawable.default_profile),
-                                    contentDescription = "Default Profile",
-                                    modifier = Modifier
-                                        .size(48.dp)
-                                        .clip(RoundedCornerShape(14.dp)),
-                                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
-                                )
-                            }
-                        }
-                        Spacer(modifier = Modifier.width(14.dp))
-                        Column {
-                            Text(
-                                text = stringResource(R.string.alarm_reminder_for),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 12.sp
-                            )
-                            Text(
-                                text = user?.fullName ?: stringResource(R.string.profile),
-                                style = MaterialTheme.typography.titleLarge.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 19.sp
-                                ),
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            // Guard: Use localized strings for age, gender, and profile fallback rather than hardcoded English " yrs" and "Medication Profile"
-                            val currentUser = user
-                            val detailsStr = when {
-                                currentUser != null && currentUser.age > 0 && currentUser.gender != null -> {
-                                    stringResource(R.string.profile_age_gender_format, currentUser.age, currentUser.gender.getLocalizedName())
-                                }
-                                currentUser != null && currentUser.age > 0 -> {
-                                    stringResource(R.string.years_format, currentUser.age)
-                                }
-                                currentUser != null && currentUser.gender != null -> {
-                                    currentUser.gender.getLocalizedName()
-                                }
-                                else -> ""
-                            }
-
-                            Text(
-                                text = if (detailsStr.isNotEmpty()) detailsStr else stringResource(R.string.profile),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = Color(0xFF1193D4),
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 13.sp
-                            )
-                        }
-                    }
-                }
-
-                // Guard: Format scheduled time prioritizing loaded entry time with user's preferred 12h/24h format and active locale
-                val displayTime = remember(initialScheduledTime, medicinesList, user) {
-                    val firstDt = medicinesList.firstOrNull()?.first?.scheduledDateTime
-                    val tf = user?.timeFormat ?: com.example.dosezy.data.model.TimeFormat.HOUR_12
-                    val savedLang = com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
-                    val activeLocale = com.example.dosezy.utils.LocaleHelper.getLocale(savedLang)
-                    if (firstDt != null) {
-                        com.example.dosezy.utils.TimeFormatUtils.formatTime(firstDt, tf, activeLocale)
-                    } else if (initialScheduledTime.isNotBlank()) {
-                        initialScheduledTime
-                    } else {
-                        val now = java.time.LocalTime.now()
-                        com.example.dosezy.utils.TimeFormatUtils.formatLocalTime(now, tf, activeLocale)
-                    }
-                }
-
-                Text(
-                    text = if (medicinesList.size > 1) stringResource(R.string.alarm_medication_reminder_multi, medicinesList.size) else stringResource(R.string.alarm_medication_reminder),
-                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-
-                // Enlarged Time with Alarm Icon
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(top = 6.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Alarm,
-                        contentDescription = null,
-                        tint = Color(0xFF1193D4),
-                        modifier = Modifier.size(26.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = displayTime,
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 26.sp
-                        ),
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
-
-            // Middle Section: Scrollable Medicines Checklist Region (for 5-7+ tablets)
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(vertical = 12.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                if (medicinesList.isEmpty() && isLoaded) {
-                    Card(
-                        shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(16.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Medication,
-                                contentDescription = null,
-                                tint = Color(0xFF1193D4),
-                                modifier = Modifier.size(32.dp)
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Text(
-                                    text = initialMedicineName,
-                                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                        }
-                    }
-                } else {
-                    val cardBgColor = if (isDarkTheme) Color(0xFF1A1D24) else MaterialTheme.colorScheme.surfaceVariant
-                    val cardBorder = if (isDarkTheme) androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF2D323E)) else null
-
-                    medicinesList.forEach { (entry, med) ->
-                        Card(
-                            shape = RoundedCornerShape(20.dp),
-                            colors = CardDefaults.cardColors(containerColor = cardBgColor),
-                            border = cardBorder,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    // Medicine Image in Squircle Frame
-                                    Box(
-                                        modifier = Modifier
-                                            .size(52.dp)
-                                            .clip(RoundedCornerShape(14.dp))
-                                            .background(Color(0xFF1193D4).copy(alpha = 0.15f)),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        val medImagePath = med.imageUri?.removePrefix("file://")
-                                        if (medImagePath != null && File(medImagePath).exists()) {
-                                            AsyncImage(
-                                                model = ImageRequest.Builder(LocalContext.current)
-                                                    .data(File(medImagePath))
-                                                    .crossfade(true)
-                                                    .build(),
-                                                contentDescription = "Medicine Image",
-                                                modifier = Modifier
-                                                    .fillMaxSize()
-                                                    .clip(RoundedCornerShape(14.dp)),
-                                                contentScale = androidx.compose.ui.layout.ContentScale.Crop
-                                            )
-                                        } else {
-                                            com.example.dosezy.ui.components.PillShapeVisual(
-                                                shape = med.pillShape,
-                                                colorHex = med.pillColor,
-                                                modifier = Modifier.size(32.dp)
-                                            )
-                                        }
-                                    }
-                                    Spacer(modifier = Modifier.width(14.dp))
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text(
-                                            text = med.medicationName,
-                                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                            color = MaterialTheme.colorScheme.onSurface
-                                        )
-                                        Text(
-                                            text = med.getDosageDisplay(entry.scheduledDateTime.toLocalTime()),
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                        med.currentStock?.let { stock ->
-                                            Text(
-                                                text = stringResource(R.string.alarm_stock_remaining, stock),
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = Color(0xFF2E7D32),
-                                                fontWeight = FontWeight.SemiBold
-                                            )
-                                        }
-                                        if (!med.notes.isNullOrBlank()) {
-                                            Spacer(modifier = Modifier.height(4.dp))
-                                            val noteBg = if (isDarkTheme) Color(0xFF381A05) else Color(0xFFFEF3C7)
-                                            val noteTextColor = if (isDarkTheme) Color(0xFFFDBA74) else Color(0xFF92400E)
-                                            val noteBorderColor = if (isDarkTheme) Color(0xFFF59E0B).copy(alpha = 0.35f) else Color(0xFFF59E0B).copy(alpha = 0.5f)
-                                            Surface(
-                                                shape = RoundedCornerShape(8.dp),
-                                                color = noteBg,
-                                                border = androidx.compose.foundation.BorderStroke(1.dp, noteBorderColor)
-                                            ) {
-                                                Row(
-                                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                                    verticalAlignment = Alignment.CenterVertically
-                                                ) {
-                                                    Text(
-                                                        text = "📝 ${med.notes}",
-                                                        style = MaterialTheme.typography.bodySmall,
-                                                        color = noteTextColor,
-                                                        fontWeight = FontWeight.Medium
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Bottom Section: Actions ("Take All" Green Primary & "Snooze" Orange Secondary)
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // "Take / Take All" Green Primary Button
-                Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            withContext(Dispatchers.IO) {
-                                val alarmScheduler = AlarmScheduler(context)
-                                val allIds = if (medicinesList.isNotEmpty()) {
-                                    medicinesList.map { it.first.entryId }
-                                } else {
-                                    entryIds
-                                }
-                                allIds.forEach { id ->
-                                    // Guard: Cancel both nagging and snooze alarms upfront for all cohort IDs to prevent delayed phantom snooze triggers
-                                    alarmScheduler.cancelNagging(id)
-                                    alarmScheduler.cancelSnooze(id)
-                                }
-                                val now = LocalDateTime.now()
-                                val nowStr = now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-                                val lateAfter = user?.considerLateAfter ?: 3
-                                val missedAfter = user?.considerMissedAfter ?: 6
-                                if (medicinesList.isNotEmpty()) {
-                                    medicinesList.forEach { (entry, _) ->
-                                        // Guard: Use isTakenLate so delayed/snoozed or overdue doses past missedAfter are correctly recorded as TAKEN_LATE
-                                        val status = if (TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, lateAfter)) {
-                                            "TAKEN_LATE"
-                                        } else {
-                                            "TAKEN_ON_TIME"
-                                        }
-                                        scheduleRepository.recordDoseTaken(entry.entryId, status, nowStr, context)
-                                    }
-                                } else if (entryIds.isNotEmpty()) {
-                                    entryIds.forEach { id ->
-                                        val entry = database.scheduleDao().getScheduleEntryById(id)
-                                        val entryUser = entry?.let { database.userDao().getUserByIdDirect(it.userId) } ?: user
-                                        val entryLateAfter = entryUser?.considerLateAfter ?: 3
-                                        val entryMissedAfter = entryUser?.considerMissedAfter ?: 6
-                                        // Guard: Use isTakenLate so delayed/snoozed or overdue doses past missedAfter are correctly recorded as TAKEN_LATE
-                                        val status = if (entry != null && TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, entryLateAfter)) {
-                                            "TAKEN_LATE"
-                                        } else {
-                                            "TAKEN_ON_TIME"
-                                        }
-                                        scheduleRepository.recordDoseTaken(id, status, nowStr, context)
-                                    }
-                                }
-                            }
-                            onDismiss()
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(18.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF10B981),
-                        contentColor = Color.White
-                    )
-                ) {
-                    Icon(imageVector = Icons.Default.Check, contentDescription = null, tint = Color.White)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = if (medicinesList.size > 1) stringResource(R.string.alarm_take_all, medicinesList.size) else stringResource(R.string.alarm_take_medicine),
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                        color = Color.White,
-                        fontSize = 17.sp
-                    )
-                }
-
-                // Dynamic Snooze Orange Secondary Button (Identical Size 56dp)
-                Button(
-                    onClick = { snoozeAction() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(18.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFF59E0B),
-                        contentColor = Color.White
-                    )
-                ) {
-                    Icon(imageVector = Icons.Default.Snooze, contentDescription = null, tint = Color.White)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.alarm_snooze_format, snoozeMinutes),
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                        color = Color.White,
-                        fontSize = 17.sp
-                    )
-                }
-
-                // Opt-in Skip Dose Button (Outlined)
-                if (user?.allowDoseSkipping == true) {
-                    OutlinedButton(
-                        onClick = { showSkipReasonDialog = true },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        shape = RoundedCornerShape(18.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = if (isDarkTheme) Color.White.copy(alpha = 0.85f) else MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
-                    ) {
-                        Icon(imageVector = Icons.Default.FastForward, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = if (medicinesList.size > 1) stringResource(R.string.alarm_skip_all, medicinesList.size) else stringResource(R.string.alarm_skip_medicine),
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                            fontSize = 17.sp
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    if (showSkipReasonDialog) {
-        com.example.dosezy.ui.components.SkipReasonDialog(
-            onConfirm = { reason ->
-                showSkipReasonDialog = false
-                coroutineScope.launch {
-                    withContext(Dispatchers.IO) {
-                        val alarmScheduler = AlarmScheduler(context)
-                        val allIds = if (medicinesList.isNotEmpty()) {
-                            medicinesList.map { it.first.entryId }
-                        } else {
-                            entryIds
-                        }
-                        allIds.forEach { id ->
-                            // Guard: Cancel both nagging and snooze alarms upfront for all cohort IDs to prevent delayed phantom snooze triggers when skipped
-                            alarmScheduler.cancelNagging(id)
-                            alarmScheduler.cancelSnooze(id)
-                        }
-                        if (medicinesList.isNotEmpty()) {
-                            medicinesList.forEach { (entry, _) ->
-                                scheduleRepository.recordDoseSkipped(entry.entryId, reason, context)
-                            }
-                        } else if (entryIds.isNotEmpty()) {
-                            entryIds.forEach { id ->
-                                scheduleRepository.recordDoseSkipped(id, reason, context)
-                            }
-                        }
-                    }
-                    onDismiss()
-                }
-            },
-            onDismiss = { showSkipReasonDialog = false }
-        )
     }
 }

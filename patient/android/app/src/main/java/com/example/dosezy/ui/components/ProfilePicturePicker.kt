@@ -64,8 +64,11 @@ fun ProfilePicturePicker(
     val context = LocalContext.current
     var showImageSourceDialog by remember { mutableStateOf(false) }
     var tempUri by remember { mutableStateOf<Uri?>(null) }
+    var tempFile by remember { mutableStateOf<File?>(null) }
     var showError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+
+    var uncommittedDraftPath by remember { mutableStateOf<String?>(null) }
 
     // Gallery launcher
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -73,7 +76,12 @@ fun ProfilePicturePicker(
         onResult = { uri ->
             if (uri != null) {
                 try {
-                    val savedPath = saveImageToInternalStorage(context, uri, profilePicPath)
+                    // Guard: Save image draft without deleting active saved picture; clean up prior uncommitted draft in same session
+                    val savedPath = saveImageToInternalStorage(context, uri)
+                    uncommittedDraftPath?.let { draft ->
+                        if (draft != profilePicPath) deleteOldImage(context, draft)
+                    }
+                    uncommittedDraftPath = savedPath
                     onProfilePictureSelected(savedPath)
                 } catch (e: Exception) {
                     Log.e("ProfilePicturePicker", "Gallery error: ${e.message}", e)
@@ -91,7 +99,12 @@ fun ProfilePicturePicker(
             if (success) {
                 tempUri?.let { uri ->
                     try {
-                        val savedPath = saveImageToInternalStorage(context, uri, profilePicPath)
+                        // Guard: Save image draft without deleting active saved picture; clean up prior uncommitted draft in same session
+                        val savedPath = saveImageToInternalStorage(context, uri)
+                        uncommittedDraftPath?.let { draft ->
+                            if (draft != profilePicPath) deleteOldImage(context, draft)
+                        }
+                        uncommittedDraftPath = savedPath
                         onProfilePictureSelected(savedPath)
                     } catch (e: Exception) {
                         Log.e("ProfilePicturePicker", "Camera save error: ${e.message}", e)
@@ -104,17 +117,25 @@ fun ProfilePicturePicker(
                 errorMessage = "Camera capture failed"
                 showError = true
             }
+            // Guard: Clean up temporary camera capture file from cache on both success and cancellation to prevent storage leaks
+            try {
+                tempFile?.let { if (it.exists()) it.delete() }
+            } catch (_: Exception) {}
             tempUri = null
+            tempFile = null
         }
     )
 
     // Camera open action (lambda)
     val openCamera = {
         try {
-            val uri = createImageFileUri(context)
-            if (uri != null) {
-                tempUri = uri
-                cameraLauncher.launch(uri)
+            // Guard: Clean up any prior unconfirmed camera capture file before launching new capture
+            try { tempFile?.let { if (it.exists()) it.delete() } } catch (_: Exception) {}
+            val fileResult = createImageFile(context)
+            if (fileResult != null) {
+                tempUri = fileResult.first
+                tempFile = fileResult.second
+                cameraLauncher.launch(fileResult.first)
             } else {
                 errorMessage = "Cannot create temporary file for camera"
                 showError = true
@@ -203,7 +224,11 @@ fun ProfilePicturePicker(
                     .align(Alignment.TopEnd)
                     .size(36.dp)
                     .clickable { 
-                        deleteOldImage(profilePicPath)
+                        // Guard: Only delete uncommitted draft; defer active saved image deletion until form save to prevent data loss on cancel (#BUG-02)
+                        uncommittedDraftPath?.let { draft ->
+                            deleteOldImage(context, draft)
+                            uncommittedDraftPath = null
+                        }
                         onProfilePictureSelected(null) 
                     }
             ) {
@@ -337,7 +362,8 @@ fun ImageSourceDialog(
 }
 
 // Utility function to create a file URI for camera
-private fun createImageFileUri(context: Context): Uri? {
+// Utility function to create a file and URI for camera
+internal fun createImageFile(context: Context): Pair<Uri, File>? {
     return try {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val storageDir = context.externalCacheDir ?: context.cacheDir
@@ -353,35 +379,23 @@ private fun createImageFileUri(context: Context): Uri? {
             createNewFile()
         }
 
-        FileProvider.getUriForFile(
+        val uri = FileProvider.getUriForFile(
             context,
             "${context.packageName}.provider",
             tempFile
-        ).also { uri ->
-            Log.d("ProfilePicturePicker", "Created temp file: $uri")
-        }
+        )
+        Pair(uri, tempFile)
     } catch (e: Exception) {
         Log.e("ProfilePicturePicker", "Error creating temp file: ${e.message}", e)
         null
     }
 }
 
-// Utility function to save image to internal storage
-private fun saveImageToInternalStorage(context: Context, uri: Uri, oldPath: String? = null): String {
-    // Delete old profile picture if it exists to prevent storage leak
-    if (!oldPath.isNullOrEmpty()) {
-        try {
-            val cleanPath = oldPath.removePrefix("file://")
-            val oldFile = File(cleanPath)
-            if (oldFile.exists() && (oldFile.parentFile?.canonicalPath == context.filesDir.canonicalPath || oldFile.canonicalPath.startsWith(context.filesDir.canonicalPath + File.separator))) {
-                val deleted = oldFile.delete()
-                Log.d("ProfilePicturePicker", "Deleted old image: $cleanPath, success=$deleted")
-            }
-        } catch (e: Exception) {
-            Log.e("ProfilePicturePicker", "Failed to delete old image: ${e.message}")
-        }
-    }
+// Guard: Backward compatible helper delegating to createImageFile
+fun createImageFileUri(context: Context): Uri? = createImageFile(context)?.first
 
+// Utility function to save image to internal storage
+private fun saveImageToInternalStorage(context: Context, uri: Uri): String {
     return try {
         val inputStream = context.contentResolver.openInputStream(uri)
             ?: throw IllegalStateException("Cannot open input stream")
@@ -403,12 +417,20 @@ private fun saveImageToInternalStorage(context: Context, uri: Uri, oldPath: Stri
     }
 }
 
-private fun deleteOldImage(path: String) {
+// Guard: Validate canonicalPath against context.filesDir and context.cacheDir to prevent path traversal and arbitrary sandbox file deletion
+fun deleteOldImage(context: Context, path: String?) {
+    if (path.isNullOrBlank()) return
     try {
         // Guard: Strip file:// prefix so File() can locate the file on disk without FileNotFoundException
         val cleanPath = path.removePrefix("file://")
         val file = File(cleanPath)
-        if (file.exists()) {
+        val filesDir = context.filesDir
+        val cacheDir = context.cacheDir
+        val isWithinFilesDir = file.parentFile?.canonicalPath == filesDir.canonicalPath ||
+                file.canonicalPath.startsWith(filesDir.canonicalPath + File.separator)
+        val isWithinCacheDir = file.parentFile?.canonicalPath == cacheDir.canonicalPath ||
+                file.canonicalPath.startsWith(cacheDir.canonicalPath + File.separator)
+        if (file.exists() && (isWithinFilesDir || isWithinCacheDir)) {
             val deleted = file.delete()
             Log.d("ProfilePicturePicker", "Deleted image: $cleanPath, success=$deleted")
         }
@@ -430,15 +452,23 @@ fun MedicinePhotoVisualPicker(
     var showImageSourceDialog by remember { mutableStateOf(false) }
     var showPillVisualDialog by remember { mutableStateOf(false) }
     var tempUri by remember { mutableStateOf<Uri?>(null) }
+    var tempFile by remember { mutableStateOf<File?>(null) }
     var showError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+
+    var uncommittedDraftPath by remember { mutableStateOf<String?>(null) }
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
             if (uri != null) {
                 try {
-                    val savedPath = saveImageToInternalStorage(context, uri, imagePath)
+                    // Guard: Save image draft without deleting active saved picture; clean up prior uncommitted draft in same session
+                    val savedPath = saveImageToInternalStorage(context, uri)
+                    uncommittedDraftPath?.let { draft ->
+                        if (draft != imagePath) deleteOldImage(context, draft)
+                    }
+                    uncommittedDraftPath = savedPath
                     onImageSelected(savedPath)
                 } catch (e: Exception) {
                     Log.e("ProfilePicturePicker", "Gallery error: ${e.message}", e)
@@ -455,7 +485,12 @@ fun MedicinePhotoVisualPicker(
             if (success) {
                 tempUri?.let { uri ->
                     try {
-                        val savedPath = saveImageToInternalStorage(context, uri, imagePath)
+                        // Guard: Save image draft without deleting active saved picture; clean up prior uncommitted draft in same session
+                        val savedPath = saveImageToInternalStorage(context, uri)
+                        uncommittedDraftPath?.let { draft ->
+                            if (draft != imagePath) deleteOldImage(context, draft)
+                        }
+                        uncommittedDraftPath = savedPath
                         onImageSelected(savedPath)
                     } catch (e: Exception) {
                         Log.e("ProfilePicturePicker", "Camera save error: ${e.message}", e)
@@ -464,16 +499,24 @@ fun MedicinePhotoVisualPicker(
                     }
                 }
             }
+            // Guard: Clean up temporary camera capture file from cache on both success and cancellation to prevent storage leaks
+            try {
+                tempFile?.let { if (it.exists()) it.delete() }
+            } catch (_: Exception) {}
             tempUri = null
+            tempFile = null
         }
     )
 
     val openCamera = {
         try {
-            val uri = createImageFileUri(context)
-            if (uri != null) {
-                tempUri = uri
-                cameraLauncher.launch(uri)
+            // Guard: Clean up any prior unconfirmed camera capture file before launching new capture
+            try { tempFile?.let { if (it.exists()) it.delete() } } catch (_: Exception) {}
+            val fileResult = createImageFile(context)
+            if (fileResult != null) {
+                tempUri = fileResult.first
+                tempFile = fileResult.second
+                cameraLauncher.launch(fileResult.first)
             } else {
                 errorMessage = "Cannot create temporary file for camera"
                 showError = true
@@ -554,7 +597,11 @@ fun MedicinePhotoVisualPicker(
                     .align(Alignment.TopEnd)
                     .size(32.dp)
                     .clickable {
-                        deleteOldImage(imagePath)
+                        // Guard: Only delete uncommitted draft; defer active saved image deletion until form save to prevent data loss on cancel (#BUG-02)
+                        uncommittedDraftPath?.let { draft ->
+                            deleteOldImage(context, draft)
+                            uncommittedDraftPath = null
+                        }
                         onImageSelected(null)
                     }
             ) {

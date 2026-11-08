@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Dosezy</string>
-    <string name="app_tagline">Прием лекарств — это просто</string>
+    <string name="app_tagline">Прием лекарств - это просто</string>
 
     <string name="nav_home">Главная</string>
     <string name="nav_schedule">Расписание</string>
@@ -12,7 +12,7 @@
     <string name="greeting_afternoon">Добрый день,</string>
     <string name="greeting_evening">Добрый вечер,</string>
     <string name="greeting_night">Доброй ночи,</string>
-    <string name="health_quote">\"Здоровье — это бесценное богатство.\"</string>
+    <string name="health_quote">\"Здоровье - это бесценное богатство.\"</string>
 
     <string name="home_todays_meds">Лекарства на сегодня</string>
     <string name="home_todays_adherence">Прием за сегодня</string>
@@ -45,6 +45,12 @@
     <string name="form_delete_medicine">Удалить лекарство</string>
     <string name="form_upload_img">Загрузить изображение</string>
     <string name="form_change_img">Изменить изображение</string>
+    <string name="form_error_med_name_required">Необходимо указать название лекарства</string>
+    <string name="form_error_dosage_required">Необходимо указать дозировку</string>
+    <string name="form_error_dosage_invalid">Дозировка должна быть положительным числом</string>
+    <string name="form_error_select_days">Пожалуйста, выберите хотя бы один день</string>
+    <string name="form_error_course_duration">Длительность курса должна быть не менее 1 дня</string>
+    <string name="form_error_fix_fields">Пожалуйста, заполните обязательные поля, выделенные выше</string>
     <string name="freq_daily">Ежедневно</string>
     <string name="freq_weekly">Еженедельно</string>
     <string name="freq_monthly">Ежемесячно</string>
@@ -144,6 +150,10 @@
     <string name="unit_drop">капля</string>
     <string name="unit_tablet">таблетка</string>
     <string name="unit_capsule">капсула</string>
+    <string name="unit_meq">мЭкв</string>
+    <string name="unit_puff">доза (вдох)</string>
+    <string name="unit_ampule">ампула</string>
+    <string name="unit_spray">спрей</string>
 
     <string name="help_title">Справка и поддержка</string>
     <string name="help_resources">Ресурсы</string>
@@ -169,7 +179,7 @@
 
     <string name="setup_welcome_title">Добро пожаловать в Dosezy</string>
     <string name="setup_welcome_sub">Ваш личный помощник по приему лекарств.</string>
-    <string name="setup_features_title">Ваше здоровье — это просто!</string>
+    <string name="setup_features_title">Ваше здоровье - это просто!</string>
     <string name="setup_features_sub">Ключевые возможности Dosezy</string>
     <string name="setup_feat1_title">Никогда не пропускайте прием</string>
     <string name="setup_feat1_desc">Получайте своевременные напоминания о каждом лекарстве.</string>
@@ -362,6 +372,8 @@
     <string name="backup_saved_success">Резервная копия успешно сохранена в папку «Загрузки».</string>
     <string name="backup_section_automatic">АВТОМАТИЧЕСКИ</string>
     <string name="backup_section_manual">ВРУЧНУЮ</string>
+    <string name="backup_tab_automatic">Автоматически</string>
+    <string name="backup_tab_manual">Вручную</string>
     <string name="backup_self_hosted_title">Собственный сервер бэкенда</string>
     <string name="backup_self_hosted_sub" formatted="false">100% открытый исходный код и приватность</string>
     <string name="backup_self_hosted_desc">Подключайтесь напрямую к собственному серверу Dosezy для полного суверенитета данных, панели ухода и независимого контроля.</string>
@@ -430,6 +442,7 @@
     <string name="to_be_taken_in">Принять через %1$d ч %2$d мин</string>
     <string name="time_diff_ago">%1$d ч %2$d мин назад</string>
     <string name="status_all_medications_taken">Все лекарства приняты</string>
+    <string name="status_slot_completed_with_skipped">Завершено (некоторые пропущены)</string>
     <string name="status_scheduled_for_this_time">Запланировано на это время</string>
     <string name="daily_frequency_presets_title">Предустановки частоты приема</string>
     <string name="action_edit_medicine_cd">Редактировать лекарство</string>
@@ -453,6 +466,7 @@
     <string name="pill_shape_injection">Инъекция</string>
     <string name="pill_shape_drops">Капли</string>
     <string name="pill_shape_patch">Пластырь</string>
+    <string name="pill_shape_spray">Спрей</string>
 
     <string name="med_notes_label">Указания врача и предостережения</string>
     <string name="med_notes_placeholder">напр. Принимать во время еды, Избегать грейпфрута, Рецепт #12345</string>
@@ -546,15 +560,6 @@
     <string name="about_tagline">Конфиденциальный оффлайн-помощник по приему лекарств для пациентов и близких.</string>
     <string name="about_star_github">Поставить звезду на GitHub</string>
     <string name="about_star_github_desc">Поддержите наш проект с открытым исходным кодом звездой на GitHub</string>
-    <string name="about_support_dev_title">Поддержать разработку</string>
-    <string name="about_support_dev_desc" formatted="false">Dosezy на 100% бесплатен, конфиденциален и без рекламы. Ваша поддержка помогает проекту развиваться!</string>
-    <string name="about_buymeacoffee">Купить кофе автору</string>
-    <string name="about_buymeacoffee_desc">Поддержать картой или через PayPal на BuyMeACoffee</string>
-    <string name="about_crypto_donations">Пожертвования в криптовалюте</string>
-    <string name="about_copied_to_clipboard">Адрес %1$s скопирован в буфер обмена</string>
-    <string name="about_tap_to_copy">Нажмите, чтобы скопировать адрес</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">Ежемесячная или разовая поддержка через GitHub Sponsors</string>
     <string name="pref_alarm_duration_title">Длительность звонка будильника</string>
     <string name="pref_alarm_duration_desc">Автоматически выключать звук и вибрацию через заданное время</string>
     <string name="alarm_duration_continuous">Непрерывно (до закрытия)</string>
@@ -564,7 +569,7 @@
     <string name="alarm_duration_1m">1 минута</string>
     <string name="alarm_duration_2m">2 минуты</string>
     <string name="alarm_duration_5m">5 минут</string>
-    <string name="alarm_silenced_auto_banner">Будильник автоматически выключен — отметьте прием лекарств, когда будете готовы</string>
+    <string name="alarm_silenced_auto_banner">Будильник автоматически выключен - отметьте прием лекарств, когда будете готовы</string>
 
     <string name="alarm_sound_custom">Свой звуковой файл</string>
     <string name="alarm_sound_select_file">Выбрать аудиофайл</string>
@@ -664,16 +669,6 @@
 
     <string name="about_community_open_source">Сообщество и открытый исходный код</string>
     <string name="about_version_build">Версия %1$s (Сборка %2$s)</string>
-    <string name="crypto_bitcoin">Bitcoin (BTC)</string>
-    <string name="crypto_ethereum">Ethereum (ETH)</string>
-    <string name="crypto_solana">Solana (SOL)</string>
-    <string name="crypto_litecoin">Litecoin (LTC)</string>
-    <string name="crypto_zcash">Zcash (ZEC)</string>
-    <string name="crypto_name_btc">Bitcoin</string>
-    <string name="crypto_name_eth">Ethereum</string>
-    <string name="crypto_name_sol">Solana</string>
-    <string name="crypto_name_ltc">Litecoin</string>
-    <string name="crypto_name_zec">Zcash</string>
     <string name="country_india">Индия</string>
     <string name="country_us_ca">США / Канада</string>
     <string name="country_uk">Великобритания</string>
@@ -776,4 +771,108 @@
     <string name="stock_inventory_card_title">Запас лекарств и учет</string>
     <string name="widget_configure_auto_badge">Авто</string>
     <string name="dialog_validation_title">Внимание</string>
+
+    <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
+    <string name="pref_section_appearance">Внешний вид</string>
+    <string name="pref_slide_actions_title">Свайп для приема и откладывания</string>
+    <string name="pref_slide_actions_desc">Проводите пальцем вместо нажатия для приема или повтора.</string>
+    <string name="pref_timeline_mode_title">Хронологический вид</string>
+    <string name="pref_timeline_mode_desc">Отображать расписание на сегодня в виде вертикальной шкалы времени.</string>
+    <string name="pref_calendar_thicker_highlight_title">Выделение дней рамкой</string>
+    <string name="pref_calendar_thicker_highlight_desc">Выделять каждый запланированный день в календаре цветной рамкой.</string>
+    <string name="alarm_slide_to_take">Проведите для приема</string>
+    <string name="alarm_slide_to_take_all">Проведите для приема всех (%1$d)</string>
+    <string name="alarm_slide_to_snooze">Проведите для откладывания (%1$d мин)</string>
+    <string name="home_view_standard">Стандартный</string>
+    <string name="home_view_timeline">Шкала времени</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">Отложить на:</string>
+    <string name="snooze_duration_chip_format">%1$d мин</string>
+    <string name="pref_custom_snooze_title">Пользовательский повтор сигнала</string>
+    <string name="pref_custom_snooze_desc">Выбирайте разную длительность повтора при звонке будильника.</string>
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">Защита с обратным отсчетом приема</string>
+    <string name="pref_intake_safeguard_desc">Поддержка при СДВГ: буфер обратного отсчета перед подтверждением с повторным оповещением при отвлечении.</string>
+    <string name="pref_intake_duration_title">Длительность защиты</string>
+    <string name="pref_intake_duration_format">%1$d мин</string>
+    <string name="dialog_intake_duration_title">Выбор длительности защиты</string>
+    <string name="notif_intake_in_progress_title">Прием в процессе</string>
+    <string name="notif_intake_in_progress_desc">%1$s: Подтвердите после приема</string>
+    <string name="notif_intake_action_confirm">Подтвердить прием</string>
+    <string name="notif_intake_action_extend">+1 мин</string>
+    <string name="notif_intake_action_cancel">Отмена</string>
+    <string name="notif_intake_realert_title">Лекарство не подтверждено</string>
+    <string name="notif_intake_realert_desc">Вы приняли %1$s? Нажмите, чтобы подтвердить прием или отложить.</string>
+    <string name="home_intake_in_progress">Прием в процессе для %1$s</string>
+    <string name="home_intake_time_remaining">Осталось %1$s</string>
+    <string name="home_intake_confirm">Подтвердить прием</string>
+    <string name="home_intake_extend">+1 мин</string>
+    <string name="home_intake_cancel">Отмена</string>
+    <string name="home_intake_confirmed">Прием записан для %1$s</string>
+    <string name="home_intake_cancelled">Защита приема отменена</string>
+    <string name="alarm_realert_badge">ПОВТОРНОЕ ОПОВЕЩЕНИЕ СДВГ</string>
+    <string name="alarm_realert_subtitle">Вы ранее нажали Принять, но прием не был подтвержден. Вы приняли лекарство?</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">Принять все</string>
+    <string name="take_all_count">Принять все (%1$d)</string>
+    <string name="dialog_take_all_title">Принять все лекарства?</string>
+    <string name="dialog_take_all_message">Отметить все %1$d лекарств, запланированных на %2$s, как принятые?</string>
+    <string name="take_all_success_toast">Все %1$d лекарств отмечены как принятые</string>
+
+    <!-- Legal, Privacy & Compliance Safeguards -->
+    <string name="notif_generic_lockscreen_reminder">Запланированное напоминание о приеме лекарств</string>
+    <string name="pref_lockscreen_details_title">Показывать подробности на экране блокировки</string>
+    <string name="pref_lockscreen_details_desc">Скрывать названия и дозировки до разблокировки устройства.</string>
+    <string name="disclaimer_dialog_title">Медицинский и юридический отказ от ответственности</string>
+    <string name="disclaimer_dialog_summary">Dosezy - это цифровая утилита напоминаний, которая НЕ является медицинским изделием. Приложение не ставит диагнозы, не рассчитывает дозировки и не дает клинических рекомендаций. Всегда консультируйтесь с лечащим врачом или фармацевтом.</string>
+    <string name="disclaimer_checkbox_consent">Я понимаю и принимаю медицинский отказ от ответственности и условия обслуживания.</string>
+    <string name="disclaimer_action_agree">Принять и продолжить</string>
+    <string name="disclaimer_link_medical">Медицинский отказ</string>
+    <string name="disclaimer_link_privacy">Политика конфиденциальности</string>
+    <string name="disclaimer_link_terms">Условия обслуживания</string>
+    <string name="emergency_dispatch_warning_title">Экстренное уведомление</string>
+    <string name="emergency_dispatch_warning_desc">Dosezy не является диспетчерской службой и не заменяет вызов 112/911. При угрозе жизни немедленно звоните в местную службу экстренной помощи. Убедитесь, что номер соответствует вашему региону.</string>
+    <string name="pdf_report_disclaimer_footer">Dosezy Трекер Лекарств • Информационный журнал самоотчета (Неклинический)</string>
+    <string name="pharmacy_refill_estimation_disclaimer">Примечание: Количество для пополнения является приблизительным на основе частоты приема. Уточняйте у врача или фармацевта.</string>
+    <string name="alarm_unlock_to_view_details">Разблокируйте для просмотра деталей</string>
+    <string name="alarm_lockscreen_details_hidden">Названия препаратов и дозировки скрыты, пока устройство заблокировано.</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">Применить изменения расписания</string>
+    <string name="schedule_effective_dialog_message">Когда обновленное расписание должно вступить в силу?</string>
+    <string name="schedule_effective_today_title">Начиная с сегодняшнего дня</string>
+    <string name="schedule_effective_today_desc">Применить новое время сегодня. Устаревшие непринятые дозы за сегодня будут удалены.</string>
+    <string name="schedule_effective_tomorrow_title">Начиная с завтрашнего дня</string>
+    <string name="schedule_effective_tomorrow_desc">Сохранить сегодняшнее расписание без изменений. Новое расписание начнется завтра.</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[Зарегистрировано задним числом]</string>
+    <string name="schedule_action_dialog_title">Управление дозой</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">Отметить как принятое</string>
+    <string name="schedule_action_skip_dose">Отметить как пропущенное</string>
+    <string name="schedule_action_undo_dose">Отменить действие для дозы</string>
+    <string name="schedule_action_edit_note">Редактировать заметку</string>
+    <string name="schedule_action_add_note">Добавить заметку</string>
+    <string name="schedule_dose_marked_taken">%1$s отмечен(а) как принятое</string>
+    <string name="schedule_dose_marked_skipped">%1$s отмечен(а) как пропущенное</string>
+    <string name="schedule_dose_reverted">%1$s возвращен(а) в ожидающие</string>
+    <string name="schedule_dose_locked_notice">Эта доза старше 48 часов и заблокирована для сохранения достоверности медицинской истории.</string>
+    <string name="schedule_dose_locked_badge">Заблокировано</string>
+    <string name="schedule_tap_to_manage">Нажмите для управления</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">Стиль напоминания</string>
+    <string name="pref_reminder_type_desc">Выберите, как звучат напоминания: как будильник или обычное уведомление</string>
+    <string name="reminder_type_alarm">Будильник</string>
+    <string name="reminder_type_alarm_desc">Полноэкранное оповещение с непрерывным звуком. Обходит режим Не беспокоить.</string>
+    <string name="reminder_type_notification">Уведомление</string>
+    <string name="reminder_type_notification_desc">Обычный баннер уведомления со звуковым сигналом. Учитывает режим Не беспокоить.</string>
+    <string name="reminder_type_default">Использовать по умолчанию для профиля (%1$s)</string>
+    <string name="reminder_type_default_profile">Использовать по умолчанию для профиля</string>
+    <string name="notif_channel_notifications_name">Уведомления о приеме лекарств</string>
+    <string name="notif_channel_notifications_desc">Стандартные уведомления о графике приема лекарств с учетом режима Не беспокоить</string>
+    <string name="form_reminder_type">Стиль напоминания</string>
+    <string name="form_reminder_type_desc">Выберите Будильник для важных лекарств или Уведомление для добавок</string>
 </resources>

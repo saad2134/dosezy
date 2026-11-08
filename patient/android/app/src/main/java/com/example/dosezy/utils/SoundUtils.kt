@@ -46,4 +46,23 @@ object SoundUtils {
             Pair(null, fileName)
         }
     }
+
+    // Guard: Validate canonicalPath within context.filesDir/custom_sounds to prevent internal storage leaks and path traversal when unlinking audio files
+    fun deleteCustomAudio(context: Context, path: String?): Boolean {
+        if (path.isNullOrBlank()) return false
+        return try {
+            val cleanPath = path.removePrefix("file://")
+            val file = File(cleanPath)
+            val soundsDir = File(context.filesDir, "custom_sounds")
+            if (file.exists() && (file.parentFile?.canonicalPath == soundsDir.canonicalPath ||
+                    file.canonicalPath.startsWith(soundsDir.canonicalPath + File.separator))) {
+                file.delete()
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to delete custom audio file: ${e.message}", e)
+            false
+        }
+    }
 }

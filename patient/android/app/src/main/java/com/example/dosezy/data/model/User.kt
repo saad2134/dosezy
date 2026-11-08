@@ -17,6 +17,8 @@ import java.util.UUID
     indices = [Index("userId")]
 )
 @TypeConverters(Converters::class)
+// Guard: Mark Immutable so Compose skips recomposing unchanged profile data on slower devices
+@androidx.compose.runtime.Immutable
 data class User(
     @PrimaryKey val userId: String = UUID.randomUUID().toString(),
     val profilePicPath: String? = null,
@@ -45,7 +47,20 @@ data class User(
     val hideAddMedicineNavButton: Boolean = false,
     val allowDoseUndo: Boolean = false,
     val allowDoseNotes: Boolean = false,
-    val promptDoseNotes: Boolean = false
+    val promptDoseNotes: Boolean = false,
+    // Guard: Preferences for sliding dose confirmation, home timeline view, and full-frame calendar highlight
+    val slideActionsEnabled: Boolean = true,
+    val timelineModeEnabled: Boolean = false,
+    val thickerCalendarDayHighlight: Boolean = false,
+    // Guard: ADHD support intake countdown timer safeguard with automatic re-alert if unconfirmed (#104)
+    val intakeSafeguardEnabled: Boolean = false,
+    val intakeCountdownSeconds: Int = 120,
+    // Guard: Lock screen privacy toggle to mask sensitive prescription details until unlocked (#HIPAA, #GDPR)
+    val lockscreenDetailsEnabled: Boolean = true,
+    // Guard: Toggle to display multiple custom snooze timing options during alarm alert popup
+    val customSnoozePopupEnabled: Boolean = false,
+    // Guard: Option to treat reminders as alarms or notifications (#111)
+    val reminderType: ReminderType = ReminderType.ALARM
 )
 
 enum class AlarmSound(val rawResId: Int?) {

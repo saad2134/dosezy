@@ -117,6 +117,30 @@ fun HelpSupportContent(navController: NavController) {
             }
         )
 
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Medical Disclaimer Card (#FDA, #MDR)
+        SupportCard(
+            icon = Icons.Outlined.Info,
+            title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.disclaimer_link_medical),
+            description = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.disclaimer_dialog_title),
+            onClick = {
+                openUrl(context, "https://dosezy.attenomy.com/disclaimer")
+            }
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Privacy Policy & Terms Card (#GDPR, #HIPAA)
+        SupportCard(
+            icon = Icons.Outlined.Info,
+            title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.disclaimer_link_privacy),
+            description = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.disclaimer_link_terms),
+            onClick = {
+                openUrl(context, "https://dosezy.attenomy.com/privacy")
+            }
+        )
+
         Spacer(modifier = Modifier.height(24.dp))
 
         // Contact Support Section
@@ -277,10 +301,33 @@ fun SupportCard(
 }
 
 // Utility functions for opening external apps
+// Guard: Add FLAG_ACTIVITY_NEW_TASK and sanitize dialer/email intents to prevent AndroidRuntimeException on non-Activity contexts and dialer truncation
+internal fun createSupportUrlIntent(url: String): android.content.Intent {
+    return android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url)).apply {
+        addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+}
+
+internal fun createSupportEmailIntent(email: String, subject: String): android.content.Intent {
+    return android.content.Intent(android.content.Intent.ACTION_SENDTO).apply {
+        data = android.net.Uri.parse("mailto:")
+        putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf(email))
+        putExtra(android.content.Intent.EXTRA_SUBJECT, subject)
+        addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+}
+
+internal fun createSupportDialIntent(phoneNumber: String): android.content.Intent {
+    val cleaned = phoneNumber.replace(Regex("[^0-9+*#]"), "")
+    return android.content.Intent(android.content.Intent.ACTION_DIAL).apply {
+        data = android.net.Uri.fromParts("tel", cleaned, null)
+        addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+}
+
 private fun openUrl(context: android.content.Context, url: String) {
     try {
-        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))
-        context.startActivity(intent)
+        context.startActivity(createSupportUrlIntent(url))
     } catch (e: Exception) {
         android.widget.Toast.makeText(context, context.getString(R.string.err_cannot_open_link), android.widget.Toast.LENGTH_SHORT).show()
     }
@@ -288,12 +335,7 @@ private fun openUrl(context: android.content.Context, url: String) {
 
 private fun openEmail(context: android.content.Context, email: String, subject: String) {
     try {
-        val intent = android.content.Intent(android.content.Intent.ACTION_SENDTO).apply {
-            data = android.net.Uri.parse("mailto:")
-            putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf(email))
-            putExtra(android.content.Intent.EXTRA_SUBJECT, subject)
-        }
-        context.startActivity(intent)
+        context.startActivity(createSupportEmailIntent(email, subject))
     } catch (e: Exception) {
         android.widget.Toast.makeText(context, context.getString(R.string.err_no_email_app), android.widget.Toast.LENGTH_SHORT).show()
     }
@@ -301,10 +343,7 @@ private fun openEmail(context: android.content.Context, email: String, subject: 
 
 private fun openPhone(context: android.content.Context, phoneNumber: String) {
     try {
-        val intent = android.content.Intent(android.content.Intent.ACTION_DIAL).apply {
-            data = android.net.Uri.parse("tel:$phoneNumber")
-        }
-        context.startActivity(intent)
+        context.startActivity(createSupportDialIntent(phoneNumber))
     } catch (e: Exception) {
         android.widget.Toast.makeText(context, context.getString(R.string.err_cannot_make_call), android.widget.Toast.LENGTH_SHORT).show()
     }

@@ -14,6 +14,7 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -166,5 +167,23 @@ class MedicineViewModelTest {
         viewModel.deleteMedicinePermanently(activeMedicine)
 
         coVerify { medicineRepository.deleteMedicinePermanently(activeMedicine) }
+    }
+
+    @Test
+    fun userLoggedOutOrDeleted_clearsMedicinesAndCancelsJobs() = runTest {
+        // Guard: Verify cached patient medicines are flushed and active jobs cancelled when user becomes null
+        val usersFlow = MutableStateFlow(listOf(testUser))
+        every { userRepository.getAllUsers() } returns usersFlow
+        val viewModel = createViewModel()
+
+        assertEquals(1, viewModel.medicines.value.size)
+        assertEquals(1, viewModel.archivedMedicines.value.size)
+
+        // Simulate all profiles deleted or user logged out
+        usersFlow.value = emptyList()
+
+        assertEquals(0, viewModel.medicines.value.size)
+        assertEquals(0, viewModel.archivedMedicines.value.size)
+        assertFalse(viewModel.isLoading.value)
     }
 }

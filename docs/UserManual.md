@@ -65,16 +65,22 @@ Dosezy is fully translated across all screens, notification actions, alarms, and
 2. Tap **Preferences**.
 3. Under the **General** section:
    - **Language**: Select your preferred language.
-   - **Theme**: Choose between **System Default**, **Light Mode**, or sleek **Dark Mode**.
    - **Time Format**: Select **12-Hour (AM/PM)** or **24-Hour** display.
+4. Under the **Appearance** section:
+   - **Theme**: Choose between **System Default**, **Light Mode**, or sleek **Dark Mode**.
+   - **Timeline Mode**: Toggle the vertical progress timeline mode on the Home screen.
+   - **Thicker Calendar Day Highlight**: Toggle full-frame outlines for scheduled calendar days.
+   - **Hide Navigation Add Button**: Symmetrically distribute bottom navigation tabs and place the Add button on the Medicines screen.
 
 ---
 
 ## 2. Home Dashboard, Live Status Badges & Intake Undo
 
-The **Home** screen displays your daily schedule grouped into chronological time headers (e.g., `08:00 AM`, `01:00 PM`, `08:00 PM`).
+The **Home** screen displays your daily schedule in two clean visual layouts that you can switch between instantly:
+- **Standard Card View**: Doses grouped by chronological time headers (`08:00 AM`, `01:00 PM`, etc.) with countdown badges.
+- **Timeline Mode**: An expanded vertical timeline view displaying the day's medications along a continuous progress line with color-coded status nodes (green for taken, amber for late, red for missed, blue for pending). Tap the timeline icon in the top app bar or toggle it in **Menu > Preferences > Appearance**.
 
-### Time Section Headers:
+### Time Section Headers (Standard View):
 Below each time header, Dosezy displays real-time countdown badges:
 - `To be taken in 45m`: An upcoming dose.
 - `1h 15m ago`: A dose whose time has passed.
@@ -175,7 +181,8 @@ At the top of the **Medicines** screen, an instant search bar filters large pres
 
 ### Dosage Units & Frequency Patterns:
 - **Dosage**: Enter the quantity (e.g., `1`, `500`) and select the unit:
-  - `tablet`, `capsule`, `mg`, `mcg`, `g`, `mL`, `drops`, `puffs`, or `units`.
+  - `tablet`, `capsule`, `mg`, `mcg`, `g`, `mL`, `drops`, `puffs`, `spray`, or `units`.
+- **Pill Shape Icons**: Choose from 9 distinct medication shapes: Round, Capsule, Oval, Liquid, Inhaler, Injection, Drops, Patch, and Spray bottle.
 - **Frequency Pattern**:
   - **Daily**: Every day.
   - **Weekly**: Choose specific days of the week (e.g., Mon, Wed, Fri).
@@ -205,7 +212,7 @@ When a treatment course finishes:
 When the navigation '+' button is hidden via Preferences, an **"Add Medicine"** button appears cleanly directly below your active medications roster (and above the Discontinued Medications section). On an empty roster, the friendly initial "Add Your First Medication" button guides you.
 
 ### Form Validation Feedback & Confirmation:
-When adding or editing a medication, Dosezy highlights missing fields in red with clear guidance. Saving a medication confirms success with a brief on-screen confirmation toast.
+When adding or editing a medication or patient profile, Dosezy immediately highlights any missing or invalid required fields (such as medicine name, dosage, or scheduled days) with clear red border frames and helpful error labels. This guides you directly to the required correction instead of leaving the save button disabled without explanation.
 
 ---
 
@@ -219,11 +226,23 @@ When multiple medications are scheduled for the exact same minute:
 - **SNOOZE (Orange Button)**: Pauses the alarm for your chosen snooze duration.
 - Individual pills can also be checked off one by one if taking only a subset.
 
+### Slide to Take & Slide to Snooze:
+To prevent accidental dismissals when waking up or half-asleep:
+- Dosezy features dedicated sliding action tracks: slide the green slider to the left to confirm intake (or "Take All"), and slide the orange slider to the right to snooze.
+- The two sliding actions are separated into distinct full-width tracks with clear directional arrows.
+- If you prefer immediate 1-tap buttons instead of gestures, you can turn off **Slide to Take & Snooze** in **Menu > Preferences > Notifications & Alarms**.
+
 ### Hardware Volume Rocker Silence:
 If an alarm rings during a meeting or while resting, press the **Volume Up** or **Volume Down** button on your phone. Dosezy instantly silences the ringtone and stops vibration without dismissing the alarm or requiring you to unlock your screen.
 
 ### Back-Gesture Snooze:
 Pressing your device's physical or gesture **Back** button during an active alarm automatically triggers a safe snooze for your configured duration, ensuring doses are never accidentally dismissed into a missed state.
+
+### Customizable Reminder Styles (Alarms vs Notifications):
+Under **Menu > Preferences > Notifications & Alarms > Reminder Style**, you can customize how reminders alert you:
+- **Full-Screen Alarm**: Rings with high-priority full-screen alerts and continuous audio that bypasses Do Not Disturb. Ideal for critical medications.
+- **Notification**: Delivers a standard notification banner with a gentle alert tone, respecting Do Not Disturb. Ideal for vitamins and supplements.
+- **Per-Medicine Override**: When adding or editing any medication, you can override your profile default to set specific medications to Alarm or Notification independently.
 
 ### Customizable Alarm Duration & Audio Volume:
 Go to **Menu > Preferences > Notifications & Alarms**:
@@ -286,7 +305,8 @@ When you need to reorder medicines from your local pharmacy or doctor:
 ## 9. Interactive Schedule Calendar & TalkBack Accessibility
 
 Tap **Schedule** in the bottom navigation bar to view your full medication calendar:
-- **Week & Month Views**: Tap any day (Mon–Sun) or date on the calendar to view past or future schedules.
+- **Week & Month Views**: Tap any day (Mon-Sun) or date on the calendar to view past or future schedules.
+- **Retrospective Missed Dose Logging & 48-Hour Clinical Guard**: Missed doses from yesterday or earlier within a 48-hour clinical window can be tapped directly on the calendar to open an interactive action sheet. You can mark the dose as taken (which automatically decrements medicine stock and tags the dose note with `[Logged retrospectively]` for physician audit transparency) or skipped with an explanation. Entries older than 48 hours are permanently locked to preserve clinical authenticity and prevent record tampering.
 - **Color-Coded Adherence Dots**:
   - 🟢 **Green**: All scheduled doses taken on time.
   - 🟧 **Orange**: Taken late.
@@ -294,6 +314,7 @@ Tap **Schedule** in the bottom navigation bar to view your full medication calen
   - 🔵 **Blue**: Clinically skipped doses.
 - **Fast Date Switching**: Tapping any day instantly loads that date's chronological schedule.
 - **Dose Notes in Schedule View**: Taken medications display their recorded meal and symptom notes directly under each entry. Tap any entry or note to review or update notes for that day.
+- **Thicker Calendar Day Highlight**: In **Menu > Preferences > Appearance**, turn on **Thicker Calendar Day Highlight** to display a full color-coded border frame around every calendar day with scheduled medications, rather than only bottom underlines.
 - **TalkBack Screen Reader Support**: For visually impaired users, every status badge and icon announces its exact status (e.g., *"Taken"*, *"Late"*, *"Skipped"*, *"Missed"*, *"Pending"*), rather than generic labels.
 
 ---
@@ -314,10 +335,19 @@ Tap **Analytics** from the Menu to view comprehensive compliance charts:
 The **Preferences** screen is organized into dedicated categories:
 - **General**:
   - **Language**: Selection across 12 languages.
-  - **Theme**: System Default, Light Mode, or Dark Mode.
   - **Time Format**: 12-Hour (AM/PM) or 24-Hour.
+- **Appearance**:
+  - **Theme**: System Default, Light Mode, or Dark Mode.
+  - **Timeline Mode**: Clean vertical progress timeline for daily medications on the Home screen (can also be toggled from the Home top bar).
+  - **Thicker Calendar Day Highlight**: Outlines all days with scheduled doses on the calendar with full color-coded frames instead of only bottom underlines.
   - **Hide Navigation Add Button**: Toggle to hide the center '+' button from the bottom navigation bar. When enabled, the remaining 4 tabs (`Home`, `Schedule`, `Medicines`, `Menu`) expand symmetrically across the bar (25% each), and an "Add Medicine" button is cleanly placed on the Medicines screen below your active prescriptions.
-- **Notifications & Alarms**: Default Snooze Duration (5–30 min), Custom Ringtone, Sound Volume, Alarm Duration (30s to 5m/loop).
+- **Notifications & Alarms**:
+  - **Reminder Style**: Choose between Full-Screen Alarms (continuous ringtones bypassing Do Not Disturb) and standard Notifications (alert tone respecting Do Not Disturb), with per-medication overrides.
+  - **Slide to Take & Snooze**: Dedicated sliding action tracks on full-screen alarms to prevent accidental dismissals (enabled by default; turn off for standard tap buttons).
+  - **Default Snooze Duration**: Choose 5, 10, 15, 20, or 30 minutes.
+  - **Alarm Sound**: Select custom ringtones, system alerts, or built-in chimes with audio preview.
+  - **Alarm Sound Duration**: Set ring length (30s to 5m or continuous loop).
+  - **Sound Volume**: Dedicated alarm volume slider.
 - **Dose Tracking**:
   - **Allow Dose Undo**: Toggle whether taken or late doses can be undone from dose cards or reminder snackbars (default is disabled for safety). Includes a confirmation dialog before reversing status and restoring pill stock.
   - **Add Note on Dose Taken**: Prompt for notes (meal context, side effects, symptoms) whenever a dose is marked as taken (default is disabled).
@@ -368,14 +398,18 @@ Manage medications for your whole household on a single phone:
 
 Protect your records or transfer them seamlessly to a new phone:
 
-### Exporting Backups:
+### Automatic Cloud & Self-Hosted Server Backups:
 1. Go to **Menu > Backup & Restore**.
+2. The **Automatic** tab displays network and cloud backup options, including upcoming end-to-end encrypted Cloud Sync and Self-Hosted server backups.
+
+### Exporting Manual Backups:
+1. Go to **Menu > Backup & Restore** and select the **Manual** tab.
 2. Tap **Export Backup** to generate a complete encrypted ZIP archive containing all profiles, active & archived medicines, compliance logs, and emergency contacts.
 3. Use the direct system share sheet or save the file to Google Drive, internal storage, or email.
 
 ### Selective Profile Restore & Conflict Resolution:
-1. On your new phone, install Dosezy, open **Menu > Backup & Restore**, and tap **Restore Backup**.
-2. Select your backup ZIP file. Dosezy inspects the archive with an in-front loading spinner.
+1. On your new phone, install Dosezy, open **Menu > Backup & Restore**, and switch to the **Manual** tab.
+2. Tap **Restore Backup** and select your backup ZIP file. Dosezy inspects the archive with an in-front loading spinner.
 3. The **Select Profiles to Import** dialog displays each profile found in the archive.
 4. For each conflicting profile, choose your preferred strategy:
    - **Create New Profile**: Imports the profile as a separate new user with an updated name.

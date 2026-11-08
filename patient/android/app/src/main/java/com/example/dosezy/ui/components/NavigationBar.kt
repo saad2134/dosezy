@@ -79,6 +79,8 @@ fun CustomNavigationBar(
     val borderColor = if (isDark) Color(0xFF303235) else Color(0xFFD1D5DB)
 
     val shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+    // Guard: Reuse cached Path to eliminate per-frame heap allocations during drawing on older GPUs
+    val borderPath = remember { Path() }
 
     androidx.compose.material3.Surface(
         modifier = modifier.fillMaxWidth(),
@@ -101,14 +103,15 @@ fun CustomNavigationBar(
                 .drawBehind {
                     val strokeWidth = 1.dp.toPx()
                     val r = 16.dp.toPx()
-                    val path = Path().apply {
+                    borderPath.reset()
+                    borderPath.apply {
                         moveTo(0f, r)
                         arcTo(Rect(0f, 0f, r * 2, r * 2), startAngleDegrees = 180f, sweepAngleDegrees = 90f, forceMoveTo = false)
                         lineTo(size.width - r, 0f)
                         arcTo(Rect(size.width - r * 2, 0f, size.width, r * 2), startAngleDegrees = 270f, sweepAngleDegrees = 90f, forceMoveTo = false)
                         lineTo(size.width, r)
                     }
-                    drawPath(path = path, color = borderColor, style = Stroke(width = strokeWidth))
+                    drawPath(path = borderPath, color = borderColor, style = Stroke(width = strokeWidth))
                 }
                 .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically

@@ -249,7 +249,24 @@ fun PharmacyOrderDialog(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Guard: Non-clinical estimation notice to prevent clinical dosage assumptions (#FDA, #MDR)
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = stringResource(R.string.pharmacy_refill_estimation_disclaimer),
+                        fontSize = 11.sp,
+                        lineHeight = 15.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
 
                 // Multi-Profile Selection (if multiple users exist)
                 if (allUsers.size > 1) {
@@ -389,8 +406,7 @@ fun PharmacyOrderDialog(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(14.dp))
-
+                // Guard: Single 14dp vertical spacer; duplicate spacer caused layout overflow on smaller viewports
                 Spacer(modifier = Modifier.height(14.dp))
 
                 // Options: Dosage & Stock privacy toggles
@@ -473,10 +489,12 @@ fun PharmacyOrderDialog(
                             @Composable
                             fun MedicineItemRow(med: Medicine) {
                                 val isChecked = med.medicineId in selectedMedicineIds
-                                val isDrop = med.dosageUnit == com.example.dosezy.data.model.DosageUnit.DROP ||
-                                        med.pillShape == com.example.dosezy.data.model.PillShape.DROPS
+                                val isBottle = med.dosageUnit == com.example.dosezy.data.model.DosageUnit.DROP ||
+                                        med.dosageUnit == com.example.dosezy.data.model.DosageUnit.SPRAY ||
+                                        med.pillShape == com.example.dosezy.data.model.PillShape.DROPS ||
+                                        med.pillShape == com.example.dosezy.data.model.PillShape.SPRAY
                                 val currentQty = customQuantities[med.medicineId] ?: calculateDefaultQty(med, supplyDays)
-                                val unitSuffix = if (isDrop) {
+                                val unitSuffix = if (isBottle) {
                                     if (currentQty > 1) " ${stringResource(R.string.unit_bottles)}" else " ${stringResource(R.string.unit_bottle)}"
                                 } else ""
 
@@ -541,7 +559,7 @@ fun PharmacyOrderDialog(
                                         }
                                         if (includeStockInOrder && med.currentStock != null) {
                                             // Guard: Use localized unit strings instead of hardcoded English words to ensure full localization coverage
-                                            val stockUnitStr = if (isDrop) {
+                                            val stockUnitStr = if (isBottle) {
                                                 if (med.currentStock > 1) stringResource(R.string.unit_bottles) else stringResource(R.string.unit_bottle)
                                             } else {
                                                 med.dosageUnit.getLocalizedName()

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about_support_dev_title">উন্নয়নে সহায়তা করুন</string>
+    <string name="about_support_dev_desc" formatted="false">Dosezy সম্পূর্ণ বিনামূল্যে, নিরাপদ এবং বিজ্ঞাপনহীন। আপনার অনুদান এই প্রজেক্টকে সচল রাখতে সাহায্য করে!</string>
+    <string name="about_buymeacoffee">Buy Me a Coffee-তে সাপোর্ট করুন</string>
+    <string name="about_buymeacoffee_desc">কার্ড বা PayPal-এর মাধ্যমে অনুদান প্রদান করুন</string>
+    <string name="about_crypto_donations">ক্রিপ্টোকারেন্সি অনুদান</string>
+    <string name="about_copied_to_clipboard">%1$s ঠিকানা ক্লিপবোর্ডে কপি করা হয়েছে</string>
+    <string name="about_tap_to_copy">ঠিকানা কপি করতে ট্যাপ করুন</string>
+    <string name="about_github_sponsors">GitHub Sponsors</string>
+    <string name="about_github_sponsors_desc">GitHub Sponsors-এর মাধ্যমে মাসিক বা এককালীন অনুদান দিন</string>
+    <string name="crypto_bitcoin">বিটকয়েন (BTC)</string>
+    <string name="crypto_ethereum">ইথেরিয়াম (ETH)</string>
+    <string name="crypto_solana">সোলানা (SOL)</string>
+    <string name="crypto_litecoin">লাইটকয়েন (LTC)</string>
+    <string name="crypto_zcash">জেটক্যাশ (ZEC)</string>
+    <string name="crypto_name_btc">বিটকয়েন</string>
+    <string name="crypto_name_eth">ইথেরিয়াম</string>
+    <string name="crypto_name_sol">সোলানা</string>
+    <string name="crypto_name_ltc">লাইটকয়েন</string>
+    <string name="crypto_name_zec">জেটক্যাশ</string>
+</resources>

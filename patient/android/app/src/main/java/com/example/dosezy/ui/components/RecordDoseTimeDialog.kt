@@ -67,11 +67,17 @@ fun RecordDoseTimeDialog(
     onDismiss: () -> Unit,
     onConfirm: (LocalDateTime, String?) -> Unit
 ) {
-    var selectedMode by remember { mutableStateOf(DoseTimeSelectionMode.JUST_NOW) }
-    var doseNote by remember { mutableStateOf("") }
-
     val now = remember { LocalDateTime.now() }
     val scheduledTime = entry.scheduledDateTime
+    // Guard: Past entries default to scheduled time rather than current time to prevent accidental distortion of historical records (#109)
+    val isPastEntry = remember { scheduledTime.toLocalDate().isBefore(java.time.LocalDate.now()) }
+
+    var selectedMode by remember {
+        mutableStateOf(
+            if (isPastEntry) DoseTimeSelectionMode.SCHEDULED_TIME else DoseTimeSelectionMode.JUST_NOW
+        )
+    }
+    var doseNote by remember { mutableStateOf("") }
 
     var customTime by remember {
         mutableStateOf(
@@ -134,12 +140,14 @@ fun RecordDoseTimeDialog(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                // Option 1: Just Now
-                DoseTimeOptionCard(
-                    title = stringResource(R.string.record_dose_time_just_now, formattedNow),
-                    isSelected = selectedMode == DoseTimeSelectionMode.JUST_NOW,
-                    onClick = { selectedMode = DoseTimeSelectionMode.JUST_NOW }
-                )
+                // Option 1: Just Now (only valid for current/today's doses)
+                if (!isPastEntry) {
+                    DoseTimeOptionCard(
+                        title = stringResource(R.string.record_dose_time_just_now, formattedNow),
+                        isSelected = selectedMode == DoseTimeSelectionMode.JUST_NOW,
+                        onClick = { selectedMode = DoseTimeSelectionMode.JUST_NOW }
+                    )
+                }
 
                 // Option 2: Scheduled Time
                 DoseTimeOptionCard(

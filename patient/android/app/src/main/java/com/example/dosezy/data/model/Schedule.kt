@@ -31,6 +31,8 @@ import java.time.LocalDateTime
     ]
 )
 @TypeConverters(Converters::class)
+// Guard: Mark Immutable so Compose skips recomposing unchanged items in LazyColumn on slower devices
+@androidx.compose.runtime.Immutable
 data class ScheduleEntry(
     @PrimaryKey val entryId: String,
     val userId: String,
@@ -46,3 +48,8 @@ data class ScheduleEntry(
 enum class MedicationStatus {
     PENDING, TAKEN_ON_TIME, TAKEN_LATE, MISSED, SKIPPED
 }
+
+enum class ScheduleEffectiveDate {
+    TODAY,
+    TOMORROW
+}

@@ -44,11 +44,20 @@ On the **Medicines** screen, use the search bar at the top. Simply type the name
 Rather than deleting the medicine and losing past compliance history, open the medication from the Medicines screen, tap **Edit**, and select **Discontinue / Archive**. This moves the medicine to your **Discontinued Medications** section at the bottom of the Medicines screen, neatly organized in an expandable and collapsible accordion. Past calendar logs and adherence analytics remain completely intact, and you can expand the section to reactivate any medication at any time.
 
 ### Can I customize the bottom navigation bar or hide the '+' button?
-Yes! In **Menu > Preferences > General**, turn on **Hide Navigation Add Button**. The 4 main tabs (`Home`, `Schedule`, `Medicines`, `Menu`) expand symmetrically across the bar (25% width each), and a convenient **"Add Medicine"** button appears cleanly directly below your active medications on the Medicines screen.
+Yes! In **Menu > Preferences > Appearance**, turn on **Hide Navigation Add Button**. The 4 main tabs (`Home`, `Schedule`, `Medicines`, `Menu`) expand symmetrically across the bar (25% width each), and a convenient **"Add Medicine"** button appears cleanly directly below your active medications on the Medicines screen.
+
+### Does Dosezy support sprays or inhalers?
+Yes! Dosezy supports spray formulations with a dedicated `spray` dosage unit and an intuitive `Spray` bottle shape icon, ideal for nasal, throat, and topical spray medications.
+
+### Can I view today's medication schedule as a timeline?
+Yes! Dosezy offers an optional vertical **Timeline Mode** that displays the day's medications sequentially along a continuous progress line with color-coded status nodes. You can switch between the standard card layout and timeline mode anytime by tapping the timeline icon on the Home top bar or toggling **Timeline Mode** in **Menu > Preferences > Appearance**.
 
 ---
 
 ## ⏰ Critical Full-Screen Alarms & Physical Controls
+
+### Can I choose between full-screen alarms and standard notifications?
+Yes! In **Menu > Preferences > Notifications & Alarms > Reminder Style**, you can select whether your reminders ring as **Alarms** (high-priority full-screen alerts with continuous sound that bypass Do Not Disturb) or **Notifications** (standard heads-up notification banners with audio chimes that respect Do Not Disturb). You can also set this individually per medication when adding or editing a prescription.
 
 ### What happens if I take multiple medicines at the same time?
 Dosezy automatically groups medicines scheduled for the exact same minute (e.g., 8:00 AM) into a single grouped alarm screen. You will see an interactive checklist of every medicine in that time slot with photos and meal instructions, along with a green **"Take All"** button and an orange **"Snooze"** button, preventing overlapping or conflicting alarms.
@@ -58,6 +67,9 @@ Yes! Simply press the **Volume Up** or **Volume Down** button on your device. Do
 
 ### What happens if I press the Back button or use the Back gesture during an alarm?
 Dosezy automatically triggers a safe snooze for your configured duration. This ensures that accidental back gestures or device handling do not dismiss alarms into an unmonitored pending or missed state.
+
+### How do Slide to Take and Slide to Snooze gestures work?
+To prevent accidental dismissals when waking up half-asleep, Dosezy's alarms feature dedicated sliding gesture tracks by default: slide the green track left to record doses as taken (or "Take All"), and slide the orange track right to snooze. The actions are never combined, keeping each intent distinct and safe. If you prefer immediate single-tap buttons, you can turn off **Slide to Take & Snooze** anytime in **Menu > Preferences > Notifications & Alarms**.
 
 ### Can I customize alarm sounds, duration, and volume?
 Yes! Go to **Menu > Preferences > Notifications & Alarms**:
@@ -71,6 +83,9 @@ Yes! In **Menu > Preferences > Notifications & Alarms > Default Snooze Duration*
 ---
 
 ## 📝 Clinical Dose Skipping, Intake Undo & Past Dose Logging
+
+### Can I mark a dose from yesterday or a previous day as taken?
+Yes! On the **Schedule** screen, navigate to the past date on the calendar. Dosezy allows you to tap any missed dose within a 48-hour clinical window (yesterday or today) to record it as taken or skipped with an explanation. When recorded, your pill inventory stock is automatically decremented and an audit tag `[Logged retrospectively]` is added to ensure transparency in reports for your doctor. Entries older than 48 hours are permanently locked to preserve the clinical authenticity of historical records.
 
 ### What if I took my medicine earlier but forgot to log it?
 Dosezy allows you to manually record your exact dose time. When confirming a dose later in the day, you can select the actual past time you consumed the medication instead of recording the current moment. This keeps your daily timeline and compliance records strictly accurate.
@@ -149,6 +164,9 @@ Tap the **Schedule** tab at the bottom to view the interactive day and month cal
 
 ### Is the schedule calendar accessible with TalkBack screen readers?
 Yes! Dosezy provides full accessibility support on the calendar. TalkBack announces the exact status of each dose (*"Taken"*, *"Late"*, *"Skipped"*, *"Missed"*, *"Pending"*) rather than generic status indicators.
+
+### Can I make scheduled days more visible on the calendar?
+Yes! In **Menu > Preferences > Appearance**, turn on **Thicker Calendar Day Highlight**. This outlines every day that has scheduled doses with a full color-coded border frame and subtle container tint instead of only displaying an underline, making active medication days stand out immediately.
 
 ### Where can I see my adherence percentage score?
 Go to **Menu > Analytics**. You will see your overall adherence percentage ring (e.g., `94% Adherence`), multi-ring comparisons, and total breakdowns of on-time, late, skipped, and missed doses across **Today**, **7 Days**, **30 Days**, **90 Days**, and **All Time**.

@@ -89,8 +89,12 @@ fun AnalyticsScreen(
     val selectedData = uiState.selectedData
     val breakdown = uiState.breakdown
 
+    val currentLang = currentUser?.language ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(androidx.compose.ui.platform.LocalContext.current)
+    val activeLocale = remember(currentLang) { com.example.dosezy.utils.LocaleHelper.getLocale(currentLang) }
+
+    // Guard: Format earliest date using user's active in-app language locale instead of device system default
     val sinceString = if (uiState.earliestDate != null) {
-        val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+        val formatter = remember(activeLocale) { DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(activeLocale) }
         stringResource(R.string.analytics_using_since, uiState.earliestDate!!.format(formatter))
     } else {
         stringResource(R.string.analytics_using_today)
@@ -361,7 +365,8 @@ fun UnifiedAdherenceCard(
                             horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            rangeDataList.filter { it.range != AdherenceRange.ALL }.forEach { rData ->
+                            // Guard: Exclude AdherenceRange.TOTAL so only distinct sub-periods are rendered without duplicate all-time ring (#BUG-ANALYTICS-TOTAL-RING)
+                            rangeDataList.filter { it.range != AdherenceRange.ALL && it.range != AdherenceRange.TOTAL }.forEach { rData ->
                                 val ringColor = when {
                                     rData.rate >= 80 -> Color(0xFF10B981)
                                     rData.rate >= 50 -> Color(0xFFF59E0B)

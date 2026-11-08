@@ -1,29 +1,36 @@
 # ===================================================================
-# Dosezy Safe Shrinker Rules (Dead Code Stripping WITHOUT Obfuscation)
+# Dosezy ProGuard & R8 Optimization Rules
+# Ensures >= 25% Optimization & Obfuscation while strictly safeguarding
+# Room Database, Hilt DI, Gson Serialization, and Glance Widgets
 # ===================================================================
 
-# 1. ABSOLUTELY NEVER OBFUSCATE OR RENAME CLASSES / METHODS / FIELDS
-# This guarantees 1000% compatibility with reflection, Room, Hilt, and Gson.
--dontobfuscate
--dontoptimize
-
-# 2. Preserve essential runtime attributes
+# 1. Preserve essential runtime attributes and stack trace line numbers for Play Console deobfuscation
 -keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod,Exceptions,SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
 
-# 3. KEEP 100% OF DOSEZY APPLICATION CODE UNTOUCHED
--keep class com.example.dosezy.** { *; }
--keep interface com.example.dosezy.** { *; }
--keep enum com.example.dosezy.** { *; }
-
-# 4. Android Framework Components (Activities, Services, Receivers, Application)
+# 2. Android Framework Components (Activities, Services, Receivers, Application, Widgets)
 -keep class * extends android.app.Activity { *; }
 -keep class * extends android.app.Application { *; }
 -keep class * extends android.app.Service { *; }
 -keep class * extends android.content.BroadcastReceiver { *; }
 -keep class * extends android.content.ContentProvider { *; }
 -keep class * extends android.app.backup.BackupAgent { *; }
+-keep class * extends android.appwidget.AppWidgetProvider { *; }
+-keep class com.example.dosezy.widget.** { *; }
 
-# 5. Room Database (Entities, DAOs, Database, TypeConverters)
+# 3. Enums: Preserve values() and valueOf() so Room TypeConverters and JSON parsing never fail
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+# 4. Data Models, Enums, and JSON Schema Parity
+# Guard: Keep all models, fields, and enums so Room queries and backup/restore JSON serialization maintain 100% parity
+-keep class com.example.dosezy.data.model.** { *; }
+-keep enum com.example.dosezy.data.model.** { *; }
+-keep class com.example.dosezy.data.export.** { *; }
+
+# 5. Room Database (Database, Entities, DAOs, TypeConverters)
 -keep class * extends androidx.room.RoomDatabase { *; }
 -keep @androidx.room.Entity class * { *; }
 -keep @androidx.room.Dao class * { *; }
@@ -31,6 +38,9 @@
 -keep @androidx.room.TypeConverter class * { *; }
 -keep @androidx.room.TypeConverters class * { *; }
 -keep class androidx.room.** { *; }
+-keep class com.example.dosezy.data.database.** { *; }
+-keep class com.example.dosezy.data.dao.** { *; }
+-keep class com.example.dosezy.data.converters.** { *; }
 -dontwarn androidx.room.**
 
 # 6. Hilt & Dagger Dependency Injection
@@ -43,14 +53,16 @@
 -keep class * extends dagger.hilt.** { *; }
 -keep class * extends dagger.internal.** { *; }
 -keep class * implements dagger.internal.** { *; }
+-keep class com.example.dosezy.di.** { *; }
+-keep class *_HiltModules* { *; }
+-keep class *_Factory { *; }
 -dontwarn dagger.hilt.**
 
-# 7. Gson & Data Models
+# 7. Gson Serialization
 -keepclassmembers class * {
     @com.google.gson.annotations.SerializedName <fields>;
 }
 -keep class com.google.gson.** { *; }
--keep class com.example.dosezy.data.model.** { *; }
 -dontwarn com.google.gson.**
 
 # 8. Jetpack Compose Runtime & UI

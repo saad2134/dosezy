@@ -1,0 +1,3 @@
+• Added ADHD intake countdown buffer with re-alert safeguards, home progress pill, and interactive notifications
+• Added Take All cohort actions for multi-dose slots and dynamic per-alarm snooze duration selectors
+• Reached 100% complete translation parity across all 12 supported languages, with core architecture improvements

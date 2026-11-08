@@ -45,6 +45,12 @@
     <string name="form_delete_medicine">Medikament löschen</string>
     <string name="form_upload_img">Bild hochladen</string>
     <string name="form_change_img">Bild ändern</string>
+    <string name="form_error_med_name_required">Medikamentenname ist erforderlich</string>
+    <string name="form_error_dosage_required">Dosierung ist erforderlich</string>
+    <string name="form_error_dosage_invalid">Dosierung muss eine positive Zahl sein</string>
+    <string name="form_error_select_days">Bitte mindestens einen Tag auswählen</string>
+    <string name="form_error_course_duration">Kursdauer muss mindestens 1 Tag betragen</string>
+    <string name="form_error_fix_fields">Bitte füllen Sie die oben markierten Pflichtfelder aus</string>
     <string name="freq_daily">Täglich</string>
     <string name="freq_weekly">Wöchentlich</string>
     <string name="freq_monthly">Monatlich</string>
@@ -144,6 +150,10 @@
     <string name="unit_drop">Tropfen</string>
     <string name="unit_tablet">Tablette</string>
     <string name="unit_capsule">Kapsel</string>
+    <string name="unit_meq">mEq</string>
+    <string name="unit_puff">Hub</string>
+    <string name="unit_ampule">Ampulle</string>
+    <string name="unit_spray">Sprühstoß</string>
 
     <string name="help_title">Hilfe &amp; Support</string>
     <string name="help_resources">Ressourcen</string>
@@ -266,7 +276,7 @@
     <string name="analytics_insights_start">Erfassen Sie Dosen, um detaillierte Statistiken anzuzeigen.</string>
     <string name="menu_backup_restore">Sichern &amp; Wiederherstellen</string>
     <string name="menu_sharing">Freigabe für Betreuer</string>
-    <string name="coming_soon">Soon</string>
+    <string name="coming_soon">Demnächst</string>
 
     <string name="export_file_format">Dateiformat</string>
     <string name="export_format_csv">CSV-Format</string>
@@ -362,6 +372,8 @@ Möchten Sie fortfahren?</string>
     <string name="backup_saved_success">Backup wurde erfolgreich im Download-Ordner gespeichert.</string>
     <string name="backup_section_automatic">AUTOMATISCH</string>
     <string name="backup_section_manual">MANUELL</string>
+    <string name="backup_tab_automatic">Automatisch</string>
+    <string name="backup_tab_manual">Manuell</string>
     <string name="backup_self_hosted_title">Selbst gehosteter Backend-Server</string>
     <string name="backup_self_hosted_sub" formatted="false">100% Open Source &amp; Privat</string>
     <string name="backup_self_hosted_desc">Verbinden Sie sich direkt mit Ihrer eigenen Dosezy-Serverinstanz für vollständige Datensouveränität, Pflege-Dashboard und private Infrastruktur.</string>
@@ -430,6 +442,7 @@ Möchten Sie fortfahren?</string>
     <string name="to_be_taken_in">Einzunehmen in %1$d Std. %2$d Min.</string>
     <string name="time_diff_ago">Vor %1$d Std. %2$d Min.</string>
     <string name="status_all_medications_taken">Alle Medikamente eingenommen</string>
+    <string name="status_slot_completed_with_skipped">Abgeschlossen (einige übersprungen)</string>
     <string name="status_scheduled_for_this_time">Für diese Zeit geplant</string>
     <string name="daily_frequency_presets_title">Tägliche Häufigkeitsvoreinstellungen</string>
     <string name="action_edit_medicine_cd">Medikament bearbeiten</string>
@@ -453,6 +466,7 @@ Möchten Sie fortfahren?</string>
     <string name="pill_shape_injection">Injektion</string>
     <string name="pill_shape_drops">Tropfen</string>
     <string name="pill_shape_patch">Pflaster</string>
+    <string name="pill_shape_spray">Spray</string>
 
     <string name="med_notes_label">Arzthinweise &amp; Warnungen</string>
     <string name="med_notes_placeholder">z. B. Zu den Mahlzeiten, Keine Grapefruit, Rezept #12345</string>
@@ -546,15 +560,6 @@ Möchten Sie fortfahren?</string>
     <string name="about_tagline">Privater, offline-fähiger Medikamenten-Begleiter für Patienten und Pflegende.</string>
     <string name="about_star_github">Auf GitHub mit Stern bewerten</string>
     <string name="about_star_github_desc">Unterstützen Sie unser Open-Source-Projekt mit einem Stern auf GitHub</string>
-    <string name="about_support_dev_title">Entwicklung unterstützen</string>
-    <string name="about_support_dev_desc" formatted="false">Dosezy ist 100% kostenlos, werbefrei und privat. Ihre Spenden halten das Projekt am Leben!</string>
-    <string name="about_buymeacoffee">Kauf mir einen Kaffee</string>
-    <string name="about_buymeacoffee_desc">Unterstützen per Karte oder PayPal auf BuyMeACoffee</string>
-    <string name="about_crypto_donations">Krypto-Spenden</string>
-    <string name="about_copied_to_clipboard">%1$s-Adresse in die Zwischenablage kopiert</string>
-    <string name="about_tap_to_copy">Tippen zum Kopieren der Adresse</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">Monatlich oder einmalig über GitHub Sponsors unterstützen</string>
     <string name="pref_alarm_duration_title">Alarm-Klingeldauer</string>
     <string name="pref_alarm_duration_desc">Ton und Vibration nach einer festgelegten Zeit automatisch stummschalten</string>
     <string name="alarm_duration_continuous">Durchgehend (bis zum Schließen)</string>
@@ -564,7 +569,7 @@ Möchten Sie fortfahren?</string>
     <string name="alarm_duration_1m">1 Minute</string>
     <string name="alarm_duration_2m">2 Minuten</string>
     <string name="alarm_duration_5m">5 Minuten</string>
-    <string name="alarm_silenced_auto_banner">Alarm automatisch stummgeschaltet — erfassen Sie Ihre Dosen, wenn Sie bereit sind</string>
+    <string name="alarm_silenced_auto_banner">Alarm automatisch stummgeschaltet - erfassen Sie Ihre Dosen, wenn Sie bereit sind</string>
 
     <string name="alarm_sound_custom">Eigene Audiodatei</string>
     <string name="alarm_sound_select_file">Audiodatei auswählen</string>
@@ -662,18 +667,8 @@ Möchten Sie fortfahren?</string>
     <string name="menu_pharmacy_order_desc">Medikamentenbestellungen erstellen und über WhatsApp teilen</string>
     <string name="pharmacy_order_markdown_preview">Markdown-Vorschau</string>
 
-    <string name="about_community_open_source">Community &amp; Open Source</string>
+    <string name="about_community_open_source">Gemeinschaft &amp; Open Source</string>
     <string name="about_version_build">Version %1$s (Build %2$s)</string>
-    <string name="crypto_bitcoin">Bitcoin (BTC)</string>
-    <string name="crypto_ethereum">Ethereum (ETH)</string>
-    <string name="crypto_solana">Solana (SOL)</string>
-    <string name="crypto_litecoin">Litecoin (LTC)</string>
-    <string name="crypto_zcash">Zcash (ZEC)</string>
-    <string name="crypto_name_btc">Bitcoin</string>
-    <string name="crypto_name_eth">Ethereum</string>
-    <string name="crypto_name_sol">Solana</string>
-    <string name="crypto_name_ltc">Litecoin</string>
-    <string name="crypto_name_zec">Zcash</string>
     <string name="country_india">Indien</string>
     <string name="country_us_ca">Vereinigte Staaten / Kanada</string>
     <string name="country_uk">Großbritannien</string>
@@ -729,7 +724,7 @@ Möchten Sie fortfahren?</string>
     <string name="about_developer_github">GitHub-Profil</string>
     <string name="about_features_title">Warum Dosezy?</string>
     <string name="about_feat_offline_title" formatted="false">100 % offline &amp; privat</string>
-    <string name="about_feat_offline_desc">Alle Daten bleiben sicher auf Ihrem Gerät – ganz ohne Cloud oder Tracker.</string>
+    <string name="about_feat_offline_desc">Alle Daten bleiben sicher auf Ihrem Gerät - ganz ohne Cloud oder Tracker.</string>
     <string name="about_feat_smart_alarms_title">Zuverlässige Wecker &amp; Zeitzonen</string>
     <string name="about_feat_smart_alarms_desc">Präzise Erinnerungen, die Ihr Gerät wecken und Zeitzonenwechsel automatisch anpassen.</string>
     <string name="about_feat_family_title">Familienpflege mit Profilen</string>
@@ -776,4 +771,108 @@ Möchten Sie fortfahren?</string>
     <string name="stock_inventory_card_title">Medikamentenvorrat &amp; Bestand</string>
     <string name="widget_configure_auto_badge">Auto</string>
     <string name="dialog_validation_title">Hinweis</string>
+
+    <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
+    <string name="pref_section_appearance">Erscheinungsbild</string>
+    <string name="pref_slide_actions_title">Wischen zum Einnehmen &amp; Schlummern</string>
+    <string name="pref_slide_actions_desc">Wischen statt tippen zum Einnehmen oder Schlummern.</string>
+    <string name="pref_timeline_mode_title">Zeitachsen-Ansicht</string>
+    <string name="pref_timeline_mode_desc">Zeigt den heutigen Einnahmeplan in einer übersichtlichen vertikalen Zeitleiste an.</string>
+    <string name="pref_calendar_thicker_highlight_title">Vollständige Tagesumrandung</string>
+    <string name="pref_calendar_thicker_highlight_desc">Umrandet jeden geplanten Kalendertag mit einem farbigen Rahmen.</string>
+    <string name="alarm_slide_to_take">Zum Einnehmen wischen</string>
+    <string name="alarm_slide_to_take_all">Alle einnehmen (%1$d)</string>
+    <string name="alarm_slide_to_snooze">Zum Schlummern wischen (%1$d Min)</string>
+    <string name="home_view_standard">Standard</string>
+    <string name="home_view_timeline">Zeitleiste</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">Schlummern für:</string>
+    <string name="snooze_duration_chip_format">%1$d Min</string>
+    <string name="pref_custom_snooze_title">Benutzerdefinierter Schlummermodus</string>
+    <string name="pref_custom_snooze_desc">Wählen Sie beim Weckruf aus verschiedenen Schlummerdauern.</string>
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">Einnahme-Countdown-Schutz</string>
+    <string name="pref_intake_safeguard_desc">ADHS-Unterstützung: Countdown-Puffer vor der Bestätigung der Einnahme mit erneuter Erinnerung bei Ablenkung.</string>
+    <string name="pref_intake_duration_title">Schutzdauer</string>
+    <string name="pref_intake_duration_format">%1$d Minuten</string>
+    <string name="dialog_intake_duration_title">Schutzdauer auswählen</string>
+    <string name="notif_intake_in_progress_title">Einnahme läuft</string>
+    <string name="notif_intake_in_progress_desc">%1$s: Nach der Einnahme bestätigen</string>
+    <string name="notif_intake_action_confirm">Einnahme bestätigen</string>
+    <string name="notif_intake_action_extend">+1 Min</string>
+    <string name="notif_intake_action_cancel">Abbrechen</string>
+    <string name="notif_intake_realert_title">Medikament nicht bestätigt</string>
+    <string name="notif_intake_realert_desc">Haben Sie %1$s eingenommen? Tippen Sie zum Bestätigen oder Schlummern.</string>
+    <string name="home_intake_in_progress">Einnahme läuft für %1$s</string>
+    <string name="home_intake_time_remaining">Noch %1$s</string>
+    <string name="home_intake_confirm">Einnahme bestätigen</string>
+    <string name="home_intake_extend">+1 Min</string>
+    <string name="home_intake_cancel">Abbrechen</string>
+    <string name="home_intake_confirmed">Einnahme erfasst für %1$s</string>
+    <string name="home_intake_cancelled">Einnahmeschutz abgebrochen</string>
+    <string name="alarm_realert_badge">ADHS-EINNAHME-WIEDERHOLUNG</string>
+    <string name="alarm_realert_subtitle">Sie haben zuvor auf Einnehmen getippt, aber die Einnahme wurde nicht bestätigt. Haben Sie Ihr Medikament eingenommen?</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">Alle einnehmen</string>
+    <string name="take_all_count">Alle einnehmen (%1$d)</string>
+    <string name="dialog_take_all_title">Alle Medikamente einnehmen?</string>
+    <string name="dialog_take_all_message">Alle %1$d für %2$s geplanten Medikamente als eingenommen markieren?</string>
+    <string name="take_all_success_toast">Alle %1$d Medikamente als eingenommen markiert</string>
+
+    <!-- Legal, Privacy & Compliance Safeguards -->
+    <string name="notif_generic_lockscreen_reminder">Geplante Medikamentenerinnerung</string>
+    <string name="pref_lockscreen_details_title">Details auf Sperrbildschirm anzeigen</string>
+    <string name="pref_lockscreen_details_desc">Medikamentennamen und Dosierung bis zum Entsperren ausblenden.</string>
+    <string name="disclaimer_dialog_title">Medizinischer &amp; rechtlicher Haftungsausschluss</string>
+    <string name="disclaimer_dialog_summary">Dosezy ist eine automatisierte digitale Erinnerungshilfe und KEIN reguliertes Medizinprodukt. Es bietet keine Diagnosen, Dosisberechnungen oder medizinische Beratung. Konsultieren Sie bei Fragen zur Einnahme stets Ihren Arzt oder Apotheker.</string>
+    <string name="disclaimer_checkbox_consent">Ich verstehe und akzeptiere den medizinischen Haftungsausschluss und die Nutzungsbedingungen.</string>
+    <string name="disclaimer_action_agree">Akzeptieren &amp; Fortfahren</string>
+    <string name="disclaimer_link_medical">Medizinischer Haftungsausschluss</string>
+    <string name="disclaimer_link_privacy">Datenschutzerklärung</string>
+    <string name="disclaimer_link_terms">Nutzungsbedingungen</string>
+    <string name="emergency_dispatch_warning_title">Notfallhinweis</string>
+    <string name="emergency_dispatch_warning_desc">Dosezy ist kein Notrufdienst und kein Ersatz für 112/911. Wählen Sie in lebensbedrohlichen Situationen direkt den örtlichen Notruf. Prüfen Sie, ob die angezeigte Nummer für Ihre Region gilt.</string>
+    <string name="pdf_report_disclaimer_footer">Dosezy Medikamenten-Tracker • Selbstauskunft-Informationsprotokoll (Nicht-Klinisch)</string>
+    <string name="pharmacy_refill_estimation_disclaimer">Hinweis: Nachfüllmengen sind Näherungswerte basierend auf der Einnahmehäufigkeit. Stimmen Sie sich mit Arzt oder Apotheker ab.</string>
+    <string name="alarm_unlock_to_view_details">Entsperren, um Details anzuzeigen</string>
+    <string name="alarm_lockscreen_details_hidden">Medikamentennamen und Dosierungen sind bei gesperrtem Gerät ausgeblendet.</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">Planänderungen anwenden</string>
+    <string name="schedule_effective_dialog_message">Wann soll der aktualisierte Plan in Kraft treten?</string>
+    <string name="schedule_effective_today_title">Ab heute</string>
+    <string name="schedule_effective_today_desc">Neue Zeiten ab heute anwenden. Veraltete, nicht eingenommene Dosen von heute werden entfernt.</string>
+    <string name="schedule_effective_tomorrow_title">Ab morgen</string>
+    <string name="schedule_effective_tomorrow_desc">Heutigen Plan beibehalten. Der neue Plan beginnt morgen.</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[Nachträglich erfasst]</string>
+    <string name="schedule_action_dialog_title">Dosis verwalten</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">Als eingenommen markieren</string>
+    <string name="schedule_action_skip_dose">Als übersprungen markieren</string>
+    <string name="schedule_action_undo_dose">Dosis-Aktion rückgängig machen</string>
+    <string name="schedule_action_edit_note">Dosisnotiz bearbeiten</string>
+    <string name="schedule_action_add_note">Dosisnotiz hinzufügen</string>
+    <string name="schedule_dose_marked_taken">%1$s als eingenommen markiert</string>
+    <string name="schedule_dose_marked_skipped">%1$s als übersprungen markiert</string>
+    <string name="schedule_dose_reverted">%1$s auf ausstehend zurückgesetzt</string>
+    <string name="schedule_dose_locked_notice">Diese Dosis ist älter als 48 Stunden und gesperrt, um die Integrität der medizinischen Historie zu wahren.</string>
+    <string name="schedule_dose_locked_badge">Gesperrt</string>
+    <string name="schedule_tap_to_manage">Tippen zum Verwalten</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">Erinnerungsstil</string>
+    <string name="pref_reminder_type_desc">Wählen Sie, ob Erinnerungen als Alarm oder Standardbenachrichtigung ertönen</string>
+    <string name="reminder_type_alarm">Alarm</string>
+    <string name="reminder_type_alarm_desc">Vollbild-Alarm mit Dauerton. Umgeht Bitte nicht stören.</string>
+    <string name="reminder_type_notification">Benachrichtigung</string>
+    <string name="reminder_type_notification_desc">Standard-Banner mit Signalton. Respektiert Bitte nicht stören.</string>
+    <string name="reminder_type_default">Profil-Standard verwenden (%1$s)</string>
+    <string name="reminder_type_default_profile">Profil-Standard verwenden</string>
+    <string name="notif_channel_notifications_name">Medikamenten-Benachrichtigungen</string>
+    <string name="notif_channel_notifications_desc">Standard-Benachrichtigungen für Medikamentenpläne, die Bitte nicht stören beachten</string>
+    <string name="form_reminder_type">Erinnerungsstil</string>
+    <string name="form_reminder_type_desc">Wählen Sie Alarm für wichtige Medikamente oder Benachrichtigung für Nahrungsergänzungsmittel</string>
 </resources>

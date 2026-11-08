@@ -45,6 +45,12 @@
     <string name="form_delete_medicine">Elimina Farmaco</string>
     <string name="form_upload_img">Carica Immagine</string>
     <string name="form_change_img">Cambia Immagine</string>
+    <string name="form_error_med_name_required">Il nome del farmaco è obbligatorio</string>
+    <string name="form_error_dosage_required">Il dosaggio è obbligatorio</string>
+    <string name="form_error_dosage_invalid">Il dosaggio deve essere un numero positivo</string>
+    <string name="form_error_select_days">Seleziona almeno un giorno</string>
+    <string name="form_error_course_duration">La durata del ciclo deve essere di almeno 1 giorno</string>
+    <string name="form_error_fix_fields">Compila i campi obbligatori evidenziati sopra</string>
     <string name="freq_daily">Giornaliero</string>
     <string name="freq_weekly">Settimanale</string>
     <string name="freq_monthly">Mensile</string>
@@ -144,6 +150,10 @@
     <string name="unit_drop">goccia</string>
     <string name="unit_tablet">compressa</string>
     <string name="unit_capsule">capsula</string>
+    <string name="unit_meq">mEq</string>
+    <string name="unit_puff">erogazione</string>
+    <string name="unit_ampule">fiala</string>
+    <string name="unit_spray">spruzzo</string>
 
     <string name="help_title">Aiuto e Supporto</string>
     <string name="help_resources">Risorse</string>
@@ -362,6 +372,8 @@ Vuoi continuare?</string>
     <string name="backup_saved_success">Il backup è stato salvato con successo nella cartella Download.</string>
     <string name="backup_section_automatic">AUTOMATICO</string>
     <string name="backup_section_manual">MANUALE</string>
+    <string name="backup_tab_automatic">Automatico</string>
+    <string name="backup_tab_manual">Manuale</string>
     <string name="backup_self_hosted_title">Server backend self-hosted</string>
     <string name="backup_self_hosted_sub" formatted="false">100% Open Source e privato</string>
     <string name="backup_self_hosted_desc">Collegati direttamente alla tua istanza server Dosezy per la piena sovranità dei dati, dashboard per i caregiver e controllo privato dell\'infrastruttura.</string>
@@ -430,6 +442,7 @@ Vuoi continuare?</string>
     <string name="to_be_taken_in">Da assumere tra %1$dh %2$dm</string>
     <string name="time_diff_ago">%1$dh %2$dm fa</string>
     <string name="status_all_medications_taken">Tutti i farmaci assunti</string>
+    <string name="status_slot_completed_with_skipped">Completato (alcuni saltati)</string>
     <string name="status_scheduled_for_this_time">Programmato per quest\'ora</string>
     <string name="daily_frequency_presets_title">Preimpostazioni frequenza giornaliera</string>
     <string name="action_edit_medicine_cd">Modifica farmaco</string>
@@ -453,6 +466,7 @@ Vuoi continuare?</string>
     <string name="pill_shape_injection">Iniezione</string>
     <string name="pill_shape_drops">Gocce</string>
     <string name="pill_shape_patch">Cerotto</string>
+    <string name="pill_shape_spray">Spray</string>
 
     <string name="med_notes_label">Note del medico e avvertenze</string>
     <string name="med_notes_placeholder">es. Assumere a stomaco pieno, Evitare pompelmo, Ricetta #12345</string>
@@ -546,15 +560,6 @@ Vuoi continuare?</string>
     <string name="about_tagline">Compagno di terapia privato e offline per pazienti e assistenti.</string>
     <string name="about_star_github">Metti una stella su GitHub</string>
     <string name="about_star_github_desc">Supporta il nostro progetto open source mettendo una stella su GitHub</string>
-    <string name="about_support_dev_title">Supporta lo sviluppo</string>
-    <string name="about_support_dev_desc" formatted="false">Dosezy è al 100% gratuito, privato e senza pubblicità. Le tue donazioni aiutano il progetto!</string>
-    <string name="about_buymeacoffee">Offrimi un caffè</string>
-    <string name="about_buymeacoffee_desc">Supporta con carta o PayPal su BuyMeACoffee</string>
-    <string name="about_crypto_donations">Donazioni in criptovalute</string>
-    <string name="about_copied_to_clipboard">Indirizzo %1$s copiato negli appunti</string>
-    <string name="about_tap_to_copy">Tocca per copiare l\'indirizzo</string>
-    <string name="about_github_sponsors">GitHub Sponsors</string>
-    <string name="about_github_sponsors_desc">Supporta mensilmente o una tantum tramite GitHub Sponsors</string>
     <string name="pref_alarm_duration_title">Durata suoneria allarme</string>
     <string name="pref_alarm_duration_desc">Silenzia automaticamente audio e vibrazione dopo il tempo impostato</string>
     <string name="alarm_duration_continuous">Continuo (fino a chiusura)</string>
@@ -564,7 +569,7 @@ Vuoi continuare?</string>
     <string name="alarm_duration_1m">1 minuto</string>
     <string name="alarm_duration_2m">2 minuti</string>
     <string name="alarm_duration_5m">5 minuti</string>
-    <string name="alarm_silenced_auto_banner">Allarme silenziato automaticamente — registra le dosi quando sei pronto</string>
+    <string name="alarm_silenced_auto_banner">Allarme silenziato automaticamente - registra le dosi quando sei pronto</string>
 
     <string name="alarm_sound_custom">File audio personalizzato</string>
     <string name="alarm_sound_select_file">Scegli file audio</string>
@@ -662,18 +667,8 @@ Vuoi continuare?</string>
     <string name="menu_pharmacy_order_desc">Genera e condividi ordini di farmaci su WhatsApp</string>
     <string name="pharmacy_order_markdown_preview">Anteprima Markdown</string>
 
-    <string name="about_community_open_source">Community &amp; Open Source</string>
+    <string name="about_community_open_source">Comunità e open source</string>
     <string name="about_version_build">Versione %1$s (Build %2$s)</string>
-    <string name="crypto_bitcoin">Bitcoin (BTC)</string>
-    <string name="crypto_ethereum">Ethereum (ETH)</string>
-    <string name="crypto_solana">Solana (SOL)</string>
-    <string name="crypto_litecoin">Litecoin (LTC)</string>
-    <string name="crypto_zcash">Zcash (ZEC)</string>
-    <string name="crypto_name_btc">Bitcoin</string>
-    <string name="crypto_name_eth">Ethereum</string>
-    <string name="crypto_name_sol">Solana</string>
-    <string name="crypto_name_ltc">Litecoin</string>
-    <string name="crypto_name_zec">Zcash</string>
     <string name="country_india">India</string>
     <string name="country_us_ca">Stati Uniti / Canada</string>
     <string name="country_uk">Regno Unito</string>
@@ -776,4 +771,108 @@ Vuoi continuare?</string>
     <string name="stock_inventory_card_title">Scorta e inventario farmaci</string>
     <string name="widget_configure_auto_badge">Auto</string>
     <string name="dialog_validation_title">Avviso</string>
+
+    <!-- Appearance, Sliding Actions, Timeline &amp; Thicker Calendar Highlight -->
+    <string name="pref_section_appearance">Aspetto</string>
+    <string name="pref_slide_actions_title">Scorri per Assumere e Posporre</string>
+    <string name="pref_slide_actions_desc">Scorri invece di toccare per assumere o posporre.</string>
+    <string name="pref_timeline_mode_title">Vista Sequenza Temporale</string>
+    <string name="pref_timeline_mode_desc">Mostra il programma di oggi in una sequenza temporale verticale chiara.</string>
+    <string name="pref_calendar_thicker_highlight_title">Cornice Completa Giorni</string>
+    <string name="pref_calendar_thicker_highlight_desc">Evidenzia ciascun giorno programmato nel calendario con una cornice colorata intera.</string>
+    <string name="alarm_slide_to_take">Scorri per assumere</string>
+    <string name="alarm_slide_to_take_all">Scorri per assumere tutto (%1$d)</string>
+    <string name="alarm_slide_to_snooze">Scorri per posporre (%1$d min)</string>
+    <string name="home_view_standard">Standard</string>
+    <string name="home_view_timeline">Sequenza temporale</string>
+
+    <!-- Dynamic Snooze Duration Selector (#103) -->
+    <string name="alarm_snooze_duration_label">Posticipa di:</string>
+    <string name="snooze_duration_chip_format">%1$d min</string>
+    <string name="pref_custom_snooze_title">Opzioni posponi personalizzate</string>
+    <string name="pref_custom_snooze_desc">Scegli diverse durate di posposizione quando suona la sveglia.</string>
+    <!-- Dose Intake Countdown Timer & Re-Alert Safeguard (ADHD Support) -->
+    <string name="pref_intake_safeguard_title">Protezione conto alla rovescia assunzione</string>
+    <string name="pref_intake_safeguard_desc">Supporto ADHD: intervallo con conto alla rovescia prima della conferma con nuovo avviso se distratti.</string>
+    <string name="pref_intake_duration_title">Durata protezione</string>
+    <string name="pref_intake_duration_format">%1$d minuti</string>
+    <string name="dialog_intake_duration_title">Seleziona durata protezione</string>
+    <string name="notif_intake_in_progress_title">Assunzione in corso</string>
+    <string name="notif_intake_in_progress_desc">%1$s: Conferma dopo l\'assunzione</string>
+    <string name="notif_intake_action_confirm">Conferma assunzione</string>
+    <string name="notif_intake_action_extend">+1 min</string>
+    <string name="notif_intake_action_cancel">Annulla</string>
+    <string name="notif_intake_realert_title">Farmaco non confermato</string>
+    <string name="notif_intake_realert_desc">Hai assunto %1$s? Tocca per confermare l\'assunzione o posponi.</string>
+    <string name="home_intake_in_progress">Assunzione in corso per %1$s</string>
+    <string name="home_intake_time_remaining">%1$s rimanenti</string>
+    <string name="home_intake_confirm">Conferma assunzione</string>
+    <string name="home_intake_extend">+1 min</string>
+    <string name="home_intake_cancel">Annulla</string>
+    <string name="home_intake_confirmed">Assunzione registrata per %1$s</string>
+    <string name="home_intake_cancelled">Protezione assunzione annullata</string>
+    <string name="alarm_realert_badge">NUOVO AVVISO ASSUNZIONE ADHD</string>
+    <string name="alarm_realert_subtitle">Hai toccato Assumi in precedenza, ma l\'assunzione non è stata confermata. Hai preso il tuo farmaco?</string>
+
+    <!-- Mark All Taken / Take All Cohort (#102) -->
+    <string name="take_all">Assumi tutto</string>
+    <string name="take_all_count">Assumi tutto (%1$d)</string>
+    <string name="dialog_take_all_title">Assumere tutti i farmaci?</string>
+    <string name="dialog_take_all_message">Contrassegnare tutti i %1$d farmaci programmati per le %2$s come assunti?</string>
+    <string name="take_all_success_toast">Contrassegnati tutti i %1$d farmaci come assunti</string>
+
+    <!-- Legal, Privacy & Compliance Safeguards -->
+    <string name="notif_generic_lockscreen_reminder">Promemoria farmaco programmato</string>
+    <string name="pref_lockscreen_details_title">Mostra dettagli su schermata di blocco</string>
+    <string name="pref_lockscreen_details_desc">Nascondi nomi e dosaggi fino allo sblocco del dispositivo.</string>
+    <string name="disclaimer_dialog_title">Disclaimer medico e legale</string>
+    <string name="disclaimer_dialog_summary">Dosezy è un\'utilità digitale automatizzata e NON è un dispositivo medico regolamentato. Non fornisce diagnosi, calcoli di dosaggio o consigli clinici. Consulta sempre il tuo medico o farmacista per le prescrizioni.</string>
+    <string name="disclaimer_checkbox_consent">Comprendo e accetto il disclaimer medico e i termini di servizio.</string>
+    <string name="disclaimer_action_agree">Accetta e continua</string>
+    <string name="disclaimer_link_medical">Disclaimer medico</string>
+    <string name="disclaimer_link_privacy">Informativa sulla privacy</string>
+    <string name="disclaimer_link_terms">Termini di servizio</string>
+    <string name="emergency_dispatch_warning_title">Avviso di emergenza</string>
+    <string name="emergency_dispatch_warning_desc">Dosezy non è un servizio di emergenza né un sostituto del 112/911. In situazioni critiche, chiama direttamente i soccorsi locali. Verifica che il numero corrisponda alla tua posizione.</string>
+    <string name="pdf_report_disclaimer_footer">Dosezy Monitoraggio Farmaci • Registro informativo autodichiarato (Non clinico)</string>
+    <string name="pharmacy_refill_estimation_disclaimer">Nota: Le quantità di ricarica sono stime approssimative basate sulla frequenza. Verifica con il tuo farmacista o medico.</string>
+    <string name="alarm_unlock_to_view_details">Sblocca per visualizzare i dettagli</string>
+    <string name="alarm_lockscreen_details_hidden">I nomi dei farmaci e i dosaggi sono nascosti quando il dispositivo è bloccato.</string>
+
+    <!-- Schedule Effective Date Selector (#105) -->
+    <string name="schedule_effective_dialog_title">Applica modifiche all\'orario</string>
+    <string name="schedule_effective_dialog_message">Quando deve entrare in vigore questo orario aggiornato?</string>
+    <string name="schedule_effective_today_title">A partire da oggi</string>
+    <string name="schedule_effective_today_desc">Applica i nuovi orari oggi. Le dosi non assunte obsolete di oggi verranno rimosse.</string>
+    <string name="schedule_effective_tomorrow_title">A partire da domani</string>
+    <string name="schedule_effective_tomorrow_desc">Mantieni intatto il programma di oggi. Il nuovo programma inizierà domani.</string>
+    <!-- Retrospective Missed Dose Calendar Management (#109) -->
+    <string name="dose_retrospective_tag">[Registrato retroattivamente]</string>
+    <string name="schedule_action_dialog_title">Gestisci dose</string>
+    <string name="schedule_action_dialog_subtitle">%1$s • %2$s</string>
+    <string name="schedule_action_take_dose">Segna come assunta</string>
+    <string name="schedule_action_skip_dose">Segna come saltata</string>
+    <string name="schedule_action_undo_dose">Annulla azione dose</string>
+    <string name="schedule_action_edit_note">Modifica nota dose</string>
+    <string name="schedule_action_add_note">Aggiungi nota dose</string>
+    <string name="schedule_dose_marked_taken">%1$s contrassegnata come assunta</string>
+    <string name="schedule_dose_marked_skipped">%1$s contrassegnata come saltata</string>
+    <string name="schedule_dose_reverted">%1$s reimpostata su in attesa</string>
+    <string name="schedule_dose_locked_notice">Questa dose ha più di 48 ore ed è bloccata per preservare l\'integrità della cronologia medica.</string>
+    <string name="schedule_dose_locked_badge">Bloccata</string>
+    <string name="schedule_tap_to_manage">Tocca per gestire</string>
+
+    <!-- Reminder Style: Alarm vs Notification (#111) -->
+    <string name="pref_reminder_type_title">Stile promemoria</string>
+    <string name="pref_reminder_type_desc">Scegli se i promemoria suonano come sveglia o notifica standard</string>
+    <string name="reminder_type_alarm">Sveglia</string>
+    <string name="reminder_type_alarm_desc">Avviso a schermo intero con suono continuo. Ignora Non disturbare.</string>
+    <string name="reminder_type_notification">Notifica</string>
+    <string name="reminder_type_notification_desc">Banner di notifica standard con tono di avviso. Rispetta Non disturbare.</string>
+    <string name="reminder_type_default">Usa impostazione predefinita del profilo (%1$s)</string>
+    <string name="reminder_type_default_profile">Usa predefinito del profilo</string>
+    <string name="notif_channel_notifications_name">Notifiche farmaci</string>
+    <string name="notif_channel_notifications_desc">Avvisi di notifica standard per gli orari dei farmaci che rispettano Non disturbare</string>
+    <string name="form_reminder_type">Stile promemoria</string>
+    <string name="form_reminder_type_desc">Scegli Sveglia per i farmaci critici o Notifica per gli integratori</string>
 </resources>

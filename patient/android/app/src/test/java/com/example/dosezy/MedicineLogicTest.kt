@@ -51,7 +51,7 @@ class MedicineLogicTest {
     )
 
     // ───────────────────────────────────────────────────────────────
-    // 1. getDosageDisplay – formatting for all units
+    // 1. getDosageDisplay - formatting for all units
     // ───────────────────────────────────────────────────────────────
 
     @Test
@@ -62,6 +62,9 @@ class MedicineLogicTest {
         assertEquals("2 drop", med(2.0, DosageUnit.DROP).getDosageDisplay())
         assertEquals("3 capsule", med(3.0, DosageUnit.CAPSULE).getDosageDisplay())
         assertEquals("50 mcg", med(50.0, DosageUnit.MCG).getDosageDisplay())
+        assertEquals("20 mEq", med(20.0, DosageUnit.MEQ).getDosageDisplay())
+        assertEquals("2 puff", med(2.0, DosageUnit.PUFF).getDosageDisplay())
+        assertEquals("1 ampule", med(1.0, DosageUnit.AMPULE).getDosageDisplay())
     }
 
     @Test
@@ -88,7 +91,7 @@ class MedicineLogicTest {
     }
 
     // ───────────────────────────────────────────────────────────────
-    // 2. getDosageForTime – value resolution
+    // 2. getDosageForTime - value resolution
     // ───────────────────────────────────────────────────────────────
 
     @Test
@@ -111,8 +114,16 @@ class MedicineLogicTest {
         assertEquals(75.0, m.getDosageForTime(LocalTime.of(9, 5)), 0.001)
     }
 
+    @Test
+    fun getDosageForTime_matchesUnpaddedTimeKey() {
+        // Guard: Verify that time 8:00 matches unpadded single-digit key "8:00" from legacy or external custom maps
+        val custom = mapOf("8:00" to 25.0)
+        val m = med(dosage = 10.0, customDosages = custom)
+        assertEquals(25.0, m.getDosageForTime(LocalTime.of(8, 0)), 0.001)
+    }
+
     // ───────────────────────────────────────────────────────────────
-    // 3. getFrequencyDisplay – text output for all patterns
+    // 3. getFrequencyDisplay - text output for all patterns
     // ───────────────────────────────────────────────────────────────
 
     @Test
@@ -163,7 +174,7 @@ class MedicineLogicTest {
     }
 
     // ───────────────────────────────────────────────────────────────
-    // 4. getStockDeductionAmount – edge cases
+    // 4. getStockDeductionAmount - edge cases
     // ───────────────────────────────────────────────────────────────
 
     @Test
@@ -203,6 +214,30 @@ class MedicineLogicTest {
     fun stockDeduction_liquidMinimumOne() {
         assertEquals(1, med(0.5, DosageUnit.ML).getStockDeductionAmount()) // 0.5.toInt() = 0, coerced to 1
         assertEquals(3, med(3.0, DosageUnit.DROP).getStockDeductionAmount())
+    }
+
+    @Test
+    fun stockDeduction_meqAlwaysOne() {
+        assertEquals(1, med(10.0, DosageUnit.MEQ).getStockDeductionAmount())
+        assertEquals(1, med(20.0, DosageUnit.MEQ).getStockDeductionAmount())
+        assertEquals(1, med(40.0, DosageUnit.MEQ).getStockDeductionAmount())
+    }
+
+    @Test
+    fun stockDeduction_puffDeductsIntakeQuantity() {
+        assertEquals(2, med(2.0, DosageUnit.PUFF).getStockDeductionAmount())
+        assertEquals(1, med(1.0, DosageUnit.PUFF).getStockDeductionAmount())
+        assertEquals(4, med(4.0, DosageUnit.PUFF).getStockDeductionAmount())
+        assertEquals(1, med(0.5, DosageUnit.PUFF).getStockDeductionAmount()) // coerced to 1
+    }
+
+    @Test
+    fun stockDeduction_ampuleClampedTo1Through10() {
+        assertEquals(1, med(1.0, DosageUnit.AMPULE).getStockDeductionAmount())
+        assertEquals(2, med(2.0, DosageUnit.AMPULE).getStockDeductionAmount())
+        assertEquals(10, med(10.0, DosageUnit.AMPULE).getStockDeductionAmount())
+        // > 10 falls back to 1
+        assertEquals(1, med(20.0, DosageUnit.AMPULE).getStockDeductionAmount())
     }
 
     @Test
@@ -611,6 +646,89 @@ class MedicineLogicTest {
             times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0))
         )
         assertEquals(3, m.calculateRefillQuantity(30))
+    }
+
+    @Test
+    fun refillQuantity_chemicalStrengthWithCustomDosages_anchorsToOneUnitPerIntake() {
+        // Guard: Chemical strength units (mg, mcg, mEq) represent active drug strength per pill/unit, not count.
+        // Even when customDosages map is present, daily requirement is 1 unit per slot (60 units for 30 days).
+        val customMg = mapOf("08:00" to 250.0, "20:00" to 500.0)
+        val mgMed = med(
+            dosage = 250.0,
+            unit = DosageUnit.MG,
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
+            customDosages = customMg
+        )
+        assertEquals(60, mgMed.calculateRefillQuantity(30))
+
+        val customMcg = mapOf("08:00" to 50.0, "20:00" to 100.0)
+        val mcgMed = med(
+            dosage = 50.0,
+            unit = DosageUnit.MCG,
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
+            customDosages = customMcg
+        )
+        assertEquals(60, mcgMed.calculateRefillQuantity(30))
+
+        val customMeq = mapOf("08:00" to 20.0, "20:00" to 40.0)
+        val meqMed = med(
+            dosage = 20.0,
+            unit = DosageUnit.MEQ,
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
+            customDosages = customMeq
+        )
+        assertEquals(60, meqMed.calculateRefillQuantity(30))
+    }
+
+    @Test
+    fun refillQuantity_countableUnitsWithMilligramStrength_clampsToOneUnitPerIntake() {
+        // Guard: Prevent 500x inflation when users enter active chemical strength (e.g. 500) for countable units (#BUG-REFILL-STRENGTH-INFLATION)
+        val tabletMed = med(
+            dosage = 500.0,
+            unit = DosageUnit.TABLET,
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0))
+        )
+        // 2 intakes per day * 30 days * 1 tablet per intake = 60 tablets (NOT 30,000 tablets)
+        assertEquals(60, tabletMed.calculateRefillQuantity(30))
+
+        val capsuleMed = med(
+            dosage = 250.0,
+            unit = DosageUnit.CAPSULE,
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0))
+        )
+        assertEquals(60, capsuleMed.calculateRefillQuantity(30))
+
+        val ampuleMed = med(
+            dosage = 100.0,
+            unit = DosageUnit.AMPULE,
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0))
+        )
+        assertEquals(30, ampuleMed.calculateRefillQuantity(30))
+
+        // Custom dosages with strength numbers (500mg morning, 1000mg night)
+        val customTabletMed = med(
+            dosage = 500.0,
+            unit = DosageUnit.TABLET,
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
+            customDosages = mapOf("08:00" to 500.0, "20:00" to 1000.0)
+        )
+        assertEquals(60, customTabletMed.calculateRefillQuantity(30))
+
+        // Legitimate count within 1..10 range (e.g. 2 tablets per intake)
+        val twoTabletsMed = med(
+            dosage = 2.0,
+            unit = DosageUnit.TABLET,
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0))
+        )
+        assertEquals(120, twoTabletsMed.calculateRefillQuantity(30))
     }
 
     // ───────────────────────────────────────────────────────────────
