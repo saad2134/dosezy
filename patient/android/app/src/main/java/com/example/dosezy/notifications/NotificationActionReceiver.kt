@@ -112,7 +112,16 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 }
             }
         }
-        val finalAllIds = targetIds.distinct()
+        // Guard: Filter targetIds strictly to primaryEntry profile to prevent cross-profile notification hijacking and pollution (#BUG-RECEIVER-PROFILE-ISOLATION)
+        val targetUserId = firstEntry?.userId
+        val userEntries = if (targetUserId != null) {
+            targetIds.mapNotNull { database.scheduleDao().getScheduleEntryById(it) }
+                .filter { it.userId == targetUserId }
+                .map { it.entryId }
+        } else {
+            targetIds
+        }
+        val finalAllIds = userEntries.distinct()
 
         val alarmScheduler = AlarmScheduler(context)
         finalAllIds.forEach { id ->
@@ -182,7 +191,8 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 val notifAlarmScheduler = AlarmScheduler(context)
                 finalAllIds.forEach { id ->
                     val entry = database.scheduleDao().getScheduleEntryById(id)
-                    val entryUser = user ?: entry?.let { database.userDao().getUserByIdDirect(it.userId) }
+                    // Guard: Resolve user per entry to prevent defaulting to primary profile lateAfter threshold (#BUG-RECEIVER-ENTRY-USER)
+                    val entryUser = entry?.let { database.userDao().getUserByIdDirect(it.userId) } ?: user
                     val lateAfter = entryUser?.lateAfterMinutes ?: 180
                     // Guard: Use isTakenLate so doses taken past missedAfter are recorded as TAKEN_LATE rather than TAKEN_ON_TIME
                     val status = if (entry != null && com.example.dosezy.utils.TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, lateAfter)) {
@@ -198,9 +208,9 @@ class NotificationActionReceiver : BroadcastReceiver() {
                     scheduleRepository.recordDoseTaken(id, status, takenAt, context, notes = null, syncSlotNotification = false)
                 }
 
-                // Guard: Coordinate slot notification sync and disarm alarms across each distinct time slot in finalAllIds to prevent leaking alarms or shade entries (#BUG-RECEIVER-MULTI-SLOT)
+                // Guard: Coordinate slot notification sync and disarm alarms across each distinct profile and time slot in finalAllIds to prevent leaking alarms or shade entries (#BUG-RECEIVER-MULTI-SLOT)
                 val entries = finalAllIds.mapNotNull { database.scheduleDao().getScheduleEntryById(it) }
-                val distinctSlots = entries.distinctBy { it.scheduledDateTime.withSecond(0).withNano(0) }
+                val distinctSlots = entries.distinctBy { Pair(it.userId, it.scheduledDateTime.withSecond(0).withNano(0)) }
                 if (distinctSlots.isNotEmpty()) {
                     distinctSlots.forEach { slotEntry ->
                         scheduleRepository.syncSlotNotificationAndAlarms(slotEntry.entryId, slotEntry, context)

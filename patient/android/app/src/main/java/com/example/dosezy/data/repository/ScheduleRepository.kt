@@ -504,9 +504,15 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                         slotEntries.forEach { nManager.cancel(it.entryId.hashCode()) }
                     } else {
                         // Other medications remain pending in this slot; update active notification to remove taken medication
-                        // Guard: Check active notifications against all slot entry IDs and stored primaryId; if entry is PENDING on today's schedule, force active alert restoration (#BUG-03, #BUG-UNDO-PAST-DATE)
+                        // Guard: Check active notifications against all slot entry IDs and stored primaryId; if entry is PENDING on today's schedule and has not exceeded missed threshold, force active alert restoration (#BUG-03, #BUG-UNDO-PAST-DATE, #BUG-UNDO-MISSED-SHADE)
                         val isScheduledToday = entry.scheduledDateTime.toLocalDate() == java.time.LocalDate.now()
-                        val hasActiveNotification = (entry.status == MedicationStatus.PENDING && isScheduledToday) || try {
+                        val user = database.userDao().getUserByIdDirect(entry.userId)
+                        val isMissed = user != null && TimeCalculationUtils.isMissed(
+                            entry.scheduledDateTime,
+                            LocalDateTime.now(),
+                            user.missedAfterMinutes
+                        )
+                        val hasActiveNotification = (entry.status == MedicationStatus.PENDING && isScheduledToday && !isMissed) || try {
                             val active = nManager.activeNotifications
                             active.any { notif ->
                                 slotEntries.any { it.entryId.hashCode() == notif.id } || (primaryId != null && notif.id == primaryId.hashCode())
@@ -533,7 +539,6 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                             val effectiveMedName = if (activeMedNames.isNotEmpty()) activeMedNames.joinToString(", ") else "Medicine"
                             val activeEntryIds = ArrayList(remainingPending.map { it.entryId })
 
-                            val user = database.userDao().getUserByIdDirect(entry.userId)
                             // Guard: Derive locale from user's explicit profile language so scheduled time matches profile preferences (#BUG-NOTIF-LOCALE)
                             val targetLanguage = user?.language ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
                             val currentLocale = com.example.dosezy.utils.LocaleHelper.getLocale(targetLanguage)
@@ -566,11 +571,6 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                             )
 
                             // Guard: Re-arm nagging reminder only if undone dose belongs to today's schedule, has not exceeded missed threshold, and nagging reminders are enabled to prevent phantom alarms for historical past-date or overdue doses (#BUG-03, #BUG-UNDO-PAST-DATE, #BUG-UNDO-MISSED)
-                            val isMissed = user != null && TimeCalculationUtils.isMissed(
-                                entry.scheduledDateTime,
-                                LocalDateTime.now(),
-                                user.missedAfterMinutes
-                            )
                             if (entry.status == MedicationStatus.PENDING && isScheduledToday && user != null && user.naggingRemindersEnabled && !isMissed && entry.scheduledDateTime.isBefore(LocalDateTime.now())) {
                                 try {
                                     val alarmScheduler = AlarmScheduler(context)

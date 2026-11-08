@@ -955,4 +955,57 @@ class RecordDoseMissedAndUndoTest {
         assertEquals(expectedPrnTitle, notif2.extras.getCharSequence(android.app.Notification.EXTRA_TITLE)?.toString())
         assertEquals(expectedPrnText, notif2.extras.getCharSequence(android.app.Notification.EXTRA_TEXT)?.toString())
     }
+
+    @Test
+    fun undoDoseTaken_onSameDayPastMissedThreshold_doesNotIssueActiveCohortNotification() = runBlocking {
+        // Guard: Verify syncSlotNotificationAndAlarms does not restore notification shade entry for same-day overdue doses exceeding missedAfterMinutes (#BUG-UNDO-MISSED-SHADE)
+        MedicineAlarmReceiver.createNotificationChannels(context)
+
+        val userWithShortMissed = testUser.copy(
+            userId = "user_shade_missed_test",
+            considerLateAfter = 60,
+            considerMissedAfter = 120 // 2 hours
+        )
+        db.userDao().insertUser(userWithShortMissed)
+        val med = testMedicine.copy(userId = userWithShortMissed.userId)
+        db.medicineDao().insertMedicine(med)
+
+        val overdueTime = LocalDateTime.now().minusHours(3)
+        val entry1 = ScheduleEntry(
+            entryId = "entry_undo_shade_1",
+            userId = userWithShortMissed.userId,
+            medicineId = med.medicineId,
+            scheduledDateTime = overdueTime,
+            status = MedicationStatus.PENDING
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_undo_shade_2",
+            userId = userWithShortMissed.userId,
+            medicineId = med.medicineId,
+            scheduledDateTime = overdueTime,
+            status = MedicationStatus.PENDING
+        )
+        db.scheduleDao().insertScheduleEntry(entry1)
+        db.scheduleDao().insertScheduleEntry(entry2)
+
+        // Mark entry1 as taken
+        scheduleRepository.recordDoseTaken(entry1.entryId, context = context)
+
+        // Cancel any notifications that might have been posted
+        notificationManager.cancelAll()
+
+        // Now undo entry1
+        scheduleRepository.undoDoseTaken(entry1.entryId, context)
+
+        // Verify status reverted
+        val reverted = db.scheduleDao().getScheduleEntryById(entry1.entryId)
+        assertEquals(MedicationStatus.PENDING, reverted?.status)
+
+        // Verify that no active notification was posted in the notification shade because the dose is already missed
+        val activeNotifs = notificationManager.activeNotifications
+        val entry1Notif = activeNotifs.firstOrNull { it.id == entry1.entryId.hashCode() }
+        val entry2Notif = activeNotifs.firstOrNull { it.id == entry2.entryId.hashCode() }
+        assertNull("Undoing same-day overdue dose must NOT post entry1 active notification", entry1Notif)
+        assertNull("Undoing same-day overdue dose must NOT post entry2 active notification", entry2Notif)
+    }
 }

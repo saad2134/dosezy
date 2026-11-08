@@ -204,10 +204,10 @@ object IntakeSafeguardManager {
             scheduler.cancelSnooze(id)
         }
 
-        // Guard: Reconcile slot notifications and disarm alarms for every distinct slot across entryIds to prevent leaking non-primary slot notifications and alarms (#BUG-SAFEGUARD-MULTI-SLOT)
+        // Guard: Reconcile slot notifications and disarm alarms for every distinct profile and slot across entryIds to prevent leaking non-primary slot notifications and alarms (#BUG-SAFEGUARD-MULTI-SLOT)
         try {
             val entries = current.entryIds.mapNotNull { database.scheduleDao().getScheduleEntryById(it) }
-            val distinctSlots = entries.distinctBy { it.scheduledDateTime.withSecond(0).withNano(0) }
+            val distinctSlots = entries.distinctBy { Pair(it.userId, it.scheduledDateTime.withSecond(0).withNano(0)) }
             if (distinctSlots.isNotEmpty()) {
                 distinctSlots.forEach { slotEntry ->
                     scheduleRepository.syncSlotNotificationAndAlarms(slotEntry.entryId, slotEntry, context)
@@ -302,7 +302,13 @@ object IntakeSafeguardManager {
                     isAlarmMode = isAlarmMode
                 )
 
-                if (user != null && user.naggingRemindersEnabled) {
+                // Guard: Re-arm nagging reminder only if cancelled dose has not exceeded missed threshold to prevent phantom nagging alarms on overdue doses (#BUG-SAFEGUARD-CANCEL-OVERDUE)
+                val isMissed = user != null && com.example.dosezy.utils.TimeCalculationUtils.isMissed(
+                    primary.scheduledDateTime,
+                    java.time.LocalDateTime.now(),
+                    user.missedAfterMinutes
+                )
+                if (user != null && user.naggingRemindersEnabled && !isMissed) {
                     val scheduler = AlarmScheduler(context)
                     scheduler.scheduleNaggingReminder(
                         entryId = primary.entryId,

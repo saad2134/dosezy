@@ -1231,6 +1231,115 @@ class IntakeSafeguardManagerLifecycleTest {
         assertTrue("BigText must contain unconfirmed intake prompt", bigText!!.contains(expectedPrompt))
         assertTrue("BigText must include scheduled time info", bigText.contains("10:00 AM"))
     }
+
+    @Test
+    fun testNotificationActionReceiver_takenAction_isolatesEntriesToPrimaryProfile() = runBlocking {
+        // Guard: Verify NotificationActionReceiver isolates cohort execution strictly to firstEntry.userId (#BUG-RECEIVER-PROFILE-ISOLATION)
+        val userB = User(
+            userId = "user_b_isolation",
+            fullName = "Patient B",
+            age = 45,
+            gender = Gender.FEMALE,
+            contactNumber = "+1122334455",
+            intakeSafeguardEnabled = false
+        )
+        val medB = Medicine(
+            medicineId = "med_b_isolation",
+            userId = userB.userId,
+            medicationName = "Aspirin",
+            dosage = 100.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            currentStock = 30,
+            autoDeductOnTake = true
+        )
+        database.userDao().insertUser(userB)
+        database.medicineDao().insertMedicine(medB)
+
+        val slotTime = LocalDateTime.now().withSecond(0).withNano(0)
+        val entryA = ScheduleEntry(
+            entryId = "entry_a_isolation",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.PENDING
+        )
+        val entryB = ScheduleEntry(
+            entryId = "entry_b_isolation",
+            userId = userB.userId,
+            medicineId = medB.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entryA)
+        database.scheduleDao().insertScheduleEntry(entryB)
+
+        val receiver = NotificationActionReceiver()
+        val intent = Intent().apply {
+            action = "TAKEN_ACTION"
+            putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, entryA.entryId)
+            putStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS, arrayListOf(entryA.entryId, entryB.entryId))
+            putExtra(MedicineAlarmReceiver.EXTRA_IS_INTAKE_REALERT, true)
+        }
+
+        receiver.onReceive(context, intent)
+
+        var updatedA: ScheduleEntry? = null
+        for (i in 1..20) {
+            kotlinx.coroutines.delay(50)
+            updatedA = database.scheduleDao().getScheduleEntryById(entryA.entryId)
+            if (updatedA?.status == MedicationStatus.TAKEN_ON_TIME) break
+        }
+
+        assertNotNull(updatedA)
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, updatedA?.status)
+
+        val updatedB = database.scheduleDao().getScheduleEntryById(entryB.entryId)
+        assertNotNull(updatedB)
+        assertEquals("User B entry must remain PENDING and not hijacked by User A action", MedicationStatus.PENDING, updatedB?.status)
+    }
+
+    @Test
+    fun testCancelCountdown_whenDoseExceededMissedThreshold_doesNotScheduleNaggingReminder() = runBlocking {
+        // Guard: Verify IntakeSafeguardManager.cancelCountdown does not re-arm nagging reminder when dose is already missed (#BUG-SAFEGUARD-CANCEL-OVERDUE)
+        val overdueScheduledTime = LocalDateTime.now().minusHours(4)
+        val overdueEntry = ScheduleEntry(
+            entryId = "entry_safeguard_overdue",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = overdueScheduledTime,
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(overdueEntry)
+
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = overdueEntry.entryId,
+            entryIds = listOf(overdueEntry.entryId),
+            medicineName = testMedicine.medicationName,
+            medicineNames = listOf(testMedicine.medicationName),
+            scheduledTime = "08:00 AM",
+            durationSeconds = 60,
+            userId = testUser.userId
+        )
+
+        assertNotNull("Active countdown should be running", IntakeSafeguardManager.activeCountdown.value)
+
+        IntakeSafeguardManager.cancelCountdown(context, restoreReminderIfPending = true)
+
+        kotlinx.coroutines.delay(100)
+
+        val naggingIntent = Intent(context, MedicineAlarmReceiver::class.java)
+        val pendingNagging = android.app.PendingIntent.getBroadcast(
+            context,
+            overdueEntry.entryId.hashCode() + 2000,
+            naggingIntent,
+            android.app.PendingIntent.FLAG_NO_CREATE or android.app.PendingIntent.FLAG_IMMUTABLE
+        )
+        assertNull("Overdue dose must not have nagging reminder scheduled upon safeguard cancel", pendingNagging)
+    }
 }
 
 
