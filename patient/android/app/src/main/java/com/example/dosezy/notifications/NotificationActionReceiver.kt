@@ -240,7 +240,6 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 val user = firstEntry?.let { database.userDao().getUserByIdDirect(it.userId) }
                 // Guard: Read explicit dynamic snooze duration from intent if passed, else fallback to user preference (#103)
                 val intentSnoozeMinutes = intent?.getIntExtra(MedicineAlarmReceiver.EXTRA_SNOOZE_MINUTES, -1) ?: -1
-                val snoozeMinutes = if (intentSnoozeMinutes > 0) intentSnoozeMinutes else (user?.snoozeDuration ?: 10)
 
                 val medicineNames = finalAllIds.mapNotNull { id ->
                     val entry = database.scheduleDao().getScheduleEntryById(id)
@@ -248,12 +247,16 @@ class NotificationActionReceiver : BroadcastReceiver() {
                     med?.medicationName
                 }
 
-                // Guard: Pass user's timeFormat and userId so snoozed alarm matches time format and routes to correct profile on tap
-                alarmScheduler.scheduleGroupedSnooze(finalAllIds, snoozeMinutes, medicineNames, timeFormat = user?.timeFormat, userId = user?.userId)
-                Log.d(TAG, "Medicine reminder snoozed for $snoozeMinutes minutes for ${finalAllIds.size} entries")
-                try {
-                    com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
-                } catch (_: Exception) {}
+                // Guard: Delegate to SnoozeCohortUseCase to partition multi-profile cohorts and enforce per-profile snooze preferences and routing (#BUG-NOTIF-SNOOZE-COHORT)
+                val fallbackMed = firstEntry?.let { database.medicineDao().getMedicineByIdDirect(it.medicineId)?.medicationName } ?: "Medicine"
+                val snoozeCohortUseCase = com.example.dosezy.domain.usecases.SnoozeCohortUseCase(database, context)
+                snoozeCohortUseCase(
+                    entryIds = finalAllIds,
+                    explicitSnoozeMinutes = if (intentSnoozeMinutes > 0) intentSnoozeMinutes else null,
+                    fallbackMedicineName = fallbackMed,
+                    medicineNames = medicineNames,
+                    user = user
+                )
             }
             else -> {
                 Log.w(TAG, "Unknown action received: $action for entry: $primaryEntryId")

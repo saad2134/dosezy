@@ -1160,5 +1160,91 @@ class DatabaseRestoreTransactionAndMigrationTest {
         assertEquals(com.example.dosezy.data.model.ReminderType.NOTIFICATION, q2?.reminderType)
         assertNull(q3?.reminderType)
     }
+
+    @Test
+    fun testSelectiveRestore_overwrite_doesNotDeleteUnrelatedLocalUserMatchingBackupUserId(): Unit = runBlocking {
+        // Guard: Verify OVERWRITE on name conflict does not purge unrelated local user whose ID matches backup profile ID (#BUG-RESTORE-ID-COLLISION)
+        val localAlice = User(
+            userId = "local_alice_id",
+            fullName = "Alice",
+            age = 30,
+            gender = Gender.FEMALE,
+            contactNumber = "+1111111111"
+        )
+        val localBob = User(
+            userId = "backup_shared_uuid",
+            fullName = "Bob",
+            age = 40,
+            gender = Gender.MALE,
+            contactNumber = "+2222222222"
+        )
+        db.userDao().insertUser(localAlice)
+        db.userDao().insertUser(localBob)
+
+        val bobMed = Medicine(
+            medicineId = "med_bob_1",
+            userId = localBob.userId,
+            medicationName = "Metformin",
+            dosage = 500.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+        db.medicineDao().insertMedicine(bobMed)
+
+        val tempDir = File(context.cacheDir, "test_restore_overwrite_collision_${System.currentTimeMillis()}")
+        tempDir.mkdirs()
+        val profileFolder = File(tempDir, "profiles/backup_shared_uuid")
+        profileFolder.mkdirs()
+
+        val backupAlice = User(
+            userId = "backup_shared_uuid",
+            fullName = "Alice",
+            age = 31,
+            gender = Gender.FEMALE,
+            contactNumber = "+1111111111"
+        )
+        File(profileFolder, "profile.json").writeText(testGson.toJson(backupAlice))
+        File(profileFolder, "medicines.json").writeText(testGson.toJson(emptyList<Medicine>()))
+        File(profileFolder, "schedules.json").writeText(testGson.toJson(emptyList<ScheduleEntry>()))
+
+        val decision = ProfileImportDecision(
+            summary = ImportableProfileSummary(
+                originalUserId = "backup_shared_uuid",
+                name = "Alice",
+                age = 31,
+                gender = "FEMALE",
+                medicineCount = 0,
+                scheduleCount = 0,
+                avatarTempPath = null,
+                isConflict = true,
+                existingLocalUserId = localAlice.userId,
+                profileFolder = profileFolder
+            ),
+            isSelected = true,
+            conflictStrategy = ConflictStrategy.OVERWRITE
+        )
+
+        val result = backupManager.executeSelectiveRestore(tempDir, listOf(decision))
+        assertTrue("Restore must succeed", result.success)
+
+        // Verify Bob still exists and was not deleted
+        val bobAfter = db.userDao().getUserByIdDirect(localBob.userId)
+        assertNotNull("Unrelated local user Bob must not be deleted by Alice's overwrite", bobAfter)
+        assertEquals("Bob", bobAfter?.fullName)
+
+        val bobMedsAfter = db.medicineDao().getMedicinesByUserDirect(localBob.userId)
+        assertEquals("Bob's medicines must not be purged", 1, bobMedsAfter.size)
+        assertEquals("Metformin", bobMedsAfter.first().medicationName)
+
+        // Verify Alice was updated/overwritten
+        val aliceAfter = db.userDao().getUserByIdDirect(localAlice.userId)
+        assertNotNull("Local user Alice must exist with overwritten data", aliceAfter)
+        assertEquals(31, aliceAfter?.age)
+
+        tempDir.deleteRecursively()
+        Unit
+    }
 }
 

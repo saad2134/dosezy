@@ -349,11 +349,20 @@ object IntakeSafeguardManager {
         val newPrimary = remainingIds.first()
         val newMedName = remainingMedNames.joinToString(", ")
 
+        // Guard: Resolve user ID for new primary entry to preserve profile isolation when cohort entries cross user profiles (#BUG-SAFEGUARD-PROFILE-RECONCILE)
+        val resolvedUserId = try {
+            kotlinx.coroutines.runBlocking(Dispatchers.IO) {
+                val db = DosezyDatabase.getInstance(context)
+                db.scheduleDao().getScheduleEntryById(newPrimary)?.userId
+            }
+        } catch (_: Exception) { null } ?: current.userId
+
         val updatedState = current.copy(
             entryId = newPrimary,
             entryIds = remainingIds,
             medicineName = newMedName,
-            medicineNames = remainingMedNames
+            medicineNames = remainingMedNames,
+            userId = resolvedUserId
         )
         saveState(context, updatedState)
         _activeCountdown.value = updatedState
@@ -369,7 +378,7 @@ object IntakeSafeguardManager {
                     entryIds = ArrayList(remainingIds),
                     medicineNames = ArrayList(remainingMedNames),
                     scheduledTime = current.scheduledTime,
-                    userId = current.userId
+                    userId = resolvedUserId
                 )
                 dismissIntakeNotification(context, current.entryId)
             }
@@ -408,25 +417,28 @@ object IntakeSafeguardManager {
                 val validPendingEntries = allTargetIds.mapNotNull { db.scheduleDao().getScheduleEntryById(it) }
                     .filter { it.status == com.example.dosezy.data.model.MedicationStatus.PENDING || it.status == com.example.dosezy.data.model.MedicationStatus.MISSED }
 
-                // Guard: Re-alert if any cohort entry remains unconfirmed to prevent silent cancellation when anchor entry is taken or deleted (#BUG-SAFEGUARD-COHORT-ALERT)
+                // Guard: Partition unconfirmed entries by profile so each patient receives isolated re-alert with their own settings (#BUG-SAFEGUARD-MULTIUSER)
                 if (validPendingEntries.isNotEmpty()) {
-                    val activePrimary = validPendingEntries.first()
-                    val activeEntryIds = ArrayList(validPendingEntries.map { it.entryId })
-                    val activeNames = ArrayList(validPendingEntries.mapNotNull { e ->
-                        db.medicineDao().getMedicineByIdDirect(e.medicineId)?.medicationName
-                    }.ifEmpty { if (!medicineNames.isNullOrEmpty()) medicineNames else listOf(medicineName) })
-                    val effectiveName = if (activeNames.isNotEmpty()) activeNames.joinToString(", ") else medicineName
-                    Log.d(TAG, "Safeguard timer expired for unconfirmed entries: $activeEntryIds; re-alerting user")
-                    val user = db.userDao().getUserByIdDirect(activePrimary.userId)
-                    MedicineAlarmReceiver.triggerReAlert(
-                        context = context,
-                        entryId = activePrimary.entryId,
-                        medicineName = effectiveName,
-                        entryIds = activeEntryIds,
-                        medicineNames = activeNames,
-                        scheduledTime = scheduledTime,
-                        user = user
-                    )
+                    val entriesByUser = validPendingEntries.groupBy { it.userId }
+                    entriesByUser.forEach { (userId, userEntries) ->
+                        val activePrimary = userEntries.first()
+                        val activeEntryIds = ArrayList(userEntries.map { it.entryId })
+                        val activeNames = ArrayList(userEntries.mapNotNull { e ->
+                            db.medicineDao().getMedicineByIdDirect(e.medicineId)?.medicationName
+                        }.ifEmpty { if (!medicineNames.isNullOrEmpty()) medicineNames else listOf(medicineName) })
+                        val effectiveName = if (activeNames.isNotEmpty()) activeNames.joinToString(", ") else medicineName
+                        Log.d(TAG, "Safeguard timer expired for unconfirmed entries: $activeEntryIds (user: $userId); re-alerting user")
+                        val user = db.userDao().getUserByIdDirect(userId)
+                        MedicineAlarmReceiver.triggerReAlert(
+                            context = context,
+                            entryId = activePrimary.entryId,
+                            medicineName = effectiveName,
+                            entryIds = activeEntryIds,
+                            medicineNames = activeNames,
+                            scheduledTime = scheduledTime,
+                            user = user
+                        )
+                    }
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error handling expired intake safeguard", e)

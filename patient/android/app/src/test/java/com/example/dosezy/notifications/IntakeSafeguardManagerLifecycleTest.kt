@@ -1340,6 +1340,174 @@ class IntakeSafeguardManagerLifecycleTest {
         )
         assertNull("Overdue dose must not have nagging reminder scheduled upon safeguard cancel", pendingNagging)
     }
+
+    @Test
+    fun testReconcileCountdown_whenPrimaryTaken_updatesUserIdToRemainingUser() = runBlocking {
+        // Guard: Verify reconcileCountdown resolves and updates userId for remaining cohort primary (#BUG-SAFEGUARD-PROFILE-RECONCILE)
+        val userA = User(
+            userId = "user_reconcile_A",
+            fullName = "Patient A",
+            age = 25,
+            gender = Gender.FEMALE,
+            contactNumber = "+1111111111"
+        )
+        val userB = User(
+            userId = "user_reconcile_B",
+            fullName = "Patient B",
+            age = 30,
+            gender = Gender.MALE,
+            contactNumber = "+2222222222"
+        )
+        database.userDao().insertUser(userA)
+        database.userDao().insertUser(userB)
+
+        val medA = Medicine(
+            medicineId = "med_reconcile_A",
+            userId = userA.userId,
+            medicationName = "Medicine A",
+            dosage = 10.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(9, 0))
+        )
+        val medB = Medicine(
+            medicineId = "med_reconcile_B",
+            userId = userB.userId,
+            medicationName = "Medicine B",
+            dosage = 20.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(9, 0))
+        )
+        database.medicineDao().insertMedicine(medA)
+        database.medicineDao().insertMedicine(medB)
+
+        val entryA = ScheduleEntry(
+            entryId = "entry_reconcile_A",
+            userId = userA.userId,
+            medicineId = medA.medicineId,
+            scheduledDateTime = LocalDateTime.now().plusHours(1),
+            status = MedicationStatus.PENDING
+        )
+        val entryB = ScheduleEntry(
+            entryId = "entry_reconcile_B",
+            userId = userB.userId,
+            medicineId = medB.medicineId,
+            scheduledDateTime = LocalDateTime.now().plusHours(1),
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entryA)
+        database.scheduleDao().insertScheduleEntry(entryB)
+
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entryA.entryId,
+            entryIds = listOf(entryA.entryId, entryB.entryId),
+            medicineName = "Medicine A, Medicine B",
+            medicineNames = listOf("Medicine A", "Medicine B"),
+            scheduledTime = "09:00 AM",
+            durationSeconds = 120,
+            userId = userA.userId
+        )
+
+        assertEquals("Initial countdown must be owned by userA", userA.userId, IntakeSafeguardManager.activeCountdown.value?.userId)
+
+        IntakeSafeguardManager.reconcileCountdown(context, listOf(entryA.entryId))
+
+        val active = IntakeSafeguardManager.activeCountdown.value
+        assertNotNull("Active countdown should remain running for entryB", active)
+        assertEquals("Remaining primary must be entryB", entryB.entryId, active?.entryId)
+        assertEquals("Safeguard owner must update to userB", userB.userId, active?.userId)
+    }
+
+    @Test
+    fun testHandleCountdownExpired_partitionsMultiUserEntriesAndFiresReAlertPerUser() = runBlocking {
+        // Guard: Verify expired intake safeguard partitions multi-user pending entries and fires separate re-alerts (#BUG-SAFEGUARD-MULTIUSER)
+        val user1 = User(
+            userId = "user_expired_1",
+            fullName = "Expired Patient 1",
+            age = 40,
+            gender = Gender.FEMALE,
+            contactNumber = "+3333333333"
+        )
+        val user2 = User(
+            userId = "user_expired_2",
+            fullName = "Expired Patient 2",
+            age = 45,
+            gender = Gender.MALE,
+            contactNumber = "+4444444444"
+        )
+        database.userDao().insertUser(user1)
+        database.userDao().insertUser(user2)
+
+        val med1 = Medicine(
+            medicineId = "med_expired_1",
+            userId = user1.userId,
+            medicationName = "Aspirin",
+            dosage = 100.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+        val med2 = Medicine(
+            medicineId = "med_expired_2",
+            userId = user2.userId,
+            medicationName = "Metformin",
+            dosage = 500.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+        database.medicineDao().insertMedicine(med1)
+        database.medicineDao().insertMedicine(med2)
+
+        val entry1 = ScheduleEntry(
+            entryId = "entry_expired_1",
+            userId = user1.userId,
+            medicineId = med1.medicineId,
+            scheduledDateTime = LocalDateTime.now().minusMinutes(5),
+            status = MedicationStatus.PENDING
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_expired_2",
+            userId = user2.userId,
+            medicineId = med2.medicineId,
+            scheduledDateTime = LocalDateTime.now().minusMinutes(5),
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entry1)
+        database.scheduleDao().insertScheduleEntry(entry2)
+
+        var onCompleteCalled = false
+        IntakeSafeguardManager.handleCountdownExpired(
+            context = context,
+            entryId = entry1.entryId,
+            medicineName = "Aspirin, Metformin",
+            entryIds = listOf(entry1.entryId, entry2.entryId),
+            medicineNames = listOf("Aspirin", "Metformin"),
+            scheduledTime = "08:00 AM",
+            onComplete = {
+                onCompleteCalled = true
+            }
+        )
+
+        val deadline = System.currentTimeMillis() + 3000
+        while (!onCompleteCalled && System.currentTimeMillis() < deadline) {
+            org.robolectric.shadows.ShadowLooper.idleMainLooper()
+            Thread.sleep(20)
+        }
+
+        assertTrue("onComplete must be called when countdown expires", onCompleteCalled)
+
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val activeNotifs = nm.activeNotifications
+        assertTrue("Notification for user 1 entry must be posted", activeNotifs.any { it.id == entry1.entryId.hashCode() })
+        assertTrue("Notification for user 2 entry must be posted separately", activeNotifs.any { it.id == entry2.entryId.hashCode() })
+    }
 }
 
 

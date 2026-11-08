@@ -121,8 +121,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             snoozeMinutes: Int = 10,
             userId: String? = null,
             userLanguage: com.example.dosezy.data.model.Language? = null,
-            isAlarmMode: Boolean = true,
-            patientName: String? = null
+            isAlarmMode: Boolean = true
         ) {
             val allowLockscreen = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE).getBoolean("lockscreen_details_enabled", true)
             MedicineAlarmReceiver().showNotification(
@@ -141,8 +140,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 userId = userId,
                 userLanguage = userLanguage,
                 allowLockscreenDetails = allowLockscreen,
-                isAlarmMode = isAlarmMode,
-                patientName = patientName
+                isAlarmMode = isAlarmMode
             )
         }
 
@@ -190,8 +188,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 userLanguage = user?.language,
                 showCustomSnoozeOptions = user?.customSnoozePopupEnabled ?: false,
                 allowLockscreenDetails = allowLockscreen,
-                isAlarmMode = isAlarmMode,
-                patientName = user?.fullName
+                isAlarmMode = isAlarmMode
             )
         }
     }
@@ -383,8 +380,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                         userLanguage = user?.language,
                         showCustomSnoozeOptions = user?.customSnoozePopupEnabled ?: false,
                         allowLockscreenDetails = user?.lockscreenDetailsEnabled ?: true,
-                        isAlarmMode = isAlarmMode,
-                        patientName = user?.fullName
+                        isAlarmMode = isAlarmMode
                     )
 
                     // Guard: Schedule next follow-up nagging reminder if enabled and below limit (0 = continuous until missed threshold) (#119)
@@ -420,7 +416,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                                 autoSilenceSeconds = 0
                             )
                         }
-                        showNotification(context, entryId, entryIds, medicineName, medicineNames, emptyList(), scheduledTime, false, 0, 3, isAlarmMode = isAlarm, patientName = fallbackUser?.fullName)
+                        showNotification(context, entryId, entryIds, medicineName, medicineNames, emptyList(), scheduledTime, false, 0, 3, isAlarmMode = isAlarm)
                     } catch (fallbackEx: Exception) {
                         Log.e(TAG, "Error in fallback alarm/notification handling", fallbackEx)
                     }
@@ -454,8 +450,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         userLanguage: com.example.dosezy.data.model.Language? = null,
         showCustomSnoozeOptions: Boolean = false,
         allowLockscreenDetails: Boolean = true,
-        isAlarmMode: Boolean = true,
-        patientName: String? = null
+        isAlarmMode: Boolean = true
     ) {
         // Guard: Resolve notification strings and actions using user profile language or fallback to globally saved app language (#BUG-NOTIF-LOCALE)
         val targetLanguage = userLanguage ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
@@ -463,14 +458,16 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
         createNotificationChannels(localizedContext)
 
-        val resolvedPatientName = patientName ?: userId?.let { uid ->
+        val targetUser = userId?.let {
             try {
                 kotlinx.coroutines.runBlocking(kotlinx.coroutines.Dispatchers.IO) {
-                    com.example.dosezy.data.DosezyDatabase.getInstance(context).userDao().getUserByIdDirect(uid)?.fullName
+                    kotlinx.coroutines.withTimeoutOrNull(500L) {
+                        com.example.dosezy.data.DosezyDatabase.getInstance(context).userDao().getUserByIdDirect(it)
+                    }
                 }
             } catch (_: Exception) { null }
         }
-        val cleanPatientName = resolvedPatientName?.takeIf { it.isNotBlank() }
+        val patientName = targetUser?.fullName?.takeIf { it.isNotBlank() }
 
         // Guard: Check scheduledTime.isNotBlank() to prevent rendering empty 'Scheduled: ' label on safeguard re-alerts
         val scheduledTimeStr = scheduledTime?.takeIf { it.isNotBlank() }?.let {
@@ -637,7 +634,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             localizedContext.getString(R.string.alarm_medication_reminder)
         }
         // Guard: Include patient name in notification shade title for reminders so multi-profile users immediately recognize who the alarm is for (#BUG-MULTIUSER-NOTIF-TITLE)
-        val notificationTitle = if (cleanPatientName != null && !isIntakeReAlert) "$baseTitle \u2022 $cleanPatientName" else baseTitle
+        val notificationTitle = if (patientName != null && !isIntakeReAlert) "$baseTitle \u2022 $patientName" else baseTitle
 
         val notificationText = if (isIntakeReAlert) {
             localizedContext.getString(R.string.notif_intake_realert_desc, primaryMedLabel)

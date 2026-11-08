@@ -49,10 +49,17 @@ object ScheduleRecurrenceEngine {
         } else {
             startDateRange
         }
-        val effectiveEnd = if (medicine.endDate != null && medicine.endDate.isBefore(startDateRange.plusDays(days.toLong()))) {
+        val rangeEnd = startDateRange.plusDays(days.toLong())
+        // Guard: Extend targetEnd from medicine.startDate when start date is beyond startDateRange to prevent 0-entry generation for distant future regimens (#BUG-RECURRENCE-FUTURE-START)
+        val targetEnd = if (medicine.startDate != null && medicine.startDate.isAfter(rangeEnd)) {
+            medicine.startDate.plusDays(days.toLong())
+        } else {
+            rangeEnd
+        }
+        val effectiveEnd = if (medicine.endDate != null && medicine.endDate.isBefore(targetEnd)) {
             medicine.endDate
         } else {
-            startDateRange.plusDays(days.toLong())
+            targetEnd
         }
 
         if (effectiveStart.isAfter(effectiveEnd)) return emptyList()

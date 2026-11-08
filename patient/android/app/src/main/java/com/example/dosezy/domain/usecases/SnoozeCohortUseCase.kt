@@ -108,6 +108,6 @@ class SnoozeCohortUseCase @Inject constructor(
         try {
             com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
         } catch (_: Exception) {}
-        Log.d(TAG, "Scheduled snooze for ${entryIds.size} medicines")
+        Log.d(TAG, "Scheduled snooze for ${entryIds.size} medicines (explicit: $explicitSnoozeMinutes)")
     }
 }
