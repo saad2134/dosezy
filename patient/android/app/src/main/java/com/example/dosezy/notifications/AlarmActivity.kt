@@ -275,8 +275,8 @@ class AlarmActivity : ComponentActivity() {
                         onUnlockRequest = { requestDeviceUnlock() },
                         onTakeAction = {
                             val isIntakeReAlert = intent?.getBooleanExtra(MedicineAlarmReceiver.EXTRA_IS_INTAKE_REALERT, false) ?: false
-                            // Guard: Ensure all cohort medication entry IDs are merged from intent and loaded UI state (#115)
-                            val allTargetIds = (currentEntryIds + uiState.medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
+                            // Guard: Ensure cohort medication entry IDs are scoped strictly to active user's medicines list to prevent multi-profile contamination (#115, #BUG-ALARM-ISOLATE)
+                            val allTargetIds = uiState.medicinesList.map { it.first.entryId }.ifEmpty { currentEntryIds }.filter { it.isNotEmpty() }.distinct()
                             if (user?.intakeSafeguardEnabled == true && !isIntakeReAlert) {
                                 // Guard: Start intake countdown timer for ADHD support on alarm dismissal (#104, #BUG-SAFEGUARD-COHORT-NAMES)
                                 val medNames = uiState.medicinesList.map { it.second.medicationName }.ifEmpty { listOf(currentMedName) }
@@ -308,13 +308,15 @@ class AlarmActivity : ComponentActivity() {
                                     Toast.LENGTH_SHORT
                                 ).show()
                             } catch (_: Exception) {}
-                            val allTargetIds = (currentEntryIds + uiState.medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
+                            // Guard: Scope snooze cohort strictly to active user's medicines list to prevent multi-profile contamination (#BUG-ALARM-ISOLATE)
+                            val allTargetIds = uiState.medicinesList.map { it.first.entryId }.ifEmpty { currentEntryIds }.filter { it.isNotEmpty() }.distinct()
                             alarmViewModel.snoozeCohort(allTargetIds, minutes, currentMedName) {
                                 dismissAction()
                             }
                         },
                         onSkipAction = { reason ->
-                            val allTargetIds = (currentEntryIds + uiState.medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
+                            // Guard: Scope skip cohort strictly to active user's medicines list to prevent multi-profile contamination (#BUG-ALARM-ISOLATE)
+                            val allTargetIds = uiState.medicinesList.map { it.first.entryId }.ifEmpty { currentEntryIds }.filter { it.isNotEmpty() }.distinct()
                             alarmViewModel.skipCohort(allTargetIds, reason) {
                                 dismissAction()
                             }

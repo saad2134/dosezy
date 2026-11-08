@@ -189,8 +189,12 @@ class AlarmViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             val medicinesList = _uiState.value.medicinesList
             val user = _uiState.value.user
-            // Guard: Merge explicit entryIds and loaded UI state list to ensure all cohort medicines are marked taken (#115)
-            val allIds = (entryIds + medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
+            val targetUserId = user?.userId
+            val userEntryIds = if (targetUserId != null) {
+                entryIds.filter { id -> database.scheduleDao().getScheduleEntryById(id)?.userId == targetUserId }
+            } else entryIds
+            // Guard: Merge explicit entryIds and loaded UI state list strictly for active user (#115, #BUG-ALARM-ISOLATE)
+            val allIds = (userEntryIds + medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
             withContext(NonCancellable) {
                 takeCohortUseCase(allIds, user = user)
             }
@@ -209,7 +213,12 @@ class AlarmViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             val medicinesList = _uiState.value.medicinesList
             val user = _uiState.value.user
-            val allIds = (entryIds + medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
+            val targetUserId = user?.userId
+            val userEntryIds = if (targetUserId != null) {
+                entryIds.filter { id -> database.scheduleDao().getScheduleEntryById(id)?.userId == targetUserId }
+            } else entryIds
+            // Guard: Scope snooze cohort strictly to active user (#BUG-ALARM-ISOLATE)
+            val allIds = (userEntryIds + medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
             val names = if (medicinesList.isNotEmpty()) {
                 medicinesList.map { it.second.medicationName }
             } else {
@@ -237,7 +246,13 @@ class AlarmViewModel @Inject constructor(
     ) {
         viewModelScope.launch(ioDispatcher) {
             val medicinesList = _uiState.value.medicinesList
-            val allIds = (entryIds + medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
+            val user = _uiState.value.user
+            val targetUserId = user?.userId
+            val userEntryIds = if (targetUserId != null) {
+                entryIds.filter { id -> database.scheduleDao().getScheduleEntryById(id)?.userId == targetUserId }
+            } else entryIds
+            // Guard: Scope skip cohort strictly to active user (#BUG-ALARM-ISOLATE)
+            val allIds = (userEntryIds + medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
             withContext(NonCancellable) {
                 skipCohortUseCase(allIds, reason)
             }

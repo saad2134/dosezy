@@ -1098,6 +1098,74 @@ class TakeAllCohortFunctionalityTest {
         // entry2 was scheduled 45 mins ago, secondUser considerLateAfter = 30 (30 mins) -> TAKEN_LATE
         assertEquals(MedicationStatus.TAKEN_LATE, res2?.status)
     }
+
+    @Test
+    fun snoozeCohortUseCase_withEntriesFromMultipleUsers_schedulesIndependentSnoozeAlarmsPerUser() = runBlocking {
+        // Guard: Verify SnoozeCohortUseCase partitions entries by user profile so distinct users have independent snooze alarms scheduled without merging into a single user's alarm (#BUG-SNOOZE-MULTIUSER-PARTITION)
+        val secondUser = User(
+            userId = "user_cohort_second_snooze",
+            fullName = "Second Snooze Patient",
+            age = 45,
+            gender = Gender.DO_NOT_SPECIFY,
+            contactNumber = "+0987654321",
+            snoozeDuration = 15
+        )
+        database.userDao().insertUser(secondUser)
+
+        val secondMed = Medicine(
+            medicineId = "med_second_user_snooze",
+            userId = secondUser.userId,
+            medicationName = "Metformin",
+            dosage = 500.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            currentStock = 30,
+            autoDeductOnTake = true
+        )
+        database.medicineDao().insertMedicine(secondMed)
+
+        val scheduledTime = LocalDateTime.now().minusMinutes(5)
+        val entry1 = ScheduleEntry(
+            entryId = "entry_snooze_user1",
+            userId = testUser.userId,
+            medicineId = medA.medicineId,
+            scheduledDateTime = scheduledTime,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_snooze_user2",
+            userId = secondUser.userId,
+            medicineId = secondMed.medicineId,
+            scheduledDateTime = scheduledTime,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        database.scheduleDao().insertScheduleEntry(entry1)
+        database.scheduleDao().insertScheduleEntry(entry2)
+
+        val snoozeCohortUseCase = SnoozeCohortUseCase(database, context)
+        snoozeCohortUseCase.invoke(listOf(entry1.entryId, entry2.entryId), user = null)
+
+        val prefs = context.getSharedPreferences(com.example.dosezy.notifications.AlarmScheduler.PREFS_COORDINATION, Context.MODE_PRIVATE)
+        // Group entries for user 1 must only contain entry 1
+        val group1 = prefs.getString("snooze_group_ids_${entry1.entryId}", null)
+        assertNotNull("Group 1 must exist", group1)
+        assertTrue(group1!!.contains(entry1.entryId))
+        assertFalse(group1.contains(entry2.entryId))
+
+        // Group entries for user 2 must only contain entry 2
+        val group2 = prefs.getString("snooze_group_ids_${entry2.entryId}", null)
+        assertNotNull("Group 2 must exist", group2)
+        assertTrue(group2!!.contains(entry2.entryId))
+        assertFalse(group2.contains(entry1.entryId))
+
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
+        val shadowAm = org.robolectric.Shadows.shadowOf(alarmManager)
+        assertTrue(shadowAm.scheduledAlarms.size >= 2)
+    }
 }
 
 

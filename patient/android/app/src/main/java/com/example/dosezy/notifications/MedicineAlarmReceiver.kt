@@ -121,7 +121,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             snoozeMinutes: Int = 10,
             userId: String? = null,
             userLanguage: com.example.dosezy.data.model.Language? = null,
-            isAlarmMode: Boolean = true
+            isAlarmMode: Boolean = true,
+            patientName: String? = null
         ) {
             val allowLockscreen = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE).getBoolean("lockscreen_details_enabled", true)
             MedicineAlarmReceiver().showNotification(
@@ -140,7 +141,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 userId = userId,
                 userLanguage = userLanguage,
                 allowLockscreenDetails = allowLockscreen,
-                isAlarmMode = isAlarmMode
+                isAlarmMode = isAlarmMode,
+                patientName = patientName
             )
         }
 
@@ -188,7 +190,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 userLanguage = user?.language,
                 showCustomSnoozeOptions = user?.customSnoozePopupEnabled ?: false,
                 allowLockscreenDetails = allowLockscreen,
-                isAlarmMode = isAlarmMode
+                isAlarmMode = isAlarmMode,
+                patientName = user?.fullName
             )
         }
     }
@@ -292,40 +295,44 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
                     // Guard: Reconcile all pending sibling schedule entries in the same time slot to ensure 4+ medication cohorts are fully loaded (#115)
                     val primary = validPendingEntries.first()
+                    val targetUserId = primary.userId
+                    // Guard: Isolate cohort strictly to primary entry profile to prevent cross-profile notification and alarm contamination (#BUG-RECEIVER-MULTIUSER)
+                    val userPendingEntries = validPendingEntries.filter { it.userId == targetUserId }.toMutableList()
+
                     val slotMillis = primary.scheduledDateTime.withSecond(0).withNano(0)
                         .atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
                     val slotEntries = database.scheduleDao().getScheduleForDateRangeDirect(
-                        primary.userId,
+                        targetUserId,
                         slotMillis,
                         slotMillis + 59999L
                     ).filter { it.status == com.example.dosezy.data.model.MedicationStatus.PENDING && !it.entryId.startsWith("PRN_") }
-                    val existingIds = validPendingEntries.map { it.entryId }.toSet()
+                    val existingIds = userPendingEntries.map { it.entryId }.toSet()
                     for (sibling in slotEntries) {
                         if (sibling.entryId !in existingIds) {
-                            validPendingEntries.add(sibling)
+                            userPendingEntries.add(sibling)
                         }
                     }
 
-                    val primaryEntry = validPendingEntries.first()
+                    val primaryEntry = userPendingEntries.first()
                     val user = database.userDao().getUserByIdDirect(primaryEntry.userId)
                     val isNagging = naggingCount > 0
 
                     // Retrieve medicine dosage details for each valid pending entry
-                    val medicineDetails = validPendingEntries.mapNotNull { e ->
+                    val medicineDetails = userPendingEntries.mapNotNull { e ->
                         val m = database.medicineDao().getMedicineByIdDirect(e.medicineId) ?: return@mapNotNull null
                         val dose = m.getDosageDisplay(e.scheduledDateTime.toLocalTime())
                         Pair(m.medicationName, dose)
                     }
 
-                    val activeMedicineNames = ArrayList(validPendingEntries.mapNotNull { e ->
+                    val activeMedicineNames = ArrayList(userPendingEntries.mapNotNull { e ->
                         database.medicineDao().getMedicineByIdDirect(e.medicineId)?.medicationName
                     }.distinct())
                     val effectiveMedicineName = if (activeMedicineNames.isNotEmpty()) activeMedicineNames.joinToString(", ") else medicineName
-                    val activeEntryIds = ArrayList(validPendingEntries.map { it.entryId })
+                    val activeEntryIds = ArrayList(userPendingEntries.map { it.entryId })
 
                     // Guard: Check if any medication in the cohort requires full alarm behavior (#111)
                     val defaultReminderType = user?.reminderType ?: com.example.dosezy.data.model.ReminderType.ALARM
-                    val isAlarmMode = validPendingEntries.any { e ->
+                    val isAlarmMode = userPendingEntries.any { e ->
                         val m = database.medicineDao().getMedicineByIdDirect(e.medicineId)
                         val effectiveType = m?.reminderType ?: defaultReminderType
                         effectiveType == com.example.dosezy.data.model.ReminderType.ALARM
@@ -376,7 +383,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                         userLanguage = user?.language,
                         showCustomSnoozeOptions = user?.customSnoozePopupEnabled ?: false,
                         allowLockscreenDetails = user?.lockscreenDetailsEnabled ?: true,
-                        isAlarmMode = isAlarmMode
+                        isAlarmMode = isAlarmMode,
+                        patientName = user?.fullName
                     )
 
                     // Guard: Schedule next follow-up nagging reminder if enabled and below limit (0 = continuous until missed threshold) (#119)
@@ -412,7 +420,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                                 autoSilenceSeconds = 0
                             )
                         }
-                        showNotification(context, entryId, entryIds, medicineName, medicineNames, emptyList(), scheduledTime, false, 0, 3, isAlarmMode = isAlarm)
+                        showNotification(context, entryId, entryIds, medicineName, medicineNames, emptyList(), scheduledTime, false, 0, 3, isAlarmMode = isAlarm, patientName = fallbackUser?.fullName)
                     } catch (fallbackEx: Exception) {
                         Log.e(TAG, "Error in fallback alarm/notification handling", fallbackEx)
                     }
@@ -446,13 +454,23 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         userLanguage: com.example.dosezy.data.model.Language? = null,
         showCustomSnoozeOptions: Boolean = false,
         allowLockscreenDetails: Boolean = true,
-        isAlarmMode: Boolean = true
+        isAlarmMode: Boolean = true,
+        patientName: String? = null
     ) {
         // Guard: Resolve notification strings and actions using user profile language or fallback to globally saved app language (#BUG-NOTIF-LOCALE)
         val targetLanguage = userLanguage ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
         val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, targetLanguage)
 
         createNotificationChannels(localizedContext)
+
+        val resolvedPatientName = patientName ?: userId?.let { uid ->
+            try {
+                kotlinx.coroutines.runBlocking(kotlinx.coroutines.Dispatchers.IO) {
+                    com.example.dosezy.data.DosezyDatabase.getInstance(context).userDao().getUserByIdDirect(uid)?.fullName
+                }
+            } catch (_: Exception) { null }
+        }
+        val cleanPatientName = resolvedPatientName?.takeIf { it.isNotBlank() }
 
         // Guard: Check scheduledTime.isNotBlank() to prevent rendering empty 'Scheduled: ' label on safeguard re-alerts
         val scheduledTimeStr = scheduledTime?.takeIf { it.isNotBlank() }?.let {
@@ -609,7 +627,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             }
         }
 
-        val notificationTitle = if (isIntakeReAlert) {
+        val baseTitle = if (isIntakeReAlert) {
             localizedContext.getString(R.string.notif_intake_realert_title)
         } else if (isNagging) {
             localizedContext.getString(R.string.notif_nagging_title, primaryMedLabel)
@@ -618,6 +636,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         } else {
             localizedContext.getString(R.string.alarm_medication_reminder)
         }
+        // Guard: Include patient name in notification shade title for reminders so multi-profile users immediately recognize who the alarm is for (#BUG-MULTIUSER-NOTIF-TITLE)
+        val notificationTitle = if (cleanPatientName != null && !isIntakeReAlert) "$baseTitle \u2022 $cleanPatientName" else baseTitle
 
         val notificationText = if (isIntakeReAlert) {
             localizedContext.getString(R.string.notif_intake_realert_desc, primaryMedLabel)
