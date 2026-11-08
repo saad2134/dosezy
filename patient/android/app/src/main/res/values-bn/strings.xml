@@ -514,8 +514,10 @@
     <string name="pref_nagging_interval">তাগিদের ব্যবধান</string>
     <string name="pref_nagging_max_repeats">সর্বোচ্চ পুনরাবৃত্তি</string>
     <string name="pref_nagging_repeats_format">%1$d বার</string>
+    <string name="pref_nagging_repeats_continuous">ধারাবাহিক (নেওয়া পর্যন্ত)</string>
     <string name="notif_nagging_title">ফলো-আপ রিমাইন্ডার: %1$s</string>
     <string name="notif_nagging_text">অনুস্মারক %1$d/%2$d: %3$s এর ডোজ এখনও গ্রহণ করা হয়নি।</string>
+    <string name="notif_nagging_text_continuous">অনুস্মারক #%1$d: %2$s এর ডোজ এখনও গ্রহণ করা হয়নি।</string>
 
     <string name="widget_title">Dosezy আজকের ওষুধ</string>
     <string name="widget_no_meds">আসন্ন কোন ডোজ নেই</string>

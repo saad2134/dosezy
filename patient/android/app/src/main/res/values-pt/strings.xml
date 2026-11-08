@@ -513,8 +513,10 @@ Deseja continuar?</string>
     <string name="pref_nagging_interval">Intervalo de insistência</string>
     <string name="pref_nagging_max_repeats">Máximo de repetições</string>
     <string name="pref_nagging_repeats_format">%1$d vezes</string>
+    <string name="pref_nagging_repeats_continuous">Contínuo (Até tomar)</string>
     <string name="notif_nagging_title">Acompanhamento: %1$s</string>
     <string name="notif_nagging_text">Lembrete %1$d/%2$d: A dose de %3$s ainda está pendente.</string>
+    <string name="notif_nagging_text_continuous">Lembrete #%1$d: A dose de %2$s ainda está pendente.</string>
 
     <string name="widget_title">Dosezy Hoje</string>
     <string name="widget_no_meds">Nenhuma dose prevista</string>

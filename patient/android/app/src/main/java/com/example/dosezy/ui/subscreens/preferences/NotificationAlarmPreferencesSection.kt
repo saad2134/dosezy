@@ -406,8 +406,13 @@ fun LazyListScope.notificationAlarmPreferencesSection(
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
+                            val repeats = currentUser?.naggingMaxRepeats ?: 3
                             Text(
-                                text = stringResource(R.string.pref_nagging_repeats_format, currentUser?.naggingMaxRepeats ?: 3),
+                                text = if (repeats <= 0) {
+                                    stringResource(R.string.pref_nagging_repeats_continuous)
+                                } else {
+                                    stringResource(R.string.pref_nagging_repeats_format, repeats)
+                                },
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.primary

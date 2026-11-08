@@ -46,7 +46,7 @@ class PdfReportGenerator(private val context: Context) {
     ): Boolean =
         entry.status == MedicationStatus.MISSED ||
         (entry.status == MedicationStatus.PENDING && evalNow.isAfter(entry.scheduledDateTime) &&
-            Duration.between(entry.scheduledDateTime, evalNow).toHours() >= missedAfterHours.toLong())
+            com.example.dosezy.utils.TimeCalculationUtils.isMissed(entry.scheduledDateTime, evalNow, missedAfterHours))
 
     // Guard: Evaluate effective status so past overdue pending doses render as Missed matching Adherence Summary (#BUG-PDF-OVERDUE-STATUS)
     internal fun resolveDisplayStatus(
@@ -264,7 +264,7 @@ class PdfReportGenerator(private val context: Context) {
         // Analytics & Adherence Summary Section (Calculated from past decided doses)
         val evalNow = LocalDateTime.now()
         val evalToday = LocalDate.now()
-        val missedAfterHours = user.considerMissedAfter
+        val missedAfterHours = user.missedAfterMinutes
 
         val adherence = calculateAdherence(schedules, evalNow, evalToday, missedAfterHours)
 

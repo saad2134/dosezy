@@ -147,14 +147,14 @@ class AnalyticsViewModel @Inject constructor(
     ): AnalyticsUiState {
         val today = LocalDate.now()
         val now = LocalDateTime.now()
-        val missedAfterHours = user.considerMissedAfter
+        val missedAfterMinutes = user.missedAfterMinutes
         val targetLocale = LocaleHelper.getLocale(user.language)
 
         // Guard: Dynamic adherence evaluation for PENDING doses exceeding considerMissedAfter threshold
         fun isEntryMissed(entry: ScheduleEntry): Boolean =
             entry.status == MedicationStatus.MISSED ||
             (entry.status == MedicationStatus.PENDING && now.isAfter(entry.scheduledDateTime) &&
-                TimeCalculationUtils.isMissed(entry.scheduledDateTime, now, missedAfterHours))
+                TimeCalculationUtils.isMissed(entry.scheduledDateTime, now, missedAfterMinutes))
 
         fun getRangeEntries(range: AdherenceRange): List<ScheduleEntry> {
             return when (range) {

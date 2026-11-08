@@ -22,7 +22,7 @@ import com.example.dosezy.data.model.User
 
 @Database(
     entities = [User::class, Medicine::class, ScheduleEntry::class],
-    version = 20,
+    version = 21,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -160,6 +160,14 @@ abstract class DosezyDatabase : RoomDatabase() {
             }
         }
 
+        // Guard: Migration 20->21 converts legacy hour-based considerLateAfter and considerMissedAfter (< 15) to minutes (#119)
+        val MIGRATION_20_21 = object : Migration(20, 21) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("UPDATE users SET considerLateAfter = considerLateAfter * 60 WHERE considerLateAfter > 0 AND considerLateAfter < 15")
+                db.execSQL("UPDATE users SET considerMissedAfter = considerMissedAfter * 60 WHERE considerMissedAfter > 0 AND considerMissedAfter < 15")
+            }
+        }
+
         // Guard: Visible for testing to inject in-memory database instance into broadcast receivers and static managers
         @androidx.annotation.VisibleForTesting
         fun setInstance(db: DosezyDatabase?) {
@@ -173,7 +181,7 @@ abstract class DosezyDatabase : RoomDatabase() {
                     DosezyDatabase::class.java,
                     "dosezy_database"
                 )
-                    .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19, MIGRATION_19_20)
+                    .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19, MIGRATION_19_20, MIGRATION_20_21)
                     .addCallback(object : RoomDatabase.Callback() {
                         override fun onOpen(db: SupportSQLiteDatabase) {
                             super.onOpen(db)

@@ -861,8 +861,12 @@ class BackupRestoreManager(
             theme = themeVal,
             timeFormat = timeFormatVal,
             language = languageVal,
-            considerLateAfter = json.get("considerLateAfter")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 3,
-            considerMissedAfter = json.get("considerMissedAfter")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 6,
+            considerLateAfter = json.get("considerLateAfter")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()?.let {
+                if (it in 1..14) it * 60 else it
+            } ?: 180,
+            considerMissedAfter = json.get("considerMissedAfter")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()?.let {
+                if (it in 1..14) it * 60 else it
+            } ?: 360,
             snoozeDuration = json.get("snoozeDuration")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 10,
             allergies = json.get("allergies")?.let { if (it.isJsonNull) null else it.asString },
             medicalConditions = json.get("medicalConditions")?.let { if (it.isJsonNull) null else it.asString },

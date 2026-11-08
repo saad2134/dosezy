@@ -80,7 +80,7 @@ fun ScheduleActionDialog(
 
     val isTaken = entry.status == MedicationStatus.TAKEN_ON_TIME || entry.status == MedicationStatus.TAKEN_LATE
     val isSkipped = entry.status == MedicationStatus.SKIPPED
-    val missedAfter = currentUser?.considerMissedAfter ?: 6
+    val missedAfter = currentUser?.missedAfterMinutes ?: 360
     val isPassed = now.isAfter(entry.scheduledDateTime)
     val isMissed = entry.status == MedicationStatus.MISSED || (!isTaken && !isSkipped && isPassed && TimeCalculationUtils.isMissed(
         entry.scheduledDateTime,

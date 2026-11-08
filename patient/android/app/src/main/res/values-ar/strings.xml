@@ -514,8 +514,10 @@
     <string name="pref_nagging_interval">فترة تكرار التنبيه</string>
     <string name="pref_nagging_max_repeats">الحد الأقصى للتكرار</string>
     <string name="pref_nagging_repeats_format">%1$d مرات</string>
+    <string name="pref_nagging_repeats_continuous">مستمر (حتى أخذ الجرعة)</string>
     <string name="notif_nagging_title">متابعة الجرعة: %1$s</string>
     <string name="notif_nagging_text">تذكير %1$d/%2$d: جرعة %3$s ما زالت معلقة ولم تؤخذ بعد.</string>
+    <string name="notif_nagging_text_continuous">تذكير رقم %1$d: جرعة %2$s ما زالت معلقة ولم تؤخذ بعد.</string>
 
     <string name="widget_title">Dosezy اليوم</string>
     <string name="widget_no_meds">لا توجد جرعات قادمة</string>

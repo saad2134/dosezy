@@ -57,8 +57,8 @@ fun HomeMedicationCard(
             entry.status == MedicationStatus.TAKEN_LATE
     val isSkipped = entry.status == MedicationStatus.SKIPPED
 
-    val lateAfter = currentUser?.considerLateAfter ?: 3
-    val missedAfter = currentUser?.considerMissedAfter ?: 6
+    val lateAfter = currentUser?.lateAfterMinutes ?: 180
+    val missedAfter = currentUser?.missedAfterMinutes ?: 360
 
     val isPassed = currentDateTime.isAfter(entry.scheduledDateTime)
 

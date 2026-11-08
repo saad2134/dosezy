@@ -514,8 +514,10 @@ Vuoi continuare?</string>
     <string name="pref_nagging_interval">Intervallo promemoria</string>
     <string name="pref_nagging_max_repeats">Ripetizioni massime</string>
     <string name="pref_nagging_repeats_format">%1$d volte</string>
+    <string name="pref_nagging_repeats_continuous">"Continuo (Fino all'assunzione)"</string>
     <string name="notif_nagging_title">Promemoria di follow-up: %1$s</string>
     <string name="notif_nagging_text">Promemoria %1$d/%2$d: La dose per %3$s è ancora in sospeso.</string>
+    <string name="notif_nagging_text_continuous">Promemoria #%1$d: La dose per %2$s è ancora in sospeso.</string>
 
     <string name="widget_title">Dosezy Oggi</string>
     <string name="widget_no_meds">Nessuna dose in programma</string>

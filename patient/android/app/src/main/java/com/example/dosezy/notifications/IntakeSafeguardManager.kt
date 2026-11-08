@@ -191,7 +191,7 @@ object IntakeSafeguardManager {
         current.entryIds.forEach { id ->
             val entry = database.scheduleDao().getScheduleEntryById(id)
             val user = entry?.let { database.userDao().getUserByIdDirect(it.userId) }
-            val lateAfter = user?.considerLateAfter ?: 3
+            val lateAfter = user?.lateAfterMinutes ?: 180
             val status = if (entry != null && TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, lateAfter)) {
                 "TAKEN_LATE"
             } else {

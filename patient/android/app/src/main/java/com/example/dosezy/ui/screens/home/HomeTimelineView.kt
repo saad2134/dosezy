@@ -62,8 +62,8 @@ fun HomeTimelineView(
     onEditNote: (String) -> Unit = {},
     onMarkAllTaken: ((List<ScheduleWithMedicine>) -> Unit)? = null
 ) {
-    val lateAfter = currentUser?.considerLateAfter ?: 3
-    val missedAfter = currentUser?.considerMissedAfter ?: 6
+    val lateAfter = currentUser?.lateAfterMinutes ?: 180
+    val missedAfter = currentUser?.missedAfterMinutes ?: 360
 
     Column(modifier = Modifier.fillMaxWidth()) {
         groupedEntries.forEachIndexed { index, (time, entries) ->

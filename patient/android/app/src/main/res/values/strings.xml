@@ -551,8 +551,10 @@ Do you want to continue?</string>
     <string name="pref_nagging_interval">Nagging Interval</string>
     <string name="pref_nagging_max_repeats">Max Repeat Reminders</string>
     <string name="pref_nagging_repeats_format">%1$d times</string>
+    <string name="pref_nagging_repeats_continuous">Continuous (Until taken)</string>
     <string name="notif_nagging_title">Follow-up: %1$s</string>
     <string name="notif_nagging_text">Reminder %1$d/%2$d: Dose scheduled for %3$s is still pending.</string>
+    <string name="notif_nagging_text_continuous">Reminder #%1$d: Dose scheduled for %2$s is still pending.</string>
 
     <!-- Home Screen Widget (#48) -->
     <string name="widget_title">Dosezy Today</string>

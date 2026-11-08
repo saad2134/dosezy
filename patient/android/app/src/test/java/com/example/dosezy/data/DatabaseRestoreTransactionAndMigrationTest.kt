@@ -232,6 +232,18 @@ class DatabaseRestoreTransactionAndMigrationTest {
         }
     }
 
+    @Test
+    fun migration20_21_convertsLateAndMissedHoursToMinutes() {
+        // Guard: Migration 20->21 must scale legacy hour values (< 15) to minutes (#119)
+        val sqliteDb = mockk<SupportSQLiteDatabase>(relaxed = true)
+        DosezyDatabase.MIGRATION_20_21.migrate(sqliteDb)
+
+        verify(exactly = 1) {
+            sqliteDb.execSQL("UPDATE users SET considerLateAfter = considerLateAfter * 60 WHERE considerLateAfter > 0 AND considerLateAfter < 15")
+            sqliteDb.execSQL("UPDATE users SET considerMissedAfter = considerMissedAfter * 60 WHERE considerMissedAfter > 0 AND considerMissedAfter < 15")
+        }
+    }
+
     // ───────────────────────────────────────────────────────────────
     // Issue 2: OVERWRITE Foreign-Key Filtering & ID Regeneration
     // ───────────────────────────────────────────────────────────────

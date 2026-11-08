@@ -514,8 +514,10 @@
     <string name="pref_nagging_interval">Интервал напоминаний</string>
     <string name="pref_nagging_max_repeats">Максимум повторений</string>
     <string name="pref_nagging_repeats_format">%1$d раз</string>
+    <string name="pref_nagging_repeats_continuous">Непрерывно (До приема)</string>
     <string name="notif_nagging_title">Повторное напоминание: %1$s</string>
     <string name="notif_nagging_text">Напоминание %1$d/%2$d: Прием %3$s все еще ожидает подтверждения.</string>
+    <string name="notif_nagging_text_continuous">Напоминание #%1$d: Прием %2$s все еще ожидает подтверждения.</string>
 
     <string name="widget_title">Dosezy Сегодня</string>
     <string name="widget_no_meds">Нет предстоящих приемов</string>

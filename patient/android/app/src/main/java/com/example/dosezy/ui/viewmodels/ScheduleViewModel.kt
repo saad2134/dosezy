@@ -193,7 +193,7 @@ class ScheduleViewModel @Inject constructor(
             val entry = scheduleRepository.getScheduleEntryById(entryId)
             val userId = entry?.userId ?: _currentUserId.value
             val user = userId?.let { userRepository.getUserByIdSync(it) } ?: userRepository.getAllUsersList().find { it.isCurrentUser }
-            val lateAfter = user?.considerLateAfter ?: 3
+            val lateAfter = user?.lateAfterMinutes ?: 180
             val parsedTakenAt = try { LocalDateTime.parse(takenAt) } catch (_: Exception) { LocalDateTime.now() }
             // Guard: Evaluate isTakenLate so overdue doses marked taken via ScheduleViewModel are accurately recorded as TAKEN_LATE rather than TAKEN_ON_TIME (#BUG-VM-LATE-STATUS)
             val status = if (entry != null && TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, parsedTakenAt, lateAfter)) {
@@ -224,7 +224,7 @@ class ScheduleViewModel @Inject constructor(
     fun markCohortAsTaken(
         entryIds: List<String>,
         takenAt: String,
-        lateAfter: Int = 3,
+        lateAfter: Int = 180,
         notes: String? = null
     ) {
         viewModelScope.launch {
@@ -302,12 +302,12 @@ class ScheduleViewModel @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun autoMarkMissedMedications(userId: String, missedAfterHours: Int) {
+    fun autoMarkMissedMedications(userId: String, missedAfterMinutes: Int) {
         // Guard: Re-evaluate today's schedule subscription if crossing midnight before checking missed status
         checkMidnightDateTransition()
         viewModelScope.launch {
             val currentTime = LocalDateTime.now()
-            val cutoffTime = currentTime.minusHours(missedAfterHours.toLong())
+            val cutoffTime = currentTime.minusMinutes(TimeCalculationUtils.normalizeMinutes(missedAfterMinutes))
             try {
                 // Query only pending entries that have passed the missed cutoff time
                 val overdueEntries = scheduleRepository.getPendingEntriesBefore(userId, cutoffTime)
@@ -317,7 +317,7 @@ class ScheduleViewModel @Inject constructor(
                     val isMissed = TimeCalculationUtils.isMissed(
                         entry.scheduledDateTime,
                         currentTime,
-                        missedAfterHours
+                        missedAfterMinutes
                     )
                     if (isMissed) {
                         // Guard: Use recordDoseMissed to clear notification shade and disarm Doze wakeups via AlarmManager

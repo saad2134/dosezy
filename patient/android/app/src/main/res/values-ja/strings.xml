@@ -514,8 +514,10 @@
     <string name="pref_nagging_interval">再通知間隔</string>
     <string name="pref_nagging_max_repeats">最大再通知回数</string>
     <string name="pref_nagging_repeats_format">%1$d 回</string>
+    <string name="pref_nagging_repeats_continuous">継続（服用するまで）</string>
     <string name="notif_nagging_title">服薬リマインド: %1$s</string>
     <string name="notif_nagging_text">再通知 %1$d/%2$d: %3$s の予定薬がまだ服用されていません。</string>
+    <string name="notif_nagging_text_continuous">再通知 #%1$d: %2$s の予定薬がまだ服用されていません。</string>
 
     <string name="widget_title">Dosezy 今日の服薬</string>
     <string name="widget_no_meds">予定されている薬はありません</string>

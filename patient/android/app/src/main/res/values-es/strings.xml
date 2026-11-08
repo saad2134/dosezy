@@ -530,8 +530,10 @@
     <string name="pref_nagging_interval">Intervalo de insistencia</string>
     <string name="pref_nagging_max_repeats">Repeticiones máximas</string>
     <string name="pref_nagging_repeats_format">%1$d veces</string>
+    <string name="pref_nagging_repeats_continuous">Continuo (Hasta tomar)</string>
     <string name="notif_nagging_title">Seguimiento: %1$s</string>
     <string name="notif_nagging_text">Recordatorio %1$d/%2$d: La dosis de %3$s aún está pendiente.</string>
+    <string name="notif_nagging_text_continuous">Recordatorio #%1$d: La dosis de %2$s aún está pendiente.</string>
 
     <string name="widget_title">Dosezy Hoy</string>
     <string name="widget_no_meds">No hay dosis próximas</string>

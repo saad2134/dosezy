@@ -514,8 +514,10 @@ Möchten Sie fortfahren?</string>
     <string name="pref_nagging_interval">Erinnerungsintervall</string>
     <string name="pref_nagging_max_repeats">Max. Wiederholungen</string>
     <string name="pref_nagging_repeats_format">%1$d-mal</string>
+    <string name="pref_nagging_repeats_continuous">Fortlaufend (Bis eingenommen)</string>
     <string name="notif_nagging_title">Nachfass-Erinnerung: %1$s</string>
     <string name="notif_nagging_text">Erinnerung %1$d/%2$d: Die Dosis für %3$s steht noch aus.</string>
+    <string name="notif_nagging_text_continuous">Erinnerung #%1$d: Die Dosis für %2$s steht noch aus.</string>
 
     <string name="widget_title">Dosezy Heute</string>
     <string name="widget_no_meds">Keine anstehenden Dosen</string>

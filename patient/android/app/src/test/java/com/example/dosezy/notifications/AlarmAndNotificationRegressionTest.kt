@@ -920,6 +920,65 @@ class AlarmAndNotificationRegressionTest {
         sourceFile.delete()
         destFile.delete()
     }
+
+    // ───────────────────────────────────────────────────────────────
+    // Regression: Issue #119 - Infinite Nagging & Sub-Hour Granularity
+    // ───────────────────────────────────────────────────────────────
+    @Test
+    fun medicineAlarmReceiver_continuousNagging_evaluatesInfiniteThresholdAccurately() {
+        // Guard: Verify continuous nagging (naggingMaxRepeats = 0) permits alarms past count 5 unless missed (#119)
+        val continuousUser = com.example.dosezy.data.model.User(
+            fullName = "Continuous Nag",
+            age = 25,
+            gender = com.example.dosezy.data.model.Gender.DO_NOT_SPECIFY,
+            contactNumber = "",
+            naggingRemindersEnabled = true,
+            naggingMaxRepeats = 0, // Continuous
+            considerMissedAfter = 360 // 6 hours
+        )
+
+        val scheduledTime = java.time.LocalDateTime.now().minusMinutes(50) // 50 mins ago (well within 360m)
+        val isMissed = com.example.dosezy.utils.TimeCalculationUtils.isMissed(
+            scheduledTime,
+            java.time.LocalDateTime.now(),
+            continuousUser.missedAfterMinutes
+        )
+        assertFalse("50m-old dose must not be missed", isMissed)
+
+        val isContinuous = continuousUser.naggingMaxRepeats <= 0
+        val highNaggingCount = 10
+        val shouldScheduleNagging = continuousUser.naggingRemindersEnabled && !isMissed && (isContinuous || highNaggingCount < continuousUser.naggingMaxRepeats)
+        assertTrue("Continuous nagging must permit scheduling even at repeat #10", shouldScheduleNagging)
+
+        // Once past missed threshold (e.g. 7 hours ago)
+        val overdueTime = java.time.LocalDateTime.now().minusHours(7)
+        val isOverdueMissed = com.example.dosezy.utils.TimeCalculationUtils.isMissed(
+            overdueTime,
+            java.time.LocalDateTime.now(),
+            continuousUser.missedAfterMinutes
+        )
+        assertTrue("7h-old dose must be missed", isOverdueMissed)
+        val shouldScheduleOverdue = continuousUser.naggingRemindersEnabled && !isOverdueMissed && (isContinuous || highNaggingCount < continuousUser.naggingMaxRepeats)
+        assertFalse("Continuous nagging must cease once dose crosses missed threshold", shouldScheduleOverdue)
+    }
+
+    @Test
+    fun medicineAlarmReceiver_continuousNaggingNotification_formatsWithoutRatio() {
+        // Guard: Verify continuous nagging formats notification text without /max ratio (#119)
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val count = 4
+        val maxNagging = 0
+        val scheduledTime = "08:00 AM"
+
+        val formattedText = if (maxNagging <= 0) {
+            context.getString(com.example.dosezy.R.string.notif_nagging_text_continuous, count, scheduledTime)
+        } else {
+            context.getString(com.example.dosezy.R.string.notif_nagging_text, count, maxNagging, scheduledTime)
+        }
+        assertTrue("Formatted text should contain repeat count", formattedText.contains("4"))
+        assertTrue("Formatted text should contain scheduled time", formattedText.contains("08:00 AM"))
+        assertFalse("Continuous nagging text should not contain /0 ratio", formattedText.contains("/0"))
+    }
 }
 
 

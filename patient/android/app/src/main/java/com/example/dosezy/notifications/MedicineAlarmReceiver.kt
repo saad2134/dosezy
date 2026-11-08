@@ -378,8 +378,14 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                         isAlarmMode = isAlarmMode
                     )
 
-                    // Schedule next follow-up nagging reminder if enabled and below limit
-                    if (user != null && user.naggingRemindersEnabled && naggingCount < user.naggingMaxRepeats) {
+                    // Guard: Schedule next follow-up nagging reminder if enabled and below limit (0 = continuous until missed threshold) (#119)
+                    val isContinuous = user != null && user.naggingMaxRepeats <= 0
+                    val isMissed = user != null && com.example.dosezy.utils.TimeCalculationUtils.isMissed(
+                        primaryEntry.scheduledDateTime,
+                        java.time.LocalDateTime.now(),
+                        user.missedAfterMinutes
+                    )
+                    if (user != null && user.naggingRemindersEnabled && !isMissed && (isContinuous || naggingCount < user.naggingMaxRepeats)) {
                         val alarmScheduler = AlarmScheduler(context)
                         alarmScheduler.scheduleNaggingReminder(
                             entryId = primaryEntry.entryId,
@@ -613,7 +619,12 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         val notificationText = if (isIntakeReAlert) {
             localizedContext.getString(R.string.notif_intake_realert_desc, primaryMedLabel)
         } else if (isNagging) {
-            localizedContext.getString(R.string.notif_nagging_text, naggingCount, maxNagging, scheduledTime ?: "")
+            // Guard: If maxNagging <= 0 (continuous), format without upper bound; otherwise show current/max (#119)
+            if (maxNagging <= 0) {
+                localizedContext.getString(R.string.notif_nagging_text_continuous, naggingCount, scheduledTime ?: "")
+            } else {
+                localizedContext.getString(R.string.notif_nagging_text, naggingCount, maxNagging, scheduledTime ?: "")
+            }
         } else if (effectiveDetails.size == 1) {
             "$primaryMedLabel • $scheduledTimeStr"
         } else {

@@ -530,8 +530,10 @@
     <string name="pref_nagging_interval">रिमाइंडर अंतराल</string>
     <string name="pref_nagging_max_repeats">अधिकतम दोहराव</string>
     <string name="pref_nagging_repeats_format">%1$d बार</string>
+    <string name="pref_nagging_repeats_continuous">लगातार (लेने तक)</string>
     <string name="notif_nagging_title">अनुवर्ती सूचना: %1$s</string>
     <string name="notif_nagging_text">रिमाइंडर %1$d/%2$d: %3$s के लिए खुराक अभी भी लंबित है।</string>
+    <string name="notif_nagging_text_continuous">रिमाइंडर #%1$d: %2$s के लिए खुराक अभी भी लंबित है।</string>
 
     <string name="widget_title">Dosezy आज</string>
     <string name="widget_no_meds">कोई आगामी खुराक नहीं</string>

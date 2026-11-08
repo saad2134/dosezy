@@ -530,8 +530,10 @@
     <string name="pref_nagging_interval">提醒间隔时间</string>
     <string name="pref_nagging_max_repeats">最大重复次数</string>
     <string name="pref_nagging_repeats_format">%1$d 次</string>
+    <string name="pref_nagging_repeats_continuous">持续提醒（直到服药）</string>
     <string name="notif_nagging_title">用药跟进提醒：%1$s</string>
     <string name="notif_nagging_text">提醒 %1$d/%2$d：原定于 %3$s 的药物尚未服用。</string>
+    <string name="notif_nagging_text_continuous">提醒 #%1$d：原定于 %2$s 的药物尚未服用。</string>
 
     <string name="widget_title">Dosezy 今日服药</string>
     <string name="widget_no_meds">暂无待服药物</string>

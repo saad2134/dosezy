@@ -69,7 +69,7 @@ class TakeCohortUseCase @Inject constructor(
         entryIds.forEach { id ->
             val entry = database.scheduleDao().getScheduleEntryById(id)
             val entryUser = user ?: entry?.let { database.userDao().getUserByIdDirect(it.userId) }
-            val lateAfter = entryUser?.considerLateAfter ?: 3
+            val lateAfter = entryUser?.lateAfterMinutes ?: 180
             val status = if (entry != null && TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, customTakenAt, lateAfter)) {
                 "TAKEN_LATE"
             } else {

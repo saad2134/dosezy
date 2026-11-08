@@ -104,7 +104,7 @@ fun ScheduleCalendar(
             currentMonth = currentMonth,
             selectedDate = selectedDate,
             scheduleEntries = scheduleEntries,
-            missedAfterHours = currentUser?.considerMissedAfter ?: 6,
+            missedAfterMinutes = currentUser?.missedAfterMinutes ?: 360,
             thickerHighlight = currentUser?.thickerCalendarDayHighlight == true,
             firstDayOfWeek = firstDayOfWeek,
             onDateSelected = { date ->
@@ -193,7 +193,7 @@ private fun CalendarGrid(
     selectedDate: LocalDate,
     scheduleEntries: List<ScheduleEntry>,
     onDateSelected: (LocalDate) -> Unit,
-    missedAfterHours: Int = 6,
+    missedAfterMinutes: Int = 360,
     thickerHighlight: Boolean = false,
     firstDayOfWeek: java.time.DayOfWeek = java.time.temporal.WeekFields.of(java.util.Locale.getDefault()).firstDayOfWeek,
     modifier: Modifier = Modifier
@@ -232,7 +232,7 @@ private fun CalendarGrid(
                         entriesByDate[currentDate] ?: emptyList()
                     } ?: emptyList()
 
-                    val statusColor = getDateStatusColor(dayEntries, missedAfterHours)
+                    val statusColor = getDateStatusColor(dayEntries, missedAfterMinutes)
 
                     Box(
                         modifier = Modifier
@@ -336,7 +336,7 @@ private fun CalendarDay(
     }
 }
 
-private fun getDateStatusColor(entries: List<ScheduleEntry>, missedAfterHours: Int = 6): Color {
+private fun getDateStatusColor(entries: List<ScheduleEntry>, missedAfterMinutes: Int = 360): Color {
     if (entries.isEmpty()) return Color.Transparent
 
     val hasMissed = entries.any { it.status == MedicationStatus.MISSED }
@@ -354,7 +354,7 @@ private fun getDateStatusColor(entries: List<ScheduleEntry>, missedAfterHours: I
     val hasPastPending = entries.any {
         it.status == MedicationStatus.PENDING &&
                 now.isAfter(it.scheduledDateTime) &&
-                TimeCalculationUtils.isMissed(it.scheduledDateTime, now, missedAfterHours)
+                TimeCalculationUtils.isMissed(it.scheduledDateTime, now, missedAfterMinutes)
     }
     val hasUpcomingPending = entries.any { it.status == MedicationStatus.PENDING }
 

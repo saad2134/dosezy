@@ -514,8 +514,10 @@ Voulez-vous continuer ?</string>
     <string name="pref_nagging_interval">Intervalle de relance</string>
     <string name="pref_nagging_max_repeats">Nombre max de répétitions</string>
     <string name="pref_nagging_repeats_format">%1$d fois</string>
+    <string name="pref_nagging_repeats_continuous">"Continu (Jusqu'à la prise)"</string>
     <string name="notif_nagging_title">Suivi de prise : %1$s</string>
     <string name="notif_nagging_text">Rappel %1$d/%2$d : La dose prévue pour %3$s est toujours en attente.</string>
+    <string name="notif_nagging_text_continuous">Rappel #%1$d : La dose prévue pour %2$s est toujours en attente.</string>
 
     <string name="widget_title">Dosezy Aujourd\'hui</string>
     <string name="widget_no_meds">Aucune dose à venir</string>
