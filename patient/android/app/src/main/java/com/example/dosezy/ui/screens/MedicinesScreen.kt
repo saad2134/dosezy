@@ -33,25 +33,34 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -86,6 +95,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.dosezy.data.model.DosageUnit
 import com.example.dosezy.data.model.Medicine
+import com.example.dosezy.data.model.MedicineSortMode
 import com.example.dosezy.data.model.getLocalizedDosageDisplay
 import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.theme.DosezyTheme
@@ -108,6 +118,7 @@ fun MedicinesScreen(
     val medicines by medicineViewModel.medicines.collectAsState()
     val archivedMedicines by medicineViewModel.archivedMedicines.collectAsState()
     val isLoading by medicineViewModel.isLoading.collectAsState()
+    val sortMode by medicineViewModel.sortMode.collectAsState()
 
     LaunchedEffect(currentUser) {
         currentUser?.let { user ->
@@ -171,6 +182,10 @@ fun MedicinesScreen(
                         navController.navigate("add_med")
                     },
                     currentUser = currentUser,
+                    sortMode = sortMode,
+                    onSortModeChange = { medicineViewModel.setSortMode(it) },
+                    onMoveUp = { medicineViewModel.moveMedicineUp(it) },
+                    onMoveDown = { medicineViewModel.moveMedicineDown(it) },
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -261,10 +276,16 @@ fun MedicinesContent(
     onPermanentDeleteClick: (Medicine) -> Unit = {},
     onAddMedicineClick: () -> Unit = {},
     currentUser: com.example.dosezy.data.model.User? = null,
+    sortMode: MedicineSortMode = MedicineSortMode.DEFAULT,
+    onSortModeChange: (MedicineSortMode) -> Unit = {},
+    onMoveUp: (String) -> Unit = {},
+    onMoveDown: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var isArchivedExpanded by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
+    var isSortMenuExpanded by remember { mutableStateOf(false) }
+    var showReorderDialog by remember { mutableStateOf(false) }
 
     val filteredMedicines = remember(medicines, searchQuery) {
         if (searchQuery.isBlank()) medicines
@@ -288,50 +309,151 @@ fun MedicinesContent(
                 },
             contentPadding = PaddingValues(start = 16.dp, top = if (hasSearchBar) 0.dp else 8.dp, end = 16.dp, bottom = 16.dp)
         ) {
-            // Search bar for medications roster
+            // Search bar and sorting controls for medications roster (#120)
             if (hasSearchBar) {
                 item {
-                    OutlinedTextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp, bottom = 8.dp),
-                        placeholder = {
-                            Text(
-                                text = stringResource(R.string.search_medicines_hint),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            modifier = Modifier.weight(1f),
+                            placeholder = {
+                                Text(
+                                    text = stringResource(R.string.search_medicines_hint),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
+                            trailingIcon = {
+                                if (searchQuery.isNotBlank()) {
+                                    IconButton(onClick = { searchQuery = "" }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Clear,
+                                            contentDescription = stringResource(R.string.search_clear),
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                            },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                            keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() }),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surface
                             )
-                        },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        },
-                        trailingIcon = {
-                            if (searchQuery.isNotBlank()) {
-                                IconButton(onClick = { searchQuery = "" }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Clear,
-                                        contentDescription = stringResource(R.string.search_clear),
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        if (medicines.size >= 2) {
+                            Box {
+                                Surface(
+                                    modifier = Modifier.size(56.dp),
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = if (sortMode != MedicineSortMode.DEFAULT) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
+                                    border = androidx.compose.foundation.BorderStroke(
+                                        1.dp,
+                                        if (sortMode != MedicineSortMode.DEFAULT) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                                    ),
+                                    onClick = { isSortMenuExpanded = true }
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Icon(
+                                            imageVector = Icons.Default.Sort,
+                                            contentDescription = stringResource(R.string.sort_medicines_title),
+                                            tint = if (sortMode != MedicineSortMode.DEFAULT) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+
+                                DropdownMenu(
+                                    expanded = isSortMenuExpanded,
+                                    onDismissRequest = { isSortMenuExpanded = false }
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.sort_preset_default)) },
+                                        onClick = {
+                                            onSortModeChange(MedicineSortMode.DEFAULT)
+                                            isSortMenuExpanded = false
+                                        },
+                                        leadingIcon = {
+                                            RadioButton(
+                                                selected = sortMode == MedicineSortMode.DEFAULT,
+                                                onClick = null
+                                            )
+                                        }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.sort_preset_name_asc)) },
+                                        onClick = {
+                                            onSortModeChange(MedicineSortMode.NAME_ASC)
+                                            isSortMenuExpanded = false
+                                        },
+                                        leadingIcon = {
+                                            RadioButton(
+                                                selected = sortMode == MedicineSortMode.NAME_ASC,
+                                                onClick = null
+                                            )
+                                        }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.sort_preset_name_desc)) },
+                                        onClick = {
+                                            onSortModeChange(MedicineSortMode.NAME_DESC)
+                                            isSortMenuExpanded = false
+                                        },
+                                        leadingIcon = {
+                                            RadioButton(
+                                                selected = sortMode == MedicineSortMode.NAME_DESC,
+                                                onClick = null
+                                            )
+                                        }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.sort_preset_time_asc)) },
+                                        onClick = {
+                                            onSortModeChange(MedicineSortMode.TIME_ASC)
+                                            isSortMenuExpanded = false
+                                        },
+                                        leadingIcon = {
+                                            RadioButton(
+                                                selected = sortMode == MedicineSortMode.TIME_ASC,
+                                                onClick = null
+                                            )
+                                        }
+                                    )
+                                    Divider()
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.sort_preset_custom)) },
+                                        onClick = {
+                                            isSortMenuExpanded = false
+                                            showReorderDialog = true
+                                        },
+                                        leadingIcon = {
+                                            RadioButton(
+                                                selected = sortMode == MedicineSortMode.CUSTOM,
+                                                onClick = null
+                                            )
+                                        }
                                     )
                                 }
                             }
-                        },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                        keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() }),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                        )
-                    )
+                        }
+                    }
                 }
             }
 
@@ -492,6 +614,125 @@ fun MedicinesContent(
             }
         }
     }
+
+    if (showReorderDialog) {
+        ReorderMedicinesDialog(
+            medicines = medicines,
+            onMoveUp = onMoveUp,
+            onMoveDown = onMoveDown,
+            onDismiss = { showReorderDialog = false }
+        )
+    }
+}
+
+@Composable
+fun ReorderMedicinesDialog(
+    medicines: List<Medicine>,
+    onMoveUp: (String) -> Unit,
+    onMoveDown: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(R.string.sort_custom_reorder_title),
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 420.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.sort_custom_reorder_desc),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    itemsIndexed(medicines, key = { _, med -> med.medicineId }) { index, med ->
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(10.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text(
+                                        text = "${index + 1}.",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.width(28.dp)
+                                    )
+                                    Column {
+                                        Text(
+                                            text = med.medicationName,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            maxLines = 1,
+                                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                        )
+                                        Text(
+                                            text = med.getLocalizedDosageDisplay(),
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    IconButton(
+                                        onClick = { onMoveUp(med.medicineId) },
+                                        enabled = index > 0,
+                                        modifier = Modifier.size(36.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.KeyboardArrowUp,
+                                            contentDescription = stringResource(R.string.sort_move_up),
+                                            tint = if (index > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+                                        )
+                                    }
+                                    IconButton(
+                                        onClick = { onMoveDown(med.medicineId) },
+                                        enabled = index < medicines.size - 1,
+                                        modifier = Modifier.size(36.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.KeyboardArrowDown,
+                                            contentDescription = stringResource(R.string.sort_move_down),
+                                            tint = if (index < medicines.size - 1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = onDismiss) {
+                Text(stringResource(R.string.close))
+            }
+        }
+    )
 }
 
 @Composable

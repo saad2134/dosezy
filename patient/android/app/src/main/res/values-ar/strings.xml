@@ -877,4 +877,16 @@
     <string name="notif_channel_notifications_desc">تنبيهات إشعار قياسية لجداول الأدوية تحترم وضع عدم الإزعاج</string>
     <string name="form_reminder_type">نمط التذكير</string>
     <string name="form_reminder_type_desc">اختر منبه للأدوية الهامة أو إشعار للمكملات الغذائية</string>
+
+    <!-- Medicine Order & Sorting (#120) -->
+    <string name="sort_medicines_title">الترتيب والتنظيم</string>
+    <string name="sort_preset_default">الافتراضي (تاريخ الإضافة)</string>
+    <string name="sort_preset_name_asc">الاسم (أ إلى ي)</string>
+    <string name="sort_preset_name_desc">الاسم (ي إلى أ)</string>
+    <string name="sort_preset_time_asc">الوقت المحدد (الأبكر أولاً)</string>
+    <string name="sort_preset_custom">ترتيب مخصص</string>
+    <string name="sort_custom_reorder_title">تعديل ترتيب الأدوية</string>
+    <string name="sort_custom_reorder_desc">استخدم الأسهم لتعديل ترتيب أدويتك.</string>
+    <string name="sort_move_up">تحريك لأعلى</string>
+    <string name="sort_move_down">تحريك لأسفل</string>
 </resources>

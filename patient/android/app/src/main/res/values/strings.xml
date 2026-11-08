@@ -906,4 +906,16 @@ Do you want to continue?</string>
     <string name="notif_channel_notifications_desc">Standard notification alerts for medication schedules respecting Do Not Disturb</string>
     <string name="form_reminder_type">Reminder Style</string>
     <string name="form_reminder_type_desc">Choose Alarm for critical medicines or Notification for supplements</string>
+
+    <!-- Medicine Order & Sorting (#120) -->
+    <string name="sort_medicines_title">Sort and Order</string>
+    <string name="sort_preset_default">Default (Date Added)</string>
+    <string name="sort_preset_name_asc">Name (A to Z)</string>
+    <string name="sort_preset_name_desc">Name (Z to A)</string>
+    <string name="sort_preset_time_asc">Scheduled Time (Earliest First)</string>
+    <string name="sort_preset_custom">Custom Order</string>
+    <string name="sort_custom_reorder_title">Edit Medicine Order</string>
+    <string name="sort_custom_reorder_desc">Use the arrows to adjust the order of your medicines.</string>
+    <string name="sort_move_up">Move up</string>
+    <string name="sort_move_down">Move down</string>
 </resources>

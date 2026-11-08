@@ -893,4 +893,16 @@
     <string name="notif_channel_notifications_desc">दवा समय-सारणी के लिए मानक सूचनाएं जो डू नॉट डिस्टर्ब का पालन करती हैं</string>
     <string name="form_reminder_type">रिमाइंडर शैली</string>
     <string name="form_reminder_type_desc">महत्वपूर्ण दवाओं के लिए अलार्म या सप्लीमेंट्स के लिए सूचना चुनें</string>
+
+    <!-- Medicine Order & Sorting (#120) -->
+    <string name="sort_medicines_title">क्रमबद्ध करें</string>
+    <string name="sort_preset_default">डिफ़ॉल्ट (जोड़ने की तारीख)</string>
+    <string name="sort_preset_name_asc">नाम (अ से ज्ञ)</string>
+    <string name="sort_preset_name_desc">नाम (ज्ञ से अ)</string>
+    <string name="sort_preset_time_asc">निर्धारित समय (पहले का समय पहले)</string>
+    <string name="sort_preset_custom">कस्टम क्रम</string>
+    <string name="sort_custom_reorder_title">दवाओं का क्रम बदलें</string>
+    <string name="sort_custom_reorder_desc">अपनी दवाओं का क्रम बदलने के लिए तीरों का उपयोग करें।</string>
+    <string name="sort_move_up">ऊपर ले जाएं</string>
+    <string name="sort_move_down">नीचे ले जाएं</string>
 </resources>

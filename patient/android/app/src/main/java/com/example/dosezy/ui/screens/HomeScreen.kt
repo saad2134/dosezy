@@ -180,11 +180,20 @@ fun HomeScreen(
     // Check if there are any medications
     val hasMedications = todayEntries.isNotEmpty()
 
-    // Group entries by time
+    // Group entries by time and order intra-slot medicines according to user's custom or sorted medicine roster (#120)
     val timeFormat = currentUser?.timeFormat ?: TimeFormat.HOUR_12
-    val groupedEntries = remember(todayEntries, timeFormat, activeLocale) {
+    val groupedEntries = remember(todayEntries, userMedicines, timeFormat, activeLocale) {
+        val medOrderMap = userMedicines.mapIndexed { index, med -> med.medicineId to index }.toMap()
         todayEntries.groupBy { entry ->
             TimeFormatUtils.formatTime(entry.scheduleEntry.scheduledDateTime, timeFormat, activeLocale)
+        }.mapValues { (_, entries) ->
+            // Guard: Sort intra-slot entries using active medicine roster order so home dose cards follow user-defined sequence
+            entries.sortedWith(
+                compareBy(
+                    { medOrderMap[it.scheduleEntry.medicineId] ?: Int.MAX_VALUE },
+                    { it.medicine?.medicationName?.lowercase() ?: "" }
+                )
+            )
         }.toList().sortedBy { (_, entries) ->
             entries.firstOrNull()?.scheduleEntry?.scheduledDateTime
         }

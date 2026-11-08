@@ -877,4 +877,16 @@ Voulez-vous continuer ?</string>
     <string name="notif_channel_notifications_desc">Alertes de notification standard pour les prises respectant Ne pas déranger</string>
     <string name="form_reminder_type">Style de rappel</string>
     <string name="form_reminder_type_desc">Choisissez Alarme pour les médicaments essentiels ou Notification pour les compléments</string>
+
+    <!-- Medicine Order & Sorting (#120) -->
+    <string name="sort_medicines_title">Trier et ordonner</string>
+    <string name="sort_preset_default">Par défaut (Date d\'ajout)</string>
+    <string name="sort_preset_name_asc">Nom (A à Z)</string>
+    <string name="sort_preset_name_desc">Nom (Z à A)</string>
+    <string name="sort_preset_time_asc">Heure programmée (La plus tôt en premier)</string>
+    <string name="sort_preset_custom">Ordre personnalisé</string>
+    <string name="sort_custom_reorder_title">Modifier l\'ordre des médicaments</string>
+    <string name="sort_custom_reorder_desc">Utilisez les flèches pour modifier l\'ordre de vos médicaments.</string>
+    <string name="sort_move_up">Monter</string>
+    <string name="sort_move_down">Descendre</string>
 </resources>

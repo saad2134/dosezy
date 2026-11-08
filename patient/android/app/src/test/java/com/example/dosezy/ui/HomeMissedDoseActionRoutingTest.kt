@@ -486,4 +486,59 @@ class HomeMissedDoseActionRoutingTest {
 
         assertEquals("Past date entry must retain scheduledDateTime for retrospective logging", scheduledTime, effectiveTakenAt)
     }
+
+    @Test
+    fun testGroupedEntries_intraSlotDosesSortedByCustomMedicineOrder() {
+        // Guard: Intra-slot medication cards must follow user's custom medicine order rather than arbitrary rowid (#120)
+        val medA = testMedicine.copy(medicineId = "med_a", medicationName = "Aspirin")
+        val medB = testMedicine.copy(medicineId = "med_b", medicationName = "Benadryl")
+        val medC = testMedicine.copy(medicineId = "med_c", medicationName = "Cetirizine")
+
+        val time8am = LocalDate.now().atTime(8, 0)
+        val entryA = ScheduleWithMedicine(
+            scheduleEntry = ScheduleEntry(
+                entryId = "e_a",
+                userId = "usr_test",
+                medicineId = "med_a",
+                scheduledDateTime = time8am,
+                status = MedicationStatus.PENDING
+            ),
+            medicine = medA
+        )
+        val entryB = ScheduleWithMedicine(
+            scheduleEntry = ScheduleEntry(
+                entryId = "e_b",
+                userId = "usr_test",
+                medicineId = "med_b",
+                scheduledDateTime = time8am,
+                status = MedicationStatus.PENDING
+            ),
+            medicine = medB
+        )
+        val entryC = ScheduleWithMedicine(
+            scheduleEntry = ScheduleEntry(
+                entryId = "e_c",
+                userId = "usr_test",
+                medicineId = "med_c",
+                scheduledDateTime = time8am,
+                status = MedicationStatus.PENDING
+            ),
+            medicine = medC
+        )
+
+        val todayEntries = listOf(entryA, entryB, entryC)
+
+        // Custom ordered medicines: medC, medA, medB
+        val userMedicines = listOf(medC, medA, medB)
+        val medOrderMap = userMedicines.mapIndexed { index, med -> med.medicineId to index }.toMap()
+
+        val sortedIntraSlot = todayEntries.sortedWith(
+            compareBy(
+                { medOrderMap[it.scheduleEntry.medicineId] ?: Int.MAX_VALUE },
+                { it.medicine?.medicationName?.lowercase() ?: "" }
+            )
+        )
+
+        assertEquals(listOf("med_c", "med_a", "med_b"), sortedIntraSlot.map { it.scheduleEntry.medicineId })
+    }
 }

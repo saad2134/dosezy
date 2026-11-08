@@ -894,4 +894,16 @@
     <string name="notif_channel_notifications_desc">Alertas de notificación estándar para horarios de medicación respetando No molestar</string>
     <string name="form_reminder_type">Estilo de recordatorio</string>
     <string name="form_reminder_type_desc">Elija Alarma para medicamentos críticos o Notificación para suplementos</string>
+
+    <!-- Medicine Order & Sorting (#120) -->
+    <string name="sort_medicines_title">Ordenar y organizar</string>
+    <string name="sort_preset_default">Predeterminado (Fecha de adición)</string>
+    <string name="sort_preset_name_asc">Nombre (A a la Z)</string>
+    <string name="sort_preset_name_desc">Nombre (Z a la A)</string>
+    <string name="sort_preset_time_asc">Hora programada (Más temprano primero)</string>
+    <string name="sort_preset_custom">Orden personalizado</string>
+    <string name="sort_custom_reorder_title">Editar orden de medicamentos</string>
+    <string name="sort_custom_reorder_desc">Use las flechas para ajustar el orden de sus medicamentos.</string>
+    <string name="sort_move_up">Mover hacia arriba</string>
+    <string name="sort_move_down">Mover hacia abajo</string>
 </resources>

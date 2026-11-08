@@ -876,4 +876,16 @@ Deseja continuar?</string>
     <string name="notif_channel_notifications_desc">Alertas de notificação padrão para horários de medicação que respeitam Não perturbe</string>
     <string name="form_reminder_type">Estilo de lembrete</string>
     <string name="form_reminder_type_desc">Escolha Alarme para remédios importantes ou Notificação para suplementos</string>
+
+    <!-- Medicine Order & Sorting (#120) -->
+    <string name="sort_medicines_title">Ordenar e organizar</string>
+    <string name="sort_preset_default">Padrão (Data de adição)</string>
+    <string name="sort_preset_name_asc">Nome (A a Z)</string>
+    <string name="sort_preset_name_desc">Nome (Z a A)</string>
+    <string name="sort_preset_time_asc">Horário agendado (Mais cedo primeiro)</string>
+    <string name="sort_preset_custom">Ordem personalizada</string>
+    <string name="sort_custom_reorder_title">Editar ordem dos medicamentos</string>
+    <string name="sort_custom_reorder_desc">Use as setas para ajustar a ordem dos seus medicamentos.</string>
+    <string name="sort_move_up">Mover para cima</string>
+    <string name="sort_move_down">Mover para baixo</string>
 </resources>

@@ -893,4 +893,16 @@
     <string name="notif_channel_notifications_desc">遵循请勿打扰模式的标准服药计划通知提醒</string>
     <string name="form_reminder_type">提醒方式</string>
     <string name="form_reminder_type_desc">重要药物请选择闹钟，保健品请选择通知</string>
+
+    <!-- Medicine Order & Sorting (#120) -->
+    <string name="sort_medicines_title">排序与排列</string>
+    <string name="sort_preset_default">默认（添加日期）</string>
+    <string name="sort_preset_name_asc">按名称（A 到 Z）</string>
+    <string name="sort_preset_name_desc">按名称（Z 到 A）</string>
+    <string name="sort_preset_time_asc">按服药时间（由早到晚）</string>
+    <string name="sort_preset_custom">自定义顺序</string>
+    <string name="sort_custom_reorder_title">调整药品顺序</string>
+    <string name="sort_custom_reorder_desc">使用箭头调整药品的排列顺序。</string>
+    <string name="sort_move_up">上移</string>
+    <string name="sort_move_down">下移</string>
 </resources>

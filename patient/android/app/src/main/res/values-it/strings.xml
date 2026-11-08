@@ -877,4 +877,16 @@ Vuoi continuare?</string>
     <string name="notif_channel_notifications_desc">Avvisi di notifica standard per gli orari dei farmaci che rispettano Non disturbare</string>
     <string name="form_reminder_type">Stile promemoria</string>
     <string name="form_reminder_type_desc">Scegli Sveglia per i farmaci critici o Notifica per gli integratori</string>
+
+    <!-- Medicine Order & Sorting (#120) -->
+    <string name="sort_medicines_title">Ordina e organizza</string>
+    <string name="sort_preset_default">Predefinito (Data di aggiunta)</string>
+    <string name="sort_preset_name_asc">Nome (A - Z)</string>
+    <string name="sort_preset_name_desc">Nome (Z - A)</string>
+    <string name="sort_preset_time_asc">Orario programmato (Prima il più presto)</string>
+    <string name="sort_preset_custom">Ordine personalizzato</string>
+    <string name="sort_custom_reorder_title">Modifica ordine farmaci</string>
+    <string name="sort_custom_reorder_desc">Usa le frecce per modificare l\'ordine dei tuoi farmaci.</string>
+    <string name="sort_move_up">Sposta su</string>
+    <string name="sort_move_down">Sposta giù</string>
 </resources>

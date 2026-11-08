@@ -877,4 +877,16 @@
     <string name="notif_channel_notifications_desc">Стандартные уведомления о графике приема лекарств с учетом режима Не беспокоить</string>
     <string name="form_reminder_type">Стиль напоминания</string>
     <string name="form_reminder_type_desc">Выберите Будильник для важных лекарств или Уведомление для добавок</string>
+
+    <!-- Medicine Order & Sorting (#120) -->
+    <string name="sort_medicines_title">Сортировка и порядок</string>
+    <string name="sort_preset_default">По умолчанию (по дате добавления)</string>
+    <string name="sort_preset_name_asc">По названию (А-Я)</string>
+    <string name="sort_preset_name_desc">По названию (Я-А)</string>
+    <string name="sort_preset_time_asc">По времени приема (сначала ранние)</string>
+    <string name="sort_preset_custom">Пользовательский порядок</string>
+    <string name="sort_custom_reorder_title">Изменить порядок лекарств</string>
+    <string name="sort_custom_reorder_desc">Используйте стрелки, чтобы настроить порядок приема лекарств.</string>
+    <string name="sort_move_up">Переместить вверх</string>
+    <string name="sort_move_down">Переместить вниз</string>
 </resources>

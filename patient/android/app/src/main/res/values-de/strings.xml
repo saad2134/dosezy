@@ -877,4 +877,16 @@ Möchten Sie fortfahren?</string>
     <string name="notif_channel_notifications_desc">Standard-Benachrichtigungen für Medikamentenpläne, die Bitte nicht stören beachten</string>
     <string name="form_reminder_type">Erinnerungsstil</string>
     <string name="form_reminder_type_desc">Wählen Sie Alarm für wichtige Medikamente oder Benachrichtigung für Nahrungsergänzungsmittel</string>
+
+    <!-- Medicine Order & Sorting (#120) -->
+    <string name="sort_medicines_title">Sortieren und Reihenfolge</string>
+    <string name="sort_preset_default">Standard (Hinzugefügt am)</string>
+    <string name="sort_preset_name_asc">Name (A bis Z)</string>
+    <string name="sort_preset_name_desc">Name (Z bis A)</string>
+    <string name="sort_preset_time_asc">Geplante Zeit (Früheste zuerst)</string>
+    <string name="sort_preset_custom">Benutzerdefinierte Reihenfolge</string>
+    <string name="sort_custom_reorder_title">Medikamenten-Reihenfolge bearbeiten</string>
+    <string name="sort_custom_reorder_desc">Verwenden Sie die Pfeile, um die Reihenfolge Ihrer Medikamente anzupassen.</string>
+    <string name="sort_move_up">Nach oben verschieben</string>
+    <string name="sort_move_down">Nach unten verschieben</string>
 </resources>

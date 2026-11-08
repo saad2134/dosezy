@@ -877,4 +877,16 @@
     <string name="notif_channel_notifications_desc">サイレントモードを考慮した服薬スケジュールの標準通知アラート</string>
     <string name="form_reminder_type">リマインダースタイル</string>
     <string name="form_reminder_type_desc">重要な薬にはアラームを、サプリメントには通知を選択します</string>
+
+    <!-- Medicine Order & Sorting (#120) -->
+    <string name="sort_medicines_title">並べ替え</string>
+    <string name="sort_preset_default">デフォルト（追加日順）</string>
+    <string name="sort_preset_name_asc">名前順（昇順）</string>
+    <string name="sort_preset_name_desc">名前順（降順）</string>
+    <string name="sort_preset_time_asc">服用時間順（早い順）</string>
+    <string name="sort_preset_custom">カスタム順</string>
+    <string name="sort_custom_reorder_title">薬の表示順を編集</string>
+    <string name="sort_custom_reorder_desc">矢印を使って薬の並び順を変更できます。</string>
+    <string name="sort_move_up">上へ移動</string>
+    <string name="sort_move_down">下へ移動</string>
 </resources>

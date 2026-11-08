@@ -5,6 +5,8 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dosezy.data.model.Medicine
+import com.example.dosezy.data.model.MedicineSortMode
+import com.example.dosezy.data.repository.MedicineOrderPreferences
 import com.example.dosezy.data.repository.MedicineRepository
 import com.example.dosezy.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,14 +19,22 @@ import javax.inject.Inject
 @HiltViewModel
 class MedicineViewModel @Inject constructor(
     private val medicineRepository: MedicineRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val orderPreferences: MedicineOrderPreferences? = null
 ) : ViewModel() {
 
+    private val _rawMedicines = MutableStateFlow<List<Medicine>>(emptyList())
     private val _medicines = MutableStateFlow<List<Medicine>>(emptyList())
     val medicines: StateFlow<List<Medicine>> = _medicines.asStateFlow()
 
     private val _archivedMedicines = MutableStateFlow<List<Medicine>>(emptyList())
     val archivedMedicines: StateFlow<List<Medicine>> = _archivedMedicines.asStateFlow()
+
+    private val _sortMode = MutableStateFlow(MedicineSortMode.DEFAULT)
+    val sortMode: StateFlow<MedicineSortMode> = _sortMode.asStateFlow()
+
+    private val _customOrder = MutableStateFlow<List<String>>(emptyList())
+    val customOrder: StateFlow<List<String>> = _customOrder.asStateFlow()
 
     private val _currentUserId = MutableStateFlow<String?>(null)
     private val _isLoading = MutableStateFlow(true)
@@ -50,7 +60,10 @@ class MedicineViewModel @Inject constructor(
                     medicinesJob?.cancel()
                     archivedMedicinesJob?.cancel()
                     _medicines.value = emptyList()
+                    _rawMedicines.value = emptyList()
                     _archivedMedicines.value = emptyList()
+                    _sortMode.value = MedicineSortMode.DEFAULT
+                    _customOrder.value = emptyList()
                     _isLoading.value = false
                 }
             }
@@ -68,9 +81,16 @@ class MedicineViewModel @Inject constructor(
         medicinesJob?.cancel()
         archivedMedicinesJob?.cancel()
         _isLoading.value = true
+
+        val initialMode = orderPreferences?.getSortMode(userId) ?: MedicineSortMode.DEFAULT
+        val initialOrder = orderPreferences?.getCustomOrder(userId) ?: emptyList()
+        _sortMode.value = initialMode
+        _customOrder.value = initialOrder
+
         medicinesJob = viewModelScope.launch {
             medicineRepository.getMedicinesByUser(userId).collect { medicines ->
-                _medicines.value = medicines
+                _rawMedicines.value = medicines
+                applySorting()
                 _isLoading.value = false
             }
         }
@@ -79,6 +99,72 @@ class MedicineViewModel @Inject constructor(
                 _archivedMedicines.value = archived
             }
         }
+    }
+
+    private fun applySorting() {
+        _medicines.value = MedicineOrderPreferences.sortMedicines(
+            medicines = _rawMedicines.value,
+            mode = _sortMode.value,
+            customOrder = _customOrder.value
+        )
+    }
+
+    fun setSortMode(mode: MedicineSortMode) {
+        val userId = _currentUserId.value ?: return
+        _sortMode.value = mode
+        orderPreferences?.setSortMode(userId, mode)
+        applySorting()
+    }
+
+    fun setCustomOrder(orderedIds: List<String>) {
+        val userId = _currentUserId.value ?: return
+        _sortMode.value = MedicineSortMode.CUSTOM
+        _customOrder.value = orderedIds
+        orderPreferences?.setSortMode(userId, MedicineSortMode.CUSTOM)
+        orderPreferences?.setCustomOrder(userId, orderedIds)
+        applySorting()
+    }
+
+    fun moveMedicineUp(medicineId: String) {
+        val userId = _currentUserId.value ?: return
+        val currentList = if (_sortMode.value == MedicineSortMode.CUSTOM && _customOrder.value.isNotEmpty()) {
+            _customOrder.value
+        } else {
+            _medicines.value.map { it.medicineId }
+        }
+        val newOrder = MedicineOrderPreferences.reorderMedicine(
+            currentOrder = currentList,
+            medicineId = medicineId,
+            moveUp = true,
+            allMedicines = _rawMedicines.value
+        )
+        // Guard: Switch to CUSTOM mode and persist order so Home screen intra-slot cards and medicines list reflect custom ordering immediately
+        _sortMode.value = MedicineSortMode.CUSTOM
+        _customOrder.value = newOrder
+        orderPreferences?.setSortMode(userId, MedicineSortMode.CUSTOM)
+        orderPreferences?.setCustomOrder(userId, newOrder)
+        applySorting()
+    }
+
+    fun moveMedicineDown(medicineId: String) {
+        val userId = _currentUserId.value ?: return
+        val currentList = if (_sortMode.value == MedicineSortMode.CUSTOM && _customOrder.value.isNotEmpty()) {
+            _customOrder.value
+        } else {
+            _medicines.value.map { it.medicineId }
+        }
+        val newOrder = MedicineOrderPreferences.reorderMedicine(
+            currentOrder = currentList,
+            medicineId = medicineId,
+            moveUp = false,
+            allMedicines = _rawMedicines.value
+        )
+        // Guard: Switch to CUSTOM mode and persist order so Home screen intra-slot cards and medicines list reflect custom ordering immediately
+        _sortMode.value = MedicineSortMode.CUSTOM
+        _customOrder.value = newOrder
+        orderPreferences?.setSortMode(userId, MedicineSortMode.CUSTOM)
+        orderPreferences?.setCustomOrder(userId, newOrder)
+        applySorting()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
