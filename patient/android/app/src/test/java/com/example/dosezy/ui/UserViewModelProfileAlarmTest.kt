@@ -689,5 +689,33 @@ class UserViewModelProfileAlarmTest {
         assertTrue("Promoted user must be one of the remaining users", current.userId == userToPromote.userId || current.userId == userThird.userId)
         assertTrue("Non-current user must be the other remaining user", nonCurrent.userId != current.userId)
     }
+
+    @Test
+    fun testDeleteUser_cleansUpMedicineOrderPreferences() = runTest(testDispatcher) {
+        val userViewModel = UserViewModel(userRepository, medicineRepository, scheduleRepository, medicineNotificationManager)
+        val userToDelete = testUser.copy(userId = "user_delete_prefs", isCurrentUser = true)
+        val remainingUser = secondUser.copy(userId = "user_remaining", isCurrentUser = false)
+        userRepository.insertUser(userToDelete)
+        userRepository.insertUser(remainingUser)
+
+        com.example.dosezy.data.repository.MedicineOrderPreferences.setSortMode(context, userToDelete.userId, com.example.dosezy.data.model.MedicineSortMode.CUSTOM)
+        com.example.dosezy.data.repository.MedicineOrderPreferences.setCustomOrder(context, userToDelete.userId, listOf("med_1", "med_2"))
+
+        userViewModel.deleteUser(userToDelete)
+        advanceUntilIdle()
+        var attempts = 0
+        while (db.userDao().getUserByIdDirect(userToDelete.userId) != null && attempts++ < 40) {
+            Thread.sleep(50)
+            advanceUntilIdle()
+        }
+
+        assertEquals(
+            com.example.dosezy.data.model.MedicineSortMode.DEFAULT,
+            com.example.dosezy.data.repository.MedicineOrderPreferences.getSortMode(context, userToDelete.userId)
+        )
+        assertTrue(
+            com.example.dosezy.data.repository.MedicineOrderPreferences.getCustomOrder(context, userToDelete.userId).isEmpty()
+        )
+    }
 }
 

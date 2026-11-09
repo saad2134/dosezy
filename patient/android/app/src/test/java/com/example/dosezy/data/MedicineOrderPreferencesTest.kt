@@ -181,5 +181,59 @@ class MedicineOrderPreferencesTest {
 
         assertTrue(preferences.getCustomOrder("user_a").isEmpty())
     }
+
+    @Test
+    fun removeMedicine_prunesDeletedIdFromCustomOrder() {
+        preferences.setCustomOrder("user_a", listOf("med_1", "med_2", "med_3"))
+        preferences.removeMedicine("user_a", "med_2")
+        assertEquals(listOf("med_1", "med_3"), preferences.getCustomOrder("user_a"))
+    }
+
+    @Test
+    fun clearPreferencesForUser_removesSortModeAndCustomOrder() {
+        preferences.setSortMode("user_a", MedicineSortMode.CUSTOM)
+        preferences.setCustomOrder("user_a", listOf("med_1", "med_2"))
+
+        preferences.clearPreferencesForUser("user_a")
+        assertEquals(MedicineSortMode.DEFAULT, preferences.getSortMode("user_a"))
+        assertTrue(preferences.getCustomOrder("user_a").isEmpty())
+    }
+
+    @Test
+    fun exportAndRestoreUserOrderConfig_remapsMedicineIdsAccurately() {
+        preferences.setSortMode("user_export", MedicineSortMode.CUSTOM)
+        preferences.setCustomOrder("user_export", listOf("old_med_1", "old_med_2"))
+
+        val exportedJson = preferences.exportUserOrderConfig("user_export")
+        assertTrue(exportedJson != null)
+
+        val idMap = mapOf(
+            "old_med_1" to "new_uuid_1",
+            "old_med_2" to "new_uuid_2"
+        )
+        MedicineOrderPreferences.restoreUserOrderConfig(context, "user_import", exportedJson!!, idMap)
+
+        assertEquals(MedicineSortMode.CUSTOM, preferences.getSortMode("user_import"))
+        assertEquals(listOf("new_uuid_1", "new_uuid_2"), preferences.getCustomOrder("user_import"))
+    }
+
+    @Test
+    fun mergeUserOrderConfig_combinesNewIdsWithoutDuplication() {
+        preferences.setSortMode("user_merge", MedicineSortMode.TIME_ASC)
+        preferences.setCustomOrder("user_merge", listOf("existing_1", "existing_2"))
+
+        val configJson = org.json.JSONObject().apply {
+            put("sortMode", MedicineSortMode.NAME_ASC.name)
+            put("customOrder", org.json.JSONArray(listOf("old_3", "existing_1")))
+        }.toString()
+
+        val idMap = mapOf("old_3" to "remapped_3")
+        MedicineOrderPreferences.mergeUserOrderConfig(context, "user_merge", configJson, idMap)
+
+        // Existing non-default sort mode is retained
+        assertEquals(MedicineSortMode.TIME_ASC, preferences.getSortMode("user_merge"))
+        // New ID is appended, existing ID is not duplicated
+        assertEquals(listOf("existing_1", "existing_2", "remapped_3"), preferences.getCustomOrder("user_merge"))
+    }
 }
 

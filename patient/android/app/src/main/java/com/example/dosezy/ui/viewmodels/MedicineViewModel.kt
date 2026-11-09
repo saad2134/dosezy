@@ -206,6 +206,11 @@ class MedicineViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     fun deleteMedicinePermanently(medicine: Medicine) {
         viewModelScope.launch {
+            // Guard: Scrub deleted medicine ID from custom sort preferences to prevent orphaned preference leaks
+            orderPreferences?.removeMedicine(medicine.userId, medicine.medicineId)
+            if (_sortMode.value == MedicineSortMode.CUSTOM) {
+                _customOrder.value = _customOrder.value.filter { it != medicine.medicineId }
+            }
             medicineRepository.deleteMedicinePermanently(medicine)
         }
     }
@@ -213,6 +218,11 @@ class MedicineViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     fun deleteMedicine(medicine: Medicine) {
         viewModelScope.launch {
+            // Guard: Scrub deleted medicine ID from custom sort preferences to prevent orphaned preference leaks
+            orderPreferences?.removeMedicine(medicine.userId, medicine.medicineId)
+            if (_sortMode.value == MedicineSortMode.CUSTOM) {
+                _customOrder.value = _customOrder.value.filter { it != medicine.medicineId }
+            }
             medicineRepository.deleteMedicine(medicine)
         }
     }

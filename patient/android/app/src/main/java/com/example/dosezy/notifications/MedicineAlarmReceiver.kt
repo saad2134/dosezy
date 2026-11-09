@@ -732,6 +732,9 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                 .setPublicVersion(publicNotification)
         }
+
+        // Guard: Attach actions and content intent directly to notificationBuilder rather than chaining on if-else expression to avoid syntactic ambiguity
+        notificationBuilder
             .setContentIntent(pendingIntent)
             .addAction(
                 getNotificationIcon(Icons.Filled.Check),

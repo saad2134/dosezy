@@ -289,4 +289,26 @@ class MedicineViewModelTest {
         assertEquals(MedicineSortMode.NAME_DESC, viewModel.sortMode.value)
         assertEquals(listOf("med_x"), viewModel.customOrder.value)
     }
+
+    @Test
+    fun deleteMedicine_prunesMedicineIdFromOrderPreferencesAndCustomOrder() = runTest {
+        val viewModel = createViewModel()
+        viewModel.setSortMode(MedicineSortMode.CUSTOM)
+
+        viewModel.deleteMedicine(activeMedicine)
+
+        verify { orderPreferences.removeMedicine("user_456", "med_active") }
+        coVerify { medicineRepository.deleteMedicine(activeMedicine) }
+    }
+
+    @Test
+    fun deleteMedicinePermanently_prunesMedicineIdFromOrderPreferencesAndCustomOrder() = runTest {
+        val viewModel = createViewModel()
+        viewModel.setSortMode(MedicineSortMode.CUSTOM)
+
+        viewModel.deleteMedicinePermanently(activeMedicine)
+
+        verify { orderPreferences.removeMedicine("user_456", "med_active") }
+        coVerify { medicineRepository.deleteMedicinePermanently(activeMedicine) }
+    }
 }

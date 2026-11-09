@@ -7,6 +7,7 @@ import androidx.annotation.RequiresApi
 import androidx.room.withTransaction
 import com.example.dosezy.data.DosezyDatabase
 import com.example.dosezy.data.model.*
+import com.example.dosezy.data.repository.MedicineOrderPreferences
 import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.utils.SoundUtils
 import com.google.gson.*
@@ -203,6 +204,14 @@ class BackupRestoreManager(
                 if (!countryCode.isNullOrEmpty()) {
                     zos.putNextEntry(ZipEntry("$profileDir/emergency_country.txt"))
                     zos.write(countryCode.toByteArray(Charsets.UTF_8))
+                    zos.closeEntry()
+                }
+
+                // Guard: Export per-profile medicine sorting mode and custom sequence so user-defined roster order persists across restore (#BUG-RESTORE-CUSTOM-ORDER)
+                val orderConfigJson = MedicineOrderPreferences.exportUserOrderConfig(context, user.userId)
+                if (!orderConfigJson.isNullOrEmpty()) {
+                    zos.putNextEntry(ZipEntry("$profileDir/medicine_order.json"))
+                    zos.write(orderConfigJson.toByteArray(Charsets.UTF_8))
                     zos.closeEntry()
                 }
             }
@@ -469,6 +478,15 @@ class BackupRestoreManager(
                                 emergencyPrefs.edit().putString("selected_country_code_$newUserId", cCode).apply()
                             }
                         }
+
+                        // Guard: Restore medicine sorting mode and remap custom order IDs for newly created profile (#BUG-RESTORE-CUSTOM-ORDER)
+                        val orderFile = File(pDir, "medicine_order.json")
+                        if (orderFile.exists()) {
+                            val orderJson = orderFile.readText(Charsets.UTF_8).trim()
+                            if (orderJson.isNotBlank()) {
+                                MedicineOrderPreferences.restoreUserOrderConfig(context, newUserId, orderJson, medIdMap)
+                            }
+                        }
                     }
 
                     ConflictStrategy.OVERWRITE -> {
@@ -649,10 +667,24 @@ class BackupRestoreManager(
                             emergencyPrefs.edit().remove("selected_country_code_$targetUserId").apply()
                         }
 
+                        // Guard: Restore medicine sorting mode and remap custom order IDs, or clear stale preferences when overwriting profile (#BUG-RESTORE-CUSTOM-ORDER)
+                        val orderFile = File(pDir, "medicine_order.json")
+                        if (orderFile.exists()) {
+                            val orderJson = orderFile.readText(Charsets.UTF_8).trim()
+                            if (orderJson.isNotBlank()) {
+                                MedicineOrderPreferences.restoreUserOrderConfig(context, targetUserId, orderJson, medIdMap)
+                            } else {
+                                MedicineOrderPreferences.clearPreferencesForUser(context, targetUserId)
+                            }
+                        } else {
+                            MedicineOrderPreferences.clearPreferencesForUser(context, targetUserId)
+                        }
+
                         // Guard: Scrub stale preferences for conflicting original user ID when overwritten into existing local profile (#BUG-RESTORE-ID-COLLISION)
                         if (decision.summary.existingLocalUserId != null && decision.summary.existingLocalUserId != originalUser.userId) {
                             emPrefs.edit().remove("contacts_json_${originalUser.userId}").apply()
                             emergencyPrefs.edit().remove("selected_country_code_${originalUser.userId}").apply()
+                            MedicineOrderPreferences.clearPreferencesForUser(context, originalUser.userId)
                         }
                     }
 
@@ -786,6 +818,15 @@ class BackupRestoreManager(
                                 if (!emergencyPrefs.contains("selected_country_code_$targetUserId")) {
                                     emergencyPrefs.edit().putString("selected_country_code_$targetUserId", cCode).apply()
                                 }
+                            }
+                        }
+
+                        // Guard: Merge medicine sorting mode and custom order into target profile if provided in backup archive (#BUG-RESTORE-CUSTOM-ORDER)
+                        val orderFile = File(pDir, "medicine_order.json")
+                        if (orderFile.exists()) {
+                            val orderJson = orderFile.readText(Charsets.UTF_8).trim()
+                            if (orderJson.isNotBlank()) {
+                                MedicineOrderPreferences.mergeUserOrderConfig(context, targetUserId, orderJson, medIdMap)
                             }
                         }
                         totalProfiles++

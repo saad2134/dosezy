@@ -15,6 +15,7 @@ import com.example.dosezy.data.DosezyDatabase
 import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.data.model.TimeFormat
+import com.example.dosezy.data.repository.MedicineOrderPreferences
 import com.example.dosezy.utils.LocaleHelper
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -82,8 +83,21 @@ class DosezyRemoteViewsFactory(
                 val todayEntries = db.scheduleDao().getScheduleForDateRangeDirect(user.userId, startOfDay, endOfDay)
                 // Guard: Filter out ad-hoc PRN doses so today's scheduled pending list and upcoming fallback are not suppressed by ad-hoc doses
                 val scheduledToday = todayEntries.filter { !it.entryId.startsWith("PRN_") }
-                val todayPending = scheduledToday.filter { it.status == MedicationStatus.PENDING }.sortedBy { it.scheduledDateTime }
-                val medicines = db.medicineDao().getMedicinesByUserDirect(user.userId).associateBy { it.medicineId }
+                val userMeds = db.medicineDao().getMedicinesByUserDirect(user.userId)
+                val sortMode = MedicineOrderPreferences.getSortMode(context, user.userId)
+                val customOrder = MedicineOrderPreferences.getCustomOrder(context, user.userId)
+                val sortedMeds = MedicineOrderPreferences.sortMedicines(userMeds, sortMode, customOrder)
+                val medOrderMap = sortedMeds.mapIndexed { index, med -> med.medicineId to index }.toMap()
+                val medicines = userMeds.associateBy { it.medicineId }
+
+                // Guard: Sort intra-slot pending doses according to user's custom medicine sequence and sorting mode to match in-app roster ordering (#120)
+                val todayPending = scheduledToday.filter { it.status == MedicationStatus.PENDING }.sortedWith(
+                    compareBy(
+                        { it.scheduledDateTime },
+                        { medOrderMap[it.medicineId] ?: Int.MAX_VALUE },
+                        { medicines[it.medicineId]?.medicationName?.lowercase() ?: "" }
+                    )
+                )
 
                 val displayEntries: List<ScheduleEntry>
                 if (todayPending.isNotEmpty()) {
@@ -92,9 +106,16 @@ class DosezyRemoteViewsFactory(
                     displayEntries = emptyList()
                 } else {
                     val upcomingEntries = db.scheduleDao().getScheduleForDateRangeDirect(user.userId, startOfDay, next7Days)
+                    // Guard: Sort intra-slot upcoming doses according to user's custom medicine sequence and sorting mode
                     displayEntries = upcomingEntries.filter {
                         !it.entryId.startsWith("PRN_") && it.status == MedicationStatus.PENDING && (it.scheduledDateTime.isAfter(LocalDateTime.now()) || it.scheduledDateTime.toLocalDate() == today)
-                    }.sortedBy { it.scheduledDateTime }
+                    }.sortedWith(
+                        compareBy(
+                            { it.scheduledDateTime },
+                            { medOrderMap[it.medicineId] ?: Int.MAX_VALUE },
+                            { medicines[it.medicineId]?.medicationName?.lowercase() ?: "" }
+                        )
+                    )
                 }
 
                 // Guard: Wrap context in user profile's chosen language to ensure widget strings and labels match profile locale (#BUG-WIDGET-LOCALE)

@@ -559,6 +559,10 @@ class AlarmScheduler(private val context: Context) {
             if (!scheduledTime.isNullOrBlank()) {
                 putExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME, scheduledTime)
             }
+            // Guard: Include user ID in nagging reminder intent to preserve user profile attribution and prevent cross-profile audio desync (#BUG-NAGGING-USER-ID)
+            if (!userId.isNullOrBlank()) {
+                putExtra(MedicineAlarmReceiver.EXTRA_USER_ID, userId)
+            }
         }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
@@ -579,6 +583,11 @@ class AlarmScheduler(private val context: Context) {
                 editor.putLong("nagging_group_trigger_$entryId", triggerTime)
                 editor.putInt("nagging_group_count_$entryId", naggingCount)
                 editor.putString("nagging_group_sched_$entryId", scheduledTime ?: "")
+                // Guard: Save user ID in nagging group coordination to retain profile ownership on reminder transfer (#BUG-NAGGING-USER-ID)
+                val targetUserId = userId ?: resolveUserId(entryId)
+                if (!targetUserId.isNullOrBlank()) {
+                    editor.putString("nagging_group_user_$entryId", targetUserId)
+                }
                 entryIds.forEach { id ->
                     editor.putString("nagging_member_$id", entryId)
                 }
@@ -684,11 +693,15 @@ class AlarmScheduler(private val context: Context) {
                 } else {
                     if (entryId == primaryId) {
                         val newPrimary = currentIds.first()
+                        // Guard: Retrieve saved user ID for transferred nagging reminder to retain profile attribution (#BUG-NAGGING-USER-ID)
+                        val savedUserId = prefs.getString("nagging_group_user_$primaryId", null) ?: resolveUserId(newPrimary)
+
                         editor.remove("nagging_group_ids_$primaryId")
                         editor.remove("nagging_group_names_$primaryId")
                         editor.remove("nagging_group_trigger_$primaryId")
                         editor.remove("nagging_group_count_$primaryId")
                         editor.remove("nagging_group_sched_$primaryId")
+                        editor.remove("nagging_group_user_$primaryId")
                         currentIds.forEach { id ->
                             editor.putString("nagging_member_$id", newPrimary)
                         }
@@ -697,6 +710,9 @@ class AlarmScheduler(private val context: Context) {
                         editor.putLong("nagging_group_trigger_$newPrimary", triggerTime)
                         editor.putInt("nagging_group_count_$newPrimary", count)
                         editor.putString("nagging_group_sched_$newPrimary", schedTime)
+                        if (!savedUserId.isNullOrBlank()) {
+                            editor.putString("nagging_group_user_$newPrimary", savedUserId)
+                        }
                         editor.apply()
 
                         if (triggerTime > System.currentTimeMillis()) {
@@ -710,7 +726,8 @@ class AlarmScheduler(private val context: Context) {
                                 entryIds = ArrayList(currentIds),
                                 medicineNames = ArrayList(currentNames),
                                 scheduledTime = schedTime,
-                                explicitTriggerTime = triggerTime
+                                explicitTriggerTime = triggerTime,
+                                userId = savedUserId
                             )
                         }
                     } else {
@@ -719,6 +736,7 @@ class AlarmScheduler(private val context: Context) {
                         editor.apply()
 
                         val summaryName = if (currentNames.isNotEmpty()) currentNames.joinToString(", ") else "Medicine"
+                        val savedUserId = prefs.getString("nagging_group_user_$primaryId", null)
                         val updateIntent = Intent(context, MedicineAlarmReceiver::class.java).apply {
                             putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, primaryId)
                             putExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME, summaryName)
@@ -727,6 +745,10 @@ class AlarmScheduler(private val context: Context) {
                             putStringArrayListExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAMES, ArrayList(currentNames))
                             if (schedTime.isNotBlank()) {
                                 putExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME, schedTime)
+                            }
+                            // Guard: Attach user ID to nagging coordinator update intent to preserve profile attribution (#BUG-NAGGING-USER-ID)
+                            if (!savedUserId.isNullOrBlank()) {
+                                putExtra(MedicineAlarmReceiver.EXTRA_USER_ID, savedUserId)
                             }
                         }
                         PendingIntent.getBroadcast(

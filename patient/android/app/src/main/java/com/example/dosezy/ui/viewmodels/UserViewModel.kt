@@ -283,6 +283,11 @@ class UserViewModel @Inject constructor(
                         com.example.dosezy.widget.DosezyWidgetPrefs.deleteWidgetPreferencesForUser(context, user.userId)
                     } catch (_: Exception) {}
 
+                    try {
+                        // Guard: Scrub orphaned medicine sorting and custom order preferences for the deleted profile to prevent SharedPreferences leakage
+                        com.example.dosezy.data.repository.MedicineOrderPreferences.clearPreferencesForUser(context, user.userId)
+                    } catch (_: Exception) {}
+
                     // Delete the user from DB (cascades to medicines & schedules)
                     userRepository.deleteUser(user)
 
