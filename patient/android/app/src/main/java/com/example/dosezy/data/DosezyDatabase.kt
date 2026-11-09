@@ -169,13 +169,16 @@ abstract class DosezyDatabase : RoomDatabase() {
         }
 
         // Guard: Migration 21->22 migrates currentStock and refillThreshold to REAL to support half doses and fractional inventory tracking (#123)
+        // Guard: Explicitly disable foreign keys before dropping medicines table to prevent SQLite ON DELETE CASCADE from wiping schedule_entries
         val MIGRATION_21_22 = object : Migration(21, 22) {
             override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("PRAGMA foreign_keys = OFF")
                 db.execSQL("CREATE TABLE IF NOT EXISTS `medicines_new` (`medicineId` TEXT NOT NULL, `userId` TEXT NOT NULL, `medicationName` TEXT NOT NULL, `dosage` REAL NOT NULL, `dosageUnit` TEXT NOT NULL, `timesPerDay` INTEGER NOT NULL, `frequency` TEXT NOT NULL, `scheduledTimes` TEXT NOT NULL, `imageUri` TEXT, `currentStock` REAL, `refillThreshold` REAL, `autoDeductOnTake` INTEGER NOT NULL, `notes` TEXT, `pillShape` TEXT NOT NULL, `pillColor` TEXT NOT NULL, `startDate` INTEGER, `endDate` INTEGER, `durationDays` INTEGER, `isArchived` INTEGER NOT NULL, `customDosages` TEXT, `reminderType` TEXT, PRIMARY KEY(`medicineId`), FOREIGN KEY(`userId`) REFERENCES `users`(`userId`) ON UPDATE NO ACTION ON DELETE CASCADE )")
-                db.execSQL("INSERT INTO `medicines_new` SELECT * FROM `medicines`")
+                db.execSQL("INSERT INTO `medicines_new` (`medicineId`, `userId`, `medicationName`, `dosage`, `dosageUnit`, `timesPerDay`, `frequency`, `scheduledTimes`, `imageUri`, `currentStock`, `refillThreshold`, `autoDeductOnTake`, `notes`, `pillShape`, `pillColor`, `startDate`, `endDate`, `durationDays`, `isArchived`, `customDosages`, `reminderType`) SELECT `medicineId`, `userId`, `medicationName`, `dosage`, `dosageUnit`, `timesPerDay`, `frequency`, `scheduledTimes`, `imageUri`, `currentStock`, `refillThreshold`, `autoDeductOnTake`, `notes`, `pillShape`, `pillColor`, `startDate`, `endDate`, `durationDays`, `isArchived`, `customDosages`, `reminderType` FROM `medicines`")
                 db.execSQL("DROP TABLE `medicines`")
                 db.execSQL("ALTER TABLE `medicines_new` RENAME TO `medicines`")
                 db.execSQL("CREATE INDEX IF NOT EXISTS `index_medicines_userId` ON `medicines` (`userId`)")
+                db.execSQL("PRAGMA foreign_keys = ON")
             }
         }
 

@@ -184,4 +184,37 @@ class AlarmCohortCoordinationTest {
         assertTrue(csv.contains("TAKEN_ON_TIME"))
         assertTrue(csv.contains("\"Taken after breakfast\""))
     }
+
+    @Test
+    fun syncSlotNotification_formatsRemainingMedicationDetailsWithCustomDosageOverride() {
+        // Guard: Verify getDosageDisplay accurately reflects schedule entry custom dosage overrides for cohort synchronization
+        val medicine = Medicine(
+            medicineId = "med_custom_dose",
+            userId = "usr_1",
+            medicationName = "Prednisone",
+            dosage = 5.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            currentStock = 30.0,
+            refillThreshold = 5.0
+        )
+        val scheduleWithOverride = ScheduleEntry(
+            entryId = "sch_custom_dose",
+            userId = "usr_1",
+            medicineId = "med_custom_dose",
+            scheduledDateTime = LocalDateTime.of(2026, 11, 10, 8, 0),
+            status = MedicationStatus.PENDING,
+            dosage = 2.5
+        )
+
+        val display = medicine.getDosageDisplay(scheduleWithOverride.scheduledDateTime.toLocalTime(), scheduleWithOverride.dosage)
+        assertEquals("2.5 mg", display)
+
+        val tabletMed = medicine.copy(dosage = 1.0, dosageUnit = DosageUnit.TABLET)
+        val tabletSchedule = scheduleWithOverride.copy(dosage = 0.5)
+        val tabletDisplay = tabletMed.getDosageDisplay(tabletSchedule.scheduledDateTime.toLocalTime(), tabletSchedule.dosage)
+        assertEquals("½ tablet", tabletDisplay)
+    }
 }

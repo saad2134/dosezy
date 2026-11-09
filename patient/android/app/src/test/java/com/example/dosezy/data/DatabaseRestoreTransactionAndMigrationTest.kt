@@ -251,12 +251,60 @@ class DatabaseRestoreTransactionAndMigrationTest {
         DosezyDatabase.MIGRATION_21_22.migrate(sqliteDb)
 
         verify(exactly = 1) {
+            sqliteDb.execSQL("PRAGMA foreign_keys = OFF")
             sqliteDb.execSQL("CREATE TABLE IF NOT EXISTS `medicines_new` (`medicineId` TEXT NOT NULL, `userId` TEXT NOT NULL, `medicationName` TEXT NOT NULL, `dosage` REAL NOT NULL, `dosageUnit` TEXT NOT NULL, `timesPerDay` INTEGER NOT NULL, `frequency` TEXT NOT NULL, `scheduledTimes` TEXT NOT NULL, `imageUri` TEXT, `currentStock` REAL, `refillThreshold` REAL, `autoDeductOnTake` INTEGER NOT NULL, `notes` TEXT, `pillShape` TEXT NOT NULL, `pillColor` TEXT NOT NULL, `startDate` INTEGER, `endDate` INTEGER, `durationDays` INTEGER, `isArchived` INTEGER NOT NULL, `customDosages` TEXT, `reminderType` TEXT, PRIMARY KEY(`medicineId`), FOREIGN KEY(`userId`) REFERENCES `users`(`userId`) ON UPDATE NO ACTION ON DELETE CASCADE )")
-            sqliteDb.execSQL("INSERT INTO `medicines_new` SELECT * FROM `medicines`")
+            sqliteDb.execSQL("INSERT INTO `medicines_new` (`medicineId`, `userId`, `medicationName`, `dosage`, `dosageUnit`, `timesPerDay`, `frequency`, `scheduledTimes`, `imageUri`, `currentStock`, `refillThreshold`, `autoDeductOnTake`, `notes`, `pillShape`, `pillColor`, `startDate`, `endDate`, `durationDays`, `isArchived`, `customDosages`, `reminderType`) SELECT `medicineId`, `userId`, `medicationName`, `dosage`, `dosageUnit`, `timesPerDay`, `frequency`, `scheduledTimes`, `imageUri`, `currentStock`, `refillThreshold`, `autoDeductOnTake`, `notes`, `pillShape`, `pillColor`, `startDate`, `endDate`, `durationDays`, `isArchived`, `customDosages`, `reminderType` FROM `medicines`")
             sqliteDb.execSQL("DROP TABLE `medicines`")
             sqliteDb.execSQL("ALTER TABLE `medicines_new` RENAME TO `medicines`")
             sqliteDb.execSQL("CREATE INDEX IF NOT EXISTS `index_medicines_userId` ON `medicines` (`userId`)")
+            sqliteDb.execSQL("PRAGMA foreign_keys = ON")
         }
+    }
+
+    @Test
+    fun migration21_22_withRealSqliteAndChildForeignKeys_preservesScheduleEntriesWithoutCascadeWipe() {
+        val helper = androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory().create(
+            androidx.sqlite.db.SupportSQLiteOpenHelper.Configuration.builder(context)
+                .name(null)
+                .callback(object : androidx.sqlite.db.SupportSQLiteOpenHelper.Callback(21) {
+                    override fun onCreate(sdb: SupportSQLiteDatabase) {
+                        sdb.execSQL("PRAGMA foreign_keys = ON")
+                        sdb.execSQL("CREATE TABLE users (userId TEXT NOT NULL PRIMARY KEY, fullName TEXT NOT NULL, age INTEGER NOT NULL, gender TEXT NOT NULL, isCurrentUser INTEGER NOT NULL)")
+                        sdb.execSQL("CREATE TABLE medicines (medicineId TEXT NOT NULL, userId TEXT NOT NULL, medicationName TEXT NOT NULL, dosage REAL NOT NULL, dosageUnit TEXT NOT NULL, timesPerDay INTEGER NOT NULL, frequency TEXT NOT NULL, scheduledTimes TEXT NOT NULL, imageUri TEXT, currentStock INTEGER, refillThreshold INTEGER, autoDeductOnTake INTEGER NOT NULL, notes TEXT, pillShape TEXT NOT NULL, pillColor TEXT NOT NULL, startDate INTEGER, endDate INTEGER, durationDays INTEGER, isArchived INTEGER NOT NULL, customDosages TEXT, reminderType TEXT, PRIMARY KEY(medicineId), FOREIGN KEY(userId) REFERENCES users(userId) ON UPDATE NO ACTION ON DELETE CASCADE)")
+                        sdb.execSQL("CREATE TABLE schedule_entries (entryId TEXT NOT NULL, userId TEXT NOT NULL, medicineId TEXT NOT NULL, scheduledDateTime INTEGER NOT NULL, status TEXT NOT NULL, takenAt INTEGER, skipReason TEXT, dosage REAL, doseNotes TEXT, PRIMARY KEY(entryId), FOREIGN KEY(userId) REFERENCES users(userId) ON UPDATE NO ACTION ON DELETE CASCADE, FOREIGN KEY(medicineId) REFERENCES medicines(medicineId) ON UPDATE NO ACTION ON DELETE CASCADE)")
+                        sdb.execSQL("INSERT INTO users VALUES ('u1', 'Test Patient', 30, 'MALE', 1)")
+                        sdb.execSQL("INSERT INTO medicines VALUES ('m1', 'u1', 'Aspirin', 100.0, 'MG', 1, 'DAILY', '08:00', NULL, 30, 5, 1, NULL, 'ROUND', '#1193D4', NULL, NULL, NULL, 0, NULL, 'ALARM')")
+                        sdb.execSQL("INSERT INTO schedule_entries VALUES ('s1', 'u1', 'm1', 1700000000000, 'PENDING', NULL, NULL, NULL, NULL)")
+                    }
+                    override fun onUpgrade(sdb: SupportSQLiteDatabase, oldV: Int, newV: Int) {}
+                })
+                .build()
+        )
+        val sdb = helper.writableDatabase
+        sdb.execSQL("PRAGMA foreign_keys = ON")
+
+        var cursor = sdb.query("SELECT COUNT(*) FROM schedule_entries")
+        cursor.moveToFirst()
+        assertEquals(1, cursor.getInt(0))
+        cursor.close()
+
+        // Execute migration 21 -> 22
+        DosezyDatabase.MIGRATION_21_22.migrate(sdb)
+
+        // Verify that schedule entry was NOT wiped out by cascade delete
+        cursor = sdb.query("SELECT COUNT(*) FROM schedule_entries")
+        cursor.moveToFirst()
+        assertEquals("Schedule entries must survive medicines table recreation without cascade deletion", 1, cursor.getInt(0))
+        cursor.close()
+
+        // Verify that stock columns are now REAL and values preserved
+        cursor = sdb.query("SELECT currentStock, refillThreshold FROM medicines WHERE medicineId = 'm1'")
+        cursor.moveToFirst()
+        assertEquals(30.0, cursor.getDouble(0), 0.001)
+        assertEquals(5.0, cursor.getDouble(1), 0.001)
+        cursor.close()
+
+        sdb.close()
     }
 
     // ───────────────────────────────────────────────────────────────

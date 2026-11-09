@@ -165,4 +165,35 @@ class DataExportFormattingTest {
         assertEquals("1", sorted[1].entryId)
         assertEquals("3", sorted[2].entryId)
     }
+
+    // ───────────────────────────────────────────────────────────────
+    // 4. PDF Report Dosage Formatting for Schedule History Log
+    // ───────────────────────────────────────────────────────────────
+
+    @Test
+    fun pdfScheduleLog_formatsFractionalDoseOverridesWithVulgarFractions() {
+        val med = sampleMed(
+            name = "Clonazepam",
+            dosage = 1.0,
+            unit = DosageUnit.TABLET
+        )
+        val schFractional = ScheduleEntry(
+            entryId = "sch_half",
+            userId = "usr_1",
+            medicineId = med.medicineId,
+            scheduledDateTime = LocalDateTime.of(2026, 11, 10, 8, 0),
+            status = MedicationStatus.TAKEN_ON_TIME,
+            dosage = 0.5
+        )
+
+        val formattedDose = med.getDosageDisplay(schFractional.scheduledDateTime.toLocalTime(), schFractional.dosage)
+        assertEquals("½ tablet", formattedDose)
+
+        val schOneAndHalf = schFractional.copy(dosage = 1.5)
+        assertEquals("1½ tablet", med.getDosageDisplay(schOneAndHalf.scheduledDateTime.toLocalTime(), schOneAndHalf.dosage))
+
+        val liquidMed = sampleMed(name = "Cough Syrup", dosage = 5.0, unit = DosageUnit.ML)
+        val schLiquid = schFractional.copy(dosage = 2.5)
+        assertEquals("2.5 mL", liquidMed.getDosageDisplay(schLiquid.scheduledDateTime.toLocalTime(), schLiquid.dosage))
+    }
 }

@@ -57,7 +57,7 @@ class DosageUnitsTest {
         assertEquals("ampule", DosageUnit.AMPULE.displayName)
         assertEquals("mg", DosageUnit.MG.displayName)
         assertEquals("mcg", DosageUnit.MCG.displayName)
-        assertEquals("ml", DosageUnit.ML.displayName)
+        assertEquals("mL", DosageUnit.ML.displayName)
         assertEquals("drop", DosageUnit.DROP.displayName)
         assertEquals("tablet", DosageUnit.TABLET.displayName)
         assertEquals("capsule", DosageUnit.CAPSULE.displayName)

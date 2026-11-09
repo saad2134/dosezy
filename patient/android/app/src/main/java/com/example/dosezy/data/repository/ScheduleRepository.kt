@@ -533,7 +533,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                             val newPrimary = remainingPending.first()
                             val medDetails = remainingPending.mapNotNull { e ->
                                 val m = database.medicineDao().getMedicineByIdDirect(e.medicineId) ?: return@mapNotNull null
-                                val dose = m.getDosageDisplay(e.scheduledDateTime.toLocalTime())
+                                // Guard: Pass e.dosage override so remaining cohort notification retains custom and fractional dosages (#BUG-NOTIF-CUSTOM-DOSE)
+                                val dose = m.getDosageDisplay(e.scheduledDateTime.toLocalTime(), e.dosage)
                                 Pair(m.medicationName, dose)
                             }
                             val activeMedNames = ArrayList(remainingPending.mapNotNull { e ->

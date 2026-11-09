@@ -290,8 +290,47 @@ class ScheduleViewModelTest {
                 status = "TAKEN_ON_TIME",
                 takenAtStr = takenAt,
                 context = context,
-                notes = notes
+                notes = notes,
+                syncSlotNotification = false
             )
+        }
+    }
+
+    @Test
+    fun markCohortAsTaken_fallbackBranch_defersSlotNotificationSyncAndReconcilesOnce() = runTest {
+        // Guard: Verify markCohortAsTaken defers notification sync per dose and syncs once per distinct slot (#BUG-COHORT-VM-CHURN)
+        val viewModel = createViewModel()
+        val scheduledTime = LocalDateTime.parse("2026-09-21T08:00:00")
+        val entry1 = ScheduleEntry(entryId = "entry_1", userId = "user_123", medicineId = "med_1", scheduledDateTime = scheduledTime, status = MedicationStatus.PENDING, dosage = 1.0)
+        val entry2 = ScheduleEntry(entryId = "entry_2", userId = "user_123", medicineId = "med_2", scheduledDateTime = scheduledTime, status = MedicationStatus.PENDING, dosage = 2.0)
+        coEvery { scheduleRepository.getScheduleEntryById("entry_1") } returns entry1
+        coEvery { scheduleRepository.getScheduleEntryById("entry_2") } returns entry2
+
+        val takenAt = "2026-09-21T08:05:00"
+        viewModel.markCohortAsTaken(listOf("entry_1", "entry_2"), takenAt, lateAfter = 3)
+
+        coVerify(exactly = 1) {
+            scheduleRepository.recordDoseTaken(
+                entryId = "entry_1",
+                status = "TAKEN_ON_TIME",
+                takenAtStr = takenAt,
+                context = context,
+                notes = null,
+                syncSlotNotification = false
+            )
+        }
+        coVerify(exactly = 1) {
+            scheduleRepository.recordDoseTaken(
+                entryId = "entry_2",
+                status = "TAKEN_ON_TIME",
+                takenAtStr = takenAt,
+                context = context,
+                notes = null,
+                syncSlotNotification = false
+            )
+        }
+        coVerify(exactly = 1) {
+            scheduleRepository.syncSlotNotificationAndAlarms(entry1.entryId, entry1, context)
         }
     }
 

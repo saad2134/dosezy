@@ -455,25 +455,8 @@ class PdfReportGenerator(private val context: Context) {
 
             val med = medMap[sch.medicineId]
             val medName = med?.medicationName ?: "Unknown"
-            val doseStr = if (sch.dosage != null && med != null) {
-                val target = sch.dosage
-                val unitAbbr = when (med.dosageUnit) {
-                    DosageUnit.MG -> "mg"
-                    DosageUnit.MCG -> "mcg"
-                    DosageUnit.ML -> "mL"
-                    DosageUnit.DROP -> "drop"
-                    DosageUnit.TABLET -> "tablet"
-                    DosageUnit.CAPSULE -> "capsule"
-                    DosageUnit.MEQ -> "mEq"
-                    DosageUnit.PUFF -> "puff"
-                    DosageUnit.AMPULE -> "ampule"
-                    DosageUnit.SPRAY -> "spray"
-                }
-                val formattedDosage = if (target % 1 == 0.0) "${target.toInt()} $unitAbbr" else "$target $unitAbbr"
-                " ($formattedDosage)"
-            } else {
-                med?.let { " (${it.getDosageDisplay(sch.scheduledDateTime.toLocalTime())})" } ?: ""
-            }
+            // Guard: Route through Medicine.getDosageDisplay so schedule overrides format with standard vulgar fractions and clinical units (#BUG-PDF-FRACTIONAL-DOSAGE)
+            val doseStr = med?.let { " (${it.getDosageDisplay(sch.scheduledDateTime.toLocalTime(), sch.dosage)})" } ?: ""
             val fullMed = "$medName$doseStr"
             // Guard: Truncate medication name and dosage using exact canvas pixel width to prevent overlapping Status column at 340f
             val truncatedMed = truncateTextToWidth(fullMed, textPaint, 175f)

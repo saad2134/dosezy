@@ -241,8 +241,16 @@ class ScheduleViewModel @Inject constructor(
                     } else {
                         "TAKEN_ON_TIME"
                     }
-                    // Guard: Record each cohort dose taken with notes to ensure atomic stock decrement, alarm cancellation, and clinical notes persistence (#102, #BUG-COHORT-DOSE-NOTES)
-                    scheduleRepository.recordDoseTaken(entryId, status, takenAt, context, notes)
+                    // Guard: Record each cohort dose taken with notes and defer slot notification sync to avoid intermediate notification churn (#102, #BUG-COHORT-DOSE-NOTES, #BUG-COHORT-VM-CHURN)
+                    scheduleRepository.recordDoseTaken(entryId, status, takenAt, context, notes, syncSlotNotification = false)
+                }
+                // Guard: Reconcile slot notifications and alarms once per distinct time slot after all cohort entries are recorded (#BUG-COHORT-VM-CHURN)
+                val entries = entryIds.mapNotNull { scheduleRepository.getScheduleEntryById(it) }
+                val distinctSlots = entries.distinctBy { Pair(it.userId, it.scheduledDateTime.withSecond(0).withNano(0)) }
+                if (distinctSlots.isNotEmpty()) {
+                    distinctSlots.forEach { slotEntry ->
+                        scheduleRepository.syncSlotNotificationAndAlarms(slotEntry.entryId, slotEntry, context)
+                    }
                 }
             }
             currentCalendarUserId = null
