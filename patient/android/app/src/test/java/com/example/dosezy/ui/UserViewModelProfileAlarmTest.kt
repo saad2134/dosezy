@@ -731,5 +731,62 @@ class UserViewModelProfileAlarmTest {
         assertEquals(25, parsedAge)
         assertEquals("+966 50 123 4567", normalizedPhone)
     }
+
+    @Test
+    fun testAllLocalesAndTranslations_oneHundredPercentKeyParity() {
+        val supportedLocales = listOf(
+            "values-ar", "values-bn", "values-de", "values-es",
+            "values-fr", "values-hi", "values-it", "values-ja",
+            "values-pt", "values-ru", "values-zh"
+        )
+
+        fun findResDir(flavor: String): File {
+            val candidates = listOf(
+                File("src/$flavor/res"),
+                File("patient/android/app/src/$flavor/res"),
+                File("../app/src/$flavor/res"),
+                File("../../patient/android/app/src/$flavor/res")
+            )
+            return candidates.firstOrNull { it.isDirectory }
+                ?: error("Unable to locate res directory for flavor $flavor")
+        }
+
+        fun extractKeys(stringsXml: File): Set<String> {
+            if (!stringsXml.exists()) return emptySet()
+            val factory = javax.xml.parsers.DocumentBuilderFactory.newInstance()
+            val builder = factory.newDocumentBuilder()
+            val doc = builder.parse(stringsXml)
+            val stringNodes = doc.getElementsByTagName("string")
+            val keys = mutableSetOf<String>()
+            for (i in 0 until stringNodes.length) {
+                val node = stringNodes.item(i)
+                val translatable = node.attributes.getNamedItem("translatable")?.nodeValue
+                if (translatable != "false") {
+                    val name = node.attributes.getNamedItem("name")?.nodeValue
+                    if (name != null) keys.add(name)
+                }
+            }
+            return keys
+        }
+
+        for (flavor in listOf("main", "foss")) {
+            val resDir = findResDir(flavor)
+            val baseKeys = extractKeys(File(resDir, "values/strings.xml"))
+            assertTrue("Base strings.xml must not be empty for flavor $flavor", baseKeys.isNotEmpty())
+
+            for (loc in supportedLocales) {
+                val locXml = File(resDir, "$loc/strings.xml")
+                assertTrue("strings.xml must exist for locale $loc in flavor $flavor", locXml.exists())
+                val locKeys = extractKeys(locXml)
+
+                val missingInLocale = baseKeys - locKeys
+                val extraInLocale = locKeys - baseKeys
+
+                // Guard: Enforce strict 100% key parity across all 11 supported locales
+                assertEquals("Locale $loc in flavor $flavor is missing string keys: $missingInLocale", emptySet<String>(), missingInLocale)
+                assertEquals("Locale $loc in flavor $flavor has extraneous string keys: $extraInLocale", emptySet<String>(), extraInLocale)
+            }
+        }
+    }
 }
 
