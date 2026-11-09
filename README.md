@@ -80,12 +80,14 @@
 Dosezy transforms daily medication management into a stress-free experience. Input your medicines, dosages, and schedules, and Dosezy handles the rest: with large, high-contrast visuals, reliable alarms, and total privacy.
 
 - 🔔 **Critical Full-Screen Alarms**: High-visibility alarm screen rings reliably even when your phone is in deep sleep or silent mode. Intercept with physical volume keys to instantly silence audio, or snooze safely with a back gesture.
-- 🎵 **Custom Sounds & Dynamic Snooze**: Choose from gentle built-in alert tones or your own device ringtones with in-app audio previews, dedicated alarm volume controls, and customizable snooze intervals (5, 10, 15, 20, or 30 minutes).
+- 🔁 **Nagging Reminders & ADHD Intake Safeguard**: Never forget a dose when busy or distracted. Dosezy can ring repeatedly until taken, and starts a quiet countdown timer when you tap "Take" that alerts you again if you walk away before consuming your medicine.
+- 🎵 **Custom Sounds & Dynamic Snooze**: Choose from gentle built-in alert tones or your own device ringtones with in-app audio previews, dedicated alarm volume controls, and customizable snooze intervals (5, 10, 15, 20, or 30 minutes) with on-the-fly snooze chips.
 - 📦 **Pill Inventory & Low-Stock Warnings**: Real-time stock tracking with automatic deduction on intake. Configurable low-stock alerts notify you well before running out of essential medications.
 - 🛒 **Dosezy Pharmacy Refill Order**: Instantly compile formatted prescription refill orders for 15, 30, 60, or 90 days from active inventory or low-stock filters with multi-profile consolidation and smart bottle supply calculations for eye drops. Preview your order with live WhatsApp markdown formatting, then tap to Share via Chat or copy to clipboard.
 - 🕒 **Manually Record Dose Time**: Easily record the actual time you took medications when logging doses later to maintain accurate adherence histories.
 - 🌐 **Crossing Time Zones (Doses Shift With You)**: Traveling across time zones? Dosezy automatically keeps your reminders anchored to your local daily routine without time distortion.
 - 🧭 **Customizable Bottom Navigation**: Toggle to hide the central '+' button for a clean, symmetrical 4-tab layout, placing an "Add Medicine" button directly below active medications on the Medicines screen.
+- 🔀 **Medicine Sorting & Custom Reordering**: Organize your medications roster alphabetically from A to Z, by scheduled intake time, or manually rearrange prescriptions into your preferred order with up and down arrows.
 - ↩️ **Configurable Dose Undo & Protection**: Made a mistake? Revert accidental dose taps from the reminder bar or dose card, backed by a safety confirmation dialog so your tablet stock and adherence records are never reset by accident.
 - ✍️ **Per-Dose Notes & Symptom Logging**: Keep track of meals and how you feel. Attach notes, meal context (*"With food"*), or side effects when logging a dose with quick-tap suggestions, and view or edit notes anytime from your dose cards or calendar.
 - ⏸️ **Clinical Dose Skipping**: Safely pause doses with required clinical explanations (*Doctor advised pause*, *Adverse reaction*, *Fasting*, *Illness*, *Ran out of medicine*) without penalizing your adherence streak.
@@ -95,10 +97,12 @@ Dosezy transforms daily medication management into a stress-free experience. Inp
 - 🔍 **Real-Time Medicine Search**: Rapidly find and filter prescriptions in large medicine rosters by name or instruction with instant empty-state guidance.
 - 💊 **Discontinued Medications Archive**: Neatly archives stopped medications into an expandable accordion at the bottom of the Medicines screen, preserving all past adherence history while keeping active prescriptions clutter-free.
 - 👥 **Multi-Family Profiles**: Manage medications for parents, children, or partners on one device with separate medicines, schedules, stock counts, personal emergency contacts, and 5-second deletion countdown safeguards.
+- 📱 **Interactive Home Screen Widget**: Scroll through your daily doses directly on your Android home screen with instant profile-switching support.
 - 📄 **Doctor PDF Reports & Data Exports**: Generate clean, print-ready adherence summary reports for medical appointments, or export JSON backups and CSV spreadsheets anytime.
 - 🔒 **Full Encrypted ZIP Backups & Selective Restore**: Export complete encrypted archives. Restore individual profiles with intelligent conflict resolution (Merge Data, Overwrite, or Create New Profile).
 - 🚨 **Emergency Services & Personal Contacts**: 1-tap dialing for national emergency numbers across 10 regions (auto-detected via SIM/locale), plus dedicated personal doctor and family emergency contacts per profile.
 - 🎨 **Accessibility & Visual Customization**: Large touch targets, presbyopia-safe 7.8:1 high-contrast typography, 9 customizable pill shapes (including sprays), 10 palette colors, and adaptive System Dark/Light themes.
+- 🛡️ **Lock Screen Privacy Safeguard**: Keeps your health data private by masking sensitive medicine names and doses on your lock screen until unlocked.
 - 🌐 **12 Native Languages**: Fully translated across all screens, notifications, alarms, and settings in English, Spanish, Hindi, Chinese, Portuguese, Arabic, French, German, Japanese, Russian, Italian, and Bengali.
 - 🛡️ **Notification Reliability Shield**: Built-in diagnostic assistant that checks exact alarm permissions and battery optimization, providing 1-tap device setup guides (Samsung, Xiaomi, OnePlus, etc.) so alarms never fail.
 - 🔒 **100% Private & Offline**: No account creation, no sign-ups, and no internet permissions. All health data is encrypted and stays strictly on your phone.  

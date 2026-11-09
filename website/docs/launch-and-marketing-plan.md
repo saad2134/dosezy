@@ -61,7 +61,7 @@ Unlike proprietary medication trackers that aggregate or sell prescription routi
 
 ### Channel 1: Hacker News (*Show HN*)
 * **Timing:** Tuesday or Wednesday at 12:00 PM UTC (7:00 AM EST / 4:00 AM PST)
-* **Title:** `Show HN: Dosezy – Free, open-source, 100% offline medicine tracker without internet permissions`
+* **Title:** `Show HN: Dosezy - Free, open-source, 100% offline medicine tracker without internet permissions`
 * **Post Copy:**
 > Hi HN! I built Dosezy, a free and open-source medication tracker designed around local-first privacy and motor accessibility.
 > 

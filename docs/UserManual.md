@@ -18,12 +18,16 @@ This guide provides a complete, step-by-step walkthrough of all features in Dose
    - [Dosage Units & Frequency Patterns](#dosage-units--frequency-patterns)
    - [Multi-Dose Quick Presets (1x, 2x, 3x, 4x)](#multi-dose-quick-presets-1x-2x-3x-4x)
    - [12-First Grid Time Picker](#12-first-grid-time-picker)
+   - [Sorting & Custom Reordering](#sorting--custom-reordering)
    - [Discontinuing & Archiving Medications](#discontinuing--archiving-medications)
    - [Form Validation Feedback & Confirmation](#form-validation-feedback--confirmation)
 6. [Critical Full-Screen Alarms, Volume Rocker Silence & Custom Tones](#6-critical-full-screen-alarms-volume-rocker-silence--custom-tones)
    - [Grouped Alarms & "Take All"](#grouped-alarms--take-all)
    - [Hardware Volume Rocker Silence](#hardware-volume-rocker-silence)
    - [Back-Gesture Snooze](#back-gesture-snooze)
+   - [Persistent Nagging Alarms](#persistent-nagging-alarms)
+   - [ADHD & Distraction Intake Safeguard](#adhd--distraction-intake-safeguard)
+   - [On-the-Fly Custom Snooze Options](#on-the-fly-custom-snooze-options)
    - [Customizable Alarm Duration & Audio Volume](#customizable-alarm-duration--audio-volume)
    - [Custom Ringtone Selection](#custom-ringtone-selection)
    - [Dynamic Snooze Presets](#dynamic-snooze-presets)
@@ -202,6 +206,16 @@ Tap any dose time chip to open the intuitive time picker:
 - **AM / PM Toggle**: 1-tap switching.
 - **Quick Minute Chips**: Tap `:00`, `:15`, `:30`, or `:45`, or slide the minute bar for exact minute precision.
 
+### Sorting & Custom Reordering:
+Keep your medicines organized just the way you like:
+1. On the **Medicines** screen, tap the **Sort** button next to search.
+2. Choose from 5 sorting options:
+   - **Default**: Order medicines were added.
+   - **Name (A-Z)**: Alphabetical from A to Z.
+   - **Name (Z-A)**: Alphabetical from Z to A.
+   - **Scheduled Time**: Ordered by earliest scheduled dose of the day.
+   - **Custom Reorder**: Manually arrange medications into your personal preferred order using simple up and down arrows.
+
 ### Discontinuing & Archiving Medications:
 When a treatment course finishes:
 1. Open the medication from the Medicines screen and tap **Edit**.
@@ -237,6 +251,21 @@ If an alarm rings during a meeting or while resting, press the **Volume Up** or 
 
 ### Back-Gesture Snooze:
 Pressing your device's physical or gesture **Back** button during an active alarm automatically triggers a safe snooze for your configured duration, ensuring doses are never accidentally dismissed into a missed state.
+
+### Persistent Nagging Alarms:
+If you tend to sleep through alarms or get sidetracked when a reminder rings:
+1. In **Menu > Preferences > Notifications & Alarms**, turn on **Nagging Reminders**.
+2. Choose your **Nagging Interval**: Repeat every `5 minutes`, `10 minutes`, or `15 minutes`.
+3. Choose your **Maximum Repeats**: Set the alarm to repeat `1`, `2`, `3`, `5`, or `10` times, or select **Until taken** for continuous follow-up until you confirm the dose.
+
+### ADHD & Distraction Intake Safeguard:
+Have you ever tapped "Take" on a pill reminder, walked toward the kitchen, gotten distracted, and wondered later if you actually took it? Dosezy includes a dedicated countdown timer safeguard:
+1. In **Menu > Preferences > Notifications & Alarms**, switch on **Intake Countdown Safeguard**.
+2. Select a countdown length: `60 seconds`, `120 seconds` (2 minutes), `180 seconds` (3 minutes), or `300 seconds` (5 minutes).
+3. When you mark a dose as taken, Dosezy starts a quiet countdown timer on your screen. If you confirm, the dose is completed. If you get distracted and the countdown expires without final confirmation, Dosezy sounds an automatic re-alert to ensure you never miss your medicine.
+
+### On-the-Fly Custom Snooze Options:
+Need more or less time to take your pills? Turn on **Custom Snooze Options** in **Menu > Preferences > Notifications & Alarms**. When an alarm rings, Dosezy displays quick chips (`5m`, `10m`, `15m`, `20m`, `30m`) directly on the alert screen so you can pick the exact pause time you need on the fly.
 
 ### Customizable Reminder Styles (Alarms vs Notifications):
 Under **Menu > Preferences > Notifications & Alarms > Reminder Style**, you can customize how reminders alert you:
@@ -344,6 +373,9 @@ The **Preferences** screen is organized into dedicated categories:
 - **Notifications & Alarms**:
   - **Reminder Style**: Choose between Full-Screen Alarms (continuous ringtones bypassing Do Not Disturb) and standard Notifications (alert tone respecting Do Not Disturb), with per-medication overrides.
   - **Slide to Take & Snooze**: Dedicated sliding action tracks on full-screen alarms to prevent accidental dismissals (enabled by default; turn off for standard tap buttons).
+  - **Nagging Reminders**: Repeat reminders every 5, 10, or 15 minutes up to 10 times or until confirmed taken.
+  - **Intake Countdown Safeguard**: Automatically re-alerts after 60s, 120s, 180s, or 300s if you get distracted before taking your medicine.
+  - **Mask Details on Lock Screen**: Protect sensitive prescription names and strengths from displaying on your lock screen until unlocked.
   - **Default Snooze Duration**: Choose 5, 10, 15, 20, or 30 minutes.
   - **Alarm Sound**: Select custom ringtones, system alerts, or built-in chimes with audio preview.
   - **Alarm Sound Duration**: Set ring length (30s to 5m or continuous loop).
@@ -352,8 +384,8 @@ The **Preferences** screen is organized into dedicated categories:
   - **Allow Dose Undo**: Toggle whether taken or late doses can be undone from dose cards or reminder snackbars (default is disabled for safety). Includes a confirmation dialog before reversing status and restoring pill stock.
   - **Add Note on Dose Taken**: Prompt for notes (meal context, side effects, symptoms) whenever a dose is marked as taken (default is disabled).
   - **Allow Dose Skipping**: Toggle the clinical dose skipping option.
-  - **Consider Late After**: Choose `1 hour`, `2 hours`, or `3 hours` (default is **3 hours**).
-  - **Consider Missed After**: Choose between `3 hours` and `9 hours` (default is **6 hours**).
+  - **Consider Late After**: Select how long after the scheduled time a dose is considered late before shifting from pending. Choose from granular intervals: `15 minutes`, `30 minutes`, `45 minutes`, `1 hour`, `1.5 hours`, `2 hours`, `3 hours`, or `4 hours` (default is **3 hours**).
+  - **Consider Missed After**: Select when an untaken dose transitions to missed. Choose between `30 minutes`, `45 minutes`, `1 hour`, `1.5 hours`, `2 hours`, `3 hours`, `4 hours`, `6 hours`, `8 hours`, or `12 hours` (default is **6 hours**).
 
 ---
 
