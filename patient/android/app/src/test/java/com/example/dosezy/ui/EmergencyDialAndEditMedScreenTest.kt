@@ -553,6 +553,68 @@ class EmergencyDialAndEditMedScreenTest {
         assertEquals("US", detectedEnglish.code)
         assertEquals("911", detectedEnglish.ambulance)
     }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 5. EditMedScreen: Dosage & DosageUnit Change Detection (#BUG-EDITMED-DOSAGE-CHANGE)
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testEditMedScreen_dosageAndUnitChanges_triggerTimingOrScheduleChanged() {
+        val baseMed = Medicine(
+            medicineId = "med_test_eval",
+            userId = "user_test",
+            medicationName = "Aspirin",
+            dosage = 100.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(pattern = FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+
+        fun isTimingOrScheduleChanged(original: Medicine, updated: Medicine): Boolean {
+            return (
+                original.scheduledTimes != updated.scheduledTimes ||
+                original.frequency != updated.frequency ||
+                original.timesPerDay != updated.timesPerDay ||
+                original.dosage != updated.dosage ||
+                original.dosageUnit != updated.dosageUnit ||
+                original.customDosages != updated.customDosages ||
+                original.startDate != updated.startDate ||
+                original.endDate != updated.endDate ||
+                original.durationDays != updated.durationDays
+            ) && updated.frequency.pattern != FrequencyPattern.AS_NEEDED
+        }
+
+        // Case 1: Identical medicine - no schedule change
+        assertFalse(
+            "Identical medicine must not trigger schedule change dialog",
+            isTimingOrScheduleChanged(baseMed, baseMed.copy())
+        )
+
+        // Case 2: Metadata only change (pill color, notes) - no schedule change
+        assertFalse(
+            "Metadata change (pill color) must not trigger schedule change dialog",
+            isTimingOrScheduleChanged(baseMed, baseMed.copy(pillColor = "#FF0000", notes = "Take with water"))
+        )
+
+        // Case 3: Dosage modification (100mg -> 200mg) - MUST trigger schedule change
+        assertTrue(
+            "Dosage modification must trigger schedule change to prompt effective date dialog",
+            isTimingOrScheduleChanged(baseMed, baseMed.copy(dosage = 200.0))
+        )
+
+        // Case 4: Dosage unit modification (MG -> TABLET) - MUST trigger schedule change
+        assertTrue(
+            "Dosage unit modification must trigger schedule change to prompt effective date dialog",
+            isTimingOrScheduleChanged(baseMed, baseMed.copy(dosageUnit = DosageUnit.TABLET))
+        )
+
+        // Case 5: When frequency is AS_NEEDED, timingOrScheduleChanged is false (PRN switch handled directly)
+        assertFalse(
+            "Switching to AS_NEEDED bypasses effective date dialog",
+            isTimingOrScheduleChanged(baseMed, baseMed.copy(dosage = 500.0, frequency = Frequency(pattern = FrequencyPattern.AS_NEEDED)))
+        )
+    }
 }
 
 

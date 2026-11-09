@@ -1008,4 +1008,44 @@ class RecordDoseMissedAndUndoTest {
         assertNull("Undoing same-day overdue dose must NOT post entry1 active notification", entry1Notif)
         assertNull("Undoing same-day overdue dose must NOT post entry2 active notification", entry2Notif)
     }
+
+    @Test
+    fun undoDoseTaken_prnDose_deletesEntry_and_restoresStock_withoutSlotAlarmSync() = runBlocking {
+        // Guard: Verify that undoing an ad-hoc PRN dose cleanly restores stock and deletes the entry without triggering slot alarm resync (#BUG-PRN-UNDO-ALARM)
+        val prnMed = testMedicine.copy(
+            medicineId = "med_prn_undo_guard",
+            currentStock = 10,
+            autoDeductOnTake = true
+        )
+        db.medicineDao().insertMedicine(prnMed)
+
+        // Log PRN dose
+        scheduleRepository.logAsNeededDose(prnMed, testUser.userId, LocalDateTime.now(), context)
+
+        // Find the PRN entry
+        val allEntries = db.scheduleDao().getAllScheduleEntries(testUser.userId)
+        val prnEntry = allEntries.firstOrNull { it.entryId.startsWith("PRN_") && it.medicineId == prnMed.medicineId }
+        assertNotNull("PRN entry must exist after logAsNeededDose", prnEntry)
+
+        val stockAfterLog = db.medicineDao().getMedicineByIdDirect(prnMed.medicineId)?.currentStock
+        assertEquals(9, stockAfterLog)
+
+        // Clear notifications
+        notificationManager.cancelAll()
+
+        // Undo the PRN dose
+        scheduleRepository.undoDoseTaken(prnEntry!!.entryId, context)
+
+        // 1. Entry must be permanently deleted from database
+        val deletedEntry = db.scheduleDao().getScheduleEntryById(prnEntry.entryId)
+        assertNull("PRN entry must be deleted after undoDoseTaken", deletedEntry)
+
+        // 2. Stock must be restored
+        val restoredStock = db.medicineDao().getMedicineByIdDirect(prnMed.medicineId)?.currentStock
+        assertEquals(10, restoredStock)
+
+        // 3. No phantom notification should be posted for the deleted PRN entry
+        val activeNotif = notificationManager.activeNotifications.firstOrNull { it.id == prnEntry.entryId.hashCode() }
+        assertNull("Undoing PRN dose must not post phantom slot notification in shade", activeNotif)
+    }
 }

@@ -10,8 +10,10 @@ import androidx.test.core.app.ApplicationProvider
 import com.example.dosezy.data.model.DosageUnit
 import com.example.dosezy.data.model.Frequency
 import com.example.dosezy.data.model.FrequencyPattern
+import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.Medicine
 import com.example.dosezy.data.model.MedicineSortMode
+import com.example.dosezy.data.model.User
 import com.example.dosezy.data.repository.MedicineOrderPreferences
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -234,6 +236,43 @@ class MedicineOrderPreferencesTest {
         assertEquals(MedicineSortMode.TIME_ASC, preferences.getSortMode("user_merge"))
         // New ID is appended, existing ID is not duplicated
         assertEquals(listOf("existing_1", "existing_2", "remapped_3"), preferences.getCustomOrder("user_merge"))
+    }
+
+    @Test
+    fun deleteMedicinePermanently_repositoryCall_scrubsMedicineFromCustomOrder() = kotlinx.coroutines.runBlocking {
+        // Guard: Verify that deleting a medicine directly via MedicineRepository purges it from custom order preferences (#BUG-MED-REPO-DELETE-ORDER)
+        val db = androidx.room.Room.inMemoryDatabaseBuilder(context, DosezyDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+        val scheduleRepo = com.example.dosezy.data.repository.ScheduleRepository(db)
+        val medRepo = com.example.dosezy.data.repository.MedicineRepository(db, scheduleRepo, context)
+
+        val userId = "user_repo_del_test"
+        val user = User(
+            userId = userId,
+            fullName = "Order Test User",
+            age = 30,
+            gender = Gender.DO_NOT_SPECIFY,
+            contactNumber = "1234567890"
+        )
+        db.userDao().insertUser(user)
+
+        val med1 = createMedicine("med_del_1", "Med One").copy(userId = userId)
+        val med2 = createMedicine("med_del_2", "Med Two").copy(userId = userId)
+        db.medicineDao().insertMedicine(med1)
+        db.medicineDao().insertMedicine(med2)
+
+        preferences.setCustomOrder(userId, listOf("med_del_1", "med_del_2"))
+        assertEquals(listOf("med_del_1", "med_del_2"), preferences.getCustomOrder(userId))
+
+        medRepo.deleteMedicinePermanently(med1)
+
+        assertEquals(
+            "deleteMedicinePermanently must remove deleted medicine ID from custom order preferences",
+            listOf("med_del_2"),
+            preferences.getCustomOrder(userId)
+        )
+        db.close()
     }
 }
 

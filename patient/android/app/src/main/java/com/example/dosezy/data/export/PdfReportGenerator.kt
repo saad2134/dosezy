@@ -120,29 +120,78 @@ class PdfReportGenerator(private val context: Context) {
 
     internal fun formatDiscontinuedMedicationsHeader(count: Int): String = "Discontinued Medications ($count)"
 
+    // Guard: Support multiline text (newlines), CJK unspaced text, and unbroken long tokens via breakText to prevent canvas overflow (#BUG-PDF-WRAP-CJK)
     internal fun wrapTextToLines(prefix: String, fullText: String, paint: Paint, maxWidth: Float): List<String> {
         val totalText = "$prefix$fullText"
-        if (paint.measureText(totalText) <= maxWidth) {
-            return listOf(totalText)
-        }
-        val lines = mutableListOf<String>()
-        val words = totalText.split(" ")
-        var currentLine = ""
-        for (w in words) {
-            val candidate = if (currentLine.isEmpty()) w else "$currentLine $w"
-            if (paint.measureText(candidate) <= maxWidth) {
-                currentLine = candidate
-            } else {
-                if (currentLine.isNotEmpty()) {
-                    lines.add(currentLine)
+        val rawLines = totalText.split(Regex("\r?\n"))
+        val result = mutableListOf<String>()
+
+        for (rawLine in rawLines) {
+            if (rawLine.isEmpty()) {
+                result.add("")
+                continue
+            }
+            if (paint.measureText(rawLine) <= maxWidth) {
+                result.add(rawLine)
+                continue
+            }
+            val words = rawLine.split(" ")
+            var currentLine = ""
+            for (w in words) {
+                if (paint.measureText(w) > maxWidth) {
+                    var remaining = w
+                    if (currentLine.isNotEmpty()) {
+                        val spacePrefix = "$currentLine "
+                        var fitCount = 0
+                        for (i in 1..remaining.length) {
+                            if (paint.measureText(spacePrefix + remaining.substring(0, i)) <= maxWidth) {
+                                fitCount = i
+                            } else {
+                                break
+                            }
+                        }
+                        if (fitCount > 0) {
+                            result.add(spacePrefix + remaining.substring(0, fitCount))
+                            remaining = remaining.substring(fitCount)
+                            currentLine = ""
+                        } else {
+                            result.add(currentLine)
+                            currentLine = ""
+                        }
+                    }
+                    while (remaining.isNotEmpty()) {
+                        var count = paint.breakText(remaining, true, maxWidth, null)
+                        if (count <= 0 || paint.measureText(remaining.substring(0, count)) > maxWidth) {
+                            var fitLen = 0
+                            for (i in 1..remaining.length) {
+                                if (paint.measureText(remaining.substring(0, i)) <= maxWidth) {
+                                    fitLen = i
+                                } else {
+                                    break
+                                }
+                            }
+                            count = fitLen.coerceAtLeast(1)
+                        }
+                        result.add(remaining.substring(0, count))
+                        remaining = remaining.substring(count)
+                    }
+                } else {
+                    val candidate = if (currentLine.isEmpty()) w else "$currentLine $w"
+                    if (paint.measureText(candidate) <= maxWidth) {
+                        currentLine = candidate
+                    } else {
+                        if (currentLine.isNotEmpty()) {
+                            result.add(currentLine)
+                        }
+                        currentLine = w
+                    }
                 }
-                currentLine = w
+            }
+            if (currentLine.isNotEmpty()) {
+                result.add(currentLine)
             }
         }
-        if (currentLine.isNotEmpty()) {
-            lines.add(currentLine)
-        }
-        return lines
+        return result
     }
 
     internal fun truncateTextToWidth(text: String, paint: Paint, maxWidth: Float): String {
@@ -200,7 +249,8 @@ class PdfReportGenerator(private val context: Context) {
 
         var y = 38f
 
-        fun checkPageBreak(neededHeight: Float) {
+        // Guard: Support re-rendering table headers on page breaks to maintain column labels on multi-page reports (#BUG-PDF-MULTI-PAGE-HEADERS)
+        fun checkPageBreak(neededHeight: Float, onNewPage: (() -> Unit)? = null) {
             if (y + neededHeight > 780f) {
                 drawFooter(canvas, pageNumber)
                 pdfDocument.finishPage(page)
@@ -213,6 +263,7 @@ class PdfReportGenerator(private val context: Context) {
                 y += 12f
                 canvas.drawLine(40f, y, 555f, y, linePaint)
                 y += 20f
+                onNewPage?.invoke()
             }
         }
 
@@ -384,8 +435,21 @@ class PdfReportGenerator(private val context: Context) {
         y += 16f
 
         subtitlePaint.isFakeBoldText = false
+        val drawScheduleHeaders: () -> Unit = {
+            subtitlePaint.isFakeBoldText = true
+            canvas.drawText("Scheduled Date/Time", 40f, y, subtitlePaint)
+            canvas.drawText("Medication", 155f, y, subtitlePaint)
+            canvas.drawText("Status", 340f, y, subtitlePaint)
+            canvas.drawText("Recorded Time", 440f, y, subtitlePaint)
+            y += 12f
+            canvas.drawLine(40f, y, 555f, y, linePaint)
+            y += 16f
+            subtitlePaint.isFakeBoldText = false
+        }
+
         sortedSchedules.take(150).forEach { sch ->
-            checkPageBreak(20f)
+            // Guard: Re-draw schedule table column headers on subsequent pages so multi-page clinical reports retain column definitions (#BUG-PDF-MULTI-PAGE-HEADERS)
+            checkPageBreak(20f, onNewPage = drawScheduleHeaders)
             val dateStr = sch.scheduledDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
             canvas.drawText(dateStr, 40f, y, textPaint)
 

@@ -426,11 +426,14 @@ fun EditMedScreen(
                                     reminderType = selectedReminderType
                                 )
 
+                                // Guard: Detect dosage and dosageUnit changes matching MedicineRepository to prompt ScheduleEffectiveDateDialog (#BUG-EDITMED-DOSAGE-CHANGE)
                                 if (medicineToEdit != null) {
                                     val timingOrScheduleChanged = (
                                         medicineToEdit.scheduledTimes != updatedMedicine.scheduledTimes ||
                                         medicineToEdit.frequency != updatedMedicine.frequency ||
                                         medicineToEdit.timesPerDay != updatedMedicine.timesPerDay ||
+                                        medicineToEdit.dosage != updatedMedicine.dosage ||
+                                        medicineToEdit.dosageUnit != updatedMedicine.dosageUnit ||
                                         medicineToEdit.customDosages != updatedMedicine.customDosages ||
                                         medicineToEdit.startDate != updatedMedicine.startDate ||
                                         medicineToEdit.endDate != updatedMedicine.endDate ||
