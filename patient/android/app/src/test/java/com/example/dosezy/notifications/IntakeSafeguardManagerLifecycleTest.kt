@@ -80,7 +80,7 @@ class IntakeSafeguardManagerLifecycleTest {
         timesPerDay = 1,
         frequency = Frequency(FrequencyPattern.DAILY),
         scheduledTimes = listOf(LocalTime.of(8, 0)),
-        currentStock = 30,
+        currentStock = 30.0,
         autoDeductOnTake = true
     )
 
@@ -279,7 +279,7 @@ class IntakeSafeguardManagerLifecycleTest {
 
         // Verify initial state
         val initialMed = database.medicineDao().getMedicineByIdDirect(testMedicine.medicineId)
-        assertEquals(30, initialMed?.currentStock)
+        assertEquals(30.0, initialMed?.currentStock!!, 0.001)
 
         // Start countdown
         IntakeSafeguardManager.startCountdown(
@@ -306,7 +306,7 @@ class IntakeSafeguardManagerLifecycleTest {
         assertEquals(MedicationStatus.TAKEN_ON_TIME, updatedEntry?.status)
 
         val updatedMed = database.medicineDao().getMedicineByIdDirect(testMedicine.medicineId)
-        assertEquals(29, updatedMed?.currentStock)
+        assertEquals(29.0, updatedMed?.currentStock!!, 0.001)
     }
 
     // ─────────────────────────────────────────────────────────────────────────────
@@ -715,8 +715,8 @@ class IntakeSafeguardManagerLifecycleTest {
         val lowStockMed = testMedicine.copy(
             medicineId = "med_low_stock_refill",
             medicationName = "Lisdexamfetamine",
-            currentStock = 5,
-            refillThreshold = 5,
+            currentStock = 5.0,
+            refillThreshold = 5.0,
             autoDeductOnTake = true
         )
         database.medicineDao().insertMedicine(lowStockMed)
@@ -746,7 +746,7 @@ class IntakeSafeguardManagerLifecycleTest {
         // Verify stock dropped from 5 to 4
         val updatedMed = database.medicineDao().getMedicineByIdDirect(lowStockMed.medicineId)
         assertNotNull(updatedMed)
-        assertEquals(4, updatedMed!!.currentStock)
+        assertEquals(4.0, updatedMed!!.currentStock!!, 0.001)
 
         // Verify refill warning notification was posted to NotificationManager
         val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
@@ -763,7 +763,7 @@ class IntakeSafeguardManagerLifecycleTest {
         val siblingMed = testMedicine.copy(
             medicineId = "med_sibling_slot",
             medicationName = "Guanfacine",
-            currentStock = 20
+            currentStock = 20.0
         )
         database.medicineDao().insertMedicine(siblingMed)
 
@@ -1252,7 +1252,7 @@ class IntakeSafeguardManagerLifecycleTest {
             timesPerDay = 1,
             frequency = Frequency(FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(8, 0)),
-            currentStock = 30,
+            currentStock = 30.0,
             autoDeductOnTake = true
         )
         database.userDao().insertUser(userB)

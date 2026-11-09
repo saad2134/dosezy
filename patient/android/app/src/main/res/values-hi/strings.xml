@@ -316,7 +316,7 @@
 
     <string name="stock_current">वर्तमान स्टॉक</string>
     <string name="stock_refill_threshold">स्टॉक कम होने पर अलर्ट</string>
-    <string name="stock_units_left">%d यूनिट शेष</string>
+    <string name="stock_units_left">%s यूनिट शेष</string>
     <string name="refill_alert_title">रीफिल अलर्ट: %s</string>
     <string name="preset_1x_daily">दिन में 1 बार (सुबह 8 बजे)</string>
     <string name="preset_2x_daily">दिन में 2 बार (सुबह 8, रात 8)</string>
@@ -419,7 +419,7 @@
     <string name="med_stock_placeholder">उदा. 30</string>
     <string name="med_threshold_placeholder">उदा. 5</string>
     <string name="notif_refill_alert_title">रिफिल चेतावनी: %1$s</string>
-    <string name="notif_refill_alert_text">कम स्टॉक शेष: केवल %1$d इकाइयाँ बची हैं। कृपया जल्द ही रिफिल करें।</string>
+    <string name="notif_refill_alert_text">कम स्टॉक शेष: केवल %1$s इकाइयाँ बची हैं। कृपया जल्द ही रिफिल करें।</string>
     <string name="notif_channel_name">दवा अनुस्मारक</string>
     <string name="notif_channel_desc">दवा की खुराक की समय सारिणी के लिए सूचनाएं</string>
     <string name="import_profile_conflict_warn">प्रोफ़ाइल नाम पहले से मौजूद है</string>
@@ -453,8 +453,8 @@
     <string name="err_cannot_open_link">लिंक नहीं खोला जा सका</string>
     <string name="err_no_email_app">कोई ईमेल ऐप उपलब्ध नहीं है</string>
     <string name="err_share_failed">साझाकरण त्रुटि: %1$s</string>
-    <string name="med_stock_refill_warning_badge">⚠️ रिफिल: %1$d शेष</string>
-    <string name="med_stock_badge">📦 स्टॉक: %1$d</string>
+    <string name="med_stock_refill_warning_badge">⚠️ रिफिल: %1$s शेष</string>
+    <string name="med_stock_badge">📦 स्टॉक: %1$s</string>
     <string name="to_be_taken_in">%1$dघंटे %2$dमिनट में लेनी है</string>
     <string name="time_diff_ago">%1$dघंटे %2$dमिनट पहले</string>
     <string name="status_all_medications_taken">सभी दवाएं ले ली गईं</string>
@@ -518,7 +518,7 @@
     <string name="quick_refill_preset_30">+30</string>
     <string name="quick_refill_preset_60">+60</string>
     <string name="quick_refill_preset_90">+90</string>
-    <string name="quick_refill_success">%1$s के लिए स्टॉक रिफिल किया गया। नया बैलेंस: %2$d</string>
+    <string name="quick_refill_success">%1$s के लिए स्टॉक रिफिल किया गया। नया बैलेंस: %2$s</string>
 
     <string name="no_scheduled_doses_today">आज के लिए कोई निर्धारित खुराक नहीं है</string>
     <string name="prn_confirm_log_title">खुराक दर्ज करें</string>
@@ -610,7 +610,7 @@
     <string name="alarm_snooze_format">स्नूज़ (%d मिनट)</string>
     <string name="notif_action_snooze_format">स्नूज़ (%d मिनट)</string>
     <string name="alarm_snoozed_toast">अलार्म %d मिनट के लिए स्नूज़ किया गया</string>
-    <string name="alarm_stock_remaining">स्टॉक: %d दवाएं शेष</string>
+    <string name="alarm_stock_remaining">स्टॉक: %s दवाएं शेष</string>
     <string name="home_action_take">लें</string>
     <string name="home_action_taken">ले ली</string>
     <string name="home_action_missed">छूट गई</string>
@@ -674,7 +674,7 @@
     <string name="pharmacy_order_copy">टेक्स्ट कॉपी करें</string>
     <string name="pharmacy_order_copied">रीफ़िल ऑर्डर क्लिपबोर्ड पर कॉपी हो गया</string>
     <string name="pharmacy_order_empty">ऑर्डर करने के लिए कोई दवा उपलब्ध नहीं है</string>
-    <string name="pharmacy_order_current_stock">वर्तमान स्टॉक: %1$d %2$s शेष</string>
+    <string name="pharmacy_order_current_stock">वर्तमान स्टॉक: %1$s %2$s शेष</string>
     <string name="pharmacy_order_qty_needed">ऑर्डर की मात्रा: %1$d %2$s</string>
     <string name="pharmacy_order_patient_header">रोगी: %1$s</string>
     <string name="pharmacy_order_date_header">दिनांक: %1$s</string>
@@ -701,7 +701,7 @@
     <string name="pharmacy_order_days_supply">आपूर्ति के दिन</string>
     <string name="pharmacy_order_days_format_short">%1$d दिन</string>
     <string name="pharmacy_order_medicines_include">शामिल दवाइयां (%1$d/%2$d)</string>
-    <string name="pharmacy_order_stock_left">%1$d शेष</string>
+    <string name="pharmacy_order_stock_left">%1$s शेष</string>
     <string name="pharmacy_order_no_stock_tracked">स्टॉक ट्रैक नहीं किया गया</string>
     <string name="pharmacy_order_header_title">📋 *दवा का ऑर्डर*</string>
     <string name="pharmacy_order_frequency_format">आवृत्ति: दिन में %1$dx बार</string>

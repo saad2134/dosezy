@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.dosezy.R
+import com.example.dosezy.data.model.normalizeArabicDigits
 
 /**
  * Card 4: Inventory & Stock Tracking Card
@@ -96,10 +97,16 @@ fun MedicineStockInventoryCard(
             ) {
                 OutlinedTextField(
                     value = currentStockText,
-                    onValueChange = { if (it.all { c -> c.isDigit() }) onCurrentStockChange(it) },
+                    onValueChange = { newVal ->
+                        // Guard: Allow fractional decimal stock numbers (e.g. 29.5) while preventing multiple decimal points (#123)
+                        val normalized = newVal.normalizeArabicDigits()
+                        if (normalized.isEmpty() || normalized.matches(Regex("^\\d*\\.?\\d*$"))) {
+                            onCurrentStockChange(newVal)
+                        }
+                    },
                     label = { Text(stringResource(R.string.stock_current)) },
                     placeholder = { Text(stringResource(R.string.med_stock_current_placeholder)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.weight(1f).defaultMinSize(minHeight = 56.dp),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -109,10 +116,16 @@ fun MedicineStockInventoryCard(
                 )
                 OutlinedTextField(
                     value = refillThresholdText,
-                    onValueChange = { if (it.all { c -> c.isDigit() }) onRefillThresholdChange(it) },
+                    onValueChange = { newVal ->
+                        // Guard: Allow fractional decimal refill thresholds while preventing multiple decimal points (#123)
+                        val normalized = newVal.normalizeArabicDigits()
+                        if (normalized.isEmpty() || normalized.matches(Regex("^\\d*\\.?\\d*$"))) {
+                            onRefillThresholdChange(newVal)
+                        }
+                    },
                     label = { Text(stringResource(R.string.stock_refill_threshold)) },
                     placeholder = { Text(stringResource(R.string.med_stock_refill_placeholder)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.weight(1f).defaultMinSize(minHeight = 56.dp),
                     colors = OutlinedTextFieldDefaults.colors(

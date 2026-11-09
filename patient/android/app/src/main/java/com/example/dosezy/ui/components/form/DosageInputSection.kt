@@ -315,6 +315,48 @@ fun DosageInputSection(
                     }
                 }
             }
+
+            // Quick fractional dose chips for discrete units (tablets and capsules)
+            if (selectedDosageUnit == DosageUnit.TABLET || selectedDosageUnit == DosageUnit.CAPSULE) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    val quickDoses = listOf("0.5" to "½", "1" to "1", "1.5" to "1½", "2" to "2")
+                    quickDoses.forEach { (value, label) ->
+                        val isSelected = dosage.trim() == value
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = if (isSelected) Color(0xFF1193D4).copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            border = BorderStroke(
+                                1.dp,
+                                if (isSelected) Color(0xFF1193D4) else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                            ),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(36.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .clickable { onDosageChange(value) }
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = label,
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                        fontSize = 14.sp
+                                    ),
+                                    color = if (isSelected) Color(0xFF1193D4) else MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

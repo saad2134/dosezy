@@ -515,7 +515,7 @@ class ScheduleStatusAndUserRepositoryDirectTest {
     fun testUndoDoseTaken_preservesUserClinicalNotes_whileStrippingPartialStockAuditTag() = runBlocking {
         val user = sampleUser("user_notes_test")
         userDao.insertUser(user)
-        val med = sampleMedicine("med_notes_test", "user_notes_test", name = "Metformin").copy(currentStock = 1, autoDeductOnTake = true)
+        val med = sampleMedicine("med_notes_test", "user_notes_test", name = "Metformin").copy(currentStock = 1.0, autoDeductOnTake = true)
         medicineDao.insertMedicine(med)
 
         val slotTime = LocalDateTime.of(2026, 10, 17, 9, 0, 0)

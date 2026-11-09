@@ -87,7 +87,7 @@ class DynamicSnoozeOptionsSelectorTest {
         timesPerDay = 1,
         frequency = Frequency(FrequencyPattern.DAILY),
         scheduledTimes = listOf(LocalTime.of(9, 0)),
-        currentStock = 20,
+        currentStock = 20.0,
         autoDeductOnTake = true
     )
 

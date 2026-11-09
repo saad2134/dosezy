@@ -69,8 +69,8 @@ class EmergencyDialAndEditMedScreenTest {
             frequency = Frequency(FrequencyPattern.DAILY),
             timesPerDay = 1,
             scheduledTimes = listOf(LocalTime.of(21, 0)),
-            currentStock = 30,
-            refillThreshold = 5,
+            currentStock = 30.0,
+            refillThreshold = 5.0,
             autoDeductOnTake = true
         )
 
@@ -78,19 +78,19 @@ class EmergencyDialAndEditMedScreenTest {
         val updatedThresholdText = "7"
 
         val updatedMed = originalMed.copy(
-            currentStock = updatedStockText.normalizeArabicDigits().toIntOrNull(),
-            refillThreshold = updatedThresholdText.normalizeArabicDigits().toIntOrNull()
+            currentStock = updatedStockText.normalizeArabicDigits().toDoubleOrNull(),
+            refillThreshold = updatedThresholdText.normalizeArabicDigits().toDoubleOrNull()
         )
 
-        assertEquals(25, updatedMed.currentStock)
-        assertEquals(7, updatedMed.refillThreshold)
+        assertEquals(25.0, updatedMed.currentStock!!, 0.001)
+        assertEquals(7.0, updatedMed.refillThreshold!!, 0.001)
 
         // Verify Arabic-Indic numerals work identically
         val arabicThresholdText = "١٠" // 10 in Arabic
         val arabicMed = originalMed.copy(
-            refillThreshold = arabicThresholdText.normalizeArabicDigits().toIntOrNull()
+            refillThreshold = arabicThresholdText.normalizeArabicDigits().toDoubleOrNull()
         )
-        assertEquals(10, arabicMed.refillThreshold)
+        assertEquals(10.0, arabicMed.refillThreshold!!, 0.001)
     }
 
     // ─────────────────────────────────────────────────────────────────────────────

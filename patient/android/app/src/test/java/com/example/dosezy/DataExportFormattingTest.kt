@@ -24,7 +24,7 @@ class DataExportFormattingTest {
         unit: DosageUnit = DosageUnit.MG,
         freq: Frequency = Frequency(FrequencyPattern.DAILY),
         times: List<LocalTime> = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
-        stock: Int? = 40
+        stock: Double? = 40.0
     ) = Medicine(
         medicineId = "med_123",
         userId = "usr_1",
@@ -58,7 +58,8 @@ class DataExportFormattingTest {
         sb.append("1. *${med.medicationName}* ($dosageDisplay $strengthUnit)\n")
         sb.append("   • Needed for $supplyDays days: $totalNeeded $orderUnit\n")
         if (med.currentStock != null) {
-            sb.append("   • Current stock: ${med.currentStock} $orderUnit\n")
+            val stockDisplay = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(med.currentStock)
+            sb.append("   • Current stock: $stockDisplay $orderUnit\n")
         }
 
         val output = sb.toString()
@@ -75,7 +76,7 @@ class DataExportFormattingTest {
             dosage = 2.0,
             unit = DosageUnit.DROP,
             times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
-            stock = 25
+            stock = 25.0
         )
         val bottlesNeeded = med.calculateRefillQuantity(30)
         assertEquals(2, bottlesNeeded)
@@ -109,7 +110,7 @@ class DataExportFormattingTest {
             med.dosageUnit.name,
             med.getFrequencyDisplay(),
             med.timesPerDay.toString(),
-            med.currentStock?.toString() ?: "",
+            med.currentStock?.let { com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(it) } ?: "",
             escapeCsv(med.notes ?: "")
         ).joinToString(",")
 
@@ -130,9 +131,9 @@ class DataExportFormattingTest {
             name = "Metformin XR",
             dosage = 500.0,
             unit = DosageUnit.MG,
-            stock = 60
+            stock = 60.0
         ).copy(
-            refillThreshold = 10,
+            refillThreshold = 10.0,
             autoDeductOnTake = true,
             isArchived = false,
             customDosages = mapOf("08:00" to 2.0, "20:00" to 1.0)

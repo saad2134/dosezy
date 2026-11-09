@@ -454,7 +454,7 @@ fun ScheduleListItem(
                 )
             }
             Text(
-                text = medicine?.getDosageDisplay(entry.scheduledDateTime.toLocalTime()) ?: "Unknown dosage",
+                text = medicine?.getDosageDisplay(entry.scheduledDateTime.toLocalTime(), entry.dosage) ?: "Unknown dosage",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

@@ -137,8 +137,8 @@ fun EditMedScreen(
             medicineImagePath = medicineToEdit.imageUri
             selectedDaysOfWeek = medicineToEdit.frequency.selectedDaysOfWeek ?: listOf()
             selectedDaysOfMonth = medicineToEdit.frequency.selectedDaysOfMonth ?: listOf()
-            currentStockText = medicineToEdit.currentStock?.toString() ?: ""
-            refillThresholdText = medicineToEdit.refillThreshold?.toString() ?: ""
+            currentStockText = medicineToEdit.currentStock?.let { com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(it) } ?: ""
+            refillThresholdText = medicineToEdit.refillThreshold?.let { com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(it) } ?: ""
             selectedPillShape = medicineToEdit.pillShape
             selectedPillColor = medicineToEdit.pillColor
             doctorNotes = medicineToEdit.notes ?: ""
@@ -408,9 +408,9 @@ fun EditMedScreen(
                                     ),
                                     scheduledTimes = if (selectedFrequency == FrequencyPattern.AS_NEEDED) emptyList() else scheduledTimesList,
                                     imageUri = medicineImagePath,
-                                    currentStock = currentStockText.normalizeArabicDigits().toIntOrNull(),
+                                    currentStock = currentStockText.normalizeArabicDigits().toDoubleOrNull(),
                                     // Guard: Preserve configured refillThreshold across edits so low-stock alerts are not wiped to null
-                                    refillThreshold = refillThresholdText.normalizeArabicDigits().toIntOrNull(),
+                                    refillThreshold = refillThresholdText.normalizeArabicDigits().toDoubleOrNull(),
                                     // Guard: Preserve existing autoDeductOnTake preference to prevent inadvertent inventory decrements when editing medication metadata
                                     autoDeductOnTake = medicineToEdit?.autoDeductOnTake ?: true,
                                     notes = doctorNotes.trim().ifBlank { null },

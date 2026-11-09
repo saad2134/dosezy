@@ -136,7 +136,7 @@ class DosezyRemoteViewsFactory(
 
                 displayEntries.forEach { entry ->
                     val med = medicines[entry.medicineId]
-                    val doseStr = if (med != null) med.getDosageDisplay(entry.scheduledDateTime.toLocalTime()) else ""
+                    val doseStr = if (med != null) med.getDosageDisplay(entry.scheduledDateTime.toLocalTime(), entry.dosage) else ""
                     items.add(
                         WidgetItem(
                             entryId = entry.entryId,

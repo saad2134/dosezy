@@ -317,7 +317,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                     // Retrieve medicine dosage details for each valid pending entry
                     val medicineDetails = userPendingEntries.mapNotNull { e ->
                         val m = database.medicineDao().getMedicineByIdDirect(e.medicineId) ?: return@mapNotNull null
-                        val dose = m.getDosageDisplay(e.scheduledDateTime.toLocalTime())
+                        val dose = m.getDosageDisplay(e.scheduledDateTime.toLocalTime(), e.dosage)
                         Pair(m.medicationName, dose)
                     }
 

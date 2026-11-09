@@ -198,11 +198,12 @@ fun MedicinesScreen(
         com.example.dosezy.ui.components.QuickRefillDialog(
             medicine = medToRefill,
             onConfirmRefill = { added ->
-                val newStock = (medToRefill.currentStock ?: 0) + added
+                val newStock = (medToRefill.currentStock ?: 0.0) + added
                 medicineViewModel.updateMedicine(medToRefill.copy(currentStock = newStock))
                 coroutineScope.launch {
+                    val stockStr = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(newStock)
                     snackbarHostState.showSnackbar(
-                        context.getString(R.string.quick_refill_success, medToRefill.medicationName, newStock)
+                        context.getString(R.string.quick_refill_success, medToRefill.medicationName, stockStr)
                     )
                 }
                 medicineToRefill = null
@@ -928,11 +929,12 @@ fun MedicineItem(
                                 color = containerBg,
                                 shape = RoundedCornerShape(8.dp)
                             ) {
+                                val stockFmt = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(stock)
                                 Text(
                                     text = if (isLow) {
-                                        stringResource(R.string.med_stock_refill_warning_badge, stock)
+                                        stringResource(R.string.med_stock_refill_warning_badge, stockFmt)
                                     } else {
-                                        stringResource(R.string.med_stock_badge, stock)
+                                        stringResource(R.string.med_stock_badge, stockFmt)
                                     },
                                     color = contentColor,
                                     fontSize = 11.sp,

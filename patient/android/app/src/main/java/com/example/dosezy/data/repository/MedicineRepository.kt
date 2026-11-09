@@ -92,7 +92,7 @@ class MedicineRepository @Inject constructor(
 
         // Guard: Dismiss active refill warning notification from shade when stock is replenished above refill threshold
         val currentStock = medicine.currentStock
-        val threshold = medicine.refillThreshold ?: 0
+        val threshold = medicine.refillThreshold ?: 0.0
         if (currentStock != null && currentStock > threshold) {
             val nManager = this.context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
             nManager?.cancel((medicine.medicineId + "_refill").hashCode())

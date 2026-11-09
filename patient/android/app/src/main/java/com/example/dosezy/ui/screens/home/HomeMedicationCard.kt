@@ -147,7 +147,7 @@ fun HomeMedicationCard(
 
                 // 2. Qty / Dosage
                 Text(
-                    text = medicine?.getDosageDisplay(entry.scheduledDateTime.toLocalTime()) ?: "Unknown dosage",
+                    text = medicine?.getDosageDisplay(entry.scheduledDateTime.toLocalTime(), entry.dosage) ?: "Unknown dosage",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -229,11 +229,12 @@ fun HomeMedicationCard(
                         shape = RoundedCornerShape(8.dp),
                         modifier = Modifier.padding(top = 2.dp)
                     ) {
+                        val stockFmt = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(stock)
                         Text(
                             text = if (isLow) {
-                                stringResource(R.string.med_stock_refill_warning_badge, stock)
+                                stringResource(R.string.med_stock_refill_warning_badge, stockFmt)
                             } else {
-                                stringResource(R.string.med_stock_badge, stock)
+                                stringResource(R.string.med_stock_badge, stockFmt)
                             },
                             color = contentColor,
                             fontSize = 11.sp,

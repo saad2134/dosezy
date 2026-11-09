@@ -318,17 +318,19 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             try {
                 val medicine = database.medicineDao().getMedicineByIdDirect(previousEntry.medicineId)
                 if (medicine != null && medicine.currentStock != null && medicine.autoDeductOnTake) {
-                    // Guard: Pass previousEntry.dosage to getStockDeductionAmount to prevent inventory calculation drift on custom dose overrides
+                    // Guard: Pass previousEntry.dosage to getStockDeductionAmount to prevent inventory calculation drift on custom dose overrides (#123)
                     val deductAmount = medicine.getStockDeductionAmount(previousEntry.scheduledDateTime.toLocalTime(), previousEntry.dosage)
                     val actualDeducted = minOf(deductAmount, medicine.currentStock)
-                    val newStock = (medicine.currentStock - deductAmount).coerceAtLeast(0)
+                    val newStock = (medicine.currentStock - deductAmount).coerceAtLeast(0.0)
                     val updatedMedicine = medicine.copy(currentStock = newStock)
                     database.medicineDao().updateMedicine(updatedMedicine)
                     Log.d(TAG, "Decremented stock for ${medicine.medicationName}: ${medicine.currentStock} -> $newStock (deducted $actualDeducted of $deductAmount)")
 
-                    // Guard: If partial stock was consumed due to stock exhaustion, record note to inform medical reports and preserve inventory symmetry on undo
+                    // Guard: If partial stock was consumed due to stock exhaustion, record note to inform medical reports and preserve inventory symmetry on undo (#123)
                     if (actualDeducted < deductAmount) {
-                        val partialTag = "[Partial Stock: Took $actualDeducted of $deductAmount]"
+                        val dFmt = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(actualDeducted)
+                        val totalFmt = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(deductAmount)
+                        val partialTag = "[Partial Stock: Took $dFmt of $totalFmt]"
                         val mergedNotes = if (!notes.isNullOrBlank()) "$notes | $partialTag" else partialTag
                         database.scheduleDao().updateDoseNotes(entryId, mergedNotes)
                     }
@@ -336,7 +338,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     // Trigger refill warning notification when crossing threshold boundary or running out
                     val threshold = medicine.refillThreshold
                     // Guard: Check medicine.currentStock >= threshold and currentStock > newStock to catch boundary crossings when initial stock equals threshold
-                    val shouldNotifyRefill = threshold != null && ((medicine.currentStock >= threshold && newStock <= threshold && medicine.currentStock > newStock) || (medicine.currentStock > 0 && newStock == 0))
+                    val shouldNotifyRefill = threshold != null && ((medicine.currentStock >= threshold && newStock <= threshold && medicine.currentStock > newStock) || (medicine.currentStock > 0.0 && newStock == 0.0))
                     if (context != null && shouldNotifyRefill) {
                         // Guard: Ensure notification channels are registered before posting refill alerts to prevent Android 8.0+ (API 26+) from dropping notifications
                         com.example.dosezy.notifications.MedicineAlarmReceiver.createNotificationChannels(context)
@@ -361,6 +363,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                         // Guard: Safely decode launcher icon bitmap to prevent crash on resource inflation failure (#BUG-REFILL-NOTIF-BUILDER)
                         val refillIconBitmap = runCatching { BitmapFactory.decodeResource(context.resources, com.example.dosezy.R.mipmap.ic_launcher) }.getOrNull()
 
+                        val formattedStock = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(newStock)
                         val builder = androidx.core.app.NotificationCompat.Builder(localizedContext, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
                             .setSmallIcon(com.example.dosezy.R.mipmap.ic_launcher)
                             .apply {
@@ -369,7 +372,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                                 }
                             }
                             .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, medicine.medicationName))
-                            .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, newStock))
+                            .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, formattedStock))
                             .setPriority(androidx.core.app.NotificationCompat.PRIORITY_DEFAULT)
                             .setContentIntent(contentIntent)
                             .setAutoCancel(true)
@@ -630,9 +633,9 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         if (entryId.startsWith("PRN_")) {
             database.scheduleDao().deleteScheduleEntry(entryId)
         } else {
-            // Guard: Strip automated partial stock tag and retrospective logging audit tags while preserving user-authored clinical notes (#BUG-04, #109)
+            // Guard: Strip automated partial stock tag and retrospective logging audit tags while preserving user-authored clinical notes (#BUG-04, #109, #123)
             val cleanedNotes = previousEntry?.doseNotes
-                ?.replace(Regex("\\[Partial Stock: Took \\d+ of \\d+\\]"), "")
+                ?.replace(Regex("\\[Partial Stock: Took [0-9.]* of [0-9.]*\\]"), "")
                 ?.replace(Regex("\\[Logged retrospectively\\]"), "")
                 ?.trim(' ', '|', '-')
                 ?.ifBlank { null }
@@ -644,9 +647,9 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             try {
                 val medicine = database.medicineDao().getMedicineByIdDirect(previousEntry.medicineId)
                 if (medicine != null && medicine.currentStock != null && medicine.autoDeductOnTake) {
-                    // Guard: Check for partial stock tag in doseNotes to restore only the quantity actually consumed and prevent artificial inventory inflation
-                    val partialMatch = previousEntry.doseNotes?.let { Regex("\\[Partial Stock: Took (\\d+) of (\\d+)\\]").find(it) }
-                    val actualConsumed = partialMatch?.groupValues?.getOrNull(1)?.toIntOrNull()
+                    // Guard: Check for partial stock tag in doseNotes to restore only the quantity actually consumed and prevent artificial inventory inflation (#123)
+                    val partialMatch = previousEntry.doseNotes?.let { Regex("\\[Partial Stock: Took ([0-9]+(?:\\.[0-9]+)?) of ([0-9]+(?:\\.[0-9]+)?)\\]").find(it) }
+                    val actualConsumed = partialMatch?.groupValues?.getOrNull(1)?.toDoubleOrNull()
                     val addAmount = actualConsumed ?: medicine.getStockDeductionAmount(previousEntry.scheduledDateTime.toLocalTime(), previousEntry.dosage)
                     val restoredStock = medicine.currentStock + addAmount
                     val updatedMedicine = medicine.copy(currentStock = restoredStock)
@@ -654,7 +657,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     Log.d(TAG, "Restored stock for ${medicine.medicationName}: ${medicine.currentStock} -> $restoredStock on undo (restored $addAmount)")
 
                     // Guard: Dismiss active refill alert notification from shade when undo restores inventory above refill threshold
-                    if (restoredStock > (medicine.refillThreshold ?: 0)) {
+                    if (restoredStock > (medicine.refillThreshold ?: 0.0)) {
                         val nManager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
                         nManager?.cancel((previousEntry.medicineId + "_refill").hashCode())
                     }
@@ -732,19 +735,21 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         if (freshMedicine.currentStock != null && freshMedicine.autoDeductOnTake) {
             val deductAmount = freshMedicine.getStockDeductionAmount(dateTime.toLocalTime())
             val actualDeducted = minOf(deductAmount, freshMedicine.currentStock)
-            val newStock = (freshMedicine.currentStock - deductAmount).coerceAtLeast(0)
+            val newStock = (freshMedicine.currentStock - deductAmount).coerceAtLeast(0.0)
             val updatedMedicine = freshMedicine.copy(currentStock = newStock)
             database.medicineDao().updateMedicine(updatedMedicine)
 
-            // Guard: Record partial stock tag on as-needed dose when stock is exhausted to preserve inventory audit trail
+            // Guard: Record partial stock tag on as-needed dose when stock is exhausted to preserve inventory audit trail (#123)
             if (actualDeducted < deductAmount) {
-                val partialTag = "[Partial Stock: Took $actualDeducted of $deductAmount]"
+                val dFmt = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(actualDeducted)
+                val totalFmt = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(deductAmount)
+                val partialTag = "[Partial Stock: Took $dFmt of $totalFmt]"
                 database.scheduleDao().updateDoseNotes(entryId, partialTag)
             }
 
             val threshold = freshMedicine.refillThreshold
             // Guard: Check freshMedicine.currentStock >= threshold and currentStock > newStock to catch boundary crossings when initial stock equals threshold
-            val shouldNotifyRefill = threshold != null && ((freshMedicine.currentStock >= threshold && newStock <= threshold && freshMedicine.currentStock > newStock) || (freshMedicine.currentStock > 0 && newStock == 0))
+            val shouldNotifyRefill = threshold != null && ((freshMedicine.currentStock >= threshold && newStock <= threshold && freshMedicine.currentStock > newStock) || (freshMedicine.currentStock > 0.0 && newStock == 0.0))
             if (context != null && shouldNotifyRefill) {
                 // Guard: Ensure notification channels are registered before posting refill alerts to prevent Android 8.0+ (API 26+) from dropping notifications
                 com.example.dosezy.notifications.MedicineAlarmReceiver.createNotificationChannels(context)
@@ -767,6 +772,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 // Guard: Safely decode launcher icon bitmap to prevent crash on resource inflation failure (#BUG-REFILL-NOTIF-BUILDER)
                 val refillIconBitmap = runCatching { BitmapFactory.decodeResource(context.resources, com.example.dosezy.R.mipmap.ic_launcher) }.getOrNull()
 
+                val formattedStock = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(newStock)
                 val builder = androidx.core.app.NotificationCompat.Builder(localizedContext, com.example.dosezy.notifications.MedicineAlarmReceiver.REFILL_CHANNEL_ID)
                     .setSmallIcon(com.example.dosezy.R.mipmap.ic_launcher)
                     .apply {
@@ -775,7 +781,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                         }
                     }
                     .setContentTitle(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_title, freshMedicine.medicationName))
-                    .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, newStock))
+                    .setContentText(localizedContext.getString(com.example.dosezy.R.string.notif_refill_alert_text, formattedStock))
                     .setPriority(androidx.core.app.NotificationCompat.PRIORITY_DEFAULT)
                     .setContentIntent(contentIntent)
                     .setAutoCancel(true)

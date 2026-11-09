@@ -75,7 +75,7 @@ class HomeMissedDoseActionRoutingTest {
         timesPerDay = 1,
         frequency = Frequency(FrequencyPattern.DAILY),
         scheduledTimes = listOf(LocalTime.of(8, 0)),
-        currentStock = 30,
+        currentStock = 30.0,
         autoDeductOnTake = true
     )
 
@@ -209,7 +209,7 @@ class HomeMissedDoseActionRoutingTest {
 
         // Verify initial setup: stock is 30, status is MISSED
         val initialMed = database.medicineDao().getMedicineByIdDirect(testMedicine.medicineId)
-        assertEquals(30, initialMed?.currentStock)
+        assertEquals(30.0, initialMed?.currentStock!!, 0.001)
         val insertedEntry = database.scheduleDao().getScheduleEntryById(entryId)
         assertEquals(MedicationStatus.MISSED, insertedEntry?.status)
 
@@ -228,7 +228,7 @@ class HomeMissedDoseActionRoutingTest {
         // Simulate stock deduction on intake
         val currentMed = database.medicineDao().getMedicineByIdDirect(testMedicine.medicineId)
         if (currentMed != null && currentMed.currentStock != null && currentMed.autoDeductOnTake) {
-            val stock = currentMed.currentStock ?: 0
+            val stock = currentMed.currentStock ?: 0.0
             val deduct = currentMed.getStockDeductionAmount(scheduledTime.toLocalTime())
             val updatedMed = currentMed.copy(currentStock = stock - deduct)
             database.medicineDao().updateMedicine(updatedMed)
@@ -239,7 +239,7 @@ class HomeMissedDoseActionRoutingTest {
         assertEquals(MedicationStatus.TAKEN_LATE, updatedEntry?.status)
 
         val finalMed = database.medicineDao().getMedicineByIdDirect(testMedicine.medicineId)
-        assertEquals(29, finalMed?.currentStock)
+        assertEquals(29.0, finalMed?.currentStock!!, 0.001)
     }
 
     @Test

@@ -262,14 +262,14 @@ class UserViewModelProfileAlarmTest {
             frequency = Frequency(FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
             customDosages = mapOf("08:00" to 2.0, "20:00" to 1.0),
-            currentStock = 30,
+            currentStock = 30.0,
             autoDeductOnTake = true
         )
         medicineRepository.insertMedicine(medicineWithSlots)
         advanceUntilIdle()
 
         val initialStock = db.medicineDao().getMedicineByIdDirect("med_prn_slots")!!.currentStock!!
-        assertEquals(30, initialStock)
+        assertEquals(30.0, initialStock, 0.001)
 
         // Log PRN dose at 08:00 AM (which has custom slot dosage of 2 tablets)
         val morningDoseTime = LocalDateTime.of(2026, 10, 6, 8, 0)
@@ -282,7 +282,7 @@ class UserViewModelProfileAlarmTest {
 
         // Check stock was decremented by 2 tablets (not default 1)
         val medAfterPrn = db.medicineDao().getMedicineByIdDirect("med_prn_slots")!!
-        assertEquals("Stock should decrease by custom slot dosage (2 tablets)", 28, medAfterPrn.currentStock)
+        assertEquals("Stock should decrease by custom slot dosage (2 tablets)", 28.0, medAfterPrn.currentStock!!, 0.001)
 
         // Fetch inserted PRN entry
         val schedules = scheduleRepository.getSchedulesByUserSync(testUser.userId)
@@ -293,7 +293,7 @@ class UserViewModelProfileAlarmTest {
         scheduleRepository.undoDoseTaken(prnEntry!!.entryId, context = context)
 
         val medAfterUndo = db.medicineDao().getMedicineByIdDirect("med_prn_slots")!!
-        assertEquals("Stock should be restored symmetrically to 30", 30, medAfterUndo.currentStock)
+        assertEquals("Stock should be restored symmetrically to 30", 30.0, medAfterUndo.currentStock!!, 0.001)
 
         // Verify PRN entry was deleted
         val schedulesAfterUndo = scheduleRepository.getSchedulesByUserSync(testUser.userId)
@@ -313,17 +313,17 @@ class UserViewModelProfileAlarmTest {
             timesPerDay = 1,
             frequency = Frequency(FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(12, 0)),
-            currentStock = 20,
+            currentStock = 20.0,
             autoDeductOnTake = true
         )
         medicineRepository.insertMedicine(medicine)
         advanceUntilIdle()
 
         // Simulate UI holding stale snapshot with stock = 20
-        val staleUiMedicine = medicine.copy(currentStock = 20)
+        val staleUiMedicine = medicine.copy(currentStock = 20.0)
 
         // Meanwhile, a concurrent operation refilled stock to 50 in the database
-        val freshDbMedicine = db.medicineDao().getMedicineByIdDirect("med_prn_concurrency")!!.copy(currentStock = 50)
+        val freshDbMedicine = db.medicineDao().getMedicineByIdDirect("med_prn_concurrency")!!.copy(currentStock = 50.0)
         db.medicineDao().updateMedicine(freshDbMedicine)
 
         // Now user logs PRN dose using the staleUiMedicine object
@@ -336,7 +336,7 @@ class UserViewModelProfileAlarmTest {
 
         // Check that fresh stock (50 - 1 = 49) was updated, NOT stale stock (20 - 1 = 19)
         val finalMedicine = db.medicineDao().getMedicineByIdDirect("med_prn_concurrency")!!
-        assertEquals("Stock must be calculated from fresh DB value (50 - 1 = 49)", 49, finalMedicine.currentStock)
+        assertEquals("Stock must be calculated from fresh DB value (50 - 1 = 49)", 49.0, finalMedicine.currentStock!!, 0.001)
     }
 
     // =========================================================================
@@ -358,7 +358,7 @@ class UserViewModelProfileAlarmTest {
             scheduledTimes = listOf(LocalTime.of(8, 0), LocalTime.of(13, 0), LocalTime.of(20, 0)),
             // Guard: Start from tomorrow so past slots on today are not skipped by time-of-day filtering
             startDate = java.time.LocalDate.now().plusDays(1),
-            currentStock = 100,
+            currentStock = 100.0,
             autoDeductOnTake = true
         )
 

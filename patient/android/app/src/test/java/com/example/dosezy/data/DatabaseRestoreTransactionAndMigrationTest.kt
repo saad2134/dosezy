@@ -244,6 +244,21 @@ class DatabaseRestoreTransactionAndMigrationTest {
         }
     }
 
+    @Test
+    fun migration21_22_recreatesMedicinesTableWithRealStockColumnsAndPreservesIndex() {
+        // Guard: Migration 21->22 recreates medicines table with currentStock and refillThreshold as REAL (#123)
+        val sqliteDb = mockk<SupportSQLiteDatabase>(relaxed = true)
+        DosezyDatabase.MIGRATION_21_22.migrate(sqliteDb)
+
+        verify(exactly = 1) {
+            sqliteDb.execSQL("CREATE TABLE IF NOT EXISTS `medicines_new` (`medicineId` TEXT NOT NULL, `userId` TEXT NOT NULL, `medicationName` TEXT NOT NULL, `dosage` REAL NOT NULL, `dosageUnit` TEXT NOT NULL, `timesPerDay` INTEGER NOT NULL, `frequency` TEXT NOT NULL, `scheduledTimes` TEXT NOT NULL, `imageUri` TEXT, `currentStock` REAL, `refillThreshold` REAL, `autoDeductOnTake` INTEGER NOT NULL, `notes` TEXT, `pillShape` TEXT NOT NULL, `pillColor` TEXT NOT NULL, `startDate` INTEGER, `endDate` INTEGER, `durationDays` INTEGER, `isArchived` INTEGER NOT NULL, `customDosages` TEXT, `reminderType` TEXT, PRIMARY KEY(`medicineId`), FOREIGN KEY(`userId`) REFERENCES `users`(`userId`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+            sqliteDb.execSQL("INSERT INTO `medicines_new` SELECT * FROM `medicines`")
+            sqliteDb.execSQL("DROP TABLE `medicines`")
+            sqliteDb.execSQL("ALTER TABLE `medicines_new` RENAME TO `medicines`")
+            sqliteDb.execSQL("CREATE INDEX IF NOT EXISTS `index_medicines_userId` ON `medicines` (`userId`)")
+        }
+    }
+
     // ───────────────────────────────────────────────────────────────
     // Issue 2: OVERWRITE Foreign-Key Filtering & ID Regeneration
     // ───────────────────────────────────────────────────────────────

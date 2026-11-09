@@ -279,7 +279,7 @@ class GroupedSnoozeAndNaggingTest {
                 timesPerDay = 1,
                 frequency = com.example.dosezy.data.model.Frequency(com.example.dosezy.data.model.FrequencyPattern.DAILY),
                 scheduledTimes = listOf(java.time.LocalTime.of(9, 0)),
-                currentStock = 10
+                currentStock = 10.0
             )
             val med2 = com.example.dosezy.data.model.Medicine(
                 medicineId = "med_2",
@@ -290,7 +290,7 @@ class GroupedSnoozeAndNaggingTest {
                 timesPerDay = 1,
                 frequency = com.example.dosezy.data.model.Frequency(com.example.dosezy.data.model.FrequencyPattern.DAILY),
                 scheduledTimes = listOf(java.time.LocalTime.of(9, 0)),
-                currentStock = 10
+                currentStock = 10.0
             )
             kotlinx.coroutines.runBlocking {
                 testDb.userDao().insertUser(arabicUser)

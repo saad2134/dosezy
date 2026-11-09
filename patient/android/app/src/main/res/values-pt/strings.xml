@@ -299,7 +299,7 @@
 
     <string name="stock_current">Estoque atual</string>
     <string name="stock_refill_threshold">Alerta de estoque baixo em</string>
-    <string name="stock_units_left">%d unidades restantes</string>
+    <string name="stock_units_left">%s unidades restantes</string>
     <string name="refill_alert_title">Alerta de reabastecimento: %s</string>
     <string name="preset_1x_daily">1x ao dia (08:00)</string>
     <string name="preset_2x_daily">2x ao dia (08:00, 20:00)</string>
@@ -402,7 +402,7 @@ Deseja continuar?</string>
     <string name="med_stock_placeholder">ex: 30</string>
     <string name="med_threshold_placeholder">ex: 5</string>
     <string name="notif_refill_alert_title">Alerta de recarga: %1$s</string>
-    <string name="notif_refill_alert_text">Estoque baixo: restam apenas %1$d unidades. Por favor recarregue em breve.</string>
+    <string name="notif_refill_alert_text">Estoque baixo: restam apenas %1$s unidades. Por favor recarregue em breve.</string>
     <string name="notif_channel_name">Lembretes de medicamentos</string>
     <string name="notif_channel_desc">Notificações para horários de medicamentos</string>
     <string name="import_profile_conflict_warn">O nome do perfil já existe localmente</string>
@@ -436,8 +436,8 @@ Deseja continuar?</string>
     <string name="err_cannot_open_link">Não é possível abrir o link</string>
     <string name="err_no_email_app">Nenhum aplicativo de e-mail disponível</string>
     <string name="err_share_failed">Erro ao compartilhar: %1$s</string>
-    <string name="med_stock_refill_warning_badge">⚠️ Recarga: restam %1$d</string>
-    <string name="med_stock_badge">📦 Estoque: %1$d</string>
+    <string name="med_stock_refill_warning_badge">⚠️ Recarga: restam %1$s</string>
+    <string name="med_stock_badge">📦 Estoque: %1$s</string>
     <string name="to_be_taken_in">A tomar em %1$dh %2$dm</string>
     <string name="time_diff_ago">Há %1$dh %2$dm</string>
     <string name="status_all_medications_taken">Todos os medicamentos tomados</string>
@@ -501,7 +501,7 @@ Deseja continuar?</string>
     <string name="quick_refill_preset_30">+30</string>
     <string name="quick_refill_preset_60">+60</string>
     <string name="quick_refill_preset_90">+90</string>
-    <string name="quick_refill_success">Estoque reposto para %1$s. Novo saldo: %2$d</string>
+    <string name="quick_refill_success">Estoque reposto para %1$s. Novo saldo: %2$s</string>
 
     <string name="no_scheduled_doses_today">Nenhuma dose agendada para hoje</string>
     <string name="prn_confirm_log_title">Registar dose</string>
@@ -593,7 +593,7 @@ Deseja continuar?</string>
     <string name="alarm_snooze_format">ADIAR (%d MIN)</string>
     <string name="notif_action_snooze_format">Adiar (%d min)</string>
     <string name="alarm_snoozed_toast">Alarme adiado por %d minutos</string>
-    <string name="alarm_stock_remaining">Estoque: %d unidades restantes</string>
+    <string name="alarm_stock_remaining">Estoque: %s unidades restantes</string>
     <string name="home_action_take">Tomar</string>
     <string name="home_action_taken">Tomado</string>
     <string name="home_action_missed">Perdido</string>
@@ -657,7 +657,7 @@ Deseja continuar?</string>
     <string name="pharmacy_order_copy">Copiar texto</string>
     <string name="pharmacy_order_copied">Pedido copiado para a área de transferência</string>
     <string name="pharmacy_order_empty">Nenhum medicamento disponível para pedir</string>
-    <string name="pharmacy_order_current_stock">Estoque atual: restam %1$d %2$s</string>
+    <string name="pharmacy_order_current_stock">Estoque atual: restam %1$s %2$s</string>
     <string name="pharmacy_order_qty_needed">Quantidade a pedir: %1$d %2$s</string>
     <string name="pharmacy_order_patient_header">Paciente: %1$s</string>
     <string name="pharmacy_order_date_header">Data: %1$s</string>
@@ -684,7 +684,7 @@ Deseja continuar?</string>
     <string name="pharmacy_order_days_supply">Dias de Suprimento</string>
     <string name="pharmacy_order_days_format_short">%1$d d</string>
     <string name="pharmacy_order_medicines_include">Medicamentos a Incluir (%1$d/%2$d)</string>
-    <string name="pharmacy_order_stock_left">%1$d restantes</string>
+    <string name="pharmacy_order_stock_left">%1$s restantes</string>
     <string name="pharmacy_order_no_stock_tracked">Sem controle de estoque</string>
     <string name="pharmacy_order_header_title">📋 *Pedido de Medicamentos*</string>
     <string name="pharmacy_order_frequency_format">Frequência: %1$dx ao dia</string>

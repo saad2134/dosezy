@@ -1037,8 +1037,9 @@ class BackupRestoreManager(
                 frequency = frequency,
                 scheduledTimes = timesList,
                 imageUri = obj.get("imageUri")?.takeUnless { it.isJsonNull }?.asString,
-                currentStock = obj.get("currentStock")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
-                refillThreshold = obj.get("refillThreshold")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                // Defensively parse stock amounts as Double to support fractional inventory quantities
+                currentStock = obj.get("currentStock")?.takeUnless { it.isJsonNull }?.runCatching { asDouble }?.getOrNull(),
+                refillThreshold = obj.get("refillThreshold")?.takeUnless { it.isJsonNull }?.runCatching { asDouble }?.getOrNull(),
                 autoDeductOnTake = obj.get("autoDeductOnTake")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: true,
                 pillShape = pillShape,
                 pillColor = pillColor,

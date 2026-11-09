@@ -82,7 +82,7 @@ class TakeAllCohortFunctionalityTest {
         timesPerDay = 1,
         frequency = Frequency(FrequencyPattern.DAILY),
         scheduledTimes = listOf(LocalTime.of(8, 0)),
-        currentStock = 30,
+        currentStock = 30.0,
         autoDeductOnTake = true
     )
 
@@ -95,7 +95,7 @@ class TakeAllCohortFunctionalityTest {
         timesPerDay = 1,
         frequency = Frequency(FrequencyPattern.DAILY),
         scheduledTimes = listOf(LocalTime.of(8, 0)),
-        currentStock = 15,
+        currentStock = 15.0,
         autoDeductOnTake = true
     )
 
@@ -108,7 +108,7 @@ class TakeAllCohortFunctionalityTest {
         timesPerDay = 1,
         frequency = Frequency(FrequencyPattern.DAILY),
         scheduledTimes = listOf(LocalTime.of(8, 0)),
-        currentStock = 60,
+        currentStock = 60.0,
         autoDeductOnTake = false
     )
 
@@ -279,9 +279,9 @@ class TakeAllCohortFunctionalityTest {
         database.scheduleDao().insertScheduleEntry(entry3)
 
         // Initial stock assertions
-        assertEquals(30, database.medicineDao().getMedicineByIdDirect(medA.medicineId)?.currentStock)
-        assertEquals(15, database.medicineDao().getMedicineByIdDirect(medB.medicineId)?.currentStock)
-        assertEquals(60, database.medicineDao().getMedicineByIdDirect(medC.medicineId)?.currentStock)
+        assertEquals(30.0, database.medicineDao().getMedicineByIdDirect(medA.medicineId)?.currentStock!!, 0.001)
+        assertEquals(15.0, database.medicineDao().getMedicineByIdDirect(medB.medicineId)?.currentStock!!, 0.001)
+        assertEquals(60.0, database.medicineDao().getMedicineByIdDirect(medC.medicineId)?.currentStock!!, 0.001)
 
         // Execute cohort take
         val now = LocalDateTime.now()
@@ -305,9 +305,9 @@ class TakeAllCohortFunctionalityTest {
         assertEquals(MedicationStatus.TAKEN_ON_TIME, updated3?.status)
 
         // Verify stock decremented for autoDeductOnTake medicines, and untouched for false
-        assertEquals(29, database.medicineDao().getMedicineByIdDirect(medA.medicineId)?.currentStock)
-        assertEquals(14, database.medicineDao().getMedicineByIdDirect(medB.medicineId)?.currentStock)
-        assertEquals(60, database.medicineDao().getMedicineByIdDirect(medC.medicineId)?.currentStock)
+        assertEquals(29.0, database.medicineDao().getMedicineByIdDirect(medA.medicineId)?.currentStock!!, 0.001)
+        assertEquals(14.0, database.medicineDao().getMedicineByIdDirect(medB.medicineId)?.currentStock!!, 0.001)
+        assertEquals(60.0, database.medicineDao().getMedicineByIdDirect(medC.medicineId)?.currentStock!!, 0.001)
     }
 
     // ─────────────────────────────────────────────────────────────────────────────
@@ -364,8 +364,8 @@ class TakeAllCohortFunctionalityTest {
         // After confirmation, both are TAKEN_ON_TIME and stock is decremented
         assertEquals(MedicationStatus.TAKEN_ON_TIME, database.scheduleDao().getScheduleEntryById("safeguard_cohort_1")?.status)
         assertEquals(MedicationStatus.TAKEN_ON_TIME, database.scheduleDao().getScheduleEntryById("safeguard_cohort_2")?.status)
-        assertEquals(29, database.medicineDao().getMedicineByIdDirect(medA.medicineId)?.currentStock)
-        assertEquals(14, database.medicineDao().getMedicineByIdDirect(medB.medicineId)?.currentStock)
+        assertEquals(29.0, database.medicineDao().getMedicineByIdDirect(medA.medicineId)?.currentStock!!, 0.001)
+        assertEquals(14.0, database.medicineDao().getMedicineByIdDirect(medB.medicineId)?.currentStock!!, 0.001)
     }
 
     // ─────────────────────────────────────────────────────────────────────────────
@@ -404,8 +404,8 @@ class TakeAllCohortFunctionalityTest {
         val e2 = database.scheduleDao().getScheduleEntryById("cancel_cohort_2")
         assertEquals(MedicationStatus.PENDING, e1?.status)
         assertEquals(MedicationStatus.PENDING, e2?.status)
-        assertEquals(30, database.medicineDao().getMedicineByIdDirect(medA.medicineId)?.currentStock)
-        assertEquals(15, database.medicineDao().getMedicineByIdDirect(medB.medicineId)?.currentStock)
+        assertEquals(30.0, database.medicineDao().getMedicineByIdDirect(medA.medicineId)?.currentStock!!, 0.001)
+        assertEquals(15.0, database.medicineDao().getMedicineByIdDirect(medB.medicineId)?.currentStock!!, 0.001)
     }
 
     @Test
@@ -631,8 +631,8 @@ class TakeAllCohortFunctionalityTest {
             timesPerDay = 1,
             frequency = Frequency(FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(8, 0)),
-            currentStock = 3,
-            refillThreshold = 3,
+            currentStock = 3.0,
+            refillThreshold = 3.0,
             autoDeductOnTake = true
         )
         database.medicineDao().insertMedicine(lowStockMed)
@@ -655,7 +655,7 @@ class TakeAllCohortFunctionalityTest {
         takeCohortUseCase.invoke(listOf(entry.entryId), user = testUser)
 
         val updatedMed = database.medicineDao().getMedicineByIdDirect(lowStockMed.medicineId)
-        assertEquals(2, updatedMed?.currentStock)
+        assertEquals(2.0, updatedMed?.currentStock!!, 0.001)
 
         // Verify refill alert notification was posted
         val refillNotifId = (lowStockMed.medicineId + "_refill").hashCode()
@@ -966,7 +966,7 @@ class TakeAllCohortFunctionalityTest {
             timesPerDay = 1,
             frequency = Frequency(FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(8, 0)),
-            currentStock = 20,
+            currentStock = 20.0,
             autoDeductOnTake = true
         )
         database.medicineDao().insertMedicine(medD)
@@ -996,10 +996,10 @@ class TakeAllCohortFunctionalityTest {
         val updatedMedC = database.medicineDao().getMedicineByIdDirect(medC.medicineId)
         val updatedMedD = database.medicineDao().getMedicineByIdDirect(medD.medicineId)
 
-        assertEquals(29, updatedMedA?.currentStock)
-        assertEquals(14, updatedMedB?.currentStock)
-        assertEquals(60, updatedMedC?.currentStock)
-        assertEquals(19, updatedMedD?.currentStock)
+        assertEquals(29.0, updatedMedA?.currentStock!!, 0.001)
+        assertEquals(14.0, updatedMedB?.currentStock!!, 0.001)
+        assertEquals(60.0, updatedMedC?.currentStock!!, 0.001)
+        assertEquals(19.0, updatedMedD?.currentStock!!, 0.001)
     }
 
     @Test
@@ -1014,7 +1014,7 @@ class TakeAllCohortFunctionalityTest {
             timesPerDay = 1,
             frequency = Frequency(FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(9, 0)),
-            currentStock = 20,
+            currentStock = 20.0,
             autoDeductOnTake = true
         )
         database.medicineDao().insertMedicine(medD)
@@ -1061,7 +1061,7 @@ class TakeAllCohortFunctionalityTest {
             timesPerDay = 1,
             frequency = Frequency(FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(8, 0)),
-            currentStock = 30,
+            currentStock = 30.0,
             autoDeductOnTake = true
         )
         database.medicineDao().insertMedicine(secondMed)
@@ -1121,7 +1121,7 @@ class TakeAllCohortFunctionalityTest {
             timesPerDay = 1,
             frequency = Frequency(FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(8, 0)),
-            currentStock = 30,
+            currentStock = 30.0,
             autoDeductOnTake = true
         )
         database.medicineDao().insertMedicine(secondMed)

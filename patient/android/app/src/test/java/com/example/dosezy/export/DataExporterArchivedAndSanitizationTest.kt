@@ -225,8 +225,8 @@ class DataExporterArchivedAndSanitizationTest {
             timesPerDay = 3,
             frequency = com.example.dosezy.data.model.Frequency(com.example.dosezy.data.model.FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(8, 0), LocalTime.of(14, 0), LocalTime.of(20, 0)),
-            currentStock = 10,
-            refillThreshold = 5
+            currentStock = 10.0,
+            refillThreshold = 5.0
         )
 
         val exporter = DataExporter(context, mockUserRepo, mockMedRepo, mockSchedRepo)

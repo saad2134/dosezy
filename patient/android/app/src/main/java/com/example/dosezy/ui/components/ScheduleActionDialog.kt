@@ -152,7 +152,7 @@ fun ScheduleActionDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = medicine?.getDosageDisplay(entry.scheduledDateTime.toLocalTime()) ?: "",
+                        text = medicine?.getDosageDisplay(entry.scheduledDateTime.toLocalTime(), entry.dosage) ?: "",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurface
