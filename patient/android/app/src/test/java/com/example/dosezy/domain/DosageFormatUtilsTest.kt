@@ -85,5 +85,20 @@ class DosageFormatUtilsTest {
         assertEquals("10.25", DosageFormatUtils.formatStockQuantity(10.25))
         assertEquals("0", DosageFormatUtils.formatStockQuantity(0.0))
         assertEquals("", DosageFormatUtils.formatStockQuantity(null))
+        // Guard: Verify floating point precision drift trims trailing zeros cleanly
+        assertEquals("2", DosageFormatUtils.formatStockQuantity(2.0000000000000004))
+        assertEquals("0", DosageFormatUtils.formatStockQuantity(0.0001))
+    }
+
+    @Test
+    fun testFormatDosageAmount_floatPrecisionAndUpperBoundary() {
+        // Discrete units: upper fraction boundary rounds up to next whole number
+        assertEquals("1", DosageFormatUtils.formatDosageAmount(0.99999999, DosageUnit.TABLET))
+        assertEquals("2", DosageFormatUtils.formatDosageAmount(1.99999999, DosageUnit.TABLET))
+        assertEquals("1 tablet", DosageFormatUtils.formatDosageDisplay(0.99999999, DosageUnit.TABLET))
+
+        // Chemical units with float precision
+        assertEquals("2", DosageFormatUtils.formatDosageAmount(2.0000000000000004, DosageUnit.MG))
+        assertEquals("0", DosageFormatUtils.formatDosageAmount(0.0001, DosageUnit.MG))
     }
 }

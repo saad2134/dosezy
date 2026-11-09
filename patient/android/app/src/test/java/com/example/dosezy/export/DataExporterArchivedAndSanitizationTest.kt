@@ -241,6 +241,21 @@ class DataExporterArchivedAndSanitizationTest {
         assertTrue("Order must contain patient name", orderText.contains("John Doe"))
         assertTrue("Order must contain medication name", orderText.contains("Amoxicillin"))
         assertTrue("Order must contain dosage", orderText.contains("500 mg"))
+
+        // Guard: Verify fractional discrete medication renders with vulgar fractions (½) rather than raw decimal string (0.5)
+        val medFractional = med.copy(
+            medicineId = "med_order_frac",
+            medicationName = "Clonazepam",
+            dosage = 0.5,
+            dosageUnit = DosageUnit.TABLET
+        )
+        val orderTextFrac = exporter.generateConsolidatedPharmacyOrderText(
+            profilesWithMedicines = listOf(Pair(userEn, listOf(medFractional))),
+            supplyDays = 30,
+            includeStock = false,
+            includeDosage = true
+        )
+        assertTrue("Order must format discrete half dose using vulgar fraction ½", orderTextFrac.contains("½"))
     }
 
     @Test

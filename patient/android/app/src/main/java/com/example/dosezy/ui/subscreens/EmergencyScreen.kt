@@ -65,6 +65,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.viewmodels.UserViewModel
+import com.example.dosezy.data.model.normalizeArabicDigits
 
 data class CountryEmergency(
     val code: String,
@@ -658,7 +659,8 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
                 androidx.compose.material3.TextButton(
                     onClick = {
                         if (contactName.isNotBlank() && contactPhone.isNotBlank()) {
-                            customContacts.add(Pair(contactName.trim(), contactPhone.trim()))
+                            // Guard: Normalize Arabic/Indic numerals when saving contact phone to maintain consistent ASCII digit representation
+                            customContacts.add(Pair(contactName.trim(), contactPhone.normalizeArabicDigits().trim()))
                             saveContacts()
                             showAddContactDialog = false
                         }
@@ -854,9 +856,9 @@ fun EmergencyServiceCard(
 
 
 
-// Guard: Strip spaces/hyphens, use Uri.fromParts, and add FLAG_ACTIVITY_NEW_TASK to prevent dialer number truncation and non-Activity context crashes
+// Guard: Normalize Arabic/Indic numerals before regex cleaning to prevent stripping digits from Arabic phone numbers
 internal fun createDialIntent(phoneNumber: String): android.content.Intent {
-    val cleaned = phoneNumber.replace(Regex("[^0-9+*#]"), "")
+    val cleaned = phoneNumber.normalizeArabicDigits().replace(Regex("[^0-9+*#]"), "")
     return android.content.Intent(android.content.Intent.ACTION_DIAL).apply {
         data = android.net.Uri.fromParts("tel", cleaned, null)
         addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)

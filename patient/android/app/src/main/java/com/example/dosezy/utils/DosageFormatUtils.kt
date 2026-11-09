@@ -38,9 +38,12 @@ object DosageFormatUtils {
             val isHalf = Math.abs(frac - 0.5) < 0.001
             val isQuarter = Math.abs(frac - 0.25) < 0.001
             val isThreeQuarters = Math.abs(frac - 0.75) < 0.001
+            // Guard: Handle upper fraction boundary (0.999+) due to IEEE 754 precision drift to prevent showing "1.0 tablet" or "2.0 tablets"
+            val isNextWhole = Math.abs(frac - 1.0) < 0.001
 
             return when {
                 frac < 0.001 -> whole.toString()
+                isNextWhole -> (whole + 1).toString()
                 isHalf -> if (whole == 0) "½" else "$whole½"
                 isQuarter -> if (whole == 0) "¼" else "$whole¼"
                 isThreeQuarters -> if (whole == 0) "¾" else "$whole¾"
@@ -89,17 +92,16 @@ object DosageFormatUtils {
         return formatDecimalClean(stock)
     }
 
+    // Guard: Round to 2 decimals and strip all trailing zeros/decimals cleanly to prevent "2.0" or "0.0" output from IEEE 754 float imprecision
     private fun formatDecimalClean(value: Double): String {
-        return if (value % 1.0 == 0.0) {
-            value.toInt().toString()
+        val rounded = Math.round(value * 100.0) / 100.0
+        return if (rounded % 1.0 == 0.0) {
+            rounded.toLong().toString()
         } else {
-            // Trim unnecessary trailing zeros if any
-            val formatted = String.format(Locale.US, "%.2f", value)
-            if (formatted.endsWith("0")) {
-                formatted.dropLast(1)
-            } else {
-                formatted
-            }
+            String.format(Locale.US, "%.2f", rounded)
+                .trimEnd('0')
+                .trimEnd('.')
+                .ifEmpty { "0" }
         }
     }
 

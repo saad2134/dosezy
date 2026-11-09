@@ -149,6 +149,11 @@ class EmergencyDialAndEditMedScreenTest {
             "Intent must have FLAG_ACTIVITY_NEW_TASK so it can be safely launched from non-Activity contexts",
             (intent.flags and Intent.FLAG_ACTIVITY_NEW_TASK) != 0
         )
+
+        // Guard: Verify Eastern Arabic and Indic numerals are normalized so dialing does not strip digits
+        val arabicNumber = "+٩٦٦ ٥٠ ١٢٣ ٤٥٦٧"
+        val arabicIntent = createDialIntent(arabicNumber)
+        assertEquals("+966501234567", arabicIntent.data?.schemeSpecificPart)
     }
 
     // ─────────────────────────────────────────────────────────────────────────────

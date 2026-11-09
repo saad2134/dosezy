@@ -15,6 +15,7 @@ import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.data.model.Theme
 import com.example.dosezy.data.model.TimeFormat
 import com.example.dosezy.data.model.User
+import com.example.dosezy.data.model.normalizeArabicDigits
 import com.example.dosezy.data.repository.MedicineRepository
 import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.data.repository.UserRepository
@@ -716,6 +717,19 @@ class UserViewModelProfileAlarmTest {
         assertTrue(
             com.example.dosezy.data.repository.MedicineOrderPreferences.getCustomOrder(context, userToDelete.userId).isEmpty()
         )
+    }
+
+    @Test
+    fun testUserSetup_normalizesArabicIndicAgeAndPhoneNumerals() {
+        val rawArabicAge = "٢٥"
+        val rawArabicPhone = "+٩٦٦ ٥٠ ١٢٣ ٤٥٦٧"
+
+        // Guard: Verify normalizeArabicDigits parses Eastern Arabic numerals into valid integer age and normalized phone
+        val parsedAge = rawArabicAge.normalizeArabicDigits().toIntOrNull() ?: 0
+        val normalizedPhone = rawArabicPhone.normalizeArabicDigits().trim()
+
+        assertEquals(25, parsedAge)
+        assertEquals("+966 50 123 4567", normalizedPhone)
     }
 }
 

@@ -140,6 +140,9 @@ class DataExportFormattingTest {
         )
         val csv = com.example.dosezy.data.export.DataExporter.buildCsvContent(user, listOf(med), emptyList())
 
+        // Guard: Verify CSV starts with UTF-8 BOM (\uFEFF) to prevent mojibake in Microsoft Excel
+        assertTrue("CSV must start with UTF-8 BOM", csv.startsWith("\uFEFF"))
+
         // Verify CSV contains inventory columns in MEDICINES section
         assertTrue(csv.contains("Refill Threshold,Auto Deduct Stock,Is Archived,Custom Dosages"))
         // Verify serialized inventory values in the data row
