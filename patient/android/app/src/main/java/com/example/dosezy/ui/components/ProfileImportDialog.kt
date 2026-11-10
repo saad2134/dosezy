@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -144,11 +143,11 @@ fun ProfileImportDialog(
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
 
-                                    // Avatar Preview
+                                    // Avatar Preview (Squircle frame)
                                     Box(
                                         modifier = Modifier
                                             .size(40.dp)
-                                            .clip(CircleShape)
+                                            .clip(RoundedCornerShape(12.dp))
                                             .background(Color(0xFF1193D4).copy(alpha = 0.15f)),
                                         contentAlignment = Alignment.Center
                                     ) {

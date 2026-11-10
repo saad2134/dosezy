@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -161,10 +160,11 @@ fun ScheduledTimesSection(
                                     .padding(horizontal = 6.dp)
                             )
                             if (scheduledTimesList.size > 1) {
+                                // Squircle remove chip button
                                 Box(
                                     modifier = Modifier
                                         .size(24.dp)
-                                        .clip(CircleShape)
+                                        .clip(RoundedCornerShape(8.dp))
                                         .clickable {
                                             val newList = scheduledTimesList - time
                                             onScheduledTimesChange(newList)

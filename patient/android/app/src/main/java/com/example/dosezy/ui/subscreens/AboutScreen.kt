@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -247,10 +246,11 @@ fun AboutScreen(navController: NavController) {
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        // Developer avatar (Squircle frame)
                         Box(
                             modifier = Modifier
                                 .size(48.dp)
-                                .clip(CircleShape)
+                                .clip(RoundedCornerShape(14.dp))
                                 .background(Color(0xFF2084E4).copy(alpha = 0.15f)),
                             contentAlignment = Alignment.Center
                         ) {
@@ -458,10 +458,11 @@ fun AboutLinkCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Link card icon (Squircle frame)
             Box(
                 modifier = Modifier
                     .size(44.dp)
-                    .clip(CircleShape)
+                    .clip(RoundedCornerShape(12.dp))
                     .background(iconTint.copy(alpha = 0.12f)),
                 contentAlignment = Alignment.Center
             ) {
@@ -596,10 +597,11 @@ fun SocialMediaCard(
                 .padding(horizontal = 12.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Social media card icon (Squircle frame)
             Box(
                 modifier = Modifier
                     .size(38.dp)
-                    .clip(CircleShape)
+                    .clip(RoundedCornerShape(10.dp))
                     .background(brandColor.copy(alpha = 0.12f)),
                 contentAlignment = Alignment.Center
             ) {

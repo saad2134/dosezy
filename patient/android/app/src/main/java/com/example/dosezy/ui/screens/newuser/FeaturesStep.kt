@@ -18,7 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
@@ -49,10 +49,11 @@ fun FeatureItem(icon: ImageVector, title: String, description: String) {
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top
     ) {
+        // Squircle feature icon frame
         Box(
             modifier = Modifier
                 .size(56.dp)
-                .clip(CircleShape)
+                .clip(RoundedCornerShape(16.dp))
                 .background(iconBg),
             contentAlignment = Alignment.Center
         ) {
