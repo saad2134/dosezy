@@ -20,6 +20,7 @@ import com.example.dosezy.data.model.FrequencyPattern
 import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.Medicine
+import com.example.dosezy.data.model.ReminderType
 import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.data.model.User
 import com.example.dosezy.data.repository.MedicineRepository
@@ -103,6 +104,7 @@ class IntakeSafeguardManagerLifecycleTest {
 
     @After
     fun tearDown() {
+        AlarmAudioPlayer.stop()
         IntakeSafeguardManager.cancelCountdown(context)
         DosezyDatabase.setInstance(null)
         database.close()
@@ -1507,6 +1509,157 @@ class IntakeSafeguardManagerLifecycleTest {
         val activeNotifs = nm.activeNotifications
         assertTrue("Notification for user 1 entry must be posted", activeNotifs.any { it.id == entry1.entryId.hashCode() })
         assertTrue("Notification for user 2 entry must be posted separately", activeNotifs.any { it.id == entry2.entryId.hashCode() })
+    }
+
+    @Test
+    fun testInitialize_restoresActiveCountdown_andRearmsAlarmAndNotification() {
+        IntakeSafeguardManager.cancelCountdown(context)
+        assertNull(IntakeSafeguardManager.activeCountdown.value)
+
+        // Start countdown which writes to SharedPreferences
+        val state = IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = "entry_boot_test",
+            entryIds = listOf("entry_boot_test"),
+            medicineName = "Methylphenidate",
+            medicineNames = listOf("Methylphenidate"),
+            scheduledTime = "08:00 AM",
+            durationSeconds = 90,
+            userId = testUser.userId
+        )
+
+        // Clear in-memory StateFlow without wiping persistent prefs to simulate process death
+        val field = IntakeSafeguardManager::class.java.getDeclaredField("_activeCountdown")
+        field.isAccessible = true
+        @Suppress("UNCHECKED_CAST")
+        val flow = field.get(IntakeSafeguardManager) as kotlinx.coroutines.flow.MutableStateFlow<IntakeSafeguardManager.IntakeCountdownState?>
+        flow.value = null
+        assertNull(IntakeSafeguardManager.activeCountdown.value)
+
+        // Guard: Verify initialize re-arms AlarmManager and posts shade notification for active countdown (#BUG-SAFEGUARD-BOOT-RESTORE)
+        IntakeSafeguardManager.initialize(context)
+
+        val active = IntakeSafeguardManager.activeCountdown.value
+        assertNotNull("Active countdown must be restored on initialize", active)
+        assertEquals("entry_boot_test", active?.entryId)
+        assertEquals(testUser.userId, active?.userId)
+
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val activeNotifs = nm.activeNotifications
+        assertTrue(
+            "Shade notification must be reposted on initialize",
+            activeNotifs.any { it.id == IntakeSafeguardManager.INTAKE_NOTIFICATION_BASE_ID }
+        )
+
+        val am = context.getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
+        val shadowAm = org.robolectric.Shadows.shadowOf(am)
+        val scheduledAlarm = shadowAm.nextScheduledAlarm
+        assertNotNull("AlarmManager exact alarm must be re-armed on initialize", scheduledAlarm)
+        assertEquals(state.targetTimestamp, scheduledAlarm!!.triggerAtTime)
+
+        val shadowIntent = org.robolectric.Shadows.shadowOf(scheduledAlarm.operation)
+        assertEquals(MedicineAlarmReceiver.ACTION_INTAKE_SAFEGUARD_EXPIRED, shadowIntent.savedIntent.action)
+        assertEquals(testUser.userId, shadowIntent.savedIntent.getStringExtra(MedicineAlarmReceiver.EXTRA_USER_ID))
+
+        IntakeSafeguardManager.cancelCountdown(context)
+    }
+
+    @Test
+    fun testAlarmScheduler_scheduleIntakeSafeguardAlarm_attachesExtraUserId() {
+        val scheduler = AlarmScheduler(context)
+        val triggerTime = System.currentTimeMillis() + 60_000L
+        // Guard: Verify scheduleIntakeSafeguardAlarm attaches EXTRA_USER_ID to preserve user profile attribution (#BUG-SAFEGUARD-USER-ID)
+        scheduler.scheduleIntakeSafeguardAlarm(
+            entryId = "entry_uid_test",
+            triggerTime = triggerTime,
+            medicineName = "Test Med",
+            scheduledTime = "09:00 AM",
+            userId = "user_adhd_104"
+        )
+
+        val am = context.getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
+        val shadowAm = org.robolectric.Shadows.shadowOf(am)
+        val scheduledAlarm = shadowAm.nextScheduledAlarm
+        assertNotNull("Safeguard alarm must be scheduled", scheduledAlarm)
+
+        val shadowIntent = org.robolectric.Shadows.shadowOf(scheduledAlarm!!.operation)
+        assertEquals(MedicineAlarmReceiver.ACTION_INTAKE_SAFEGUARD_EXPIRED, shadowIntent.savedIntent.action)
+        assertEquals("user_adhd_104", shadowIntent.savedIntent.getStringExtra(MedicineAlarmReceiver.EXTRA_USER_ID))
+
+        scheduler.cancelIntakeSafeguardAlarm("entry_uid_test")
+    }
+
+    @Test
+    fun testHandleCountdownExpired_respectsPerMedicineReminderTypeOverride() = runBlocking {
+        AlarmAudioPlayer.stop()
+
+        // User default is NOTIFICATION
+        val userNotifDefault = User(
+            userId = "user_override_test",
+            fullName = "Notification User",
+            age = 40,
+            gender = Gender.MALE,
+            contactNumber = "+11223344",
+            reminderType = ReminderType.NOTIFICATION
+        )
+        // Medicine has explicit ALARM override
+        val medWithAlarmOverride = Medicine(
+            medicineId = "med_alarm_override_1",
+            userId = userNotifDefault.userId,
+            medicationName = "Urgent Heart Med",
+            dosage = 50.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            reminderType = ReminderType.ALARM
+        )
+        database.userDao().insertUser(userNotifDefault)
+        database.medicineDao().insertMedicine(medWithAlarmOverride)
+
+        val entry = ScheduleEntry(
+            entryId = "entry_alarm_override_1",
+            userId = userNotifDefault.userId,
+            medicineId = medWithAlarmOverride.medicineId,
+            scheduledDateTime = LocalDateTime.now().minusMinutes(5),
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entry)
+
+        var onCompleteCalled = false
+        // Guard: Verify handleCountdownExpired triggers alarm mode when medicine has ALARM override despite NOTIFICATION user default (#111)
+        IntakeSafeguardManager.handleCountdownExpired(
+            context = context,
+            entryId = entry.entryId,
+            medicineName = medWithAlarmOverride.medicationName,
+            entryIds = listOf(entry.entryId),
+            medicineNames = listOf(medWithAlarmOverride.medicationName),
+            scheduledTime = "08:00 AM",
+            userId = userNotifDefault.userId,
+            onComplete = { onCompleteCalled = true }
+        )
+
+        val deadline = System.currentTimeMillis() + 3000
+        while (!onCompleteCalled && System.currentTimeMillis() < deadline) {
+            org.robolectric.shadows.ShadowLooper.idleMainLooper()
+            Thread.sleep(20)
+        }
+
+        assertTrue("onComplete must be called", onCompleteCalled)
+
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val realertNotif = nm.activeNotifications.firstOrNull { it.id == entry.entryId.hashCode() }?.notification
+        assertNotNull("Re-alert notification must be posted", realertNotif)
+        assertEquals(
+            "Notification priority must be PRIORITY_MAX for ALARM mode",
+            androidx.core.app.NotificationCompat.PRIORITY_MAX,
+            realertNotif?.priority
+        )
+        assertEquals(
+            "Notification category must be CATEGORY_ALARM for ALARM mode",
+            androidx.core.app.NotificationCompat.CATEGORY_ALARM,
+            realertNotif?.category
+        )
     }
 }
 

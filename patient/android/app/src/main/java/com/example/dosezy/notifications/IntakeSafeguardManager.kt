@@ -71,10 +71,26 @@ object IntakeSafeguardManager {
                     medicineName = state.medicineName,
                     entryIds = state.entryIds,
                     medicineNames = state.medicineNames,
-                    scheduledTime = state.scheduledTime
+                    scheduledTime = state.scheduledTime,
+                    userId = state.userId
                 )
             } else {
                 _activeCountdown.value = state
+                // Guard: Re-arm exact AlarmManager wakeup and restore shade notification on device boot/restart to prevent dropping safeguard alarm (#BUG-SAFEGUARD-BOOT-RESTORE)
+                val scheduler = AlarmScheduler(context)
+                scheduler.scheduleIntakeSafeguardAlarm(
+                    entryId = state.entryId,
+                    triggerTime = state.targetTimestamp,
+                    medicineName = state.medicineName,
+                    entryIds = ArrayList(state.entryIds),
+                    medicineNames = ArrayList(state.medicineNames),
+                    scheduledTime = state.scheduledTime,
+                    userId = state.userId
+                )
+                showIntakeNotification(context, state)
+                try {
+                    com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+                } catch (_: Exception) {}
             }
         }
     }
@@ -400,6 +416,7 @@ object IntakeSafeguardManager {
         entryIds: List<String>?,
         medicineNames: List<String>?,
         scheduledTime: String?,
+        userId: String? = null,
         onComplete: (() -> Unit)? = null
     ) {
         dismissIntakeNotification(context, entryId)
@@ -420,15 +437,22 @@ object IntakeSafeguardManager {
                 // Guard: Partition unconfirmed entries by profile so each patient receives isolated re-alert with their own settings (#BUG-SAFEGUARD-MULTIUSER)
                 if (validPendingEntries.isNotEmpty()) {
                     val entriesByUser = validPendingEntries.groupBy { it.userId }
-                    entriesByUser.forEach { (userId, userEntries) ->
+                    entriesByUser.forEach { (entryUserId, userEntries) ->
                         val activePrimary = userEntries.first()
                         val activeEntryIds = ArrayList(userEntries.map { it.entryId })
                         val activeNames = ArrayList(userEntries.mapNotNull { e ->
                             db.medicineDao().getMedicineByIdDirect(e.medicineId)?.medicationName
                         }.ifEmpty { if (!medicineNames.isNullOrEmpty()) medicineNames else listOf(medicineName) })
                         val effectiveName = if (activeNames.isNotEmpty()) activeNames.joinToString(", ") else medicineName
-                        Log.d(TAG, "Safeguard timer expired for unconfirmed entries: $activeEntryIds (user: $userId); re-alerting user")
-                        val user = db.userDao().getUserByIdDirect(userId)
+                        Log.d(TAG, "Safeguard timer expired for unconfirmed entries: $activeEntryIds (user: $entryUserId); re-alerting user")
+                        val user = db.userDao().getUserByIdDirect(entryUserId)
+                        val defaultReminderType = user?.reminderType ?: com.example.dosezy.data.model.ReminderType.ALARM
+                        // Guard: Respect per-medicine reminderType overrides across cohort so critical medications trigger full alarms on safeguard expiry (#111)
+                        val isAlarmMode = userEntries.any { e ->
+                            val m = db.medicineDao().getMedicineByIdDirect(e.medicineId)
+                            val effectiveType = m?.reminderType ?: defaultReminderType
+                            effectiveType == com.example.dosezy.data.model.ReminderType.ALARM
+                        }
                         MedicineAlarmReceiver.triggerReAlert(
                             context = context,
                             entryId = activePrimary.entryId,
@@ -436,9 +460,22 @@ object IntakeSafeguardManager {
                             entryIds = activeEntryIds,
                             medicineNames = activeNames,
                             scheduledTime = scheduledTime,
-                            user = user
+                            user = user,
+                            isAlarmModeOverride = isAlarmMode
                         )
                     }
+                } else if (!userId.isNullOrBlank()) {
+                    // Guard: Fallback re-alert when database entries are unavailable but target user profile is explicitly known (#BUG-SAFEGUARD-USER-ID)
+                    val user = db.userDao().getUserByIdDirect(userId)
+                    MedicineAlarmReceiver.triggerReAlert(
+                        context = context,
+                        entryId = entryId,
+                        medicineName = medicineName,
+                        entryIds = if (!entryIds.isNullOrEmpty()) ArrayList(entryIds) else arrayListOf(entryId),
+                        medicineNames = if (!medicineNames.isNullOrEmpty()) ArrayList(medicineNames) else arrayListOf(medicineName),
+                        scheduledTime = scheduledTime,
+                        user = user
+                    )
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error handling expired intake safeguard", e)

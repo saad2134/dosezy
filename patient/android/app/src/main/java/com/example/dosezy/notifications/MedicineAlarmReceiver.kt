@@ -144,7 +144,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             )
         }
 
-        // Guard: Trigger ADHD safeguard re-alert when intake countdown expires without confirmation (#104)
+        // Guard: Trigger ADHD safeguard re-alert when intake countdown expires without confirmation (#104, #111)
         fun triggerReAlert(
             context: Context,
             entryId: String,
@@ -152,10 +152,28 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             entryIds: ArrayList<String>?,
             medicineNames: ArrayList<String>?,
             scheduledTime: String?,
-            user: com.example.dosezy.data.model.User?
+            user: com.example.dosezy.data.model.User?,
+            isAlarmModeOverride: Boolean? = null
         ) {
             val userReminderType = user?.reminderType ?: com.example.dosezy.data.model.ReminderType.ALARM
-            val isAlarmMode = userReminderType == com.example.dosezy.data.model.ReminderType.ALARM
+            // Guard: Evaluate per-medicine reminderType overrides to prevent silent notifications on critical ALARM medicines or unwanted loud alarms on NOTIFICATION medicines (#111)
+            val isAlarmMode = isAlarmModeOverride ?: run {
+                try {
+                    val db = DosezyDatabase.getInstance(context)
+                    val allIds = entryIds ?: arrayListOf(entryId)
+                    kotlinx.coroutines.runBlocking {
+                        kotlinx.coroutines.withTimeoutOrNull(500L) {
+                            allIds.any { id ->
+                                val entry = db.scheduleDao().getScheduleEntryById(id)
+                                val med = entry?.let { db.medicineDao().getMedicineByIdDirect(it.medicineId) }
+                                (med?.reminderType ?: userReminderType) == com.example.dosezy.data.model.ReminderType.ALARM
+                            }
+                        }
+                    } ?: (userReminderType == com.example.dosezy.data.model.ReminderType.ALARM)
+                } catch (_: Exception) {
+                    userReminderType == com.example.dosezy.data.model.ReminderType.ALARM
+                }
+            }
 
             if (isAlarmMode) {
                 val sound = user?.alarmSound ?: com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT
@@ -197,13 +215,14 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         database = DosezyDatabase.getInstance(context)
         val action = intent?.action
 
-        // Guard: Handle ADHD intake countdown safeguard expiration re-alert broadcast (#104)
+        // Guard: Handle ADHD intake countdown safeguard expiration re-alert broadcast (#104, #BUG-SAFEGUARD-USER-ID)
         if (action == ACTION_INTAKE_SAFEGUARD_EXPIRED) {
             val entryId = intent.getStringExtra(EXTRA_ENTRY_ID)
             val medicineName = intent.getStringExtra(EXTRA_MEDICINE_NAME) ?: "Medicine"
             val entryIds = intent.getStringArrayListExtra(EXTRA_ENTRY_IDS)
             val medicineNames = intent.getStringArrayListExtra(EXTRA_MEDICINE_NAMES)
             val scheduledTime = intent.getStringExtra(EXTRA_SCHEDULED_TIME)
+            val userId = intent.getStringExtra(EXTRA_USER_ID)
             if (entryId != null) {
                 // Guard: Hold goAsync() and WakeLock for intake safeguard expiration to prevent device sleep before re-alert completes
                 val pendingResult = try { goAsync() } catch (_: Exception) { null }
@@ -225,6 +244,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                     entryIds = entryIds,
                     medicineNames = medicineNames,
                     scheduledTime = scheduledTime,
+                    userId = userId,
                     onComplete = {
                         try {
                             wakeLock?.let { if (it.isHeld) it.release() }

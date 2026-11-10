@@ -1309,5 +1309,96 @@ class DatabaseRestoreTransactionAndMigrationTest {
         tempDir.deleteRecursively()
         Unit
     }
+
+    @Test
+    fun testRestore_mergeStrategy_deduplicatesSchedulesWithSubSecondOrMinuteDifferences() = runBlocking {
+        // Setup existing user and medicine in local database
+        val localUser = User(
+            userId = "user_merge_subsecond",
+            fullName = "Merge Dedupe User",
+            age = 45,
+            gender = Gender.MALE,
+            contactNumber = "+1234567890"
+        )
+        db.userDao().insertUser(localUser)
+
+        val localMed = Medicine(
+            medicineId = "med_merge_subsecond",
+            userId = localUser.userId,
+            medicationName = "Atorvastatin",
+            dosage = 20.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+        db.medicineDao().insertMedicine(localMed)
+
+        // Existing schedule has exact minute precision: 08:00:00.000
+        val existingSchedule = ScheduleEntry(
+            entryId = "sch_local_exact",
+            userId = localUser.userId,
+            medicineId = localMed.medicineId,
+            scheduledDateTime = LocalDateTime.of(2026, 11, 10, 8, 0, 0, 0),
+            status = MedicationStatus.PENDING
+        )
+        db.scheduleDao().insertScheduleEntry(existingSchedule)
+
+        // Setup backup directory with matching user, medicine, and schedule with sub-second / seconds difference (e.g. 08:00:25.500)
+        val tempDir = File(context.cacheDir, "test_restore_merge_subsecond_${System.currentTimeMillis()}")
+        tempDir.mkdirs()
+        val profileFolder = File(tempDir, "profiles/user_merge_subsecond")
+        profileFolder.mkdirs()
+
+        File(profileFolder, "profile.json").writeText(testGson.toJson(localUser))
+        File(profileFolder, "medicines.json").writeText(testGson.toJson(listOf(localMed)))
+
+        // Backup schedule has non-zero second and nanosecond precision
+        val backupSchedule = ScheduleEntry(
+            entryId = "sch_backup_subsecond",
+            userId = localUser.userId,
+            medicineId = localMed.medicineId,
+            scheduledDateTime = LocalDateTime.of(2026, 11, 10, 8, 0, 25, 500_000_000),
+            status = MedicationStatus.PENDING
+        )
+        File(profileFolder, "schedules.json").writeText(testGson.toJson(listOf(backupSchedule)))
+
+        val decision = ProfileImportDecision(
+            summary = ImportableProfileSummary(
+                originalUserId = localUser.userId,
+                name = localUser.fullName,
+                age = localUser.age,
+                gender = localUser.gender.name,
+                medicineCount = 1,
+                scheduleCount = 1,
+                avatarTempPath = null,
+                isConflict = true,
+                existingLocalUserId = localUser.userId,
+                profileFolder = profileFolder
+            ),
+            isSelected = true,
+            conflictStrategy = ConflictStrategy.MERGE
+        )
+
+        // Guard: Verify MERGE strategy deduplicates schedules within the same minute despite sub-second or seconds variance (#BUG-RESTORE-MERGE-DUP)
+        val result = backupManager.executeSelectiveRestore(tempDir, listOf(decision))
+        assertTrue("Merge restore must succeed", result.success)
+        assertEquals("Duplicate schedule must not be counted as restored", 0, result.schedulesRestored)
+
+        val allSchedules = db.scheduleDao().getAllScheduleEntries(localUser.userId)
+        val schedulesAtSlot = allSchedules.filter { 
+            it.scheduledDateTime.toLocalDate() == java.time.LocalDate.of(2026, 11, 10) && 
+            it.scheduledDateTime.hour == 8 && 
+            it.scheduledDateTime.minute == 0 
+        }
+        assertEquals(
+            "Schedule with sub-second variance must be deduplicated; exactly 1 entry must exist for the 08:00 AM slot",
+            1,
+            schedulesAtSlot.size
+        )
+
+        tempDir.deleteRecursively()
+        Unit
+    }
 }
 

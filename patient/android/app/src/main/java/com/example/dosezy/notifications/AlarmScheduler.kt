@@ -778,6 +778,7 @@ class AlarmScheduler(private val context: Context) {
         scheduledTime: String? = null,
         userId: String? = null
     ) {
+        val targetUserId = userId ?: resolveUserId(entryId)
         val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
             action = MedicineAlarmReceiver.ACTION_INTAKE_SAFEGUARD_EXPIRED
             putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, entryId)
@@ -792,6 +793,10 @@ class AlarmScheduler(private val context: Context) {
             if (!scheduledTime.isNullOrBlank()) {
                 putExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME, scheduledTime)
             }
+            // Guard: Include user ID in safeguard re-alert intent to preserve user profile attribution (#BUG-SAFEGUARD-USER-ID)
+            if (!targetUserId.isNullOrBlank()) {
+                putExtra(MedicineAlarmReceiver.EXTRA_USER_ID, targetUserId)
+            }
         }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
@@ -800,7 +805,6 @@ class AlarmScheduler(private val context: Context) {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val targetUserId = userId ?: resolveUserId(entryId)
         val isAlarm = resolveIsAlarmForEntryIds(entryIds ?: arrayListOf(entryId), targetUserId)
 
         if (isAlarm && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {

@@ -727,8 +727,10 @@ class BackupRestoreManager(
 
                         for (sch in schedules) {
                             val mappedMedId = medIdMap[sch.medicineId] ?: continue
+                            // Guard: Compare timestamps truncated to minute precision to prevent sub-second ISO vs epoch-millis discrepancies from inserting duplicate schedule entries (#BUG-RESTORE-MERGE-DUP)
                             val duplicate = existingSchedules.any { 
-                                it.medicineId == mappedMedId && it.scheduledDateTime == sch.scheduledDateTime 
+                                it.medicineId == mappedMedId && 
+                                it.scheduledDateTime.withSecond(0).withNano(0) == sch.scheduledDateTime.withSecond(0).withNano(0) 
                             }
                             if (!duplicate) {
                                 mergedSchedules.add(

@@ -582,6 +582,53 @@ class UserViewModelProfileAlarmTest {
     }
 
     @Test
+    fun testDeleteUser_preservesActiveIntakeCountdownOfOtherProfile() = runTest(testDispatcher) {
+        val userViewModel = UserViewModel(userRepository, medicineRepository, scheduleRepository, medicineNotificationManager)
+
+        userViewModel.addUser(testUser)
+        userViewModel.addUser(secondUser)
+        awaitCondition {
+            userRepository.getUserByIdSync(testUser.userId) != null &&
+            userRepository.getUserByIdSync(secondUser.userId) != null
+        }
+
+        // Active safeguard countdown belongs to secondUser
+        com.example.dosezy.notifications.IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = "entry_belonging_to_second_user",
+            entryIds = listOf("entry_belonging_to_second_user"),
+            medicineName = "Second User Med",
+            medicineNames = listOf("Second User Med"),
+            scheduledTime = "11:00 AM",
+            durationSeconds = 120,
+            userId = secondUser.userId
+        )
+        assertNotNull(com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value)
+        assertEquals(secondUser.userId, com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value?.userId)
+
+        // Guard: Verify deleting first user does NOT cancel active countdown belonging to second user (#BUG-SAFEGUARD-MULTIUSER)
+        userViewModel.deleteUser(testUser)
+        awaitCondition { userRepository.getUserByIdSync(testUser.userId) == null }
+        advanceUntilIdle()
+
+        assertNotNull(
+            "Active countdown belonging to secondUser must be preserved when testUser is deleted",
+            com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
+        )
+        assertEquals(secondUser.userId, com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value?.userId)
+
+        // Deleting secondUser must cancel its own active countdown
+        userViewModel.deleteUser(secondUser)
+        awaitCondition { userRepository.getUserByIdSync(secondUser.userId) == null }
+        advanceUntilIdle()
+
+        assertNull(
+            "Active countdown belonging to secondUser must be cancelled when secondUser is deleted",
+            com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
+        )
+    }
+
+    @Test
     fun testUpdateContextLocale_providesLocalizedResourcesForProfile() {
         // Guard: Verify that updateContextLocale correctly provides localized resources for Compose LocalContext matching the active profile (#BUG-MAIN-LOCALIZED-CONTEXT)
         val esContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, Language.SPANISH)
