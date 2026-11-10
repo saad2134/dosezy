@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,21 +29,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Accessibility
-import androidx.compose.material.icons.filled.AlternateEmail
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.Chat
-import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Security
-import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.outlined.ArrowOutward
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.ui.text.style.TextOverflow
@@ -392,15 +385,16 @@ fun AboutScreen(navController: NavController) {
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
+            val isDark = isSystemInDarkTheme()
             val socials = listOf(
-                SocialMediaItem("X (Twitter)", "@dosezyapp", "https://x.com/dosezyapp", Color(0xFF1D9BF0), Icons.Default.AlternateEmail),
-                SocialMediaItem("Bluesky", "@dosezy.attenomy.com", "https://bsky.app/profile/dosezy.attenomy.com", Color(0xFF0285FF), Icons.Default.Cloud),
-                SocialMediaItem("YouTube", "@dosezyapp", "https://www.youtube.com/@dosezyapp", Color(0xFFFF0000), Icons.Default.PlayArrow),
-                SocialMediaItem("Reddit", "r/Dosezy", "https://www.reddit.com/r/Dosezy/", Color(0xFFFF4500), Icons.Default.Chat),
-                SocialMediaItem("Facebook", "@dosezyapp", "https://www.facebook.com/dosezyapp", Color(0xFF1877F2), Icons.Default.Public),
-                SocialMediaItem("Instagram", "@dosezyapp", "https://www.instagram.com/dosezyapp", Color(0xFFE4405F), Icons.Default.CameraAlt),
-                SocialMediaItem("TikTok", "@dosezyapp", "https://www.tiktok.com/@dosezyapp", Color(0xFFFF004F), Icons.Default.MusicNote),
-                SocialMediaItem("Threads", "@dosezyapp", "https://www.threads.net/@dosezyapp", Color(0xFF101010), Icons.Default.Tag)
+                SocialMediaItem("X (Twitter)", "@dosezyapp", "https://x.com/dosezyapp", if (isDark) Color.White else Color(0xFF14171A), R.drawable.ic_brand_x),
+                SocialMediaItem("Bluesky", "@dosezy.attenomy.com", "https://bsky.app/profile/dosezy.attenomy.com", Color(0xFF0285FF), R.drawable.ic_brand_bluesky),
+                SocialMediaItem("YouTube", "@dosezyapp", "https://www.youtube.com/@dosezyapp", Color(0xFFFF0000), R.drawable.ic_brand_youtube),
+                SocialMediaItem("Reddit", "r/Dosezy", "https://www.reddit.com/r/Dosezy/", Color(0xFFFF4500), R.drawable.ic_brand_reddit),
+                SocialMediaItem("Facebook", "@dosezyapp", "https://www.facebook.com/dosezyapp", Color(0xFF1877F2), R.drawable.ic_brand_facebook),
+                SocialMediaItem("Instagram", "@dosezyapp", "https://www.instagram.com/dosezyapp", Color(0xFFE4405F), R.drawable.ic_brand_instagram),
+                SocialMediaItem("TikTok", "@dosezyapp", "https://www.tiktok.com/@dosezyapp", if (isDark) Color.White else Color(0xFF111827), R.drawable.ic_brand_tiktok),
+                SocialMediaItem("Threads", "@dosezyapp", "https://www.threads.net/@dosezyapp", if (isDark) Color.White else Color(0xFF111827), R.drawable.ic_brand_threads)
             )
 
             Column(
@@ -413,7 +407,7 @@ fun AboutScreen(navController: NavController) {
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         SocialMediaCard(
-                            icon = pair[0].icon,
+                            iconResId = pair[0].iconResId,
                             brandColor = pair[0].brandColor,
                             title = pair[0].name,
                             handle = pair[0].handle,
@@ -422,7 +416,7 @@ fun AboutScreen(navController: NavController) {
                         )
                         if (pair.size > 1) {
                             SocialMediaCard(
-                                icon = pair[1].icon,
+                                iconResId = pair[1].iconResId,
                                 brandColor = pair[1].brandColor,
                                 title = pair[1].name,
                                 handle = pair[1].handle,
@@ -578,12 +572,12 @@ private data class SocialMediaItem(
     val handle: String,
     val url: String,
     val brandColor: Color,
-    val icon: ImageVector
+    val iconResId: Int
 )
 
 @Composable
 fun SocialMediaCard(
-    icon: ImageVector,
+    iconResId: Int,
     brandColor: Color,
     title: String,
     handle: String,
@@ -610,7 +604,7 @@ fun SocialMediaCard(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = icon,
+                    painter = painterResource(id = iconResId),
                     contentDescription = null,
                     tint = brandColor,
                     modifier = Modifier.size(20.dp)
