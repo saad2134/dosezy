@@ -1,0 +1,29 @@
+name: "Main Branch Source Guard"
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - edited
+
+permissions:
+  contents: read
+
+jobs:
+  verify-source:
+    name: "Verify Source Branch is develop"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR head branch
+        run: |
+          echo "Target branch: ${{ github.base_ref }}"
+          echo "Source branch: ${{ github.head_ref }}"
+          if [ "${{ github.head_ref }}" != "develop" ]; then
+            echo "::error title=Invalid Target Branch::Pull requests targeting 'main' must originate from 'develop'. Current head branch is '${{ github.head_ref }}'. Please retarget this pull request to 'develop'."
+            exit 1
+          fi
+          echo "PR source branch successfully verified as 'develop'."
