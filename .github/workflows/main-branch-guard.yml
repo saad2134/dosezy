@@ -22,8 +22,17 @@ jobs:
         run: |
           echo "Target branch: ${{ github.base_ref }}"
           echo "Source branch: ${{ github.head_ref }}"
-          if [ "${{ github.head_ref }}" != "develop" ]; then
-            echo "::error title=Invalid Target Branch::Pull requests targeting 'main' must originate from 'develop'. Current head branch is '${{ github.head_ref }}'. Please retarget this pull request to 'develop'."
-            exit 1
+          echo "Actor: ${{ github.actor }}"
+          if [ "${{ github.head_ref }}" = "develop" ] || [ "${{ github.actor }}" = "dependabot[bot]" ]; then
+            echo "PR source verified successfully."
+          else
+            case "${{ github.head_ref }}" in
+              dependabot/*)
+                echo "Dependabot automated branch verified successfully."
+                ;;
+              *)
+                echo "::error title=Invalid Target Branch::Pull requests targeting 'main' must originate from 'develop' (or dependabot). Current head branch is '${{ github.head_ref }}'. Please retarget this pull request to 'develop'."
+                exit 1
+                ;;
+            esac
           fi
-          echo "PR source branch successfully verified as 'develop'."
