@@ -348,4 +348,136 @@ class GroupedSnoozeAndNaggingTest {
             testDb.close()
         }
     }
+
+    @Test
+    fun groupedSnoozeAndAlarms_propagateAndPersistUserId_acrossTransfersAndPartialCancellations() {
+        // Guard: Verify EXTRA_USER_ID and snooze_group_user persistence across grouped alarm scheduling and transfers (#BUG-ALARM-USER-PROPAGATION)
+        val testDb = androidx.room.Room.inMemoryDatabaseBuilder(context, com.example.dosezy.data.DosezyDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+        com.example.dosezy.data.DosezyDatabase.setInstance(testDb)
+        try {
+            val scheduler = AlarmScheduler(context)
+            val targetUser = com.example.dosezy.data.model.User(
+                userId = "user_snooze_test_99",
+                fullName = "Snooze User",
+                gender = com.example.dosezy.data.model.Gender.DO_NOT_SPECIFY,
+                age = 30,
+                contactNumber = "1234567890",
+                isCurrentUser = false
+            )
+            val med1 = com.example.dosezy.data.model.Medicine(
+                medicineId = "med_1",
+                userId = targetUser.userId,
+                medicationName = "Medicine 1",
+                dosage = 500.0,
+                dosageUnit = com.example.dosezy.data.model.DosageUnit.MG,
+                timesPerDay = 1,
+                frequency = com.example.dosezy.data.model.Frequency(com.example.dosezy.data.model.FrequencyPattern.DAILY),
+                scheduledTimes = listOf(java.time.LocalTime.of(9, 0)),
+                currentStock = 10.0
+            )
+            val med2 = com.example.dosezy.data.model.Medicine(
+                medicineId = "med_2",
+                userId = targetUser.userId,
+                medicationName = "Medicine 2",
+                dosage = 200.0,
+                dosageUnit = com.example.dosezy.data.model.DosageUnit.MG,
+                timesPerDay = 1,
+                frequency = com.example.dosezy.data.model.Frequency(com.example.dosezy.data.model.FrequencyPattern.DAILY),
+                scheduledTimes = listOf(java.time.LocalTime.of(9, 0)),
+                currentStock = 10.0
+            )
+            val entry1 = ScheduleEntry(
+                entryId = "entry_snooze_u1",
+                userId = targetUser.userId,
+                medicineId = med1.medicineId,
+                scheduledDateTime = LocalDateTime.now().plusHours(2),
+                status = MedicationStatus.PENDING
+            )
+            val entry2 = ScheduleEntry(
+                entryId = "entry_snooze_u2",
+                userId = targetUser.userId,
+                medicineId = med2.medicineId,
+                scheduledDateTime = LocalDateTime.now().plusHours(2),
+                status = MedicationStatus.PENDING
+            )
+            kotlinx.coroutines.runBlocking {
+                testDb.userDao().insertUser(targetUser)
+                testDb.medicineDao().insertMedicine(med1)
+                testDb.medicineDao().insertMedicine(med2)
+                testDb.scheduleDao().insertScheduleEntry(entry1)
+                testDb.scheduleDao().insertScheduleEntry(entry2)
+            }
+
+            // 1. Test scheduleGroupedMedicineAlarm propagates EXTRA_USER_ID
+            scheduler.scheduleGroupedMedicineAlarm(
+                scheduledDateTime = entry1.scheduledDateTime,
+                entries = listOf(entry1, entry2),
+                medicineNames = listOf("Medicine 1", "Medicine 2")
+            )
+            val alarmSlotKey = "${entry1.userId}_${entry1.scheduledDateTime.withSecond(0).withNano(0)}"
+            val alarmPendingIntent = PendingIntent.getBroadcast(
+                context,
+                alarmSlotKey.hashCode(),
+                Intent(context, MedicineAlarmReceiver::class.java),
+                PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+            )
+            assertNotNull("Grouped alarm PendingIntent must exist", alarmPendingIntent)
+            val alarmIntent = org.robolectric.Shadows.shadowOf(alarmPendingIntent).savedIntent
+            assertEquals(targetUser.userId, alarmIntent.getStringExtra(MedicineAlarmReceiver.EXTRA_USER_ID))
+
+            // 2. Test scheduleGroupedSnooze attaches EXTRA_USER_ID and persists snooze_group_user
+            val futureTrigger = System.currentTimeMillis() + 600_000L
+            scheduler.scheduleGroupedSnooze(
+                entryIds = listOf(entry1.entryId, entry2.entryId),
+                minutes = 10,
+                medicineNames = listOf("Medicine 1", "Medicine 2"),
+                explicitTriggerTime = futureTrigger,
+                userId = targetUser.userId
+            )
+            val prefs = context.getSharedPreferences(AlarmScheduler.PREFS_COORDINATION, Context.MODE_PRIVATE)
+            assertEquals(targetUser.userId, prefs.getString("snooze_group_user_${entry1.entryId}", null))
+
+            val snoozePendingIntent = PendingIntent.getBroadcast(
+                context,
+                entry1.entryId.hashCode() + 1000,
+                Intent(context, MedicineAlarmReceiver::class.java),
+                PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+            )
+            assertNotNull("Snooze PendingIntent must exist", snoozePendingIntent)
+            val snoozeIntent = org.robolectric.Shadows.shadowOf(snoozePendingIntent).savedIntent
+            assertEquals(targetUser.userId, snoozeIntent.getStringExtra(MedicineAlarmReceiver.EXTRA_USER_ID))
+
+            // 3. Test cancelSnooze for non-primary updates intent with EXTRA_USER_ID
+            scheduler.cancelSnooze(entry2.entryId)
+            val updatedSnoozePi = PendingIntent.getBroadcast(
+                context,
+                entry1.entryId.hashCode() + 1000,
+                Intent(context, MedicineAlarmReceiver::class.java),
+                PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+            )
+            val updatedIntent = org.robolectric.Shadows.shadowOf(updatedSnoozePi).savedIntent
+            assertEquals(targetUser.userId, updatedIntent.getStringExtra(MedicineAlarmReceiver.EXTRA_USER_ID))
+
+            // 4. Test cancelSnooze for primary transfers snooze_group_user to new primary
+            scheduler.scheduleGroupedSnooze(
+                entryIds = listOf(entry1.entryId, entry2.entryId),
+                minutes = 10,
+                medicineNames = listOf("Medicine 1", "Medicine 2"),
+                explicitTriggerTime = futureTrigger,
+                userId = targetUser.userId
+            )
+            scheduler.cancelSnooze(entry1.entryId)
+            assertEquals(targetUser.userId, prefs.getString("snooze_group_user_${entry2.entryId}", null))
+            assertNull(prefs.getString("snooze_group_user_${entry1.entryId}", null))
+
+            // 5. Test empty group cleanup removes snooze_group_user
+            scheduler.cancelSnooze(entry2.entryId)
+            assertNull(prefs.getString("snooze_group_user_${entry2.entryId}", null))
+        } finally {
+            com.example.dosezy.data.DosezyDatabase.setInstance(null)
+            testDb.close()
+        }
+    }
 }

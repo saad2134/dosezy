@@ -283,6 +283,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         val medicineNames = intent?.getStringArrayListExtra(EXTRA_MEDICINE_NAMES)
         val scheduledTime = intent?.getStringExtra(EXTRA_SCHEDULED_TIME)
         val naggingCount = intent?.getIntExtra(EXTRA_NAGGING_COUNT, 0) ?: 0
+        // Guard: Extract EXTRA_USER_ID so background catch fallback can resolve profile rather than default active user
+        val intentUserId = intent?.getStringExtra(EXTRA_USER_ID)
 
         if (entryId != null && medicineName != null) {
             // Guard: goAsync() returns null in unit tests and can throw if receiver lifecycle expired; guard against NPE and IllegalStateException
@@ -426,7 +428,15 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 } catch (ex: Exception) {
                     Log.e(TAG, "Error processing alarm in background", ex)
                     try {
-                        val fallbackUser = try { database.userDao().getAllUsersDirect().firstOrNull { it.isCurrentUser } } catch (_: Exception) { null }
+                        // Guard: Resolve fallback user via intentUserId before falling back to isCurrentUser to respect target profile settings
+                        val fallbackUser = try {
+                            if (!intentUserId.isNullOrBlank()) {
+                                database.userDao().getUserByIdDirect(intentUserId)
+                            } else null
+                        } catch (_: Exception) { null } ?: try {
+                            database.userDao().getAllUsersDirect().firstOrNull { it.isCurrentUser }
+                        } catch (_: Exception) { null }
+
                         val isAlarm = fallbackUser?.reminderType != com.example.dosezy.data.model.ReminderType.NOTIFICATION
                         if (isAlarm) {
                             AlarmAudioPlayer.play(
@@ -436,7 +446,22 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                                 autoSilenceSeconds = 0
                             )
                         }
-                        showNotification(context, entryId, entryIds, medicineName, medicineNames, emptyList(), scheduledTime, false, 0, 3, isAlarmMode = isAlarm)
+                        showNotification(
+                            context = context,
+                            entryId = entryId,
+                            entryIds = entryIds,
+                            medicineName = medicineName,
+                            medicineNames = medicineNames,
+                            medicineDetails = emptyList(),
+                            scheduledTime = scheduledTime,
+                            isNagging = false,
+                            naggingCount = 0,
+                            maxNagging = 3,
+                            userId = fallbackUser?.userId ?: intentUserId,
+                            userLanguage = fallbackUser?.language,
+                            allowLockscreenDetails = fallbackUser?.lockscreenDetailsEnabled ?: true,
+                            isAlarmMode = isAlarm
+                        )
                     } catch (fallbackEx: Exception) {
                         Log.e(TAG, "Error in fallback alarm/notification handling", fallbackEx)
                     }

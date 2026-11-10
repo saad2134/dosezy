@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.room.withTransaction
 import com.example.dosezy.data.DosezyDatabase
 import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.ScheduleEntry
@@ -729,28 +730,36 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             status = MedicationStatus.TAKEN_ON_TIME,
             dosage = medicine.getDosageForTime(dateTime.toLocalTime())
         )
-        database.scheduleDao().insertScheduleEntry(entry)
+        // Guard: Execute entry insertion, stock deduction, and dose notes in an atomic Room transaction to prevent state desynchronization
+        val (freshMedicine, newStock) = database.withTransaction {
+            database.scheduleDao().insertScheduleEntry(entry)
 
-        // Guard: Query fresh entity from Room and pass slot time to getStockDeductionAmount to prevent stale UI stock overwrites and symmetry drift with undoDoseTaken
-        val freshMedicine = database.medicineDao().getMedicineByIdDirect(medicine.medicineId) ?: medicine
-        if (freshMedicine.currentStock != null && freshMedicine.autoDeductOnTake) {
-            val deductAmount = freshMedicine.getStockDeductionAmount(dateTime.toLocalTime())
-            val actualDeducted = minOf(deductAmount, freshMedicine.currentStock)
-            val newStock = (freshMedicine.currentStock - deductAmount).coerceAtLeast(0.0)
-            val updatedMedicine = freshMedicine.copy(currentStock = newStock)
-            database.medicineDao().updateMedicine(updatedMedicine)
+            // Guard: Query fresh entity from Room within transaction to prevent stale UI stock overwrites and symmetry drift with undoDoseTaken
+            val fresh = database.medicineDao().getMedicineByIdDirect(medicine.medicineId) ?: medicine
+            var computedStock: Double? = null
+            if (fresh.currentStock != null && fresh.autoDeductOnTake) {
+                val deductAmount = fresh.getStockDeductionAmount(dateTime.toLocalTime())
+                val actualDeducted = minOf(deductAmount, fresh.currentStock)
+                val calculatedNewStock = (fresh.currentStock - deductAmount).coerceAtLeast(0.0)
+                val updatedMedicine = fresh.copy(currentStock = calculatedNewStock)
+                database.medicineDao().updateMedicine(updatedMedicine)
+                computedStock = calculatedNewStock
 
-            // Guard: Record partial stock tag on as-needed dose when stock is exhausted to preserve inventory audit trail (#123)
-            if (actualDeducted < deductAmount) {
-                val dFmt = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(actualDeducted)
-                val totalFmt = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(deductAmount)
-                val partialTag = "[Partial Stock: Took $dFmt of $totalFmt]"
-                database.scheduleDao().updateDoseNotes(entryId, partialTag)
+                // Guard: Record partial stock tag on as-needed dose when stock is exhausted to preserve inventory audit trail (#123)
+                if (actualDeducted < deductAmount) {
+                    val dFmt = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(actualDeducted)
+                    val totalFmt = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(deductAmount)
+                    val partialTag = "[Partial Stock: Took $dFmt of $totalFmt]"
+                    database.scheduleDao().updateDoseNotes(entryId, partialTag)
+                }
             }
+            Pair(fresh, computedStock)
+        }
 
+        if (newStock != null) {
             val threshold = freshMedicine.refillThreshold
             // Guard: Check freshMedicine.currentStock >= threshold and currentStock > newStock to catch boundary crossings when initial stock equals threshold
-            val shouldNotifyRefill = threshold != null && ((freshMedicine.currentStock >= threshold && newStock <= threshold && freshMedicine.currentStock > newStock) || (freshMedicine.currentStock > 0.0 && newStock == 0.0))
+            val shouldNotifyRefill = threshold != null && ((freshMedicine.currentStock != null && freshMedicine.currentStock >= threshold && newStock <= threshold && freshMedicine.currentStock > newStock) || (freshMedicine.currentStock != null && freshMedicine.currentStock > 0.0 && newStock == 0.0))
             if (context != null && shouldNotifyRefill) {
                 // Guard: Ensure notification channels are registered before posting refill alerts to prevent Android 8.0+ (API 26+) from dropping notifications
                 com.example.dosezy.notifications.MedicineAlarmReceiver.createNotificationChannels(context)

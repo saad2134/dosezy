@@ -8,6 +8,8 @@ import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.utils.ImageUtils
 import com.example.dosezy.utils.TimeCalculationUtils
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -1006,6 +1008,63 @@ class AlarmAndNotificationRegressionTest {
             android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,
             splashActivity.requestedOrientation
         )
+    }
+
+    @Test
+    fun medicineAlarmReceiver_fallbackUsesIntentUserId_toResolveTargetProfile() {
+        // Guard: Verify catch fallback resolves user from intentUserId before isCurrentUser fallback (#BUG-ALARM-FALLBACK-USER)
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val mockDb = mockk<com.example.dosezy.data.DosezyDatabase>(relaxed = true)
+        val mockScheduleDao = mockk<com.example.dosezy.data.dao.ScheduleDao>(relaxed = true)
+        val mockUserDao = mockk<com.example.dosezy.data.dao.UserDao>(relaxed = true)
+
+        every { mockDb.scheduleDao() } returns mockScheduleDao
+        every { mockDb.userDao() } returns mockUserDao
+
+        val targetUser = com.example.dosezy.data.model.User(
+            userId = "target_user_fallback_1",
+            fullName = "Target Profile",
+            gender = com.example.dosezy.data.model.Gender.DO_NOT_SPECIFY,
+            age = 28,
+            contactNumber = "111222333",
+            reminderType = com.example.dosezy.data.model.ReminderType.NOTIFICATION,
+            isCurrentUser = false
+        )
+        val currentUser = com.example.dosezy.data.model.User(
+            userId = "active_current_user_1",
+            fullName = "Active Profile",
+            gender = com.example.dosezy.data.model.Gender.DO_NOT_SPECIFY,
+            age = 35,
+            contactNumber = "444555666",
+            reminderType = com.example.dosezy.data.model.ReminderType.ALARM,
+            isCurrentUser = true
+        )
+
+        coEvery { mockScheduleDao.getScheduleEntryById(any()) } throws RuntimeException("Simulated SQLite failure")
+        coEvery { mockUserDao.getUserByIdDirect(targetUser.userId) } returns targetUser
+        coEvery { mockUserDao.getAllUsersDirect() } returns listOf(currentUser)
+
+        com.example.dosezy.data.DosezyDatabase.setInstance(mockDb)
+        try {
+            val receiver = MedicineAlarmReceiver()
+            val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
+                putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, "entry_fallback_1")
+                putExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME, "Paracetamol")
+                putExtra(MedicineAlarmReceiver.EXTRA_USER_ID, targetUser.userId)
+                putExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME, "10:00 AM")
+            }
+
+            receiver.onReceive(context, intent)
+            org.robolectric.shadows.ShadowLooper.idleMainLooper()
+            Thread.sleep(100)
+            org.robolectric.shadows.ShadowLooper.idleMainLooper()
+
+            // Guard: Verify target profile was looked up via getUserByIdDirect and active current user query was skipped
+            coVerify(atLeast = 1) { mockUserDao.getUserByIdDirect(targetUser.userId) }
+            coVerify(exactly = 0) { mockUserDao.getAllUsersDirect() }
+        } finally {
+            com.example.dosezy.data.DosezyDatabase.setInstance(null)
+        }
     }
 }
 

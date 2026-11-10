@@ -1661,6 +1661,76 @@ class IntakeSafeguardManagerLifecycleTest {
             realertNotif?.category
         )
     }
+
+    @Test
+    fun showIntakeNotification_respectsTargetUserLockscreenPrivacy() = runBlocking {
+        // Guard: Verify intake safeguard notification masks medicine name on lock screen when target user has lockscreenDetailsEnabled == false (#BUG-SAFEGUARD-LOCKSCREEN)
+        val privateUser = User(
+            userId = "user_lockscreen_private",
+            fullName = "Private User",
+            gender = Gender.DO_NOT_SPECIFY,
+            age = 29,
+            contactNumber = "999888777",
+            lockscreenDetailsEnabled = false,
+            isCurrentUser = false
+        )
+        database.userDao().insertUser(privateUser)
+
+        val state = IntakeSafeguardManager.IntakeCountdownState(
+            entryId = "entry_lockscreen_test",
+            entryIds = listOf("entry_lockscreen_test"),
+            medicineName = "Top Secret Med",
+            medicineNames = listOf("Top Secret Med"),
+            scheduledTime = "08:00 AM",
+            startTimestamp = System.currentTimeMillis(),
+            targetTimestamp = System.currentTimeMillis() + 60_000L,
+            totalDurationSeconds = 60,
+            userId = privateUser.userId
+        )
+
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        IntakeSafeguardManager.showIntakeNotification(context, state)
+
+        val notif = nm.activeNotifications.firstOrNull { it.id == IntakeSafeguardManager.INTAKE_NOTIFICATION_BASE_ID }?.notification
+        assertNotNull("Intake countdown notification must be active", notif)
+        assertEquals(
+            "Notification visibility must be PRIVATE when target profile has lockscreenDetailsEnabled = false",
+            androidx.core.app.NotificationCompat.VISIBILITY_PRIVATE,
+            notif?.visibility
+        )
+        assertNotNull("Public version notification must be set for lock screen masking", notif?.publicVersion)
+
+        IntakeSafeguardManager.dismissIntakeNotification(context)
+    }
+
+    @Test
+    fun getPersistedState_restoresStateFromPreferencesWhenInMemoryStateIsNull() {
+        // Guard: Verify getPersistedState returns persisted state from preferences even when in-memory StateFlow is lost (#BUG-SAFEGUARD-PERSISTED)
+        IntakeSafeguardManager.cancelCountdown(context)
+        assertNull(IntakeSafeguardManager.activeCountdown.value)
+
+        val prefs = context.getSharedPreferences("dosezy_intake_safeguard", Context.MODE_PRIVATE)
+        prefs.edit()
+            .putString("entry_id", "entry_persisted_test")
+            .putString("entry_ids", "entry_persisted_test")
+            .putString("med_name", "Aspirin")
+            .putString("med_names", "Aspirin")
+            .putString("scheduled_time", "09:00 AM")
+            .putLong("start_time", 1000L)
+            .putLong("target_time", 5000L)
+            .putInt("duration_sec", 120)
+            .putString("user_id", "user_persisted_abc")
+            .apply()
+
+        assertNull("In-memory countdown must remain null before restoration", IntakeSafeguardManager.activeCountdown.value)
+        val persisted = IntakeSafeguardManager.getPersistedState(context)
+        assertNotNull("getPersistedState must return state from preferences", persisted)
+        assertEquals("entry_persisted_test", persisted?.entryId)
+        assertEquals("user_persisted_abc", persisted?.userId)
+
+        IntakeSafeguardManager.cancelCountdown(context)
+        assertNull(IntakeSafeguardManager.getPersistedState(context))
+    }
 }
 
 

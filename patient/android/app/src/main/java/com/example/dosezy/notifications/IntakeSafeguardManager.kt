@@ -537,20 +537,22 @@ object IntakeSafeguardManager {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Guard: Resolve profile or app language context so countdown shade title, description, and action buttons match user profile locale (#BUG-INTAKE-LOCALE)
-        val targetLanguage = state.userId?.let { uid ->
+        // Guard: Resolve profile or app language context and lockscreen privacy settings so countdown shade matches target profile (#BUG-INTAKE-LOCALE)
+        val targetUser = state.userId?.let { uid ->
             try {
                 kotlinx.coroutines.runBlocking(Dispatchers.IO) {
                     kotlinx.coroutines.withTimeoutOrNull(500L) {
-                        DosezyDatabase.getInstance(context).userDao().getUserByIdDirect(uid)?.language
+                        DosezyDatabase.getInstance(context).userDao().getUserByIdDirect(uid)
                     }
                 }
             } catch (_: Exception) { null }
-        } ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+        }
+        val targetLanguage = targetUser?.language ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
         val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, targetLanguage)
 
         val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-        val allowLockscreenDetails = prefs.getBoolean("lockscreen_details_enabled", true)
+        // Guard: Check target user profile lockscreenDetailsEnabled and global preference to prevent medicine leak on locked screens
+        val allowLockscreenDetails = (targetUser?.lockscreenDetailsEnabled ?: true) && prefs.getBoolean("lockscreen_details_enabled", true)
 
         val appIconBitmap = runCatching {
             BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)
@@ -642,6 +644,9 @@ object IntakeSafeguardManager {
         }
         editor.apply()
     }
+
+    // Guard: Expose persisted countdown state so lifecycle callers can check and clear background countdowns even if in-memory StateFlow was lost
+    fun getPersistedState(context: Context): IntakeCountdownState? = restoreState(context)
 
     private fun restoreState(context: Context): IntakeCountdownState? {
         val prefs = context.getSharedPreferences(PREFS_SAFEGUARD, Context.MODE_PRIVATE)

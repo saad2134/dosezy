@@ -151,7 +151,8 @@ class AlarmScheduler(private val context: Context) {
         // Guard: Format scheduled time respecting 24h vs 12h user preference and active profile locale instead of hardcoded 12h pattern
         val is24 = timeFormat == TimeFormat.HOUR_24 || (timeFormat == null && android.text.format.DateFormat.is24HourFormat(context))
         val pattern = if (is24) "HH:mm" else "h:mm a"
-        val targetLang = resolveUserLanguage(entries.firstOrNull()?.userId)
+        val primaryUserId = entries.firstOrNull()?.userId
+        val targetLang = resolveUserLanguage(primaryUserId)
         val locale = com.example.dosezy.utils.LocaleHelper.getLocale(targetLang)
         val timeFormatted = cleanDateTime.format(java.time.format.DateTimeFormatter.ofPattern(pattern, locale))
         val slotKey = "${entries.first().userId}_${cleanDateTime}"
@@ -162,6 +163,10 @@ class AlarmScheduler(private val context: Context) {
             putExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME, medNames.joinToString(", "))
             putStringArrayListExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAMES, medNames)
             putExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME, timeFormatted)
+            // Guard: Propagate EXTRA_USER_ID in grouped alarms so receiver fallback resolves target profile rather than active profile
+            if (!primaryUserId.isNullOrBlank()) {
+                putExtra(MedicineAlarmReceiver.EXTRA_USER_ID, primaryUserId)
+            }
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
@@ -248,6 +253,10 @@ class AlarmScheduler(private val context: Context) {
             putStringArrayListExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAMES, ArrayList(medicineNames))
             // Guard: Pass formatted snooze time to avoid blank time extra and double reminder title in AlarmActivity
             putExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME, snoozeTimeFormatted)
+            // Guard: Propagate EXTRA_USER_ID in grouped snooze alarms for profile attribution during receiver fallback
+            if (!targetUserId.isNullOrBlank()) {
+                putExtra(MedicineAlarmReceiver.EXTRA_USER_ID, targetUserId)
+            }
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
@@ -264,6 +273,10 @@ class AlarmScheduler(private val context: Context) {
             editor.putString("snooze_group_ids_$primaryId", entryIds.joinToString(","))
             editor.putString("snooze_group_names_$primaryId", medicineNames.joinToString("|||"))
             editor.putLong("snooze_group_trigger_$primaryId", triggerTime)
+            // Guard: Persist target user ID so transfer or partial snooze cancellation maintains profile attribution
+            if (!targetUserId.isNullOrBlank()) {
+                editor.putString("snooze_group_user_$primaryId", targetUserId)
+            }
             entryIds.forEach { id ->
                 editor.putString("snooze_member_$id", primaryId)
             }
@@ -449,6 +462,7 @@ class AlarmScheduler(private val context: Context) {
                     editor.remove("snooze_group_ids_$primaryId")
                         .remove("snooze_group_names_$primaryId")
                         .remove("snooze_group_trigger_$primaryId")
+                        .remove("snooze_group_user_$primaryId")
                     editor.apply()
                     if (primaryId != entryId) {
                         val pIntent = PendingIntent.getBroadcast(
@@ -482,22 +496,29 @@ class AlarmScheduler(private val context: Context) {
 
                     if (entryId == primaryId) {
                         val newPrimary = currentIds.first()
+                        val savedUserId = prefs.getString("snooze_group_user_$primaryId", null) ?: targetUserId
                         editor.remove("snooze_group_ids_$primaryId")
                         editor.remove("snooze_group_names_$primaryId")
                         editor.remove("snooze_group_trigger_$primaryId")
+                        editor.remove("snooze_group_user_$primaryId")
                         currentIds.forEach { id ->
                             editor.putString("snooze_member_$id", newPrimary)
                         }
                         editor.putString("snooze_group_ids_$newPrimary", currentIds.joinToString(","))
                         editor.putString("snooze_group_names_$newPrimary", currentNames.joinToString("|||"))
                         editor.putLong("snooze_group_trigger_$newPrimary", triggerTime)
+                        // Guard: Transfer user ID to new primary snooze entry so fallback handling attributes to the correct profile
+                        if (!savedUserId.isNullOrBlank()) {
+                            editor.putString("snooze_group_user_$newPrimary", savedUserId)
+                        }
                         editor.apply()
 
                         if (triggerTime > System.currentTimeMillis()) {
                             val remMins = ((triggerTime - System.currentTimeMillis()) / (60 * 1000)).toInt().coerceAtLeast(1)
-                            scheduleGroupedSnooze(currentIds, remMins, currentNames, triggerTime, timeFormat = userTimeFormat, userId = targetUserId)
+                            scheduleGroupedSnooze(currentIds, remMins, currentNames, triggerTime, timeFormat = userTimeFormat, userId = savedUserId)
                         }
                     } else {
+                        val savedUserId = prefs.getString("snooze_group_user_$primaryId", null) ?: targetUserId
                         editor.putString("snooze_group_ids_$primaryId", currentIds.joinToString(","))
                             .putString("snooze_group_names_$primaryId", currentNames.joinToString("|||"))
                         editor.apply()
@@ -508,7 +529,7 @@ class AlarmScheduler(private val context: Context) {
                                 (userTimeFormat == null && android.text.format.DateFormat.is24HourFormat(context))
                         val pattern = if (is24) "HH:mm" else "h:mm a"
                         // Guard: Format snooze time with target profile language rather than global app language to prevent locale flipping on partial snooze cancellation (#BUG-SNOOZE-CANCEL-LOCALE)
-                        val targetLang = targetUser?.language ?: resolveUserLanguage(targetUserId)
+                        val targetLang = targetUser?.language ?: resolveUserLanguage(savedUserId)
                         val locale = com.example.dosezy.utils.LocaleHelper.getLocale(targetLang)
                         val snoozeTimeFormatted = java.text.SimpleDateFormat(pattern, locale).format(java.util.Date(triggerTime))
                         val updateIntent = Intent(context, MedicineAlarmReceiver::class.java).apply {
@@ -517,6 +538,10 @@ class AlarmScheduler(private val context: Context) {
                             putExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME, medNameSummary)
                             putStringArrayListExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAMES, ArrayList(currentNames))
                             putExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME, snoozeTimeFormatted)
+                            // Guard: Propagate user ID in partial snooze cancellation so receiver fallback preserves profile attribution
+                            if (!savedUserId.isNullOrBlank()) {
+                                putExtra(MedicineAlarmReceiver.EXTRA_USER_ID, savedUserId)
+                            }
                         }
                         PendingIntent.getBroadcast(
                             context,

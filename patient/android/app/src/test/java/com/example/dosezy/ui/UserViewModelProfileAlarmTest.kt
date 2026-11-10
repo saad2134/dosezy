@@ -767,6 +767,66 @@ class UserViewModelProfileAlarmTest {
     }
 
     @Test
+    fun testDeleteUser_cancelsPersistedIntakeCountdown_whenInMemoryStateIsNull() = runTest(testDispatcher) {
+        val userViewModel = UserViewModel(userRepository, medicineRepository, scheduleRepository, medicineNotificationManager)
+        val userToDelete = testUser.copy(userId = "user_delete_persisted_safeguard", isCurrentUser = true)
+        val remainingUser = secondUser.copy(userId = "user_remaining_safeguard", isCurrentUser = false)
+        userRepository.insertUser(userToDelete)
+        userRepository.insertUser(remainingUser)
+
+        val testMedicine = Medicine(
+            medicineId = "med_del_test_1",
+            userId = userToDelete.userId,
+            medicationName = "Test Med",
+            dosage = 100.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+        medicineRepository.insertMedicine(testMedicine)
+
+        val scheduleEntry = ScheduleEntry(
+            entryId = "entry_persisted_countdown_1",
+            userId = userToDelete.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = LocalDateTime.now().plusHours(1),
+            status = MedicationStatus.PENDING
+        )
+        scheduleRepository.insertScheduleEntry(scheduleEntry)
+
+        // Clear in-memory activeCountdown and write directly to SharedPreferences
+        com.example.dosezy.notifications.IntakeSafeguardManager.cancelCountdown(context)
+        assertNull(com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value)
+
+        val prefs = context.getSharedPreferences("dosezy_intake_safeguard", Context.MODE_PRIVATE)
+        prefs.edit()
+            .putString("entry_id", scheduleEntry.entryId)
+            .putString("entry_ids", scheduleEntry.entryId)
+            .putString("med_name", "Test Med")
+            .putString("med_names", "Test Med")
+            .putString("scheduled_time", "08:00 AM")
+            .putLong("start_time", 1000L)
+            .putLong("target_time", 5000L)
+            .putInt("duration_sec", 120)
+            .putString("user_id", userToDelete.userId)
+            .apply()
+
+        assertNotNull(com.example.dosezy.notifications.IntakeSafeguardManager.getPersistedState(context))
+
+        // Guard: Verify deleteUser checks getPersistedState and cancels persisted countdown belonging to deleted user (#BUG-SAFEGUARD-DELETE-RESTORE)
+        userViewModel.deleteUser(userToDelete)
+        advanceUntilIdle()
+        var attempts = 0
+        while (db.userDao().getUserByIdDirect(userToDelete.userId) != null && attempts++ < 40) {
+            Thread.sleep(50)
+            advanceUntilIdle()
+        }
+
+        assertNull("Persisted intake countdown must be cancelled after user deletion", com.example.dosezy.notifications.IntakeSafeguardManager.getPersistedState(context))
+    }
+
+    @Test
     fun testUserSetup_normalizesArabicIndicAgeAndPhoneNumerals() {
         val rawArabicAge = "٢٥"
         val rawArabicPhone = "+٩٦٦ ٥٠ ١٢٣ ٤٥٦٧"

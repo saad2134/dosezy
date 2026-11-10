@@ -229,6 +229,7 @@ class UserViewModel @Inject constructor(
                     // Guard: Dismiss active ADHD intake countdown notification only if active countdown belongs to deleted user to prevent cancelling other profiles' active safeguards (#BUG-SAFEGUARD-MULTIUSER)
                     try {
                         val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
+                            ?: com.example.dosezy.notifications.IntakeSafeguardManager.getPersistedState(context)
                         if (activeCountdown != null) {
                             val entry = scheduleRepository.getScheduleEntryById(activeCountdown.entryId)
                             if (activeCountdown.userId == user.userId || entry?.userId == user.userId) {
