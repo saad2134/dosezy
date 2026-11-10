@@ -671,8 +671,8 @@
 
     <string name="about_community_open_source">المجتمع والمصدر المفتوح</string>
     <string name="about_version_build">الإصدار %1$s (بناء %2$s)</string>
-    <string name="about_build_play">متجر Play</string>
-    <string name="about_build_foss">FOSS</string>
+    <string name="about_build_play">بناء Marketplace</string>
+    <string name="about_build_foss">بناء FOSS</string>
     <string name="about_social_links_title">وسائل التواصل الاجتماعي</string>
     <string name="country_india">الهند</string>
     <string name="country_us_ca">الولايات المتحدة / كندا</string>

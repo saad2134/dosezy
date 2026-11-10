@@ -671,8 +671,8 @@
 
     <string name="about_community_open_source">コミュニティとオープンソース</string>
     <string name="about_version_build">バージョン %1$s (ビルド %2$s)</string>
-    <string name="about_build_play">Play ストア</string>
-    <string name="about_build_foss">FOSS</string>
+    <string name="about_build_play">Marketplace ビルド</string>
+    <string name="about_build_foss">FOSS ビルド</string>
     <string name="about_social_links_title">ソーシャルメディア</string>
     <string name="country_india">インド</string>
     <string name="country_us_ca">アメリカ / カナダ</string>

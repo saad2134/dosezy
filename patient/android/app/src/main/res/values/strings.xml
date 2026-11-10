@@ -699,8 +699,8 @@ Do you want to continue?</string>
 
     <string name="about_community_open_source">Community &amp; Open Source</string>
     <string name="about_version_build">Version %1$s (Build %2$s)</string>
-    <string name="about_build_play">Play Store</string>
-    <string name="about_build_foss">FOSS</string>
+    <string name="about_build_play">Marketplace Build</string>
+    <string name="about_build_foss">FOSS Build</string>
     <string name="about_social_links_title">Social Media</string>
     <string name="country_india">India</string>
     <string name="country_us_ca">United States / Canada</string>

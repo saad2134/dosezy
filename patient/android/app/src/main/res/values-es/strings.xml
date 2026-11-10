@@ -687,8 +687,8 @@
 
     <string name="about_community_open_source">Comunidad y código abierto</string>
     <string name="about_version_build">Versión %1$s (Compilación %2$s)</string>
-    <string name="about_build_play">Play Store</string>
-    <string name="about_build_foss">FOSS</string>
+    <string name="about_build_play">Compilación Marketplace</string>
+    <string name="about_build_foss">Compilación FOSS</string>
     <string name="about_social_links_title">Redes sociales</string>
     <string name="country_india">India</string>
     <string name="country_us_ca">Estados Unidos / Canadá</string>

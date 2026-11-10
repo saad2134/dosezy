@@ -687,8 +687,8 @@
 
     <string name="about_community_open_source">समुदाय और ओपन सोर्स</string>
     <string name="about_version_build">संस्करण %1$s (बिल्ड %2$s)</string>
-    <string name="about_build_play">प्ले स्टोर</string>
-    <string name="about_build_foss">FOSS</string>
+    <string name="about_build_play">मार्केटप्लेस बिल्ड</string>
+    <string name="about_build_foss">FOSS बिल्ड</string>
     <string name="about_social_links_title">सोशल मीडिया</string>
     <string name="country_india">भारत</string>
     <string name="country_us_ca">संयुक्त राज्य अमेरिका / कनाडा</string>

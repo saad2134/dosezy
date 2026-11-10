@@ -670,8 +670,8 @@ Deseja continuar?</string>
 
     <string name="about_community_open_source">Comunidade e Código Aberto</string>
     <string name="about_version_build">Versão %1$s (Build %2$s)</string>
-    <string name="about_build_play">Play Store</string>
-    <string name="about_build_foss">FOSS</string>
+    <string name="about_build_play">Build Marketplace</string>
+    <string name="about_build_foss">Build FOSS</string>
     <string name="about_social_links_title">Redes sociais</string>
     <string name="country_india">Índia</string>
     <string name="country_us_ca">Estados Unidos / Canadá</string>

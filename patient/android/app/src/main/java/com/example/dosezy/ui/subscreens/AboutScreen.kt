@@ -388,13 +388,11 @@ fun AboutScreen(navController: NavController) {
             val isDark = isSystemInDarkTheme()
             val socials = listOf(
                 SocialMediaItem("X (Twitter)", "@dosezyapp", "https://x.com/dosezyapp", if (isDark) Color.White else Color(0xFF14171A), R.drawable.ic_brand_x),
-                SocialMediaItem("Bluesky", "@dosezy.attenomy.com", "https://bsky.app/profile/dosezy.attenomy.com", Color(0xFF0285FF), R.drawable.ic_brand_bluesky),
                 SocialMediaItem("YouTube", "@dosezyapp", "https://www.youtube.com/@dosezyapp", Color(0xFFFF0000), R.drawable.ic_brand_youtube),
                 SocialMediaItem("Reddit", "r/Dosezy", "https://www.reddit.com/r/Dosezy/", Color(0xFFFF4500), R.drawable.ic_brand_reddit),
                 SocialMediaItem("Facebook", "@dosezyapp", "https://www.facebook.com/dosezyapp", Color(0xFF1877F2), R.drawable.ic_brand_facebook),
                 SocialMediaItem("Instagram", "@dosezyapp", "https://www.instagram.com/dosezyapp", Color(0xFFE4405F), R.drawable.ic_brand_instagram),
-                SocialMediaItem("TikTok", "@dosezyapp", "https://www.tiktok.com/@dosezyapp", if (isDark) Color.White else Color(0xFF111827), R.drawable.ic_brand_tiktok),
-                SocialMediaItem("Threads", "@dosezyapp", "https://www.threads.net/@dosezyapp", if (isDark) Color.White else Color(0xFF111827), R.drawable.ic_brand_threads)
+                SocialMediaItem("TikTok", "@dosezyapp", "https://www.tiktok.com/@dosezyapp", if (isDark) Color.White else Color(0xFF111827), R.drawable.ic_brand_tiktok)
             )
 
             Column(

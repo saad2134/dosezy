@@ -667,8 +667,8 @@
 
     <string name="about_community_open_source">কমিউনিটি ও ওপেন সোর্স</string>
     <string name="about_version_build">সংস্করণ %1$s (বিল্ড %2$s)</string>
-    <string name="about_build_play">প্লে স্টোর</string>
-    <string name="about_build_foss">FOSS</string>
+    <string name="about_build_play">মার্কেটপ্লেস বিল্ড</string>
+    <string name="about_build_foss">FOSS বিল্ড</string>
     <string name="about_social_links_title">সামাজিক যোগাযোগ মাধ্যম</string>
     <string name="country_india">ভারত</string>
     <string name="country_us_ca">যুক্তরাষ্ট্র / কানাডা</string>
