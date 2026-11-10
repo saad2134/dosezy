@@ -92,7 +92,7 @@ class MedicineRepository @Inject constructor(
 
         // Guard: Dismiss active refill warning notification from shade when stock is replenished above refill threshold
         val currentStock = medicine.currentStock
-        val threshold = medicine.refillThreshold ?: 0
+        val threshold = medicine.refillThreshold ?: 0.0
         if (currentStock != null && currentStock > threshold) {
             val nManager = this.context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
             nManager?.cancel((medicine.medicineId + "_refill").hashCode())
@@ -212,6 +212,11 @@ class MedicineRepository @Inject constructor(
         // Then delete the medicine
         database.medicineDao().deleteMedicine(medicine)
 
+        // Guard: Prune deleted medicine ID from custom order sequence to prevent orphaned preference leaks in storage (#BUG-MED-REPO-DELETE-ORDER)
+        try {
+            MedicineOrderPreferences.removeMedicine(this.context, medicine.userId, medicine.medicineId)
+        } catch (_: Exception) {}
+
         // Guard: Delete internal storage medicine photo and verify canonicalPath to prevent storage leaks and path traversal
         medicine.imageUri?.let { uriStr ->
             try {
@@ -250,6 +255,9 @@ class MedicineRepository @Inject constructor(
             scheduleRepository.cancelAlarmsForMedicine(medicineId, this.context)
             database.scheduleDao().deleteScheduleEntriesByMedicine(medicineId)
             if (affectedUserId != null) {
+                try {
+                    MedicineOrderPreferences.removeMedicine(this.context, affectedUserId, medicineId)
+                } catch (_: Exception) {}
                 scheduleRepository.rescheduleAllAlarms(affectedUserId, this.context)
             }
         }
@@ -291,6 +299,9 @@ class MedicineRepository @Inject constructor(
             scheduleRepository.cancelAlarmsForMedicine(medicineId, context)
             database.scheduleDao().deleteScheduleEntriesByMedicine(medicineId)
             if (affectedUserId != null) {
+                try {
+                    MedicineOrderPreferences.removeMedicine(context, affectedUserId, medicineId)
+                } catch (_: Exception) {}
                 scheduleRepository.rescheduleAllAlarms(affectedUserId, context)
             }
         }

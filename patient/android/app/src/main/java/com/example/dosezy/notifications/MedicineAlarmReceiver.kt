@@ -45,6 +45,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         const val ACTION_INTAKE_SAFEGUARD_EXPIRED = "com.example.dosezy.INTAKE_SAFEGUARD_EXPIRED"
         const val EXTRA_IS_INTAKE_REALERT = "is_intake_realert"
         const val EXTRA_SNOOZE_MINUTES = "extra_snooze_minutes"
+        const val EXTRA_USER_ID = "user_id"
 
         fun createNotificationChannels(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -143,7 +144,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             )
         }
 
-        // Guard: Trigger ADHD safeguard re-alert when intake countdown expires without confirmation (#104)
+        // Guard: Trigger ADHD safeguard re-alert when intake countdown expires without confirmation (#104, #111)
         fun triggerReAlert(
             context: Context,
             entryId: String,
@@ -151,10 +152,28 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             entryIds: ArrayList<String>?,
             medicineNames: ArrayList<String>?,
             scheduledTime: String?,
-            user: com.example.dosezy.data.model.User?
+            user: com.example.dosezy.data.model.User?,
+            isAlarmModeOverride: Boolean? = null
         ) {
             val userReminderType = user?.reminderType ?: com.example.dosezy.data.model.ReminderType.ALARM
-            val isAlarmMode = userReminderType == com.example.dosezy.data.model.ReminderType.ALARM
+            // Guard: Evaluate per-medicine reminderType overrides to prevent silent notifications on critical ALARM medicines or unwanted loud alarms on NOTIFICATION medicines (#111)
+            val isAlarmMode = isAlarmModeOverride ?: run {
+                try {
+                    val db = DosezyDatabase.getInstance(context)
+                    val allIds = entryIds ?: arrayListOf(entryId)
+                    kotlinx.coroutines.runBlocking {
+                        kotlinx.coroutines.withTimeoutOrNull(500L) {
+                            allIds.any { id ->
+                                val entry = db.scheduleDao().getScheduleEntryById(id)
+                                val med = entry?.let { db.medicineDao().getMedicineByIdDirect(it.medicineId) }
+                                (med?.reminderType ?: userReminderType) == com.example.dosezy.data.model.ReminderType.ALARM
+                            }
+                        }
+                    } ?: (userReminderType == com.example.dosezy.data.model.ReminderType.ALARM)
+                } catch (_: Exception) {
+                    userReminderType == com.example.dosezy.data.model.ReminderType.ALARM
+                }
+            }
 
             if (isAlarmMode) {
                 val sound = user?.alarmSound ?: com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT
@@ -196,13 +215,14 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         database = DosezyDatabase.getInstance(context)
         val action = intent?.action
 
-        // Guard: Handle ADHD intake countdown safeguard expiration re-alert broadcast (#104)
+        // Guard: Handle ADHD intake countdown safeguard expiration re-alert broadcast (#104, #BUG-SAFEGUARD-USER-ID)
         if (action == ACTION_INTAKE_SAFEGUARD_EXPIRED) {
             val entryId = intent.getStringExtra(EXTRA_ENTRY_ID)
             val medicineName = intent.getStringExtra(EXTRA_MEDICINE_NAME) ?: "Medicine"
             val entryIds = intent.getStringArrayListExtra(EXTRA_ENTRY_IDS)
             val medicineNames = intent.getStringArrayListExtra(EXTRA_MEDICINE_NAMES)
             val scheduledTime = intent.getStringExtra(EXTRA_SCHEDULED_TIME)
+            val userId = intent.getStringExtra(EXTRA_USER_ID)
             if (entryId != null) {
                 // Guard: Hold goAsync() and WakeLock for intake safeguard expiration to prevent device sleep before re-alert completes
                 val pendingResult = try { goAsync() } catch (_: Exception) { null }
@@ -224,6 +244,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                     entryIds = entryIds,
                     medicineNames = medicineNames,
                     scheduledTime = scheduledTime,
+                    userId = userId,
                     onComplete = {
                         try {
                             wakeLock?.let { if (it.isHeld) it.release() }
@@ -262,6 +283,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         val medicineNames = intent?.getStringArrayListExtra(EXTRA_MEDICINE_NAMES)
         val scheduledTime = intent?.getStringExtra(EXTRA_SCHEDULED_TIME)
         val naggingCount = intent?.getIntExtra(EXTRA_NAGGING_COUNT, 0) ?: 0
+        // Guard: Extract EXTRA_USER_ID so background catch fallback can resolve profile rather than default active user
+        val intentUserId = intent?.getStringExtra(EXTRA_USER_ID)
 
         if (entryId != null && medicineName != null) {
             // Guard: goAsync() returns null in unit tests and can throw if receiver lifecycle expired; guard against NPE and IllegalStateException
@@ -291,40 +314,44 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
 
                     // Guard: Reconcile all pending sibling schedule entries in the same time slot to ensure 4+ medication cohorts are fully loaded (#115)
                     val primary = validPendingEntries.first()
+                    val targetUserId = primary.userId
+                    // Guard: Isolate cohort strictly to primary entry profile to prevent cross-profile notification and alarm contamination (#BUG-RECEIVER-MULTIUSER)
+                    val userPendingEntries = validPendingEntries.filter { it.userId == targetUserId }.toMutableList()
+
                     val slotMillis = primary.scheduledDateTime.withSecond(0).withNano(0)
                         .atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
                     val slotEntries = database.scheduleDao().getScheduleForDateRangeDirect(
-                        primary.userId,
+                        targetUserId,
                         slotMillis,
                         slotMillis + 59999L
                     ).filter { it.status == com.example.dosezy.data.model.MedicationStatus.PENDING && !it.entryId.startsWith("PRN_") }
-                    val existingIds = validPendingEntries.map { it.entryId }.toSet()
+                    val existingIds = userPendingEntries.map { it.entryId }.toSet()
                     for (sibling in slotEntries) {
                         if (sibling.entryId !in existingIds) {
-                            validPendingEntries.add(sibling)
+                            userPendingEntries.add(sibling)
                         }
                     }
 
-                    val primaryEntry = validPendingEntries.first()
+                    val primaryEntry = userPendingEntries.first()
                     val user = database.userDao().getUserByIdDirect(primaryEntry.userId)
                     val isNagging = naggingCount > 0
 
                     // Retrieve medicine dosage details for each valid pending entry
-                    val medicineDetails = validPendingEntries.mapNotNull { e ->
+                    val medicineDetails = userPendingEntries.mapNotNull { e ->
                         val m = database.medicineDao().getMedicineByIdDirect(e.medicineId) ?: return@mapNotNull null
-                        val dose = m.getDosageDisplay(e.scheduledDateTime.toLocalTime())
+                        val dose = m.getDosageDisplay(e.scheduledDateTime.toLocalTime(), e.dosage)
                         Pair(m.medicationName, dose)
                     }
 
-                    val activeMedicineNames = ArrayList(validPendingEntries.mapNotNull { e ->
+                    val activeMedicineNames = ArrayList(userPendingEntries.mapNotNull { e ->
                         database.medicineDao().getMedicineByIdDirect(e.medicineId)?.medicationName
                     }.distinct())
                     val effectiveMedicineName = if (activeMedicineNames.isNotEmpty()) activeMedicineNames.joinToString(", ") else medicineName
-                    val activeEntryIds = ArrayList(validPendingEntries.map { it.entryId })
+                    val activeEntryIds = ArrayList(userPendingEntries.map { it.entryId })
 
                     // Guard: Check if any medication in the cohort requires full alarm behavior (#111)
                     val defaultReminderType = user?.reminderType ?: com.example.dosezy.data.model.ReminderType.ALARM
-                    val isAlarmMode = validPendingEntries.any { e ->
+                    val isAlarmMode = userPendingEntries.any { e ->
                         val m = database.medicineDao().getMedicineByIdDirect(e.medicineId)
                         val effectiveType = m?.reminderType ?: defaultReminderType
                         effectiveType == com.example.dosezy.data.model.ReminderType.ALARM
@@ -378,8 +405,14 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                         isAlarmMode = isAlarmMode
                     )
 
-                    // Schedule next follow-up nagging reminder if enabled and below limit
-                    if (user != null && user.naggingRemindersEnabled && naggingCount < user.naggingMaxRepeats) {
+                    // Guard: Schedule next follow-up nagging reminder if enabled and below limit (0 = continuous until missed threshold) (#119)
+                    val isContinuous = user != null && user.naggingMaxRepeats <= 0
+                    val isMissed = user != null && com.example.dosezy.utils.TimeCalculationUtils.isMissed(
+                        primaryEntry.scheduledDateTime,
+                        java.time.LocalDateTime.now(),
+                        user.missedAfterMinutes
+                    )
+                    if (user != null && user.naggingRemindersEnabled && !isMissed && (isContinuous || naggingCount < user.naggingMaxRepeats)) {
                         val alarmScheduler = AlarmScheduler(context)
                         alarmScheduler.scheduleNaggingReminder(
                             entryId = primaryEntry.entryId,
@@ -395,7 +428,15 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                 } catch (ex: Exception) {
                     Log.e(TAG, "Error processing alarm in background", ex)
                     try {
-                        val fallbackUser = try { database.userDao().getAllUsersDirect().firstOrNull { it.isCurrentUser } } catch (_: Exception) { null }
+                        // Guard: Resolve fallback user via intentUserId before falling back to isCurrentUser to respect target profile settings
+                        val fallbackUser = try {
+                            if (!intentUserId.isNullOrBlank()) {
+                                database.userDao().getUserByIdDirect(intentUserId)
+                            } else null
+                        } catch (_: Exception) { null } ?: try {
+                            database.userDao().getAllUsersDirect().firstOrNull { it.isCurrentUser }
+                        } catch (_: Exception) { null }
+
                         val isAlarm = fallbackUser?.reminderType != com.example.dosezy.data.model.ReminderType.NOTIFICATION
                         if (isAlarm) {
                             AlarmAudioPlayer.play(
@@ -405,7 +446,22 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                                 autoSilenceSeconds = 0
                             )
                         }
-                        showNotification(context, entryId, entryIds, medicineName, medicineNames, emptyList(), scheduledTime, false, 0, 3, isAlarmMode = isAlarm)
+                        showNotification(
+                            context = context,
+                            entryId = entryId,
+                            entryIds = entryIds,
+                            medicineName = medicineName,
+                            medicineNames = medicineNames,
+                            medicineDetails = emptyList(),
+                            scheduledTime = scheduledTime,
+                            isNagging = false,
+                            naggingCount = 0,
+                            maxNagging = 3,
+                            userId = fallbackUser?.userId ?: intentUserId,
+                            userLanguage = fallbackUser?.language,
+                            allowLockscreenDetails = fallbackUser?.lockscreenDetailsEnabled ?: true,
+                            isAlarmMode = isAlarm
+                        )
                     } catch (fallbackEx: Exception) {
                         Log.e(TAG, "Error in fallback alarm/notification handling", fallbackEx)
                     }
@@ -446,6 +502,17 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, targetLanguage)
 
         createNotificationChannels(localizedContext)
+
+        val targetUser = userId?.let {
+            try {
+                kotlinx.coroutines.runBlocking(kotlinx.coroutines.Dispatchers.IO) {
+                    kotlinx.coroutines.withTimeoutOrNull(500L) {
+                        com.example.dosezy.data.DosezyDatabase.getInstance(context).userDao().getUserByIdDirect(it)
+                    }
+                }
+            } catch (_: Exception) { null }
+        }
+        val patientName = targetUser?.fullName?.takeIf { it.isNotBlank() }
 
         // Guard: Check scheduledTime.isNotBlank() to prevent rendering empty 'Scheduled: ' label on safeguard re-alerts
         val scheduledTimeStr = scheduledTime?.takeIf { it.isNotBlank() }?.let {
@@ -568,6 +635,8 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             putExtra("allow_lockscreen_details", effectiveAllowLockscreen)
             // Guard: Pass user's configured snooze duration to AlarmActivity so UI defaults correctly on first composition frame (#113)
             putExtra(EXTRA_SNOOZE_MINUTES, snoozeMinutes)
+            // Guard: Pass user ID to AlarmActivity to ensure multi-profile alarms isolate cohorts without cross-patient data leakage (#BUG-MULTIUSER-ALARM-MERGE)
+            userId?.let { putExtra(EXTRA_USER_ID, it) }
         }
 
         // Android 14+ background activity start options for PendingIntent creation
@@ -600,7 +669,7 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             }
         }
 
-        val notificationTitle = if (isIntakeReAlert) {
+        val baseTitle = if (isIntakeReAlert) {
             localizedContext.getString(R.string.notif_intake_realert_title)
         } else if (isNagging) {
             localizedContext.getString(R.string.notif_nagging_title, primaryMedLabel)
@@ -609,11 +678,18 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         } else {
             localizedContext.getString(R.string.alarm_medication_reminder)
         }
+        // Guard: Include patient name in notification shade title for reminders so multi-profile users immediately recognize who the alarm is for (#BUG-MULTIUSER-NOTIF-TITLE)
+        val notificationTitle = if (patientName != null && !isIntakeReAlert) "$baseTitle \u2022 $patientName" else baseTitle
 
         val notificationText = if (isIntakeReAlert) {
             localizedContext.getString(R.string.notif_intake_realert_desc, primaryMedLabel)
         } else if (isNagging) {
-            localizedContext.getString(R.string.notif_nagging_text, naggingCount, maxNagging, scheduledTime ?: "")
+            // Guard: If maxNagging <= 0 (continuous), format without upper bound; otherwise show current/max (#119)
+            if (maxNagging <= 0) {
+                localizedContext.getString(R.string.notif_nagging_text_continuous, naggingCount, scheduledTime ?: "")
+            } else {
+                localizedContext.getString(R.string.notif_nagging_text, naggingCount, maxNagging, scheduledTime ?: "")
+            }
         } else if (effectiveDetails.size == 1) {
             "$primaryMedLabel • $scheduledTimeStr"
         } else {
@@ -701,6 +777,9 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                 .setPublicVersion(publicNotification)
         }
+
+        // Guard: Attach actions and content intent directly to notificationBuilder rather than chaining on if-else expression to avoid syntactic ambiguity
+        notificationBuilder
             .setContentIntent(pendingIntent)
             .addAction(
                 getNotificationIcon(Icons.Filled.Check),

@@ -20,6 +20,7 @@ import com.example.dosezy.data.model.FrequencyPattern
 import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.Medicine
+import com.example.dosezy.data.model.ReminderType
 import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.data.model.User
 import com.example.dosezy.data.repository.MedicineRepository
@@ -80,7 +81,7 @@ class IntakeSafeguardManagerLifecycleTest {
         timesPerDay = 1,
         frequency = Frequency(FrequencyPattern.DAILY),
         scheduledTimes = listOf(LocalTime.of(8, 0)),
-        currentStock = 30,
+        currentStock = 30.0,
         autoDeductOnTake = true
     )
 
@@ -103,6 +104,7 @@ class IntakeSafeguardManagerLifecycleTest {
 
     @After
     fun tearDown() {
+        AlarmAudioPlayer.stop()
         IntakeSafeguardManager.cancelCountdown(context)
         DosezyDatabase.setInstance(null)
         database.close()
@@ -279,7 +281,7 @@ class IntakeSafeguardManagerLifecycleTest {
 
         // Verify initial state
         val initialMed = database.medicineDao().getMedicineByIdDirect(testMedicine.medicineId)
-        assertEquals(30, initialMed?.currentStock)
+        assertEquals(30.0, initialMed?.currentStock!!, 0.001)
 
         // Start countdown
         IntakeSafeguardManager.startCountdown(
@@ -306,7 +308,7 @@ class IntakeSafeguardManagerLifecycleTest {
         assertEquals(MedicationStatus.TAKEN_ON_TIME, updatedEntry?.status)
 
         val updatedMed = database.medicineDao().getMedicineByIdDirect(testMedicine.medicineId)
-        assertEquals(29, updatedMed?.currentStock)
+        assertEquals(29.0, updatedMed?.currentStock!!, 0.001)
     }
 
     // ─────────────────────────────────────────────────────────────────────────────
@@ -715,8 +717,8 @@ class IntakeSafeguardManagerLifecycleTest {
         val lowStockMed = testMedicine.copy(
             medicineId = "med_low_stock_refill",
             medicationName = "Lisdexamfetamine",
-            currentStock = 5,
-            refillThreshold = 5,
+            currentStock = 5.0,
+            refillThreshold = 5.0,
             autoDeductOnTake = true
         )
         database.medicineDao().insertMedicine(lowStockMed)
@@ -746,7 +748,7 @@ class IntakeSafeguardManagerLifecycleTest {
         // Verify stock dropped from 5 to 4
         val updatedMed = database.medicineDao().getMedicineByIdDirect(lowStockMed.medicineId)
         assertNotNull(updatedMed)
-        assertEquals(4, updatedMed!!.currentStock)
+        assertEquals(4.0, updatedMed!!.currentStock!!, 0.001)
 
         // Verify refill warning notification was posted to NotificationManager
         val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
@@ -763,7 +765,7 @@ class IntakeSafeguardManagerLifecycleTest {
         val siblingMed = testMedicine.copy(
             medicineId = "med_sibling_slot",
             medicationName = "Guanfacine",
-            currentStock = 20
+            currentStock = 20.0
         )
         database.medicineDao().insertMedicine(siblingMed)
 
@@ -1230,6 +1232,504 @@ class IntakeSafeguardManagerLifecycleTest {
         val expectedPrompt = context.getString(com.example.dosezy.R.string.notif_intake_realert_desc, testMedicine.medicationName)
         assertTrue("BigText must contain unconfirmed intake prompt", bigText!!.contains(expectedPrompt))
         assertTrue("BigText must include scheduled time info", bigText.contains("10:00 AM"))
+    }
+
+    @Test
+    fun testNotificationActionReceiver_takenAction_isolatesEntriesToPrimaryProfile() = runBlocking {
+        // Guard: Verify NotificationActionReceiver isolates cohort execution strictly to firstEntry.userId (#BUG-RECEIVER-PROFILE-ISOLATION)
+        val userB = User(
+            userId = "user_b_isolation",
+            fullName = "Patient B",
+            age = 45,
+            gender = Gender.FEMALE,
+            contactNumber = "+1122334455",
+            intakeSafeguardEnabled = false
+        )
+        val medB = Medicine(
+            medicineId = "med_b_isolation",
+            userId = userB.userId,
+            medicationName = "Aspirin",
+            dosage = 100.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            currentStock = 30.0,
+            autoDeductOnTake = true
+        )
+        database.userDao().insertUser(userB)
+        database.medicineDao().insertMedicine(medB)
+
+        val slotTime = LocalDateTime.now().withSecond(0).withNano(0)
+        val entryA = ScheduleEntry(
+            entryId = "entry_a_isolation",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.PENDING
+        )
+        val entryB = ScheduleEntry(
+            entryId = "entry_b_isolation",
+            userId = userB.userId,
+            medicineId = medB.medicineId,
+            scheduledDateTime = slotTime,
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entryA)
+        database.scheduleDao().insertScheduleEntry(entryB)
+
+        val receiver = NotificationActionReceiver()
+        val intent = Intent().apply {
+            action = "TAKEN_ACTION"
+            putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, entryA.entryId)
+            putStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS, arrayListOf(entryA.entryId, entryB.entryId))
+            putExtra(MedicineAlarmReceiver.EXTRA_IS_INTAKE_REALERT, true)
+        }
+
+        receiver.onReceive(context, intent)
+
+        var updatedA: ScheduleEntry? = null
+        for (i in 1..20) {
+            kotlinx.coroutines.delay(50)
+            updatedA = database.scheduleDao().getScheduleEntryById(entryA.entryId)
+            if (updatedA?.status == MedicationStatus.TAKEN_ON_TIME) break
+        }
+
+        assertNotNull(updatedA)
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, updatedA?.status)
+
+        val updatedB = database.scheduleDao().getScheduleEntryById(entryB.entryId)
+        assertNotNull(updatedB)
+        assertEquals("User B entry must remain PENDING and not hijacked by User A action", MedicationStatus.PENDING, updatedB?.status)
+    }
+
+    @Test
+    fun testCancelCountdown_whenDoseExceededMissedThreshold_doesNotScheduleNaggingReminder() = runBlocking {
+        // Guard: Verify IntakeSafeguardManager.cancelCountdown does not re-arm nagging reminder when dose is already missed (#BUG-SAFEGUARD-CANCEL-OVERDUE)
+        val overdueScheduledTime = LocalDateTime.now().minusHours(4)
+        val overdueEntry = ScheduleEntry(
+            entryId = "entry_safeguard_overdue",
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = overdueScheduledTime,
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(overdueEntry)
+
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = overdueEntry.entryId,
+            entryIds = listOf(overdueEntry.entryId),
+            medicineName = testMedicine.medicationName,
+            medicineNames = listOf(testMedicine.medicationName),
+            scheduledTime = "08:00 AM",
+            durationSeconds = 60,
+            userId = testUser.userId
+        )
+
+        assertNotNull("Active countdown should be running", IntakeSafeguardManager.activeCountdown.value)
+
+        IntakeSafeguardManager.cancelCountdown(context, restoreReminderIfPending = true)
+
+        kotlinx.coroutines.delay(100)
+
+        val naggingIntent = Intent(context, MedicineAlarmReceiver::class.java)
+        val pendingNagging = android.app.PendingIntent.getBroadcast(
+            context,
+            overdueEntry.entryId.hashCode() + 2000,
+            naggingIntent,
+            android.app.PendingIntent.FLAG_NO_CREATE or android.app.PendingIntent.FLAG_IMMUTABLE
+        )
+        assertNull("Overdue dose must not have nagging reminder scheduled upon safeguard cancel", pendingNagging)
+    }
+
+    @Test
+    fun testReconcileCountdown_whenPrimaryTaken_updatesUserIdToRemainingUser() = runBlocking {
+        // Guard: Verify reconcileCountdown resolves and updates userId for remaining cohort primary (#BUG-SAFEGUARD-PROFILE-RECONCILE)
+        val userA = User(
+            userId = "user_reconcile_A",
+            fullName = "Patient A",
+            age = 25,
+            gender = Gender.FEMALE,
+            contactNumber = "+1111111111"
+        )
+        val userB = User(
+            userId = "user_reconcile_B",
+            fullName = "Patient B",
+            age = 30,
+            gender = Gender.MALE,
+            contactNumber = "+2222222222"
+        )
+        database.userDao().insertUser(userA)
+        database.userDao().insertUser(userB)
+
+        val medA = Medicine(
+            medicineId = "med_reconcile_A",
+            userId = userA.userId,
+            medicationName = "Medicine A",
+            dosage = 10.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(9, 0))
+        )
+        val medB = Medicine(
+            medicineId = "med_reconcile_B",
+            userId = userB.userId,
+            medicationName = "Medicine B",
+            dosage = 20.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(9, 0))
+        )
+        database.medicineDao().insertMedicine(medA)
+        database.medicineDao().insertMedicine(medB)
+
+        val entryA = ScheduleEntry(
+            entryId = "entry_reconcile_A",
+            userId = userA.userId,
+            medicineId = medA.medicineId,
+            scheduledDateTime = LocalDateTime.now().plusHours(1),
+            status = MedicationStatus.PENDING
+        )
+        val entryB = ScheduleEntry(
+            entryId = "entry_reconcile_B",
+            userId = userB.userId,
+            medicineId = medB.medicineId,
+            scheduledDateTime = LocalDateTime.now().plusHours(1),
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entryA)
+        database.scheduleDao().insertScheduleEntry(entryB)
+
+        IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = entryA.entryId,
+            entryIds = listOf(entryA.entryId, entryB.entryId),
+            medicineName = "Medicine A, Medicine B",
+            medicineNames = listOf("Medicine A", "Medicine B"),
+            scheduledTime = "09:00 AM",
+            durationSeconds = 120,
+            userId = userA.userId
+        )
+
+        assertEquals("Initial countdown must be owned by userA", userA.userId, IntakeSafeguardManager.activeCountdown.value?.userId)
+
+        IntakeSafeguardManager.reconcileCountdown(context, listOf(entryA.entryId))
+
+        val active = IntakeSafeguardManager.activeCountdown.value
+        assertNotNull("Active countdown should remain running for entryB", active)
+        assertEquals("Remaining primary must be entryB", entryB.entryId, active?.entryId)
+        assertEquals("Safeguard owner must update to userB", userB.userId, active?.userId)
+    }
+
+    @Test
+    fun testHandleCountdownExpired_partitionsMultiUserEntriesAndFiresReAlertPerUser() = runBlocking {
+        // Guard: Verify expired intake safeguard partitions multi-user pending entries and fires separate re-alerts (#BUG-SAFEGUARD-MULTIUSER)
+        val user1 = User(
+            userId = "user_expired_1",
+            fullName = "Expired Patient 1",
+            age = 40,
+            gender = Gender.FEMALE,
+            contactNumber = "+3333333333"
+        )
+        val user2 = User(
+            userId = "user_expired_2",
+            fullName = "Expired Patient 2",
+            age = 45,
+            gender = Gender.MALE,
+            contactNumber = "+4444444444"
+        )
+        database.userDao().insertUser(user1)
+        database.userDao().insertUser(user2)
+
+        val med1 = Medicine(
+            medicineId = "med_expired_1",
+            userId = user1.userId,
+            medicationName = "Aspirin",
+            dosage = 100.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+        val med2 = Medicine(
+            medicineId = "med_expired_2",
+            userId = user2.userId,
+            medicationName = "Metformin",
+            dosage = 500.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+        database.medicineDao().insertMedicine(med1)
+        database.medicineDao().insertMedicine(med2)
+
+        val entry1 = ScheduleEntry(
+            entryId = "entry_expired_1",
+            userId = user1.userId,
+            medicineId = med1.medicineId,
+            scheduledDateTime = LocalDateTime.now().minusMinutes(5),
+            status = MedicationStatus.PENDING
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_expired_2",
+            userId = user2.userId,
+            medicineId = med2.medicineId,
+            scheduledDateTime = LocalDateTime.now().minusMinutes(5),
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entry1)
+        database.scheduleDao().insertScheduleEntry(entry2)
+
+        var onCompleteCalled = false
+        IntakeSafeguardManager.handleCountdownExpired(
+            context = context,
+            entryId = entry1.entryId,
+            medicineName = "Aspirin, Metformin",
+            entryIds = listOf(entry1.entryId, entry2.entryId),
+            medicineNames = listOf("Aspirin", "Metformin"),
+            scheduledTime = "08:00 AM",
+            onComplete = {
+                onCompleteCalled = true
+            }
+        )
+
+        val deadline = System.currentTimeMillis() + 3000
+        while (!onCompleteCalled && System.currentTimeMillis() < deadline) {
+            org.robolectric.shadows.ShadowLooper.idleMainLooper()
+            Thread.sleep(20)
+        }
+
+        assertTrue("onComplete must be called when countdown expires", onCompleteCalled)
+
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val activeNotifs = nm.activeNotifications
+        assertTrue("Notification for user 1 entry must be posted", activeNotifs.any { it.id == entry1.entryId.hashCode() })
+        assertTrue("Notification for user 2 entry must be posted separately", activeNotifs.any { it.id == entry2.entryId.hashCode() })
+    }
+
+    @Test
+    fun testInitialize_restoresActiveCountdown_andRearmsAlarmAndNotification() {
+        IntakeSafeguardManager.cancelCountdown(context)
+        assertNull(IntakeSafeguardManager.activeCountdown.value)
+
+        // Start countdown which writes to SharedPreferences
+        val state = IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = "entry_boot_test",
+            entryIds = listOf("entry_boot_test"),
+            medicineName = "Methylphenidate",
+            medicineNames = listOf("Methylphenidate"),
+            scheduledTime = "08:00 AM",
+            durationSeconds = 90,
+            userId = testUser.userId
+        )
+
+        // Clear in-memory StateFlow without wiping persistent prefs to simulate process death
+        val field = IntakeSafeguardManager::class.java.getDeclaredField("_activeCountdown")
+        field.isAccessible = true
+        @Suppress("UNCHECKED_CAST")
+        val flow = field.get(IntakeSafeguardManager) as kotlinx.coroutines.flow.MutableStateFlow<IntakeSafeguardManager.IntakeCountdownState?>
+        flow.value = null
+        assertNull(IntakeSafeguardManager.activeCountdown.value)
+
+        // Guard: Verify initialize re-arms AlarmManager and posts shade notification for active countdown (#BUG-SAFEGUARD-BOOT-RESTORE)
+        IntakeSafeguardManager.initialize(context)
+
+        val active = IntakeSafeguardManager.activeCountdown.value
+        assertNotNull("Active countdown must be restored on initialize", active)
+        assertEquals("entry_boot_test", active?.entryId)
+        assertEquals(testUser.userId, active?.userId)
+
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val activeNotifs = nm.activeNotifications
+        assertTrue(
+            "Shade notification must be reposted on initialize",
+            activeNotifs.any { it.id == IntakeSafeguardManager.INTAKE_NOTIFICATION_BASE_ID }
+        )
+
+        val am = context.getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
+        val shadowAm = org.robolectric.Shadows.shadowOf(am)
+        val scheduledAlarm = shadowAm.nextScheduledAlarm
+        assertNotNull("AlarmManager exact alarm must be re-armed on initialize", scheduledAlarm)
+        assertEquals(state.targetTimestamp, scheduledAlarm!!.triggerAtTime)
+
+        val shadowIntent = org.robolectric.Shadows.shadowOf(scheduledAlarm.operation)
+        assertEquals(MedicineAlarmReceiver.ACTION_INTAKE_SAFEGUARD_EXPIRED, shadowIntent.savedIntent.action)
+        assertEquals(testUser.userId, shadowIntent.savedIntent.getStringExtra(MedicineAlarmReceiver.EXTRA_USER_ID))
+
+        IntakeSafeguardManager.cancelCountdown(context)
+    }
+
+    @Test
+    fun testAlarmScheduler_scheduleIntakeSafeguardAlarm_attachesExtraUserId() {
+        val scheduler = AlarmScheduler(context)
+        val triggerTime = System.currentTimeMillis() + 60_000L
+        // Guard: Verify scheduleIntakeSafeguardAlarm attaches EXTRA_USER_ID to preserve user profile attribution (#BUG-SAFEGUARD-USER-ID)
+        scheduler.scheduleIntakeSafeguardAlarm(
+            entryId = "entry_uid_test",
+            triggerTime = triggerTime,
+            medicineName = "Test Med",
+            scheduledTime = "09:00 AM",
+            userId = "user_adhd_104"
+        )
+
+        val am = context.getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
+        val shadowAm = org.robolectric.Shadows.shadowOf(am)
+        val scheduledAlarm = shadowAm.nextScheduledAlarm
+        assertNotNull("Safeguard alarm must be scheduled", scheduledAlarm)
+
+        val shadowIntent = org.robolectric.Shadows.shadowOf(scheduledAlarm!!.operation)
+        assertEquals(MedicineAlarmReceiver.ACTION_INTAKE_SAFEGUARD_EXPIRED, shadowIntent.savedIntent.action)
+        assertEquals("user_adhd_104", shadowIntent.savedIntent.getStringExtra(MedicineAlarmReceiver.EXTRA_USER_ID))
+
+        scheduler.cancelIntakeSafeguardAlarm("entry_uid_test")
+    }
+
+    @Test
+    fun testHandleCountdownExpired_respectsPerMedicineReminderTypeOverride() = runBlocking {
+        AlarmAudioPlayer.stop()
+
+        // User default is NOTIFICATION
+        val userNotifDefault = User(
+            userId = "user_override_test",
+            fullName = "Notification User",
+            age = 40,
+            gender = Gender.MALE,
+            contactNumber = "+11223344",
+            reminderType = ReminderType.NOTIFICATION
+        )
+        // Medicine has explicit ALARM override
+        val medWithAlarmOverride = Medicine(
+            medicineId = "med_alarm_override_1",
+            userId = userNotifDefault.userId,
+            medicationName = "Urgent Heart Med",
+            dosage = 50.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            reminderType = ReminderType.ALARM
+        )
+        database.userDao().insertUser(userNotifDefault)
+        database.medicineDao().insertMedicine(medWithAlarmOverride)
+
+        val entry = ScheduleEntry(
+            entryId = "entry_alarm_override_1",
+            userId = userNotifDefault.userId,
+            medicineId = medWithAlarmOverride.medicineId,
+            scheduledDateTime = LocalDateTime.now().minusMinutes(5),
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entry)
+
+        var onCompleteCalled = false
+        // Guard: Verify handleCountdownExpired triggers alarm mode when medicine has ALARM override despite NOTIFICATION user default (#111)
+        IntakeSafeguardManager.handleCountdownExpired(
+            context = context,
+            entryId = entry.entryId,
+            medicineName = medWithAlarmOverride.medicationName,
+            entryIds = listOf(entry.entryId),
+            medicineNames = listOf(medWithAlarmOverride.medicationName),
+            scheduledTime = "08:00 AM",
+            userId = userNotifDefault.userId,
+            onComplete = { onCompleteCalled = true }
+        )
+
+        val deadline = System.currentTimeMillis() + 3000
+        while (!onCompleteCalled && System.currentTimeMillis() < deadline) {
+            org.robolectric.shadows.ShadowLooper.idleMainLooper()
+            Thread.sleep(20)
+        }
+
+        assertTrue("onComplete must be called", onCompleteCalled)
+
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val realertNotif = nm.activeNotifications.firstOrNull { it.id == entry.entryId.hashCode() }?.notification
+        assertNotNull("Re-alert notification must be posted", realertNotif)
+        assertEquals(
+            "Notification priority must be PRIORITY_MAX for ALARM mode",
+            androidx.core.app.NotificationCompat.PRIORITY_MAX,
+            realertNotif?.priority
+        )
+        assertEquals(
+            "Notification category must be CATEGORY_ALARM for ALARM mode",
+            androidx.core.app.NotificationCompat.CATEGORY_ALARM,
+            realertNotif?.category
+        )
+    }
+
+    @Test
+    fun showIntakeNotification_respectsTargetUserLockscreenPrivacy() = runBlocking {
+        // Guard: Verify intake safeguard notification masks medicine name on lock screen when target user has lockscreenDetailsEnabled == false (#BUG-SAFEGUARD-LOCKSCREEN)
+        val privateUser = User(
+            userId = "user_lockscreen_private",
+            fullName = "Private User",
+            gender = Gender.DO_NOT_SPECIFY,
+            age = 29,
+            contactNumber = "999888777",
+            lockscreenDetailsEnabled = false,
+            isCurrentUser = false
+        )
+        database.userDao().insertUser(privateUser)
+
+        val state = IntakeSafeguardManager.IntakeCountdownState(
+            entryId = "entry_lockscreen_test",
+            entryIds = listOf("entry_lockscreen_test"),
+            medicineName = "Top Secret Med",
+            medicineNames = listOf("Top Secret Med"),
+            scheduledTime = "08:00 AM",
+            startTimestamp = System.currentTimeMillis(),
+            targetTimestamp = System.currentTimeMillis() + 60_000L,
+            totalDurationSeconds = 60,
+            userId = privateUser.userId
+        )
+
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        IntakeSafeguardManager.showIntakeNotification(context, state)
+
+        val notif = nm.activeNotifications.firstOrNull { it.id == IntakeSafeguardManager.INTAKE_NOTIFICATION_BASE_ID }?.notification
+        assertNotNull("Intake countdown notification must be active", notif)
+        assertEquals(
+            "Notification visibility must be PRIVATE when target profile has lockscreenDetailsEnabled = false",
+            androidx.core.app.NotificationCompat.VISIBILITY_PRIVATE,
+            notif?.visibility
+        )
+        assertNotNull("Public version notification must be set for lock screen masking", notif?.publicVersion)
+
+        IntakeSafeguardManager.dismissIntakeNotification(context)
+    }
+
+    @Test
+    fun getPersistedState_restoresStateFromPreferencesWhenInMemoryStateIsNull() {
+        // Guard: Verify getPersistedState returns persisted state from preferences even when in-memory StateFlow is lost (#BUG-SAFEGUARD-PERSISTED)
+        IntakeSafeguardManager.cancelCountdown(context)
+        assertNull(IntakeSafeguardManager.activeCountdown.value)
+
+        val prefs = context.getSharedPreferences("dosezy_intake_safeguard", Context.MODE_PRIVATE)
+        prefs.edit()
+            .putString("entry_id", "entry_persisted_test")
+            .putString("entry_ids", "entry_persisted_test")
+            .putString("med_name", "Aspirin")
+            .putString("med_names", "Aspirin")
+            .putString("scheduled_time", "09:00 AM")
+            .putLong("start_time", 1000L)
+            .putLong("target_time", 5000L)
+            .putInt("duration_sec", 120)
+            .putString("user_id", "user_persisted_abc")
+            .apply()
+
+        assertNull("In-memory countdown must remain null before restoration", IntakeSafeguardManager.activeCountdown.value)
+        val persisted = IntakeSafeguardManager.getPersistedState(context)
+        assertNotNull("getPersistedState must return state from preferences", persisted)
+        assertEquals("entry_persisted_test", persisted?.entryId)
+        assertEquals("user_persisted_abc", persisted?.userId)
+
+        IntakeSafeguardManager.cancelCountdown(context)
+        assertNull(IntakeSafeguardManager.getPersistedState(context))
     }
 }
 

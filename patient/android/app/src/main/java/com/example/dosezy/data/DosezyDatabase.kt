@@ -22,7 +22,7 @@ import com.example.dosezy.data.model.User
 
 @Database(
     entities = [User::class, Medicine::class, ScheduleEntry::class],
-    version = 20,
+    version = 22,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -160,6 +160,28 @@ abstract class DosezyDatabase : RoomDatabase() {
             }
         }
 
+        // Guard: Migration 20->21 converts legacy hour-based considerLateAfter and considerMissedAfter (< 15) to minutes (#119)
+        val MIGRATION_20_21 = object : Migration(20, 21) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("UPDATE users SET considerLateAfter = considerLateAfter * 60 WHERE considerLateAfter > 0 AND considerLateAfter < 15")
+                db.execSQL("UPDATE users SET considerMissedAfter = considerMissedAfter * 60 WHERE considerMissedAfter > 0 AND considerMissedAfter < 15")
+            }
+        }
+
+        // Guard: Migration 21->22 migrates currentStock and refillThreshold to REAL to support half doses and fractional inventory tracking (#123)
+        // Guard: Explicitly disable foreign keys before dropping medicines table to prevent SQLite ON DELETE CASCADE from wiping schedule_entries
+        val MIGRATION_21_22 = object : Migration(21, 22) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("PRAGMA foreign_keys = OFF")
+                db.execSQL("CREATE TABLE IF NOT EXISTS `medicines_new` (`medicineId` TEXT NOT NULL, `userId` TEXT NOT NULL, `medicationName` TEXT NOT NULL, `dosage` REAL NOT NULL, `dosageUnit` TEXT NOT NULL, `timesPerDay` INTEGER NOT NULL, `frequency` TEXT NOT NULL, `scheduledTimes` TEXT NOT NULL, `imageUri` TEXT, `currentStock` REAL, `refillThreshold` REAL, `autoDeductOnTake` INTEGER NOT NULL, `notes` TEXT, `pillShape` TEXT NOT NULL, `pillColor` TEXT NOT NULL, `startDate` INTEGER, `endDate` INTEGER, `durationDays` INTEGER, `isArchived` INTEGER NOT NULL, `customDosages` TEXT, `reminderType` TEXT, PRIMARY KEY(`medicineId`), FOREIGN KEY(`userId`) REFERENCES `users`(`userId`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+                db.execSQL("INSERT INTO `medicines_new` (`medicineId`, `userId`, `medicationName`, `dosage`, `dosageUnit`, `timesPerDay`, `frequency`, `scheduledTimes`, `imageUri`, `currentStock`, `refillThreshold`, `autoDeductOnTake`, `notes`, `pillShape`, `pillColor`, `startDate`, `endDate`, `durationDays`, `isArchived`, `customDosages`, `reminderType`) SELECT `medicineId`, `userId`, `medicationName`, `dosage`, `dosageUnit`, `timesPerDay`, `frequency`, `scheduledTimes`, `imageUri`, `currentStock`, `refillThreshold`, `autoDeductOnTake`, `notes`, `pillShape`, `pillColor`, `startDate`, `endDate`, `durationDays`, `isArchived`, `customDosages`, `reminderType` FROM `medicines`")
+                db.execSQL("DROP TABLE `medicines`")
+                db.execSQL("ALTER TABLE `medicines_new` RENAME TO `medicines`")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_medicines_userId` ON `medicines` (`userId`)")
+                db.execSQL("PRAGMA foreign_keys = ON")
+            }
+        }
+
         // Guard: Visible for testing to inject in-memory database instance into broadcast receivers and static managers
         @androidx.annotation.VisibleForTesting
         fun setInstance(db: DosezyDatabase?) {
@@ -173,7 +195,7 @@ abstract class DosezyDatabase : RoomDatabase() {
                     DosezyDatabase::class.java,
                     "dosezy_database"
                 )
-                    .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19, MIGRATION_19_20)
+                    .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19, MIGRATION_19_20, MIGRATION_20_21, MIGRATION_21_22)
                     .addCallback(object : RoomDatabase.Callback() {
                         override fun onOpen(db: SupportSQLiteDatabase) {
                             super.onOpen(db)

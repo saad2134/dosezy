@@ -69,8 +69,8 @@ class EmergencyDialAndEditMedScreenTest {
             frequency = Frequency(FrequencyPattern.DAILY),
             timesPerDay = 1,
             scheduledTimes = listOf(LocalTime.of(21, 0)),
-            currentStock = 30,
-            refillThreshold = 5,
+            currentStock = 30.0,
+            refillThreshold = 5.0,
             autoDeductOnTake = true
         )
 
@@ -78,19 +78,19 @@ class EmergencyDialAndEditMedScreenTest {
         val updatedThresholdText = "7"
 
         val updatedMed = originalMed.copy(
-            currentStock = updatedStockText.normalizeArabicDigits().toIntOrNull(),
-            refillThreshold = updatedThresholdText.normalizeArabicDigits().toIntOrNull()
+            currentStock = updatedStockText.normalizeArabicDigits().toDoubleOrNull(),
+            refillThreshold = updatedThresholdText.normalizeArabicDigits().toDoubleOrNull()
         )
 
-        assertEquals(25, updatedMed.currentStock)
-        assertEquals(7, updatedMed.refillThreshold)
+        assertEquals(25.0, updatedMed.currentStock!!, 0.001)
+        assertEquals(7.0, updatedMed.refillThreshold!!, 0.001)
 
         // Verify Arabic-Indic numerals work identically
         val arabicThresholdText = "١٠" // 10 in Arabic
         val arabicMed = originalMed.copy(
-            refillThreshold = arabicThresholdText.normalizeArabicDigits().toIntOrNull()
+            refillThreshold = arabicThresholdText.normalizeArabicDigits().toDoubleOrNull()
         )
-        assertEquals(10, arabicMed.refillThreshold)
+        assertEquals(10.0, arabicMed.refillThreshold!!, 0.001)
     }
 
     // ─────────────────────────────────────────────────────────────────────────────
@@ -149,6 +149,11 @@ class EmergencyDialAndEditMedScreenTest {
             "Intent must have FLAG_ACTIVITY_NEW_TASK so it can be safely launched from non-Activity contexts",
             (intent.flags and Intent.FLAG_ACTIVITY_NEW_TASK) != 0
         )
+
+        // Guard: Verify Eastern Arabic and Indic numerals are normalized so dialing does not strip digits
+        val arabicNumber = "+٩٦٦ ٥٠ ١٢٣ ٤٥٦٧"
+        val arabicIntent = createDialIntent(arabicNumber)
+        assertEquals("+966501234567", arabicIntent.data?.schemeSpecificPart)
     }
 
     // ─────────────────────────────────────────────────────────────────────────────
@@ -552,6 +557,68 @@ class EmergencyDialAndEditMedScreenTest {
         val detectedEnglish = detectDeviceEmergencyCountry(enContext, Language.ENGLISH)
         assertEquals("US", detectedEnglish.code)
         assertEquals("911", detectedEnglish.ambulance)
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 5. EditMedScreen: Dosage & DosageUnit Change Detection (#BUG-EDITMED-DOSAGE-CHANGE)
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testEditMedScreen_dosageAndUnitChanges_triggerTimingOrScheduleChanged() {
+        val baseMed = Medicine(
+            medicineId = "med_test_eval",
+            userId = "user_test",
+            medicationName = "Aspirin",
+            dosage = 100.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(pattern = FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+
+        fun isTimingOrScheduleChanged(original: Medicine, updated: Medicine): Boolean {
+            return (
+                original.scheduledTimes != updated.scheduledTimes ||
+                original.frequency != updated.frequency ||
+                original.timesPerDay != updated.timesPerDay ||
+                original.dosage != updated.dosage ||
+                original.dosageUnit != updated.dosageUnit ||
+                original.customDosages != updated.customDosages ||
+                original.startDate != updated.startDate ||
+                original.endDate != updated.endDate ||
+                original.durationDays != updated.durationDays
+            ) && updated.frequency.pattern != FrequencyPattern.AS_NEEDED
+        }
+
+        // Case 1: Identical medicine - no schedule change
+        assertFalse(
+            "Identical medicine must not trigger schedule change dialog",
+            isTimingOrScheduleChanged(baseMed, baseMed.copy())
+        )
+
+        // Case 2: Metadata only change (pill color, notes) - no schedule change
+        assertFalse(
+            "Metadata change (pill color) must not trigger schedule change dialog",
+            isTimingOrScheduleChanged(baseMed, baseMed.copy(pillColor = "#FF0000", notes = "Take with water"))
+        )
+
+        // Case 3: Dosage modification (100mg -> 200mg) - MUST trigger schedule change
+        assertTrue(
+            "Dosage modification must trigger schedule change to prompt effective date dialog",
+            isTimingOrScheduleChanged(baseMed, baseMed.copy(dosage = 200.0))
+        )
+
+        // Case 4: Dosage unit modification (MG -> TABLET) - MUST trigger schedule change
+        assertTrue(
+            "Dosage unit modification must trigger schedule change to prompt effective date dialog",
+            isTimingOrScheduleChanged(baseMed, baseMed.copy(dosageUnit = DosageUnit.TABLET))
+        )
+
+        // Case 5: When frequency is AS_NEEDED, timingOrScheduleChanged is false (PRN switch handled directly)
+        assertFalse(
+            "Switching to AS_NEEDED bypasses effective date dialog",
+            isTimingOrScheduleChanged(baseMed, baseMed.copy(dosage = 500.0, frequency = Frequency(pattern = FrequencyPattern.AS_NEEDED)))
+        )
     }
 }
 

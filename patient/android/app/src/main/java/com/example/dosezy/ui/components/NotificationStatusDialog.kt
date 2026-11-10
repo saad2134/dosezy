@@ -159,6 +159,7 @@ private fun createNotificationStatuses(
 ): List<NotificationStatus> {
     val notificationPermStatus = NotificationUtils.hasNotificationPermission(context)
     val exactAlarmsStatus = NotificationUtils.canScheduleExactAlarms(context)
+    val fullScreenStatus = NotificationUtils.canUseFullScreenIntent(context)
     val overlayStatus = NotificationUtils.canDrawOverlays(context)
     val backgroundPermStatus = NotificationUtils.isIgnoringBatteryOptimizations(context)
     val soundStatus = NotificationUtils.isPhoneNotSilent(context)
@@ -217,7 +218,7 @@ private fun createNotificationStatuses(
     )
 
     if (com.example.dosezy.BuildConfig.SUPPORTS_OVERLAY_PERMISSION) {
-        // Display Over Apps (F-Droid flavor only: OEM popup assistance for Xiaomi/MIUI)
+        // Display Over Apps: Enables full-screen alarm popups over active apps and assists Xiaomi/HyperOS background window display
         statuses.add(
             NotificationStatus(
                 title = context.getString(com.example.dosezy.R.string.notif_overlay_title),
@@ -239,6 +240,35 @@ private fun createNotificationStatuses(
                 onFixClick = {
                     if (!overlayStatus) {
                         NotificationUtils.requestOverlayPermission(context)
+                    }
+                }
+            )
+        )
+    }
+
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        // Full-Screen Intent: Android 14+ special app access to wake screen and show alarms over lock screen
+        statuses.add(
+            NotificationStatus(
+                title = context.getString(com.example.dosezy.R.string.notif_fullscreen_title),
+                description = if (fullScreenStatus) {
+                    context.getString(com.example.dosezy.R.string.notif_fullscreen_granted)
+                } else {
+                    context.getString(com.example.dosezy.R.string.notif_fullscreen_desc)
+                },
+                isPassed = fullScreenStatus,
+                isWarning = false,
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.WorkOutline,
+                        contentDescription = "Full-Screen Alarm Popups",
+                        modifier = Modifier.size(30.dp),
+                        tint = if (fullScreenStatus) Color(0xFF10B981) else Color(0xFFEF4444)
+                    )
+                },
+                onFixClick = {
+                    if (!fullScreenStatus) {
+                        NotificationUtils.requestFullScreenIntentPermission(context)
                     }
                 }
             )

@@ -473,4 +473,57 @@ class ScheduleGenerationTest {
             dates
         )
     }
+
+    @Test
+    fun generateScheduleEntries_futureStartDateBeyond30Days_generatesFullWindowStartingFromStartDate() {
+        // Guard: Verify ScheduleRecurrenceEngine generates full window for future-dated medicines beyond 30 days rather than returning empty list (#BUG-RECURRENCE-FUTURE-START)
+        val today = LocalDate.of(2026, 11, 8)
+        val futureStart = today.plusDays(40)
+        val m = med(
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0)),
+            start = futureStart
+        )
+
+        val entries = m.generateScheduleEntries(startDateRange = today, days = 30)
+        assertEquals(31, entries.size)
+        assertEquals(futureStart, entries.first().scheduledDateTime.toLocalDate())
+        assertEquals(futureStart.plusDays(30), entries.last().scheduledDateTime.toLocalDate())
+    }
+
+    @Test
+    fun generateScheduleEntries_futureStartDateWithin30Days_generatesEntriesUpToRangeEnd() {
+        // Guard: Verify ScheduleRecurrenceEngine generates entries within range for future-dated medicines starting within the active window (#BUG-RECURRENCE-FUTURE-START)
+        val today = LocalDate.of(2026, 11, 8)
+        val futureStart = today.plusDays(15)
+        val m = med(
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0)),
+            start = futureStart
+        )
+
+        val entries = m.generateScheduleEntries(startDateRange = today, days = 30)
+        assertEquals(16, entries.size)
+        assertEquals(futureStart, entries.first().scheduledDateTime.toLocalDate())
+        assertEquals(today.plusDays(30), entries.last().scheduledDateTime.toLocalDate())
+    }
+
+    @Test
+    fun generateScheduleEntries_futureStartDateWithExplicitEndDate_clampsToEndDate() {
+        // Guard: Verify explicit endDate properly clamps the generation window for future-dated medicines
+        val today = LocalDate.of(2026, 11, 8)
+        val futureStart = today.plusDays(10)
+        val explicitEnd = futureStart.plusDays(5)
+        val m = med(
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0)),
+            start = futureStart,
+            end = explicitEnd
+        )
+
+        val entries = m.generateScheduleEntries(startDateRange = today, days = 30)
+        assertEquals(6, entries.size)
+        assertEquals(futureStart, entries.first().scheduledDateTime.toLocalDate())
+        assertEquals(explicitEnd, entries.last().scheduledDateTime.toLocalDate())
+    }
 }

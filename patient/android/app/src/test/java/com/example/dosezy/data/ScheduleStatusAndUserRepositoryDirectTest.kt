@@ -515,7 +515,7 @@ class ScheduleStatusAndUserRepositoryDirectTest {
     fun testUndoDoseTaken_preservesUserClinicalNotes_whileStrippingPartialStockAuditTag() = runBlocking {
         val user = sampleUser("user_notes_test")
         userDao.insertUser(user)
-        val med = sampleMedicine("med_notes_test", "user_notes_test", name = "Metformin").copy(currentStock = 1, autoDeductOnTake = true)
+        val med = sampleMedicine("med_notes_test", "user_notes_test", name = "Metformin").copy(currentStock = 1.0, autoDeductOnTake = true)
         medicineDao.insertMedicine(med)
 
         val slotTime = LocalDateTime.of(2026, 10, 17, 9, 0, 0)
@@ -665,6 +665,48 @@ class ScheduleStatusAndUserRepositoryDirectTest {
             MedicineAlarmReceiver.NOTIFICATION_CHANNEL_ID,
             remainingNotif!!.notification.channelId
         )
+    }
+
+    @Test
+    fun logAsNeededDose_executesAtomicallyWithStockDeductionAndPartialNotes() = runBlocking {
+        // Guard: Verify logAsNeededDose inserts PRN schedule entry, decrements stock atomically, and logs partial stock tag (#BUG-PRN-TRANSACTION)
+        val user = sampleUser("user_prn_test")
+        userDao.insertUser(user)
+
+        val prnMed = sampleMedicine("med_prn_1", user.userId, "Ibuprofen PRN").copy(
+            dosage = 2.0,
+            dosageUnit = DosageUnit.TABLET,
+            frequency = Frequency(FrequencyPattern.AS_NEEDED),
+            currentStock = 1.0,
+            autoDeductOnTake = true,
+            refillThreshold = 2.0
+        )
+        medicineDao.insertMedicine(prnMed)
+
+        val scheduleRepository = com.example.dosezy.data.repository.ScheduleRepository(db)
+        val now = LocalDateTime.now()
+
+        scheduleRepository.logAsNeededDose(
+            medicine = prnMed,
+            userId = user.userId,
+            dateTime = now,
+            context = context
+        )
+
+        val allEntries = scheduleDao.getAllScheduleEntries(user.userId)
+        assertEquals(1, allEntries.size)
+        val prnEntry = allEntries.first()
+        assertTrue("Entry ID must start with PRN_", prnEntry.entryId.startsWith("PRN_"))
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, prnEntry.status)
+        assertEquals(2.0, prnEntry.dosage ?: 0.0, 0.001)
+
+        val updatedMed = medicineDao.getMedicineByIdDirect(prnMed.medicineId)
+        assertNotNull(updatedMed)
+        assertEquals(0.0, updatedMed!!.currentStock!!, 0.001)
+
+        val refreshedEntry = scheduleDao.getScheduleEntryById(prnEntry.entryId)
+        assertNotNull(refreshedEntry)
+        assertTrue(refreshedEntry!!.doseNotes?.contains("[Partial Stock: Took 1 of 2]") == true)
     }
 }
 

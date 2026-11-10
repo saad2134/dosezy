@@ -316,7 +316,7 @@
 
     <string name="stock_current">Inventario Actual</string>
     <string name="stock_refill_threshold">Alerta de reabastecimiento bajo</string>
-    <string name="stock_units_left">%d unidades restantes</string>
+    <string name="stock_units_left">%s unidades restantes</string>
     <string name="refill_alert_title">Alerta de reabastecimiento: %s</string>
     <string name="preset_1x_daily">1x al día (8:00 AM)</string>
     <string name="preset_2x_daily">2x al día (8:00 AM, 8:00 PM)</string>
@@ -419,7 +419,7 @@
     <string name="med_stock_placeholder">ej. 30</string>
     <string name="med_threshold_placeholder">ej. 5</string>
     <string name="notif_refill_alert_title">Alerta de reposición: %1$s</string>
-    <string name="notif_refill_alert_text">Quedan pocas existencias: %1$d unidades restantes. Por favor reponga pronto.</string>
+    <string name="notif_refill_alert_text">Quedan pocas existencias: %1$s unidades restantes. Por favor reponga pronto.</string>
     <string name="notif_channel_name">Recordatorios de medicamentos</string>
     <string name="notif_channel_desc">Notificaciones de horarios de toma de medicamentos</string>
     <string name="import_profile_conflict_warn">El nombre del perfil ya existe localmente</string>
@@ -453,8 +453,8 @@
     <string name="err_cannot_open_link">No se puede abrir el enlace</string>
     <string name="err_no_email_app">No hay aplicaciones de correo electrónico disponibles</string>
     <string name="err_share_failed">Error al compartir: %1$s</string>
-    <string name="med_stock_refill_warning_badge">⚠️ Reposición: quedan %1$d</string>
-    <string name="med_stock_badge">📦 Stock: %1$d</string>
+    <string name="med_stock_refill_warning_badge">⚠️ Reposición: quedan %1$s</string>
+    <string name="med_stock_badge">📦 Stock: %1$s</string>
     <string name="to_be_taken_in">Por tomar en %1$dh %2$dm</string>
     <string name="time_diff_ago">Hace %1$dh %2$dm</string>
     <string name="status_all_medications_taken">Todos los medicamentos tomados</string>
@@ -518,7 +518,7 @@
     <string name="quick_refill_preset_30">+30</string>
     <string name="quick_refill_preset_60">+60</string>
     <string name="quick_refill_preset_90">+90</string>
-    <string name="quick_refill_success">Stock repuesto para %1$s. Nuevo saldo: %2$d</string>
+    <string name="quick_refill_success">Stock repuesto para %1$s. Nuevo saldo: %2$s</string>
 
     <string name="no_scheduled_doses_today">No hay dosis programadas para hoy</string>
     <string name="prn_confirm_log_title">Registrar dosis</string>
@@ -530,8 +530,10 @@
     <string name="pref_nagging_interval">Intervalo de insistencia</string>
     <string name="pref_nagging_max_repeats">Repeticiones máximas</string>
     <string name="pref_nagging_repeats_format">%1$d veces</string>
+    <string name="pref_nagging_repeats_continuous">Continuo (Hasta tomar)</string>
     <string name="notif_nagging_title">Seguimiento: %1$s</string>
     <string name="notif_nagging_text">Recordatorio %1$d/%2$d: La dosis de %3$s aún está pendiente.</string>
+    <string name="notif_nagging_text_continuous">Recordatorio #%1$d: La dosis de %2$s aún está pendiente.</string>
 
     <string name="widget_title">Dosezy Hoy</string>
     <string name="widget_no_meds">No hay dosis próximas</string>
@@ -608,7 +610,7 @@
     <string name="alarm_snooze_format">POSPONER (%d MIN)</string>
     <string name="notif_action_snooze_format">Posponer (%d min)</string>
     <string name="alarm_snoozed_toast">Alarma pospuesta por %d minutos</string>
-    <string name="alarm_stock_remaining">Existencias: %d unidades restantes</string>
+    <string name="alarm_stock_remaining">Existencias: %s unidades restantes</string>
     <string name="home_action_take">Tomar</string>
     <string name="home_action_taken">Tomado</string>
     <string name="home_action_missed">Perdido</string>
@@ -672,7 +674,7 @@
     <string name="pharmacy_order_copy">Copiar texto</string>
     <string name="pharmacy_order_copied">Pedido copiado al portapapeles</string>
     <string name="pharmacy_order_empty">No hay medicamentos disponibles para pedir</string>
-    <string name="pharmacy_order_current_stock">Stock actual: quedan %1$d %2$s</string>
+    <string name="pharmacy_order_current_stock">Stock actual: quedan %1$s %2$s</string>
     <string name="pharmacy_order_qty_needed">Cantidad a pedir: %1$d %2$s</string>
     <string name="pharmacy_order_patient_header">Paciente: %1$s</string>
     <string name="pharmacy_order_date_header">Fecha: %1$s</string>
@@ -685,6 +687,9 @@
 
     <string name="about_community_open_source">Comunidad y código abierto</string>
     <string name="about_version_build">Versión %1$s (Compilación %2$s)</string>
+    <string name="about_build_play">Compilación Marketplace</string>
+    <string name="about_build_foss">Compilación FOSS</string>
+    <string name="about_social_links_title">Redes sociales</string>
     <string name="country_india">India</string>
     <string name="country_us_ca">Estados Unidos / Canadá</string>
     <string name="country_uk">Reino Unido</string>
@@ -699,7 +704,7 @@
     <string name="pharmacy_order_days_supply">Días de suministro</string>
     <string name="pharmacy_order_days_format_short">%1$d d</string>
     <string name="pharmacy_order_medicines_include">Medicamentos a incluir (%1$d/%2$d)</string>
-    <string name="pharmacy_order_stock_left">%1$d restantes</string>
+    <string name="pharmacy_order_stock_left">%1$s restantes</string>
     <string name="pharmacy_order_no_stock_tracked">Sin seguimiento de stock</string>
     <string name="pharmacy_order_header_title">📋 *Pedido de medicamentos*</string>
     <string name="pharmacy_order_frequency_format">Frecuencia: %1$dx al día</string>
@@ -892,4 +897,16 @@
     <string name="notif_channel_notifications_desc">Alertas de notificación estándar para horarios de medicación respetando No molestar</string>
     <string name="form_reminder_type">Estilo de recordatorio</string>
     <string name="form_reminder_type_desc">Elija Alarma para medicamentos críticos o Notificación para suplementos</string>
+
+    <!-- Medicine Order & Sorting (#120) -->
+    <string name="sort_medicines_title">Ordenar y organizar</string>
+    <string name="sort_preset_default">Predeterminado (Fecha de adición)</string>
+    <string name="sort_preset_name_asc">Nombre (A a la Z)</string>
+    <string name="sort_preset_name_desc">Nombre (Z a la A)</string>
+    <string name="sort_preset_time_asc">Hora programada (Más temprano primero)</string>
+    <string name="sort_preset_custom">Orden personalizado</string>
+    <string name="sort_custom_reorder_title">Editar orden de medicamentos</string>
+    <string name="sort_custom_reorder_desc">Use las flechas para ajustar el orden de sus medicamentos.</string>
+    <string name="sort_move_up">Mover hacia arriba</string>
+    <string name="sort_move_down">Mover hacia abajo</string>
 </resources>

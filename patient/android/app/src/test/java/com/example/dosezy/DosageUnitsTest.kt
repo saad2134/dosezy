@@ -25,7 +25,7 @@ class DosageUnitsTest {
         dosage: Double,
         unit: DosageUnit,
         timesPerDay: Int = 1,
-        stock: Int = 100,
+        stock: Double = 100.0,
         pattern: FrequencyPattern = FrequencyPattern.DAILY
     ): Medicine {
         return Medicine(
@@ -57,7 +57,7 @@ class DosageUnitsTest {
         assertEquals("ampule", DosageUnit.AMPULE.displayName)
         assertEquals("mg", DosageUnit.MG.displayName)
         assertEquals("mcg", DosageUnit.MCG.displayName)
-        assertEquals("ml", DosageUnit.ML.displayName)
+        assertEquals("mL", DosageUnit.ML.displayName)
         assertEquals("drop", DosageUnit.DROP.displayName)
         assertEquals("tablet", DosageUnit.TABLET.displayName)
         assertEquals("capsule", DosageUnit.CAPSULE.displayName)
@@ -86,31 +86,31 @@ class DosageUnitsTest {
     fun testStockDeductionAmount() {
         // MEQ: physical stock is measured in discrete tablets/packets, consume 1 unit per intake
         val meqMed10 = createMedicine(10.0, DosageUnit.MEQ)
-        assertEquals(1, meqMed10.getStockDeductionAmount())
+        assertEquals(1.0, meqMed10.getStockDeductionAmount(), 0.001)
         val meqMed20 = createMedicine(20.0, DosageUnit.MEQ)
-        assertEquals(1, meqMed20.getStockDeductionAmount())
+        assertEquals(1.0, meqMed20.getStockDeductionAmount(), 0.001)
 
         // PUFF: inhaler canister tracks total actuations, consume intake dosage count
         val puffMed1 = createMedicine(1.0, DosageUnit.PUFF)
-        assertEquals(1, puffMed1.getStockDeductionAmount())
+        assertEquals(1.0, puffMed1.getStockDeductionAmount(), 0.001)
         val puffMed2 = createMedicine(2.0, DosageUnit.PUFF)
-        assertEquals(2, puffMed2.getStockDeductionAmount())
+        assertEquals(2.0, puffMed2.getStockDeductionAmount(), 0.001)
         val puffMed4 = createMedicine(4.0, DosageUnit.PUFF)
-        assertEquals(4, puffMed4.getStockDeductionAmount())
+        assertEquals(4.0, puffMed4.getStockDeductionAmount(), 0.001)
 
         // AMPULE: single-use containers, consume 1..10 or clamp to 1
         val ampuleMed1 = createMedicine(1.0, DosageUnit.AMPULE)
-        assertEquals(1, ampuleMed1.getStockDeductionAmount())
+        assertEquals(1.0, ampuleMed1.getStockDeductionAmount(), 0.001)
         val ampuleMed2 = createMedicine(2.0, DosageUnit.AMPULE)
-        assertEquals(2, ampuleMed2.getStockDeductionAmount())
+        assertEquals(2.0, ampuleMed2.getStockDeductionAmount(), 0.001)
         val ampuleMedLarge = createMedicine(50.0, DosageUnit.AMPULE)
-        assertEquals(1, ampuleMedLarge.getStockDeductionAmount())
+        assertEquals(1.0, ampuleMedLarge.getStockDeductionAmount(), 0.001)
 
         // SPRAY: spray bottle tracks metered sprays, consume intake dosage count
         val sprayMed1 = createMedicine(1.0, DosageUnit.SPRAY)
-        assertEquals(1, sprayMed1.getStockDeductionAmount())
+        assertEquals(1.0, sprayMed1.getStockDeductionAmount(), 0.001)
         val sprayMed2 = createMedicine(2.0, DosageUnit.SPRAY)
-        assertEquals(2, sprayMed2.getStockDeductionAmount())
+        assertEquals(2.0, sprayMed2.getStockDeductionAmount(), 0.001)
     }
 
     @Test

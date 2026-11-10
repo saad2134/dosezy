@@ -7,6 +7,7 @@ import androidx.annotation.RequiresApi
 import androidx.room.withTransaction
 import com.example.dosezy.data.DosezyDatabase
 import com.example.dosezy.data.model.*
+import com.example.dosezy.data.repository.MedicineOrderPreferences
 import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.utils.SoundUtils
 import com.google.gson.*
@@ -203,6 +204,14 @@ class BackupRestoreManager(
                 if (!countryCode.isNullOrEmpty()) {
                     zos.putNextEntry(ZipEntry("$profileDir/emergency_country.txt"))
                     zos.write(countryCode.toByteArray(Charsets.UTF_8))
+                    zos.closeEntry()
+                }
+
+                // Guard: Export per-profile medicine sorting mode and custom sequence so user-defined roster order persists across restore (#BUG-RESTORE-CUSTOM-ORDER)
+                val orderConfigJson = MedicineOrderPreferences.exportUserOrderConfig(context, user.userId)
+                if (!orderConfigJson.isNullOrEmpty()) {
+                    zos.putNextEntry(ZipEntry("$profileDir/medicine_order.json"))
+                    zos.write(orderConfigJson.toByteArray(Charsets.UTF_8))
                     zos.closeEntry()
                 }
             }
@@ -469,6 +478,15 @@ class BackupRestoreManager(
                                 emergencyPrefs.edit().putString("selected_country_code_$newUserId", cCode).apply()
                             }
                         }
+
+                        // Guard: Restore medicine sorting mode and remap custom order IDs for newly created profile (#BUG-RESTORE-CUSTOM-ORDER)
+                        val orderFile = File(pDir, "medicine_order.json")
+                        if (orderFile.exists()) {
+                            val orderJson = orderFile.readText(Charsets.UTF_8).trim()
+                            if (orderJson.isNotBlank()) {
+                                MedicineOrderPreferences.restoreUserOrderConfig(context, newUserId, orderJson, medIdMap)
+                            }
+                        }
                     }
 
                     ConflictStrategy.OVERWRITE -> {
@@ -599,13 +617,7 @@ class BackupRestoreManager(
 
                         // Guard: Execute clear and restore within an atomic Room transaction so that if any failure occurs midway, previous profile data is rolled back rather than permanently lost
                         database.withTransaction {
-                            // Guard: Purge conflicting original user record if existingLocalUserId differs from originalUser.userId to prevent duplicate user entities and orphan foreign keys (#BUG-RESTORE-ID-COLLISION)
-                            if (decision.summary.existingLocalUserId != null && decision.summary.existingLocalUserId != originalUser.userId) {
-                                database.scheduleDao().deleteScheduleByUser(originalUser.userId)
-                                database.medicineDao().deleteMedicinesByUser(originalUser.userId)
-                                database.userDao().deleteUserById(originalUser.userId)
-                            }
-
+                            // Guard: Only clear targetUserId data; never delete originalUser.userId to prevent wiping unrelated local profiles sharing that ID on name conflicts (#BUG-RESTORE-ID-COLLISION)
                             database.scheduleDao().deleteScheduleByUser(targetUserId)
                             database.medicineDao().deleteMedicinesByUser(targetUserId)
 
@@ -655,10 +667,24 @@ class BackupRestoreManager(
                             emergencyPrefs.edit().remove("selected_country_code_$targetUserId").apply()
                         }
 
+                        // Guard: Restore medicine sorting mode and remap custom order IDs, or clear stale preferences when overwriting profile (#BUG-RESTORE-CUSTOM-ORDER)
+                        val orderFile = File(pDir, "medicine_order.json")
+                        if (orderFile.exists()) {
+                            val orderJson = orderFile.readText(Charsets.UTF_8).trim()
+                            if (orderJson.isNotBlank()) {
+                                MedicineOrderPreferences.restoreUserOrderConfig(context, targetUserId, orderJson, medIdMap)
+                            } else {
+                                MedicineOrderPreferences.clearPreferencesForUser(context, targetUserId)
+                            }
+                        } else {
+                            MedicineOrderPreferences.clearPreferencesForUser(context, targetUserId)
+                        }
+
                         // Guard: Scrub stale preferences for conflicting original user ID when overwritten into existing local profile (#BUG-RESTORE-ID-COLLISION)
                         if (decision.summary.existingLocalUserId != null && decision.summary.existingLocalUserId != originalUser.userId) {
                             emPrefs.edit().remove("contacts_json_${originalUser.userId}").apply()
                             emergencyPrefs.edit().remove("selected_country_code_${originalUser.userId}").apply()
+                            MedicineOrderPreferences.clearPreferencesForUser(context, originalUser.userId)
                         }
                     }
 
@@ -701,8 +727,10 @@ class BackupRestoreManager(
 
                         for (sch in schedules) {
                             val mappedMedId = medIdMap[sch.medicineId] ?: continue
+                            // Guard: Compare timestamps truncated to minute precision to prevent sub-second ISO vs epoch-millis discrepancies from inserting duplicate schedule entries (#BUG-RESTORE-MERGE-DUP)
                             val duplicate = existingSchedules.any { 
-                                it.medicineId == mappedMedId && it.scheduledDateTime == sch.scheduledDateTime 
+                                it.medicineId == mappedMedId && 
+                                it.scheduledDateTime.withSecond(0).withNano(0) == sch.scheduledDateTime.withSecond(0).withNano(0) 
                             }
                             if (!duplicate) {
                                 mergedSchedules.add(
@@ -794,6 +822,15 @@ class BackupRestoreManager(
                                 }
                             }
                         }
+
+                        // Guard: Merge medicine sorting mode and custom order into target profile if provided in backup archive (#BUG-RESTORE-CUSTOM-ORDER)
+                        val orderFile = File(pDir, "medicine_order.json")
+                        if (orderFile.exists()) {
+                            val orderJson = orderFile.readText(Charsets.UTF_8).trim()
+                            if (orderJson.isNotBlank()) {
+                                MedicineOrderPreferences.mergeUserOrderConfig(context, targetUserId, orderJson, medIdMap)
+                            }
+                        }
                         totalProfiles++
                     }
 
@@ -861,8 +898,12 @@ class BackupRestoreManager(
             theme = themeVal,
             timeFormat = timeFormatVal,
             language = languageVal,
-            considerLateAfter = json.get("considerLateAfter")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 3,
-            considerMissedAfter = json.get("considerMissedAfter")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 6,
+            considerLateAfter = json.get("considerLateAfter")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()?.let {
+                if (it in 1..14) it * 60 else it
+            } ?: 180,
+            considerMissedAfter = json.get("considerMissedAfter")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()?.let {
+                if (it in 1..14) it * 60 else it
+            } ?: 360,
             snoozeDuration = json.get("snoozeDuration")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 10,
             allergies = json.get("allergies")?.let { if (it.isJsonNull) null else it.asString },
             medicalConditions = json.get("medicalConditions")?.let { if (it.isJsonNull) null else it.asString },
@@ -998,8 +1039,9 @@ class BackupRestoreManager(
                 frequency = frequency,
                 scheduledTimes = timesList,
                 imageUri = obj.get("imageUri")?.takeUnless { it.isJsonNull }?.asString,
-                currentStock = obj.get("currentStock")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
-                refillThreshold = obj.get("refillThreshold")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                // Defensively parse stock amounts as Double to support fractional inventory quantities
+                currentStock = obj.get("currentStock")?.takeUnless { it.isJsonNull }?.runCatching { asDouble }?.getOrNull(),
+                refillThreshold = obj.get("refillThreshold")?.takeUnless { it.isJsonNull }?.runCatching { asDouble }?.getOrNull(),
                 autoDeductOnTake = obj.get("autoDeductOnTake")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: true,
                 pillShape = pillShape,
                 pillColor = pillColor,

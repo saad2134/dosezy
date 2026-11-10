@@ -407,24 +407,32 @@ fun LazyListScope.doseTrackingPreferencesSection(
     }
 
     item {
-        // Consider Late After Preference
+        // Consider Late After Preference (#119)
+        val lateMins = currentUser?.lateAfterMinutes ?: 180
+        val lateLabel = if (lateMins < 60 || lateMins % 60 != 0) {
+            stringResource(R.string.minutes_format, lateMins)
+        } else {
+            stringResource(R.string.hours_format, lateMins / 60)
+        }
         PreferenceItem(
             title = stringResource(R.string.pref_late_after),
-            currentValue = currentUser?.considerLateAfter?.let {
-                stringResource(R.string.hours_format, it)
-            } ?: stringResource(R.string.hours_format, 3),
+            currentValue = lateLabel,
             iconName = "late_after",
             onClick = onLateAfterClick
         )
     }
 
     item {
-        // Consider Missed After Preference
+        // Consider Missed After Preference (#119)
+        val missedMins = currentUser?.missedAfterMinutes ?: 360
+        val missedLabel = if (missedMins < 60 || missedMins % 60 != 0) {
+            stringResource(R.string.minutes_format, missedMins)
+        } else {
+            stringResource(R.string.hours_format, missedMins / 60)
+        }
         PreferenceItem(
             title = stringResource(R.string.pref_missed_after),
-            currentValue = currentUser?.considerMissedAfter?.let {
-                stringResource(R.string.hours_format, it)
-            } ?: stringResource(R.string.hours_format, 6),
+            currentValue = missedLabel,
             iconName = "missed_after",
             onClick = onMissedAfterClick
         )

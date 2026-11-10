@@ -1,0 +1,3 @@
+# Keep logs directory tracked while ignoring all crash dump and runtime logs
+*
+!.gitignore

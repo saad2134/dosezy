@@ -1,10 +1,10 @@
 <en-IN>
-• Android 14+ Alarm Fix: Resolved background PendingIntent crash preventing alarms from sounding on Android 14–16
+• Android 14+ Alarm Fix: Resolved background PendingIntent crash preventing alarms from sounding on Android 14-16
 • Dose Undo Confirmation: Added preference toggle and confirmation dialog before reverting dose status
 • Per-Dose Notes: Added option to record notes, meals, and symptoms when taking medications
 </en-IN>
 <en-US>
-• Android 14+ Alarm Fix: Resolved background PendingIntent crash preventing alarms from sounding on Android 14–16
+• Android 14+ Alarm Fix: Resolved background PendingIntent crash preventing alarms from sounding on Android 14-16
 • Dose Undo Confirmation: Added preference toggle and confirmation dialog before reverting dose status
 • Per-Dose Notes: Added option to record notes, meals, and symptoms when taking medications
 </en-US>
@@ -19,7 +19,7 @@
 • Dosis-Notizen: Option zum Erfassen von Notizen und Symptomen bei der Einnahme
 </de-DE>
 <es-419>
-• Corrección para Android 14+: Solucionado el fallo de PendingIntent para que las alarmas suenen en Android 14–16
+• Corrección para Android 14+: Solucionado el fallo de PendingIntent para que las alarmas suenen en Android 14-16
 • Confirmación de deshacer: Ajuste para activar/desactivar y confirmación antes de revertir dosis
 • Notas de dosis: Opción para registrar notas y síntomas al tomar medicamentos
 </es-419>
@@ -34,7 +34,7 @@
 • खुराक नोट: दवा लेते समय नोट और लक्षण दर्ज करने का विकल्प
 </hi-IN>
 <it-IT>
-• Risoluzione allarmi Android 14+: Risolto l'errore PendingIntent per garantire allarmi affidabili su Android 14–16
+• Risoluzione allarmi Android 14+: Risolto l'errore PendingIntent per garantire allarmi affidabili su Android 14-16
 • Conferma annullamento dose: Nuova preferenza e finestra di conferma prima di annullare la dose
 • Note sulla dose: Opzione per registrare note e sintomi all'assunzione
 </it-IT>
@@ -44,7 +44,7 @@
 • 服薬メモ: 服薬時に食事や症状などのメモを記録する機能を追加
 </ja-JP>
 <pt-BR>
-• Correção para Android 14+: Corrigida exceção de PendingIntent para garantir alarmes pontuais no Android 14–16
+• Correção para Android 14+: Corrigida exceção de PendingIntent para garantir alarmes pontuais no Android 14-16
 • Confirmação de desfazer: Ajuste e confirmação de segurança antes de reverter doses
 • Notas de dose: Opção de registrar notas e sintomas ao tomar remédios
 </pt-BR>

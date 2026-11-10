@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -80,7 +79,7 @@ fun ScheduleActionDialog(
 
     val isTaken = entry.status == MedicationStatus.TAKEN_ON_TIME || entry.status == MedicationStatus.TAKEN_LATE
     val isSkipped = entry.status == MedicationStatus.SKIPPED
-    val missedAfter = currentUser?.considerMissedAfter ?: 6
+    val missedAfter = currentUser?.missedAfterMinutes ?: 360
     val isPassed = now.isAfter(entry.scheduledDateTime)
     val isMissed = entry.status == MedicationStatus.MISSED || (!isTaken && !isSkipped && isPassed && TimeCalculationUtils.isMissed(
         entry.scheduledDateTime,
@@ -152,7 +151,7 @@ fun ScheduleActionDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = medicine?.getDosageDisplay(entry.scheduledDateTime.toLocalTime()) ?: "",
+                        text = medicine?.getDosageDisplay(entry.scheduledDateTime.toLocalTime(), entry.dosage) ?: "",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurface

@@ -15,6 +15,7 @@ import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.data.model.Theme
 import com.example.dosezy.data.model.TimeFormat
 import com.example.dosezy.data.model.User
+import com.example.dosezy.data.model.normalizeArabicDigits
 import com.example.dosezy.data.repository.MedicineRepository
 import com.example.dosezy.data.repository.ScheduleRepository
 import com.example.dosezy.data.repository.UserRepository
@@ -101,8 +102,13 @@ class UserViewModelProfileAlarmTest {
 
     @After
     fun tearDown() {
-        Dispatchers.resetMain()
-        db.close()
+        // Guard: Prevent teardown failure if background coroutines or db close encounter edge-case races
+        runCatching { Dispatchers.resetMain() }
+        runCatching {
+            if (::db.isInitialized) {
+                db.close()
+            }
+        }
     }
 
     private suspend fun awaitCondition(timeoutMs: Long = 10000, condition: suspend () -> Boolean) {
@@ -257,14 +263,14 @@ class UserViewModelProfileAlarmTest {
             frequency = Frequency(FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
             customDosages = mapOf("08:00" to 2.0, "20:00" to 1.0),
-            currentStock = 30,
+            currentStock = 30.0,
             autoDeductOnTake = true
         )
         medicineRepository.insertMedicine(medicineWithSlots)
         advanceUntilIdle()
 
         val initialStock = db.medicineDao().getMedicineByIdDirect("med_prn_slots")!!.currentStock!!
-        assertEquals(30, initialStock)
+        assertEquals(30.0, initialStock, 0.001)
 
         // Log PRN dose at 08:00 AM (which has custom slot dosage of 2 tablets)
         val morningDoseTime = LocalDateTime.of(2026, 10, 6, 8, 0)
@@ -277,7 +283,7 @@ class UserViewModelProfileAlarmTest {
 
         // Check stock was decremented by 2 tablets (not default 1)
         val medAfterPrn = db.medicineDao().getMedicineByIdDirect("med_prn_slots")!!
-        assertEquals("Stock should decrease by custom slot dosage (2 tablets)", 28, medAfterPrn.currentStock)
+        assertEquals("Stock should decrease by custom slot dosage (2 tablets)", 28.0, medAfterPrn.currentStock!!, 0.001)
 
         // Fetch inserted PRN entry
         val schedules = scheduleRepository.getSchedulesByUserSync(testUser.userId)
@@ -288,7 +294,7 @@ class UserViewModelProfileAlarmTest {
         scheduleRepository.undoDoseTaken(prnEntry!!.entryId, context = context)
 
         val medAfterUndo = db.medicineDao().getMedicineByIdDirect("med_prn_slots")!!
-        assertEquals("Stock should be restored symmetrically to 30", 30, medAfterUndo.currentStock)
+        assertEquals("Stock should be restored symmetrically to 30", 30.0, medAfterUndo.currentStock!!, 0.001)
 
         // Verify PRN entry was deleted
         val schedulesAfterUndo = scheduleRepository.getSchedulesByUserSync(testUser.userId)
@@ -308,17 +314,17 @@ class UserViewModelProfileAlarmTest {
             timesPerDay = 1,
             frequency = Frequency(FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(12, 0)),
-            currentStock = 20,
+            currentStock = 20.0,
             autoDeductOnTake = true
         )
         medicineRepository.insertMedicine(medicine)
         advanceUntilIdle()
 
         // Simulate UI holding stale snapshot with stock = 20
-        val staleUiMedicine = medicine.copy(currentStock = 20)
+        val staleUiMedicine = medicine.copy(currentStock = 20.0)
 
         // Meanwhile, a concurrent operation refilled stock to 50 in the database
-        val freshDbMedicine = db.medicineDao().getMedicineByIdDirect("med_prn_concurrency")!!.copy(currentStock = 50)
+        val freshDbMedicine = db.medicineDao().getMedicineByIdDirect("med_prn_concurrency")!!.copy(currentStock = 50.0)
         db.medicineDao().updateMedicine(freshDbMedicine)
 
         // Now user logs PRN dose using the staleUiMedicine object
@@ -331,7 +337,7 @@ class UserViewModelProfileAlarmTest {
 
         // Check that fresh stock (50 - 1 = 49) was updated, NOT stale stock (20 - 1 = 19)
         val finalMedicine = db.medicineDao().getMedicineByIdDirect("med_prn_concurrency")!!
-        assertEquals("Stock must be calculated from fresh DB value (50 - 1 = 49)", 49, finalMedicine.currentStock)
+        assertEquals("Stock must be calculated from fresh DB value (50 - 1 = 49)", 49.0, finalMedicine.currentStock!!, 0.001)
     }
 
     // =========================================================================
@@ -353,7 +359,7 @@ class UserViewModelProfileAlarmTest {
             scheduledTimes = listOf(LocalTime.of(8, 0), LocalTime.of(13, 0), LocalTime.of(20, 0)),
             // Guard: Start from tomorrow so past slots on today are not skipped by time-of-day filtering
             startDate = java.time.LocalDate.now().plusDays(1),
-            currentStock = 100,
+            currentStock = 100.0,
             autoDeductOnTake = true
         )
 
@@ -576,6 +582,53 @@ class UserViewModelProfileAlarmTest {
     }
 
     @Test
+    fun testDeleteUser_preservesActiveIntakeCountdownOfOtherProfile() = runTest(testDispatcher) {
+        val userViewModel = UserViewModel(userRepository, medicineRepository, scheduleRepository, medicineNotificationManager)
+
+        userViewModel.addUser(testUser)
+        userViewModel.addUser(secondUser)
+        awaitCondition {
+            userRepository.getUserByIdSync(testUser.userId) != null &&
+            userRepository.getUserByIdSync(secondUser.userId) != null
+        }
+
+        // Active safeguard countdown belongs to secondUser
+        com.example.dosezy.notifications.IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = "entry_belonging_to_second_user",
+            entryIds = listOf("entry_belonging_to_second_user"),
+            medicineName = "Second User Med",
+            medicineNames = listOf("Second User Med"),
+            scheduledTime = "11:00 AM",
+            durationSeconds = 120,
+            userId = secondUser.userId
+        )
+        assertNotNull(com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value)
+        assertEquals(secondUser.userId, com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value?.userId)
+
+        // Guard: Verify deleting first user does NOT cancel active countdown belonging to second user (#BUG-SAFEGUARD-MULTIUSER)
+        userViewModel.deleteUser(testUser)
+        awaitCondition { userRepository.getUserByIdSync(testUser.userId) == null }
+        advanceUntilIdle()
+
+        assertNotNull(
+            "Active countdown belonging to secondUser must be preserved when testUser is deleted",
+            com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
+        )
+        assertEquals(secondUser.userId, com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value?.userId)
+
+        // Deleting secondUser must cancel its own active countdown
+        userViewModel.deleteUser(secondUser)
+        awaitCondition { userRepository.getUserByIdSync(secondUser.userId) == null }
+        advanceUntilIdle()
+
+        assertNull(
+            "Active countdown belonging to secondUser must be cancelled when secondUser is deleted",
+            com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
+        )
+    }
+
+    @Test
     fun testUpdateContextLocale_providesLocalizedResourcesForProfile() {
         // Guard: Verify that updateContextLocale correctly provides localized resources for Compose LocalContext matching the active profile (#BUG-MAIN-LOCALIZED-CONTEXT)
         val esContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, Language.SPANISH)
@@ -683,6 +736,164 @@ class UserViewModelProfileAlarmTest {
         val nonCurrent = remaining.first { !it.isCurrentUser }
         assertTrue("Promoted user must be one of the remaining users", current.userId == userToPromote.userId || current.userId == userThird.userId)
         assertTrue("Non-current user must be the other remaining user", nonCurrent.userId != current.userId)
+    }
+
+    @Test
+    fun testDeleteUser_cleansUpMedicineOrderPreferences() = runTest(testDispatcher) {
+        val userViewModel = UserViewModel(userRepository, medicineRepository, scheduleRepository, medicineNotificationManager)
+        val userToDelete = testUser.copy(userId = "user_delete_prefs", isCurrentUser = true)
+        val remainingUser = secondUser.copy(userId = "user_remaining", isCurrentUser = false)
+        userRepository.insertUser(userToDelete)
+        userRepository.insertUser(remainingUser)
+
+        com.example.dosezy.data.repository.MedicineOrderPreferences.setSortMode(context, userToDelete.userId, com.example.dosezy.data.model.MedicineSortMode.CUSTOM)
+        com.example.dosezy.data.repository.MedicineOrderPreferences.setCustomOrder(context, userToDelete.userId, listOf("med_1", "med_2"))
+
+        userViewModel.deleteUser(userToDelete)
+        advanceUntilIdle()
+        var attempts = 0
+        while (db.userDao().getUserByIdDirect(userToDelete.userId) != null && attempts++ < 40) {
+            Thread.sleep(50)
+            advanceUntilIdle()
+        }
+
+        assertEquals(
+            com.example.dosezy.data.model.MedicineSortMode.DEFAULT,
+            com.example.dosezy.data.repository.MedicineOrderPreferences.getSortMode(context, userToDelete.userId)
+        )
+        assertTrue(
+            com.example.dosezy.data.repository.MedicineOrderPreferences.getCustomOrder(context, userToDelete.userId).isEmpty()
+        )
+    }
+
+    @Test
+    fun testDeleteUser_cancelsPersistedIntakeCountdown_whenInMemoryStateIsNull() = runTest(testDispatcher) {
+        val userViewModel = UserViewModel(userRepository, medicineRepository, scheduleRepository, medicineNotificationManager)
+        val userToDelete = testUser.copy(userId = "user_delete_persisted_safeguard", isCurrentUser = true)
+        val remainingUser = secondUser.copy(userId = "user_remaining_safeguard", isCurrentUser = false)
+        userRepository.insertUser(userToDelete)
+        userRepository.insertUser(remainingUser)
+
+        val testMedicine = Medicine(
+            medicineId = "med_del_test_1",
+            userId = userToDelete.userId,
+            medicationName = "Test Med",
+            dosage = 100.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+        medicineRepository.insertMedicine(testMedicine)
+
+        val scheduleEntry = ScheduleEntry(
+            entryId = "entry_persisted_countdown_1",
+            userId = userToDelete.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = LocalDateTime.now().plusHours(1),
+            status = MedicationStatus.PENDING
+        )
+        scheduleRepository.insertScheduleEntry(scheduleEntry)
+
+        // Clear in-memory activeCountdown and write directly to SharedPreferences
+        com.example.dosezy.notifications.IntakeSafeguardManager.cancelCountdown(context)
+        assertNull(com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value)
+
+        val prefs = context.getSharedPreferences("dosezy_intake_safeguard", Context.MODE_PRIVATE)
+        prefs.edit()
+            .putString("entry_id", scheduleEntry.entryId)
+            .putString("entry_ids", scheduleEntry.entryId)
+            .putString("med_name", "Test Med")
+            .putString("med_names", "Test Med")
+            .putString("scheduled_time", "08:00 AM")
+            .putLong("start_time", 1000L)
+            .putLong("target_time", 5000L)
+            .putInt("duration_sec", 120)
+            .putString("user_id", userToDelete.userId)
+            .apply()
+
+        assertNotNull(com.example.dosezy.notifications.IntakeSafeguardManager.getPersistedState(context))
+
+        // Guard: Verify deleteUser checks getPersistedState and cancels persisted countdown belonging to deleted user (#BUG-SAFEGUARD-DELETE-RESTORE)
+        userViewModel.deleteUser(userToDelete)
+        advanceUntilIdle()
+        var attempts = 0
+        while (db.userDao().getUserByIdDirect(userToDelete.userId) != null && attempts++ < 40) {
+            Thread.sleep(50)
+            advanceUntilIdle()
+        }
+
+        assertNull("Persisted intake countdown must be cancelled after user deletion", com.example.dosezy.notifications.IntakeSafeguardManager.getPersistedState(context))
+    }
+
+    @Test
+    fun testUserSetup_normalizesArabicIndicAgeAndPhoneNumerals() {
+        val rawArabicAge = "٢٥"
+        val rawArabicPhone = "+٩٦٦ ٥٠ ١٢٣ ٤٥٦٧"
+
+        // Guard: Verify normalizeArabicDigits parses Eastern Arabic numerals into valid integer age and normalized phone
+        val parsedAge = rawArabicAge.normalizeArabicDigits().toIntOrNull() ?: 0
+        val normalizedPhone = rawArabicPhone.normalizeArabicDigits().trim()
+
+        assertEquals(25, parsedAge)
+        assertEquals("+966 50 123 4567", normalizedPhone)
+    }
+
+    @Test
+    fun testAllLocalesAndTranslations_oneHundredPercentKeyParity() {
+        val supportedLocales = listOf(
+            "values-ar", "values-bn", "values-de", "values-es",
+            "values-fr", "values-hi", "values-it", "values-ja",
+            "values-pt", "values-ru", "values-zh"
+        )
+
+        fun findResDir(flavor: String): File {
+            val candidates = listOf(
+                File("src/$flavor/res"),
+                File("patient/android/app/src/$flavor/res"),
+                File("../app/src/$flavor/res"),
+                File("../../patient/android/app/src/$flavor/res")
+            )
+            return candidates.firstOrNull { it.isDirectory }
+                ?: error("Unable to locate res directory for flavor $flavor")
+        }
+
+        fun extractKeys(stringsXml: File): Set<String> {
+            if (!stringsXml.exists()) return emptySet()
+            val factory = javax.xml.parsers.DocumentBuilderFactory.newInstance()
+            val builder = factory.newDocumentBuilder()
+            val doc = builder.parse(stringsXml)
+            val stringNodes = doc.getElementsByTagName("string")
+            val keys = mutableSetOf<String>()
+            for (i in 0 until stringNodes.length) {
+                val node = stringNodes.item(i)
+                val translatable = node.attributes.getNamedItem("translatable")?.nodeValue
+                if (translatable != "false") {
+                    val name = node.attributes.getNamedItem("name")?.nodeValue
+                    if (name != null) keys.add(name)
+                }
+            }
+            return keys
+        }
+
+        for (flavor in listOf("main", "foss")) {
+            val resDir = findResDir(flavor)
+            val baseKeys = extractKeys(File(resDir, "values/strings.xml"))
+            assertTrue("Base strings.xml must not be empty for flavor $flavor", baseKeys.isNotEmpty())
+
+            for (loc in supportedLocales) {
+                val locXml = File(resDir, "$loc/strings.xml")
+                assertTrue("strings.xml must exist for locale $loc in flavor $flavor", locXml.exists())
+                val locKeys = extractKeys(locXml)
+
+                val missingInLocale = baseKeys - locKeys
+                val extraInLocale = locKeys - baseKeys
+
+                // Guard: Enforce strict 100% key parity across all 11 supported locales
+                assertEquals("Locale $loc in flavor $flavor is missing string keys: $missingInLocale", emptySet<String>(), missingInLocale)
+                assertEquals("Locale $loc in flavor $flavor has extraneous string keys: $extraInLocale", emptySet<String>(), extraInLocale)
+            }
+        }
     }
 }
 

@@ -86,7 +86,7 @@ fun ScheduleScreen(navController: NavController) {
 
     // Get user's time format preference
     val timeFormat = currentUser?.timeFormat ?: TimeFormat.HOUR_12
-    val considerMissedAfter = currentUser?.considerMissedAfter ?: 6
+    val considerMissedAfter = currentUser?.missedAfterMinutes ?: 360
 
     // Guard: Past schedule entries default to scheduled time for retrospective logging while today and future entries use LocalDateTime.now() so overdue doses trigger TAKEN_LATE detection (#BUG-SCHEDULE-LATE-STATUS)
     fun resolveDefaultDoseTime(swm: ScheduleWithMedicine): LocalDateTime {
@@ -131,7 +131,7 @@ fun ScheduleScreen(navController: NavController) {
         currentUser?.let { user ->
             scheduleViewModel.autoMarkMissedMedications(
                 user.userId,
-                user.considerMissedAfter
+                user.missedAfterMinutes
             )
         }
         while (true) {
@@ -141,7 +141,7 @@ fun ScheduleScreen(navController: NavController) {
             currentUser?.let { user ->
                 scheduleViewModel.autoMarkMissedMedications(
                     user.userId,
-                    user.considerMissedAfter
+                    user.missedAfterMinutes
                 )
             }
         }
