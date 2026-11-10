@@ -28,15 +28,24 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Accessibility
+import androidx.compose.material.icons.filled.AlternateEmail
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.outlined.ArrowOutward
 import androidx.compose.material.icons.outlined.Star
+import androidx.compose.ui.text.style.TextOverflow
 import com.example.dosezy.utils.AppSignature
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -136,10 +145,32 @@ fun AboutScreen(navController: NavController) {
                     )
 
                     Text(
-                        text = stringResource(R.string.about_version_build, versionName ?: "2.5.2", versionCode),
+                        text = stringResource(R.string.about_version_build, versionName ?: "2.5.13", versionCode),
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    val buildFlavorName = if (com.example.dosezy.BuildConfig.FLAVOR.equals("foss", ignoreCase = true)) {
+                        stringResource(R.string.about_build_foss)
+                    } else {
+                        stringResource(R.string.about_build_play)
+                    }
+                    val buildBadgeLabel = if (com.example.dosezy.BuildConfig.DEBUG) "$buildFlavorName (Debug)" else buildFlavorName
+
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                    ) {
+                        Text(
+                            text = buildBadgeLabel,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp)
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(10.dp))
 
@@ -350,6 +381,61 @@ fun AboutScreen(navController: NavController) {
                 }
             )
 
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Social Media / Official Channels Section
+            Text(
+                text = stringResource(R.string.about_social_links_title),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            val socials = listOf(
+                SocialMediaItem("X (Twitter)", "@dosezyapp", "https://x.com/dosezyapp", Color(0xFF1D9BF0), Icons.Default.AlternateEmail),
+                SocialMediaItem("Bluesky", "@dosezy.attenomy.com", "https://bsky.app/profile/dosezy.attenomy.com", Color(0xFF0285FF), Icons.Default.Cloud),
+                SocialMediaItem("YouTube", "@dosezyapp", "https://www.youtube.com/@dosezyapp", Color(0xFFFF0000), Icons.Default.PlayArrow),
+                SocialMediaItem("Reddit", "r/Dosezy", "https://www.reddit.com/r/Dosezy/", Color(0xFFFF4500), Icons.Default.Chat),
+                SocialMediaItem("Facebook", "@dosezyapp", "https://www.facebook.com/dosezyapp", Color(0xFF1877F2), Icons.Default.Public),
+                SocialMediaItem("Instagram", "@dosezyapp", "https://www.instagram.com/dosezyapp", Color(0xFFE4405F), Icons.Default.CameraAlt),
+                SocialMediaItem("TikTok", "@dosezyapp", "https://www.tiktok.com/@dosezyapp", Color(0xFFFF004F), Icons.Default.MusicNote),
+                SocialMediaItem("Threads", "@dosezyapp", "https://www.threads.net/@dosezyapp", Color(0xFF101010), Icons.Default.Tag)
+            )
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                socials.chunked(2).forEach { pair ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        SocialMediaCard(
+                            icon = pair[0].icon,
+                            brandColor = pair[0].brandColor,
+                            title = pair[0].name,
+                            handle = pair[0].handle,
+                            onClick = { openUrl(context, pair[0].url) },
+                            modifier = Modifier.weight(1f)
+                        )
+                        if (pair.size > 1) {
+                            SocialMediaCard(
+                                icon = pair[1].icon,
+                                brandColor = pair[1].brandColor,
+                                title = pair[1].name,
+                                handle = pair[1].handle,
+                                onClick = { openUrl(context, pair[1].url) },
+                                modifier = Modifier.weight(1f)
+                            )
+                        } else {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
             Spacer(modifier = Modifier.height(32.dp))
         }
@@ -483,6 +569,80 @@ fun AboutFeatureItem(
                     lineHeight = 17.sp
                 )
             }
+        }
+    }
+}
+
+private data class SocialMediaItem(
+    val name: String,
+    val handle: String,
+    val url: String,
+    val brandColor: Color,
+    val icon: ImageVector
+)
+
+@Composable
+fun SocialMediaCard(
+    icon: ImageVector,
+    brandColor: Color,
+    title: String,
+    handle: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.clickable { onClick() },
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 1.5.dp
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(CircleShape)
+                    .background(brandColor.copy(alpha = 0.12f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = brandColor,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = handle,
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            Icon(
+                imageVector = Icons.Outlined.ArrowOutward,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.45f),
+                modifier = Modifier.size(16.dp)
+            )
         }
     }
 }

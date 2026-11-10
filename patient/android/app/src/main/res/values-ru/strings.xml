@@ -671,6 +671,9 @@
 
     <string name="about_community_open_source">Сообщество и открытый исходный код</string>
     <string name="about_version_build">Версия %1$s (Сборка %2$s)</string>
+    <string name="about_build_play">Play Маркет</string>
+    <string name="about_build_foss">FOSS</string>
+    <string name="about_social_links_title">Социальные сети</string>
     <string name="country_india">Индия</string>
     <string name="country_us_ca">США / Канада</string>
     <string name="country_uk">Великобритания</string>

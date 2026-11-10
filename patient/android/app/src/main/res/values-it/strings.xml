@@ -671,6 +671,9 @@ Vuoi continuare?</string>
 
     <string name="about_community_open_source">Comunità e open source</string>
     <string name="about_version_build">Versione %1$s (Build %2$s)</string>
+    <string name="about_build_play">Play Store</string>
+    <string name="about_build_foss">FOSS</string>
+    <string name="about_social_links_title">Social media</string>
     <string name="country_india">India</string>
     <string name="country_us_ca">Stati Uniti / Canada</string>
     <string name="country_uk">Regno Unito</string>

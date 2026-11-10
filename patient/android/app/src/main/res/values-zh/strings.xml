@@ -687,6 +687,9 @@
 
     <string name="about_community_open_source">社区与开源</string>
     <string name="about_version_build">版本 %1$s (构建 %2$s)</string>
+    <string name="about_build_play">Play 商店</string>
+    <string name="about_build_foss">FOSS</string>
+    <string name="about_social_links_title">社交媒体</string>
     <string name="country_india">印度</string>
     <string name="country_us_ca">美国 / 加拿大</string>
     <string name="country_uk">英国</string>
