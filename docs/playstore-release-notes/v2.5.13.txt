@@ -1,0 +1,60 @@
+<en-IN>
+* Custom medicine reordering and sorting presets (schedule, alphabetical, next due), plus support for half and fractional dosages.
+* Multi-profile alarm and snooze coordination with continuous repeat reminders and configurable sub-hour late notification intervals.
+* Refined squircle UI frames across all screens, atomic PRN dose recording, profile-specific lock screen masking, and memory optimizations.
+</en-IN>
+<en-US>
+* Custom medicine reordering and sorting presets (schedule, alphabetical, next due), plus support for half and fractional dosages.
+* Multi-profile alarm and snooze coordination with continuous repeat reminders and configurable sub-hour late notification intervals.
+* Refined squircle UI frames across all screens, atomic PRN dose recording, profile-specific lock screen masking, and memory optimizations.
+</en-US>
+<ar>
+* إعادة ترتيب الأدوية يدويًا وخيارات فرز متعددة، مع دعم الجرعات النصفية والكسرية وسحب المخزون بدقة.
+* تنسيق التنبيهات والغفوة لكل ملف شخصي مع تذكيرات متكررة وفترات إشعار قابلة للتخصيص دون الساعة.
+* تصميم واجهة محدث بإطارات دائرية ناعمة، تسجيل ذري للجرعات عند اللزوم، وحماية تفاصيل شاشة القفل.
+</ar>
+<de-DE>
+* Benutzerdefinierte Medikamentensortierung (nach Zeitplan, alphabetisch, nächste Dosis) und Unterstützung für halbe und fraktionierte Dosen.
+* Profilgenaue Alarm- und Schlummerkoordination mit wiederholten Erinnerungen und anpassbaren Benachrichtigungsintervallen.
+* Neues Squircle-Rahmendesign auf allen Bildschirmen, atomare PRN-Dosiserfassung und Schutz sensibler Sperrbildschirmdetails.
+</de-DE>
+<es-419>
+* Reordenamiento manual de medicamentos y opciones de orden (horario, alfabético), con soporte para dosis fraccionadas y medias.
+* Coordinación de alarmas y repeticiones por perfil, recordatorios insistentes e intervalos de retraso configurables.
+* Diseño renovado con marcos squircle en todas las pantallas, registro atómico de dosis necesarias y mayor privacidad en bloqueo.
+</es-419>
+<fr-FR>
+* Réorganisation personnalisée des médicaments et options de tri (horaires, alphabétique), avec gestion des demi-doses et doses fractionnées.
+* Coordination des alarmes et reports par profil avec rappels insistants et intervalles de retard personnalisables.
+* Interface raffinée avec cadres squircle sur tous les écrans, enregistrement atomique des doses au besoin et sécurité de verrouillage.
+</fr-FR>
+<hi-IN>
+* कस्टम दवा पुनःक्रमण और छँटाई विकल्प (समय सारिणी, वर्णमाला, अगली खुराक), साथ ही आधी और भिन्नात्मक खुराक का समर्थन।
+* प्रोफाइल-वार अलार्म और स्नूज़ समन्वय, निरंतर अनुस्मारक और अनुकूलन योग्य उप-घंटे सूचना अंतराल।
+* सभी स्क्रीन पर परिष्कृत स्क्वर्किअल यूआई फ्रेम, सुरक्षित आवश्यक खुराक रिकॉर्डिंग और लॉक स्क्रीन गोपनीयता।
+</hi-IN>
+<it-IT>
+* Riordinamento manuale dei farmaci e criteri di ordinamento (orario, alfabetico), con supporto per dosi dimezzate e frazionarie.
+* Coordinamento di allarmi e rinvii per singolo profilo con promemoria ripetuti e intervalli di ritardo personalizzabili.
+* Design raffinato con cornici squircle su tutte le schermate, registrazione atomica delle dosi al bisogno e privacy su blocco schermo.
+</it-IT>
+<ja-JP>
+* 薬のカスタム並べ替えと各種ソート（スケジュール、名前順、次回の服用）、半錠や端数用量の記録に対応。
+* プロファイルごとのアラームとスヌーズの個別制御、継続リマインダー、1時間未満の遅れ通知設定。
+* 全画面でスクワークル形状の洗練されたUIフレームを採用、頓服薬のトランザクション記録、ロック画面の表示保護を強化。
+</ja-JP>
+<pt-BR>
+* Reordenação manual de medicamentos e opções de ordenação (horário, alfabética), com suporte para meia dose e doses fracionadas.
+* Coordenação de alarmes e soneca por perfil com lembretes insistentes e intervalos de atraso configuráveis.
+* Novo design com molduras squircle em todas as telas, registro atômico de doses quando necessárias e privacidade na tela de bloqueio.
+</pt-BR>
+<ru-RU>
+* Пользовательская сортировка лекарств (по расписанию, алфавиту, следующему приему) и поддержка половинных и дробных доз.
+* Раздельная координация будильников и откладывания для каждого профиля с повторными напоминаниями и гибкими интервалами.
+* Обновленный дизайн с мягкими рамками-сквирклами, атомарная запись доз по требованию и маскировка данных на экране блокировки.
+</ru-RU>
+<zh-CN>
+* 支持自定义拖拽药物排序与多种排序预设（日程、首字母、下次用药），并全面支持半量与小数剂量。
+* 多档案独立的闹钟与稍后提醒协同，新增持续重复提醒与自定义间隔提醒。
+* 全屏界面采用圆角平滑框设计，顿服药物原子化安全记录，并强化锁屏隐私信息遮盖。
+</zh-CN>

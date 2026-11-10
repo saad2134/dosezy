@@ -232,6 +232,81 @@ class DatabaseRestoreTransactionAndMigrationTest {
         }
     }
 
+    @Test
+    fun migration20_21_convertsLateAndMissedHoursToMinutes() {
+        // Guard: Migration 20->21 must scale legacy hour values (< 15) to minutes (#119)
+        val sqliteDb = mockk<SupportSQLiteDatabase>(relaxed = true)
+        DosezyDatabase.MIGRATION_20_21.migrate(sqliteDb)
+
+        verify(exactly = 1) {
+            sqliteDb.execSQL("UPDATE users SET considerLateAfter = considerLateAfter * 60 WHERE considerLateAfter > 0 AND considerLateAfter < 15")
+            sqliteDb.execSQL("UPDATE users SET considerMissedAfter = considerMissedAfter * 60 WHERE considerMissedAfter > 0 AND considerMissedAfter < 15")
+        }
+    }
+
+    @Test
+    fun migration21_22_recreatesMedicinesTableWithRealStockColumnsAndPreservesIndex() {
+        // Guard: Migration 21->22 recreates medicines table with currentStock and refillThreshold as REAL (#123)
+        val sqliteDb = mockk<SupportSQLiteDatabase>(relaxed = true)
+        DosezyDatabase.MIGRATION_21_22.migrate(sqliteDb)
+
+        verify(exactly = 1) {
+            sqliteDb.execSQL("PRAGMA foreign_keys = OFF")
+            sqliteDb.execSQL("CREATE TABLE IF NOT EXISTS `medicines_new` (`medicineId` TEXT NOT NULL, `userId` TEXT NOT NULL, `medicationName` TEXT NOT NULL, `dosage` REAL NOT NULL, `dosageUnit` TEXT NOT NULL, `timesPerDay` INTEGER NOT NULL, `frequency` TEXT NOT NULL, `scheduledTimes` TEXT NOT NULL, `imageUri` TEXT, `currentStock` REAL, `refillThreshold` REAL, `autoDeductOnTake` INTEGER NOT NULL, `notes` TEXT, `pillShape` TEXT NOT NULL, `pillColor` TEXT NOT NULL, `startDate` INTEGER, `endDate` INTEGER, `durationDays` INTEGER, `isArchived` INTEGER NOT NULL, `customDosages` TEXT, `reminderType` TEXT, PRIMARY KEY(`medicineId`), FOREIGN KEY(`userId`) REFERENCES `users`(`userId`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+            sqliteDb.execSQL("INSERT INTO `medicines_new` (`medicineId`, `userId`, `medicationName`, `dosage`, `dosageUnit`, `timesPerDay`, `frequency`, `scheduledTimes`, `imageUri`, `currentStock`, `refillThreshold`, `autoDeductOnTake`, `notes`, `pillShape`, `pillColor`, `startDate`, `endDate`, `durationDays`, `isArchived`, `customDosages`, `reminderType`) SELECT `medicineId`, `userId`, `medicationName`, `dosage`, `dosageUnit`, `timesPerDay`, `frequency`, `scheduledTimes`, `imageUri`, `currentStock`, `refillThreshold`, `autoDeductOnTake`, `notes`, `pillShape`, `pillColor`, `startDate`, `endDate`, `durationDays`, `isArchived`, `customDosages`, `reminderType` FROM `medicines`")
+            sqliteDb.execSQL("DROP TABLE `medicines`")
+            sqliteDb.execSQL("ALTER TABLE `medicines_new` RENAME TO `medicines`")
+            sqliteDb.execSQL("CREATE INDEX IF NOT EXISTS `index_medicines_userId` ON `medicines` (`userId`)")
+            sqliteDb.execSQL("PRAGMA foreign_keys = ON")
+        }
+    }
+
+    @Test
+    fun migration21_22_withRealSqliteAndChildForeignKeys_preservesScheduleEntriesWithoutCascadeWipe() {
+        val helper = androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory().create(
+            androidx.sqlite.db.SupportSQLiteOpenHelper.Configuration.builder(context)
+                .name(null)
+                .callback(object : androidx.sqlite.db.SupportSQLiteOpenHelper.Callback(21) {
+                    override fun onCreate(sdb: SupportSQLiteDatabase) {
+                        sdb.execSQL("PRAGMA foreign_keys = ON")
+                        sdb.execSQL("CREATE TABLE users (userId TEXT NOT NULL PRIMARY KEY, fullName TEXT NOT NULL, age INTEGER NOT NULL, gender TEXT NOT NULL, isCurrentUser INTEGER NOT NULL)")
+                        sdb.execSQL("CREATE TABLE medicines (medicineId TEXT NOT NULL, userId TEXT NOT NULL, medicationName TEXT NOT NULL, dosage REAL NOT NULL, dosageUnit TEXT NOT NULL, timesPerDay INTEGER NOT NULL, frequency TEXT NOT NULL, scheduledTimes TEXT NOT NULL, imageUri TEXT, currentStock INTEGER, refillThreshold INTEGER, autoDeductOnTake INTEGER NOT NULL, notes TEXT, pillShape TEXT NOT NULL, pillColor TEXT NOT NULL, startDate INTEGER, endDate INTEGER, durationDays INTEGER, isArchived INTEGER NOT NULL, customDosages TEXT, reminderType TEXT, PRIMARY KEY(medicineId), FOREIGN KEY(userId) REFERENCES users(userId) ON UPDATE NO ACTION ON DELETE CASCADE)")
+                        sdb.execSQL("CREATE TABLE schedule_entries (entryId TEXT NOT NULL, userId TEXT NOT NULL, medicineId TEXT NOT NULL, scheduledDateTime INTEGER NOT NULL, status TEXT NOT NULL, takenAt INTEGER, skipReason TEXT, dosage REAL, doseNotes TEXT, PRIMARY KEY(entryId), FOREIGN KEY(userId) REFERENCES users(userId) ON UPDATE NO ACTION ON DELETE CASCADE, FOREIGN KEY(medicineId) REFERENCES medicines(medicineId) ON UPDATE NO ACTION ON DELETE CASCADE)")
+                        sdb.execSQL("INSERT INTO users VALUES ('u1', 'Test Patient', 30, 'MALE', 1)")
+                        sdb.execSQL("INSERT INTO medicines VALUES ('m1', 'u1', 'Aspirin', 100.0, 'MG', 1, 'DAILY', '08:00', NULL, 30, 5, 1, NULL, 'ROUND', '#1193D4', NULL, NULL, NULL, 0, NULL, 'ALARM')")
+                        sdb.execSQL("INSERT INTO schedule_entries VALUES ('s1', 'u1', 'm1', 1700000000000, 'PENDING', NULL, NULL, NULL, NULL)")
+                    }
+                    override fun onUpgrade(sdb: SupportSQLiteDatabase, oldV: Int, newV: Int) {}
+                })
+                .build()
+        )
+        val sdb = helper.writableDatabase
+        sdb.execSQL("PRAGMA foreign_keys = ON")
+
+        var cursor = sdb.query("SELECT COUNT(*) FROM schedule_entries")
+        cursor.moveToFirst()
+        assertEquals(1, cursor.getInt(0))
+        cursor.close()
+
+        // Execute migration 21 -> 22
+        DosezyDatabase.MIGRATION_21_22.migrate(sdb)
+
+        // Verify that schedule entry was NOT wiped out by cascade delete
+        cursor = sdb.query("SELECT COUNT(*) FROM schedule_entries")
+        cursor.moveToFirst()
+        assertEquals("Schedule entries must survive medicines table recreation without cascade deletion", 1, cursor.getInt(0))
+        cursor.close()
+
+        // Verify that stock columns are now REAL and values preserved
+        cursor = sdb.query("SELECT currentStock, refillThreshold FROM medicines WHERE medicineId = 'm1'")
+        cursor.moveToFirst()
+        assertEquals(30.0, cursor.getDouble(0), 0.001)
+        assertEquals(5.0, cursor.getDouble(1), 0.001)
+        cursor.close()
+
+        sdb.close()
+    }
+
     // ───────────────────────────────────────────────────────────────
     // Issue 2: OVERWRITE Foreign-Key Filtering & ID Regeneration
     // ───────────────────────────────────────────────────────────────
@@ -1147,6 +1222,183 @@ class DatabaseRestoreTransactionAndMigrationTest {
         assertEquals(com.example.dosezy.data.model.ReminderType.ALARM, q1?.reminderType)
         assertEquals(com.example.dosezy.data.model.ReminderType.NOTIFICATION, q2?.reminderType)
         assertNull(q3?.reminderType)
+    }
+
+    @Test
+    fun testSelectiveRestore_overwrite_doesNotDeleteUnrelatedLocalUserMatchingBackupUserId(): Unit = runBlocking {
+        // Guard: Verify OVERWRITE on name conflict does not purge unrelated local user whose ID matches backup profile ID (#BUG-RESTORE-ID-COLLISION)
+        val localAlice = User(
+            userId = "local_alice_id",
+            fullName = "Alice",
+            age = 30,
+            gender = Gender.FEMALE,
+            contactNumber = "+1111111111"
+        )
+        val localBob = User(
+            userId = "backup_shared_uuid",
+            fullName = "Bob",
+            age = 40,
+            gender = Gender.MALE,
+            contactNumber = "+2222222222"
+        )
+        db.userDao().insertUser(localAlice)
+        db.userDao().insertUser(localBob)
+
+        val bobMed = Medicine(
+            medicineId = "med_bob_1",
+            userId = localBob.userId,
+            medicationName = "Metformin",
+            dosage = 500.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+        db.medicineDao().insertMedicine(bobMed)
+
+        val tempDir = File(context.cacheDir, "test_restore_overwrite_collision_${System.currentTimeMillis()}")
+        tempDir.mkdirs()
+        val profileFolder = File(tempDir, "profiles/backup_shared_uuid")
+        profileFolder.mkdirs()
+
+        val backupAlice = User(
+            userId = "backup_shared_uuid",
+            fullName = "Alice",
+            age = 31,
+            gender = Gender.FEMALE,
+            contactNumber = "+1111111111"
+        )
+        File(profileFolder, "profile.json").writeText(testGson.toJson(backupAlice))
+        File(profileFolder, "medicines.json").writeText(testGson.toJson(emptyList<Medicine>()))
+        File(profileFolder, "schedules.json").writeText(testGson.toJson(emptyList<ScheduleEntry>()))
+
+        val decision = ProfileImportDecision(
+            summary = ImportableProfileSummary(
+                originalUserId = "backup_shared_uuid",
+                name = "Alice",
+                age = 31,
+                gender = "FEMALE",
+                medicineCount = 0,
+                scheduleCount = 0,
+                avatarTempPath = null,
+                isConflict = true,
+                existingLocalUserId = localAlice.userId,
+                profileFolder = profileFolder
+            ),
+            isSelected = true,
+            conflictStrategy = ConflictStrategy.OVERWRITE
+        )
+
+        val result = backupManager.executeSelectiveRestore(tempDir, listOf(decision))
+        assertTrue("Restore must succeed", result.success)
+
+        // Verify Bob still exists and was not deleted
+        val bobAfter = db.userDao().getUserByIdDirect(localBob.userId)
+        assertNotNull("Unrelated local user Bob must not be deleted by Alice's overwrite", bobAfter)
+        assertEquals("Bob", bobAfter?.fullName)
+
+        val bobMedsAfter = db.medicineDao().getMedicinesByUserDirect(localBob.userId)
+        assertEquals("Bob's medicines must not be purged", 1, bobMedsAfter.size)
+        assertEquals("Metformin", bobMedsAfter.first().medicationName)
+
+        // Verify Alice was updated/overwritten
+        val aliceAfter = db.userDao().getUserByIdDirect(localAlice.userId)
+        assertNotNull("Local user Alice must exist with overwritten data", aliceAfter)
+        assertEquals(31, aliceAfter?.age)
+
+        tempDir.deleteRecursively()
+        Unit
+    }
+
+    @Test
+    fun testRestore_mergeStrategy_deduplicatesSchedulesWithSubSecondOrMinuteDifferences() = runBlocking {
+        // Setup existing user and medicine in local database
+        val localUser = User(
+            userId = "user_merge_subsecond",
+            fullName = "Merge Dedupe User",
+            age = 45,
+            gender = Gender.MALE,
+            contactNumber = "+1234567890"
+        )
+        db.userDao().insertUser(localUser)
+
+        val localMed = Medicine(
+            medicineId = "med_merge_subsecond",
+            userId = localUser.userId,
+            medicationName = "Atorvastatin",
+            dosage = 20.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+        db.medicineDao().insertMedicine(localMed)
+
+        // Existing schedule has exact minute precision: 08:00:00.000
+        val existingSchedule = ScheduleEntry(
+            entryId = "sch_local_exact",
+            userId = localUser.userId,
+            medicineId = localMed.medicineId,
+            scheduledDateTime = LocalDateTime.of(2026, 11, 10, 8, 0, 0, 0),
+            status = MedicationStatus.PENDING
+        )
+        db.scheduleDao().insertScheduleEntry(existingSchedule)
+
+        // Setup backup directory with matching user, medicine, and schedule with sub-second / seconds difference (e.g. 08:00:25.500)
+        val tempDir = File(context.cacheDir, "test_restore_merge_subsecond_${System.currentTimeMillis()}")
+        tempDir.mkdirs()
+        val profileFolder = File(tempDir, "profiles/user_merge_subsecond")
+        profileFolder.mkdirs()
+
+        File(profileFolder, "profile.json").writeText(testGson.toJson(localUser))
+        File(profileFolder, "medicines.json").writeText(testGson.toJson(listOf(localMed)))
+
+        // Backup schedule has non-zero second and nanosecond precision
+        val backupSchedule = ScheduleEntry(
+            entryId = "sch_backup_subsecond",
+            userId = localUser.userId,
+            medicineId = localMed.medicineId,
+            scheduledDateTime = LocalDateTime.of(2026, 11, 10, 8, 0, 25, 500_000_000),
+            status = MedicationStatus.PENDING
+        )
+        File(profileFolder, "schedules.json").writeText(testGson.toJson(listOf(backupSchedule)))
+
+        val decision = ProfileImportDecision(
+            summary = ImportableProfileSummary(
+                originalUserId = localUser.userId,
+                name = localUser.fullName,
+                age = localUser.age,
+                gender = localUser.gender.name,
+                medicineCount = 1,
+                scheduleCount = 1,
+                avatarTempPath = null,
+                isConflict = true,
+                existingLocalUserId = localUser.userId,
+                profileFolder = profileFolder
+            ),
+            isSelected = true,
+            conflictStrategy = ConflictStrategy.MERGE
+        )
+
+        // Guard: Verify MERGE strategy deduplicates schedules within the same minute despite sub-second or seconds variance (#BUG-RESTORE-MERGE-DUP)
+        val result = backupManager.executeSelectiveRestore(tempDir, listOf(decision))
+        assertTrue("Merge restore must succeed", result.success)
+        assertEquals("Duplicate schedule must not be counted as restored", 0, result.schedulesRestored)
+
+        val allSchedules = db.scheduleDao().getAllScheduleEntries(localUser.userId)
+        val schedulesAtSlot = allSchedules.filter { 
+            it.scheduledDateTime.toLocalDate() == java.time.LocalDate.of(2026, 11, 10) && 
+            it.scheduledDateTime.hour == 8 && 
+            it.scheduledDateTime.minute == 0 
+        }
+        assertEquals(
+            "Schedule with sub-second variance must be deduplicated; exactly 1 entry must exist for the 08:00 AM slot",
+            1,
+            schedulesAtSlot.size
+        )
+
+        tempDir.deleteRecursively()
+        Unit
     }
 }
 

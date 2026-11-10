@@ -40,6 +40,9 @@ Dosezy automatically keeps your scheduled medication routine anchored to your da
 ### How do I search or find a medicine if I take many prescriptions?
 On the **Medicines** screen, use the search bar at the top. Simply type the name of your medication or instructions to instantly filter your roster in real-time. If no items match, tap "Clear search" to reset the list.
 
+### Can I sort or rearrange the order of my medications?
+Yes! On the **Medicines** screen, tap the **Sort** button next to search. You can sort prescriptions by Default (order added), Name (A-Z or Z-A), Scheduled Time, or choose Custom Reorder to move medicines up and down into your preferred personal order.
+
 ### What should I do when a doctor stops or changes my prescription?
 Rather than deleting the medicine and losing past compliance history, open the medication from the Medicines screen, tap **Edit**, and select **Discontinue / Archive**. This moves the medicine to your **Discontinued Medications** section at the bottom of the Medicines screen, neatly organized in an expandable and collapsible accordion. Past calendar logs and adherence analytics remain completely intact, and you can expand the section to reactivate any medication at any time.
 
@@ -78,7 +81,16 @@ Yes! Go to **Menu > Preferences > Notifications & Alarms**:
 - **Alarm Sound Volume**: Adjust the dedicated audio volume slider.
 
 ### Can I change how long the Snooze button pauses alarms?
-Yes! In **Menu > Preferences > Notifications & Alarms > Default Snooze Duration**, choose between **5, 10, 15, 20, or 30 minutes**. Your chosen duration dynamically applies to full-screen alarm popups and notification action buttons.
+Yes! In **Menu > Preferences > Notifications & Alarms > Default Snooze Duration**, choose between **5, 10, 15, 20, or 30 minutes**. Your chosen duration dynamically applies to full-screen alarm popups and notification action buttons. You can also enable **Custom Snooze Options** to choose between 5m, 10m, 15m, 20m, or 30m chips directly on the alarm screen when it rings.
+
+### What are Nagging Reminders and how do they work?
+If you tend to sleep through alarms or get sidetracked, turn on **Nagging Reminders** in **Menu > Preferences > Notifications & Alarms**. Dosezy will repeat periodic reminder alarms every 5, 10, or 15 minutes up to 1, 2, 3, 5, or 10 times, or continuously until you confirm the dose as taken.
+
+### What is the Intake Countdown Safeguard?
+Designed for ADHD and busy routines, the **Intake Countdown Safeguard** starts a timer (60s, 120s, 180s, or 300s) when you tap "Take". If you get distracted and walk away before actually consuming your medication, Dosezy sounds an automatic re-alert so no dose is forgotten.
+
+### Can I mask sensitive prescription names on my lock screen?
+Yes! In **Menu > Preferences > Notifications & Alarms**, turn on **Mask Details on Lock Screen**. The notification alerts you to take your medicine while keeping specific medication names and dosages hidden until your phone is unlocked.
 
 ---
 
@@ -119,8 +131,8 @@ Yes! Dosezy lets you record meal details, symptoms, or side effects for every do
 
 ### Can I customize when a dose is considered "Late" or "Missed"?
 Yes! Go to **Menu > Preferences > Dose Tracking**:
-- **Consider Late After**: Choose 1 hour, 2 hours, or 3 hours (default is 3 hours).
-- **Consider Missed After**: Choose between 3 hours and 9 hours (default is 6 hours).
+- **Consider Late After**: Choose from granular intervals including 15, 30, 45 minutes, 1 hour, 1.5 hours, 2 hours, 3 hours, or 4 hours (default is 3 hours).
+- **Consider Missed After**: Choose from intervals including 30, 45 minutes, 1 hour, 1.5 hours, 2 hours, 3 hours, 4 hours, 6 hours, 8 hours, or 12 hours (default is 6 hours).
 
 ---
 

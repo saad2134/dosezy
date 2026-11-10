@@ -35,7 +35,6 @@ fun NewUserBottomBar(
     existingUsers: List<User>,
     onBack: () -> Unit,
     onNext: () -> Unit,
-    isProfileSetupValid: Boolean = true,
     onCompleteProfileSetup: () -> Unit = {}
 ) {
     Surface(

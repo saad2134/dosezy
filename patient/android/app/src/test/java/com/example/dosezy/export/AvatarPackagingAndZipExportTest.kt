@@ -120,8 +120,8 @@ class AvatarPackagingAndZipExportTest {
             timesPerDay = 2,
             frequency = Frequency(FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
-            currentStock = 2,
-            refillThreshold = 10
+            currentStock = 2.0,
+            refillThreshold = 10.0
         )
         val med2 = Medicine(
             medicineId = "med_2",
@@ -132,8 +132,8 @@ class AvatarPackagingAndZipExportTest {
             timesPerDay = 1,
             frequency = Frequency(FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(21, 0)),
-            currentStock = 100,
-            refillThreshold = 10
+            currentStock = 100.0,
+            refillThreshold = 10.0
         )
 
         val allActiveMeds = listOf(med1, med2)

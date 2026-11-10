@@ -186,4 +186,105 @@ class AlarmViewModelTest {
         // startPlaybackIfNeeded completes and loads target sound configuration without error
         assertNotNull(viewModel)
     }
+
+    @Test
+    fun loadCohort_withEntriesFromMultipleUsers_isolatesCohortToPrimaryUser() = runTest(testDispatcher) {
+        // Guard: Verify that if loadCohort receives entry IDs from different users, it scopes medicinesList exclusively to the primary user (#BUG-MULTIUSER-ALARM-MERGE)
+        val secondUser = User(userId = "user_456", fullName = "Second User", age = 40, gender = Gender.FEMALE, contactNumber = "0987654321")
+        val secondMed = Medicine(medicineId = "med_456", userId = "user_456", medicationName = "Metformin", dosage = 500.0, dosageUnit = DosageUnit.MG, timesPerDay = 1, frequency = Frequency(FrequencyPattern.DAILY), scheduledTimes = listOf(LocalTime.of(8, 0)))
+        val secondEntry = ScheduleEntry(entryId = "entry_456", medicineId = "med_456", userId = "user_456", scheduledDateTime = LocalDateTime.now().minusMinutes(10), status = MedicationStatus.PENDING)
+
+        coEvery { scheduleDao.getScheduleEntryById("entry_123") } returns testEntry
+        coEvery { scheduleDao.getScheduleEntryById("entry_456") } returns secondEntry
+        coEvery { medicineDao.getMedicineByIdDirect("med_123") } returns testMedicine
+        coEvery { medicineDao.getMedicineByIdDirect("med_456") } returns secondMed
+        coEvery { userDao.getUserByIdDirect("user_123") } returns testUser
+        coEvery { userDao.getUserByIdDirect("user_456") } returns secondUser
+
+        val viewModel = AlarmViewModel(database, scheduleRepository, context, testDispatcher)
+        viewModel.loadCohort(listOf("entry_123", "entry_456"))
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state.isLoaded)
+        assertEquals("user_123", state.user?.userId)
+        assertEquals(1, state.medicinesList.size)
+        assertEquals("entry_123", state.medicinesList.first().first.entryId)
+    }
+
+    @Test
+    fun takeCohort_withMixedUserIds_onlyTakesMedicationsForPrimaryUser() = runTest(testDispatcher) {
+        // Guard: Verify takeCohort filters out foreign profile entry IDs when invoked with mixed entry IDs (#BUG-ALARM-PROFILE-REINJECT)
+        val secondUser = User(userId = "user_456", fullName = "Second User", age = 40, gender = Gender.FEMALE, contactNumber = "0987654321")
+        val secondMed = Medicine(medicineId = "med_456", userId = "user_456", medicationName = "Metformin", dosage = 500.0, dosageUnit = DosageUnit.MG, timesPerDay = 1, frequency = Frequency(FrequencyPattern.DAILY), scheduledTimes = listOf(LocalTime.of(8, 0)))
+        val secondEntry = ScheduleEntry(entryId = "entry_456", medicineId = "med_456", userId = "user_456", scheduledDateTime = LocalDateTime.now().minusMinutes(10), status = MedicationStatus.PENDING)
+
+        coEvery { scheduleDao.getScheduleEntryById("entry_123") } returns testEntry
+        coEvery { scheduleDao.getScheduleEntryById("entry_456") } returns secondEntry
+        coEvery { medicineDao.getMedicineByIdDirect("med_123") } returns testMedicine
+        coEvery { medicineDao.getMedicineByIdDirect("med_456") } returns secondMed
+        coEvery { userDao.getUserByIdDirect("user_123") } returns testUser
+        coEvery { userDao.getUserByIdDirect("user_456") } returns secondUser
+
+        val viewModel = AlarmViewModel(database, scheduleRepository, context, testDispatcher)
+        viewModel.loadCohort(listOf("entry_123"))
+        advanceUntilIdle()
+
+        var completed = false
+        viewModel.takeCohort(listOf("entry_123", "entry_456")) {
+            completed = true
+        }
+        advanceUntilIdle()
+
+        assertTrue(completed)
+        coVerify(exactly = 1) {
+            scheduleRepository.recordDoseTaken(
+                entryId = eq("entry_123"),
+                status = any(),
+                takenAtStr = any(),
+                context = any(),
+                notes = any(),
+                syncSlotNotification = any()
+            )
+        }
+        coVerify(exactly = 0) {
+            scheduleRepository.recordDoseTaken(
+                entryId = eq("entry_456"),
+                status = any(),
+                takenAtStr = any(),
+                context = any(),
+                notes = any(),
+                syncSlotNotification = any()
+            )
+        }
+    }
+
+    @Test
+    fun skipCohort_withMixedUserIds_onlySkipsMedicationsForPrimaryUser() = runTest(testDispatcher) {
+        // Guard: Verify skipCohort filters out foreign profile entry IDs when invoked with mixed entry IDs (#BUG-ALARM-PROFILE-REINJECT)
+        val secondUser = User(userId = "user_456", fullName = "Second User", age = 40, gender = Gender.FEMALE, contactNumber = "0987654321")
+        val secondMed = Medicine(medicineId = "med_456", userId = "user_456", medicationName = "Metformin", dosage = 500.0, dosageUnit = DosageUnit.MG, timesPerDay = 1, frequency = Frequency(FrequencyPattern.DAILY), scheduledTimes = listOf(LocalTime.of(8, 0)))
+        val secondEntry = ScheduleEntry(entryId = "entry_456", medicineId = "med_456", userId = "user_456", scheduledDateTime = LocalDateTime.now().minusMinutes(10), status = MedicationStatus.PENDING)
+
+        coEvery { scheduleDao.getScheduleEntryById("entry_123") } returns testEntry
+        coEvery { scheduleDao.getScheduleEntryById("entry_456") } returns secondEntry
+        coEvery { medicineDao.getMedicineByIdDirect("med_123") } returns testMedicine
+        coEvery { medicineDao.getMedicineByIdDirect("med_456") } returns secondMed
+        coEvery { userDao.getUserByIdDirect("user_123") } returns testUser
+        coEvery { userDao.getUserByIdDirect("user_456") } returns secondUser
+
+        val viewModel = AlarmViewModel(database, scheduleRepository, context, testDispatcher)
+        viewModel.loadCohort(listOf("entry_123"))
+        advanceUntilIdle()
+
+        var completed = false
+        viewModel.skipCohort(listOf("entry_123", "entry_456"), reason = "Patient asleep") {
+            completed = true
+        }
+        advanceUntilIdle()
+
+        assertTrue(completed)
+        coVerify(exactly = 1) { scheduleRepository.recordDoseSkipped(eq("entry_123"), eq("Patient asleep"), any()) }
+        coVerify(exactly = 0) { scheduleRepository.recordDoseSkipped(eq("entry_456"), any(), any()) }
+    }
 }

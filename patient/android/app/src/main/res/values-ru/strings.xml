@@ -300,7 +300,7 @@
 
     <string name="stock_current">Текущий запас</string>
     <string name="stock_refill_threshold">Предупреждать при запасе менее</string>
-    <string name="stock_units_left">Осталось %d ед.</string>
+    <string name="stock_units_left">Осталось %s ед.</string>
     <string name="refill_alert_title">Пополнение запаса: %s</string>
     <string name="preset_1x_daily">1 раз в день (08:00)</string>
     <string name="preset_2x_daily">2 раза в день (08:00, 20:00)</string>
@@ -403,7 +403,7 @@
     <string name="med_stock_placeholder">напр. 30</string>
     <string name="med_threshold_placeholder">напр. 5</string>
     <string name="notif_refill_alert_title">Напоминание о пополнении: %1$s</string>
-    <string name="notif_refill_alert_text">Заканчивается запас: осталось %1$d ед. Пожалуйста, пополните запас.</string>
+    <string name="notif_refill_alert_text">Заканчивается запас: осталось %1$s ед. Пожалуйста, пополните запас.</string>
     <string name="notif_channel_name">Напоминания о приёме</string>
     <string name="notif_channel_desc">Уведомления о времени приёма лекарств</string>
     <string name="import_profile_conflict_warn">Имя профиля уже существует на устройстве</string>
@@ -437,8 +437,8 @@
     <string name="err_cannot_open_link">Невозможно открыть ссылку</string>
     <string name="err_no_email_app">Нет доступных почтовых приложений</string>
     <string name="err_share_failed">Ошибка отправки: %1$s</string>
-    <string name="med_stock_refill_warning_badge">⚠️ Пополнение: осталось %1$d</string>
-    <string name="med_stock_badge">📦 Запас: %1$d</string>
+    <string name="med_stock_refill_warning_badge">⚠️ Пополнение: осталось %1$s</string>
+    <string name="med_stock_badge">📦 Запас: %1$s</string>
     <string name="to_be_taken_in">Принять через %1$d ч %2$d мин</string>
     <string name="time_diff_ago">%1$d ч %2$d мин назад</string>
     <string name="status_all_medications_taken">Все лекарства приняты</string>
@@ -502,7 +502,7 @@
     <string name="quick_refill_preset_30">+30</string>
     <string name="quick_refill_preset_60">+60</string>
     <string name="quick_refill_preset_90">+90</string>
-    <string name="quick_refill_success">Запас пополнен для %1$s. Новый остаток: %2$d</string>
+    <string name="quick_refill_success">Запас пополнен для %1$s. Новый остаток: %2$s</string>
 
     <string name="no_scheduled_doses_today">На сегодня приёмов не запланировано</string>
     <string name="prn_confirm_log_title">Записать приём</string>
@@ -514,8 +514,10 @@
     <string name="pref_nagging_interval">Интервал напоминаний</string>
     <string name="pref_nagging_max_repeats">Максимум повторений</string>
     <string name="pref_nagging_repeats_format">%1$d раз</string>
+    <string name="pref_nagging_repeats_continuous">Непрерывно (До приема)</string>
     <string name="notif_nagging_title">Повторное напоминание: %1$s</string>
     <string name="notif_nagging_text">Напоминание %1$d/%2$d: Прием %3$s все еще ожидает подтверждения.</string>
+    <string name="notif_nagging_text_continuous">Напоминание #%1$d: Прием %2$s все еще ожидает подтверждения.</string>
 
     <string name="widget_title">Dosezy Сегодня</string>
     <string name="widget_no_meds">Нет предстоящих приемов</string>
@@ -592,7 +594,7 @@
     <string name="alarm_snooze_format">ОТЛОЖИТЬ (%d МИН)</string>
     <string name="notif_action_snooze_format">Отложить (%d мин)</string>
     <string name="alarm_snoozed_toast">Напоминание отложено на %d минут</string>
-    <string name="alarm_stock_remaining">Запас: осталось %d ед.</string>
+    <string name="alarm_stock_remaining">Запас: осталось %s ед.</string>
     <string name="home_action_take">Принять</string>
     <string name="home_action_taken">Принято</string>
     <string name="home_action_missed">Пропущено</string>
@@ -656,7 +658,7 @@
     <string name="pharmacy_order_copy">Скопировать текст</string>
     <string name="pharmacy_order_copied">Заказ скопирован в буфер обмена</string>
     <string name="pharmacy_order_empty">Нет доступных лекарств для заказа</string>
-    <string name="pharmacy_order_current_stock">Текущий остаток: осталось %1$d %2$s</string>
+    <string name="pharmacy_order_current_stock">Текущий остаток: осталось %1$s %2$s</string>
     <string name="pharmacy_order_qty_needed">Количество для заказа: %1$d %2$s</string>
     <string name="pharmacy_order_patient_header">Пациент: %1$s</string>
     <string name="pharmacy_order_date_header">Дата: %1$s</string>
@@ -669,6 +671,9 @@
 
     <string name="about_community_open_source">Сообщество и открытый исходный код</string>
     <string name="about_version_build">Версия %1$s (Сборка %2$s)</string>
+    <string name="about_build_play">Сборка Marketplace</string>
+    <string name="about_build_foss">Сборка FOSS</string>
+    <string name="about_social_links_title">Социальные сети</string>
     <string name="country_india">Индия</string>
     <string name="country_us_ca">США / Канада</string>
     <string name="country_uk">Великобритания</string>
@@ -683,7 +688,7 @@
     <string name="pharmacy_order_days_supply">Запас на (дней)</string>
     <string name="pharmacy_order_days_format_short">%1$d дн.</string>
     <string name="pharmacy_order_medicines_include">Включить лекарства (%1$d/%2$d)</string>
-    <string name="pharmacy_order_stock_left">Осталось: %1$d</string>
+    <string name="pharmacy_order_stock_left">Осталось: %1$s</string>
     <string name="pharmacy_order_no_stock_tracked">Запас не отслеживается</string>
     <string name="pharmacy_order_header_title">📋 *Заказ лекарств*</string>
     <string name="pharmacy_order_frequency_format">Частота: %1$dx в день</string>
@@ -875,4 +880,16 @@
     <string name="notif_channel_notifications_desc">Стандартные уведомления о графике приема лекарств с учетом режима Не беспокоить</string>
     <string name="form_reminder_type">Стиль напоминания</string>
     <string name="form_reminder_type_desc">Выберите Будильник для важных лекарств или Уведомление для добавок</string>
+
+    <!-- Medicine Order & Sorting (#120) -->
+    <string name="sort_medicines_title">Сортировка и порядок</string>
+    <string name="sort_preset_default">По умолчанию (по дате добавления)</string>
+    <string name="sort_preset_name_asc">По названию (А-Я)</string>
+    <string name="sort_preset_name_desc">По названию (Я-А)</string>
+    <string name="sort_preset_time_asc">По времени приема (сначала ранние)</string>
+    <string name="sort_preset_custom">Пользовательский порядок</string>
+    <string name="sort_custom_reorder_title">Изменить порядок лекарств</string>
+    <string name="sort_custom_reorder_desc">Используйте стрелки, чтобы настроить порядок приема лекарств.</string>
+    <string name="sort_move_up">Переместить вверх</string>
+    <string name="sort_move_down">Переместить вниз</string>
 </resources>

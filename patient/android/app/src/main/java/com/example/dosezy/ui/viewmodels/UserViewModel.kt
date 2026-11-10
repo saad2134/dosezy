@@ -226,12 +226,13 @@ class UserViewModel @Inject constructor(
                     // Guard: Cancel alarms across all supported versions (API 24+) to prevent orphaned alarms ringing after user deletion
                     medicineNotificationManager.cancelAllAlarmsForUser(user.userId)
 
-                    // Guard: Dismiss active ADHD intake countdown notification if active countdown belongs to deleted user
+                    // Guard: Dismiss active ADHD intake countdown notification only if active countdown belongs to deleted user to prevent cancelling other profiles' active safeguards (#BUG-SAFEGUARD-MULTIUSER)
                     try {
                         val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
+                            ?: com.example.dosezy.notifications.IntakeSafeguardManager.getPersistedState(context)
                         if (activeCountdown != null) {
                             val entry = scheduleRepository.getScheduleEntryById(activeCountdown.entryId)
-                            if (entry == null || entry.userId == user.userId) {
+                            if (activeCountdown.userId == user.userId || entry?.userId == user.userId) {
                                 com.example.dosezy.notifications.IntakeSafeguardManager.cancelCountdown(context)
                             }
                         }
@@ -281,6 +282,11 @@ class UserViewModel @Inject constructor(
                     try {
                         // Guard: Scrub orphaned widget preferences and unbind widgets from deleted user to prevent SharedPreferences leakage and stale widget bindings
                         com.example.dosezy.widget.DosezyWidgetPrefs.deleteWidgetPreferencesForUser(context, user.userId)
+                    } catch (_: Exception) {}
+
+                    try {
+                        // Guard: Scrub orphaned medicine sorting and custom order preferences for the deleted profile to prevent SharedPreferences leakage
+                        com.example.dosezy.data.repository.MedicineOrderPreferences.clearPreferencesForUser(context, user.userId)
                     } catch (_: Exception) {}
 
                     // Delete the user from DB (cascades to medicines & schedules)

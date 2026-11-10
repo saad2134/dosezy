@@ -56,9 +56,9 @@ class SkipCohortUseCase @Inject constructor(
             }
         } catch (_: Exception) {}
 
-        // Guard: Coordinate slot notification sync and widget updates across each distinct time slot in entryIds (#BUG-MULTI-SLOT-COHORT)
+        // Guard: Coordinate slot notification sync and widget updates across each distinct user and time slot (#BUG-MULTI-SLOT-COHORT, #BUG-MULTIUSER-COHORT)
         val entries = entryIds.mapNotNull { scheduleRepository.getScheduleEntryById(it) }
-        val distinctSlots = entries.distinctBy { it.scheduledDateTime.withSecond(0).withNano(0) }
+        val distinctSlots = entries.distinctBy { Pair(it.userId, it.scheduledDateTime.withSecond(0).withNano(0)) }
         if (distinctSlots.isNotEmpty()) {
             distinctSlots.forEach { slotEntry ->
                 scheduleRepository.syncSlotNotificationAndAlarms(slotEntry.entryId, slotEntry, context)

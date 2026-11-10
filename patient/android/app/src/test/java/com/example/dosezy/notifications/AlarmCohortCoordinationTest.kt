@@ -1,4 +1,4 @@
-﻿package com.example.dosezy.notifications
+package com.example.dosezy.notifications
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
@@ -96,6 +96,33 @@ class AlarmCohortCoordinationTest {
         assertNull(prefs.getString("snooze_group_ids_entry_audit10_2", null))
     }
 
+    @Test
+    fun alarmScheduler_naggingReminder_persistsAndTransfersUserId() {
+        val scheduler = AlarmScheduler(context)
+        val entryIds = arrayListOf("entry_nag_1", "entry_nag_2")
+        val medNames = arrayListOf("Med One", "Med Two")
+
+        scheduler.scheduleNaggingReminder(
+            entryId = "entry_nag_1",
+            minutes = 5,
+            medicineName = "Med One, Med Two",
+            naggingCount = 1,
+            entryIds = entryIds,
+            medicineNames = medNames,
+            scheduledTime = "08:00",
+            userId = "user_nag_target"
+        )
+
+        val prefs = context.getSharedPreferences(AlarmScheduler.PREFS_COORDINATION, Context.MODE_PRIVATE)
+        assertEquals("user_nag_target", prefs.getString("nagging_group_user_entry_nag_1", null))
+
+        // When primary entry 1 is cancelled/taken, nagging should transfer to entry 2 with user ID retained
+        scheduler.cancelNagging("entry_nag_1")
+
+        assertNull(prefs.getString("nagging_group_user_entry_nag_1", null))
+        assertEquals("user_nag_target", prefs.getString("nagging_group_user_entry_nag_2", null))
+    }
+
     // ─────────────────────────────────────────────────────────────────
     // Issue 3 Tests: CSV Full Schema Parity & Inventory Serialization
     // ─────────────────────────────────────────────────────────────────
@@ -121,8 +148,8 @@ class AlarmCohortCoordinationTest {
             timesPerDay = 2,
             frequency = Frequency(FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
-            currentStock = 120,
-            refillThreshold = 20,
+            currentStock = 120.0,
+            refillThreshold = 20.0,
             autoDeductOnTake = true,
             notes = "Take with water",
             startDate = LocalDate.of(2026, 1, 1),
@@ -156,5 +183,38 @@ class AlarmCohortCoordinationTest {
         assertTrue(csv.contains("\"sch_audit10\""))
         assertTrue(csv.contains("TAKEN_ON_TIME"))
         assertTrue(csv.contains("\"Taken after breakfast\""))
+    }
+
+    @Test
+    fun syncSlotNotification_formatsRemainingMedicationDetailsWithCustomDosageOverride() {
+        // Guard: Verify getDosageDisplay accurately reflects schedule entry custom dosage overrides for cohort synchronization
+        val medicine = Medicine(
+            medicineId = "med_custom_dose",
+            userId = "usr_1",
+            medicationName = "Prednisone",
+            dosage = 5.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            currentStock = 30.0,
+            refillThreshold = 5.0
+        )
+        val scheduleWithOverride = ScheduleEntry(
+            entryId = "sch_custom_dose",
+            userId = "usr_1",
+            medicineId = "med_custom_dose",
+            scheduledDateTime = LocalDateTime.of(2026, 11, 10, 8, 0),
+            status = MedicationStatus.PENDING,
+            dosage = 2.5
+        )
+
+        val display = medicine.getDosageDisplay(scheduleWithOverride.scheduledDateTime.toLocalTime(), scheduleWithOverride.dosage)
+        assertEquals("2.5 mg", display)
+
+        val tabletMed = medicine.copy(dosage = 1.0, dosageUnit = DosageUnit.TABLET)
+        val tabletSchedule = scheduleWithOverride.copy(dosage = 0.5)
+        val tabletDisplay = tabletMed.getDosageDisplay(tabletSchedule.scheduledDateTime.toLocalTime(), tabletSchedule.dosage)
+        assertEquals("½ tablet", tabletDisplay)
     }
 }

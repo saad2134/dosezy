@@ -145,7 +145,7 @@ fun launchStoreOrFallback(context: Context, sourceDetails: InstallSourceDetails)
         }
         context.startActivity(intent)
     } catch (e: ActivityNotFoundException) {
-        // Native store app is uninstalled or missing — fallback to web store URL in default browser
+        // Native store app is uninstalled or missing: fallback to web store URL in default browser
         val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(sourceDetails.webFallbackUrl)).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }

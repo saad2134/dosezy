@@ -8,10 +8,17 @@ package com.example.dosezy
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.example.dosezy.data.export.PdfReportGenerator
+import com.example.dosezy.data.model.DosageUnit
+import com.example.dosezy.data.model.Frequency
+import com.example.dosezy.data.model.FrequencyPattern
+import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.MedicationStatus
+import com.example.dosezy.data.model.Medicine
 import com.example.dosezy.data.model.ScheduleEntry
+import com.example.dosezy.data.model.User
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -267,5 +274,45 @@ class PdfReportGeneratorTest {
             status = MedicationStatus.SKIPPED
         )
         assertEquals(MedicationStatus.SKIPPED, generator.resolveDisplayStatus(skippedEntry, now, missedAfterHours))
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // Multiline, CJK Wrapping & Multi-Page Table Header Tests (#BUG-PDF-WRAP-CJK, #BUG-PDF-MULTI-PAGE-HEADERS)
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testWrapTextToLines_handlesChineseAndJapaneseUnspacedTextWithoutOverflow() {
+        val paint = android.graphics.Paint().apply { textSize = 10f }
+        // CJK text without spaces
+        val cjkAllergies = "青霉素严重过敏，对阿莫西林、头孢类抗生素过敏，海鲜及坚果过敏"
+        val maxColWidth = 15f // Character limit in Robolectric default font metrics
+        val lines = generator.wrapTextToLines("Allergies: ", cjkAllergies, paint, maxColWidth)
+
+        assertTrue("CJK text must wrap into multiple lines without spaces", lines.size > 1)
+        assertTrue("All wrapped CJK lines must fit within maxWidth", lines.all { paint.measureText(it) <= maxColWidth })
+        assertTrue("First line must retain prefix", lines.first().startsWith("Allergies: "))
+    }
+
+    @Test
+    fun testWrapTextToLines_handlesEmbeddedNewlinesProperly() {
+        val paint = android.graphics.Paint().apply { textSize = 10f }
+        val multilineConditions = "Type 2 Diabetes\nHypertension\nAsthma"
+        val lines = generator.wrapTextToLines("Conditions: ", multilineConditions, paint, 50f)
+
+        assertEquals("Must produce 3 distinct lines for 3 newline-separated conditions", 3, lines.size)
+        assertTrue("First line must contain prefix and first item", lines[0].startsWith("Conditions: Type 2 Diabetes"))
+        assertEquals("Hypertension", lines[1])
+        assertEquals("Asthma", lines[2])
+    }
+
+    @Test
+    fun testWrapTextToLines_breaksUnbrokenLongToken() {
+        val paint = android.graphics.Paint().apply { textSize = 10f }
+        val longChemical = "Hydrochlorothiazide-Triamterene-Extended-Release-Compound"
+        val maxColWidth = 20f
+        val lines = generator.wrapTextToLines("", longChemical, paint, maxColWidth)
+
+        assertTrue("Unbroken token longer than maxWidth must be split across lines", lines.size > 1)
+        assertTrue("All split chunks must fit within maxWidth", lines.all { paint.measureText(it) <= maxColWidth })
     }
 }

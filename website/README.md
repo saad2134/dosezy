@@ -8,7 +8,7 @@
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
 <p align="center">
-  The official marketing portal, landing page, and documentation hub for <strong>Dosezy</strong> — the smart, open-source, local-first medicine tracking and adherence platform.
+  The official marketing portal, landing page, and documentation hub for <strong>Dosezy</strong>: the smart, open-source, local-first medicine tracking and adherence platform.
 </p>
 
 </div>

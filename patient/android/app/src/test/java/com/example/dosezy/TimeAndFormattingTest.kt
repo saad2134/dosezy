@@ -155,6 +155,58 @@ class TimeAndFormattingTest {
         assertTrue(TimeCalculationUtils.isTakenLate(scheduled, current, lateAfterHours = 3))
     }
 
+    @Test
+    fun isTakenLate_subHourGranularMinutes_correctlyEvaluates() {
+        // Guard: Verify sub-hour minute-based thresholds (15, 30, 45 min) evaluate accurately (#119)
+        val scheduled = LocalDateTime.of(2026, 9, 21, 8, 0)
+
+        // 15-minute threshold
+        val at14m = LocalDateTime.of(2026, 9, 21, 8, 14)
+        val at15m = LocalDateTime.of(2026, 9, 21, 8, 15)
+        val at20m = LocalDateTime.of(2026, 9, 21, 8, 20)
+        assertFalse(TimeCalculationUtils.isTakenLate(scheduled, at14m, lateAfterHours = 15))
+        assertTrue(TimeCalculationUtils.isTakenLate(scheduled, at15m, lateAfterHours = 15))
+        assertTrue(TimeCalculationUtils.isTakenLate(scheduled, at20m, lateAfterHours = 15))
+
+        // 30-minute threshold
+        val at29m = LocalDateTime.of(2026, 9, 21, 8, 29)
+        val at30m = LocalDateTime.of(2026, 9, 21, 8, 30)
+        assertFalse(TimeCalculationUtils.isTakenLate(scheduled, at29m, lateAfterHours = 30))
+        assertTrue(TimeCalculationUtils.isTakenLate(scheduled, at30m, lateAfterHours = 30))
+
+        // 45-minute threshold
+        val at44m = LocalDateTime.of(2026, 9, 21, 8, 44)
+        val at45m = LocalDateTime.of(2026, 9, 21, 8, 45)
+        assertFalse(TimeCalculationUtils.isTakenLate(scheduled, at44m, lateAfterHours = 45))
+        assertTrue(TimeCalculationUtils.isTakenLate(scheduled, at45m, lateAfterHours = 45))
+    }
+
+    @Test
+    fun user_defensiveGetters_normalizeLegacyHoursToMinutes() {
+        // Guard: Verify User model defensive getters normalize legacy whole-hour values (< 15) to minutes (#119)
+        val legacyUser = com.example.dosezy.data.model.User(
+            fullName = "Legacy",
+            age = 30,
+            gender = com.example.dosezy.data.model.Gender.DO_NOT_SPECIFY,
+            contactNumber = "",
+            considerLateAfter = 1,
+            considerMissedAfter = 3
+        )
+        assertEquals(60, legacyUser.lateAfterMinutes)
+        assertEquals(180, legacyUser.missedAfterMinutes)
+
+        val modernUser = com.example.dosezy.data.model.User(
+            fullName = "Modern",
+            age = 30,
+            gender = com.example.dosezy.data.model.Gender.DO_NOT_SPECIFY,
+            contactNumber = "",
+            considerLateAfter = 15,
+            considerMissedAfter = 45
+        )
+        assertEquals(15, modernUser.lateAfterMinutes)
+        assertEquals(45, modernUser.missedAfterMinutes)
+    }
+
     // ───────────────────────────────────────────────────────────────
     // 3. TimeCalculationUtils.isMissed
     // ───────────────────────────────────────────────────────────────

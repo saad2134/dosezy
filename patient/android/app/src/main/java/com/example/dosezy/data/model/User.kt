@@ -30,14 +30,14 @@ data class User(
     val theme: Theme = Theme.SYSTEM,
     val timeFormat: TimeFormat = TimeFormat.HOUR_12,
     val language: Language = Language.SYSTEM,
-    val considerLateAfter: Int = 3, // hours, default 3 (options 1-3)
-    val considerMissedAfter: Int = 6, // hours, default 6 (options 3-9)
+    val considerLateAfter: Int = 180, // minutes (e.g. 15, 30, 45, 60, 90, 120, 180, 240), default 180 (3 hours) (#119)
+    val considerMissedAfter: Int = 360, // minutes (e.g. 30, 45, 60, 90, 120, 180, 240, 360, 480, 720), default 360 (6 hours) (#119)
     val snoozeDuration: Int = 10, // minutes, default 10 (options 5, 10, 15, 20, 30)
     val allergies: String? = null,
     val medicalConditions: String? = null,
     val naggingRemindersEnabled: Boolean = false,
     val naggingIntervalMinutes: Int = 5, // 5, 10, 15 min
-    val naggingMaxRepeats: Int = 3, // 1, 2, 3 repeats
+    val naggingMaxRepeats: Int = 3, // 0 = continuous/until taken, 1, 2, 3, 5, 10 repeats (#119)
     val alarmSound: AlarmSound = AlarmSound.SYSTEM_DEFAULT,
     val customAlarmSoundPath: String? = null,
     val customAlarmSoundTitle: String? = null,
@@ -61,7 +61,11 @@ data class User(
     val customSnoozePopupEnabled: Boolean = false,
     // Guard: Option to treat reminders as alarms or notifications (#111)
     val reminderType: ReminderType = ReminderType.ALARM
-)
+) {
+    // Guard: Defensive getters normalizing legacy whole-hour values (< 15) to minutes for seamless backward compatibility (#119)
+    val lateAfterMinutes: Int get() = if (considerLateAfter in 1..14) considerLateAfter * 60 else considerLateAfter
+    val missedAfterMinutes: Int get() = if (considerMissedAfter in 1..14) considerMissedAfter * 60 else considerMissedAfter
+}
 
 enum class AlarmSound(val rawResId: Int?) {
     SYSTEM_DEFAULT(null),

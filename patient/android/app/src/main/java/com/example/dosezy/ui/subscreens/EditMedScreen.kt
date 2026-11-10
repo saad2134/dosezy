@@ -137,8 +137,8 @@ fun EditMedScreen(
             medicineImagePath = medicineToEdit.imageUri
             selectedDaysOfWeek = medicineToEdit.frequency.selectedDaysOfWeek ?: listOf()
             selectedDaysOfMonth = medicineToEdit.frequency.selectedDaysOfMonth ?: listOf()
-            currentStockText = medicineToEdit.currentStock?.toString() ?: ""
-            refillThresholdText = medicineToEdit.refillThreshold?.toString() ?: ""
+            currentStockText = medicineToEdit.currentStock?.let { com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(it) } ?: ""
+            refillThresholdText = medicineToEdit.refillThreshold?.let { com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(it) } ?: ""
             selectedPillShape = medicineToEdit.pillShape
             selectedPillColor = medicineToEdit.pillColor
             doctorNotes = medicineToEdit.notes ?: ""
@@ -408,9 +408,9 @@ fun EditMedScreen(
                                     ),
                                     scheduledTimes = if (selectedFrequency == FrequencyPattern.AS_NEEDED) emptyList() else scheduledTimesList,
                                     imageUri = medicineImagePath,
-                                    currentStock = currentStockText.normalizeArabicDigits().toIntOrNull(),
+                                    currentStock = currentStockText.normalizeArabicDigits().toDoubleOrNull(),
                                     // Guard: Preserve configured refillThreshold across edits so low-stock alerts are not wiped to null
-                                    refillThreshold = refillThresholdText.normalizeArabicDigits().toIntOrNull(),
+                                    refillThreshold = refillThresholdText.normalizeArabicDigits().toDoubleOrNull(),
                                     // Guard: Preserve existing autoDeductOnTake preference to prevent inadvertent inventory decrements when editing medication metadata
                                     autoDeductOnTake = medicineToEdit?.autoDeductOnTake ?: true,
                                     notes = doctorNotes.trim().ifBlank { null },
@@ -426,11 +426,14 @@ fun EditMedScreen(
                                     reminderType = selectedReminderType
                                 )
 
+                                // Guard: Detect dosage and dosageUnit changes matching MedicineRepository to prompt ScheduleEffectiveDateDialog (#BUG-EDITMED-DOSAGE-CHANGE)
                                 if (medicineToEdit != null) {
                                     val timingOrScheduleChanged = (
                                         medicineToEdit.scheduledTimes != updatedMedicine.scheduledTimes ||
                                         medicineToEdit.frequency != updatedMedicine.frequency ||
                                         medicineToEdit.timesPerDay != updatedMedicine.timesPerDay ||
+                                        medicineToEdit.dosage != updatedMedicine.dosage ||
+                                        medicineToEdit.dosageUnit != updatedMedicine.dosageUnit ||
                                         medicineToEdit.customDosages != updatedMedicine.customDosages ||
                                         medicineToEdit.startDate != updatedMedicine.startDate ||
                                         medicineToEdit.endDate != updatedMedicine.endDate ||
