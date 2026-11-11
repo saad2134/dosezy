@@ -137,7 +137,7 @@ fun AboutScreen(navController: NavController) {
                     )
 
                     Text(
-                        text = stringResource(R.string.about_version_build, versionName ?: "2.5.13", versionCode),
+                        text = stringResource(R.string.about_version_build, versionName ?: "2.5.14", versionCode),
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
