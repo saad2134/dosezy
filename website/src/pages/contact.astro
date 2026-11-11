@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { SOCIAL_LINKS } from '../lib/social-links';
 ---
 
 <Layout title="Contact & Support ✦ Dosezy">
@@ -43,7 +44,7 @@ import Footer from '../components/Footer.astro';
 						</p>
 					</div>
 					<a 
-						href="https://github.com/saad2134/dosezy/discussions" 
+						href={SOCIAL_LINKS.discussions.href} 
 						target="_blank" 
 						rel="noopener noreferrer"
 						class="w-full py-3 px-4 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-bold hover:bg-white/10 transition-all flex items-center justify-center space-x-2 group-hover:border-sky-500/40"
