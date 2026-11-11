@@ -25,6 +25,82 @@ import java.time.temporal.TemporalAdjusters
 object ScheduleRecurrenceEngine {
 
     /**
+     * pure domain engine responsible for computing recurring medication dose schedules,
+     * interval timelines across midnight boundaries, and frequency evaluations.
+     */
+    /**
+     * Calculates the duration in minutes for a single rolling intake interval based on medicine frequency pattern.
+     * Returns null if the medicine is not configured for rolling intervals or has an incompatible pattern (#119).
+     */
+    fun getRollingIntervalMinutes(medicine: Medicine): Long? {
+        if (!medicine.frequency.isRollingInterval) return null
+        return when (medicine.frequency.pattern) {
+            FrequencyPattern.DAILY -> {
+                val times = medicine.timesPerDay.coerceAtLeast(1)
+                1440L / times
+            }
+            FrequencyPattern.EVERY_X_HOURS -> {
+                val hours = (medicine.frequency.intervalHours ?: 4).coerceIn(1, 23)
+                hours * 60L
+            }
+            FrequencyPattern.EVERY_X_DAYS -> {
+                val days = (medicine.frequency.intervalDays ?: 1).coerceAtLeast(1)
+                days * 1440L
+            }
+            else -> null
+        }
+    }
+
+    /**
+     * Projects future schedule entries anchored dynamically from a specific date-time
+     * (such as takenAt + interval) using fixed rolling interval spacing (#119).
+     *
+     * @param medicine Target medicine entity.
+     * @param anchorDateTime Starting date-time for the first projected future entry.
+     * @param daysCount Number of days forward to project entries (default: 30 days).
+     * @return List of generated [ScheduleEntry] items.
+     */
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun generateRollingScheduleEntries(
+        medicine: Medicine,
+        anchorDateTime: LocalDateTime,
+        daysCount: Int = 30
+    ): List<ScheduleEntry> {
+        val intervalMinutes = getRollingIntervalMinutes(medicine) ?: return emptyList()
+        if (medicine.isArchived || medicine.frequency.pattern == FrequencyPattern.AS_NEEDED) return emptyList()
+
+        val entries = mutableListOf<ScheduleEntry>()
+        val endDateTime = anchorDateTime.plusDays(daysCount.toLong())
+        val effectiveEnd = if (medicine.endDate != null) {
+            val medEnd = medicine.endDate.atTime(LocalTime.MAX)
+            if (medEnd.isBefore(endDateTime)) medEnd else endDateTime
+        } else {
+            endDateTime
+        }
+
+        var cursor = anchorDateTime.withSecond(0).withNano(0)
+        while (!cursor.isAfter(effectiveEnd)) {
+            val itemDate = cursor.toLocalDate()
+            val cleanTime = cursor.toLocalTime().withSecond(0).withNano(0)
+            val scheduledDateTime = cursor.withSecond(0).withNano(0)
+            val entryId = "${medicine.medicineId}_${itemDate}_${cleanTime}".replace(":", "_").replace("-", "_")
+
+            entries.add(
+                ScheduleEntry(
+                    entryId = entryId,
+                    userId = medicine.userId,
+                    medicineId = medicine.medicineId,
+                    scheduledDateTime = scheduledDateTime,
+                    status = MedicationStatus.PENDING,
+                    dosage = medicine.getDosageForTime(cleanTime)
+                )
+            )
+            cursor = cursor.plusMinutes(intervalMinutes)
+        }
+        return entries
+    }
+
+    /**
      * Generates schedule entries for a medicine across a given date range.
      *
      * @param medicine The target medicine entity.

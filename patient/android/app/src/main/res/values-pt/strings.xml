@@ -491,6 +491,11 @@ Deseja continuar?</string>
     <string name="custom_recurrence_interval_label">Repetir a cada (semanas)</string>
     <string name="custom_recurrence_summary">Repete a cada %1$d semanas em %2$s</string>
     <string name="validation_select_custom_days">Selecione pelo menos um dia para a repetição personalizada</string>
+    <!-- Rolling Interval Scheduling (#119) -->
+    <string name="freq_rolling_interval_title">Intervalo contínuo</string>
+    <string name="freq_rolling_interval_desc">O temporizador da próxima dose inicia após registrar a ingestão para manter o espaçamento seguro</string>
+    <string name="freq_rolling_badge">Contínuo</string>
+
     <string name="btn_log_prn_dose">Registar dose</string>
     <string name="prn_doses_taken_today">Doses registadas hoje: %1$d</string>
     <string name="prn_section_title">Medicamentos SOS / Conforme necessário</string>

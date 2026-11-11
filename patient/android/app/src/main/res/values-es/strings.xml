@@ -508,6 +508,11 @@
     <string name="custom_recurrence_interval_label">Repetir cada (semanas)</string>
     <string name="custom_recurrence_summary">Se repite cada %1$d semanas los %2$s</string>
     <string name="validation_select_custom_days">Seleccione al menos un día para la frecuencia personalizada</string>
+    <!-- Rolling Interval Scheduling (#119) -->
+    <string name="freq_rolling_interval_title">Intervalo continuo</string>
+    <string name="freq_rolling_interval_desc">El temporizador de la siguiente dosis inicia tras registrar la toma para mantener el intervalo seguro</string>
+    <string name="freq_rolling_badge">Continuo</string>
+
     <string name="btn_log_prn_dose">Registrar dosis</string>
     <string name="prn_doses_taken_today">Dosis registradas hoy: %1$d</string>
     <string name="prn_section_title">Medicamentos a demanda (PRN)</string>

@@ -968,7 +968,9 @@ class BackupRestoreManager(
                     selectedDaysOfMonth = selectedDaysOfMonth,
                     intervalHours = freqObj.get("intervalHours")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
                     intervalDays = freqObj.get("intervalDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
-                    intervalWeeks = freqObj.get("intervalWeeks")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()
+                    intervalWeeks = freqObj.get("intervalWeeks")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    // Guard: Restore rolling interval flag from frequency JSON object (#119)
+                    isRollingInterval = freqObj.get("isRollingInterval")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false
                 )
             } else if (obj.has("frequencyPattern") || obj.has("pattern")) {
                 // Guard: Support flattened frequency attributes from DataExporter exports and legacy backups to prevent silent schedule corruption
@@ -988,7 +990,9 @@ class BackupRestoreManager(
                     selectedDaysOfMonth = selectedDaysOfMonth,
                     intervalHours = obj.get("intervalHours")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
                     intervalDays = obj.get("intervalDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
-                    intervalWeeks = obj.get("intervalWeeks")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()
+                    intervalWeeks = obj.get("intervalWeeks")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    // Guard: Restore rolling interval flag from flattened frequency properties (#119)
+                    isRollingInterval = obj.get("isRollingInterval")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false
                 )
             } else {
                 Frequency(FrequencyPattern.DAILY)

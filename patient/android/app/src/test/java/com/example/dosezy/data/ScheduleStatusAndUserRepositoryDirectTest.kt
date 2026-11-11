@@ -708,6 +708,110 @@ class ScheduleStatusAndUserRepositoryDirectTest {
         assertNotNull(refreshedEntry)
         assertTrue(refreshedEntry!!.doseNotes?.contains("[Partial Stock: Took 1 of 2]") == true)
     }
+
+    @Test
+    fun recordDoseTaken_rollingInterval_reanchorsFuturePendingEntries() = runBlocking {
+        // Guard: Verify taking a rolling interval dose late re-anchors future pending schedule entries to takenAt + interval (#119)
+        val user = sampleUser("user_rolling_test")
+        userDao.insertUser(user)
+
+        val rollingMed = sampleMedicine("med_rolling_1", user.userId, "Daily Rolling Med").copy(
+            frequency = Frequency(FrequencyPattern.DAILY, isRollingInterval = true),
+            timesPerDay = 1,
+            scheduledTimes = listOf(LocalTime.of(9, 0))
+        )
+        medicineDao.insertMedicine(rollingMed)
+
+        val scheduleRepository = com.example.dosezy.data.repository.ScheduleRepository(db)
+        val initialEntry1 = ScheduleEntry(
+            entryId = "rolling_entry_1",
+            userId = user.userId,
+            medicineId = rollingMed.medicineId,
+            scheduledDateTime = LocalDateTime.of(2026, 12, 1, 9, 0, 0),
+            status = MedicationStatus.PENDING,
+            dosage = 500.0
+        )
+        val initialEntry2 = ScheduleEntry(
+            entryId = "rolling_entry_2",
+            userId = user.userId,
+            medicineId = rollingMed.medicineId,
+            scheduledDateTime = LocalDateTime.of(2026, 12, 2, 9, 0, 0),
+            status = MedicationStatus.PENDING,
+            dosage = 500.0
+        )
+        scheduleDao.insertScheduleEntries(listOf(initialEntry1, initialEntry2))
+
+        val takenAt = LocalDateTime.of(2026, 12, 1, 14, 30, 0) // 5.5 hours late
+        scheduleRepository.recordDoseTaken(
+            entryId = initialEntry1.entryId,
+            status = "TAKEN_LATE",
+            takenAt = takenAt,
+            context = context
+        )
+
+        val updatedEntry1 = scheduleDao.getScheduleEntryById(initialEntry1.entryId)
+        assertNotNull(updatedEntry1)
+        assertEquals(MedicationStatus.TAKEN_LATE, updatedEntry1!!.status)
+
+        // Previous fixed tomorrow 09:00 entry should be removed
+        val deletedEntry2 = scheduleDao.getScheduleEntryById(initialEntry2.entryId)
+        assertNull("Old fixed future pending entry must be deleted on rolling re-anchor", deletedEntry2)
+
+        // New re-anchored entry must exist at takenAt + 24 hours (2026-12-02T14:30)
+        val allEntries = scheduleDao.getAllScheduleEntries(user.userId)
+        val nextEntry = allEntries.firstOrNull { it.entryId != initialEntry1.entryId }
+        assertNotNull("Re-anchored future entry must be inserted", nextEntry)
+        assertEquals(LocalDateTime.of(2026, 12, 2, 14, 30, 0), nextEntry!!.scheduledDateTime)
+        assertEquals(MedicationStatus.PENDING, nextEntry.status)
+    }
+
+    @Test
+    fun recordDosePending_rollingInterval_restoresBaselineScheduleOnUndo() = runBlocking {
+        // Guard: Verify undoing a taken rolling dose purges re-anchored entries and restores schedule from baseline time (#119)
+        val user = sampleUser("user_rolling_undo_test")
+        userDao.insertUser(user)
+
+        val rollingMed = sampleMedicine("med_rolling_undo_1", user.userId, "Daily Rolling Undo Med").copy(
+            frequency = Frequency(FrequencyPattern.DAILY, isRollingInterval = true),
+            timesPerDay = 1,
+            scheduledTimes = listOf(LocalTime.of(9, 0))
+        )
+        medicineDao.insertMedicine(rollingMed)
+
+        val scheduleRepository = com.example.dosezy.data.repository.ScheduleRepository(db)
+        val baselineTime = LocalDateTime.of(2026, 12, 1, 9, 0, 0)
+        val entry1 = ScheduleEntry(
+            entryId = "rolling_undo_entry_1",
+            userId = user.userId,
+            medicineId = rollingMed.medicineId,
+            scheduledDateTime = baselineTime,
+            status = MedicationStatus.PENDING,
+            dosage = 500.0
+        )
+        scheduleDao.insertScheduleEntry(entry1)
+
+        val takenAt = LocalDateTime.of(2026, 12, 1, 15, 0, 0) // 6 hours late
+        scheduleRepository.recordDoseTaken(
+            entryId = entry1.entryId,
+            status = "TAKEN_LATE",
+            takenAt = takenAt,
+            context = context
+        )
+
+        // Undo the taken dose
+        scheduleRepository.undoDoseTaken(entry1.entryId, context)
+
+        val revertedEntry1 = scheduleDao.getScheduleEntryById(entry1.entryId)
+        assertNotNull(revertedEntry1)
+        assertEquals(MedicationStatus.PENDING, revertedEntry1!!.status)
+        assertEquals(baselineTime, revertedEntry1.scheduledDateTime)
+
+        // Future pending entries should now be anchored to baseline 09:00 + 24h = 2026-12-02T09:00
+        val allEntries = scheduleDao.getAllScheduleEntries(user.userId)
+        val restoredNext = allEntries.firstOrNull { it.entryId != entry1.entryId }
+        assertNotNull("Restored baseline future entry must exist", restoredNext)
+        assertEquals(LocalDateTime.of(2026, 12, 2, 9, 0, 0), restoredNext!!.scheduledDateTime)
+    }
 }
 
 

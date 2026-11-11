@@ -527,6 +527,11 @@ Do you want to continue?</string>
     <string name="custom_recurrence_interval_label">Repeat every (weeks)</string>
     <string name="custom_recurrence_summary">Repeats every %1$d weeks on %2$s</string>
     <string name="validation_select_custom_days">Please select at least one day for custom recurrence</string>
+    <!-- Rolling Interval Scheduling (#119) -->
+    <string name="freq_rolling_interval_title">Rolling Interval</string>
+    <string name="freq_rolling_interval_desc">Start timer only after dose is marked taken to maintain safe spacing</string>
+    <string name="freq_rolling_badge">Rolling</string>
+
     <string name="btn_log_prn_dose">Log Dose</string>
     <string name="prn_doses_taken_today">Doses logged today: %1$d</string>
     <string name="prn_section_title">As Needed (PRN) Medications</string>

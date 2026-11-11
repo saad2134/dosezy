@@ -492,6 +492,11 @@
     <string name="custom_recurrence_interval_label">পুনরাবৃত্তি প্রতি (সপ্তাহে)</string>
     <string name="custom_recurrence_summary">প্রতি %1$d সপ্তাহ পর পর %2$s বারে পুনরাবৃত্তি হবে</string>
     <string name="validation_select_custom_days">কাস্টম পুনরাবৃত্তির জন্য অনুগ্রহ করে কমপক্ষে একটি দিন নির্বাচন করুন</string>
+    <!-- Rolling Interval Scheduling (#119) -->
+    <string name="freq_rolling_interval_title">রোলিং ব্যবধান</string>
+    <string name="freq_rolling_interval_desc">নিরাপদ ব্যবধান বজায় রাখতে ওষুধ খাওয়ার পর পরবর্তী ডোজের টাইমার শুরু হবে</string>
+    <string name="freq_rolling_badge">রোলিং</string>
+
     <string name="btn_log_prn_dose">ডোজ লগ করুন</string>
     <string name="prn_doses_taken_today">আজকে রেকর্ডকৃত ডোজ: %1$d</string>
     <string name="prn_section_title">প্রয়োজনভিত্তিক ওষুধ (PRN)</string>

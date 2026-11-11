@@ -189,7 +189,9 @@ fun MedicineTimingsAndDosagesCard(
     dosageErrorMessage: String? = null,
     invalidTimeSlotKeys: Set<String> = emptySet(),
     isFrequencyError: Boolean = false,
-    frequencyErrorMessage: String? = null
+    frequencyErrorMessage: String? = null,
+    isRollingInterval: Boolean = false,
+    onRollingIntervalChange: (Boolean) -> Unit = {}
 ) = com.example.dosezy.ui.components.form.MedicineTimingsAndDosagesCard(
     selectedFrequency = selectedFrequency,
     onFrequencyChange = onFrequencyChange,
@@ -223,7 +225,9 @@ fun MedicineTimingsAndDosagesCard(
     dosageErrorMessage = dosageErrorMessage,
     invalidTimeSlotKeys = invalidTimeSlotKeys,
     isFrequencyError = isFrequencyError,
-    frequencyErrorMessage = frequencyErrorMessage
+    frequencyErrorMessage = frequencyErrorMessage,
+    isRollingInterval = isRollingInterval,
+    onRollingIntervalChange = onRollingIntervalChange
 )
 
 @RequiresApi(Build.VERSION_CODES.O)

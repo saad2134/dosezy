@@ -105,7 +105,7 @@ data class Medicine(
      * Gets a display string for the frequency (e.g., "Daily", "3 times per week")
      */
     fun getFrequencyDisplay(): String {
-        return when (frequency.pattern) {
+        val base = when (frequency.pattern) {
             FrequencyPattern.DAILY -> if (timesPerDay > 1) "${timesPerDay}x Daily" else "Daily"
             FrequencyPattern.AS_NEEDED -> "As Needed (PRN)"
             FrequencyPattern.EVERY_X_HOURS -> "Every ${frequency.intervalHours ?: 4} Hours"
@@ -139,6 +139,7 @@ data class Medicine(
                 }
             }
         }
+        return if (frequency.isRollingInterval) "$base (Rolling)" else base
     }
 
     /**
@@ -336,7 +337,8 @@ data class Frequency(
     val selectedDaysOfMonth: List<Int>? = null,  // 1-31
     val intervalHours: Int? = null,              // for EVERY_X_HOURS (e.g. 4, 6, 8, 12)
     val intervalDays: Int? = null,               // for EVERY_X_DAYS (e.g. 2, 3, 5)
-    val intervalWeeks: Int? = null               // for CUSTOM (e.g. 2 for every 2 weeks)
+    val intervalWeeks: Int? = null,              // for CUSTOM (e.g. 2 for every 2 weeks)
+    val isRollingInterval: Boolean = false       // for DAILY, EVERY_X_HOURS, EVERY_X_DAYS (#119)
 )
 
 enum class FrequencyPattern {
@@ -364,7 +366,7 @@ fun Medicine.getLocalizedDosageDisplay(time: LocalTime? = null, dosageOverride: 
 
 @androidx.compose.runtime.Composable
 fun Medicine.getLocalizedFrequencyDisplay(): String {
-    return when (frequency.pattern) {
+    val base = when (frequency.pattern) {
         FrequencyPattern.DAILY -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_daily)
         FrequencyPattern.AS_NEEDED -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_as_needed)
         FrequencyPattern.EVERY_X_HOURS -> {
@@ -391,6 +393,11 @@ fun Medicine.getLocalizedFrequencyDisplay(): String {
                 androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_custom)
             }
         }
+    }
+    return if (frequency.isRollingInterval) {
+        "$base (${androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_rolling_badge)})"
+    } else {
+        base
     }
 }
 

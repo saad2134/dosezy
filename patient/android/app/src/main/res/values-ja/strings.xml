@@ -492,6 +492,11 @@
     <string name="custom_recurrence_interval_label">繰り返しの間隔 (週数)</string>
     <string name="custom_recurrence_summary">%1$d 週間ごとの %2$s に繰り返し</string>
     <string name="validation_select_custom_days">カスタム繰り返しの曜日を少なくとも1つ選択してください</string>
+    <!-- Rolling Interval Scheduling (#119) -->
+    <string name="freq_rolling_interval_title">服用連動インターバル</string>
+    <string name="freq_rolling_interval_desc">安全な間隔を保つため、実際に服用を記録した時点から次のタイマーを開始します</string>
+    <string name="freq_rolling_badge">連動</string>
+
     <string name="btn_log_prn_dose">服用を記録</string>
     <string name="prn_doses_taken_today">本日記録された服用数: %1$d</string>
     <string name="prn_section_title">頓服薬 (PRN)</string>

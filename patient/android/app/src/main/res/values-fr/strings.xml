@@ -492,6 +492,11 @@ Voulez-vous continuer ?</string>
     <string name="custom_recurrence_interval_label">Répéter toutes les (semaines)</string>
     <string name="custom_recurrence_summary">Répété toutes les %1$d semaines le %2$s</string>
     <string name="validation_select_custom_days">Veuillez sélectionner au moins un jour pour la récurrence personnalisée</string>
+    <!-- Rolling Interval Scheduling (#119) -->
+    <string name="freq_rolling_interval_title">Intervalle glissant</string>
+    <string name="freq_rolling_interval_desc">Le minuteur de la prochaine prise commence après l\'enregistrement pour respecter l\'intervalle de sécurité</string>
+    <string name="freq_rolling_badge">Glissant</string>
+
     <string name="btn_log_prn_dose">Enregistrer la prise</string>
     <string name="prn_doses_taken_today">Prises enregistrées aujourd\'hui : %1$d</string>
     <string name="prn_section_title">Médicaments au besoin (PRN)</string>

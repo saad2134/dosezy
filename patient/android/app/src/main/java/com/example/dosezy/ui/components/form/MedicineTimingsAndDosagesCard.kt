@@ -74,7 +74,9 @@ fun MedicineTimingsAndDosagesCard(
     dosageErrorMessage: String? = null,
     invalidTimeSlotKeys: Set<String> = emptySet(),
     isFrequencyError: Boolean = false,
-    frequencyErrorMessage: String? = null
+    frequencyErrorMessage: String? = null,
+    isRollingInterval: Boolean = false,
+    onRollingIntervalChange: (Boolean) -> Unit = {}
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -117,7 +119,9 @@ fun MedicineTimingsAndDosagesCard(
                 selectedDaysOfWeek = selectedDaysOfWeek,
                 onDaysOfWeekChange = onDaysOfWeekChange,
                 selectedDaysOfMonth = selectedDaysOfMonth,
-                onDaysOfMonthChange = onDaysOfMonthChange
+                onDaysOfMonthChange = onDaysOfMonthChange,
+                isRollingInterval = isRollingInterval,
+                onRollingIntervalChange = onRollingIntervalChange
             )
 
             if (isFrequencyError && !frequencyErrorMessage.isNullOrBlank()) {

@@ -27,6 +27,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -61,7 +63,9 @@ fun FrequencyConfigSection(
     onDaysOfWeekChange: (List<Int>) -> Unit,
     selectedDaysOfMonth: List<Int>,
     onDaysOfMonthChange: (List<Int>) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isRollingInterval: Boolean = false,
+    onRollingIntervalChange: (Boolean) -> Unit = {}
 ) {
     var frequencyExpanded by remember { mutableStateOf(false) }
 
@@ -320,6 +324,51 @@ fun FrequencyConfigSection(
                         }
                     }
                 }
+            }
+        }
+
+        // Rolling intake interval switch for interval-compatible regimens (#119)
+        if (selectedFrequency == FrequencyPattern.DAILY ||
+            selectedFrequency == FrequencyPattern.EVERY_X_HOURS ||
+            selectedFrequency == FrequencyPattern.EVERY_X_DAYS
+        ) {
+            Spacer(modifier = Modifier.height(14.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable { onRollingIntervalChange(!isRollingInterval) }
+                    .padding(vertical = 4.dp, horizontal = 2.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 12.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.freq_rolling_interval_title),
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.SemiBold
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = stringResource(R.string.freq_rolling_interval_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Switch(
+                    checked = isRollingInterval,
+                    onCheckedChange = onRollingIntervalChange,
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = Color(0xFF1193D4)
+                    )
+                )
             }
         }
     }

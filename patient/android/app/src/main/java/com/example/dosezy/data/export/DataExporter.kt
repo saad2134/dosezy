@@ -308,6 +308,8 @@ class DataExporter(
             freqObj.put("intervalHours", med.frequency.intervalHours)
             freqObj.put("intervalDays", med.frequency.intervalDays)
             freqObj.put("intervalWeeks", med.frequency.intervalWeeks)
+            // Guard: Explicitly export rolling interval setting so restored backup preserves dynamic intake spacing (#119)
+            freqObj.put("isRollingInterval", med.frequency.isRollingInterval)
             mObj.put("frequency", freqObj)
             mObj.put("scheduledTimes", JSONArray(med.scheduledTimes.map { it.toString() }))
             mObj.put("imageUri", med.imageUri ?: "")

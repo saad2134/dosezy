@@ -385,7 +385,39 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             }
         }
 
-        // 4. Synchronize active slot notifications, cancel armed alarms, and update widgets
+        // 4. Dynamic Rolling Interval Schedule Re-anchoring (#119)
+        if (previousEntry != null) {
+            try {
+                val medicine = database.medicineDao().getMedicineByIdDirect(previousEntry.medicineId)
+                if (medicine != null && medicine.frequency.isRollingInterval) {
+                    val intervalMinutes = com.example.dosezy.domain.ScheduleRecurrenceEngine.getRollingIntervalMinutes(medicine)
+                    if (intervalMinutes != null && intervalMinutes > 0) {
+                        val nextDoseTime = takenAt.plusMinutes(intervalMinutes).withSecond(0).withNano(0)
+                        val takenMillis = takenAt.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+
+                        // Guard: Purge future pending schedule entries after takenAt to prevent schedule stacking (#119)
+                        database.scheduleDao().deleteFuturePendingScheduleEntries(medicine.medicineId, takenMillis)
+
+                        val reanchoredEntries = com.example.dosezy.domain.ScheduleRecurrenceEngine.generateRollingScheduleEntries(
+                            medicine = medicine,
+                            anchorDateTime = nextDoseTime,
+                            daysCount = 30
+                        )
+                        if (reanchoredEntries.isNotEmpty()) {
+                            database.scheduleDao().insertScheduleEntries(reanchoredEntries)
+                        }
+
+                        if (context != null && syncSlotNotification) {
+                            rescheduleAllAlarms(previousEntry.userId, context)
+                        }
+                    }
+                }
+            } catch (ex: Exception) {
+                Log.e(TAG, "Error re-anchoring rolling interval schedule in recordDoseTaken", ex)
+            }
+        }
+
+        // 5. Synchronize active slot notifications, cancel armed alarms, and update widgets
         // Guard: Allow suppressing intermediate slot synchronization during coordinated batch processing (e.g. IntakeSafeguardManager) to avoid redundant notification churn (#BUG-01)
         if (context != null && syncSlotNotification) {
             syncSlotNotificationAndAlarms(entryId, previousEntry, context)
@@ -669,27 +701,56 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             }
         }
 
-        // 3. Update app widgets and alarms
+        // 3. Rolling Interval Undo Re-anchoring (#119)
+        var isRollingMed = false
+        if (wasTaken && previousEntry != null) {
+            try {
+                val medicine = database.medicineDao().getMedicineByIdDirect(previousEntry.medicineId)
+                if (medicine != null && medicine.frequency.isRollingInterval) {
+                    isRollingMed = true
+                    val intervalMinutes = com.example.dosezy.domain.ScheduleRecurrenceEngine.getRollingIntervalMinutes(medicine)
+                    if (intervalMinutes != null && intervalMinutes > 0) {
+                        val baseTime = previousEntry.scheduledDateTime
+                        val entryMillis = baseTime.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+                        // Guard: Purge pending schedule entries projected after baseTime to prevent orphaned rolling entries (#119)
+                        database.scheduleDao().deleteFuturePendingScheduleEntries(medicine.medicineId, entryMillis + 1000L)
+                        val restoredEntries = com.example.dosezy.domain.ScheduleRecurrenceEngine.generateRollingScheduleEntries(
+                            medicine = medicine,
+                            anchorDateTime = baseTime.plusMinutes(intervalMinutes),
+                            daysCount = 30
+                        )
+                        if (restoredEntries.isNotEmpty()) {
+                            database.scheduleDao().insertScheduleEntries(restoredEntries)
+                        }
+                    }
+                }
+            } catch (ex: Exception) {
+                Log.e(TAG, "Error restoring rolling interval schedule on undo", ex)
+            }
+        }
+
+        // 4. Update app widgets and alarms
         if (context != null && previousEntry != null) {
             // Guard: Ad-hoc PRN doses do not have scheduled alarms or slot notifications; skip alarm/notification resync to prevent phantom alerts (#BUG-PRN-UNDO-ALARM)
             if (!entryId.startsWith("PRN_")) {
                 val now = LocalDateTime.now()
                 val isScheduledToday = previousEntry.scheduledDateTime.toLocalDate() == java.time.LocalDate.now()
-                if (previousEntry.scheduledDateTime.isAfter(now)) {
-                    // Guard: Reschedule alarms for upcoming doses so undoing a mistakenly marked future dose restores future AlarmManager reminders
+                if (previousEntry.scheduledDateTime.isAfter(now) || isRollingMed) {
+                    // Guard: Reschedule alarms for upcoming doses so undoing a dose restores future AlarmManager reminders
                     try {
                         rescheduleAllAlarms(previousEntry.userId, context)
                     } catch (e: Exception) {
                         Log.e(TAG, "Error rescheduling alarms on undoDoseTaken", e)
                     }
-                } else if (isScheduledToday) {
+                }
+                if (isScheduledToday) {
                     // Guard: Re-post shade notification and re-arm reminder for current or overdue undone dose on today's schedule (#BUG-03, #BUG-UNDO-PAST-DATE)
                     try {
                         syncSlotNotificationAndAlarms(entryId, previousEntry.copy(status = MedicationStatus.PENDING), context)
                     } catch (e: Exception) {
                         Log.e(TAG, "Error resyncing slot notification on undoDoseTaken", e)
                     }
-                } else {
+                } else if (!isRollingMed) {
                     // Guard: For historical past-date doses, disarm any lingering notifications or alarms without posting new ones (#BUG-UNDO-PAST-DATE)
                     try {
                         val alarmScheduler = AlarmScheduler(context)

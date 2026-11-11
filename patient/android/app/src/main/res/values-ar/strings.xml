@@ -492,6 +492,11 @@
     <string name="custom_recurrence_interval_label">التكرار كل (بالأسابيع)</string>
     <string name="custom_recurrence_summary">يتكرر كل %1$d أسابيع في أيام %2$s</string>
     <string name="validation_select_custom_days">يرجى تحديد يوم واحد على الأقل للتكرار المخصص</string>
+    <!-- Rolling Interval Scheduling (#119) -->
+    <string name="freq_rolling_interval_title">فترة مرنة بعد التناول</string>
+    <string name="freq_rolling_interval_desc">يبدأ مؤقت الجرعة التالية بعد تسجيل تناول الجرعة للحفاظ على التباعد الآمن</string>
+    <string name="freq_rolling_badge">مرن</string>
+
     <string name="btn_log_prn_dose">تسجيل جرعة</string>
     <string name="prn_doses_taken_today">الجرعات المسجلة اليوم: %1$d</string>
     <string name="prn_section_title">أدوية تؤخذ عند الحاجة (PRN)</string>

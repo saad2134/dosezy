@@ -107,6 +107,7 @@ fun AddMedScreen(
     var intervalHoursText by remember { mutableStateOf("4") }
     var intervalDaysText by remember { mutableStateOf("2") }
     var intervalWeeksText by remember { mutableStateOf("2") }
+    var isRollingInterval by remember { mutableStateOf(false) }
     var selectedReminderType by remember { mutableStateOf<ReminderType?>(null) }
 
     var showValidationErrors by remember { mutableStateOf(false) }
@@ -229,7 +230,9 @@ fun AddMedScreen(
                     dosageErrorMessage = dosageErrorMessage,
                     invalidTimeSlotKeys = validation.invalidTimeSlotKeys,
                     isFrequencyError = isFrequencyError,
-                    frequencyErrorMessage = frequencyErrorMessage
+                    frequencyErrorMessage = frequencyErrorMessage,
+                    isRollingInterval = isRollingInterval,
+                    onRollingIntervalChange = { isRollingInterval = it }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -335,7 +338,8 @@ fun AddMedScreen(
                                 selectedDaysOfMonth = if (selectedFrequency == FrequencyPattern.MONTHLY) selectedDaysOfMonth else null,
                                 intervalHours = if (selectedFrequency == FrequencyPattern.EVERY_X_HOURS) intervalHoursText.normalizeArabicDigits().toIntOrNull() else null,
                                 intervalDays = if (selectedFrequency == FrequencyPattern.EVERY_X_DAYS) intervalDaysText.normalizeArabicDigits().toIntOrNull() else null,
-                                intervalWeeks = if (selectedFrequency == FrequencyPattern.CUSTOM) (intervalWeeksText.normalizeArabicDigits().toIntOrNull() ?: 1).coerceAtLeast(1) else null
+                                intervalWeeks = if (selectedFrequency == FrequencyPattern.CUSTOM) (intervalWeeksText.normalizeArabicDigits().toIntOrNull() ?: 1).coerceAtLeast(1) else null,
+                                isRollingInterval = isRollingInterval && (selectedFrequency == FrequencyPattern.DAILY || selectedFrequency == FrequencyPattern.EVERY_X_HOURS || selectedFrequency == FrequencyPattern.EVERY_X_DAYS)
                             ),
                             scheduledTimes = if (selectedFrequency == FrequencyPattern.AS_NEEDED) emptyList() else scheduledTimesList,
                             imageUri = medicineImagePath,

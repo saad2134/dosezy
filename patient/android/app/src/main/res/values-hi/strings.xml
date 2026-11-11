@@ -508,6 +508,11 @@
     <string name="custom_recurrence_interval_label">दोहराव अंतराल (सप्ताह)</string>
     <string name="custom_recurrence_summary">प्रत्येक %1$d सप्ताह में %2$s को दोहराया जाएगा</string>
     <string name="validation_select_custom_days">कस्टम पुनरावृत्ति के लिए कृपया कम से कम एक दिन चुनें</string>
+    <!-- Rolling Interval Scheduling (#119) -->
+    <string name="freq_rolling_interval_title">रोलिंग अंतराल</string>
+    <string name="freq_rolling_interval_desc">सुरक्षित अंतराल बनाए रखने के लिए खुराक लेने के बाद ही अगली खुराक का टाइमर शुरू होगा</string>
+    <string name="freq_rolling_badge">रोलिंग</string>
+
     <string name="btn_log_prn_dose">खुराक दर्ज करें</string>
     <string name="prn_doses_taken_today">आज दर्ज खुराकें: %1$d</string>
     <string name="prn_section_title">ज़रूरत पड़ने पर दवाएं (PRN)</string>

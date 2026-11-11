@@ -492,6 +492,11 @@ Vuoi continuare?</string>
     <string name="custom_recurrence_interval_label">Ripeti ogni (settimane)</string>
     <string name="custom_recurrence_summary">Si ripete ogni %1$d settimane il %2$s</string>
     <string name="validation_select_custom_days">Seleziona almeno un giorno per la ricorrenza personalizzata</string>
+    <!-- Rolling Interval Scheduling (#119) -->
+    <string name="freq_rolling_interval_title">Intervallo continuo</string>
+    <string name="freq_rolling_interval_desc">Il timer della dose successiva si attiva dopo aver registrato l\'assunzione per mantenere un intervallo sicuro</string>
+    <string name="freq_rolling_badge">Continuo</string>
+
     <string name="btn_log_prn_dose">Registra dose</string>
     <string name="prn_doses_taken_today">Dosi registrate oggi: %1$d</string>
     <string name="prn_section_title">Farmaci al bisogno (PRN)</string>

@@ -492,6 +492,11 @@
     <string name="custom_recurrence_interval_label">Интервал повторения (недели)</string>
     <string name="custom_recurrence_summary">Повторяется каждые %1$d нед.: %2$s</string>
     <string name="validation_select_custom_days">Выберите хотя бы один день для настраиваемого повторения</string>
+    <!-- Rolling Interval Scheduling (#119) -->
+    <string name="freq_rolling_interval_title">Скользящий интервал</string>
+    <string name="freq_rolling_interval_desc">Таймер следующей дозы запускается после подтверждения приема для соблюдения безопасного интервала</string>
+    <string name="freq_rolling_badge">Скользящий</string>
+
     <string name="btn_log_prn_dose">Записать прием</string>
     <string name="prn_doses_taken_today">Приемов записано сегодня: %1$d</string>
     <string name="prn_section_title">Препараты по необходимости (PRN)</string>

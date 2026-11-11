@@ -492,6 +492,11 @@ Möchten Sie fortfahren?</string>
     <string name="custom_recurrence_interval_label">Wiederholen alle (Wochen)</string>
     <string name="custom_recurrence_summary">Wiederholt sich alle %1$d Wochen am %2$s</string>
     <string name="validation_select_custom_days">Bitte wählen Sie mindestens einen Tag für die benutzerdefinierte Wiederholung</string>
+    <!-- Rolling Interval Scheduling (#119) -->
+    <string name="freq_rolling_interval_title">Gleitendes Intervall</string>
+    <string name="freq_rolling_interval_desc">Der Timer für die nächste Dosis startet erst nach der Einnahme, um sichere Abstände zu wahren</string>
+    <string name="freq_rolling_badge">Gleitend</string>
+
     <string name="btn_log_prn_dose">Dosis erfassen</string>
     <string name="prn_doses_taken_today">Heute erfasste Dosen: %1$d</string>
     <string name="prn_section_title">Bedarfsmedikation (PRN)</string>

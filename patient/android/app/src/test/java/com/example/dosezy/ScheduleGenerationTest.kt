@@ -526,4 +526,105 @@ class ScheduleGenerationTest {
         assertEquals(futureStart, entries.first().scheduledDateTime.toLocalDate())
         assertEquals(explicitEnd, entries.last().scheduledDateTime.toLocalDate())
     }
+
+    // ───────────────────────────────────────────────────────────────
+    // 12. Rolling Interval Intake (#119)
+    // ───────────────────────────────────────────────────────────────
+
+    @Test
+    fun getRollingIntervalMinutes_dailyRegimens() {
+        // Daily with 1 slot -> 1440 mins (24h)
+        val m1 = med(
+            freq = Frequency(FrequencyPattern.DAILY, isRollingInterval = true),
+            times = listOf(LocalTime.of(8, 0))
+        )
+        assertEquals(1440L, com.example.dosezy.domain.ScheduleRecurrenceEngine.getRollingIntervalMinutes(m1))
+
+        // Daily with 2 slots -> 720 mins (12h)
+        val m2 = med(
+            freq = Frequency(FrequencyPattern.DAILY, isRollingInterval = true),
+            times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0))
+        )
+        assertEquals(720L, com.example.dosezy.domain.ScheduleRecurrenceEngine.getRollingIntervalMinutes(m2))
+
+        // Daily with 3 slots -> 480 mins (8h)
+        val m3 = med(
+            freq = Frequency(FrequencyPattern.DAILY, isRollingInterval = true),
+            times = listOf(LocalTime.of(8, 0), LocalTime.of(14, 0), LocalTime.of(20, 0))
+        )
+        assertEquals(480L, com.example.dosezy.domain.ScheduleRecurrenceEngine.getRollingIntervalMinutes(m3))
+    }
+
+    @Test
+    fun getRollingIntervalMinutes_everyXHoursAndDays() {
+        val mHours = med(
+            freq = Frequency(FrequencyPattern.EVERY_X_HOURS, intervalHours = 6, isRollingInterval = true),
+            times = listOf(LocalTime.of(8, 0))
+        )
+        assertEquals(360L, com.example.dosezy.domain.ScheduleRecurrenceEngine.getRollingIntervalMinutes(mHours))
+
+        val mDays = med(
+            freq = Frequency(FrequencyPattern.EVERY_X_DAYS, intervalDays = 3, isRollingInterval = true),
+            times = listOf(LocalTime.of(8, 0))
+        )
+        assertEquals(4320L, com.example.dosezy.domain.ScheduleRecurrenceEngine.getRollingIntervalMinutes(mDays))
+    }
+
+    @Test
+    fun getRollingIntervalMinutes_disabledWhenRollingIsFalse() {
+        val mDailyDisabled = med(
+            freq = Frequency(FrequencyPattern.DAILY, isRollingInterval = false),
+            times = listOf(LocalTime.of(8, 0))
+        )
+        org.junit.Assert.assertNull(com.example.dosezy.domain.ScheduleRecurrenceEngine.getRollingIntervalMinutes(mDailyDisabled))
+
+        val mAsNeeded = med(
+            freq = Frequency(FrequencyPattern.AS_NEEDED, isRollingInterval = true),
+            times = emptyList()
+        )
+        org.junit.Assert.assertNull(com.example.dosezy.domain.ScheduleRecurrenceEngine.getRollingIntervalMinutes(mAsNeeded))
+    }
+
+    @Test
+    fun generateRollingScheduleEntries_spacesAccuratelyFromDynamicAnchor() {
+        val m = med(
+            freq = Frequency(FrequencyPattern.DAILY, isRollingInterval = true),
+            times = listOf(LocalTime.of(8, 0))
+        )
+        // Anchor at 13:45 on Dec 1 (e.g. dose taken late at 13:45, next dose projected at 13:45 Dec 2)
+        val anchor = java.time.LocalDateTime.of(2026, 12, 2, 13, 45, 0)
+        val entries = com.example.dosezy.domain.ScheduleRecurrenceEngine.generateRollingScheduleEntries(
+            medicine = m,
+            anchorDateTime = anchor,
+            daysCount = 5
+        )
+
+        assertEquals(6, entries.size) // Dec 2, 3, 4, 5, 6, 7
+        assertEquals(anchor, entries[0].scheduledDateTime)
+        assertEquals(anchor.plusDays(1), entries[1].scheduledDateTime)
+        assertEquals(anchor.plusDays(2), entries[2].scheduledDateTime)
+        assertEquals(LocalTime.of(13, 45), entries[0].scheduledDateTime.toLocalTime())
+        assertEquals(LocalTime.of(13, 45), entries[1].scheduledDateTime.toLocalTime())
+    }
+
+    @Test
+    fun generateRollingScheduleEntries_clampsToEndDate() {
+        val m = med(
+            freq = Frequency(FrequencyPattern.EVERY_X_HOURS, intervalHours = 8, isRollingInterval = true),
+            times = listOf(LocalTime.of(8, 0)),
+            end = LocalDate.of(2026, 12, 3)
+        )
+        val anchor = java.time.LocalDateTime.of(2026, 12, 1, 8, 0, 0)
+        val entries = com.example.dosezy.domain.ScheduleRecurrenceEngine.generateRollingScheduleEntries(
+            medicine = m,
+            anchorDateTime = anchor,
+            daysCount = 30
+        )
+
+        // Dec 1: 08:00, 16:00
+        // Dec 2: 00:00, 08:00, 16:00
+        // Dec 3: 00:00, 08:00, 16:00
+        assertEquals(8, entries.size)
+        assertTrue(entries.all { !it.scheduledDateTime.toLocalDate().isAfter(LocalDate.of(2026, 12, 3)) })
+    }
 }
