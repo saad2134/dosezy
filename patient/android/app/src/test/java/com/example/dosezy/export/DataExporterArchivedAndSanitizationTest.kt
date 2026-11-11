@@ -241,6 +241,26 @@ class DataExporterArchivedAndSanitizationTest {
         assertTrue("Order must contain patient name", orderText.contains("John Doe"))
         assertTrue("Order must contain medication name", orderText.contains("Amoxicillin"))
         assertTrue("Order must contain dosage", orderText.contains("500 mg"))
+        // Guard: Verify chemical strength medication (MG) displays stock in countable units instead of raw milligrams (#129)
+        assertTrue("Order must contain current stock in units", orderText.contains("Current stock: 10 units left"))
+        assertFalse("Order must not display current stock in mg", orderText.contains("10 mg left"))
+
+        // Guard: Verify bottle formulation (DROPS) displays stock in bottles
+        val medDrops = med.copy(
+            medicineId = "med_order_drops",
+            medicationName = "Latanoprost",
+            dosage = 1.0,
+            dosageUnit = DosageUnit.DROP,
+            pillShape = com.example.dosezy.data.model.PillShape.DROPS,
+            currentStock = 2.0
+        )
+        val orderTextDrops = exporter.generateConsolidatedPharmacyOrderText(
+            profilesWithMedicines = listOf(Pair(userEn, listOf(medDrops))),
+            supplyDays = 30,
+            includeStock = true,
+            includeDosage = false
+        )
+        assertTrue("Order must contain current stock in bottles", orderTextDrops.contains("Current stock: 2 bottles left"))
 
         // Guard: Verify fractional discrete medication renders with vulgar fractions (½) rather than raw decimal string (0.5)
         val medFractional = med.copy(

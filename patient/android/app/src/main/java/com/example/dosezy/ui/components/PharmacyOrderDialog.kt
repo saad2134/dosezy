@@ -558,12 +558,12 @@ fun PharmacyOrderDialog(
                                             }
                                         }
                                         if (includeStockInOrder && med.currentStock != null) {
-                                            // Guard: Use localized unit strings instead of hardcoded English words to ensure full localization coverage
-                                            val stockUnitStr = if (isBottle) {
-                                                if (med.currentStock > 1.0) stringResource(R.string.unit_bottles) else stringResource(R.string.unit_bottle)
-                                            } else {
-                                                med.dosageUnit.getLocalizedName()
-                                            }
+                                            // Guard: Use DosageFormatUtils.formatLocalizedStockUnit to display countable units instead of chemical strengths (MG, MCG, MEQ) for stock (#129)
+                                            val stockUnitStr = com.example.dosezy.utils.DosageFormatUtils.formatLocalizedStockUnit(
+                                                unit = med.dosageUnit,
+                                                shape = med.pillShape,
+                                                quantity = med.currentStock
+                                            )
                                             val stockStr = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(med.currentStock)
                                             Text(
                                                 text = stringResource(R.string.pharmacy_order_current_stock, stockStr, stockUnitStr),

@@ -1,1 +1,1 @@
-<!-- In development -->
+* Fixed pharmacy refill order stock display to show countable inventory units instead of dosage strength units.

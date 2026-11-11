@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.example.dosezy.R
 import com.example.dosezy.data.model.DosageUnit
+import com.example.dosezy.data.model.PillShape
 import com.example.dosezy.data.model.getLocalizedName
 import java.util.Locale
 
@@ -90,6 +91,87 @@ object DosageFormatUtils {
     fun formatStockQuantity(stock: Double?): String {
         if (stock == null) return ""
         return formatDecimalClean(stock)
+    }
+
+    /**
+     * Resolves the appropriate localized display unit for inventory stock quantities (#129).
+     * When medication dosage is measured in chemical strength (MG, MCG, MEQ), inventory stock counts
+     * discrete physical units (e.g. tablets/pills in the prescription bottle), so R.string.unit_units ("units")
+     * is returned instead of displaying raw milligram strength as inventory stock.
+     * For bottle formulations (DROP, SPRAY), returns bottle or bottles based on quantity.
+     * For discrete physical formulations (TABLET, CAPSULE, etc.), returns their respective localized names.
+     */
+    fun formatStockUnit(context: Context, unit: DosageUnit, shape: PillShape, quantity: Double = 1.0): String {
+        val isBottle = unit == DosageUnit.DROP ||
+                unit == DosageUnit.SPRAY ||
+                shape == PillShape.DROPS ||
+                shape == PillShape.SPRAY
+        // Guard: Use unit_units for chemical strength to prevent displaying stock as "30 mg" instead of "30 units" (#129)
+        return if (isBottle) {
+            if (quantity > 1.0) context.getString(R.string.unit_bottles) else context.getString(R.string.unit_bottle)
+        } else when (unit) {
+            DosageUnit.MG, DosageUnit.MCG, DosageUnit.MEQ -> {
+                context.getString(R.string.unit_units)
+            }
+            else -> unit.getLocalizedName(context)
+        }
+    }
+
+    /**
+     * Composable helper resolving the appropriate localized display unit for inventory stock quantities (#129).
+     */
+    @Composable
+    fun formatLocalizedStockUnit(unit: DosageUnit, shape: PillShape, quantity: Double = 1.0): String {
+        val isBottle = unit == DosageUnit.DROP ||
+                unit == DosageUnit.SPRAY ||
+                shape == PillShape.DROPS ||
+                shape == PillShape.SPRAY
+        // Guard: Use unit_units for chemical strength to prevent displaying stock as "30 mg" instead of "30 units" (#129)
+        return if (isBottle) {
+            if (quantity > 1.0) stringResource(R.string.unit_bottles) else stringResource(R.string.unit_bottle)
+        } else when (unit) {
+            DosageUnit.MG, DosageUnit.MCG, DosageUnit.MEQ -> {
+                stringResource(R.string.unit_units)
+            }
+            else -> unit.getLocalizedName()
+        }
+    }
+
+    /**
+     * Resolves the appropriate localized display unit for pharmacy refill order quantities (#129).
+     */
+    fun formatOrderUnit(context: Context, unit: DosageUnit, shape: PillShape, quantity: Int = 1): String {
+        val isBottle = unit == DosageUnit.DROP ||
+                unit == DosageUnit.SPRAY ||
+                shape == PillShape.DROPS ||
+                shape == PillShape.SPRAY
+        return if (isBottle) {
+            if (quantity > 1) context.getString(R.string.unit_bottles) else context.getString(R.string.unit_bottle)
+        } else when (unit) {
+            DosageUnit.MG, DosageUnit.MCG, DosageUnit.MEQ -> {
+                context.getString(R.string.unit_units)
+            }
+            else -> unit.getLocalizedName(context)
+        }
+    }
+
+    /**
+     * Composable helper resolving the appropriate localized display unit for pharmacy refill order quantities (#129).
+     */
+    @Composable
+    fun formatLocalizedOrderUnit(unit: DosageUnit, shape: PillShape, quantity: Int = 1): String {
+        val isBottle = unit == DosageUnit.DROP ||
+                unit == DosageUnit.SPRAY ||
+                shape == PillShape.DROPS ||
+                shape == PillShape.SPRAY
+        return if (isBottle) {
+            if (quantity > 1) stringResource(R.string.unit_bottles) else stringResource(R.string.unit_bottle)
+        } else when (unit) {
+            DosageUnit.MG, DosageUnit.MCG, DosageUnit.MEQ -> {
+                stringResource(R.string.unit_units)
+            }
+            else -> unit.getLocalizedName()
+        }
     }
 
     // Guard: Round to 2 decimals and strip all trailing zeros/decimals cleanly to prevent "2.0" or "0.0" output from IEEE 754 float imprecision

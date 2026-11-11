@@ -1,36 +1,36 @@
 <en-IN>
-<!-- In development -->
+* Fixed pharmacy refill order stock display to show countable inventory units instead of dosage strength units.
 </en-IN>
 <en-US>
-<!-- In development -->
+* Fixed pharmacy refill order stock display to show countable inventory units instead of dosage strength units.
 </en-US>
 <ar>
-<!-- In development -->
+* تصحيح عرض المخزون في طلبات إعادة صرف الدواء ليظهر بالوحدات الفعلية بدلاً من وحدات قوة الجرعة.
 </ar>
 <de-DE>
-<!-- In development -->
+* Korrektur der Bestandsanzeige bei Apotheken-Nachbestellungen: Zeigt nun zählbare Einheiten statt Dosierungsstärken an.
 </de-DE>
 <es-419>
-<!-- In development -->
+* Se corrigió la visualización del stock en pedidos de farmacia para mostrar unidades contables en lugar de dosis.
 </es-419>
 <fr-FR>
-<!-- In development -->
+* Correction de l'affichage du stock dans les commandes de pharmacie pour afficher des unités comptables au lieu du dosage.
 </fr-FR>
 <hi-IN>
-<!-- In development -->
+* फ़ार्मेसी रीफ़िल ऑर्डर में स्टॉक प्रदर्शन को खुराक शक्ति के बजाय गणनीय इन्वेंट्री इकाइयों में दिखाने के लिए ठीक किया गया।
 </hi-IN>
 <it-IT>
-<!-- In development -->
+* Corretta la visualizzazione delle scorte negli ordini farmacia per mostrare le unità effettive anziché il dosaggio.
 </it-IT>
 <ja-JP>
-<!-- In development -->
+* 薬局への処方箋・補充注文メッセージで、在庫の単位が用量（mg等）ではなく個数（単位・本など）で正しく表示されるよう修正しました。
 </ja-JP>
 <pt-BR>
-<!-- In development -->
+* Corrigida a exibição do estoque nos pedidos de farmácia para mostrar unidades contáveis em vez da dosagem.
 </pt-BR>
 <ru-RU>
-<!-- In development -->
+* Исправлено отображение текущего остатка в заказах аптеки: теперь отображаются штучные единицы вместо дозировки.
 </ru-RU>
 <zh-CN>
-<!-- In development -->
+* 修复药房补药订单中的库存单位显示，准确展示实际库存单位而非药物规格剂量。
 </zh-CN>

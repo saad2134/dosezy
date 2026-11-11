@@ -553,9 +553,6 @@ class DataExporter(
             }
 
             profileMeds.forEachIndexed { index, med ->
-                val isDrop = med.dosageUnit == com.example.dosezy.data.model.DosageUnit.DROP ||
-                        med.pillShape == com.example.dosezy.data.model.PillShape.DROPS
-
                 val totalNeeded = customQuantities[med.medicineId] ?: med.calculateRefillQuantity(supplyDays)
 
                 val showDosageInTitle = includeDosage && when (med.dosageUnit) {
@@ -571,16 +568,13 @@ class DataExporter(
                 } else ""
                 val strengthUnitStr = med.dosageUnit.getLocalizedName(context)
 
-                val orderUnitStr = if (isDrop) {
-                    if (totalNeeded > 1) context.getString(com.example.dosezy.R.string.unit_bottles) else context.getString(com.example.dosezy.R.string.unit_bottle)
-                } else when (med.dosageUnit) {
-                    com.example.dosezy.data.model.DosageUnit.MG,
-                    com.example.dosezy.data.model.DosageUnit.MCG,
-                    com.example.dosezy.data.model.DosageUnit.MEQ -> {
-                        context.getString(com.example.dosezy.R.string.unit_units)
-                    }
-                    else -> med.dosageUnit.getLocalizedName(context)
-                }
+                // Guard: Format order unit via DosageFormatUtils to accurately show countable units instead of chemical strengths (#129)
+                val orderUnitStr = com.example.dosezy.utils.DosageFormatUtils.formatOrderUnit(
+                    context = context,
+                    unit = med.dosageUnit,
+                    shape = med.pillShape,
+                    quantity = totalNeeded
+                )
 
                 sb.append("${index + 1}. *${med.medicationName}*")
                 if (showDosageInTitle && dosageDisplay.isNotBlank()) {
@@ -590,11 +584,13 @@ class DataExporter(
                 sb.append("   • ").append(context.getString(com.example.dosezy.R.string.pharmacy_order_qty_needed, totalNeeded, orderUnitStr)).append("\n")
 
                 if (includeStock && med.currentStock != null) {
-                    val stockUnitStr = if (isDrop) {
-                        context.getString(com.example.dosezy.R.string.unit_drop)
-                    } else {
-                        med.dosageUnit.getLocalizedName(context)
-                    }
+                    // Guard: Use formatStockUnit to display countable units (or bottles) for current stock instead of chemical strengths (#129)
+                    val stockUnitStr = com.example.dosezy.utils.DosageFormatUtils.formatStockUnit(
+                        context = context,
+                        unit = med.dosageUnit,
+                        shape = med.pillShape,
+                        quantity = med.currentStock
+                    )
                     val formattedStock = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(med.currentStock)
                     sb.append("   • ").append(context.getString(com.example.dosezy.R.string.pharmacy_order_current_stock, formattedStock, stockUnitStr)).append("\n")
                 }
