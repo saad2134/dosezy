@@ -53,8 +53,25 @@ body:
   - type: input
     id: version
     attributes:
-      label: Dosezy version and Installation Source
-      placeholder: "e.g. 2.2.1"
+      label: Dosezy version
+      description: The version of Dosezy you are using (found in Settings -> About Dosezy).
+      placeholder: "e.g. 2.5.13"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: installation_source
+    attributes:
+      label: Installation source
+      description: Where did you install or download Dosezy from?
+      options:
+        - Google Play Store
+        - GitHub Releases
+        - F-Droid
+        - IzzyOnDroid
+        - Obtainium
+        - Built from source
+        - Other
     validations:
       required: true
 
