@@ -1,36 +1,48 @@
 <en-IN>
+* Added custom supply days selector for pharmacy refill orders with quick increment steppers.
 * Fixed pharmacy refill order stock display to show countable inventory units instead of dosage strength units.
 </en-IN>
 <en-US>
+* Added custom supply days selector for pharmacy refill orders with quick increment steppers.
 * Fixed pharmacy refill order stock display to show countable inventory units instead of dosage strength units.
 </en-US>
 <ar>
+* إضافة خيار مخصص لعدد أيام الإمداد في طلبات صيدلية إعادة الصرف مع أزرار زيادة ونقصان سريعة.
 * تصحيح عرض المخزون في طلبات إعادة صرف الدواء ليظهر بالوحدات الفعلية بدلاً من وحدات قوة الجرعة.
 </ar>
 <de-DE>
+* Benutzerdefinierte Tagesanzahl für Apotheken-Nachbestellungen mit schnellen Schritt-Tasten hinzugefügt.
 * Korrektur der Bestandsanzeige bei Apotheken-Nachbestellungen: Zeigt nun zählbare Einheiten statt Dosierungsstärken an.
 </de-DE>
 <es-419>
+* Se agregó selección de días personalizados para pedidos de farmacia con botones de ajuste rápido.
 * Se corrigió la visualización del stock en pedidos de farmacia para mostrar unidades contables en lugar de dosis.
 </es-419>
 <fr-FR>
+* Ajout de la sélection personnalisée du nombre de jours pour les commandes de pharmacie avec boutons d'incrémentation.
 * Correction de l'affichage du stock dans les commandes de pharmacie pour afficher des unités comptables au lieu du dosage.
 </fr-FR>
 <hi-IN>
+* त्वरित वृद्धि बटन के साथ फ़ार्मेसी रीफ़िल ऑर्डर के लिए कस्टम आपूर्ति दिनों का चयन जोड़ा गया।
 * फ़ार्मेसी रीफ़िल ऑर्डर में स्टॉक प्रदर्शन को खुराक शक्ति के बजाय गणनीय इन्वेंट्री इकाइयों में दिखाने के लिए ठीक किया गया।
 </hi-IN>
 <it-IT>
+* Aggiunta la selezione dei giorni di fornitura personalizzati per gli ordini farmacia con pulsanti rapidi.
 * Corretta la visualizzazione delle scorte negli ordini farmacia per mostrare le unità effettive anziché il dosaggio.
 </it-IT>
 <ja-JP>
+* 薬局への処方箋・補充注文で、希望の日数を自由に入力・調整できるカスタム日数選択を追加しました。
 * 薬局への処方箋・補充注文メッセージで、在庫の単位が用量（mg等）ではなく個数（単位・本など）で正しく表示されるよう修正しました。
 </ja-JP>
 <pt-BR>
+* Adicionada seleção de dias personalizados para pedidos de farmácia com botões de ajuste rápido.
 * Corrigida a exibição do estoque nos pedidos de farmácia para mostrar unidades contáveis em vez da dosagem.
 </pt-BR>
 <ru-RU>
+* Добавлен выбор произвольного количества дней поставки для заказов в аптеку с кнопками быстрой настройки.
 * Исправлено отображение текущего остатка в заказах аптеки: теперь отображаются штучные единицы вместо дозировки.
 </ru-RU>
 <zh-CN>
+* 药房补药订单新增自定义备药天数选择，支持快速增减微调。
 * 修复药房补药订单中的库存单位显示，准确展示实际库存单位而非药物规格剂量。
 </zh-CN>

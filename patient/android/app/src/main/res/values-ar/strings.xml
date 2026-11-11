@@ -687,6 +687,10 @@
     <string name="pharmacy_order_refill_filter">تصفية إعادة التعبئة</string>
     <string name="pharmacy_order_days_supply">مدة الإمداد بالأيام</string>
     <string name="pharmacy_order_days_format_short">%1$d يوم</string>
+    <string name="pharmacy_order_days_custom">مخصص</string>
+    <string name="pharmacy_order_custom_days_label">مدة مخصصة (بالأيام)</string>
+    <string name="pharmacy_order_custom_days_placeholder">مثال: 28</string>
+    <string name="unit_days_suffix">يوم</string>
     <string name="pharmacy_order_medicines_include">الأدوية المشمولة (%1$d/%2$d)</string>
     <string name="pharmacy_order_stock_left">المتبقي %1$s</string>
     <string name="pharmacy_order_no_stock_tracked">المخزون غير متتبع</string>

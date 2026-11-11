@@ -703,6 +703,10 @@
     <string name="pharmacy_order_refill_filter">रीफ़िल फ़िल्टर</string>
     <string name="pharmacy_order_days_supply">आपूर्ति के दिन</string>
     <string name="pharmacy_order_days_format_short">%1$d दिन</string>
+    <string name="pharmacy_order_days_custom">कस्टम</string>
+    <string name="pharmacy_order_custom_days_label">कस्टम आपूर्ति (दिन)</string>
+    <string name="pharmacy_order_custom_days_placeholder">उदा. 28</string>
+    <string name="unit_days_suffix">दिन</string>
     <string name="pharmacy_order_medicines_include">शामिल दवाइयां (%1$d/%2$d)</string>
     <string name="pharmacy_order_stock_left">%1$s शेष</string>
     <string name="pharmacy_order_no_stock_tracked">स्टॉक ट्रैक नहीं किया गया</string>

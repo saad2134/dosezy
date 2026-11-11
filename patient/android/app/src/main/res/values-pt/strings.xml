@@ -686,6 +686,10 @@ Deseja continuar?</string>
     <string name="pharmacy_order_refill_filter">Filtro de Reposição</string>
     <string name="pharmacy_order_days_supply">Dias de Suprimento</string>
     <string name="pharmacy_order_days_format_short">%1$d d</string>
+    <string name="pharmacy_order_days_custom">Personalizado</string>
+    <string name="pharmacy_order_custom_days_label">Suprimento personalizado (dias)</string>
+    <string name="pharmacy_order_custom_days_placeholder">ex.: 28</string>
+    <string name="unit_days_suffix">dias</string>
     <string name="pharmacy_order_medicines_include">Medicamentos a Incluir (%1$d/%2$d)</string>
     <string name="pharmacy_order_stock_left">%1$s restantes</string>
     <string name="pharmacy_order_no_stock_tracked">Sem controle de estoque</string>

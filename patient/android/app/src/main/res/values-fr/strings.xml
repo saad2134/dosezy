@@ -687,6 +687,10 @@ Voulez-vous continuer ?</string>
     <string name="pharmacy_order_refill_filter">Filtre de réapprovisionnement</string>
     <string name="pharmacy_order_days_supply">Jours d\'approvisionnement</string>
     <string name="pharmacy_order_days_format_short">%1$d j</string>
+    <string name="pharmacy_order_days_custom">Perso.</string>
+    <string name="pharmacy_order_custom_days_label">Approvisionnement personnalisé (jours)</string>
+    <string name="pharmacy_order_custom_days_placeholder">ex. 28</string>
+    <string name="unit_days_suffix">jours</string>
     <string name="pharmacy_order_medicines_include">Médicaments à inclure (%1$d/%2$d)</string>
     <string name="pharmacy_order_stock_left">%1$s restant(s)</string>
     <string name="pharmacy_order_no_stock_tracked">Aucun stock suivi</string>

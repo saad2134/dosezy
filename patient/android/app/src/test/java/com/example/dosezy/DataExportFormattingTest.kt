@@ -86,6 +86,37 @@ class DataExportFormattingTest {
         assertEquals("bottles", unitLabel)
     }
 
+    @Test
+    fun pharmacyOrder_supportsArbitraryCustomDaysSupply() {
+        val dailyMed = sampleMed(
+            name = "Amoxicillin",
+            dosage = 500.0,
+            unit = DosageUnit.MG,
+            freq = Frequency(FrequencyPattern.DAILY),
+            times = listOf(LocalTime.of(8, 0), LocalTime.of(14, 0), LocalTime.of(20, 0)) // 3x daily = 3 tablets/day
+        )
+        // Guard: Verify refill quantity calculation scales accurately for arbitrary supply days (e.g. 7, 14, 21, 28 days) (#128)
+        assertEquals(21, dailyMed.calculateRefillQuantity(7))
+        assertEquals(42, dailyMed.calculateRefillQuantity(14))
+        assertEquals(63, dailyMed.calculateRefillQuantity(21))
+        assertEquals(84, dailyMed.calculateRefillQuantity(28))
+
+        // PRN (as-needed) medicine default: safe non-overdose estimate (~1 dose per 3 days)
+        val prnMed = sampleMed(
+            name = "Ibuprofen",
+            dosage = 400.0,
+            unit = DosageUnit.MG,
+            freq = Frequency(FrequencyPattern.AS_NEEDED),
+            times = emptyList()
+        )
+        // 7 days: ceil(7 / 3) = 3 doses
+        assertEquals(3, prnMed.calculateRefillQuantity(7))
+        // 14 days: ceil(14 / 3) = 5 doses
+        assertEquals(5, prnMed.calculateRefillQuantity(14))
+        // 28 days: ceil(28 / 3) = 10 doses
+        assertEquals(10, prnMed.calculateRefillQuantity(28))
+    }
+
     // ───────────────────────────────────────────────────────────────
     // 2. CSV Export Formatting
     // ───────────────────────────────────────────────────────────────

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -20,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -39,6 +41,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -57,6 +60,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,6 +72,7 @@ import com.example.dosezy.data.export.DataExporter
 import com.example.dosezy.data.model.Medicine
 import com.example.dosezy.data.model.User
 import com.example.dosezy.data.model.getLocalizedName
+import com.example.dosezy.data.model.normalizeArabicDigits
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -116,6 +122,8 @@ fun PharmacyOrderDialog(
 
     var onlyLowStock by remember { mutableStateOf(lowStockMedicines.isNotEmpty()) }
     var supplyDays by remember { mutableIntStateOf(30) }
+    var isCustomDays by remember { mutableStateOf(false) }
+    var customDaysInput by remember { mutableStateOf("28") }
     var includeStockInOrder by remember { mutableStateOf(false) }
     var includeDosageInOrder by remember { mutableStateOf(true) }
 
@@ -379,27 +387,161 @@ fun PharmacyOrderDialog(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(6.dp))
+                val presetDays = listOf(15, 30, 60, 90)
+                val isCustomSelected = isCustomDays || supplyDays !in presetDays
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    val daysOptions = listOf(15, 30, 60, 90)
-                    daysOptions.forEach { days ->
-                        val isSelected = supplyDays == days
+                    presetDays.forEach { days ->
+                        val isSelected = !isCustomSelected && supplyDays == days
                         Surface(
                             shape = RoundedCornerShape(10.dp),
                             color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
                             modifier = Modifier
                                 .weight(1f)
                                 .height(36.dp)
-                                .clickable { supplyDays = days }
+                                .clickable {
+                                    isCustomDays = false
+                                    supplyDays = days
+                                }
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Text(
                                     text = stringResource(R.string.pharmacy_order_days_format_short, days),
-                                    fontSize = 12.sp,
+                                    fontSize = 11.sp,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
+                    }
+
+                    // Guard: Custom supply days chip allows patient or caregiver to specify non-standard order durations (e.g. 7, 14, 21, 28 days) (#128)
+                    Surface(
+                        shape = RoundedCornerShape(10.dp),
+                        color = if (isCustomSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                        modifier = Modifier
+                            .weight(1.15f)
+                            .height(36.dp)
+                            .clickable {
+                                isCustomDays = true
+                                val parsed = customDaysInput.normalizeArabicDigits().filter { it.isDigit() }.toIntOrNull()
+                                if (parsed != null && parsed in 1..365) {
+                                    supplyDays = parsed
+                                } else {
+                                    customDaysInput = "28"
+                                    supplyDays = 28
+                                }
+                            }
+                    ) {
+                        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(horizontal = 2.dp)) {
+                            Text(
+                                text = if (isCustomSelected && supplyDays !in presetDays) {
+                                    stringResource(R.string.pharmacy_order_days_format_short, supplyDays)
+                                } else {
+                                    stringResource(R.string.pharmacy_order_days_custom)
+                                },
+                                fontSize = 11.sp,
+                                fontWeight = if (isCustomSelected) FontWeight.Bold else FontWeight.Medium,
+                                color = if (isCustomSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                }
+
+                if (isCustomSelected) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = customDaysInput,
+                            onValueChange = { newVal ->
+                                val normalized = newVal.normalizeArabicDigits().filter { it.isDigit() }
+                                if (normalized.length <= 3) {
+                                    customDaysInput = normalized
+                                    val parsed = normalized.toIntOrNull()
+                                    if (parsed != null && parsed in 1..365) {
+                                        supplyDays = parsed
+                                    }
+                                }
+                            },
+                            label = {
+                                Text(
+                                    text = stringResource(R.string.pharmacy_order_custom_days_label),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            },
+                            placeholder = { Text(stringResource(R.string.pharmacy_order_custom_days_placeholder)) },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done
+                            ),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier
+                                .weight(1f)
+                                .defaultMinSize(minHeight = 56.dp),
+                            trailingIcon = {
+                                Text(
+                                    text = stringResource(R.string.unit_days_suffix),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(end = 12.dp)
+                                )
+                            }
+                        )
+
+                        // Decrement button (-)
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clickable {
+                                    val current = customDaysInput.toIntOrNull() ?: supplyDays
+                                    val next = (current - 1).coerceAtLeast(1)
+                                    customDaysInput = next.toString()
+                                    supplyDays = next
+                                }
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    text = "-",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 22.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+
+                        // Increment button (+)
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clickable {
+                                    val current = customDaysInput.toIntOrNull() ?: supplyDays
+                                    val next = (current + 1).coerceAtMost(365)
+                                    customDaysInput = next.toString()
+                                    supplyDays = next
+                                }
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    text = "+",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 20.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
