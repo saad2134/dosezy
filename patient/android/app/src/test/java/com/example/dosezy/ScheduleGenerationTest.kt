@@ -445,7 +445,7 @@ class ScheduleGenerationTest {
 
     @Test
     fun customRecurrence_generateScheduleEntries_generatesSlotsForSelectedDaysOnly() {
-        val startMonday = LocalDate.of(2026, 11, 2) // Future Monday
+        val startMonday = LocalDate.of(2028, 11, 6) // Future Monday
         val m = med(
             Frequency(
                 pattern = FrequencyPattern.CUSTOM,
@@ -456,19 +456,19 @@ class ScheduleGenerationTest {
             start = startMonday
         )
 
-        // Span 14 days (15 days total: Nov 2 to Nov 16 inclusive)
+        // Span 14 days (15 days total: Nov 6 to Nov 20 inclusive)
         val entries = m.generateScheduleEntries(startDateRange = startMonday, days = 14)
-        // Week 0: Nov 2 (Mon), Nov 4 (Wed)
+        // Week 0: Nov 6 (Mon), Nov 8 (Wed)
         // Week 1: None
-        // Week 2: Nov 16 (Mon)
+        // Week 2: Nov 20 (Mon)
         // Total = 3 entries
         assertEquals(3, entries.size)
         val dates = entries.map { it.scheduledDateTime.toLocalDate() }
         assertEquals(
             listOf(
-                LocalDate.of(2026, 11, 2),
-                LocalDate.of(2026, 11, 4),
-                LocalDate.of(2026, 11, 16)
+                LocalDate.of(2028, 11, 6),
+                LocalDate.of(2028, 11, 8),
+                LocalDate.of(2028, 11, 20)
             ),
             dates
         )

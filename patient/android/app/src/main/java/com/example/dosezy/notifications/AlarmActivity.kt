@@ -76,14 +76,6 @@ class AlarmActivity : ComponentActivity() {
         isKeyguardLockedState.value = keyguardManager?.isKeyguardLocked == true
     }
 
-    private fun isLockscreenPrivacyActive(): Boolean {
-        val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        val defaultPref = prefs.getBoolean("lockscreen_details_enabled", true)
-        val intentPref = intent?.getBooleanExtra("allow_lockscreen_details", defaultPref) ?: defaultPref
-        val userPref = alarmViewModel.uiState.value.user?.lockscreenDetailsEnabled ?: intentPref
-        return !userPref
-    }
-
     fun requestDeviceUnlock(onSuccess: (() -> Unit)? = null) {
         val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -93,7 +85,20 @@ class AlarmActivity : ComponentActivity() {
                     isKeyguardLockedState.value = false
                     onSuccess?.invoke()
                 }
-            })
+
+                override fun onDismissCancelled() {
+                    super.onDismissCancelled()
+                    checkKeyguardState()
+                }
+
+                override fun onDismissError() {
+                    super.onDismissError()
+                    checkKeyguardState()
+                }
+            }) ?: run {
+                isKeyguardLockedState.value = false
+                onSuccess?.invoke()
+            }
         } else {
             // Guard: Android 7.0/7.1 (API 24/25) lacks requestDismissKeyguard; apply FLAG_DISMISS_KEYGUARD and update state directly (#BUG-KEYGUARD-API24)
             @Suppress("DEPRECATION")
@@ -256,6 +261,44 @@ class AlarmActivity : ComponentActivity() {
                 finish()
             }
 
+            val executeTakeAction: () -> Unit = {
+                // Guard: Silence alarm audio immediately upon take confirmation so audio never screams while async database operations run (#BUG-ALARM-SCREAMING-LOCKSCREEN)
+                stopAlarm()
+                val isIntakeReAlert = intent?.getBooleanExtra(MedicineAlarmReceiver.EXTRA_IS_INTAKE_REALERT, false) ?: false
+                // Guard: Ensure cohort medication entry IDs are scoped strictly to active user's medicines list to prevent multi-profile contamination (#115, #BUG-ALARM-ISOLATE)
+                val allTargetIds = uiState.medicinesList.map { it.first.entryId }.ifEmpty { currentEntryIds }.filter { it.isNotEmpty() }.distinct()
+                if (user?.intakeSafeguardEnabled == true && !isIntakeReAlert) {
+                    // Guard: Start intake countdown timer for ADHD support on alarm dismissal (#104, #BUG-SAFEGUARD-COHORT-NAMES)
+                    val medNames = uiState.medicinesList.map { it.second.medicationName }.ifEmpty { listOf(currentMedName) }
+                    val compositeMedName = if (medNames.size > 1) medNames.joinToString(", ") else currentMedName
+                    IntakeSafeguardManager.startCountdown(
+                        context = applicationContext,
+                        entryId = allTargetIds.firstOrNull() ?: "",
+                        entryIds = allTargetIds,
+                        medicineName = compositeMedName,
+                        medicineNames = medNames,
+                        scheduledTime = currentSchedTime,
+                        durationSeconds = user.intakeCountdownSeconds,
+                        userId = user.userId
+                    )
+                    dismissAction()
+                } else {
+                    alarmViewModel.takeCohort(allTargetIds) {
+                        dismissAction()
+                    }
+                }
+            }
+
+            val handleTakeAction: () -> Unit = {
+                if (isDetailsMasked) {
+                    // Guard: Silence alarm audio immediately when user initiates take on locked screen, then prompt for biometric/PIN unlock and execute intake on success (#BUG-ALARM-SCREAMING-LOCKSCREEN)
+                    stopAlarm()
+                    requestDeviceUnlock(onSuccess = executeTakeAction)
+                } else {
+                    executeTakeAction()
+                }
+            }
+
             CompositionLocalProvider(
                 LocalLayoutDirection provides layoutDirection,
                 LocalContext provides localizedContext,
@@ -272,32 +315,8 @@ class AlarmActivity : ComponentActivity() {
                         isDarkTheme = isDark,
                         isDetailsMasked = isDetailsMasked,
                         isIntakeReAlert = intent?.getBooleanExtra(MedicineAlarmReceiver.EXTRA_IS_INTAKE_REALERT, false) ?: false,
-                        onUnlockRequest = { requestDeviceUnlock() },
-                        onTakeAction = {
-                            val isIntakeReAlert = intent?.getBooleanExtra(MedicineAlarmReceiver.EXTRA_IS_INTAKE_REALERT, false) ?: false
-                            // Guard: Ensure cohort medication entry IDs are scoped strictly to active user's medicines list to prevent multi-profile contamination (#115, #BUG-ALARM-ISOLATE)
-                            val allTargetIds = uiState.medicinesList.map { it.first.entryId }.ifEmpty { currentEntryIds }.filter { it.isNotEmpty() }.distinct()
-                            if (user?.intakeSafeguardEnabled == true && !isIntakeReAlert) {
-                                // Guard: Start intake countdown timer for ADHD support on alarm dismissal (#104, #BUG-SAFEGUARD-COHORT-NAMES)
-                                val medNames = uiState.medicinesList.map { it.second.medicationName }.ifEmpty { listOf(currentMedName) }
-                                val compositeMedName = if (medNames.size > 1) medNames.joinToString(", ") else currentMedName
-                                IntakeSafeguardManager.startCountdown(
-                                    context = applicationContext,
-                                    entryId = allTargetIds.firstOrNull() ?: "",
-                                    entryIds = allTargetIds,
-                                    medicineName = compositeMedName,
-                                    medicineNames = medNames,
-                                    scheduledTime = currentSchedTime,
-                                    durationSeconds = user.intakeCountdownSeconds,
-                                    userId = user.userId
-                                )
-                                dismissAction()
-                            } else {
-                                alarmViewModel.takeCohort(allTargetIds) {
-                                    dismissAction()
-                                }
-                            }
-                        },
+                        onUnlockRequest = { callback -> requestDeviceUnlock(callback) },
+                        onTakeAction = handleTakeAction,
                         // Guard: Support dynamic snooze duration chosen directly on alarm screen (#103)
                         onSnoozeAction = { minutes ->
                             try {
@@ -328,18 +347,10 @@ class AlarmActivity : ComponentActivity() {
     }
 
     private fun setupWindowFlags() {
-        val lockscreenPrivacy = isLockscreenPrivacyActive()
-        val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager
-        val isLocked = keyguardManager?.isKeyguardLocked == true
-
+        // Guard: Display activity over lockscreen and turn display on without dismissing keyguard prematurely (#BUG-ALARM-SCREAMING-LOCKSCREEN)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true)
             setTurnScreenOn(true)
-            // Guard: Safe-cast KeyguardManager to prevent NullPointerException or TypeCastException crash on headless or custom OEM builds
-            // Guard: Keep keyguard locked when user has disabled lockscreen details to prevent premature PHI exposure
-            if (!lockscreenPrivacy || !isLocked) {
-                keyguardManager?.requestDismissKeyguard(this, null)
-            }
         }
         @Suppress("DEPRECATION")
         window.apply {
@@ -349,11 +360,8 @@ class AlarmActivity : ComponentActivity() {
                         WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
                         WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
             )
-            if (!lockscreenPrivacy || !isLocked) {
-                addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
-            } else {
-                clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
-            }
+            // Guard: Never add FLAG_DISMISS_KEYGUARD in window setup; keyguard must stay secured until user explicitly authenticates (#BUG-ALARM-SCREAMING-LOCKSCREEN)
+            clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
         }
     }
 
