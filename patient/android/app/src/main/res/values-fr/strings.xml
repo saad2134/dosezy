@@ -689,6 +689,7 @@ Voulez-vous continuer ?</string>
     <string name="country_brazil">Brésil</string>
     <string name="country_bangladesh">Bangladesh</string>
     <string name="country_australia">Australie</string>
+    <string name="country_new_zealand">Nouvelle-Zélande</string>
     <string name="pharmacy_order_refill_filter">Filtre de réapprovisionnement</string>
     <string name="pharmacy_order_days_supply">Jours d\'approvisionnement</string>
     <string name="pharmacy_order_days_format_short">%1$d j</string>

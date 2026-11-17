@@ -705,6 +705,7 @@
     <string name="country_brazil">Brasil</string>
     <string name="country_bangladesh">Bangladés</string>
     <string name="country_australia">Australia</string>
+    <string name="country_new_zealand">Nueva Zelanda</string>
     <string name="pharmacy_order_refill_filter">Filtro de reposición</string>
     <string name="pharmacy_order_days_supply">Días de suministro</string>
     <string name="pharmacy_order_days_format_short">%1$d d</string>

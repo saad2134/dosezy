@@ -498,8 +498,8 @@ class BackupRestoreManager(
                             val notifManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
                             val existingSchedules = scheduleRepository.getSchedulesByUserSync(targetUserId)
                             existingSchedules.forEach { entry ->
-                                // Guard: Pass entry directly to cancelAlarm to bypass sequential blocking DB lookups
-                                alarmScheduler.cancelAlarm(entry)
+                                // Guard: Pass rearmSiblings = false to cancelAlarm to eliminate blocking DB lookups when wiping schedules for restore (#BUG-CANCEL-REARM-BYPASS)
+                                alarmScheduler.cancelAlarm(entry, rearmSiblings = false)
                                 alarmScheduler.cancelSnooze(entry.entryId)
                                 alarmScheduler.cancelNagging(entry.entryId)
                                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)

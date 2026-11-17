@@ -812,6 +812,66 @@ class ScheduleStatusAndUserRepositoryDirectTest {
         assertNotNull("Restored baseline future entry must exist", restoredNext)
         assertEquals(LocalDateTime.of(2026, 12, 2, 9, 0, 0), restoredNext!!.scheduledDateTime)
     }
+
+    // Guard: Verify that taking a rolling dose with syncSlotNotification = false (batch mode in TakeCohortUseCase and NotificationActionReceiver) still re-anchors and reschedules future alarms (#119, #BUG-ROLLING-ALARM-BATCH)
+    @Test
+    fun recordDoseTaken_rollingInterval_reanchorsWhenSyncSlotNotificationFalse() = runBlocking {
+        val user = sampleUser("user_rolling_batch_test")
+        userDao.insertUser(user)
+
+        val rollingMed = sampleMedicine("med_rolling_batch", user.userId, "Hourly Rolling Med").copy(
+            frequency = Frequency(FrequencyPattern.EVERY_X_HOURS, intervalHours = 4, isRollingInterval = true),
+            timesPerDay = 6,
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+        medicineDao.insertMedicine(rollingMed)
+
+        val scheduleRepository = com.example.dosezy.data.repository.ScheduleRepository(db)
+        val initialEntry = ScheduleEntry(
+            entryId = "rolling_batch_entry_1",
+            userId = user.userId,
+            medicineId = rollingMed.medicineId,
+            scheduledDateTime = LocalDateTime.of(2026, 12, 1, 8, 0, 0),
+            status = MedicationStatus.PENDING,
+            dosage = 200.0
+        )
+        val futureEntry = ScheduleEntry(
+            entryId = "rolling_batch_entry_2",
+            userId = user.userId,
+            medicineId = rollingMed.medicineId,
+            scheduledDateTime = LocalDateTime.of(2026, 12, 1, 12, 0, 0),
+            status = MedicationStatus.PENDING,
+            dosage = 200.0
+        )
+        scheduleDao.insertScheduleEntries(listOf(initialEntry, futureEntry))
+
+        // Take dose at 09:30 AM with syncSlotNotification = false (standard TakeCohortUseCase / NotificationActionReceiver path)
+        val takenAt = LocalDateTime.of(2026, 12, 1, 9, 30, 0)
+        scheduleRepository.recordDoseTaken(
+            entryId = initialEntry.entryId,
+            status = "TAKEN_LATE",
+            takenAt = takenAt,
+            context = context,
+            notes = null,
+            syncSlotNotification = false
+        )
+
+        // 1. Initial entry is marked TAKEN_LATE
+        val updatedInitial = scheduleDao.getScheduleEntryById(initialEntry.entryId)
+        assertNotNull(updatedInitial)
+        assertEquals(MedicationStatus.TAKEN_LATE, updatedInitial!!.status)
+
+        // 2. Future fixed 12:00 entry is deleted
+        val deletedFuture = scheduleDao.getScheduleEntryById(futureEntry.entryId)
+        assertNull("Stale future pending entry must be purged", deletedFuture)
+
+        // 3. New re-anchored entry must exist at takenAt + 4 hours (09:30 + 4h = 13:30)
+        val allEntries = scheduleDao.getAllScheduleEntries(user.userId)
+        val nextRolling = allEntries.firstOrNull { it.entryId != initialEntry.entryId }
+        assertNotNull("Re-anchored future entry must be generated and inserted", nextRolling)
+        assertEquals(LocalDateTime.of(2026, 12, 1, 13, 30, 0), nextRolling!!.scheduledDateTime)
+        assertEquals(MedicationStatus.PENDING, nextRolling.status)
+    }
 }
 
 

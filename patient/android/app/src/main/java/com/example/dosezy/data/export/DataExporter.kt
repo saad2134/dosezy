@@ -289,6 +289,8 @@ class DataExporter(
             mObj.put("intervalHours", med.frequency.intervalHours)
             mObj.put("intervalDays", med.frequency.intervalDays)
             mObj.put("intervalWeeks", med.frequency.intervalWeeks)
+            // Guard: Explicitly export rolling interval setting at root level for flat JSON compatibility and BackupRestoreManager fallback (#119, #BUG-EXPORT-ROLLING)
+            mObj.put("isRollingInterval", med.frequency.isRollingInterval)
 
             // Guard: Serialize nested frequency object alongside top-level keys for dual compatibility with Gson and BackupRestoreManager
             val freqObj = JSONObject()
@@ -399,8 +401,8 @@ class DataExporter(
 
             // Medicines Section
             csvBuilder.append("MEDICINES\n")
-            // Guard: Include Refill Threshold, Auto Deduct Stock, Is Archived, Custom Dosages, and Days of Week/Month to preserve complete inventory and frequency metadata in CSV exports
-            csvBuilder.append("Medicine ID,User ID,Medication Name,Dosage,Dosage Unit,Times Per Day,Frequency Pattern,Interval Hours,Interval Days,Interval Weeks,Days Per Week,Days Per Month,Selected Days Of Week,Selected Days Of Month,Scheduled Times,Pill Shape,Pill Color,Doctor Notes,Start Date,End Date,Duration Days,Stock,Refill Threshold,Auto Deduct Stock,Is Archived,Custom Dosages,Image URI,Reminder Type\n")
+            // Guard: Include Refill Threshold, Auto Deduct Stock, Is Archived, Custom Dosages, Days of Week/Month, and Rolling Interval to preserve complete inventory and frequency metadata in CSV exports
+            csvBuilder.append("Medicine ID,User ID,Medication Name,Dosage,Dosage Unit,Times Per Day,Frequency Pattern,Interval Hours,Interval Days,Interval Weeks,Rolling Interval,Days Per Week,Days Per Month,Selected Days Of Week,Selected Days Of Month,Scheduled Times,Pill Shape,Pill Color,Doctor Notes,Start Date,End Date,Duration Days,Stock,Refill Threshold,Auto Deduct Stock,Is Archived,Custom Dosages,Image URI,Reminder Type\n")
             medicines.forEach { medicine ->
                 val scheduledTimesStr = medicine.scheduledTimes.joinToString(";") { it.toString() }
                 val customDosagesStr = medicine.customDosages?.entries?.joinToString(";") { "${it.key}:${it.value}" } ?: ""
@@ -417,6 +419,7 @@ class DataExporter(
                     "${medicine.frequency.intervalHours ?: ""}," +
                     "${medicine.frequency.intervalDays ?: ""}," +
                     "${medicine.frequency.intervalWeeks ?: ""}," +
+                    "${medicine.frequency.isRollingInterval}," +
                     "${medicine.frequency.daysPerWeek ?: ""}," +
                     "${medicine.frequency.daysPerMonth ?: ""}," +
                     "${escapeCsv(selectedDaysOfWeekStr)}," +

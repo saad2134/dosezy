@@ -689,6 +689,7 @@
     <string name="country_brazil">البرازيل</string>
     <string name="country_bangladesh">بنغلاديش</string>
     <string name="country_australia">أستراليا</string>
+    <string name="country_new_zealand">نيوزيلندا</string>
     <string name="pharmacy_order_refill_filter">تصفية إعادة التعبئة</string>
     <string name="pharmacy_order_days_supply">مدة الإمداد بالأيام</string>
     <string name="pharmacy_order_days_format_short">%1$d يوم</string>

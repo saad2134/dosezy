@@ -685,6 +685,7 @@
     <string name="country_brazil">ব্রাজিল</string>
     <string name="country_bangladesh">বাংলাদেশ</string>
     <string name="country_australia">অস্ট্রেলিয়া</string>
+    <string name="country_new_zealand">নিউজিল্যান্ড</string>
     <string name="pharmacy_order_refill_filter">রিফিল ফিল্টার</string>
     <string name="pharmacy_order_days_supply">সরবরাহের দিন</string>
     <string name="pharmacy_order_days_format_short">%1$d দিন</string>

@@ -717,6 +717,7 @@ Do you want to continue?</string>
     <string name="country_brazil">Brazil</string>
     <string name="country_bangladesh">Bangladesh</string>
     <string name="country_australia">Australia</string>
+    <string name="country_new_zealand">New Zealand</string>
     <string name="pharmacy_order_refill_filter">Refill Filter</string>
     <string name="pharmacy_order_days_supply">Days of Supply</string>
     <string name="pharmacy_order_days_format_short">%1$d d</string>

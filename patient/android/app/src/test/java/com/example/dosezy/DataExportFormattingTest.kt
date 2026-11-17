@@ -230,4 +230,44 @@ class DataExportFormattingTest {
         val schLiquid = schFractional.copy(dosage = 2.5)
         assertEquals("2.5 mL", liquidMed.getDosageDisplay(schLiquid.scheduledDateTime.toLocalTime(), schLiquid.dosage))
     }
+
+    // Guard: Verify CSV export includes Rolling Interval header and row data for rolling regimens (#119, #BUG-EXPORT-ROLLING)
+    @Test
+    fun dataExporter_buildCsvContent_includesRollingIntervalColumn() {
+        val user = com.example.dosezy.data.model.User(
+            userId = "usr_rolling_exp",
+            fullName = "Rolling Patient",
+            age = 30,
+            gender = com.example.dosezy.data.model.Gender.FEMALE,
+            contactNumber = "+1987654321"
+        )
+        val rollingMed = sampleMed(
+            name = "Ibuprofen Rolling",
+            dosage = 400.0,
+            unit = DosageUnit.MG,
+            stock = 30.0
+        ).copy(
+            frequency = Frequency(
+                pattern = FrequencyPattern.EVERY_X_HOURS,
+                intervalHours = 6,
+                isRollingInterval = true
+            )
+        )
+        val nonRollingMed = sampleMed(
+            name = "Amlodipine Daily",
+            dosage = 5.0,
+            unit = DosageUnit.MG,
+            stock = 28.0
+        ).copy(
+            frequency = Frequency(
+                pattern = FrequencyPattern.DAILY,
+                isRollingInterval = false
+            )
+        )
+
+        val csv = com.example.dosezy.data.export.DataExporter.buildCsvContent(user, listOf(rollingMed, nonRollingMed), emptyList())
+        assertTrue("CSV header must contain Rolling Interval column", csv.contains("Interval Weeks,Rolling Interval,Days Per Week"))
+        assertTrue("CSV row for rolling med must output true", csv.contains("EVERY_X_HOURS,6,,,true,"))
+        assertTrue("CSV row for non-rolling med must output false", csv.contains("DAILY,,,,false,"))
+    }
 }

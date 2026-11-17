@@ -164,8 +164,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 entry.scheduledDateTime.isBefore(activeWindowEnd)
             }
             entriesToCancel.forEach { entry ->
-                // Guard: Pass entry directly to cancelAlarm to bypass sequential blocking DB lookups
-                alarmScheduler.cancelAlarm(entry)
+                // Guard: Pass rearmSiblings = false to cancelAlarm to eliminate redundant sequential blocking DB lookups during full alarm rebuilds (#BUG-CANCEL-REARM-BYPASS)
+                alarmScheduler.cancelAlarm(entry, rearmSiblings = false)
                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
             }
 
@@ -407,7 +407,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                             database.scheduleDao().insertScheduleEntries(reanchoredEntries)
                         }
 
-                        if (context != null && syncSlotNotification) {
+                        // Guard: Reschedule alarms whenever rolling interval re-anchoring generates new upcoming doses, regardless of syncSlotNotification, to prevent losing next rolling alarm (#119, #BUG-ROLLING-ALARM-BATCH)
+                        if (context != null) {
                             rescheduleAllAlarms(previousEntry.userId, context)
                         }
                     }
@@ -527,7 +528,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                             val alarmScheduler = AlarmScheduler(context)
                             alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
                             slotEntries.forEach { slotEntry ->
-                                alarmScheduler.cancelAlarm(slotEntry)
+                                alarmScheduler.cancelAlarm(slotEntry, rearmSiblings = false)
                                 alarmScheduler.cancelSnooze(slotEntry.entryId)
                                 alarmScheduler.cancelNagging(slotEntry.entryId)
                                 alarmScheduler.cancelIntakeSafeguardAlarm(slotEntry.entryId)

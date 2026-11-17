@@ -317,7 +317,12 @@ class AlarmScheduler(private val context: Context) {
         Log.d(TAG, "Scheduled grouped snooze for ${entryIds.size} entries in $minutes minutes (primaryId=$primaryId)")
     }
 
-    fun cancelAlarm(entryId: String, userId: String? = null, scheduledDateTime: LocalDateTime? = null) {
+    fun cancelAlarm(
+        entryId: String,
+        userId: String? = null,
+        scheduledDateTime: LocalDateTime? = null,
+        rearmSiblings: Boolean = true
+    ) {
         val intent = Intent(context, MedicineAlarmReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(
             context,
@@ -329,6 +334,9 @@ class AlarmScheduler(private val context: Context) {
         alarmManager.cancel(pendingIntent)
         pendingIntent.cancel()
         Log.d(TAG, "Cancelled alarm for entry: $entryId")
+
+        // Guard: Bypass sequential blocking DB queries when bulk rescheduling cancels all entries before batch recreation (#BUG-CANCEL-REARM-BYPASS)
+        if (!rearmSiblings) return
 
         var resolvedUserId = userId
         var resolvedDateTime = scheduledDateTime
@@ -386,8 +394,8 @@ class AlarmScheduler(private val context: Context) {
         }
     }
 
-    fun cancelAlarm(entry: ScheduleEntry) {
-        cancelAlarm(entry.entryId, entry.userId, entry.scheduledDateTime)
+    fun cancelAlarm(entry: ScheduleEntry, rearmSiblings: Boolean = true) {
+        cancelAlarm(entry.entryId, entry.userId, entry.scheduledDateTime, rearmSiblings)
     }
 
     fun cancelSlotAlarm(userId: String, scheduledDateTime: LocalDateTime) {

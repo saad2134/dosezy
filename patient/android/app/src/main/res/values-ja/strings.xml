@@ -689,6 +689,7 @@
     <string name="country_brazil">ブラジル</string>
     <string name="country_bangladesh">バングラデシュ</string>
     <string name="country_australia">オーストラリア</string>
+    <string name="country_new_zealand">ニュージーランド</string>
     <string name="pharmacy_order_refill_filter">補充フィルター</string>
     <string name="pharmacy_order_days_supply">処方日数</string>
     <string name="pharmacy_order_days_format_short">%1$d 日</string>

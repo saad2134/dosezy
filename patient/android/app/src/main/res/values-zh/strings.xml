@@ -705,6 +705,7 @@
     <string name="country_brazil">巴西</string>
     <string name="country_bangladesh">孟加拉国</string>
     <string name="country_australia">澳大利亚</string>
+    <string name="country_new_zealand">新西兰</string>
     <string name="pharmacy_order_refill_filter">补药筛选</string>
     <string name="pharmacy_order_days_supply">用药天数</string>
     <string name="pharmacy_order_days_format_short">%1$d 天</string>
