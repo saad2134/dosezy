@@ -12,20 +12,10 @@
     <!-- Header Bar -->
     <div class="px-4 py-3.5 bg-[#12151c]/90 border-b border-white/10 flex items-center justify-between">
       <div class="flex items-center space-x-2.5">
-        <div class="relative w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 p-[1px] shadow-md flex items-center justify-center shrink-0">
-          <div class="w-full h-full bg-[#0a0c10] rounded-[11px] flex items-center justify-center text-sky-400">
-            <svg class="w-4 h-4 text-sky-400" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2C12 7.52285 7.52285 12 2 12C7.52285 12 12 16.4771 12 22C12 16.4771 16.4771 12 22 12C16.4771 12 12 7.52285 12 2Z" fill="url(#hdr-ai-grad)"/>
-              <path d="M19 2C19 4.20914 17.2091 6 15 6C17.2091 6 19 7.79086 19 10C19 7.79086 20.7909 6 23 6C20.7909 6 19 4.20914 19 2Z" fill="#38BDF8"/>
-              <defs>
-                <linearGradient id="hdr-ai-grad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#38BDF8"/>
-                  <stop offset="1" stop-color="#818CF8"/>
-                </linearGradient>
-              </defs>
-            </svg>
+        <div class="relative w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500/20 to-blue-600/20 border border-white/10 p-[1px] shadow-md flex items-center justify-center shrink-0">
+          <div class="w-full h-full bg-[#0a0c10] rounded-[11px] flex items-center justify-center p-1.5">
+            <img src="/icons/star.png" alt="Dosezy AI" class="w-full h-full object-contain" />
           </div>
-          <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#0a0c10]"></span>
         </div>
         <div>
           <h4 class="font-bold text-white text-xs font-display">
@@ -52,10 +42,8 @@
     <div id="ai-chat-messages" class="p-4 h-72 overflow-y-auto space-y-3.5 text-xs leading-relaxed bg-grid-pattern">
       <!-- Initial AI Greeting -->
       <div class="flex items-start space-x-2.5">
-        <div class="w-6 h-6 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center shrink-0 mt-0.5">
-          <svg class="w-3.5 h-3.5 text-sky-400" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2C12 7.52285 7.52285 12 2 12C7.52285 12 12 16.4771 12 22C12 16.4771 16.4771 12 22 12C16.4771 12 12 7.52285 12 2Z" fill="#38BDF8"/>
-          </svg>
+        <div class="w-6 h-6 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0 mt-0.5 p-1">
+          <img src="/icons/star.png" alt="Dosezy AI" class="w-full h-full object-contain" />
         </div>
         <div class="bg-[#12151c] p-3 rounded-2xl border border-white/10 text-neutral-200 space-y-1.5 max-w-[85%]">
           <p>Hello! I am <strong>Dosezy AI</strong>. How can I assist your medication management today?</p>
@@ -102,29 +90,70 @@
     </form>
   </div>
 
-  <!-- Squircle Trigger Button (Fixed In Place, Custom High-End AI Sparkle Emblem) -->
+  <!-- Go to Top Button (Positioned to the left of AI Assistant) -->
+  <button 
+    id="scroll-to-top-btn"
+    type="button"
+    class="opacity-0 scale-75 translate-y-2 pointer-events-none absolute right-[3.5rem] sm:right-[3.75rem] bottom-0 w-12 h-12 rounded-2xl bg-gradient-to-b from-[#040711]/98 via-[#020409]/98 to-[#010205]/98 hover:from-[#080e1e] hover:via-[#040710] hover:to-[#020308] backdrop-blur-2xl shadow-[inset_0_1px_1px_0_rgba(56,189,248,0.2),0_8px_30px_rgba(0,0,0,0.6)] hover:shadow-[inset_0_1px_1px_0_rgba(56,189,248,0.45),0_0_25px_rgba(14,165,233,0.4)] active:scale-95 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center cursor-pointer overflow-hidden group text-neutral-300 hover:text-white"
+    aria-label="Back to top"
+    title="Back to top"
+  >
+    <!-- Resting Border Fading Out Downwards -->
+    <div class="absolute inset-0 rounded-2xl pointer-events-none border border-sky-500/25 transition-opacity duration-300 group-hover:opacity-0 [mask-image:linear-gradient(180deg,black_0%,black_20%,transparent_85%)] [-webkit-mask-image:linear-gradient(180deg,black_0%,black_20%,transparent_85%)]"></div>
+
+    <!-- Hover Border Fading Out Downwards -->
+    <div class="absolute inset-0 rounded-2xl pointer-events-none border border-sky-400/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300 [mask-image:linear-gradient(180deg,black_0%,black_25%,transparent_95%)] [-webkit-mask-image:linear-gradient(180deg,black_0%,black_25%,transparent_95%)]"></div>
+
+    <!-- Specular Topline Highlight -->
+    <div class="absolute inset-0 rounded-2xl pointer-events-none border border-transparent [border-top-color:rgba(255,255,255,0.7)] [border-left-color:rgba(56,189,248,0.35)] [border-right-color:rgba(56,189,248,0.35)] opacity-0 group-hover:opacity-100 transition-opacity duration-300 [mask-image:linear-gradient(180deg,black_0%,transparent_50%)] [-webkit-mask-image:linear-gradient(180deg,black_0%,transparent_50%)]"></div>
+
+    <!-- Ambient Blue Caustic Glow (Subtle Dark Underglow) -->
+    <div class="absolute inset-0 bg-gradient-to-tr from-sky-500/10 via-blue-600/5 to-transparent opacity-40 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none"></div>
+
+    <!-- Arrow Icon -->
+    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-neutral-300 group-hover:text-white transition-transform duration-200 group-hover:-translate-y-0.5 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+    </svg>
+  </button>
+
+  <!-- Squircle Trigger Button (Dark Obsidian Midnight Glass, Star Emblem) -->
   <button 
     id="ai-chat-trigger-btn"
     type="button"
-    class="pointer-events-auto relative w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 via-blue-600 to-indigo-600 hover:from-sky-400 hover:via-blue-500 hover:to-indigo-500 text-white shadow-[0_8px_25px_rgba(2,132,199,0.45)] hover:shadow-[0_0_20px_rgba(56,189,248,0.6)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center border border-white/20 cursor-pointer group"
+    class="pointer-events-auto relative w-12 h-12 rounded-2xl bg-gradient-to-b from-[#040711]/98 via-[#020409]/98 to-[#010205]/98 hover:from-[#080e1e] hover:via-[#040710] hover:to-[#020308] backdrop-blur-2xl shadow-[inset_0_1px_1px_0_rgba(56,189,248,0.2),0_8px_30px_rgba(0,0,0,0.6)] hover:shadow-[inset_0_1px_1px_0_rgba(56,189,248,0.45),0_0_25px_rgba(14,165,233,0.4)] active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer overflow-hidden group"
     aria-label="Open Dosezy AI Assistant"
   >
-    <svg class="w-5 h-5 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 drop-shadow-[0_2px_8px_rgba(56,189,248,0.5)]" viewBox="0 0 24 24" fill="none">
-      <path d="M12 2C12 7.52285 7.52285 12 2 12C7.52285 12 12 16.4771 12 22C12 16.4771 16.4771 12 22 12C16.4771 12 12 7.52285 12 2Z" fill="url(#trg-ai-grad)"/>
-      <path d="M19 2C19 4.20914 17.2091 6 15 6C17.2091 6 19 7.79086 19 10C19 7.79086 20.7909 6 23 6C20.7909 6 19 4.20914 19 2Z" fill="#38BDF8"/>
-      <defs>
-        <linearGradient id="trg-ai-grad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#FFFFFF"/>
-          <stop offset="1" stop-color="#38BDF8"/>
-        </linearGradient>
-      </defs>
-    </svg>
+    <!-- Resting Border Fading Out Downwards -->
+    <div class="absolute inset-0 rounded-2xl pointer-events-none border border-sky-500/25 transition-opacity duration-300 group-hover:opacity-0 [mask-image:linear-gradient(180deg,black_0%,black_20%,transparent_85%)] [-webkit-mask-image:linear-gradient(180deg,black_0%,black_20%,transparent_85%)]"></div>
 
-    <!-- Online Pulse Status Badge -->
-    <span class="absolute -top-1 -right-1 flex h-3 w-3">
-      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-300 opacity-75"></span>
-      <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-400 border-2 border-[#0a0c10]"></span>
-    </span>
+    <!-- Hover Border Fading Out Downwards -->
+    <div class="absolute inset-0 rounded-2xl pointer-events-none border border-sky-400/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300 [mask-image:linear-gradient(180deg,black_0%,black_25%,transparent_95%)] [-webkit-mask-image:linear-gradient(180deg,black_0%,black_25%,transparent_95%)]"></div>
+
+    <!-- Specular Topline Highlight -->
+    <div class="absolute inset-0 rounded-2xl pointer-events-none border border-transparent [border-top-color:rgba(255,255,255,0.7)] [border-left-color:rgba(56,189,248,0.35)] [border-right-color:rgba(56,189,248,0.35)] opacity-0 group-hover:opacity-100 transition-opacity duration-300 [mask-image:linear-gradient(180deg,black_0%,transparent_50%)] [-webkit-mask-image:linear-gradient(180deg,black_0%,transparent_50%)]"></div>
+
+    <!-- Ambient Blue Caustic Glow (Subtle Dark Underglow) -->
+    <div class="absolute inset-0 bg-gradient-to-tr from-sky-500/10 via-blue-600/5 to-transparent opacity-40 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none"></div>
+
+    <!-- Star Icon Container with Ambient Backlight -->
+    <div class="relative w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center pointer-events-none z-10 transition-transform duration-200 group-hover:scale-110 drop-shadow-[0_0_8px_rgba(56,189,248,0.3)]">
+      <!-- Static Star (Default resting state) -->
+      <img 
+        src="/icons/star.png" 
+        alt="" 
+        width="24" 
+        height="24" 
+        class="w-full h-full object-contain select-none transition-opacity duration-200 group-hover:opacity-0" 
+      />
+      <!-- Animated APNG Star (Smooth 60-frame loop on hover) -->
+      <img 
+        src="/icons/star-a.apng" 
+        alt="Dosezy AI Assistant" 
+        width="24" 
+        height="24" 
+        class="w-full h-full object-contain select-none absolute inset-0 m-auto transition-opacity duration-200 opacity-0 group-hover:opacity-100" 
+      />
+    </div>
   </button>
 
 </div>
@@ -140,13 +169,110 @@
     const chatInput = document.getElementById('ai-chat-input') as HTMLInputElement | null;
     const chipBtns = document.querySelectorAll('.chip-btn');
 
+    // Scroll To Top Handler (Attenomy physics easeOutCubic engine)
+    const scrollToTopBtn = document.getElementById('scroll-to-top-btn');
+    if (scrollToTopBtn) {
+      const handleScroll = () => {
+        if (window.scrollY > 350) {
+          scrollToTopBtn.classList.remove('opacity-0', 'scale-75', 'translate-y-2', 'pointer-events-none');
+          scrollToTopBtn.classList.add('opacity-100', 'scale-100', 'translate-y-0', 'pointer-events-auto');
+        } else {
+          scrollToTopBtn.classList.remove('opacity-100', 'scale-100', 'translate-y-0', 'pointer-events-auto');
+          scrollToTopBtn.classList.add('opacity-0', 'scale-75', 'translate-y-2', 'pointer-events-none');
+        }
+      };
+
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      handleScroll();
+
+      scrollToTopBtn.addEventListener('click', () => {
+        const startPosition = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+        if (startPosition === 0) return;
+
+        // Smooth duration scaled between 600ms and 850ms based on scroll distance
+        const duration = Math.min(850, Math.max(600, Math.sqrt(startPosition) * 14));
+        let startTime: number | null = null;
+
+        // Ease Out Cubic: starts with physical momentum and glides smoothly to rest
+        const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+        const step = (currentTime: number) => {
+          if (!startTime) startTime = currentTime;
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const easedProgress = easeOutCubic(progress);
+
+          window.scrollTo(0, Math.round(startPosition * (1 - easedProgress)));
+
+          if (progress < 1) {
+            requestAnimationFrame(step);
+          }
+        };
+
+        requestAnimationFrame(step);
+      });
+    }
+
     const KNOWLEDGE_BASE: Record<string, string> = {
       privacy: "🔒 **100% Local Privacy**: Dosezy omits `android.permission.INTERNET` from its core Android manifest. Your prescription schedules and medical history stay 100% offline inside an encrypted local SQLite Room database.",
-      grid: "⏰ **12-Hour Grid Time Picker**: Designed specifically for geriatric accessibility and tremor reduction! Replaces rotating radial clock dials with 12 stationary, high-contrast touch targets (48 × 48 dp min).",
-      cloud: "☁️ **Dosezy Cloud**: An optional managed service for families. Provides caregiver web portal monitoring at `app.dosezy.com` with real-time missed dose push alerts and patient-controlled E2EE consent.",
-      selfhost: "🐳 **Self-Hosting**: You can deploy your own private sync node on Docker Compose & PostgreSQL (`server/`). It provides complete hardware sovereignty with zero external API calls.",
-      download: "📱 **Downloading Dosezy**: Patient App (v2.5.13) is free and available via direct APK sideload or F-Droid! Check out `/patient` for download packages."
+      grid: "⏰ **12-Hour Grid Time Picker**: Designed specifically for geriatric accessibility and tremor reduction! Replaces rotating radial clock dials with 12 stationary, high-contrast touch targets (48 × 48 dp min). Learn more in [/manual](/manual).",
+      cloud: "☁️ **Dosezy Cloud**: An optional managed service for families. Provides caregiver web portal monitoring at [caregiver.dosezy.app](https://caregiver.dosezy.app) with real-time missed dose push alerts and patient-controlled E2EE consent.",
+      selfhost: "🐳 **Self-Hosting**: You can deploy your own private sync node on Docker Compose & PostgreSQL (`server/`). See [/self-host](/self-host) for complete hardware sovereignty with zero external API calls.",
+      download: "📱 **Downloading Dosezy**: Patient App (v2.5.13) is free and available via direct APK sideload or F-Droid! Check out [/patient](/patient) for download packages."
     };
+
+    function renderMarkdown(md: string): string {
+      if (!md) return '';
+
+      // 1. Escape raw HTML tags
+      let html = md
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      // 2. Multi-line Code blocks (```lang ... ```)
+      html = html.replace(/```([a-zA-Z0-9_-]*)\n?([\s\S]*?)```/g, (_, lang, code) => {
+        return `<pre class="p-2.5 my-2 rounded-xl bg-black/60 border border-white/10 overflow-x-auto font-mono text-[11px] text-sky-300"><code>${code.trim()}</code></pre>`;
+      });
+
+      // 3. Inline code (`code`)
+      html = html.replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 rounded-md bg-white/10 text-sky-300 font-mono text-[11px] border border-white/15">$1</code>');
+
+      // 4. Bold + Italic (***text*** or ___text___)
+      html = html.replace(/(\*\*\*|___)(.*?)\1/g, '<strong class="font-bold text-white"><em class="italic">$2</em></strong>');
+
+      // 5. Bold (**text** or __text__)
+      html = html.replace(/(\*\*|__)(.*?)\1/g, '<strong class="font-semibold text-white">$2</strong>');
+
+      // 6. Italic (*text* or _text_)
+      html = html.replace(/(?<!\*)\*([^*]+)\*(?!\*)|(?<!_)_([^_]+)_(?!_)/g, '<em class="italic text-neutral-300">$1$2</em>');
+
+      // 7. Markdown Links ([text](url))
+      html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
+        const isExternal = url.startsWith('http://') || url.startsWith('https://');
+        const target = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
+        return `<a href="${url}"${target} class="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors">${text}</a>`;
+      });
+
+      // 8. Bullet list items (- item or * item)
+      html = html.replace(/^[*-]\s+(.+)$/gm, '<li class="ml-4 list-disc text-neutral-300">$1</li>');
+      html = html.replace(/((?:<li class="ml-4 list-disc text-neutral-300">.*?<\/li>\n?)+)/g, (match) => {
+        return `<ul class="my-1.5 space-y-1">${match.replace(/\n/g, '')}</ul>`;
+      });
+
+      // 9. Line breaks: preserve paragraphs
+      html = html.replace(/\n\n+/g, '</p><p class="mt-2">');
+      html = html.replace(/\n/g, '<br />');
+
+      // 10. Clean up empty/nested paragraphs
+      html = html.replace(/<p>\s*<\/p>/g, '');
+      html = html.replace(/<p><ul/g, '<ul');
+      html = html.replace(/<\/ul><\/p>/g, '</ul>');
+      html = html.replace(/<p><pre/g, '<pre');
+      html = html.replace(/<\/pre><\/p>/g, '</pre>');
+
+      return html;
+    }
 
     function toggleChat(show?: boolean) {
       if (!chatWindow) return;
@@ -173,9 +299,10 @@
       if (!chatMessages) return;
       const msgDiv = document.createElement('div');
       msgDiv.className = 'flex justify-end';
+      const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       msgDiv.innerHTML = `
         <div class="bg-sky-600 text-white p-3 rounded-2xl max-w-[85%] text-xs shadow-md">
-          ${text}
+          ${escaped}
         </div>
       `;
       chatMessages.appendChild(msgDiv);
@@ -187,13 +314,11 @@
       const msgDiv = document.createElement('div');
       msgDiv.className = 'flex items-start space-x-2.5 animate-fade-in';
       msgDiv.innerHTML = `
-        <div class="w-6 h-6 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center shrink-0 mt-0.5">
-          <svg class="w-3.5 h-3.5 text-sky-400" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2C12 7.52285 7.52285 12 2 12C7.52285 12 12 16.4771 12 22C12 16.4771 16.4771 12 22 12C16.4771 12 12 7.52285 12 2Z" fill="#38BDF8"/>
-          </svg>
+        <div class="w-6 h-6 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0 mt-0.5 p-1">
+          <img src="/icons/star.png" alt="Dosezy AI" class="w-full h-full object-contain" />
         </div>
-        <div class="bg-[#12151c] p-3 rounded-2xl border border-white/10 text-neutral-200 leading-relaxed max-w-[85%]">
-          ${replyText}
+        <div class="bg-[#12151c] p-3 rounded-2xl border border-white/10 text-neutral-200 leading-relaxed max-w-[85%] text-xs space-y-1">
+          ${renderMarkdown(replyText)}
         </div>
       `;
       chatMessages.appendChild(msgDiv);
@@ -204,7 +329,7 @@
       appendUserMessage(query);
 
       const q = query.toLowerCase();
-      let response = "I'm glad you asked! Dosezy is an open-source, local-first medicine tracker. You can explore our Patient Application, Caregiver Cloud, or Architecture specs anytime from the top navigation bar.";
+      let response = "I'm glad you asked! Dosezy is an open-source, local-first medicine tracker. You can explore our [Patient Application](/patient), [Caregiver Cloud](/caregiver), [Self-Hosting](/self-host), or [Architecture Specs](/architecture) anytime from the top navigation bar.";
 
       if (q.includes('privac') || q.includes('offlin') || q.includes('data')) {
         response = KNOWLEDGE_BASE.privacy;

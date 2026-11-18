@@ -4,7 +4,10 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 ---
 
-<Layout title="Patient Application ✦ Dosezy Free Offline Medicine Tracker">
+<Layout 
+	title="Patient Application ✦ Dosezy Free Offline Medicine Tracker"
+	description="Download the Dosezy patient app for Android and iOS. 100% private medication tracking with custom schedules, inventory low-stock alerts, and zero telemetry."
+>
 	<Header />
 	<main class="flex-grow pt-28 sm:pt-32 pb-16 bg-[#030407] bg-grid-pattern">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -86,11 +89,14 @@ import Footer from '../components/Footer.astro';
 						<div class="mt-2 pt-4 border-t border-white/10 shrink-0 space-y-3">
 							<h4 class="font-bold text-white font-mono uppercase tracking-wider mb-2 text-[11px]">Downloads</h4>
 							<div class="flex flex-wrap items-center gap-3">
+								<a href="https://play.google.com/store/apps/details?id=com.saad2134.dosezy" target="_blank" rel="noopener noreferrer" class="inline-block hover:scale-105 transition-transform">
+									<img src="/get-it-on-google-play.png" alt="Get it on Google Play" class="h-10 w-auto" loading="lazy" decoding="async" />
+								</a>
 								<a href="https://f-droid.org/en/packages/com.saad2134.dosezy" target="_blank" rel="noopener noreferrer" class="inline-block hover:scale-105 transition-transform">
-									<img src="/get-it-on-fdroid.png" alt="Get it on F-Droid" class="h-10 w-auto" />
+									<img src="/get-it-on-fdroid.png" alt="Get it on F-Droid" class="h-10 w-auto" loading="lazy" decoding="async" />
 								</a>
 								<a href="https://github.com/saad2134/dosezy/releases" target="_blank" rel="noopener noreferrer" class="inline-block hover:scale-105 transition-transform">
-									<img src="/get-it-on-github.png" alt="Get it on GitHub" class="h-10 w-auto" />
+									<img src="/get-it-on-github.png" alt="Get it on GitHub" class="h-10 w-auto" loading="lazy" decoding="async" />
 								</a>
 							</div>
 							<!-- SHA-256 Integrity Verification Banner -->
@@ -324,7 +330,7 @@ import Footer from '../components/Footer.astro';
 						<!-- Screen 1: Home Dashboard -->
 						<div class="min-w-[210px] sm:min-w-[230px] flex-1 space-y-2.5 text-center group/screen shrink-0">
 							<div class="rounded-2xl overflow-hidden border border-white/10 bg-[#030407] p-1.5 shadow-xl transition-all duration-300 group-hover/screen:border-sky-500/50 group-hover/screen:scale-105">
-								<img src="/screenshots/home.png" alt="Home Screen" class="w-full h-auto rounded-xl" />
+								<img src="/screenshots/home.png" alt="Home Screen" class="w-full h-auto rounded-xl" loading="lazy" decoding="async" />
 							</div>
 							<span class="text-xs font-mono text-neutral-300 font-semibold block">Home Dashboard</span>
 						</div>
@@ -332,7 +338,7 @@ import Footer from '../components/Footer.astro';
 						<!-- Screen 2: Schedule Calendar -->
 						<div class="min-w-[210px] sm:min-w-[230px] flex-1 space-y-2.5 text-center group/screen shrink-0">
 							<div class="rounded-2xl overflow-hidden border border-white/10 bg-[#030407] p-1.5 shadow-xl transition-all duration-300 group-hover/screen:border-sky-500/50 group-hover/screen:scale-105">
-								<img src="/screenshots/schedule.png" alt="Schedule Screen" class="w-full h-auto rounded-xl" />
+								<img src="/screenshots/schedule.png" alt="Schedule Screen" class="w-full h-auto rounded-xl" loading="lazy" decoding="async" />
 							</div>
 							<span class="text-xs font-mono text-neutral-300 font-semibold block">Schedule Calendar</span>
 						</div>
@@ -340,7 +346,7 @@ import Footer from '../components/Footer.astro';
 						<!-- Screen 3: Medicine Vault -->
 						<div class="min-w-[210px] sm:min-w-[230px] flex-1 space-y-2.5 text-center group/screen shrink-0">
 							<div class="rounded-2xl overflow-hidden border border-white/10 bg-[#030407] p-1.5 shadow-xl transition-all duration-300 group-hover/screen:border-sky-500/50 group-hover/screen:scale-105">
-								<img src="/screenshots/medicines.png" alt="Medicines Screen" class="w-full h-auto rounded-xl" />
+								<img src="/screenshots/medicines.png" alt="Medicines Screen" class="w-full h-auto rounded-xl" loading="lazy" decoding="async" />
 							</div>
 							<span class="text-xs font-mono text-neutral-300 font-semibold block">Medicine Vault</span>
 						</div>
@@ -348,7 +354,7 @@ import Footer from '../components/Footer.astro';
 						<!-- Screen 4: Grid Time Selector -->
 						<div class="min-w-[210px] sm:min-w-[230px] flex-1 space-y-2.5 text-center group/screen shrink-0">
 							<div class="rounded-2xl overflow-hidden border border-white/10 bg-[#030407] p-1.5 shadow-xl transition-all duration-300 group-hover/screen:border-sky-500/50 group-hover/screen:scale-105">
-								<img src="/screenshots/add-med.png" alt="Add Medicine Screen" class="w-full h-auto rounded-xl" />
+								<img src="/screenshots/add-med.png" alt="Add Medicine Screen" class="w-full h-auto rounded-xl" loading="lazy" decoding="async" />
 							</div>
 							<span class="text-xs font-mono text-neutral-300 font-semibold block">Grid Time Selector</span>
 						</div>
@@ -356,7 +362,7 @@ import Footer from '../components/Footer.astro';
 						<!-- Screen 5: PDF & Data Export -->
 						<div class="min-w-[210px] sm:min-w-[230px] flex-1 space-y-2.5 text-center group/screen shrink-0">
 							<div class="rounded-2xl overflow-hidden border border-white/10 bg-[#030407] p-1.5 shadow-xl transition-all duration-300 group-hover/screen:border-sky-500/50 group-hover/screen:scale-105">
-								<img src="/screenshots/export.png" alt="Export Screen" class="w-full h-auto rounded-xl" />
+								<img src="/screenshots/export.png" alt="Export Screen" class="w-full h-auto rounded-xl" loading="lazy" decoding="async" />
 							</div>
 							<span class="text-xs font-mono text-neutral-300 font-semibold block">PDF & Data Export</span>
 						</div>

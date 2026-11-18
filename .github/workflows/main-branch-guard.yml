@@ -24,7 +24,7 @@ jobs:
           echo "Target branch: ${{ github.base_ref }}"
           echo "Source branch: ${{ github.head_ref }}"
           echo "Actor: ${{ github.actor }}"
-          if [ "${{ github.head_ref }}" = "develop" ] || [ "${{ github.actor }}" = "dependabot[bot]" ]; then
+          if [ "${{ github.head_ref }}" = "develop" ] || [ "${{ github.head_ref }}" = "website" ] || [ "${{ github.actor }}" = "dependabot[bot]" ]; then
             echo "PR source verified successfully."
           else
             case "${{ github.head_ref }}" in
