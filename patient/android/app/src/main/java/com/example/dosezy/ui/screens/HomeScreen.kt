@@ -17,7 +17,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.UnfoldLess
+import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material.icons.filled.ViewAgenda
 import androidx.compose.material.icons.filled.ViewTimeline
 import androidx.compose.material3.AlertDialog
@@ -91,7 +94,10 @@ import java.time.LocalDateTime
 @Composable
 fun HomeScreen(
     navController: NavController,
-    shouldRefresh: Boolean = false
+    shouldRefresh: Boolean = false,
+    targetEntryId: String? = null,
+    targetTime: String? = null,
+    onTargetScrolled: (() -> Unit)? = null
 ) {
     val userViewModel: UserViewModel = sharedUserViewModel()
     val scheduleViewModel: ScheduleViewModel = sharedScheduleViewModel()
@@ -109,6 +115,13 @@ fun HomeScreen(
     val activeLocale = remember(currentLang) { LocaleHelper.getLocale(currentLang) }
     // Get current day for subtitle
     val dayOfWeek = remember(activeLocale) { DateUtils.getCurrentDayOfWeekLegacy(activeLocale) }
+
+    // Virtualized list state for smooth scrolling to alert target slot (#137)
+    val listState = rememberLazyListState()
+
+    // State for collapsible time slots ("Rollup", #138)
+    var collapsedSlots by remember { mutableStateOf<Set<String>>(emptySet()) }
+    val isRollupEnabled = currentUser?.slotRollupEnabled == true
 
     // State for real-time updates
     var currentTime by remember { mutableStateOf(LocalDateTime.now()) }
@@ -196,6 +209,27 @@ fun HomeScreen(
             )
         }.toList().sortedBy { (_, entries) ->
             entries.firstOrNull()?.scheduleEntry?.scheduledDateTime
+        }
+    }
+
+    // Guard: Auto-scroll LazyColumn to targeted medication group when opened from alert notification (#137)
+    LaunchedEffect(targetEntryId, targetTime, groupedEntries) {
+        if ((targetEntryId != null || targetTime != null) && groupedEntries.isNotEmpty()) {
+            val slotIndex = groupedEntries.indexOfFirst { (time, entries) ->
+                (targetTime != null && time.equals(targetTime, ignoreCase = true)) ||
+                        (targetEntryId != null && entries.any { it.scheduleEntry.entryId == targetEntryId })
+            }
+            if (slotIndex >= 0) {
+                // If the targeted slot is collapsed, expand it so the medication card is immediately visible
+                val targetTimeSlot = groupedEntries[slotIndex].first
+                if (targetTimeSlot in collapsedSlots) {
+                    collapsedSlots = collapsedSlots - targetTimeSlot
+                }
+                val bannerOffset = if (allCompleted && hasTaken) 1 else 0
+                val targetIndex = bannerOffset + slotIndex
+                listState.animateScrollToItem(targetIndex)
+                onTargetScrolled?.invoke()
+            }
         }
     }
 
@@ -324,6 +358,25 @@ fun HomeScreen(
                 subtitle = "($dayOfWeek)",
                 actions = {
                     if (hasMedications) {
+                        // Guard: Show Expand All / Collapse All button only when slot rollup preference is enabled (#138)
+                        if (isRollupEnabled && currentUser?.timelineModeEnabled != true) {
+                            val allCollapsed = groupedEntries.isNotEmpty() && groupedEntries.all { it.first in collapsedSlots }
+                            IconButton(
+                                onClick = {
+                                    collapsedSlots = if (allCollapsed) {
+                                        emptySet()
+                                    } else {
+                                        groupedEntries.map { it.first }.toSet()
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = if (allCollapsed) Icons.Default.UnfoldMore else Icons.Default.UnfoldLess,
+                                    contentDescription = if (allCollapsed) stringResource(R.string.home_expand_all) else stringResource(R.string.home_collapse_all),
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
                         val isTimeline = currentUser?.timelineModeEnabled == true
                         IconButton(
                             onClick = {
@@ -348,6 +401,7 @@ fun HomeScreen(
                 // Main content with virtualized scrolling
                 // Guard: Virtualize home content with LazyColumn to eliminate massive initial layout measurement overhead on older devices
                 LazyColumn(
+                    state = listState,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth(),
@@ -399,6 +453,15 @@ fun HomeScreen(
                                         entries = entries,
                                         currentDateTime = currentTime,
                                         currentUser = currentUser,
+                                        isCollapsible = isRollupEnabled,
+                                        isCollapsed = isRollupEnabled && time in collapsedSlots,
+                                        onToggleCollapse = {
+                                            collapsedSlots = if (time in collapsedSlots) {
+                                                collapsedSlots - time
+                                            } else {
+                                                collapsedSlots + time
+                                            }
+                                        },
                                         onMarkAsTaken = handleMarkAsTaken,
                                         onMarkAsLate = handleMarkAsLate,
                                         onUndo = { entryId ->

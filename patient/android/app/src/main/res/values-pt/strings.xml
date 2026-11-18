@@ -902,4 +902,12 @@ Deseja continuar?</string>
     <string name="sort_custom_reorder_desc">Use as setas para ajustar a ordem dos seus medicamentos.</string>
     <string name="sort_move_up">Mover para cima</string>
     <string name="sort_move_down">Mover para baixo</string>
+
+    <!-- Collapsible Time Slots on Home Screen (#138) -->
+    <string name="pref_slot_rollup_title">Horários recolhíveis</string>
+    <string name="pref_slot_rollup_desc">Permite recolher e expandir grupos de medicamentos na tela inicial. Desativado por padrão para evitar doses esquecidas.</string>
+    <string name="home_expand_all">Expandir tudo</string>
+    <string name="home_collapse_all">Recolher tudo</string>
+    <string name="home_slot_expand">Expandir horário</string>
+    <string name="home_slot_collapse">Recolher horário</string>
 </resources>

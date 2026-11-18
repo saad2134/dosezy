@@ -5,17 +5,22 @@
 
 package com.example.dosezy.ui.screens.home
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -24,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -39,6 +45,9 @@ fun HomeTimeSection(
     entries: List<ScheduleWithMedicine>,
     currentDateTime: java.time.LocalDateTime,
     currentUser: User?,
+    isCollapsible: Boolean = false,
+    isCollapsed: Boolean = false,
+    onToggleCollapse: (() -> Unit)? = null,
     onMarkAsTaken: (String) -> Unit,
     onMarkAsLate: (String) -> Unit,
     onUndo: (String) -> Unit = {},
@@ -49,14 +58,37 @@ fun HomeTimeSection(
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        // Time Header
-        Text(
-            text = time,
-            style = MaterialTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
+        // Time Header: Collapsible squircle header when slot rollup is enabled (#138)
+        Row(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .then(
+                    if (isCollapsible) {
+                        Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .clickable { onToggleCollapse?.invoke() }
+                            .padding(horizontal = 12.dp, vertical = 4.dp)
+                    } else Modifier
+                ),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = time,
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            if (isCollapsible) {
+                Spacer(modifier = Modifier.width(6.dp))
+                Icon(
+                    imageVector = if (isCollapsed) Icons.Default.ExpandMore else Icons.Default.ExpandLess,
+                    contentDescription = if (isCollapsed) stringResource(R.string.home_slot_expand) else stringResource(R.string.home_slot_collapse),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(28.dp)
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -119,48 +151,51 @@ fun HomeTimeSection(
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
-        // Guard: Show Take All button only when 2 or more pending/missed medications share the slot (#102)
-        if (pendingEntries.size >= 2 && onMarkAllTaken != null) {
-            Spacer(modifier = Modifier.height(10.dp))
-            FilledTonalButton(
-                onClick = { onMarkAllTaken(pendingEntries) },
-                shape = RoundedCornerShape(20.dp),
-                colors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp),
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.DoneAll,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = stringResource(R.string.take_all_count, pendingEntries.size),
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold
-                )
+        // Guard: Collapse medication cards and bulk actions when slot rollup is enabled and toggled (#138)
+        if (!isCollapsed) {
+            // Guard: Show Take All button only when 2 or more pending/missed medications share the slot (#102)
+            if (pendingEntries.size >= 2 && onMarkAllTaken != null) {
+                Spacer(modifier = Modifier.height(10.dp))
+                FilledTonalButton(
+                    onClick = { onMarkAllTaken(pendingEntries) },
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    ),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DoneAll,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = stringResource(R.string.take_all_count, pendingEntries.size),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        // Medication cards for this time
-        entries.forEach { entry ->
-            HomeMedicationCard(
-                scheduleWithMedicine = entry,
-                currentDateTime = currentDateTime,
-                currentUser = currentUser,
-                onMarkAsTaken = onMarkAsTaken,
-                onMarkAsLate = onMarkAsLate,
-                onUndo = onUndo,
-                onSkip = onSkip,
-                onEditNote = onEditNote
-            )
-            Spacer(modifier = Modifier.height(8.dp))
+            // Medication cards for this time
+            entries.forEach { entry ->
+                HomeMedicationCard(
+                    scheduleWithMedicine = entry,
+                    currentDateTime = currentDateTime,
+                    currentUser = currentUser,
+                    onMarkAsTaken = onMarkAsTaken,
+                    onMarkAsLate = onMarkAsLate,
+                    onUndo = onUndo,
+                    onSkip = onSkip,
+                    onEditNote = onEditNote
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
         }
     }
 }

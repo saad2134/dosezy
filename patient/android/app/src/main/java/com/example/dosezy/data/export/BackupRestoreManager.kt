@@ -931,7 +931,9 @@ class BackupRestoreManager(
             lockscreenDetailsEnabled = json.get("lockscreenDetailsEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: true,
             customSnoozePopupEnabled = json.get("customSnoozePopupEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
             // Guard: Defensively parse reminder delivery style with fallback to ALARM for legacy backup archives (#111)
-            reminderType = json.get("reminderType")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { com.example.dosezy.data.model.ReminderType.valueOf(it.trim().uppercase()) }.getOrNull() } ?: com.example.dosezy.data.model.ReminderType.ALARM
+            reminderType = json.get("reminderType")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { com.example.dosezy.data.model.ReminderType.valueOf(it.trim().uppercase()) }.getOrNull() } ?: com.example.dosezy.data.model.ReminderType.ALARM,
+            // Guard: Defensively parse slotRollupEnabled with fallback to false for legacy backup archives (#138)
+            slotRollupEnabled = json.get("slotRollupEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false
         )
     }
 

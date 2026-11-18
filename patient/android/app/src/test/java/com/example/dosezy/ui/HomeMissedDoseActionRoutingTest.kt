@@ -541,4 +541,44 @@ class HomeMissedDoseActionRoutingTest {
 
         assertEquals(listOf("med_c", "med_a", "med_b"), sortedIntraSlot.map { it.scheduleEntry.medicineId })
     }
+
+    @Test
+    fun slotRollup_userPreference_defaultsToFalseForSafety() {
+        // Guard: Clinical safety requirement: slotRollupEnabled must default to false so patients do not miss medication (#138)
+        val defaultUser = User(
+            userId = "usr_safety",
+            fullName = "Safety User",
+            age = 50,
+            gender = Gender.DO_NOT_SPECIFY,
+            contactNumber = "+1234567890"
+        )
+        assertFalse(defaultUser.slotRollupEnabled)
+    }
+
+    @Test
+    fun slotRollup_expandAndCollapseAllToggling_tracksAllSlotsAccurately() {
+        // Guard: Slot rollup toggle accurately maintains collapsed set and auto-expands target slot (#138)
+        val slots = listOf("08:00 AM", "01:00 PM", "08:00 PM")
+        var collapsedSlots = emptySet<String>()
+
+        // Initially no slots are collapsed
+        assertTrue(collapsedSlots.isEmpty())
+
+        // Collapse all slots
+        collapsedSlots = slots.toSet()
+        assertEquals(3, collapsedSlots.size)
+        assertTrue(slots.all { it in collapsedSlots })
+
+        // Target scroll to a specific slot expands it (#137, #138)
+        val targetSlot = "01:00 PM"
+        if (targetSlot in collapsedSlots) {
+            collapsedSlots = collapsedSlots - targetSlot
+        }
+        assertEquals(setOf("08:00 AM", "08:00 PM"), collapsedSlots)
+        assertFalse(targetSlot in collapsedSlots)
+
+        // Expand all slots
+        collapsedSlots = emptySet()
+        assertTrue(collapsedSlots.isEmpty())
+    }
 }

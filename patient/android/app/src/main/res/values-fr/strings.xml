@@ -903,4 +903,12 @@ Voulez-vous continuer ?</string>
     <string name="sort_custom_reorder_desc">Utilisez les flèches pour modifier l\'ordre de vos médicaments.</string>
     <string name="sort_move_up">Monter</string>
     <string name="sort_move_down">Descendre</string>
+
+    <!-- Collapsible Time Slots on Home Screen (#138) -->
+    <string name="pref_slot_rollup_title">Créneaux horaires réductibles</string>
+    <string name="pref_slot_rollup_desc">Permet de réduire et développer les groupes de médicaments sur l\'écran d\'accueil. Désactivé par défaut pour éviter les oublis.</string>
+    <string name="home_expand_all">Tout développer</string>
+    <string name="home_collapse_all">Tout réduire</string>
+    <string name="home_slot_expand">Développer le créneau</string>
+    <string name="home_slot_collapse">Réduire le créneau</string>
 </resources>

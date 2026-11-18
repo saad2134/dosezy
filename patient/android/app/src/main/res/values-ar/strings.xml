@@ -903,4 +903,12 @@
     <string name="sort_custom_reorder_desc">استخدم الأسهم لتعديل ترتيب أدويتك.</string>
     <string name="sort_move_up">تحريك لأعلى</string>
     <string name="sort_move_down">تحريك لأسفل</string>
+
+    <!-- Collapsible Time Slots on Home Screen (#138) -->
+    <string name="pref_slot_rollup_title">فترات زمنية قابلة للطي</string>
+    <string name="pref_slot_rollup_desc">السماح بطي وتوسيع مجموعات الأدوية في الشاشة الرئيسية. معطل افتراضياً لتجنب تفويت الجرعات.</string>
+    <string name="home_expand_all">توسيع الكل</string>
+    <string name="home_collapse_all">طي الكل</string>
+    <string name="home_slot_expand">توسيع الفترة</string>
+    <string name="home_slot_collapse">طي الفترة</string>
 </resources>

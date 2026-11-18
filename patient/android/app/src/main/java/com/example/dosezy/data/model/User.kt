@@ -60,7 +60,9 @@ data class User(
     // Guard: Toggle to display multiple custom snooze timing options during alarm alert popup
     val customSnoozePopupEnabled: Boolean = false,
     // Guard: Option to treat reminders as alarms or notifications (#111)
-    val reminderType: ReminderType = ReminderType.ALARM
+    val reminderType: ReminderType = ReminderType.ALARM,
+    // Guard: Option to allow collapsing and expanding medication time slots on the Home screen; disabled by default to prevent missed doses (#138)
+    val slotRollupEnabled: Boolean = false
 ) {
     // Guard: Defensive getters normalizing legacy whole-hour values (< 15) to minutes for seamless backward compatibility (#119)
     val lateAfterMinutes: Int get() = if (considerLateAfter in 1..14) considerLateAfter * 60 else considerLateAfter

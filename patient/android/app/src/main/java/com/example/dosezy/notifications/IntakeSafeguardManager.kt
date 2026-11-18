@@ -490,9 +490,12 @@ object IntakeSafeguardManager {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         MedicineAlarmReceiver.createNotificationChannels(context)
 
+        // Guard: Route notification click directly to Home screen with target entry ID and scheduled time (#137)
         val mainIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            putExtra("fragment", "schedule")
+            putExtra("fragment", "home")
+            putExtra("target_entry_id", state.entryId)
+            putExtra("target_time", state.scheduledTime)
             // Guard: Attach target user ID so clicking intake safeguard notification switches to correct profile
             state.userId?.let { putExtra("switch_to_user_id", it) }
         }

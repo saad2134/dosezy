@@ -534,12 +534,15 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             medicineName
         }
 
-        // Guard: Use SINGLE_TOP/CLEAR_TOP with profile switch and route so clicking notification switches user and displays schedule
+        // Guard: Use SINGLE_TOP/CLEAR_TOP with profile switch and route so clicking notification defaults to Home screen checklist (#137)
+        // Guard: Pass target_entry_id and target_time so HomeScreen automatically scrolls to alert slot (#137)
         // Guard: Pass from_alarm flag so tapping notification stops continuous alarm audio and vibration in MainActivity (#BUG-ALARM-TAP-STOP)
         val mainIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            putExtra("fragment", "schedule")
+            putExtra("fragment", "home")
             putExtra("from_alarm", true)
+            putExtra("target_entry_id", entryId)
+            putExtra("target_time", scheduledTime ?: "")
             userId?.let { putExtra("switch_to_user_id", it) }
         }
 

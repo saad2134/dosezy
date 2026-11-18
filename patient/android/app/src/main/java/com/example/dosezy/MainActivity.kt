@@ -81,6 +81,8 @@ class MainActivity : ComponentActivity() {
     }
 
     private val pendingRouteState = androidx.compose.runtime.mutableStateOf<String?>(null)
+    private val pendingTargetEntryIdState = androidx.compose.runtime.mutableStateOf<String?>(null)
+    private val pendingTargetTimeState = androidx.compose.runtime.mutableStateOf<String?>(null)
 
     override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
@@ -93,9 +95,17 @@ class MainActivity : ComponentActivity() {
         if (!targetUserId.isNullOrBlank()) {
             userViewModel.setCurrentUserById(targetUserId)
         }
-        // Guard: Route to target screen when tapped notification specifies fragment (schedule or medicines)
+        val targetEntryId = intent.getStringExtra("target_entry_id")
+        val targetTime = intent.getStringExtra("target_time")
+        if (!targetEntryId.isNullOrBlank()) {
+            pendingTargetEntryIdState.value = targetEntryId
+        }
+        if (!targetTime.isNullOrBlank()) {
+            pendingTargetTimeState.value = targetTime
+        }
+        // Guard: Route to target screen when tapped notification specifies fragment (home, schedule or medicines) (#137)
         val targetFragment = intent.getStringExtra("fragment")
-        if (targetFragment in listOf("schedule", "medicines")) {
+        if (targetFragment in listOf("home", "schedule", "medicines")) {
             pendingRouteState.value = targetFragment
         }
     }
@@ -116,9 +126,17 @@ class MainActivity : ComponentActivity() {
             userViewModel.setCurrentUserById(targetUserId)
         }
 
-        // Guard: Parse initial launch intent extras to route directly to target screen on cold start
+        val targetEntryId = intent.getStringExtra("target_entry_id")
+        val targetTime = intent.getStringExtra("target_time")
+        if (!targetEntryId.isNullOrBlank()) {
+            pendingTargetEntryIdState.value = targetEntryId
+        }
+        if (!targetTime.isNullOrBlank()) {
+            pendingTargetTimeState.value = targetTime
+        }
+        // Guard: Parse initial launch intent extras to route directly to target screen on cold start (#137)
         val targetFragment = intent.getStringExtra("fragment")
-        if (targetFragment in listOf("schedule", "medicines")) {
+        if (targetFragment in listOf("home", "schedule", "medicines")) {
             pendingRouteState.value = targetFragment
         }
 
@@ -223,7 +241,11 @@ class MainActivity : ComponentActivity() {
                         ) {
                             DosezyApp(
                                 pendingRouteState = pendingRouteState,
-                                onRouteConsumed = { pendingRouteState.value = null }
+                                onRouteConsumed = { pendingRouteState.value = null },
+                                pendingTargetEntryIdState = pendingTargetEntryIdState,
+                                onTargetEntryIdConsumed = { pendingTargetEntryIdState.value = null },
+                                pendingTargetTimeState = pendingTargetTimeState,
+                                onTargetTimeConsumed = { pendingTargetTimeState.value = null }
                             )
                         }
                     }
@@ -237,7 +259,11 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DosezyApp(
     pendingRouteState: androidx.compose.runtime.State<String?> = androidx.compose.runtime.mutableStateOf(null),
-    onRouteConsumed: () -> Unit = {}
+    onRouteConsumed: () -> Unit = {},
+    pendingTargetEntryIdState: androidx.compose.runtime.State<String?> = androidx.compose.runtime.mutableStateOf(null),
+    onTargetEntryIdConsumed: () -> Unit = {},
+    pendingTargetTimeState: androidx.compose.runtime.State<String?> = androidx.compose.runtime.mutableStateOf(null),
+    onTargetTimeConsumed: () -> Unit = {}
 ) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
@@ -282,13 +308,16 @@ fun DosezyApp(
         }
     }
 
-    // Guard: Navigate to schedule screen dynamically when notification is tapped while MainActivity is in foreground
+    // Guard: Navigate to target screen dynamically when notification is tapped while MainActivity is in foreground (#137)
     LaunchedEffect(pendingRouteState.value) {
         val target = pendingRouteState.value
         if (target != null && isInitialized && currentUser != null) {
             onRouteConsumed()
             navController.navigate(target) {
                 launchSingleTop = true
+                if (target == "home") {
+                    popUpTo("home") { inclusive = false }
+                }
             }
         }
     }
@@ -340,7 +369,13 @@ fun DosezyApp(
             composable("home") {
                 HomeScreen(
                     navController = navController,
-                    shouldRefresh = true
+                    shouldRefresh = true,
+                    targetEntryId = pendingTargetEntryIdState.value,
+                    targetTime = pendingTargetTimeState.value,
+                    onTargetScrolled = {
+                        onTargetEntryIdConsumed()
+                        onTargetTimeConsumed()
+                    }
                 )
             }
             composable("schedule") {

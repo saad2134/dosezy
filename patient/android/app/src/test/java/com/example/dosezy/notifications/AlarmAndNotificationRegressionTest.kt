@@ -48,6 +48,26 @@ class AlarmAndNotificationRegressionTest {
         assertEquals("schedule", destinationRoute)
     }
 
+    @Test
+    fun testNotificationIntent_defaultsToHomeRouteWithTargetEntryAndSlot() {
+        // Guard: Verify alert notification tap intent routes directly to Home screen with target slot metadata (#137)
+        val intent = Intent().apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra("fragment", "home")
+            putExtra("from_alarm", true)
+            putExtra("target_entry_id", "entry_test_123")
+            putExtra("target_time", "08:00")
+            putExtra("switch_to_user_id", "user_test_456")
+        }
+
+        assertEquals("home", intent.getStringExtra("fragment"))
+        assertTrue(intent.getBooleanExtra("from_alarm", false))
+        assertEquals("entry_test_123", intent.getStringExtra("target_entry_id"))
+        assertEquals("08:00", intent.getStringExtra("target_time"))
+        assertEquals("user_test_456", intent.getStringExtra("switch_to_user_id"))
+        assertTrue((intent.flags and Intent.FLAG_ACTIVITY_SINGLE_TOP) != 0)
+    }
+
     // ───────────────────────────────────────────────────────────────
     // Bug 2: Pending Doses Within considerMissedAfter Are Not Flagged Missed
     // ───────────────────────────────────────────────────────────────

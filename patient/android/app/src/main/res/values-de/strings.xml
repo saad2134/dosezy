@@ -903,4 +903,12 @@ Möchten Sie fortfahren?</string>
     <string name="sort_custom_reorder_desc">Verwenden Sie die Pfeile, um die Reihenfolge Ihrer Medikamente anzupassen.</string>
     <string name="sort_move_up">Nach oben verschieben</string>
     <string name="sort_move_down">Nach unten verschieben</string>
+
+    <!-- Collapsible Time Slots on Home Screen (#138) -->
+    <string name="pref_slot_rollup_title">Einklappbare Zeitfenster</string>
+    <string name="pref_slot_rollup_desc">Erlaubt das Ein- und Ausklappen von Medikamentengruppen auf dem Startbildschirm. Standardmäßig deaktiviert, um vergessene Einnahmen zu vermeiden.</string>
+    <string name="home_expand_all">Alle ausklappen</string>
+    <string name="home_collapse_all">Alle einklappen</string>
+    <string name="home_slot_expand">Zeitfenster ausklappen</string>
+    <string name="home_slot_collapse">Zeitfenster einklappen</string>
 </resources>

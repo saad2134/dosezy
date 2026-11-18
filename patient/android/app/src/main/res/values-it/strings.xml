@@ -903,4 +903,12 @@ Vuoi continuare?</string>
     <string name="sort_custom_reorder_desc">Usa le frecce per modificare l\'ordine dei tuoi farmaci.</string>
     <string name="sort_move_up">Sposta su</string>
     <string name="sort_move_down">Sposta giù</string>
+
+    <!-- Collapsible Time Slots on Home Screen (#138) -->
+    <string name="pref_slot_rollup_title">Fasce orarie comprimibili</string>
+    <string name="pref_slot_rollup_desc">Consente di comprimere ed espandere i gruppi di farmaci nella schermata principale. Disattivato per impostazione predefinita per evitare dosi dimenticate.</string>
+    <string name="home_expand_all">Espandi tutto</string>
+    <string name="home_collapse_all">Comprimi tutto</string>
+    <string name="home_slot_expand">Espandi fascia</string>
+    <string name="home_slot_collapse">Comprimi fascia</string>
 </resources>

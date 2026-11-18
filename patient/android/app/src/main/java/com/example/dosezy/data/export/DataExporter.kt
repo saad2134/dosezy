@@ -261,6 +261,8 @@ class DataExporter(
         userObj.put("customSnoozePopupEnabled", user.customSnoozePopupEnabled)
         // Guard: Explicitly serialize reminderType to retain user alert delivery preference on backup restore (#111)
         userObj.put("reminderType", user.reminderType.name)
+        // Guard: Explicitly serialize slotRollupEnabled to retain collapsible time slots preference on backup restore (#138)
+        userObj.put("slotRollupEnabled", user.slotRollupEnabled)
         root.put("user", userObj)
 
         val medArray = JSONArray()

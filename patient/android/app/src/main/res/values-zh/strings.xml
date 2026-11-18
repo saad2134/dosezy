@@ -919,4 +919,12 @@
     <string name="sort_custom_reorder_desc">使用箭头调整药品的排列顺序。</string>
     <string name="sort_move_up">上移</string>
     <string name="sort_move_down">下移</string>
+
+    <!-- Collapsible Time Slots on Home Screen (#138) -->
+    <string name="pref_slot_rollup_title">可折叠时间段</string>
+    <string name="pref_slot_rollup_desc">允许在主屏幕上折叠和展开药物分组。默认关闭以防遗漏服药。</string>
+    <string name="home_expand_all">全部展开</string>
+    <string name="home_collapse_all">全部折叠</string>
+    <string name="home_slot_expand">展开时间段</string>
+    <string name="home_slot_collapse">折叠时间段</string>
 </resources>

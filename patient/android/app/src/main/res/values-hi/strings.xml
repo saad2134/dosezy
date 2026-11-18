@@ -919,4 +919,12 @@
     <string name="sort_custom_reorder_desc">अपनी दवाओं का क्रम बदलने के लिए तीरों का उपयोग करें।</string>
     <string name="sort_move_up">ऊपर ले जाएं</string>
     <string name="sort_move_down">नीचे ले जाएं</string>
+
+    <!-- Collapsible Time Slots on Home Screen (#138) -->
+    <string name="pref_slot_rollup_title">संक्षिप्त करने योग्य समय स्लॉट</string>
+    <string name="pref_slot_rollup_desc">होम स्क्रीन पर दवा समूहों को संक्षिप्त और विस्तृत करने की अनुमति दें। छूटी हुई खुराकों को रोकने के लिए डिफ़ॉल्ट रूप से अक्षम।</string>
+    <string name="home_expand_all">सभी विस्तृत करें</string>
+    <string name="home_collapse_all">सभी संक्षिप्त करें</string>
+    <string name="home_slot_expand">स्लॉट विस्तृत करें</string>
+    <string name="home_slot_collapse">स्लॉट संक्षिप्त करें</string>
 </resources>

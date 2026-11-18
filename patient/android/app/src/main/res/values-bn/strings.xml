@@ -902,4 +902,12 @@
     <string name="sort_custom_reorder_desc">ওষুধের ক্রম পরিবর্তন করতে তীর চিহ্ন ব্যবহার করুন।</string>
     <string name="sort_move_up">উপরে সরান</string>
     <string name="sort_move_down">নিচে সরান</string>
+
+    <!-- Collapsible Time Slots on Home Screen (#138) -->
+    <string name="pref_slot_rollup_title">সংকোচনযোগ্য সময় স্লট</string>
+    <string name="pref_slot_rollup_desc">হোম স্ক্রিনে ওষুধের গ্রুপ সংকোচন ও প্রসারণের অনুমতি দিন। ডোজ ভুলে যাওয়া রোধ করতে ডিফল্টভাবে নিষ্ক্রিয়।</string>
+    <string name="home_expand_all">সব প্রসারিত করুন</string>
+    <string name="home_collapse_all">সব সংকোচন করুন</string>
+    <string name="home_slot_expand">স্লট প্রসারিত করুন</string>
+    <string name="home_slot_collapse">স্লট সংকোচন করুন</string>
 </resources>

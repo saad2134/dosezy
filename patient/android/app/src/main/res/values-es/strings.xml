@@ -920,4 +920,12 @@
     <string name="sort_custom_reorder_desc">Use las flechas para ajustar el orden de sus medicamentos.</string>
     <string name="sort_move_up">Mover hacia arriba</string>
     <string name="sort_move_down">Mover hacia abajo</string>
+
+    <!-- Collapsible Time Slots on Home Screen (#138) -->
+    <string name="pref_slot_rollup_title">Grupos horarios desplegables</string>
+    <string name="pref_slot_rollup_desc">Permite colapsar y expandir grupos de medicamentos en la pantalla principal. Desactivado por defecto para evitar dosis olvidadas.</string>
+    <string name="home_expand_all">Expandir todo</string>
+    <string name="home_collapse_all">Colapsar todo</string>
+    <string name="home_slot_expand">Expandir horario</string>
+    <string name="home_slot_collapse">Colapsar horario</string>
 </resources>

@@ -903,4 +903,12 @@
     <string name="sort_custom_reorder_desc">矢印を使って薬の並び順を変更できます。</string>
     <string name="sort_move_up">上へ移動</string>
     <string name="sort_move_down">下へ移動</string>
+
+    <!-- Collapsible Time Slots on Home Screen (#138) -->
+    <string name="pref_slot_rollup_title">折りたたみ可能な時間枠</string>
+    <string name="pref_slot_rollup_desc">ホーム画面でお薬グループの折りたたみと展開を許可します。服薬忘れを防ぐためデフォルトで無効です。</string>
+    <string name="home_expand_all">すべて展開</string>
+    <string name="home_collapse_all">すべて折りたたむ</string>
+    <string name="home_slot_expand">時間枠を展開</string>
+    <string name="home_slot_collapse">時間枠を折りたたむ</string>
 </resources>
