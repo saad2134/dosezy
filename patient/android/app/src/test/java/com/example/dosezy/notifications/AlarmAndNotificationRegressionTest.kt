@@ -4,8 +4,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import androidx.test.core.app.ApplicationProvider
+import com.example.dosezy.data.DosezyDatabase
+import com.example.dosezy.data.model.Gender
+import com.example.dosezy.data.model.Language
 import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.ScheduleEntry
+import com.example.dosezy.data.model.Theme
+import com.example.dosezy.data.model.TimeFormat
+import com.example.dosezy.data.model.User
+import kotlinx.coroutines.runBlocking
 import com.example.dosezy.utils.ImageUtils
 import com.example.dosezy.utils.TimeCalculationUtils
 import io.mockk.coEvery
@@ -1197,6 +1204,105 @@ class AlarmAndNotificationRegressionTest {
 
         val hasDismissKeyguardFlag = (window.attributes.flags and android.view.WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD) != 0
         assertFalse("FLAG_DISMISS_KEYGUARD must be cleared to prevent premature bouncer prompt on locked screen", hasDismissKeyguardFlag)
+    }
+
+    @Test
+    fun testMultiUserLockscreenPrivacy_honorsProfileOverGlobalPreference() = runBlocking {
+        // Guard: Verify updateCohortNotification and showNotification honor profile lockscreenDetailsEnabled over global app_prefs (#BUG-LOCKSCREEN-MULTIUSER)
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val inMemoryDb = androidx.room.Room.inMemoryDatabaseBuilder(context, DosezyDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+        DosezyDatabase.setInstance(inMemoryDb)
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+
+        try {
+            val privateUser = User(
+                userId = "user_priv_test",
+                fullName = "Private Patient",
+                age = 40,
+                gender = Gender.FEMALE,
+                contactNumber = "+1234567890",
+                lockscreenDetailsEnabled = false,
+                isCurrentUser = false
+            )
+            val publicUser = User(
+                userId = "user_pub_test",
+                fullName = "Public Patient",
+                age = 45,
+                gender = Gender.MALE,
+                contactNumber = "+1987654321",
+                lockscreenDetailsEnabled = true,
+                isCurrentUser = true
+            )
+            inMemoryDb.userDao().insertUser(privateUser)
+            inMemoryDb.userDao().insertUser(publicUser)
+
+            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+
+            // Case 1: Global app_prefs has lockscreen_details_enabled = true (e.g. from publicUser), but target is privateUser
+            prefs.edit().putBoolean("lockscreen_details_enabled", true).commit()
+            MedicineAlarmReceiver.updateCohortNotification(
+                context = context,
+                entryId = "entry_priv_cohort",
+                entryIds = arrayListOf("entry_priv_cohort"),
+                medicineName = "Antiretroviral",
+                medicineNames = arrayListOf("Antiretroviral"),
+                scheduledTime = "08:00 AM",
+                userId = privateUser.userId
+            )
+
+            val privateNotif = nm.activeNotifications.firstOrNull { it.id == "entry_priv_cohort".hashCode() }?.notification
+            assertNotNull("Notification for private user must be posted", privateNotif)
+            assertEquals(
+                "Private profile must enforce VISIBILITY_PRIVATE despite global app_prefs = true",
+                androidx.core.app.NotificationCompat.VISIBILITY_PRIVATE,
+                privateNotif?.visibility
+            )
+            assertNotNull("Private profile notification must include public version for masking", privateNotif?.publicVersion)
+
+            // Case 2: Global app_prefs has lockscreen_details_enabled = false (e.g. from privateUser), but target is publicUser
+            prefs.edit().putBoolean("lockscreen_details_enabled", false).commit()
+            MedicineAlarmReceiver.updateCohortNotification(
+                context = context,
+                entryId = "entry_pub_cohort",
+                entryIds = arrayListOf("entry_pub_cohort"),
+                medicineName = "Vitamin C",
+                medicineNames = arrayListOf("Vitamin C"),
+                scheduledTime = "09:00 AM",
+                userId = publicUser.userId
+            )
+
+            val publicNotif = nm.activeNotifications.firstOrNull { it.id == "entry_pub_cohort".hashCode() }?.notification
+            assertNotNull("Notification for public user must be posted", publicNotif)
+            assertEquals(
+                "Public profile must retain VISIBILITY_PUBLIC even if global app_prefs = false",
+                androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC,
+                publicNotif?.visibility
+            )
+        } finally {
+            DosezyDatabase.setInstance(null)
+            inMemoryDb.close()
+        }
+    }
+
+    @Test
+    fun testAlarmScheduler_createAlarmClockShowIntent_routesToHomeWithTargetExtras() {
+        // Guard: Verify AlarmClock showIntent routes to Home with target entry ID and switch user extra (#137)
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val scheduler = AlarmScheduler(context)
+        val pendingIntent = scheduler.createAlarmClockShowIntent(
+            requestCode = 1234,
+            targetUserId = "user_alarm_show",
+            targetEntryId = "entry_alarm_clock_show",
+            targetTime = "10:00 AM"
+        )
+
+        val showIntent = org.robolectric.Shadows.shadowOf(pendingIntent).savedIntent
+        assertEquals("home", showIntent.getStringExtra("fragment"))
+        assertEquals("entry_alarm_clock_show", showIntent.getStringExtra("target_entry_id"))
+        assertEquals("10:00 AM", showIntent.getStringExtra("target_time"))
+        assertEquals("user_alarm_show", showIntent.getStringExtra("switch_to_user_id"))
     }
 }
 

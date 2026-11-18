@@ -123,7 +123,18 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             userLanguage: com.example.dosezy.data.model.Language? = null,
             isAlarmMode: Boolean = true
         ) {
-            val allowLockscreen = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE).getBoolean("lockscreen_details_enabled", true)
+            val targetUser = userId?.let {
+                try {
+                    kotlinx.coroutines.runBlocking(kotlinx.coroutines.Dispatchers.IO) {
+                        kotlinx.coroutines.withTimeoutOrNull(500L) {
+                            com.example.dosezy.data.DosezyDatabase.getInstance(context).userDao().getUserByIdDirect(it)
+                        }
+                    }
+                } catch (_: Exception) { null }
+            }
+            // Guard: Derive lockscreen privacy setting from target user profile to prevent PHI exposure when updating notifications (#BUG-LOCKSCREEN-MULTIUSER)
+            val allowLockscreen = targetUser?.lockscreenDetailsEnabled
+                ?: context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE).getBoolean("lockscreen_details_enabled", true)
             MedicineAlarmReceiver().showNotification(
                 context = context,
                 entryId = entryId,
@@ -616,7 +627,12 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         )
 
         val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        val effectiveAllowLockscreen = allowLockscreenDetails && prefs.getBoolean("lockscreen_details_enabled", true)
+        // Guard: Honor profile lockscreen details setting; fallback to global preference only if profile is absent (#BUG-LOCKSCREEN-MULTIUSER)
+        val effectiveAllowLockscreen = if (targetUser != null) {
+            targetUser.lockscreenDetailsEnabled
+        } else {
+            allowLockscreenDetails && prefs.getBoolean("lockscreen_details_enabled", true)
+        }
 
         // Full screen alarm intent
         val alarmIntent = Intent(context, AlarmActivity::class.java).apply {

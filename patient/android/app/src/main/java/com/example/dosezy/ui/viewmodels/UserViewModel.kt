@@ -129,6 +129,13 @@ class UserViewModel @Inject constructor(
                     medicineNotificationManager.scheduleAlarmsForUser(updatedUser.userId)
 
                     try {
+                        // Guard: Persist lock screen privacy toggle synchronously to app_prefs on profile switch (#BUG-LOCKSCREEN-PROFILE-SWITCH)
+                        context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                            .edit()
+                            .putBoolean("lockscreen_details_enabled", updatedUser.lockscreenDetailsEnabled)
+                            .commit()
+                    } catch (_: Exception) {}
+                    try {
                         syncAppTheme(updatedUser.theme.name.lowercase())
                         com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, updatedUser.userId, updatedUser.theme.name.lowercase(), isCurrentProfile = true)
                     } catch (_: Exception) {}
@@ -175,6 +182,13 @@ class UserViewModel @Inject constructor(
                         }
                         // Guard: Core library desugaring supports API 24+; schedule alarms for new profile across all supported OS versions
                         medicineNotificationManager.scheduleAlarmsForUser(userToInsert.userId)
+                        try {
+                            // Guard: Persist lock screen privacy toggle synchronously to app_prefs for newly added active profile (#BUG-LOCKSCREEN-PROFILE-SWITCH)
+                            context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                                .edit()
+                                .putBoolean("lockscreen_details_enabled", userToInsert.lockscreenDetailsEnabled)
+                                .commit()
+                        } catch (_: Exception) {}
                         try {
                             syncAppTheme(userToInsert.theme.name.lowercase())
                             com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, userToInsert.userId, userToInsert.theme.name.lowercase(), isCurrentProfile = shouldBeCurrent)

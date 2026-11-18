@@ -35,15 +35,19 @@ class AlarmScheduler(private val context: Context) {
         }
     }
 
-    // Guard: Route alarm clock click to schedule screen under the specific target user profile to prevent taking medicines under the wrong user
-    private fun createAlarmClockShowIntent(
+    // Guard: Route alarm clock click to home daily checklist with target slot extras to prevent opening wrong tab (#137)
+    internal fun createAlarmClockShowIntent(
         requestCode: Int,
-        targetUserId: String? = null
+        targetUserId: String? = null,
+        targetEntryId: String? = null,
+        targetTime: String? = null
     ): PendingIntent {
         val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             targetUserId?.let { putExtra("switch_to_user_id", it) }
-            putExtra("fragment", "schedule")
+            putExtra("fragment", "home")
+            targetEntryId?.let { putExtra("target_entry_id", it) }
+            targetTime?.let { putExtra("target_time", it) }
         }
         return PendingIntent.getActivity(
             context,
@@ -186,9 +190,12 @@ class AlarmScheduler(private val context: Context) {
         val isAlarm = resolveIsAlarm(entries)
 
         if (isAlarm && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
+            val primaryEntry = entries.firstOrNull()
             val showIntent = createAlarmClockShowIntent(
-                slotKey.hashCode() + 500,
-                entries.firstOrNull()?.userId
+                requestCode = slotKey.hashCode() + 500,
+                targetUserId = primaryEntry?.userId,
+                targetEntryId = primaryEntry?.entryId,
+                targetTime = cleanDateTime.toLocalTime().toString()
             )
             alarmManager.setAlarmClock(
                 AlarmManager.AlarmClockInfo(triggerTime, showIntent),
@@ -289,8 +296,9 @@ class AlarmScheduler(private val context: Context) {
 
         if (isAlarm && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
             val showIntent = createAlarmClockShowIntent(
-                primaryId.hashCode() + 1500,
-                targetUserId
+                requestCode = primaryId.hashCode() + 1500,
+                targetUserId = targetUserId,
+                targetEntryId = primaryId
             )
             alarmManager.setAlarmClock(
                 AlarmManager.AlarmClockInfo(triggerTime, showIntent),
@@ -635,8 +643,10 @@ class AlarmScheduler(private val context: Context) {
 
         if (isAlarm && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
             val showIntent = createAlarmClockShowIntent(
-                entryId.hashCode() + 2500,
-                targetUserId
+                requestCode = entryId.hashCode() + 2500,
+                targetUserId = targetUserId,
+                targetEntryId = entryId,
+                targetTime = scheduledTime
             )
             alarmManager.setAlarmClock(
                 AlarmManager.AlarmClockInfo(triggerTime, showIntent),
@@ -842,8 +852,10 @@ class AlarmScheduler(private val context: Context) {
 
         if (isAlarm && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
             val showIntent = createAlarmClockShowIntent(
-                entryId.hashCode() + 3500,
-                targetUserId
+                requestCode = entryId.hashCode() + 3500,
+                targetUserId = targetUserId,
+                targetEntryId = entryId,
+                targetTime = scheduledTime
             )
             alarmManager.setAlarmClock(
                 AlarmManager.AlarmClockInfo(triggerTime, showIntent),

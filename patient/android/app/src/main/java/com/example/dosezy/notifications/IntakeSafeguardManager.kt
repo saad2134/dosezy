@@ -554,8 +554,9 @@ object IntakeSafeguardManager {
         val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, targetLanguage)
 
         val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-        // Guard: Check target user profile lockscreenDetailsEnabled and global preference to prevent medicine leak on locked screens
-        val allowLockscreenDetails = (targetUser?.lockscreenDetailsEnabled ?: true) && prefs.getBoolean("lockscreen_details_enabled", true)
+        // Guard: Check target user profile lockscreenDetailsEnabled; fallback to global preference if profile not resolved to prevent medicine leak on locked screens (#BUG-LOCKSCREEN-MULTIUSER)
+        val allowLockscreenDetails = targetUser?.lockscreenDetailsEnabled
+            ?: prefs.getBoolean("lockscreen_details_enabled", true)
 
         val appIconBitmap = runCatching {
             BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)

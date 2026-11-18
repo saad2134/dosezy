@@ -226,7 +226,12 @@ fun HomeScreen(
                     collapsedSlots = collapsedSlots - targetTimeSlot
                 }
                 val bannerOffset = if (allCompleted && hasTaken) 1 else 0
-                val targetIndex = bannerOffset + slotIndex
+                // Guard: In timeline view, HomeTimelineView is a single LazyColumn item; target timeline view directly (#BUG-TIMELINE-SCROLL)
+                val targetIndex = if (currentUser?.timelineModeEnabled == true) {
+                    bannerOffset
+                } else {
+                    bannerOffset + slotIndex
+                }
                 listState.animateScrollToItem(targetIndex)
                 onTargetScrolled?.invoke()
             }

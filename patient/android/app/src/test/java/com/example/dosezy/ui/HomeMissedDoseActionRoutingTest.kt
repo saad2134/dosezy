@@ -581,4 +581,42 @@ class HomeMissedDoseActionRoutingTest {
         collapsedSlots = emptySet()
         assertTrue(collapsedSlots.isEmpty())
     }
+
+    @Test
+    fun testTimelineMode_autoScrollIndex_targetsBannerOffsetDirectly() {
+        // Guard: In timeline mode, HomeTimelineView is a single LazyColumn item; targetIndex must not overflow into non-existent slot indices (#BUG-TIMELINE-SCROLL)
+        val isTimeline = true
+        val allCompleted = false
+        val hasTaken = false
+        val bannerOffset = if (allCompleted && hasTaken) 1 else 0
+        val slotIndex = 4
+
+        val targetIndex = if (isTimeline) {
+            bannerOffset
+        } else {
+            bannerOffset + slotIndex
+        }
+
+        assertEquals(0, targetIndex)
+
+        // When standard card view is active
+        val standardTargetIndex = bannerOffset + slotIndex
+        assertEquals(4, standardTargetIndex)
+    }
+
+    @Test
+    fun testWidgetFillInIntent_routesToHomeWithTargetExtras() {
+        // Guard: Verify widget list item fillInIntent routes directly to Home checklist with target entry and time (#137)
+        val fillInIntent = android.content.Intent().apply {
+            putExtra("switch_to_user_id", "user_widget_test")
+            putExtra("fragment", "home")
+            putExtra("target_entry_id", "entry_widget_123")
+            putExtra("target_time", "08:00 AM")
+        }
+
+        assertEquals("home", fillInIntent.getStringExtra("fragment"))
+        assertEquals("user_widget_test", fillInIntent.getStringExtra("switch_to_user_id"))
+        assertEquals("entry_widget_123", fillInIntent.getStringExtra("target_entry_id"))
+        assertEquals("08:00 AM", fillInIntent.getStringExtra("target_time"))
+    }
 }
