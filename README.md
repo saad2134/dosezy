@@ -377,9 +377,10 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 
-## 👤 Publisher
+## 👤 Credits
 
-Developed and published by **Saad (@saad2134)**.
+- **Core Development** by Saad [@saad2134](https://github.com/saad2134).
+- **Official Publication** by [Attenomy](https://attenomy.com).
 
 ---
 
