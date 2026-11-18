@@ -119,7 +119,7 @@ Dosezy transforms daily medication management into a stress-free experience. Inp
 
 <div align="center">
 
-[![Website](https://img.shields.io/badge/Website-dosezy.attenomy.com-1e293b?style=flat&logo=googlechrome&logoColor=white&labelColor=0284c7)](https://dosezy.attenomy.com)
+[![Website](https://img.shields.io/badge/Website-dosezy.app-1e293b?style=flat&logo=googlechrome&logoColor=white&labelColor=0284c7)](https://dosezy.app)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22957599.svg)](https://doi.org/10.5281/zenodo.22957599)
 [![AlternativeTo](https://img.shields.io/badge/AlternativeTo-Dosezy-1e293b?style=flat&logo=alternativeto&logoColor=white&labelColor=5A4FCF)](https://alternativeto.net/software/dosezy/about/)
 [![Product Hunt](https://img.shields.io/badge/Product%20Hunt-Dosezy-1e293b?style=flat&logo=producthunt&logoColor=white&labelColor=DA552F)](https://www.producthunt.com/products/dosezy)
