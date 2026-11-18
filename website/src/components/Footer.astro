@@ -16,7 +16,7 @@ import TextHoverEffect from './ui/TextHoverEffect.astro';
       <!-- Column 1: Brand Info (Wider Column Span) -->
       <div class="sm:col-span-2 md:col-span-2 space-y-4 pr-0 md:pr-6">
         <a href="/" class="flex items-center space-x-3 group">
-          <img src="/icon-squircle-1000px.png" alt="Dosezy Icon" class="w-9 h-9 rounded-xl object-cover group-hover:scale-105 transition-transform" />
+          <img src="/icon-squircle-1000px.png" alt="Dosezy Icon" class="w-9 h-9 rounded-xl object-cover group-hover:scale-105 transition-transform" loading="lazy" decoding="async" />
           <span class="font-bold text-xl text-white">Dosezy<span class="text-sky-400">.</span></span>
         </a>
 
@@ -141,6 +141,8 @@ import TextHoverEffect from './ui/TextHoverEffect.astro';
                   src="https://github.com/saad2134.png" 
                   alt="Saad Profile" 
                   class="w-full h-full object-cover rounded-full" 
+                  loading="lazy"
+                  decoding="async"
                   onerror="this.onerror=null; this.src='/icon-squircle-1000px.png';"
                 />
               </div>
@@ -171,6 +173,8 @@ import TextHoverEffect from './ui/TextHoverEffect.astro';
                   src="https://github.com/attenomy.png" 
                   alt="Attenomy Profile" 
                   class="w-full h-full object-cover" 
+                  loading="lazy"
+                  decoding="async"
                   onerror="this.onerror=null; this.src='/icon-squircle-1000px.png';"
                 />
               </div>
