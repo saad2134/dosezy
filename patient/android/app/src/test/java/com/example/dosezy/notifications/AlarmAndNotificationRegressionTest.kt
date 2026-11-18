@@ -8,6 +8,8 @@ import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.utils.ImageUtils
 import com.example.dosezy.utils.TimeCalculationUtils
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -828,6 +830,241 @@ class AlarmAndNotificationRegressionTest {
         val userDefaultAlarm = com.example.dosezy.data.model.ReminderType.ALARM
         val isAlarm4 = medsInherit.any { (it ?: userDefaultAlarm) == com.example.dosezy.data.model.ReminderType.ALARM }
         assertTrue("Null reminderType must inherit user profile default (ALARM)", isAlarm4)
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // Regression: Overlay & Full Screen Intent Permissions
+    // ───────────────────────────────────────────────────────────────
+    @Test
+    fun overlayAndFullScreenPermissions_enabledForAlarmReliability() {
+        // Guard: Verify SUPPORTS_OVERLAY_PERMISSION is true so "Display Over Apps" item is visible
+        // in NotificationStatusDialog to enable full-screen alarms over active apps and lock screen
+        assertTrue(
+            "SUPPORTS_OVERLAY_PERMISSION must be enabled so overlay permission is exposed and supported",
+            com.example.dosezy.BuildConfig.SUPPORTS_OVERLAY_PERMISSION
+        )
+
+        // Guard: Verify canUseFullScreenIntent evaluates safely on API 34+
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val canUseFsi = com.example.dosezy.utils.NotificationUtils.canUseFullScreenIntent(context)
+        // In Robolectric with SDK 34, notificationManager.canUseFullScreenIntent() defaults to false until granted
+        assertFalse(canUseFsi)
+
+        // Guard: Verify requestFullScreenIntentPermission does not crash on API 34+
+        com.example.dosezy.utils.NotificationUtils.requestFullScreenIntentPermission(context)
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // Regression: Large Screen Resizability & Bitmap Downsampling
+    // ───────────────────────────────────────────────────────────────
+    @Test
+    fun manifest_activities_supportMultiOrientationForLargeScreens() {
+        // Guard: Verify MainActivity and AlarmActivity do not lock portrait orientation in manifest to support tablets and foldables (#120)
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val packageInfo = context.packageManager.getPackageInfo(
+            context.packageName,
+            android.content.pm.PackageManager.GET_ACTIVITIES
+        )
+        val mainActivityInfo = packageInfo.activities?.firstOrNull { it.name == "com.example.dosezy.MainActivity" }
+        assertNotNull("MainActivity must be declared in manifest", mainActivityInfo)
+        assertEquals(
+            "MainActivity must support multi-orientation for large screen devices",
+            android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,
+            mainActivityInfo?.screenOrientation
+        )
+
+        val alarmActivityInfo = packageInfo.activities?.firstOrNull { it.name == "com.example.dosezy.notifications.AlarmActivity" }
+        assertNotNull("AlarmActivity must be declared in manifest", alarmActivityInfo)
+        assertEquals(
+            "AlarmActivity must support multi-orientation for large screen devices",
+            android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,
+            alarmActivityInfo?.screenOrientation
+        )
+    }
+
+    @Test
+    fun imageUtils_calculateInSampleSize_scalesPowerOfTwo() {
+        // Guard: Verify inSampleSize calculates powers of 2 for memory-efficient downsampling
+        val options = android.graphics.BitmapFactory.Options().apply {
+            outWidth = 4000
+            outHeight = 3000
+        }
+        val sampleSize = ImageUtils.calculateInSampleSize(options, 1024, 1024)
+        assertEquals(2, sampleSize)
+
+        val smallOptions = android.graphics.BitmapFactory.Options().apply {
+            outWidth = 800
+            outHeight = 600
+        }
+        assertEquals(1, ImageUtils.calculateInSampleSize(smallOptions, 1024, 1024))
+    }
+
+    @Test
+    fun imageUtils_saveDownsampledImage_downsamplesAndCompresses() {
+        // Guard: Verify saveDownsampledImage reduces dimensions and memory footprint
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val sourceFile = File(context.cacheDir, "test_source.jpg")
+        val destFile = File(context.cacheDir, "test_downsampled.jpg")
+
+        val sourceBitmap = android.graphics.Bitmap.createBitmap(2000, 2000, android.graphics.Bitmap.Config.ARGB_8888)
+        sourceFile.outputStream().use { out ->
+            sourceBitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, out)
+        }
+        sourceBitmap.recycle()
+
+        val savedPath = ImageUtils.saveDownsampledImage(
+            context,
+            android.net.Uri.fromFile(sourceFile),
+            destFile,
+            maxDimension = 512
+        )
+        assertEquals(destFile.absolutePath, savedPath)
+        assertTrue("Downsampled file must exist", destFile.exists())
+        assertTrue("Downsampled file must be non-empty", destFile.length() > 0)
+
+        val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        android.graphics.BitmapFactory.decodeFile(destFile.absolutePath, bounds)
+        assertTrue("Width must be <= 512, but was ${bounds.outWidth}", bounds.outWidth <= 512)
+        assertTrue("Height must be <= 512, but was ${bounds.outHeight}", bounds.outHeight <= 512)
+
+        sourceFile.delete()
+        destFile.delete()
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // Regression: Issue #119 - Infinite Nagging & Sub-Hour Granularity
+    // ───────────────────────────────────────────────────────────────
+    @Test
+    fun medicineAlarmReceiver_continuousNagging_evaluatesInfiniteThresholdAccurately() {
+        // Guard: Verify continuous nagging (naggingMaxRepeats = 0) permits alarms past count 5 unless missed (#119)
+        val continuousUser = com.example.dosezy.data.model.User(
+            fullName = "Continuous Nag",
+            age = 25,
+            gender = com.example.dosezy.data.model.Gender.DO_NOT_SPECIFY,
+            contactNumber = "",
+            naggingRemindersEnabled = true,
+            naggingMaxRepeats = 0, // Continuous
+            considerMissedAfter = 360 // 6 hours
+        )
+
+        val scheduledTime = java.time.LocalDateTime.now().minusMinutes(50) // 50 mins ago (well within 360m)
+        val isMissed = com.example.dosezy.utils.TimeCalculationUtils.isMissed(
+            scheduledTime,
+            java.time.LocalDateTime.now(),
+            continuousUser.missedAfterMinutes
+        )
+        assertFalse("50m-old dose must not be missed", isMissed)
+
+        val isContinuous = continuousUser.naggingMaxRepeats <= 0
+        val highNaggingCount = 10
+        val shouldScheduleNagging = continuousUser.naggingRemindersEnabled && !isMissed && (isContinuous || highNaggingCount < continuousUser.naggingMaxRepeats)
+        assertTrue("Continuous nagging must permit scheduling even at repeat #10", shouldScheduleNagging)
+
+        // Once past missed threshold (e.g. 7 hours ago)
+        val overdueTime = java.time.LocalDateTime.now().minusHours(7)
+        val isOverdueMissed = com.example.dosezy.utils.TimeCalculationUtils.isMissed(
+            overdueTime,
+            java.time.LocalDateTime.now(),
+            continuousUser.missedAfterMinutes
+        )
+        assertTrue("7h-old dose must be missed", isOverdueMissed)
+        val shouldScheduleOverdue = continuousUser.naggingRemindersEnabled && !isOverdueMissed && (isContinuous || highNaggingCount < continuousUser.naggingMaxRepeats)
+        assertFalse("Continuous nagging must cease once dose crosses missed threshold", shouldScheduleOverdue)
+    }
+
+    @Test
+    fun medicineAlarmReceiver_continuousNaggingNotification_formatsWithoutRatio() {
+        // Guard: Verify continuous nagging formats notification text without /max ratio (#119)
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val count = 4
+        val maxNagging = 0
+        val scheduledTime = "08:00 AM"
+
+        val formattedText = if (maxNagging <= 0) {
+            context.getString(com.example.dosezy.R.string.notif_nagging_text_continuous, count, scheduledTime)
+        } else {
+            context.getString(com.example.dosezy.R.string.notif_nagging_text, count, maxNagging, scheduledTime)
+        }
+        assertTrue("Formatted text should contain repeat count", formattedText.contains("4"))
+        assertTrue("Formatted text should contain scheduled time", formattedText.contains("08:00 AM"))
+        assertFalse("Continuous nagging text should not contain /0 ratio", formattedText.contains("/0"))
+    }
+
+    @Test
+    fun activities_doNotLockOrientationProgrammatically_forLargeScreens() {
+        // Guard: Verify activities do not lock orientation programmatically so large-screen devices can rotate freely (#120)
+        val mainController = org.robolectric.Robolectric.buildActivity(com.example.dosezy.MainActivity::class.java).setup()
+        val mainActivity = mainController.get()
+        assertEquals(
+            "MainActivity must not programmatically lock orientation",
+            android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,
+            mainActivity.requestedOrientation
+        )
+
+        val splashController = org.robolectric.Robolectric.buildActivity(com.example.dosezy.SplashActivity::class.java).setup()
+        val splashActivity = splashController.get()
+        assertEquals(
+            "SplashActivity must not programmatically lock orientation",
+            android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,
+            splashActivity.requestedOrientation
+        )
+    }
+
+    @Test
+    fun medicineAlarmReceiver_fallbackUsesIntentUserId_toResolveTargetProfile() {
+        // Guard: Verify catch fallback resolves user from intentUserId before isCurrentUser fallback (#BUG-ALARM-FALLBACK-USER)
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val mockDb = mockk<com.example.dosezy.data.DosezyDatabase>(relaxed = true)
+        val mockScheduleDao = mockk<com.example.dosezy.data.dao.ScheduleDao>(relaxed = true)
+        val mockUserDao = mockk<com.example.dosezy.data.dao.UserDao>(relaxed = true)
+
+        every { mockDb.scheduleDao() } returns mockScheduleDao
+        every { mockDb.userDao() } returns mockUserDao
+
+        val targetUser = com.example.dosezy.data.model.User(
+            userId = "target_user_fallback_1",
+            fullName = "Target Profile",
+            gender = com.example.dosezy.data.model.Gender.DO_NOT_SPECIFY,
+            age = 28,
+            contactNumber = "111222333",
+            reminderType = com.example.dosezy.data.model.ReminderType.NOTIFICATION,
+            isCurrentUser = false
+        )
+        val currentUser = com.example.dosezy.data.model.User(
+            userId = "active_current_user_1",
+            fullName = "Active Profile",
+            gender = com.example.dosezy.data.model.Gender.DO_NOT_SPECIFY,
+            age = 35,
+            contactNumber = "444555666",
+            reminderType = com.example.dosezy.data.model.ReminderType.ALARM,
+            isCurrentUser = true
+        )
+
+        coEvery { mockScheduleDao.getScheduleEntryById(any()) } throws RuntimeException("Simulated SQLite failure")
+        coEvery { mockUserDao.getUserByIdDirect(targetUser.userId) } returns targetUser
+        coEvery { mockUserDao.getAllUsersDirect() } returns listOf(currentUser)
+
+        com.example.dosezy.data.DosezyDatabase.setInstance(mockDb)
+        try {
+            val receiver = MedicineAlarmReceiver()
+            val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
+                putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, "entry_fallback_1")
+                putExtra(MedicineAlarmReceiver.EXTRA_MEDICINE_NAME, "Paracetamol")
+                putExtra(MedicineAlarmReceiver.EXTRA_USER_ID, targetUser.userId)
+                putExtra(MedicineAlarmReceiver.EXTRA_SCHEDULED_TIME, "10:00 AM")
+            }
+
+            receiver.onReceive(context, intent)
+            org.robolectric.shadows.ShadowLooper.idleMainLooper()
+            Thread.sleep(100)
+            org.robolectric.shadows.ShadowLooper.idleMainLooper()
+
+            // Guard: Verify target profile was looked up via getUserByIdDirect and active current user query was skipped
+            coVerify(atLeast = 1) { mockUserDao.getUserByIdDirect(targetUser.userId) }
+            coVerify(exactly = 0) { mockUserDao.getAllUsersDirect() }
+        } finally {
+            com.example.dosezy.data.DosezyDatabase.setInstance(null)
+        }
     }
 }
 

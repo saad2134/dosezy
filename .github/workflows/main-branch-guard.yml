@@ -1,0 +1,38 @@
+name: "Main Branch Source Guard"
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - edited
+
+permissions:
+  contents: read
+
+jobs:
+  verify-source:
+    name: "Verify Source Branch is develop"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR head branch
+        run: |
+          echo "Target branch: ${{ github.base_ref }}"
+          echo "Source branch: ${{ github.head_ref }}"
+          echo "Actor: ${{ github.actor }}"
+          if [ "${{ github.head_ref }}" = "develop" ] || [ "${{ github.actor }}" = "dependabot[bot]" ]; then
+            echo "PR source verified successfully."
+          else
+            case "${{ github.head_ref }}" in
+              dependabot/*)
+                echo "Dependabot automated branch verified successfully."
+                ;;
+              *)
+                echo "::error title=Invalid Target Branch::Pull requests targeting 'main' must originate from 'develop' (or dependabot). Current head branch is '${{ github.head_ref }}'. Please retarget this pull request to 'develop'."
+                exit 1
+                ;;
+            esac
+          fi

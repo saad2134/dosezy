@@ -39,7 +39,7 @@ import com.example.dosezy.data.model.normalizeArabicDigits
 @Composable
 fun QuickRefillDialog(
     medicine: Medicine,
-    onConfirmRefill: (addedQuantity: Int) -> Unit,
+    onConfirmRefill: (addedQuantity: Double) -> Unit,
     onDismiss: () -> Unit
 ) {
     var quantityText by remember { mutableStateOf("30") }
@@ -55,9 +55,9 @@ fun QuickRefillDialog(
         },
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
-                val currentStock = medicine.currentStock ?: 0
+                val currentStockStr = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(medicine.currentStock ?: 0.0)
                 Text(
-                    text = "${stringResource(R.string.stock_current)}: $currentStock",
+                    text = "${stringResource(R.string.stock_current)}: $currentStockStr",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -90,8 +90,14 @@ fun QuickRefillDialog(
 
                 OutlinedTextField(
                     value = quantityText,
-                    onValueChange = { if (it.all { c -> c.isDigit() }) quantityText = it },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    onValueChange = { newVal ->
+                        // Guard: Allow fractional quantities when logging quick refills (e.g. 15.5 tablets) (#123)
+                        val normalized = newVal.normalizeArabicDigits()
+                        if (normalized.isEmpty() || normalized.matches(Regex("^\\d*\\.?\\d*$"))) {
+                            quantityText = newVal
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -102,14 +108,14 @@ fun QuickRefillDialog(
             }
         },
         confirmButton = {
-            val parsedQuantity = quantityText.normalizeArabicDigits().toIntOrNull() ?: 0
+            val parsedQuantity = quantityText.normalizeArabicDigits().toDoubleOrNull() ?: 0.0
             Button(
                 onClick = {
-                    if (parsedQuantity > 0) {
+                    if (parsedQuantity > 0.0) {
                         onConfirmRefill(parsedQuantity)
                     }
                 },
-                enabled = parsedQuantity > 0,
+                enabled = parsedQuantity > 0.0,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1193D4))
             ) {
                 Text(stringResource(R.string.form_save))

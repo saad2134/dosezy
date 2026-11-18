@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
@@ -43,11 +42,12 @@ import com.example.dosezy.ui.theme.LightBlue40
 
 @Composable
 fun ProgressDot(active: Boolean) {
+    // Squircle progress indicator
     Box(
         modifier = Modifier
             .height(12.dp)
             .width(if (active) 32.dp else 12.dp)
-            .clip(CircleShape)
+            .clip(RoundedCornerShape(6.dp))
             .background(
                 if (active) LightBlue40
                 else Color.Gray.copy(alpha = 0.3f)

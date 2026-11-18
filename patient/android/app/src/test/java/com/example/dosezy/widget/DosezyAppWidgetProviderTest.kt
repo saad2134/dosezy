@@ -11,6 +11,14 @@ import android.content.Intent
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.example.dosezy.MainActivity
+import com.example.dosezy.data.model.DosageUnit
+import com.example.dosezy.data.model.Frequency
+import com.example.dosezy.data.model.FrequencyPattern
+import com.example.dosezy.data.model.MedicationStatus
+import com.example.dosezy.data.model.Medicine
+import com.example.dosezy.data.model.MedicineSortMode
+import com.example.dosezy.data.model.ScheduleEntry
+import com.example.dosezy.data.repository.MedicineOrderPreferences
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -287,6 +295,65 @@ class DosezyAppWidgetProviderTest {
         val simulatedApiBelow31 = if (28 >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
         assertEquals(0, simulatedApiBelow31)
         assertEquals(PendingIntent.FLAG_UPDATE_CURRENT, PendingIntent.FLAG_UPDATE_CURRENT or simulatedApiBelow31)
+    }
+
+    @Test
+    fun testWidgetIntraSlotSorting_matchesCustomMedicineOrderPreferences() {
+        val userMeds = listOf(
+            Medicine(
+                medicineId = "med_z",
+                userId = "u_widget",
+                medicationName = "Z-Med",
+                dosage = 10.0,
+                dosageUnit = DosageUnit.MG,
+                timesPerDay = 1,
+                frequency = Frequency(FrequencyPattern.DAILY),
+                scheduledTimes = listOf(java.time.LocalTime.of(8, 0))
+            ),
+            Medicine(
+                medicineId = "med_a",
+                userId = "u_widget",
+                medicationName = "A-Med",
+                dosage = 20.0,
+                dosageUnit = DosageUnit.MG,
+                timesPerDay = 1,
+                frequency = Frequency(FrequencyPattern.DAILY),
+                scheduledTimes = listOf(java.time.LocalTime.of(8, 0))
+            )
+        )
+        // Custom order places med_z first, even though alphabetically med_a comes first
+        val customOrder = listOf("med_z", "med_a")
+        val sortedMeds = MedicineOrderPreferences.sortMedicines(userMeds, MedicineSortMode.CUSTOM, customOrder)
+        val medOrderMap = sortedMeds.mapIndexed { index, med -> med.medicineId to index }.toMap()
+        val medicines = userMeds.associateBy { it.medicineId }
+
+        val sameSlotEntries = listOf(
+            ScheduleEntry(
+                entryId = "e_a",
+                userId = "u_widget",
+                medicineId = "med_a",
+                scheduledDateTime = java.time.LocalDateTime.of(2026, 11, 10, 8, 0),
+                status = MedicationStatus.PENDING
+            ),
+            ScheduleEntry(
+                entryId = "e_z",
+                userId = "u_widget",
+                medicineId = "med_z",
+                scheduledDateTime = java.time.LocalDateTime.of(2026, 11, 10, 8, 0),
+                status = MedicationStatus.PENDING
+            )
+        )
+
+        val sortedEntries = sameSlotEntries.sortedWith(
+            compareBy(
+                { it.scheduledDateTime },
+                { medOrderMap[it.medicineId] ?: Int.MAX_VALUE },
+                { medicines[it.medicineId]?.medicationName?.lowercase() ?: "" }
+            )
+        )
+
+        assertEquals("e_z", sortedEntries[0].entryId)
+        assertEquals("e_a", sortedEntries[1].entryId)
     }
 }
 

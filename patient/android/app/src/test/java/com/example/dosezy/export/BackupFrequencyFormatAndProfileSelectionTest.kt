@@ -9,8 +9,10 @@ import com.example.dosezy.data.model.Frequency
 import com.example.dosezy.data.model.FrequencyPattern
 import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.Medicine
+import com.example.dosezy.data.model.MedicineSortMode
 import com.example.dosezy.data.model.PillShape
 import com.example.dosezy.data.model.ReminderType
+import com.example.dosezy.data.repository.MedicineOrderPreferences
 import com.example.dosezy.data.model.Theme
 import com.example.dosezy.data.model.TimeFormat
 import com.example.dosezy.data.model.User
@@ -646,5 +648,55 @@ class BackupFrequencyFormatAndProfileSelectionTest {
         assertEquals("ALARM", medObj.getString("reminderType"))
         assertEquals("SPRAY", medObj.getString("pillShape"))
         assertEquals("SPRAY", medObj.getString("dosageUnit"))
+    }
+
+    @Test
+    fun testCrossSchemaParity_fractionalStockAndAdherenceMinutes() {
+        val user = User(
+            userId = "u_parity",
+            fullName = "Schema Parity User",
+            age = 40,
+            gender = Gender.FEMALE,
+            contactNumber = "555-0123",
+            considerLateAfter = 180,
+            considerMissedAfter = 360,
+            naggingMaxRepeats = 3
+        )
+
+        val medicine = Medicine(
+            medicineId = "m_parity",
+            userId = "u_parity",
+            medicationName = "Liquid Amoxicillin",
+            dosage = 250.0,
+            dosageUnit = DosageUnit.ML,
+            timesPerDay = 2,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
+            currentStock = 29.5,
+            refillThreshold = 5.5,
+            autoDeductOnTake = true
+        )
+
+        val jsonStr = dataExporter.buildJsonContent(user, listOf(medicine), emptyList())
+        val root = JSONObject(jsonStr)
+
+        val userObj = root.getJSONObject("user")
+        // Guard: Verify considerLateAfter and considerMissedAfter are exported in minutes matching OpenAPI schema
+        assertEquals(180, userObj.getInt("considerLateAfter"))
+        assertEquals(360, userObj.getInt("considerMissedAfter"))
+        assertEquals(3, userObj.getInt("naggingMaxRepeats"))
+
+        val medsArray = root.getJSONArray("medicines")
+        assertEquals(1, medsArray.length())
+        val medObj = medsArray.getJSONObject(0)
+        // Guard: Verify fractional currentStock and refillThreshold export as Double matching OpenAPI schema
+        assertEquals(29.5, medObj.getDouble("currentStock"), 0.001)
+        assertEquals(5.5, medObj.getDouble("refillThreshold"), 0.001)
+
+        // Verify restoration from JSON with fractional inventory
+        val parsedMeds = backupRestoreManager.parseMedicinesFromJson(medsArray.toString())
+        assertEquals(1, parsedMeds.size)
+        assertEquals(29.5, parsedMeds[0].currentStock ?: 0.0, 0.001)
+        assertEquals(5.5, parsedMeds[0].refillThreshold ?: 0.0, 0.001)
     }
 }

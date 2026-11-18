@@ -68,8 +68,9 @@ class TakeCohortUseCase @Inject constructor(
 
         entryIds.forEach { id ->
             val entry = database.scheduleDao().getScheduleEntryById(id)
-            val entryUser = user ?: entry?.let { database.userDao().getUserByIdDirect(it.userId) }
-            val lateAfter = entryUser?.considerLateAfter ?: 3
+            // Guard: Resolve user strictly from entry first to prevent multi-profile late threshold contamination (#BUG-MULTIUSER-COHORT)
+            val entryUser = entry?.let { database.userDao().getUserByIdDirect(it.userId) } ?: user
+            val lateAfter = entryUser?.lateAfterMinutes ?: 180
             val status = if (entry != null && TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, customTakenAt, lateAfter)) {
                 "TAKEN_LATE"
             } else {
@@ -80,9 +81,9 @@ class TakeCohortUseCase @Inject constructor(
             scheduleRepository.recordDoseTaken(id, status, nowStr, context, notes, syncSlotNotification = false)
         }
 
-        // Guard: Coordinate slot notification sync and widget updates across each distinct time slot in entryIds (#BUG-MULTI-SLOT-COHORT)
+        // Guard: Coordinate slot notification sync and widget updates across each distinct user and time slot (#BUG-MULTI-SLOT-COHORT, #BUG-MULTIUSER-COHORT)
         val entries = entryIds.mapNotNull { database.scheduleDao().getScheduleEntryById(it) }
-        val distinctSlots = entries.distinctBy { it.scheduledDateTime.withSecond(0).withNano(0) }
+        val distinctSlots = entries.distinctBy { Pair(it.userId, it.scheduledDateTime.withSecond(0).withNano(0)) }
         if (distinctSlots.isNotEmpty()) {
             distinctSlots.forEach { slotEntry ->
                 scheduleRepository.syncSlotNotificationAndAlarms(slotEntry.entryId, slotEntry, context)

@@ -102,8 +102,16 @@ class AlarmViewModel @Inject constructor(
                     }
                 }
             }
+            // Guard: Filter cohort list strictly to targetUser to isolate UI cards and prevent multi-profile cross-contamination (#BUG-MULTIUSER-ALARM-MERGE)
+            val primaryUser = targetUser
+            val filteredList = if (primaryUser != null) {
+                list.filter { it.first.userId == primaryUser.userId }.toMutableList()
+            } else {
+                list
+            }
+
             // Guard: Reconcile all pending sibling schedule entries in the same time slot to ensure 4+ medication cohorts are fully loaded (#115)
-            val firstEntry = list.firstOrNull()?.first ?: entryIds.firstNotNullOfOrNull { database.scheduleDao().getScheduleEntryById(it) }
+            val firstEntry = filteredList.firstOrNull()?.first ?: entryIds.firstNotNullOfOrNull { database.scheduleDao().getScheduleEntryById(it) }
             if (firstEntry != null) {
                 val slotMillis = firstEntry.scheduledDateTime.withSecond(0).withNano(0)
                     .atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
@@ -113,10 +121,10 @@ class AlarmViewModel @Inject constructor(
                     slotMillis + 59999L
                 ).filter { it.status == com.example.dosezy.data.model.MedicationStatus.PENDING && !it.entryId.startsWith("PRN_") }
                 for (sibling in slotEntries) {
-                    if (sibling.entryId !in foundIds) {
+                    if (sibling.entryId !in foundIds && sibling.userId == firstEntry.userId) {
                         val med = database.medicineDao().getMedicineByIdDirect(sibling.medicineId)
                         if (med != null) {
-                            list.add(Pair(sibling, med))
+                            filteredList.add(Pair(sibling, med))
                             foundIds.add(sibling.entryId)
                         }
                     }
@@ -128,8 +136,8 @@ class AlarmViewModel @Inject constructor(
             }
             _uiState.value = AlarmUiState(
                 isLoaded = true,
-                medicinesList = list,
-                user = targetUser
+                medicinesList = filteredList,
+                user = primaryUser ?: targetUser
             )
         }
     }
@@ -181,8 +189,12 @@ class AlarmViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             val medicinesList = _uiState.value.medicinesList
             val user = _uiState.value.user
-            // Guard: Merge explicit entryIds and loaded UI state list to ensure all cohort medicines are marked taken (#115)
-            val allIds = (entryIds + medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
+            val targetUserId = user?.userId
+            val userEntryIds = if (targetUserId != null) {
+                entryIds.filter { id -> database.scheduleDao().getScheduleEntryById(id)?.userId == targetUserId }
+            } else entryIds
+            // Guard: Merge explicit entryIds and loaded UI state list strictly for active user (#115, #BUG-ALARM-ISOLATE)
+            val allIds = (userEntryIds + medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
             withContext(NonCancellable) {
                 takeCohortUseCase(allIds, user = user)
             }
@@ -201,7 +213,12 @@ class AlarmViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             val medicinesList = _uiState.value.medicinesList
             val user = _uiState.value.user
-            val allIds = (entryIds + medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
+            val targetUserId = user?.userId
+            val userEntryIds = if (targetUserId != null) {
+                entryIds.filter { id -> database.scheduleDao().getScheduleEntryById(id)?.userId == targetUserId }
+            } else entryIds
+            // Guard: Scope snooze cohort strictly to active user (#BUG-ALARM-ISOLATE)
+            val allIds = (userEntryIds + medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
             val names = if (medicinesList.isNotEmpty()) {
                 medicinesList.map { it.second.medicationName }
             } else {
@@ -229,7 +246,13 @@ class AlarmViewModel @Inject constructor(
     ) {
         viewModelScope.launch(ioDispatcher) {
             val medicinesList = _uiState.value.medicinesList
-            val allIds = (entryIds + medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
+            val user = _uiState.value.user
+            val targetUserId = user?.userId
+            val userEntryIds = if (targetUserId != null) {
+                entryIds.filter { id -> database.scheduleDao().getScheduleEntryById(id)?.userId == targetUserId }
+            } else entryIds
+            // Guard: Scope skip cohort strictly to active user (#BUG-ALARM-ISOLATE)
+            val allIds = (userEntryIds + medicinesList.map { it.first.entryId }).filter { it.isNotEmpty() }.distinct()
             withContext(NonCancellable) {
                 skipCohortUseCase(allIds, reason)
             }

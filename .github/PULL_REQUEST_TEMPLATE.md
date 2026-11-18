@@ -64,7 +64,7 @@ network communication, permissions, authentication, or other security implicatio
 
 - [ ] No privacy/security impact
 - [ ] Privacy/security reviewed
-- [ ] Security-sensitive change — additional review may be required
+- [ ] Security-sensitive change: additional review may be required
 
 Details:
 

@@ -468,13 +468,14 @@ fun AlarmScreenContent(
                                             color = MaterialTheme.colorScheme.onSurface
                                         )
                                         Text(
-                                            text = med.getDosageDisplay(entry.scheduledDateTime.toLocalTime()),
+                                            text = med.getDosageDisplay(entry.scheduledDateTime.toLocalTime(), entry.dosage),
                                             style = MaterialTheme.typography.bodyMedium,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                         med.currentStock?.let { stock ->
+                                            val stockFmt = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(stock)
                                             Text(
-                                                text = stringResource(R.string.alarm_stock_remaining, stock),
+                                                text = stringResource(R.string.alarm_stock_remaining, stockFmt),
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = Color(0xFF2E7D32),
                                                 fontWeight = FontWeight.SemiBold

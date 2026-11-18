@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -184,13 +183,13 @@ fun ManageProfileScreen(navController: NavController) {
                                 modifier = Modifier.size(128.dp)
                             )
 
-                            // Edit icon overlay
+                            // Edit icon overlay (Squircle frame)
                             Box(
                                 modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(CircleShape)
-                                    .background(MaterialTheme.colorScheme.primary)
-                                    .align(Alignment.BottomEnd),
+                                .size(40.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(MaterialTheme.colorScheme.primary)
+                                .align(Alignment.BottomEnd),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(

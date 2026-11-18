@@ -34,7 +34,7 @@ class MedicineLogicTest {
         freq: Frequency = Frequency(FrequencyPattern.DAILY),
         times: List<LocalTime> = listOf(LocalTime.of(8, 0)),
         customDosages: Map<String, Double>? = null,
-        stock: Int = 100
+        stock: Double = 100.0
     ) = Medicine(
         medicineId = "med_1",
         userId = "usr_1",
@@ -46,7 +46,7 @@ class MedicineLogicTest {
         scheduledTimes = times,
         customDosages = customDosages,
         currentStock = stock,
-        refillThreshold = 10,
+        refillThreshold = 10.0,
         autoDeductOnTake = true
     )
 
@@ -70,7 +70,7 @@ class MedicineLogicTest {
     @Test
     fun dosageDisplay_fractionalNumber_showsDecimal() {
         assertEquals("2.5 mg", med(2.5, DosageUnit.MG).getDosageDisplay())
-        assertEquals("0.5 tablet", med(0.5, DosageUnit.TABLET).getDosageDisplay())
+        assertEquals("½ tablet", med(0.5, DosageUnit.TABLET).getDosageDisplay())
     }
 
     @Test
@@ -179,73 +179,77 @@ class MedicineLogicTest {
 
     @Test
     fun stockDeduction_mgAlwaysOne() {
-        assertEquals(1, med(500.0, DosageUnit.MG).getStockDeductionAmount())
-        assertEquals(1, med(0.5, DosageUnit.MG).getStockDeductionAmount())
+        assertEquals(1.0, med(500.0, DosageUnit.MG).getStockDeductionAmount(), 0.001)
+        assertEquals(1.0, med(0.5, DosageUnit.MG).getStockDeductionAmount(), 0.001)
     }
 
     @Test
     fun stockDeduction_mcgAlwaysOne() {
-        assertEquals(1, med(100.0, DosageUnit.MCG).getStockDeductionAmount())
+        assertEquals(1.0, med(100.0, DosageUnit.MCG).getStockDeductionAmount(), 0.001)
     }
 
     @Test
     fun stockDeduction_tabletClampedTo1Through10() {
-        assertEquals(1, med(1.0, DosageUnit.TABLET).getStockDeductionAmount())
-        assertEquals(5, med(5.0, DosageUnit.TABLET).getStockDeductionAmount())
-        assertEquals(10, med(10.0, DosageUnit.TABLET).getStockDeductionAmount())
+        assertEquals(1.0, med(1.0, DosageUnit.TABLET).getStockDeductionAmount(), 0.001)
+        assertEquals(5.0, med(5.0, DosageUnit.TABLET).getStockDeductionAmount(), 0.001)
+        assertEquals(10.0, med(10.0, DosageUnit.TABLET).getStockDeductionAmount(), 0.001)
+        // Fractional half doses support (Issue #123)
+        assertEquals(0.5, med(0.5, DosageUnit.TABLET).getStockDeductionAmount(), 0.001)
+        assertEquals(1.5, med(1.5, DosageUnit.TABLET).getStockDeductionAmount(), 0.001)
         // > 10 falls back to 1
-        assertEquals(1, med(11.0, DosageUnit.TABLET).getStockDeductionAmount())
-        assertEquals(1, med(500.0, DosageUnit.TABLET).getStockDeductionAmount())
+        assertEquals(1.0, med(11.0, DosageUnit.TABLET).getStockDeductionAmount(), 0.001)
+        assertEquals(1.0, med(500.0, DosageUnit.TABLET).getStockDeductionAmount(), 0.001)
     }
 
     @Test
     fun stockDeduction_capsuleClampedTo1Through10() {
-        assertEquals(2, med(2.0, DosageUnit.CAPSULE).getStockDeductionAmount())
-        assertEquals(1, med(100.0, DosageUnit.CAPSULE).getStockDeductionAmount())
+        assertEquals(2.0, med(2.0, DosageUnit.CAPSULE).getStockDeductionAmount(), 0.001)
+        assertEquals(0.5, med(0.5, DosageUnit.CAPSULE).getStockDeductionAmount(), 0.001)
+        assertEquals(1.0, med(100.0, DosageUnit.CAPSULE).getStockDeductionAmount(), 0.001)
     }
 
     @Test
     fun stockDeduction_zeroDosageTabletDefaultsTo1() {
-        // dosage 0.0 → toInt() = 0, not in 1..10, falls back to 1
-        assertEquals(1, med(0.0, DosageUnit.TABLET).getStockDeductionAmount())
+        // dosage 0.0 not in 0.1..10.0, falls back to 1
+        assertEquals(1.0, med(0.0, DosageUnit.TABLET).getStockDeductionAmount(), 0.001)
     }
 
     @Test
     fun stockDeduction_liquidMinimumOne() {
-        assertEquals(1, med(0.5, DosageUnit.ML).getStockDeductionAmount()) // 0.5.toInt() = 0, coerced to 1
-        assertEquals(3, med(3.0, DosageUnit.DROP).getStockDeductionAmount())
+        assertEquals(0.5, med(0.5, DosageUnit.ML).getStockDeductionAmount(), 0.001)
+        assertEquals(3.0, med(3.0, DosageUnit.DROP).getStockDeductionAmount(), 0.001)
     }
 
     @Test
     fun stockDeduction_meqAlwaysOne() {
-        assertEquals(1, med(10.0, DosageUnit.MEQ).getStockDeductionAmount())
-        assertEquals(1, med(20.0, DosageUnit.MEQ).getStockDeductionAmount())
-        assertEquals(1, med(40.0, DosageUnit.MEQ).getStockDeductionAmount())
+        assertEquals(1.0, med(10.0, DosageUnit.MEQ).getStockDeductionAmount(), 0.001)
+        assertEquals(1.0, med(20.0, DosageUnit.MEQ).getStockDeductionAmount(), 0.001)
+        assertEquals(1.0, med(40.0, DosageUnit.MEQ).getStockDeductionAmount(), 0.001)
     }
 
     @Test
     fun stockDeduction_puffDeductsIntakeQuantity() {
-        assertEquals(2, med(2.0, DosageUnit.PUFF).getStockDeductionAmount())
-        assertEquals(1, med(1.0, DosageUnit.PUFF).getStockDeductionAmount())
-        assertEquals(4, med(4.0, DosageUnit.PUFF).getStockDeductionAmount())
-        assertEquals(1, med(0.5, DosageUnit.PUFF).getStockDeductionAmount()) // coerced to 1
+        assertEquals(2.0, med(2.0, DosageUnit.PUFF).getStockDeductionAmount(), 0.001)
+        assertEquals(1.0, med(1.0, DosageUnit.PUFF).getStockDeductionAmount(), 0.001)
+        assertEquals(4.0, med(4.0, DosageUnit.PUFF).getStockDeductionAmount(), 0.001)
+        assertEquals(0.5, med(0.5, DosageUnit.PUFF).getStockDeductionAmount(), 0.001)
     }
 
     @Test
     fun stockDeduction_ampuleClampedTo1Through10() {
-        assertEquals(1, med(1.0, DosageUnit.AMPULE).getStockDeductionAmount())
-        assertEquals(2, med(2.0, DosageUnit.AMPULE).getStockDeductionAmount())
-        assertEquals(10, med(10.0, DosageUnit.AMPULE).getStockDeductionAmount())
+        assertEquals(1.0, med(1.0, DosageUnit.AMPULE).getStockDeductionAmount(), 0.001)
+        assertEquals(2.0, med(2.0, DosageUnit.AMPULE).getStockDeductionAmount(), 0.001)
+        assertEquals(10.0, med(10.0, DosageUnit.AMPULE).getStockDeductionAmount(), 0.001)
         // > 10 falls back to 1
-        assertEquals(1, med(20.0, DosageUnit.AMPULE).getStockDeductionAmount())
+        assertEquals(1.0, med(20.0, DosageUnit.AMPULE).getStockDeductionAmount(), 0.001)
     }
 
     @Test
     fun stockDeduction_usesCustomDosageForSlot() {
         val custom = mapOf("08:00" to 3.0, "20:00" to 1.0)
         val m = med(dosage = 1.0, unit = DosageUnit.TABLET, customDosages = custom)
-        assertEquals(3, m.getStockDeductionAmount(LocalTime.of(8, 0)))
-        assertEquals(1, m.getStockDeductionAmount(LocalTime.of(20, 0)))
+        assertEquals(3.0, m.getStockDeductionAmount(LocalTime.of(8, 0)), 0.001)
+        assertEquals(1.0, m.getStockDeductionAmount(LocalTime.of(20, 0)), 0.001)
     }
 
     // ───────────────────────────────────────────────────────────────

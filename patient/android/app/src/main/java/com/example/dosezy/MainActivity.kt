@@ -103,7 +103,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        // Guard: Do not programmatically lock portrait orientation so tablets, foldables, and desktop displays resize cleanly (#120)
 
         // Guard: Stop ringing alarm sound and vibration if cold-started from notification tap or while alarm is playing (#BUG-ALARM-TAP-STOP)
         if (intent.getBooleanExtra("from_alarm", false) || AlarmAudioPlayer.isPlaying()) {

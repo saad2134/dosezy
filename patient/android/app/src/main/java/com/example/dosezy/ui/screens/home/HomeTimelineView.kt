@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -62,8 +61,8 @@ fun HomeTimelineView(
     onEditNote: (String) -> Unit = {},
     onMarkAllTaken: ((List<ScheduleWithMedicine>) -> Unit)? = null
 ) {
-    val lateAfter = currentUser?.considerLateAfter ?: 3
-    val missedAfter = currentUser?.considerMissedAfter ?: 6
+    val lateAfter = currentUser?.lateAfterMinutes ?: 180
+    val missedAfter = currentUser?.missedAfterMinutes ?: 360
 
     Column(modifier = Modifier.fillMaxWidth()) {
         groupedEntries.forEachIndexed { index, (time, entries) ->
@@ -146,10 +145,11 @@ fun HomeTimelineView(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.width(38.dp)
                 ) {
+                    // Squircle timeline node frame
                     Box(
                         modifier = Modifier
                             .size(34.dp)
-                            .clip(CircleShape)
+                            .clip(RoundedCornerShape(10.dp))
                             .background(nodeColor),
                         contentAlignment = Alignment.Center
                     ) {

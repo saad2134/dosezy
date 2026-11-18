@@ -374,8 +374,9 @@ class DataExporter(
             return "\"${sanitized.replace("\"", "\"\"")}\""
         }
 
+        // Guard: Prepend UTF-8 BOM (\uFEFF) so desktop spreadsheet software (Excel on Windows) auto-detects UTF-8 and renders non-Latin medical text without mojibake
         internal fun buildCsvContent(user: User, medicines: List<Medicine>, schedules: List<ScheduleEntry>): String {
-            val csvBuilder = StringBuilder()
+            val csvBuilder = StringBuilder("\uFEFF")
 
             // User Information Section
             csvBuilder.append("USER INFORMATION\n")
@@ -425,8 +426,8 @@ class DataExporter(
                     "${escapeCsv(medicine.startDate ?: "")}," +
                     "${escapeCsv(medicine.endDate ?: "")}," +
                     "${medicine.durationDays ?: ""}," +
-                    "${medicine.currentStock ?: ""}," +
-                    "${medicine.refillThreshold ?: ""}," +
+                    "${medicine.currentStock?.let { com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(it) } ?: ""}," +
+                    "${medicine.refillThreshold?.let { com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(it) } ?: ""}," +
                     "${medicine.autoDeductOnTake}," +
                     "${medicine.isArchived}," +
                     "${escapeCsv(customDosagesStr)}," +
@@ -564,8 +565,9 @@ class DataExporter(
                     com.example.dosezy.data.model.DosageUnit.MEQ -> true
                     else -> med.dosage > 0
                 }
+                // Guard: Format dosage using DosageFormatUtils to preserve vulgar fractions for discrete units and clean decimals (#123)
                 val dosageDisplay = if (med.dosage > 0) {
-                    if (med.dosage % 1.0 == 0.0) "${med.dosage.toInt()}" else "${med.dosage}"
+                    com.example.dosezy.utils.DosageFormatUtils.formatDosageAmount(med.dosage, med.dosageUnit)
                 } else ""
                 val strengthUnitStr = med.dosageUnit.getLocalizedName(context)
 
@@ -593,7 +595,8 @@ class DataExporter(
                     } else {
                         med.dosageUnit.getLocalizedName(context)
                     }
-                    sb.append("   • ").append(context.getString(com.example.dosezy.R.string.pharmacy_order_current_stock, med.currentStock, stockUnitStr)).append("\n")
+                    val formattedStock = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(med.currentStock)
+                    sb.append("   • ").append(context.getString(com.example.dosezy.R.string.pharmacy_order_current_stock, formattedStock, stockUnitStr)).append("\n")
                 }
                 sb.append("\n")
             }

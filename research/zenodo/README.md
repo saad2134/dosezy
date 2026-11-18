@@ -31,7 +31,7 @@ This package bundles all artifacts required for permanent open-access archiving 
 
 ## 2. How to Upload to Zenodo (Step-by-Step Guide)
 
-### Method A: Web Upload (Recommended — Takes ~2 Minutes)
+### Method A: Web Upload (Recommended: Takes ~2 Minutes)
 1. Navigate to **[zenodo.org](https://zenodo.org/)** and log in (or create an account with GitHub / ORCID).
 2. Click the **Upload** button in the top navigation bar, then click **New Upload**.
 3. **Files:** Drag and drop `dosezy_zenodo_bundle.zip` (or drag in `paper.pdf`, `usability_participants.csv`, `oem_alarm_benchmark.csv`, and `reproduce_paper_stats.py` individually).

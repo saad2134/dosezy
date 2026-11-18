@@ -29,7 +29,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AlarmOff
@@ -145,10 +144,11 @@ fun AnalyticsScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
+                        // Squircle empty state icon frame
                         Box(
                             modifier = Modifier
                                 .size(64.dp)
-                                .clip(CircleShape)
+                                .clip(RoundedCornerShape(18.dp))
                                 .background(Color(0xFF1193D4).copy(alpha = 0.15f)),
                             contentAlignment = Alignment.Center
                         ) {
@@ -533,10 +533,11 @@ fun StatCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // Squircle stat card icon frame
                 Box(
                     modifier = Modifier
                         .size(36.dp)
-                        .clip(CircleShape)
+                        .clip(RoundedCornerShape(10.dp))
                         .background(bgColor),
                     contentAlignment = Alignment.Center
                 ) {
@@ -696,10 +697,11 @@ fun InsightCard(adherenceRate: Int, totalEntries: Int) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
+            // Squircle insight icon frame
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .clip(CircleShape)
+                    .clip(RoundedCornerShape(12.dp))
                     .background(insightColor.copy(alpha = 0.2f)),
                 contentAlignment = Alignment.Center
             ) {

@@ -222,7 +222,7 @@ No application running on Android (including system apps like Google Clock or Al
    - *The Risk:* Certain phone manufacturers enforce proprietary battery managers that freeze or kill background applications if the user has not marked the app as **Unrestricted**.
    - *Dosezy's Defense:* Dosezy includes a built-in diagnostic engine (**Notification Reliability Dialog**) that prompts for `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` and alerts users if battery restrictions threaten alarm delivery.
 2. **Revoked Exact Alarm Permission (`SCHEDULE_EXACT_ALARM`)**:
-   - *The Risk:* On Android 12+, if a user manually opens Android Settings $\to$ Apps $\to$ Special App Access $\to$ Alarms & Reminders and toggles off Dosezy, the OS delays alarms by 15–30 minutes to batch them with other system tasks.
+   - *The Risk:* On Android 12+, if a user manually opens Android Settings $\to$ Apps $\to$ Special App Access $\to$ Alarms & Reminders and toggles off Dosezy, the OS delays alarms by 15-30 minutes to batch them with other system tasks.
    - *Dosezy's Defense:* Dosezy actively checks `alarmManager.canScheduleExactAlarms()` and displays an interactive prompt redirecting the user to system settings if revoked.
 3. **Physical Hardware State**:
    - *The Risk:* Completely drained battery (0%), powered-off phone, or damaged physical speaker.
@@ -231,6 +231,6 @@ No application running on Android (including system apps like Google Clock or Al
 ### C. Redundancy Safety Net: Never Miss a Dose
 
 To protect patients in real-life situations where they might sleep through an alarm or accidentally swipe away a banner:
-1. **Nagging Reminders**: If the initial alarm is ignored or dismissed without marking the dose as taken, Dosezy’s automated follow-up engine triggers repeated nagging alarms (e.g. every 5 minutes up to 3–5 times).
+1. **Nagging Reminders**: If the initial alarm is ignored or dismissed without marking the dose as taken, Dosezy's automated follow-up engine triggers repeated nagging alarms (e.g. every 5 minutes up to 3-5 times).
 2. **100% Local-First Resilience**: Dosezy operates entirely offline on a local Room database. It will never fail because of AWS/Firebase downtime, unstable WiFi, flight mode, or lost cellular connectivity.
 

@@ -82,7 +82,7 @@ class TakeAllCohortFunctionalityTest {
         timesPerDay = 1,
         frequency = Frequency(FrequencyPattern.DAILY),
         scheduledTimes = listOf(LocalTime.of(8, 0)),
-        currentStock = 30,
+        currentStock = 30.0,
         autoDeductOnTake = true
     )
 
@@ -95,7 +95,7 @@ class TakeAllCohortFunctionalityTest {
         timesPerDay = 1,
         frequency = Frequency(FrequencyPattern.DAILY),
         scheduledTimes = listOf(LocalTime.of(8, 0)),
-        currentStock = 15,
+        currentStock = 15.0,
         autoDeductOnTake = true
     )
 
@@ -108,7 +108,7 @@ class TakeAllCohortFunctionalityTest {
         timesPerDay = 1,
         frequency = Frequency(FrequencyPattern.DAILY),
         scheduledTimes = listOf(LocalTime.of(8, 0)),
-        currentStock = 60,
+        currentStock = 60.0,
         autoDeductOnTake = false
     )
 
@@ -279,9 +279,9 @@ class TakeAllCohortFunctionalityTest {
         database.scheduleDao().insertScheduleEntry(entry3)
 
         // Initial stock assertions
-        assertEquals(30, database.medicineDao().getMedicineByIdDirect(medA.medicineId)?.currentStock)
-        assertEquals(15, database.medicineDao().getMedicineByIdDirect(medB.medicineId)?.currentStock)
-        assertEquals(60, database.medicineDao().getMedicineByIdDirect(medC.medicineId)?.currentStock)
+        assertEquals(30.0, database.medicineDao().getMedicineByIdDirect(medA.medicineId)?.currentStock!!, 0.001)
+        assertEquals(15.0, database.medicineDao().getMedicineByIdDirect(medB.medicineId)?.currentStock!!, 0.001)
+        assertEquals(60.0, database.medicineDao().getMedicineByIdDirect(medC.medicineId)?.currentStock!!, 0.001)
 
         // Execute cohort take
         val now = LocalDateTime.now()
@@ -305,9 +305,9 @@ class TakeAllCohortFunctionalityTest {
         assertEquals(MedicationStatus.TAKEN_ON_TIME, updated3?.status)
 
         // Verify stock decremented for autoDeductOnTake medicines, and untouched for false
-        assertEquals(29, database.medicineDao().getMedicineByIdDirect(medA.medicineId)?.currentStock)
-        assertEquals(14, database.medicineDao().getMedicineByIdDirect(medB.medicineId)?.currentStock)
-        assertEquals(60, database.medicineDao().getMedicineByIdDirect(medC.medicineId)?.currentStock)
+        assertEquals(29.0, database.medicineDao().getMedicineByIdDirect(medA.medicineId)?.currentStock!!, 0.001)
+        assertEquals(14.0, database.medicineDao().getMedicineByIdDirect(medB.medicineId)?.currentStock!!, 0.001)
+        assertEquals(60.0, database.medicineDao().getMedicineByIdDirect(medC.medicineId)?.currentStock!!, 0.001)
     }
 
     // ─────────────────────────────────────────────────────────────────────────────
@@ -364,8 +364,8 @@ class TakeAllCohortFunctionalityTest {
         // After confirmation, both are TAKEN_ON_TIME and stock is decremented
         assertEquals(MedicationStatus.TAKEN_ON_TIME, database.scheduleDao().getScheduleEntryById("safeguard_cohort_1")?.status)
         assertEquals(MedicationStatus.TAKEN_ON_TIME, database.scheduleDao().getScheduleEntryById("safeguard_cohort_2")?.status)
-        assertEquals(29, database.medicineDao().getMedicineByIdDirect(medA.medicineId)?.currentStock)
-        assertEquals(14, database.medicineDao().getMedicineByIdDirect(medB.medicineId)?.currentStock)
+        assertEquals(29.0, database.medicineDao().getMedicineByIdDirect(medA.medicineId)?.currentStock!!, 0.001)
+        assertEquals(14.0, database.medicineDao().getMedicineByIdDirect(medB.medicineId)?.currentStock!!, 0.001)
     }
 
     // ─────────────────────────────────────────────────────────────────────────────
@@ -404,8 +404,8 @@ class TakeAllCohortFunctionalityTest {
         val e2 = database.scheduleDao().getScheduleEntryById("cancel_cohort_2")
         assertEquals(MedicationStatus.PENDING, e1?.status)
         assertEquals(MedicationStatus.PENDING, e2?.status)
-        assertEquals(30, database.medicineDao().getMedicineByIdDirect(medA.medicineId)?.currentStock)
-        assertEquals(15, database.medicineDao().getMedicineByIdDirect(medB.medicineId)?.currentStock)
+        assertEquals(30.0, database.medicineDao().getMedicineByIdDirect(medA.medicineId)?.currentStock!!, 0.001)
+        assertEquals(15.0, database.medicineDao().getMedicineByIdDirect(medB.medicineId)?.currentStock!!, 0.001)
     }
 
     @Test
@@ -631,8 +631,8 @@ class TakeAllCohortFunctionalityTest {
             timesPerDay = 1,
             frequency = Frequency(FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(8, 0)),
-            currentStock = 3,
-            refillThreshold = 3,
+            currentStock = 3.0,
+            refillThreshold = 3.0,
             autoDeductOnTake = true
         )
         database.medicineDao().insertMedicine(lowStockMed)
@@ -655,7 +655,7 @@ class TakeAllCohortFunctionalityTest {
         takeCohortUseCase.invoke(listOf(entry.entryId), user = testUser)
 
         val updatedMed = database.medicineDao().getMedicineByIdDirect(lowStockMed.medicineId)
-        assertEquals(2, updatedMed?.currentStock)
+        assertEquals(2.0, updatedMed?.currentStock!!, 0.001)
 
         // Verify refill alert notification was posted
         val refillNotifId = (lowStockMed.medicineId + "_refill").hashCode()
@@ -966,7 +966,7 @@ class TakeAllCohortFunctionalityTest {
             timesPerDay = 1,
             frequency = Frequency(FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(8, 0)),
-            currentStock = 20,
+            currentStock = 20.0,
             autoDeductOnTake = true
         )
         database.medicineDao().insertMedicine(medD)
@@ -996,10 +996,10 @@ class TakeAllCohortFunctionalityTest {
         val updatedMedC = database.medicineDao().getMedicineByIdDirect(medC.medicineId)
         val updatedMedD = database.medicineDao().getMedicineByIdDirect(medD.medicineId)
 
-        assertEquals(29, updatedMedA?.currentStock)
-        assertEquals(14, updatedMedB?.currentStock)
-        assertEquals(60, updatedMedC?.currentStock)
-        assertEquals(19, updatedMedD?.currentStock)
+        assertEquals(29.0, updatedMedA?.currentStock!!, 0.001)
+        assertEquals(14.0, updatedMedB?.currentStock!!, 0.001)
+        assertEquals(60.0, updatedMedC?.currentStock!!, 0.001)
+        assertEquals(19.0, updatedMedD?.currentStock!!, 0.001)
     }
 
     @Test
@@ -1014,7 +1014,7 @@ class TakeAllCohortFunctionalityTest {
             timesPerDay = 1,
             frequency = Frequency(FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(9, 0)),
-            currentStock = 20,
+            currentStock = 20.0,
             autoDeductOnTake = true
         )
         database.medicineDao().insertMedicine(medD)
@@ -1037,6 +1037,134 @@ class TakeAllCohortFunctionalityTest {
         assertEquals(4, slotEntries.size)
         val entryIds = slotEntries.map { it.entryId }.toSet()
         assertTrue(entryIds.containsAll(listOf("e_rec_1", "e_rec_2", "e_rec_3", "e_rec_4")))
+    }
+
+    @Test
+    fun takeCohortUseCase_withMultiUserEntries_scopesLateThresholdAndSyncPerUser() = runBlocking {
+        // Guard: Verify TakeCohortUseCase correctly resolves distinct users per entry so late status evaluation and slot synchronization do not cross-contaminate profiles (#BUG-MULTIUSER-COHORT)
+        val secondUser = User(
+            userId = "user_cohort_second",
+            fullName = "Second Patient",
+            age = 45,
+            gender = Gender.DO_NOT_SPECIFY,
+            contactNumber = "+0987654321",
+            considerLateAfter = 30 // 30 minutes threshold
+        )
+        database.userDao().insertUser(secondUser)
+
+        val secondMed = Medicine(
+            medicineId = "med_second_user",
+            userId = secondUser.userId,
+            medicationName = "Metformin",
+            dosage = 500.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            currentStock = 30.0,
+            autoDeductOnTake = true
+        )
+        database.medicineDao().insertMedicine(secondMed)
+
+        val scheduledTime = LocalDateTime.now().minusMinutes(45)
+        val entry1 = ScheduleEntry(
+            entryId = "entry_user1",
+            userId = testUser.userId,
+            medicineId = medA.medicineId,
+            scheduledDateTime = scheduledTime,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_user2",
+            userId = secondUser.userId,
+            medicineId = secondMed.medicineId,
+            scheduledDateTime = scheduledTime,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        database.scheduleDao().insertScheduleEntry(entry1)
+        database.scheduleDao().insertScheduleEntry(entry2)
+
+        val takeCohortUseCase = TakeCohortUseCase(database, scheduleRepository, context)
+        // Invoke takeCohortUseCase passing testUser as the fallback user parameter
+        takeCohortUseCase(listOf(entry1.entryId, entry2.entryId), user = testUser)
+
+        val res1 = database.scheduleDao().getScheduleEntryById(entry1.entryId)
+        val res2 = database.scheduleDao().getScheduleEntryById(entry2.entryId)
+
+        // entry1 was scheduled 45 mins ago, testUser considerLateAfter = 2 (120 mins) -> TAKEN_ON_TIME
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, res1?.status)
+        // entry2 was scheduled 45 mins ago, secondUser considerLateAfter = 30 (30 mins) -> TAKEN_LATE
+        assertEquals(MedicationStatus.TAKEN_LATE, res2?.status)
+    }
+
+    @Test
+    fun snoozeCohortUseCase_withEntriesFromMultipleUsers_schedulesIndependentSnoozeAlarmsPerUser() = runBlocking {
+        // Guard: Verify SnoozeCohortUseCase partitions entries by user profile so distinct users have independent snooze alarms scheduled without merging into a single user's alarm (#BUG-SNOOZE-MULTIUSER-PARTITION)
+        val secondUser = User(
+            userId = "user_cohort_second_snooze",
+            fullName = "Second Snooze Patient",
+            age = 45,
+            gender = Gender.DO_NOT_SPECIFY,
+            contactNumber = "+0987654321",
+            snoozeDuration = 15
+        )
+        database.userDao().insertUser(secondUser)
+
+        val secondMed = Medicine(
+            medicineId = "med_second_user_snooze",
+            userId = secondUser.userId,
+            medicationName = "Metformin",
+            dosage = 500.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            currentStock = 30.0,
+            autoDeductOnTake = true
+        )
+        database.medicineDao().insertMedicine(secondMed)
+
+        val scheduledTime = LocalDateTime.now().minusMinutes(5)
+        val entry1 = ScheduleEntry(
+            entryId = "entry_snooze_user1",
+            userId = testUser.userId,
+            medicineId = medA.medicineId,
+            scheduledDateTime = scheduledTime,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        val entry2 = ScheduleEntry(
+            entryId = "entry_snooze_user2",
+            userId = secondUser.userId,
+            medicineId = secondMed.medicineId,
+            scheduledDateTime = scheduledTime,
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        database.scheduleDao().insertScheduleEntry(entry1)
+        database.scheduleDao().insertScheduleEntry(entry2)
+
+        val snoozeCohortUseCase = SnoozeCohortUseCase(database, context)
+        snoozeCohortUseCase.invoke(listOf(entry1.entryId, entry2.entryId), user = null)
+
+        val prefs = context.getSharedPreferences(com.example.dosezy.notifications.AlarmScheduler.PREFS_COORDINATION, Context.MODE_PRIVATE)
+        // Group entries for user 1 must only contain entry 1
+        val group1 = prefs.getString("snooze_group_ids_${entry1.entryId}", null)
+        assertNotNull("Group 1 must exist", group1)
+        assertTrue(group1!!.contains(entry1.entryId))
+        assertFalse(group1.contains(entry2.entryId))
+
+        // Group entries for user 2 must only contain entry 2
+        val group2 = prefs.getString("snooze_group_ids_${entry2.entryId}", null)
+        assertNotNull("Group 2 must exist", group2)
+        assertTrue(group2!!.contains(entry2.entryId))
+        assertFalse(group2.contains(entry1.entryId))
+
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
+        val shadowAm = org.robolectric.Shadows.shadowOf(alarmManager)
+        assertTrue(shadowAm.scheduledAlarms.size >= 2)
     }
 }
 

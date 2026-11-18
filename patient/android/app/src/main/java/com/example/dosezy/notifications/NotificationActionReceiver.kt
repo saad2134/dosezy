@@ -112,7 +112,16 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 }
             }
         }
-        val finalAllIds = targetIds.distinct()
+        // Guard: Filter targetIds strictly to primaryEntry profile to prevent cross-profile notification hijacking and pollution (#BUG-RECEIVER-PROFILE-ISOLATION)
+        val targetUserId = firstEntry?.userId
+        val userEntries = if (targetUserId != null) {
+            targetIds.mapNotNull { database.scheduleDao().getScheduleEntryById(it) }
+                .filter { it.userId == targetUserId }
+                .map { it.entryId }
+        } else {
+            targetIds
+        }
+        val finalAllIds = userEntries.distinct()
 
         val alarmScheduler = AlarmScheduler(context)
         finalAllIds.forEach { id ->
@@ -182,8 +191,9 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 val notifAlarmScheduler = AlarmScheduler(context)
                 finalAllIds.forEach { id ->
                     val entry = database.scheduleDao().getScheduleEntryById(id)
-                    val entryUser = user ?: entry?.let { database.userDao().getUserByIdDirect(it.userId) }
-                    val lateAfter = entryUser?.considerLateAfter ?: 3
+                    // Guard: Resolve user per entry to prevent defaulting to primary profile lateAfter threshold (#BUG-RECEIVER-ENTRY-USER)
+                    val entryUser = entry?.let { database.userDao().getUserByIdDirect(it.userId) } ?: user
+                    val lateAfter = entryUser?.lateAfterMinutes ?: 180
                     // Guard: Use isTakenLate so doses taken past missedAfter are recorded as TAKEN_LATE rather than TAKEN_ON_TIME
                     val status = if (entry != null && com.example.dosezy.utils.TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, lateAfter)) {
                         "TAKEN_LATE"
@@ -198,9 +208,9 @@ class NotificationActionReceiver : BroadcastReceiver() {
                     scheduleRepository.recordDoseTaken(id, status, takenAt, context, notes = null, syncSlotNotification = false)
                 }
 
-                // Guard: Coordinate slot notification sync and disarm alarms across each distinct time slot in finalAllIds to prevent leaking alarms or shade entries (#BUG-RECEIVER-MULTI-SLOT)
+                // Guard: Coordinate slot notification sync and disarm alarms across each distinct profile and time slot in finalAllIds to prevent leaking alarms or shade entries (#BUG-RECEIVER-MULTI-SLOT)
                 val entries = finalAllIds.mapNotNull { database.scheduleDao().getScheduleEntryById(it) }
-                val distinctSlots = entries.distinctBy { it.scheduledDateTime.withSecond(0).withNano(0) }
+                val distinctSlots = entries.distinctBy { Pair(it.userId, it.scheduledDateTime.withSecond(0).withNano(0)) }
                 if (distinctSlots.isNotEmpty()) {
                     distinctSlots.forEach { slotEntry ->
                         scheduleRepository.syncSlotNotificationAndAlarms(slotEntry.entryId, slotEntry, context)
@@ -230,7 +240,6 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 val user = firstEntry?.let { database.userDao().getUserByIdDirect(it.userId) }
                 // Guard: Read explicit dynamic snooze duration from intent if passed, else fallback to user preference (#103)
                 val intentSnoozeMinutes = intent?.getIntExtra(MedicineAlarmReceiver.EXTRA_SNOOZE_MINUTES, -1) ?: -1
-                val snoozeMinutes = if (intentSnoozeMinutes > 0) intentSnoozeMinutes else (user?.snoozeDuration ?: 10)
 
                 val medicineNames = finalAllIds.mapNotNull { id ->
                     val entry = database.scheduleDao().getScheduleEntryById(id)
@@ -238,12 +247,16 @@ class NotificationActionReceiver : BroadcastReceiver() {
                     med?.medicationName
                 }
 
-                // Guard: Pass user's timeFormat and userId so snoozed alarm matches time format and routes to correct profile on tap
-                alarmScheduler.scheduleGroupedSnooze(finalAllIds, snoozeMinutes, medicineNames, timeFormat = user?.timeFormat, userId = user?.userId)
-                Log.d(TAG, "Medicine reminder snoozed for $snoozeMinutes minutes for ${finalAllIds.size} entries")
-                try {
-                    com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
-                } catch (_: Exception) {}
+                // Guard: Delegate to SnoozeCohortUseCase to partition multi-profile cohorts and enforce per-profile snooze preferences and routing (#BUG-NOTIF-SNOOZE-COHORT)
+                val fallbackMed = firstEntry?.let { database.medicineDao().getMedicineByIdDirect(it.medicineId)?.medicationName } ?: "Medicine"
+                val snoozeCohortUseCase = com.example.dosezy.domain.usecases.SnoozeCohortUseCase(database, context)
+                snoozeCohortUseCase(
+                    entryIds = finalAllIds,
+                    explicitSnoozeMinutes = if (intentSnoozeMinutes > 0) intentSnoozeMinutes else null,
+                    fallbackMedicineName = fallbackMed,
+                    medicineNames = medicineNames,
+                    user = user
+                )
             }
             else -> {
                 Log.w(TAG, "Unknown action received: $action for entry: $primaryEntryId")

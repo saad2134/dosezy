@@ -29,8 +29,8 @@ class VariableDosageTest {
             frequency = Frequency(FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
             customDosages = customDosages,
-            currentStock = 100,
-            refillThreshold = 10,
+            currentStock = 100.0,
+            refillThreshold = 10.0,
             autoDeductOnTake = true
         )
     }
@@ -79,13 +79,13 @@ class VariableDosageTest {
         )
 
         // Morning: 2 tablets taken -> deducts 2
-        assertEquals(2, medTablets.getStockDeductionAmount(LocalTime.of(8, 0)))
+        assertEquals(2.0, medTablets.getStockDeductionAmount(LocalTime.of(8, 0)), 0.001)
 
         // Evening: 1 tablet taken -> deducts 1
-        assertEquals(1, medTablets.getStockDeductionAmount(LocalTime.of(20, 0)))
+        assertEquals(1.0, medTablets.getStockDeductionAmount(LocalTime.of(20, 0)), 0.001)
 
         // Fallback without time -> base dosage (1 tablet)
-        assertEquals(1, medTablets.getStockDeductionAmount(null))
+        assertEquals(1.0, medTablets.getStockDeductionAmount(null), 0.001)
     }
 
     @Test

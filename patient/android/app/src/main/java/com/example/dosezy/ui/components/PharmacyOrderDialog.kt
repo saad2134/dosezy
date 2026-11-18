@@ -109,8 +109,8 @@ fun PharmacyOrderDialog(
     val lowStockMedicines = remember(activeMedicines) {
         activeMedicines.filter { med ->
             val stock = med.currentStock ?: return@filter false
-            val threshold = med.refillThreshold ?: 0
-            stock <= threshold || stock <= 5
+            val threshold = med.refillThreshold ?: 0.0
+            stock <= threshold || stock <= 5.0
         }
     }
 
@@ -560,12 +560,13 @@ fun PharmacyOrderDialog(
                                         if (includeStockInOrder && med.currentStock != null) {
                                             // Guard: Use localized unit strings instead of hardcoded English words to ensure full localization coverage
                                             val stockUnitStr = if (isBottle) {
-                                                if (med.currentStock > 1) stringResource(R.string.unit_bottles) else stringResource(R.string.unit_bottle)
+                                                if (med.currentStock > 1.0) stringResource(R.string.unit_bottles) else stringResource(R.string.unit_bottle)
                                             } else {
                                                 med.dosageUnit.getLocalizedName()
                                             }
+                                            val stockStr = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(med.currentStock)
                                             Text(
-                                                text = stringResource(R.string.pharmacy_order_current_stock, med.currentStock, stockUnitStr),
+                                                text = stringResource(R.string.pharmacy_order_current_stock, stockStr, stockUnitStr),
                                                 style = MaterialTheme.typography.labelSmall,
                                                 color = MaterialTheme.colorScheme.outline
                                             )
@@ -641,8 +642,8 @@ fun PharmacyOrderDialog(
                                     val profileMeds = (allProfilesMedicines[profileUser.userId] ?: emptyList()).filter { med ->
                                         if (onlyLowStock) {
                                             val stock = med.currentStock ?: return@filter false
-                                            val threshold = med.refillThreshold ?: 0
-                                            stock <= threshold || stock <= 5
+                                            val threshold = med.refillThreshold ?: 0.0
+                                            stock <= threshold || stock <= 5.0
                                         } else true
                                     }
                                     if (profileMeds.isNotEmpty()) {

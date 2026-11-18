@@ -71,10 +71,26 @@ object IntakeSafeguardManager {
                     medicineName = state.medicineName,
                     entryIds = state.entryIds,
                     medicineNames = state.medicineNames,
-                    scheduledTime = state.scheduledTime
+                    scheduledTime = state.scheduledTime,
+                    userId = state.userId
                 )
             } else {
                 _activeCountdown.value = state
+                // Guard: Re-arm exact AlarmManager wakeup and restore shade notification on device boot/restart to prevent dropping safeguard alarm (#BUG-SAFEGUARD-BOOT-RESTORE)
+                val scheduler = AlarmScheduler(context)
+                scheduler.scheduleIntakeSafeguardAlarm(
+                    entryId = state.entryId,
+                    triggerTime = state.targetTimestamp,
+                    medicineName = state.medicineName,
+                    entryIds = ArrayList(state.entryIds),
+                    medicineNames = ArrayList(state.medicineNames),
+                    scheduledTime = state.scheduledTime,
+                    userId = state.userId
+                )
+                showIntakeNotification(context, state)
+                try {
+                    com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
+                } catch (_: Exception) {}
             }
         }
     }
@@ -191,7 +207,7 @@ object IntakeSafeguardManager {
         current.entryIds.forEach { id ->
             val entry = database.scheduleDao().getScheduleEntryById(id)
             val user = entry?.let { database.userDao().getUserByIdDirect(it.userId) }
-            val lateAfter = user?.considerLateAfter ?: 3
+            val lateAfter = user?.lateAfterMinutes ?: 180
             val status = if (entry != null && TimeCalculationUtils.isTakenLate(entry.scheduledDateTime, now, lateAfter)) {
                 "TAKEN_LATE"
             } else {
@@ -204,10 +220,10 @@ object IntakeSafeguardManager {
             scheduler.cancelSnooze(id)
         }
 
-        // Guard: Reconcile slot notifications and disarm alarms for every distinct slot across entryIds to prevent leaking non-primary slot notifications and alarms (#BUG-SAFEGUARD-MULTI-SLOT)
+        // Guard: Reconcile slot notifications and disarm alarms for every distinct profile and slot across entryIds to prevent leaking non-primary slot notifications and alarms (#BUG-SAFEGUARD-MULTI-SLOT)
         try {
             val entries = current.entryIds.mapNotNull { database.scheduleDao().getScheduleEntryById(it) }
-            val distinctSlots = entries.distinctBy { it.scheduledDateTime.withSecond(0).withNano(0) }
+            val distinctSlots = entries.distinctBy { Pair(it.userId, it.scheduledDateTime.withSecond(0).withNano(0)) }
             if (distinctSlots.isNotEmpty()) {
                 distinctSlots.forEach { slotEntry ->
                     scheduleRepository.syncSlotNotificationAndAlarms(slotEntry.entryId, slotEntry, context)
@@ -302,7 +318,13 @@ object IntakeSafeguardManager {
                     isAlarmMode = isAlarmMode
                 )
 
-                if (user != null && user.naggingRemindersEnabled) {
+                // Guard: Re-arm nagging reminder only if cancelled dose has not exceeded missed threshold to prevent phantom nagging alarms on overdue doses (#BUG-SAFEGUARD-CANCEL-OVERDUE)
+                val isMissed = user != null && com.example.dosezy.utils.TimeCalculationUtils.isMissed(
+                    primary.scheduledDateTime,
+                    java.time.LocalDateTime.now(),
+                    user.missedAfterMinutes
+                )
+                if (user != null && user.naggingRemindersEnabled && !isMissed) {
                     val scheduler = AlarmScheduler(context)
                     scheduler.scheduleNaggingReminder(
                         entryId = primary.entryId,
@@ -343,11 +365,20 @@ object IntakeSafeguardManager {
         val newPrimary = remainingIds.first()
         val newMedName = remainingMedNames.joinToString(", ")
 
+        // Guard: Resolve user ID for new primary entry to preserve profile isolation when cohort entries cross user profiles (#BUG-SAFEGUARD-PROFILE-RECONCILE)
+        val resolvedUserId = try {
+            kotlinx.coroutines.runBlocking(Dispatchers.IO) {
+                val db = DosezyDatabase.getInstance(context)
+                db.scheduleDao().getScheduleEntryById(newPrimary)?.userId
+            }
+        } catch (_: Exception) { null } ?: current.userId
+
         val updatedState = current.copy(
             entryId = newPrimary,
             entryIds = remainingIds,
             medicineName = newMedName,
-            medicineNames = remainingMedNames
+            medicineNames = remainingMedNames,
+            userId = resolvedUserId
         )
         saveState(context, updatedState)
         _activeCountdown.value = updatedState
@@ -363,7 +394,7 @@ object IntakeSafeguardManager {
                     entryIds = ArrayList(remainingIds),
                     medicineNames = ArrayList(remainingMedNames),
                     scheduledTime = current.scheduledTime,
-                    userId = current.userId
+                    userId = resolvedUserId
                 )
                 dismissIntakeNotification(context, current.entryId)
             }
@@ -385,6 +416,7 @@ object IntakeSafeguardManager {
         entryIds: List<String>?,
         medicineNames: List<String>?,
         scheduledTime: String?,
+        userId: String? = null,
         onComplete: (() -> Unit)? = null
     ) {
         dismissIntakeNotification(context, entryId)
@@ -402,22 +434,45 @@ object IntakeSafeguardManager {
                 val validPendingEntries = allTargetIds.mapNotNull { db.scheduleDao().getScheduleEntryById(it) }
                     .filter { it.status == com.example.dosezy.data.model.MedicationStatus.PENDING || it.status == com.example.dosezy.data.model.MedicationStatus.MISSED }
 
-                // Guard: Re-alert if any cohort entry remains unconfirmed to prevent silent cancellation when anchor entry is taken or deleted (#BUG-SAFEGUARD-COHORT-ALERT)
+                // Guard: Partition unconfirmed entries by profile so each patient receives isolated re-alert with their own settings (#BUG-SAFEGUARD-MULTIUSER)
                 if (validPendingEntries.isNotEmpty()) {
-                    val activePrimary = validPendingEntries.first()
-                    val activeEntryIds = ArrayList(validPendingEntries.map { it.entryId })
-                    val activeNames = ArrayList(validPendingEntries.mapNotNull { e ->
-                        db.medicineDao().getMedicineByIdDirect(e.medicineId)?.medicationName
-                    }.ifEmpty { if (!medicineNames.isNullOrEmpty()) medicineNames else listOf(medicineName) })
-                    val effectiveName = if (activeNames.isNotEmpty()) activeNames.joinToString(", ") else medicineName
-                    Log.d(TAG, "Safeguard timer expired for unconfirmed entries: $activeEntryIds; re-alerting user")
-                    val user = db.userDao().getUserByIdDirect(activePrimary.userId)
+                    val entriesByUser = validPendingEntries.groupBy { it.userId }
+                    entriesByUser.forEach { (entryUserId, userEntries) ->
+                        val activePrimary = userEntries.first()
+                        val activeEntryIds = ArrayList(userEntries.map { it.entryId })
+                        val activeNames = ArrayList(userEntries.mapNotNull { e ->
+                            db.medicineDao().getMedicineByIdDirect(e.medicineId)?.medicationName
+                        }.ifEmpty { if (!medicineNames.isNullOrEmpty()) medicineNames else listOf(medicineName) })
+                        val effectiveName = if (activeNames.isNotEmpty()) activeNames.joinToString(", ") else medicineName
+                        Log.d(TAG, "Safeguard timer expired for unconfirmed entries: $activeEntryIds (user: $entryUserId); re-alerting user")
+                        val user = db.userDao().getUserByIdDirect(entryUserId)
+                        val defaultReminderType = user?.reminderType ?: com.example.dosezy.data.model.ReminderType.ALARM
+                        // Guard: Respect per-medicine reminderType overrides across cohort so critical medications trigger full alarms on safeguard expiry (#111)
+                        val isAlarmMode = userEntries.any { e ->
+                            val m = db.medicineDao().getMedicineByIdDirect(e.medicineId)
+                            val effectiveType = m?.reminderType ?: defaultReminderType
+                            effectiveType == com.example.dosezy.data.model.ReminderType.ALARM
+                        }
+                        MedicineAlarmReceiver.triggerReAlert(
+                            context = context,
+                            entryId = activePrimary.entryId,
+                            medicineName = effectiveName,
+                            entryIds = activeEntryIds,
+                            medicineNames = activeNames,
+                            scheduledTime = scheduledTime,
+                            user = user,
+                            isAlarmModeOverride = isAlarmMode
+                        )
+                    }
+                } else if (!userId.isNullOrBlank()) {
+                    // Guard: Fallback re-alert when database entries are unavailable but target user profile is explicitly known (#BUG-SAFEGUARD-USER-ID)
+                    val user = db.userDao().getUserByIdDirect(userId)
                     MedicineAlarmReceiver.triggerReAlert(
                         context = context,
-                        entryId = activePrimary.entryId,
-                        medicineName = effectiveName,
-                        entryIds = activeEntryIds,
-                        medicineNames = activeNames,
+                        entryId = entryId,
+                        medicineName = medicineName,
+                        entryIds = if (!entryIds.isNullOrEmpty()) ArrayList(entryIds) else arrayListOf(entryId),
+                        medicineNames = if (!medicineNames.isNullOrEmpty()) ArrayList(medicineNames) else arrayListOf(medicineName),
                         scheduledTime = scheduledTime,
                         user = user
                     )
@@ -482,20 +537,22 @@ object IntakeSafeguardManager {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Guard: Resolve profile or app language context so countdown shade title, description, and action buttons match user profile locale (#BUG-INTAKE-LOCALE)
-        val targetLanguage = state.userId?.let { uid ->
+        // Guard: Resolve profile or app language context and lockscreen privacy settings so countdown shade matches target profile (#BUG-INTAKE-LOCALE)
+        val targetUser = state.userId?.let { uid ->
             try {
                 kotlinx.coroutines.runBlocking(Dispatchers.IO) {
                     kotlinx.coroutines.withTimeoutOrNull(500L) {
-                        DosezyDatabase.getInstance(context).userDao().getUserByIdDirect(uid)?.language
+                        DosezyDatabase.getInstance(context).userDao().getUserByIdDirect(uid)
                     }
                 }
             } catch (_: Exception) { null }
-        } ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+        }
+        val targetLanguage = targetUser?.language ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
         val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, targetLanguage)
 
         val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-        val allowLockscreenDetails = prefs.getBoolean("lockscreen_details_enabled", true)
+        // Guard: Check target user profile lockscreenDetailsEnabled and global preference to prevent medicine leak on locked screens
+        val allowLockscreenDetails = (targetUser?.lockscreenDetailsEnabled ?: true) && prefs.getBoolean("lockscreen_details_enabled", true)
 
         val appIconBitmap = runCatching {
             BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)
@@ -587,6 +644,9 @@ object IntakeSafeguardManager {
         }
         editor.apply()
     }
+
+    // Guard: Expose persisted countdown state so lifecycle callers can check and clear background countdowns even if in-memory StateFlow was lost
+    fun getPersistedState(context: Context): IntakeCountdownState? = restoreState(context)
 
     private fun restoreState(context: Context): IntakeCountdownState? {
         val prefs = context.getSharedPreferences(PREFS_SAFEGUARD, Context.MODE_PRIVATE)

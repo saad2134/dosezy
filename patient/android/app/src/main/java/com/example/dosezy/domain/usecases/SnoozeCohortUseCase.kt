@@ -59,43 +59,55 @@ class SnoozeCohortUseCase @Inject constructor(
             }
         } catch (_: Exception) {}
 
-        // Guard: Resolve user entity upfront if null so explicit snooze durations preserve user's preferred timeFormat and userId (#BUG-SNOOZE-USER-RESOLVE)
-        val resolvedUser = user ?: entryIds.firstNotNullOfOrNull { id ->
-            database.scheduleDao().getScheduleEntryById(id)?.let { entry ->
-                database.userDao().getUserByIdDirect(entry.userId)
+        // Guard: Partition snooze scheduling by user profile so each patient receives an isolated snooze alarm matching their time format and preferences (#BUG-SNOOZE-MULTIUSER-PARTITION)
+        val entries = entryIds.mapNotNull { database.scheduleDao().getScheduleEntryById(it) }
+        val entriesByUser = entries.groupBy { it.userId }
+
+        if (entriesByUser.isNotEmpty()) {
+            entriesByUser.forEach { (userId, userEntries) ->
+                val entryUser = database.userDao().getUserByIdDirect(userId) ?: user
+                val snoozeMins = if (explicitSnoozeMinutes != null && explicitSnoozeMinutes > 0) {
+                    explicitSnoozeMinutes
+                } else {
+                    entryUser?.snoozeDuration ?: 10
+                }
+                val userEntryIds = userEntries.map { it.entryId }
+                val userMedNames = userEntries.mapNotNull { e ->
+                    database.medicineDao().getMedicineByIdDirect(e.medicineId)?.medicationName
+                }.ifEmpty { listOf(fallbackMedicineName) }
+
+                alarmScheduler.scheduleGroupedSnooze(
+                    entryIds = userEntryIds,
+                    minutes = snoozeMins,
+                    medicineNames = userMedNames,
+                    timeFormat = entryUser?.timeFormat,
+                    userId = userId
+                )
             }
-        }
-
-        val finalSnoozeMinutes = if (explicitSnoozeMinutes != null && explicitSnoozeMinutes > 0) {
-            explicitSnoozeMinutes
         } else {
-            resolvedUser?.snoozeDuration ?: 10
-        }
-
-        val names = if (!medicineNames.isNullOrEmpty()) {
-            medicineNames
-        } else if (fallbackMedicineName.isNotBlank() && fallbackMedicineName != "Medicine") {
-            listOf(fallbackMedicineName)
-        } else {
-            val queried = entryIds.mapNotNull { id ->
-                val entry = database.scheduleDao().getScheduleEntryById(id)
-                val med = entry?.let { database.medicineDao().getMedicineByIdDirect(it.medicineId) }
-                med?.medicationName
+            val resolvedUser = user
+            val finalSnoozeMinutes = if (explicitSnoozeMinutes != null && explicitSnoozeMinutes > 0) {
+                explicitSnoozeMinutes
+            } else {
+                resolvedUser?.snoozeDuration ?: 10
             }
-            if (queried.isNotEmpty()) queried else listOf(fallbackMedicineName)
+            val names = if (!medicineNames.isNullOrEmpty()) {
+                medicineNames
+            } else {
+                listOf(fallbackMedicineName)
+            }
+            alarmScheduler.scheduleGroupedSnooze(
+                entryIds = entryIds,
+                minutes = finalSnoozeMinutes,
+                medicineNames = names,
+                timeFormat = resolvedUser?.timeFormat,
+                userId = resolvedUser?.userId
+            )
         }
-
-        alarmScheduler.scheduleGroupedSnooze(
-            entryIds = entryIds,
-            minutes = finalSnoozeMinutes,
-            medicineNames = names,
-            timeFormat = resolvedUser?.timeFormat,
-            userId = resolvedUser?.userId
-        )
         // Guard: Refresh app widgets to reflect updated snooze status immediately
         try {
             com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
         } catch (_: Exception) {}
-        Log.d(TAG, "Scheduled snooze for ${entryIds.size} medicines for $finalSnoozeMinutes minutes")
+        Log.d(TAG, "Scheduled snooze for ${entryIds.size} medicines (explicit: $explicitSnoozeMinutes)")
     }
 }

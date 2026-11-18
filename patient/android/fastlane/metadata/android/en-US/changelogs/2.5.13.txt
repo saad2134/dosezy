@@ -1,0 +1,3 @@
+* Custom medicine reordering and sorting presets (schedule, alphabetical, next due), plus support for half and fractional dosages.
+* Multi-profile alarm and snooze coordination with continuous repeat reminders and configurable sub-hour late notification intervals.
+* Refined squircle UI frames across all screens, atomic PRN dose recording, profile-specific lock screen masking, and memory optimizations.

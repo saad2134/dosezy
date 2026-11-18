@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -216,9 +215,9 @@ fun ProfilePicturePicker(
                 contentScale = ContentScale.Crop
             )
             
-            // Remove Picture Button
+            // Remove Picture Button (Squircle badge)
             Surface(
-                shape = CircleShape,
+                shape = RoundedCornerShape(10.dp),
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -242,8 +241,9 @@ fun ProfilePicturePicker(
                 }
             }
         } else {
+            // Empty placeholder container (Squircle frame)
             Surface(
-                shape = CircleShape,
+                shape = RoundedCornerShape(24.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline),
                 modifier = Modifier.size(128.dp)
@@ -259,9 +259,9 @@ fun ProfilePicturePicker(
             }
         }
 
-        // Camera Icon Overlay
+        // Camera Icon Overlay (Squircle badge)
         Surface(
-            shape = CircleShape,
+            shape = RoundedCornerShape(12.dp),
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -394,27 +394,12 @@ internal fun createImageFile(context: Context): Pair<Uri, File>? {
 // Guard: Backward compatible helper delegating to createImageFile
 fun createImageFileUri(context: Context): Uri? = createImageFile(context)?.first
 
-// Utility function to save image to internal storage
+// Utility function to save image to internal storage with bitmap downsampling
 private fun saveImageToInternalStorage(context: Context, uri: Uri): String {
-    return try {
-        val inputStream = context.contentResolver.openInputStream(uri)
-            ?: throw IllegalStateException("Cannot open input stream")
-
-        val timeStamp = System.currentTimeMillis()
-        val file = File(context.filesDir, "profile_$timeStamp.jpg")
-
-        inputStream.use { input ->
-            file.outputStream().use { output ->
-                input.copyTo(output)
-            }
-        }
-
-        Log.d("ProfilePicturePicker", "Image saved to: ${file.absolutePath}")
-        file.absolutePath
-    } catch (e: Exception) {
-        Log.e("ProfilePicturePicker", "Error saving image: ${e.message}", e)
-        throw e
-    }
+    val timeStamp = System.currentTimeMillis()
+    val file = File(context.filesDir, "profile_$timeStamp.jpg")
+    // Guard: Downsample camera and gallery images to max 1024x1024 to prevent memory OOM and reduce storage footprint
+    return com.example.dosezy.utils.ImageUtils.saveDownsampledImage(context, uri, file)
 }
 
 // Guard: Validate canonicalPath against context.filesDir and context.cacheDir to prevent path traversal and arbitrary sandbox file deletion
@@ -588,10 +573,10 @@ fun MedicinePhotoVisualPicker(
             }
         }
 
-        // Top-Right: Remove photo button (if photo exists)
+        // Top-Right: Remove photo button (if photo exists - Squircle badge)
         if (!imagePath.isNullOrEmpty()) {
             Surface(
-                shape = CircleShape,
+                shape = RoundedCornerShape(10.dp),
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -616,9 +601,9 @@ fun MedicinePhotoVisualPicker(
             }
         }
 
-        // Bottom-Right: Camera/Photo Picker Button
+        // Bottom-Right: Camera/Photo Picker Button (Squircle badge)
         Surface(
-            shape = CircleShape,
+            shape = RoundedCornerShape(10.dp),
             color = MaterialTheme.colorScheme.primary,
             shadowElevation = 4.dp,
             modifier = Modifier
@@ -636,9 +621,9 @@ fun MedicinePhotoVisualPicker(
             }
         }
 
-        // Bottom-Left: Pill Shape & Visual Dialog Button (Around photo frame)
+        // Bottom-Left: Pill Shape & Visual Dialog Button (Squircle badge)
         Surface(
-            shape = CircleShape,
+            shape = RoundedCornerShape(10.dp),
             color = parseHexColor(pillColor),
             shadowElevation = 4.dp,
             border = BorderStroke(2.dp, Color.White),

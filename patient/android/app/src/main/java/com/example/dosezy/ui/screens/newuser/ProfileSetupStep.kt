@@ -50,6 +50,7 @@ import com.example.dosezy.R
 import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.User
 import com.example.dosezy.data.model.getLocalizedName
+import com.example.dosezy.data.model.normalizeArabicDigits
 import com.example.dosezy.ui.components.ProfilePicturePicker
 
 @Composable
@@ -73,7 +74,8 @@ fun ProfileSetupPage(
     var ageError by remember { mutableStateOf(false) }
     var genderError by remember { mutableStateOf(false) }
 
-    val parsedAge = age.toIntOrNull() ?: 0
+    // Guard: Normalize Arabic/Indic numerals before parsing age to prevent onboarding lockouts in Arabic locales
+    val parsedAge = age.normalizeArabicDigits().toIntOrNull() ?: 0
 
     // Check if form is valid
     val isFormValid = remember(fullName, parsedAge, gender) {
@@ -199,7 +201,7 @@ fun ProfileSetupPage(
                     onValueChange = {
                         if (it.all { char -> char.isDigit() } && it.length <= 3) {
                             age = it
-                            ageError = it.isBlank() || (it.toIntOrNull() ?: 0) <= 0
+                            ageError = it.isBlank() || (it.normalizeArabicDigits().toIntOrNull() ?: 0) <= 0
                         }
                     },
                     label = { Text(stringResource(R.string.profile_age) + " *") },
@@ -326,7 +328,8 @@ fun ProfileSetupPage(
                 fullName = fullName.trim(),
                 age = parsedAge,
                 gender = gender!!,
-                contactNumber = contactNumber.trim(),
+                // Guard: Normalize Arabic/Indic numerals in contact phone to maintain consistent ASCII digit storage
+                contactNumber = contactNumber.normalizeArabicDigits().trim(),
                 allergies = allergies.trim().ifBlank { null },
                 medicalConditions = medicalConditions.trim().ifBlank { null },
                 isCurrentUser = isDefaultUser

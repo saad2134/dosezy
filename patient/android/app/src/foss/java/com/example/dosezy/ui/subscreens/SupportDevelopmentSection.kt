@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
@@ -132,10 +131,11 @@ fun SupportDevelopmentSection() {
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // Squircle crypto donation card icon frame
                     Box(
                         modifier = Modifier
                             .size(44.dp)
-                            .clip(CircleShape)
+                            .clip(RoundedCornerShape(12.dp))
                             .background(Color(0xFFF7931A).copy(alpha = 0.12f)),
                         contentAlignment = Alignment.Center
                     ) {
@@ -263,10 +263,11 @@ fun CryptoAddressCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    // Squircle currency badge dot
                     Box(
                         modifier = Modifier
                             .size(10.dp)
-                            .clip(CircleShape)
+                            .clip(RoundedCornerShape(3.dp))
                             .background(badgeColor)
                     )
                     Spacer(modifier = Modifier.width(8.dp))

@@ -401,20 +401,28 @@ fun TimeFormatSelectionDialog(
 // Dialog Composable for Late After Selection
 @Composable
 fun LateAfterSelectionDialog(
-    currentHours: Int,
-    currentMissedHours: Int = 6,
-    onHoursSelected: (Int) -> Unit,
+    currentMinutes: Int,
+    currentMissedMinutes: Int = 360,
+    onMinutesSelected: (Int) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val maxLate = (currentMissedHours - 1).coerceIn(1, 8)
-    val hourOptionStrings = (1..maxLate).map { hours ->
-        stringResource(R.string.hours_format, hours) to hours
+    // Guard: Support granular sub-hour and hour-based late thresholds while enforcing currentMissedMinutes ceiling (#119)
+    val lateMinuteOptions = listOf(15, 30, 45, 60, 90, 120, 180, 240)
+    val validOptions = lateMinuteOptions.filter { it < currentMissedMinutes }
+    val optionStrings = validOptions.map { mins ->
+        val label = if (mins < 60 || mins % 60 != 0) {
+            stringResource(R.string.minutes_format, mins)
+        } else {
+            stringResource(R.string.hours_format, mins / 60)
+        }
+        label to mins
     }
+    val effectiveSelection = if (currentMinutes in validOptions) currentMinutes else (validOptions.lastOrNull() ?: 180)
     SelectionDialog(
         title = stringResource(R.string.pref_late_after),
-        options = hourOptionStrings,
-        currentSelection = currentHours.coerceIn(1, maxLate),
-        onOptionSelected = onHoursSelected,
+        options = optionStrings,
+        currentSelection = effectiveSelection,
+        onOptionSelected = onMinutesSelected,
         onDismiss = onDismiss
     )
 }
@@ -422,20 +430,28 @@ fun LateAfterSelectionDialog(
 // Dialog Composable for Missed After Selection
 @Composable
 fun MissedAfterSelectionDialog(
-    currentHours: Int,
-    currentLateHours: Int = 3,
-    onHoursSelected: (Int) -> Unit,
+    currentMinutes: Int,
+    currentLateMinutes: Int = 180,
+    onMinutesSelected: (Int) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val minMissed = (currentLateHours + 1).coerceIn(2, 9)
-    val hourOptionStrings = (minMissed..9).map { hours ->
-        stringResource(R.string.hours_format, hours) to hours
+    // Guard: Support granular sub-hour and multi-hour missed thresholds while enforcing currentLateMinutes floor (#119)
+    val missedMinuteOptions = listOf(30, 45, 60, 90, 120, 180, 240, 360, 480, 720)
+    val validOptions = missedMinuteOptions.filter { it > currentLateMinutes }
+    val optionStrings = validOptions.map { mins ->
+        val label = if (mins < 60 || mins % 60 != 0) {
+            stringResource(R.string.minutes_format, mins)
+        } else {
+            stringResource(R.string.hours_format, mins / 60)
+        }
+        label to mins
     }
+    val effectiveSelection = if (currentMinutes in validOptions) currentMinutes else (validOptions.firstOrNull() ?: 360)
     SelectionDialog(
         title = stringResource(R.string.pref_mark_missed_after),
-        options = hourOptionStrings,
-        currentSelection = currentHours.coerceIn(minMissed, 9),
-        onOptionSelected = onHoursSelected,
+        options = optionStrings,
+        currentSelection = effectiveSelection,
+        onOptionSelected = onMinutesSelected,
         onDismiss = onDismiss
     )
 }

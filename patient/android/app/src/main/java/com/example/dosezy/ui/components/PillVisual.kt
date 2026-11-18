@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -393,19 +392,19 @@ fun PillColorSelector(
                 Box(
                     modifier = Modifier
                         .size(48.dp)
-                        .clip(CircleShape)
+                        .clip(RoundedCornerShape(12.dp))
                         .clickable { onColorSelected(hex) },
                     contentAlignment = Alignment.Center
                 ) {
                     Box(
                         modifier = Modifier
                             .size(36.dp)
-                            .clip(CircleShape)
+                            .clip(RoundedCornerShape(10.dp))
                             .background(color)
                             .border(
                                 width = if (isSelected) 3.dp else 1.dp,
                                 color = if (isSelected) MaterialTheme.colorScheme.onSurface else Color.White.copy(alpha = 0.4f),
-                                shape = CircleShape
+                                shape = RoundedCornerShape(10.dp)
                             ),
                         contentAlignment = Alignment.Center
                     ) {
@@ -432,19 +431,19 @@ fun PillColorSelector(
                 Box(
                     modifier = Modifier
                         .size(48.dp)
-                        .clip(CircleShape)
+                        .clip(RoundedCornerShape(12.dp))
                         .clickable { onColorSelected(hex) },
                     contentAlignment = Alignment.Center
                 ) {
                     Box(
                         modifier = Modifier
                             .size(36.dp)
-                            .clip(CircleShape)
+                            .clip(RoundedCornerShape(10.dp))
                             .background(color)
                             .border(
                                 width = if (isSelected) 3.dp else 1.dp,
                                 color = if (isSelected) MaterialTheme.colorScheme.onSurface else Color.White.copy(alpha = 0.4f),
-                                shape = CircleShape
+                                shape = RoundedCornerShape(10.dp)
                             ),
                         contentAlignment = Alignment.Center
                     ) {

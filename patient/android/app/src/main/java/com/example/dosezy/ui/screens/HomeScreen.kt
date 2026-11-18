@@ -132,7 +132,7 @@ fun HomeScreen(
         currentUser?.let { user ->
             scheduleViewModel.autoMarkMissedMedications(
                 user.userId,
-                user.considerMissedAfter
+                user.missedAfterMinutes
             )
         }
         while (true) {
@@ -146,7 +146,7 @@ fun HomeScreen(
             currentUser?.let { user ->
                 scheduleViewModel.autoMarkMissedMedications(
                     user.userId,
-                    user.considerMissedAfter
+                    user.missedAfterMinutes
                 )
             }
         }
@@ -180,11 +180,20 @@ fun HomeScreen(
     // Check if there are any medications
     val hasMedications = todayEntries.isNotEmpty()
 
-    // Group entries by time
+    // Group entries by time and order intra-slot medicines according to user's custom or sorted medicine roster (#120)
     val timeFormat = currentUser?.timeFormat ?: TimeFormat.HOUR_12
-    val groupedEntries = remember(todayEntries, timeFormat, activeLocale) {
+    val groupedEntries = remember(todayEntries, userMedicines, timeFormat, activeLocale) {
+        val medOrderMap = userMedicines.mapIndexed { index, med -> med.medicineId to index }.toMap()
         todayEntries.groupBy { entry ->
             TimeFormatUtils.formatTime(entry.scheduleEntry.scheduledDateTime, timeFormat, activeLocale)
+        }.mapValues { (_, entries) ->
+            // Guard: Sort intra-slot entries using active medicine roster order so home dose cards follow user-defined sequence
+            entries.sortedWith(
+                compareBy(
+                    { medOrderMap[it.scheduleEntry.medicineId] ?: Int.MAX_VALUE },
+                    { it.medicine?.medicationName?.lowercase() ?: "" }
+                )
+            )
         }.toList().sortedBy { (_, entries) ->
             entries.firstOrNull()?.scheduleEntry?.scheduledDateTime
         }
@@ -192,7 +201,7 @@ fun HomeScreen(
 
     val executeTakeDose: (String, LocalDateTime, String?) -> Unit = { entryId, resolvedDateTime, note ->
         val medName = todayEntries.find { it.scheduleEntry.entryId == entryId }?.medicine?.medicationName ?: ""
-        val lateAfter = currentUser?.considerLateAfter ?: 3
+        val lateAfter = currentUser?.lateAfterMinutes ?: 180
         val targetScheduleEntry = todayEntries.find { it.scheduleEntry.entryId == entryId }?.scheduleEntry
         // Guard: Use isTakenLate so overdue doses past missedAfter are correctly recorded as TAKEN_LATE instead of reverting to on-time
         val isLate = if (targetScheduleEntry != null) {
@@ -712,7 +721,7 @@ fun HomeScreen(
                             )
                         } else {
                             val now = LocalDateTime.now()
-                            val lateAfter = user?.considerLateAfter ?: 3
+                            val lateAfter = user?.lateAfterMinutes ?: 180
                             scheduleViewModel.markCohortAsTaken(entryIds, now.toString(), lateAfter)
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar(
@@ -768,7 +777,7 @@ fun HomeScreen(
                         notes = trimmedNote
                     )
                 } else {
-                    val lateAfter = currentUser?.considerLateAfter ?: 3
+                    val lateAfter = currentUser?.lateAfterMinutes ?: 180
                     scheduleViewModel.markCohortAsTaken(entryIds, resolvedDateTime.toString(), lateAfter, notes = trimmedNote)
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar(
@@ -807,7 +816,7 @@ fun HomeScreen(
                         notes = trimmedNote
                     )
                 } else {
-                    val lateAfter = currentUser?.considerLateAfter ?: 3
+                    val lateAfter = currentUser?.lateAfterMinutes ?: 180
                     scheduleViewModel.markCohortAsTaken(entryIds, LocalDateTime.now().toString(), lateAfter, notes = trimmedNote)
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar(
@@ -832,7 +841,7 @@ fun HomeScreen(
                         notes = null
                     )
                 } else {
-                    val lateAfter = currentUser?.considerLateAfter ?: 3
+                    val lateAfter = currentUser?.lateAfterMinutes ?: 180
                     scheduleViewModel.markCohortAsTaken(entryIds, LocalDateTime.now().toString(), lateAfter, notes = null)
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar(

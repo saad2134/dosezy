@@ -24,7 +24,7 @@ class DataExportFormattingTest {
         unit: DosageUnit = DosageUnit.MG,
         freq: Frequency = Frequency(FrequencyPattern.DAILY),
         times: List<LocalTime> = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
-        stock: Int? = 40
+        stock: Double? = 40.0
     ) = Medicine(
         medicineId = "med_123",
         userId = "usr_1",
@@ -58,7 +58,8 @@ class DataExportFormattingTest {
         sb.append("1. *${med.medicationName}* ($dosageDisplay $strengthUnit)\n")
         sb.append("   • Needed for $supplyDays days: $totalNeeded $orderUnit\n")
         if (med.currentStock != null) {
-            sb.append("   • Current stock: ${med.currentStock} $orderUnit\n")
+            val stockDisplay = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(med.currentStock)
+            sb.append("   • Current stock: $stockDisplay $orderUnit\n")
         }
 
         val output = sb.toString()
@@ -75,7 +76,7 @@ class DataExportFormattingTest {
             dosage = 2.0,
             unit = DosageUnit.DROP,
             times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
-            stock = 25
+            stock = 25.0
         )
         val bottlesNeeded = med.calculateRefillQuantity(30)
         assertEquals(2, bottlesNeeded)
@@ -109,7 +110,7 @@ class DataExportFormattingTest {
             med.dosageUnit.name,
             med.getFrequencyDisplay(),
             med.timesPerDay.toString(),
-            med.currentStock?.toString() ?: "",
+            med.currentStock?.let { com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(it) } ?: "",
             escapeCsv(med.notes ?: "")
         ).joinToString(",")
 
@@ -130,14 +131,17 @@ class DataExportFormattingTest {
             name = "Metformin XR",
             dosage = 500.0,
             unit = DosageUnit.MG,
-            stock = 60
+            stock = 60.0
         ).copy(
-            refillThreshold = 10,
+            refillThreshold = 10.0,
             autoDeductOnTake = true,
             isArchived = false,
             customDosages = mapOf("08:00" to 2.0, "20:00" to 1.0)
         )
         val csv = com.example.dosezy.data.export.DataExporter.buildCsvContent(user, listOf(med), emptyList())
+
+        // Guard: Verify CSV starts with UTF-8 BOM (\uFEFF) to prevent mojibake in Microsoft Excel
+        assertTrue("CSV must start with UTF-8 BOM", csv.startsWith("\uFEFF"))
 
         // Verify CSV contains inventory columns in MEDICINES section
         assertTrue(csv.contains("Refill Threshold,Auto Deduct Stock,Is Archived,Custom Dosages"))
@@ -163,5 +167,36 @@ class DataExportFormattingTest {
         assertEquals("2", sorted[0].entryId)
         assertEquals("1", sorted[1].entryId)
         assertEquals("3", sorted[2].entryId)
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // 4. PDF Report Dosage Formatting for Schedule History Log
+    // ───────────────────────────────────────────────────────────────
+
+    @Test
+    fun pdfScheduleLog_formatsFractionalDoseOverridesWithVulgarFractions() {
+        val med = sampleMed(
+            name = "Clonazepam",
+            dosage = 1.0,
+            unit = DosageUnit.TABLET
+        )
+        val schFractional = ScheduleEntry(
+            entryId = "sch_half",
+            userId = "usr_1",
+            medicineId = med.medicineId,
+            scheduledDateTime = LocalDateTime.of(2026, 11, 10, 8, 0),
+            status = MedicationStatus.TAKEN_ON_TIME,
+            dosage = 0.5
+        )
+
+        val formattedDose = med.getDosageDisplay(schFractional.scheduledDateTime.toLocalTime(), schFractional.dosage)
+        assertEquals("½ tablet", formattedDose)
+
+        val schOneAndHalf = schFractional.copy(dosage = 1.5)
+        assertEquals("1½ tablet", med.getDosageDisplay(schOneAndHalf.scheduledDateTime.toLocalTime(), schOneAndHalf.dosage))
+
+        val liquidMed = sampleMed(name = "Cough Syrup", dosage = 5.0, unit = DosageUnit.ML)
+        val schLiquid = schFractional.copy(dosage = 2.5)
+        assertEquals("2.5 mL", liquidMed.getDosageDisplay(schLiquid.scheduledDateTime.toLocalTime(), schLiquid.dosage))
     }
 }

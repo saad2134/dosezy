@@ -35,6 +35,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -86,7 +87,7 @@ class DynamicSnoozeOptionsSelectorTest {
         timesPerDay = 1,
         frequency = Frequency(FrequencyPattern.DAILY),
         scheduledTimes = listOf(LocalTime.of(9, 0)),
-        currentStock = 20,
+        currentStock = 20.0,
         autoDeductOnTake = true
     )
 
@@ -99,6 +100,7 @@ class DynamicSnoozeOptionsSelectorTest {
         database = Room.inMemoryDatabaseBuilder(context, DosezyDatabase::class.java)
             .allowMainThreadQueries()
             .build()
+        DosezyDatabase.setInstance(database)
         scheduleRepository = ScheduleRepository(database)
         userRepository = UserRepository(database)
 
@@ -318,5 +320,100 @@ class DynamicSnoozeOptionsSelectorTest {
         currentOnConfirmed = frame2Callback
         currentOnConfirmed()
         assertEquals(30, confirmedMinutes)
+    }
+
+    @Test
+    fun testNotificationActionReceiver_snoozeAction_snoozesUserAWithoutHijackingUserB(): Unit = runBlocking {
+        // Guard: Verify NotificationActionReceiver isolates snooze action to the active notification profile and delegates to SnoozeCohortUseCase (#BUG-NOTIF-SNOOZE-COHORT)
+        val userA = User(
+            userId = "user_notif_snooze_A",
+            fullName = "Patient Notif A",
+            age = 35,
+            gender = Gender.FEMALE,
+            contactNumber = "+11223344",
+            snoozeDuration = 5
+        )
+        val userB = User(
+            userId = "user_notif_snooze_B",
+            fullName = "Patient Notif B",
+            age = 45,
+            gender = Gender.MALE,
+            contactNumber = "+55667788",
+            snoozeDuration = 15
+        )
+        database.userDao().insertUser(userA)
+        database.userDao().insertUser(userB)
+
+        val medA = Medicine(
+            medicineId = "med_notif_snooze_A",
+            userId = userA.userId,
+            medicationName = "Medication Alpha",
+            dosage = 10.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+        val medB = Medicine(
+            medicineId = "med_notif_snooze_B",
+            userId = userB.userId,
+            medicationName = "Medication Beta",
+            dosage = 20.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+        database.medicineDao().insertMedicine(medA)
+        database.medicineDao().insertMedicine(medB)
+
+        val entryA = ScheduleEntry(
+            entryId = "entry_notif_snooze_A",
+            userId = userA.userId,
+            medicineId = medA.medicineId,
+            scheduledDateTime = LocalDateTime.now().minusMinutes(2),
+            status = MedicationStatus.PENDING
+        )
+        val entryB = ScheduleEntry(
+            entryId = "entry_notif_snooze_B",
+            userId = userB.userId,
+            medicineId = medB.medicineId,
+            scheduledDateTime = LocalDateTime.now().minusMinutes(2),
+            status = MedicationStatus.PENDING
+        )
+        database.scheduleDao().insertScheduleEntry(entryA)
+        database.scheduleDao().insertScheduleEntry(entryB)
+
+        val receiver = NotificationActionReceiver()
+        val intent = Intent().apply {
+            action = "SNOOZE_ACTION"
+            putExtra(MedicineAlarmReceiver.EXTRA_ENTRY_ID, entryA.entryId)
+            putStringArrayListExtra(MedicineAlarmReceiver.EXTRA_ENTRY_IDS, arrayListOf(entryA.entryId, entryB.entryId))
+        }
+
+        receiver.onReceive(context, intent)
+
+        var pendingIntentA: android.app.PendingIntent? = null
+        val deadline = System.currentTimeMillis() + 2000
+        while (pendingIntentA == null && System.currentTimeMillis() < deadline) {
+            Thread.sleep(50)
+            pendingIntentA = android.app.PendingIntent.getBroadcast(
+                context,
+                entryA.entryId.hashCode() + 1000,
+                Intent(context, MedicineAlarmReceiver::class.java),
+                android.app.PendingIntent.FLAG_NO_CREATE or android.app.PendingIntent.FLAG_IMMUTABLE
+            )
+        }
+
+        assertNotNull("Snooze alarm must be scheduled for User A", pendingIntentA)
+
+        // Verify User B's entry was not hijacked into User A's snooze alarm
+        val pendingIntentB = android.app.PendingIntent.getBroadcast(
+            context,
+            entryB.entryId.hashCode() + 1000,
+            Intent(context, MedicineAlarmReceiver::class.java),
+            android.app.PendingIntent.FLAG_NO_CREATE or android.app.PendingIntent.FLAG_IMMUTABLE
+        )
+        assertNull("User B entry must not be hijacked by User A notification snooze action", pendingIntentB)
     }
 }

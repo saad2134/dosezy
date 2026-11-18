@@ -22,13 +22,13 @@ android {
         applicationId = "com.saad2134.dosezy"
         minSdk = 24
         targetSdk = 36
-        versionCode = 37
-        versionName = "2.5.12"
+        versionCode = 38
+        versionName = "2.5.13"
         buildConfigField("String", "VERSION_NAME", "\"$versionName\"")
         buildConfigField("int", "VERSION_CODE", "$versionCode")
 
         ndk {
-            debugSymbolLevel = "FULL"
+            debugSymbolLevel = "SYMBOL_TABLE"
         }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -43,7 +43,7 @@ android {
         create("play") {
             dimension = "distribution"
             buildConfigField("boolean", "SHOW_DONATIONS", "false")
-            buildConfigField("boolean", "SUPPORTS_OVERLAY_PERMISSION", "false")
+            buildConfigField("boolean", "SUPPORTS_OVERLAY_PERMISSION", "true")
         }
         create("foss") {
             dimension = "distribution"
@@ -84,6 +84,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
         }
         debug {
             isMinifyEnabled = false
@@ -92,6 +95,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
         }
     }
 

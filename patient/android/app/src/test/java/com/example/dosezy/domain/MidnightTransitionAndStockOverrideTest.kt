@@ -158,23 +158,23 @@ class MidnightTransitionAndStockOverrideTest {
             timesPerDay = 2,
             frequency = Frequency(FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
-            currentStock = 30,
+            currentStock = 30.0,
             autoDeductOnTake = true
         )
 
         // Without override, standard 1 tablet is deducted
-        assertEquals(1, tabletMed.getStockDeductionAmount())
+        assertEquals(1.0, tabletMed.getStockDeductionAmount(), 0.001)
 
         // With dosage override of 2 tablets (custom slot or PRN dose), deduct 2 tablets
-        assertEquals(2, tabletMed.getStockDeductionAmount(dosageOverride = 2.0))
+        assertEquals(2.0, tabletMed.getStockDeductionAmount(dosageOverride = 2.0), 0.001)
 
         // Chemical strength (MG) always deducts 1 physical unit count
         val mgMed = tabletMed.copy(dosageUnit = DosageUnit.MG, dosage = 500.0)
-        assertEquals(1, mgMed.getStockDeductionAmount(dosageOverride = 1000.0))
+        assertEquals(1.0, mgMed.getStockDeductionAmount(dosageOverride = 1000.0), 0.001)
 
         // Liquid volume (ML) deducts specified milliliter amount
         val mlMed = tabletMed.copy(dosageUnit = DosageUnit.ML, dosage = 5.0)
-        assertEquals(15, mlMed.getStockDeductionAmount(dosageOverride = 15.0))
+        assertEquals(15.0, mlMed.getStockDeductionAmount(dosageOverride = 15.0), 0.001)
     }
 
     // ---------------------------------------------------------------------------------------------

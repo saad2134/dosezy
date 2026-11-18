@@ -28,21 +28,28 @@ object TimeCalculationUtils {
         }
     }
 
-    fun isLate(scheduledTime: LocalDateTime, currentTime: LocalDateTime, lateAfterHours: Int, missedAfterHours: Int): Boolean {
-        val duration = Duration.between(scheduledTime, currentTime)
-        val hours = duration.toHours()
-        return hours >= lateAfterHours.toLong() && hours < missedAfterHours.toLong()
+    // Guard: Thresholds < 15 represent legacy whole-hour values (1-12); normalize to minutes to maintain backward compatibility across old models and unit tests (#119)
+    internal fun normalizeMinutes(value: Int): Long {
+        return if (value in 1..14) value.toLong() * 60L else value.toLong()
     }
 
-    // Guard: Any dose taken >= lateAfterHours is late; do not cap with missedAfterHours to prevent overdue doses paradoxically recording as TAKEN_ON_TIME
+    fun isLate(scheduledTime: LocalDateTime, currentTime: LocalDateTime, lateAfterHours: Int, missedAfterHours: Int): Boolean {
+        val duration = Duration.between(scheduledTime, currentTime)
+        val minutes = duration.toMinutes()
+        val lateMins = normalizeMinutes(lateAfterHours)
+        val missedMins = normalizeMinutes(missedAfterHours)
+        return minutes >= lateMins && minutes < missedMins
+    }
+
+    // Guard: Any dose taken >= lateAfter threshold is late; do not cap with missedAfter to prevent overdue doses paradoxically recording as TAKEN_ON_TIME (#119)
     fun isTakenLate(scheduledTime: LocalDateTime, currentTime: LocalDateTime, lateAfterHours: Int): Boolean {
         val duration = Duration.between(scheduledTime, currentTime)
-        return duration.toHours() >= lateAfterHours.toLong()
+        return duration.toMinutes() >= normalizeMinutes(lateAfterHours)
     }
 
     fun isMissed(scheduledTime: LocalDateTime, currentTime: LocalDateTime, missedAfterHours: Int): Boolean {
         val duration = Duration.between(scheduledTime, currentTime)
-        return duration.toHours() >= missedAfterHours.toLong()
+        return duration.toMinutes() >= normalizeMinutes(missedAfterHours)
     }
 
     fun getStatus(

@@ -37,8 +37,8 @@ data class Medicine(
     val frequency: Frequency,
     val scheduledTimes: List<LocalTime>, // Multiple times per day
     val imageUri: String? = null,
-    val currentStock: Int? = null,
-    val refillThreshold: Int? = null,
+    val currentStock: Double? = null,
+    val refillThreshold: Double? = null,
     val autoDeductOnTake: Boolean = true,
     val notes: String? = null,
     val pillShape: PillShape = PillShape.ROUND,
@@ -93,30 +93,12 @@ data class Medicine(
     }
 
     /**
-     * Gets a display string for the dosage (e.g., "100 mg", "5 mL"), optionally for a specific scheduled time.
+     * Gets a display string for the dosage (e.g., "100 mg", "½ tablet", "1½ tablets"), optionally for a specific scheduled time or override.
      */
-    fun getDosageDisplay(time: LocalTime? = null): String {
-        val targetDosage = getDosageForTime(time)
-        val unitAbbr = when (dosageUnit) {
-            DosageUnit.MG -> "mg"
-            DosageUnit.MCG -> "mcg"
-            DosageUnit.ML -> "mL"
-            DosageUnit.DROP -> "drop"
-            DosageUnit.TABLET -> "tablet"
-            DosageUnit.CAPSULE -> "capsule"
-            // Support for mEq (electrolyte supplements), puffs/actuations (inhalers), ampules (single-use liquid), and spray (nasal/topical)
-            DosageUnit.MEQ -> "mEq"
-            DosageUnit.PUFF -> "puff"
-            DosageUnit.AMPULE -> "ampule"
-            DosageUnit.SPRAY -> "spray"
-        }
-
-        // Remove decimal if it's a whole number
-        return if (targetDosage % 1 == 0.0) {
-            "${targetDosage.toInt()} $unitAbbr"
-        } else {
-            "$targetDosage $unitAbbr"
-        }
+    fun getDosageDisplay(time: LocalTime? = null, dosageOverride: Double? = null): String {
+        // Guard: Use dosageOverride if provided (e.g. from ScheduleEntry) to reflect actual logged intake (#123)
+        val targetDosage = dosageOverride ?: getDosageForTime(time)
+        return com.example.dosezy.utils.DosageFormatUtils.formatDosageDisplay(targetDosage, dosageUnit)
     }
 
     /**
@@ -179,24 +161,23 @@ data class Medicine(
      *
      * - For solid medications measured by chemical strength (MG, MCG): physical stock is tracked
      *   in count of units/pills (e.g. 150 pills in a bottle). Taking a dose consumes 1 unit (not 150/500 units).
-     * - For TABLET / CAPSULE: deducts the tablet/capsule quantity (defaulting to 1 if dosage is <= 0 or
-     *   if an unusually large number like 500 was entered representing mg strength).
-     * - For liquid / drops (ML, DROP): deducts the specified dose quantity (at least 1).
+     * - For TABLET / CAPSULE / AMPULE: deducts the exact tablet/capsule quantity (supporting half doses e.g. 0.5, 1.5;
+     *   defaulting to 1.0 if dosage is outside 0.1..10.0 or if an unusually large number like 500 was entered representing mg strength).
+     * - For liquid / drops (ML, DROP, PUFF, SPRAY): deducts the specified dose quantity (at least 0.1).
      */
-    fun getStockDeductionAmount(time: LocalTime? = null, dosageOverride: Double? = null): Int {
-        // Guard: Use dosageOverride if provided to prevent stock deduction and restoration drift when a schedule entry has custom dosage
+    fun getStockDeductionAmount(time: LocalTime? = null, dosageOverride: Double? = null): Double {
+        // Guard: Use dosageOverride if provided to prevent stock deduction and restoration drift when a schedule entry has custom dosage (#123)
         val targetDosage = dosageOverride ?: getDosageForTime(time)
         return when (dosageUnit) {
             // Chemical strength units (MG, MCG, MEQ): stock is counted in physical dosage units (1 per intake)
-            DosageUnit.MG, DosageUnit.MCG, DosageUnit.MEQ -> 1
-            // Unit containers/discrete items: deduct dose count if in reasonable single intake range
+            DosageUnit.MG, DosageUnit.MCG, DosageUnit.MEQ -> 1.0
+            // Unit containers/discrete items: deduct exact dose count if in reasonable single intake range (supporting fractional half doses e.g. 0.5, 1.5)
             DosageUnit.TABLET, DosageUnit.CAPSULE, DosageUnit.AMPULE -> {
-                val count = targetDosage.toInt()
-                if (count in 1..10) count else 1
+                if (targetDosage in 0.1..10.0) targetDosage else 1.0
             }
             // Continuous/metered quantities (drops, liquid mL, inhaler puffs, spray): deduct specified dose count
             DosageUnit.DROP, DosageUnit.ML, DosageUnit.PUFF, DosageUnit.SPRAY -> {
-                targetDosage.toInt().coerceAtLeast(1)
+                targetDosage.coerceAtLeast(0.1)
             }
         }
     }
@@ -376,9 +357,9 @@ fun FrequencyPattern.getLocalizedName(): String {
 }
 
 @androidx.compose.runtime.Composable
-fun Medicine.getLocalizedDosageDisplay(): String {
-    val countStr = if (dosage % 1.0 == 0.0) dosage.toInt().toString() else dosage.toString()
-    return "$countStr ${dosageUnit.getLocalizedName()}"
+fun Medicine.getLocalizedDosageDisplay(time: LocalTime? = null, dosageOverride: Double? = null): String {
+    val targetDosage = dosageOverride ?: getDosageForTime(time)
+    return com.example.dosezy.utils.DosageFormatUtils.formatLocalizedDosageDisplay(targetDosage, dosageUnit)
 }
 
 @androidx.compose.runtime.Composable

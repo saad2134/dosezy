@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -90,11 +89,11 @@ fun MedicalDisclaimerDialog(
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Header Icon
+                // Header Icon (Squircle frame)
                 Box(
                     modifier = Modifier
                         .size(56.dp)
-                        .clip(CircleShape)
+                        .clip(RoundedCornerShape(16.dp))
                         .background(Color(0xFFF59E0B).copy(alpha = 0.15f)),
                     contentAlignment = Alignment.Center
                 ) {

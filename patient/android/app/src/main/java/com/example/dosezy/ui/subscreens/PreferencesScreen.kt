@@ -223,11 +223,16 @@ fun PreferencesScreen(navController: NavController) {
             )
         }
 
-        // Nagging Repeats Dialog
+        // Nagging Repeats Dialog (#119)
         if (showNaggingRepeatsDialog) {
-            val options = listOf(1, 2, 3, 5).map { repeats ->
-                stringResource(R.string.pref_nagging_repeats_format, repeats) to repeats
-            }
+            val options = listOf(
+                stringResource(R.string.pref_nagging_repeats_continuous) to 0,
+                stringResource(R.string.pref_nagging_repeats_format, 1) to 1,
+                stringResource(R.string.pref_nagging_repeats_format, 2) to 2,
+                stringResource(R.string.pref_nagging_repeats_format, 3) to 3,
+                stringResource(R.string.pref_nagging_repeats_format, 5) to 5,
+                stringResource(R.string.pref_nagging_repeats_format, 10) to 10
+            )
             com.example.dosezy.ui.components.SelectionDialog(
                 title = stringResource(R.string.pref_nagging_max_repeats),
                 options = options,
@@ -270,15 +275,20 @@ fun PreferencesScreen(navController: NavController) {
             )
         }
 
-        // Late After Selection Dialog
+        // Late After Selection Dialog (#119)
         if (showLateAfterDialog) {
             LateAfterSelectionDialog(
-                currentHours = currentUser?.considerLateAfter ?: 3,
-                currentMissedHours = currentUser?.considerMissedAfter ?: 6,
-                onHoursSelected = { newHours ->
+                currentMinutes = currentUser?.lateAfterMinutes ?: 180,
+                currentMissedMinutes = currentUser?.missedAfterMinutes ?: 360,
+                onMinutesSelected = { newMinutes ->
                     currentUser?.let { user ->
-                        val safeMissed = if (user.considerMissedAfter <= newHours) newHours + 1 else user.considerMissedAfter
-                        userViewModel.updateUser(user.copy(considerLateAfter = newHours, considerMissedAfter = safeMissed))
+                        val missedOptions = listOf(30, 45, 60, 90, 120, 180, 240, 360, 480, 720)
+                        val safeMissed = if (user.missedAfterMinutes <= newMinutes) {
+                            missedOptions.firstOrNull { it > newMinutes } ?: (newMinutes + 60)
+                        } else {
+                            user.missedAfterMinutes
+                        }
+                        userViewModel.updateUser(user.copy(considerLateAfter = newMinutes, considerMissedAfter = safeMissed))
                     }
                     showLateAfterDialog = false
                 },
@@ -286,15 +296,20 @@ fun PreferencesScreen(navController: NavController) {
             )
         }
 
-        // Missed After Selection Dialog
+        // Missed After Selection Dialog (#119)
         if (showMissedAfterDialog) {
             MissedAfterSelectionDialog(
-                currentHours = currentUser?.considerMissedAfter ?: 6,
-                currentLateHours = currentUser?.considerLateAfter ?: 3,
-                onHoursSelected = { newHours ->
+                currentMinutes = currentUser?.missedAfterMinutes ?: 360,
+                currentLateMinutes = currentUser?.lateAfterMinutes ?: 180,
+                onMinutesSelected = { newMinutes ->
                     currentUser?.let { user ->
-                        val safeLate = if (user.considerLateAfter >= newHours) newHours - 1 else user.considerLateAfter
-                        userViewModel.updateUser(user.copy(considerMissedAfter = newHours, considerLateAfter = safeLate))
+                        val lateOptions = listOf(15, 30, 45, 60, 90, 120, 180, 240)
+                        val safeLate = if (user.lateAfterMinutes >= newMinutes) {
+                            lateOptions.lastOrNull { it < newMinutes } ?: (newMinutes - 15).coerceAtLeast(15)
+                        } else {
+                            user.lateAfterMinutes
+                        }
+                        userViewModel.updateUser(user.copy(considerMissedAfter = newMinutes, considerLateAfter = safeLate))
                     }
                     showMissedAfterDialog = false
                 },

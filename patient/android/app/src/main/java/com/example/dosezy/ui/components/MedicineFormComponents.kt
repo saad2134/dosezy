@@ -21,7 +21,8 @@ val DosageUnit.displayName: String
     get() = when (this) {
         DosageUnit.MG -> "mg"
         DosageUnit.MCG -> "mcg"
-        DosageUnit.ML -> "ml"
+        // Guard: Use capital 'L' for 'mL' per ISMP and SI standards to avoid clinical confusion with numeral 1
+        DosageUnit.ML -> "mL"
         DosageUnit.DROP -> "drop"
         DosageUnit.TABLET -> "tablet"
         DosageUnit.CAPSULE -> "capsule"

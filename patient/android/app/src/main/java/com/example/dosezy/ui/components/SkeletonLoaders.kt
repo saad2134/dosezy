@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -304,11 +303,11 @@ fun EditMedSkeletonView(
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Pill Visual / Photo Avatar Skeleton
+        // Pill Visual / Photo Avatar Skeleton (Squircle frame)
         Box(
             modifier = Modifier
                 .size(96.dp)
-                .clip(CircleShape)
+                .clip(RoundedCornerShape(20.dp))
                 .shimmer()
         )
 
@@ -462,21 +461,21 @@ fun ManageProfileSkeletonView(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Profile Picture Circle Skeleton (128dp with edit overlay)
+        // Profile Picture Squircle Skeleton (128dp with edit overlay)
         Box(
             modifier = Modifier.size(128.dp)
         ) {
             Box(
                 modifier = Modifier
                     .size(128.dp)
-                    .clip(CircleShape)
+                    .clip(RoundedCornerShape(24.dp))
                     .shimmer()
             )
-            // Edit icon overlay placeholder
+            // Edit icon overlay placeholder (Squircle badge)
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .clip(CircleShape)
+                    .clip(RoundedCornerShape(12.dp))
                     .shimmer()
                     .align(Alignment.BottomEnd)
             )

@@ -300,7 +300,7 @@
 
     <string name="stock_current">المخزون الحالي</string>
     <string name="stock_refill_threshold">تنبيه عند انخفاض المخزون عن</string>
-    <string name="stock_units_left">متبقي %d وحدة</string>
+    <string name="stock_units_left">متبقي %s وحدة</string>
     <string name="refill_alert_title">تنبيه إعطاء الدواء: %s</string>
     <string name="preset_1x_daily">مرة يومياً (8 صباحاً)</string>
     <string name="preset_2x_daily">مرتان يومياً (8 صباحاً، 8 مساءً)</string>
@@ -403,7 +403,7 @@
     <string name="med_stock_placeholder">مثال: 30</string>
     <string name="med_threshold_placeholder">مثال: 5</string>
     <string name="notif_refill_alert_title">تنبيه إعادة التعبئة: %1$s</string>
-    <string name="notif_refill_alert_text">المخزون المتبقي منخفض: %1$d وحدات متبقية. يرجى إعادة التعبئة قريباً.</string>
+    <string name="notif_refill_alert_text">المخزون المتبقي منخفض: %1$s وحدات متبقية. يرجى إعادة التعبئة قريباً.</string>
     <string name="notif_channel_name">تنبيهات الأدوية</string>
     <string name="notif_channel_desc">إشعارات لتذكيرات مواعيد الأدوية</string>
     <string name="import_profile_conflict_warn">اسم الملف الشخصي موجود بالفعل محلياً</string>
@@ -437,8 +437,8 @@
     <string name="err_cannot_open_link">تعذر فتح الرابط</string>
     <string name="err_no_email_app">لا يوجد تطبيق بريد إلكتروني متاح</string>
     <string name="err_share_failed">خطأ في المشاركة: %1$s</string>
-    <string name="med_stock_refill_warning_badge">⚠️ إعادة التعبئة: متبقي %1$d</string>
-    <string name="med_stock_badge">📦 المخزون: %1$d</string>
+    <string name="med_stock_refill_warning_badge">⚠️ إعادة التعبئة: متبقي %1$s</string>
+    <string name="med_stock_badge">📦 المخزون: %1$s</string>
     <string name="to_be_taken_in">يجب تناوله خلال %1$d س و %2$d د</string>
     <string name="time_diff_ago">منذ %1$d س و %2$d د</string>
     <string name="status_all_medications_taken">تم تناول جميع الأدوية</string>
@@ -502,7 +502,7 @@
     <string name="quick_refill_preset_30">+30</string>
     <string name="quick_refill_preset_60">+60</string>
     <string name="quick_refill_preset_90">+90</string>
-    <string name="quick_refill_success">تمت إعادة تعبئة المخزون لـ %1$s. الرصيد الجديد: %2$d</string>
+    <string name="quick_refill_success">تمت إعادة تعبئة المخزون لـ %1$s. الرصيد الجديد: %2$s</string>
 
     <string name="no_scheduled_doses_today">لا توجد جرعات مجدولة لهذا اليوم</string>
     <string name="prn_confirm_log_title">تسجيل الجرعة</string>
@@ -514,8 +514,10 @@
     <string name="pref_nagging_interval">فترة تكرار التنبيه</string>
     <string name="pref_nagging_max_repeats">الحد الأقصى للتكرار</string>
     <string name="pref_nagging_repeats_format">%1$d مرات</string>
+    <string name="pref_nagging_repeats_continuous">مستمر (حتى أخذ الجرعة)</string>
     <string name="notif_nagging_title">متابعة الجرعة: %1$s</string>
     <string name="notif_nagging_text">تذكير %1$d/%2$d: جرعة %3$s ما زالت معلقة ولم تؤخذ بعد.</string>
+    <string name="notif_nagging_text_continuous">تذكير رقم %1$d: جرعة %2$s ما زالت معلقة ولم تؤخذ بعد.</string>
 
     <string name="widget_title">Dosezy اليوم</string>
     <string name="widget_no_meds">لا توجد جرعات قادمة</string>
@@ -592,7 +594,7 @@
     <string name="alarm_snooze_format">تأجيل (%d دقيقة)</string>
     <string name="notif_action_snooze_format">تأجيل (%d د)</string>
     <string name="alarm_snoozed_toast">تم تأجيل التنبيه لمدة %d دقيقة</string>
-    <string name="alarm_stock_remaining">المخزون المتبقي: %d وحدة</string>
+    <string name="alarm_stock_remaining">المخزون المتبقي: %s وحدة</string>
     <string name="home_action_take">تناول</string>
     <string name="home_action_taken">تم التناول</string>
     <string name="home_action_missed">فاتك</string>
@@ -656,7 +658,7 @@
     <string name="pharmacy_order_copy">نسخ النص</string>
     <string name="pharmacy_order_copied">تم نسخ طلب الأدوية إلى الحافظة</string>
     <string name="pharmacy_order_empty">لا توجد أدوية متاحة للطلب</string>
-    <string name="pharmacy_order_current_stock">المخزون الحالي: متبقي %1$d %2$s</string>
+    <string name="pharmacy_order_current_stock">المخزون الحالي: متبقي %1$s %2$s</string>
     <string name="pharmacy_order_qty_needed">الكمية المطلوبة: %1$d %2$s</string>
     <string name="pharmacy_order_patient_header">المريض: %1$s</string>
     <string name="pharmacy_order_date_header">التاريخ: %1$s</string>
@@ -669,6 +671,9 @@
 
     <string name="about_community_open_source">المجتمع والمصدر المفتوح</string>
     <string name="about_version_build">الإصدار %1$s (بناء %2$s)</string>
+    <string name="about_build_play">بناء Marketplace</string>
+    <string name="about_build_foss">بناء FOSS</string>
+    <string name="about_social_links_title">وسائل التواصل الاجتماعي</string>
     <string name="country_india">الهند</string>
     <string name="country_us_ca">الولايات المتحدة / كندا</string>
     <string name="country_uk">المملكة المتحدة</string>
@@ -683,7 +688,7 @@
     <string name="pharmacy_order_days_supply">مدة الإمداد بالأيام</string>
     <string name="pharmacy_order_days_format_short">%1$d يوم</string>
     <string name="pharmacy_order_medicines_include">الأدوية المشمولة (%1$d/%2$d)</string>
-    <string name="pharmacy_order_stock_left">المتبقي %1$d</string>
+    <string name="pharmacy_order_stock_left">المتبقي %1$s</string>
     <string name="pharmacy_order_no_stock_tracked">المخزون غير متتبع</string>
     <string name="pharmacy_order_header_title">📋 *طلب الأدوية*</string>
     <string name="pharmacy_order_frequency_format">التكرار: %1$d مرات يومياً</string>
@@ -875,4 +880,16 @@
     <string name="notif_channel_notifications_desc">تنبيهات إشعار قياسية لجداول الأدوية تحترم وضع عدم الإزعاج</string>
     <string name="form_reminder_type">نمط التذكير</string>
     <string name="form_reminder_type_desc">اختر منبه للأدوية الهامة أو إشعار للمكملات الغذائية</string>
+
+    <!-- Medicine Order & Sorting (#120) -->
+    <string name="sort_medicines_title">الترتيب والتنظيم</string>
+    <string name="sort_preset_default">الافتراضي (تاريخ الإضافة)</string>
+    <string name="sort_preset_name_asc">الاسم (أ إلى ي)</string>
+    <string name="sort_preset_name_desc">الاسم (ي إلى أ)</string>
+    <string name="sort_preset_time_asc">الوقت المحدد (الأبكر أولاً)</string>
+    <string name="sort_preset_custom">ترتيب مخصص</string>
+    <string name="sort_custom_reorder_title">تعديل ترتيب الأدوية</string>
+    <string name="sort_custom_reorder_desc">استخدم الأسهم لتعديل ترتيب أدويتك.</string>
+    <string name="sort_move_up">تحريك لأعلى</string>
+    <string name="sort_move_down">تحريك لأسفل</string>
 </resources>

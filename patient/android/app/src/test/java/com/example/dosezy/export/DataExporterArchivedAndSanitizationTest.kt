@@ -225,8 +225,8 @@ class DataExporterArchivedAndSanitizationTest {
             timesPerDay = 3,
             frequency = com.example.dosezy.data.model.Frequency(com.example.dosezy.data.model.FrequencyPattern.DAILY),
             scheduledTimes = listOf(LocalTime.of(8, 0), LocalTime.of(14, 0), LocalTime.of(20, 0)),
-            currentStock = 10,
-            refillThreshold = 5
+            currentStock = 10.0,
+            refillThreshold = 5.0
         )
 
         val exporter = DataExporter(context, mockUserRepo, mockMedRepo, mockSchedRepo)
@@ -241,6 +241,21 @@ class DataExporterArchivedAndSanitizationTest {
         assertTrue("Order must contain patient name", orderText.contains("John Doe"))
         assertTrue("Order must contain medication name", orderText.contains("Amoxicillin"))
         assertTrue("Order must contain dosage", orderText.contains("500 mg"))
+
+        // Guard: Verify fractional discrete medication renders with vulgar fractions (½) rather than raw decimal string (0.5)
+        val medFractional = med.copy(
+            medicineId = "med_order_frac",
+            medicationName = "Clonazepam",
+            dosage = 0.5,
+            dosageUnit = DosageUnit.TABLET
+        )
+        val orderTextFrac = exporter.generateConsolidatedPharmacyOrderText(
+            profilesWithMedicines = listOf(Pair(userEn, listOf(medFractional))),
+            supplyDays = 30,
+            includeStock = false,
+            includeDosage = true
+        )
+        assertTrue("Order must format discrete half dose using vulgar fraction ½", orderTextFrac.contains("½"))
     }
 
     @Test
