@@ -9,7 +9,7 @@
 
 <div align="center">
 
-[![Android Patient App](https://img.shields.io/badge/Android%20Patient-v2.5.12%20Released-1e293b?style=flat&logo=android&logoColor=white&labelColor=2ea44f)](https://github.com/saad2134/dosezy/releases)
+[![Android Patient App](https://img.shields.io/badge/Android%20Patient-v2.5.13%20Released-1e293b?style=flat&logo=android&logoColor=white&labelColor=2ea44f)](https://github.com/saad2134/dosezy/releases)
 [![iOS Patient App](https://img.shields.io/badge/iOS%20Patient-Planned-1e293b?style=flat&logo=apple&logoColor=white&labelColor=007aff)](https://github.com/saad2134/dosezy)
 [![Server Node](https://img.shields.io/badge/Server%20Node-In%20Dev-1e293b?style=flat&logo=fastify&logoColor=white&labelColor=8b5cf6)](https://github.com/saad2134/dosezy)
 [![Caregiver Web](https://img.shields.io/badge/Caregiver%20Web-In%20Dev-1e293b?style=flat&logo=astro&logoColor=white&labelColor=f59e0b)](https://github.com/saad2134/dosezy)
@@ -20,11 +20,16 @@
 
 ### 💊 Patient App (Free, Open-source, Offline & Private by Default)
 
-> <sub>💡 **Note:** Some stores (such as F-Droid, etc.) may take a few days (usually 2-5 days) to review and publish new releases. For immediate access to the latest updates, download directly from [GitHub Releases](https://github.com/saad2134/dosezy/releases). Also, if you sideload apps from GitHub, APKMirror etc., check out ObtainX. It handles all the updates automatically so you don't have to keep checking the sites manually: https://bikram-agarwal.github.io/obtainx/</sub>
+> 💡 **Note:** New releases may take 2–5 days to appear on stores like F-Droid. Get the latest version directly from [GitHub Releases](https://github.com/saad2134/dosezy/releases). For automatic updates when sideloading, try [ObtainX](https://bikram-agarwal.github.io/obtainx/).
+>
+> **Official Publication Partner:** [Attenomy](https://attenomy.com).
 
 <br>
 
 <div align="center">
+  <a href="https://play.google.com/store/apps/details?id=com.saad2134.dosezy">
+    <img width="197" height="59" alt="Google Play" src="assets/badges/google-play.png" />
+  </a>
   <a href="https://f-droid.org/en/packages/com.saad2134.dosezy">
     <img width="197" height="59" alt="F-Droid" src="assets/badges/fdroid.png" />
   </a>
@@ -54,9 +59,6 @@
 #### Coming Soon On
 
 <div align="center">
-  <a href="https://play.google.com/store/apps/details?id=com.saad2134.dosezy">
-    <img width="197" height="59" alt="Google Play" src="assets/badges/google-play.png" />
-  </a>
   <a href="#">
     <img width="197" height="59" alt="App Store" src="assets/badges/app-store.png" />
   </a>
@@ -117,7 +119,7 @@ Dosezy transforms daily medication management into a stress-free experience. Inp
 
 <div align="center">
 
-[![Website](https://img.shields.io/badge/Website-dosezy.attenomy.com-1e293b?style=flat&logo=googlechrome&logoColor=white&labelColor=0284c7)](https://dosezy.attenomy.com)
+[![Website](https://img.shields.io/badge/Website-dosezy.app-1e293b?style=flat&logo=googlechrome&logoColor=white&labelColor=0284c7)](https://dosezy.app)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22957599.svg)](https://doi.org/10.5281/zenodo.22957599)
 [![AlternativeTo](https://img.shields.io/badge/AlternativeTo-Dosezy-1e293b?style=flat&logo=alternativeto&logoColor=white&labelColor=5A4FCF)](https://alternativeto.net/software/dosezy/about/)
 [![Product Hunt](https://img.shields.io/badge/Product%20Hunt-Dosezy-1e293b?style=flat&logo=producthunt&logoColor=white&labelColor=DA552F)](https://www.producthunt.com/products/dosezy)
@@ -143,7 +145,7 @@ Dosezy transforms daily medication management into a stress-free experience. Inp
 
 | Module | Platform | Status | Min / Target | Tech Stack |
 | :--- | :--- | :--- | :--- | :--- |
-| **📱 Patient App** | Android | Released (v2.5.12) | Android 7.0+ (API 24+) | Kotlin, Jetpack Compose, Room |
+| **📱 Patient App** | Android | Released (v2.5.13) | Android 7.0+ (API 24+) | Kotlin, Jetpack Compose, Room |
 | **🍎 Patient App** | iOS | Planned | iOS 16+ | Swift, SwiftUI, SwiftData |
 | **☁️ Server Node** | Server / API | In Development | Docker / Self-Host | Node.js, Fastify, TypeScript, SQLite/Postgres |
 | **🩺 Caregiver Portal** | Web | In Development | Modern Browsers | Astro, TypeScript, Tailwind |
@@ -219,7 +221,7 @@ flowchart TB
 dosezy/
 ├── .github/                  # CI/CD workflows, build pipelines, and repository automation
 ├── api/                      # OpenAPI 3.0 contract (openapi.yaml) defining shared client/server schemas
-├── caregiver/                # Caregiver companion application & web dashboard (app.dosezy.com)
+├── caregiver/                # Caregiver companion application & web dashboard (caregiver.dosezy.app)
 ├── docs/                     # Architecture Decision Records (ADRs), domain specifications, and guides
 │   ├── architecture/         # Data layer, sync protocols, and encryption designs
 │   ├── privacy/              # Data safety declarations and health privacy compliance
@@ -261,13 +263,13 @@ dosezy/
       <td><strong>Local-First Android Client & Schema Parity</strong></td>
       <td>Core Adherence & Ecosystem Parity</td>
       <td>Jetpack Compose UI, 12 native localizations, Room offline database v15, time zone travel, manual dose recording, per-dose symptom notes, dose undo confirmation, pharmacy refill orders with smart bottle supplies, full-screen alarms, emergency dialer, shared OpenAPI 3.0 contract.</td>
-      <td align="center">🟢 Released (v2.5.12)<br><sub>🟡 In Dev (v2.5.13)</sub></td>
+      <td align="center">🟢 Released (v2.5.13)<br><sub>🟡 In Dev (v2.5.14)</sub></td>
     </tr>
     <tr>
       <td><strong>v3.0 - v3.9</strong></td>
       <td><strong>Self-Hostable Backend & Caregiver Platform</strong></td>
       <td>Incremental Sync & Web Portal</td>
-      <td>Open-source server (<code>server/</code>), PostgreSQL DB, conflict-free sync engine, offline mutation queues, optional cloud connection, dedicated Caregiver web portal (<code>caregiver/</code> at <code>app.dosezy.com</code>), remote adherence monitoring, patient-controlled granular sharing permissions.</td>
+      <td>Open-source server (<code>server/</code>), PostgreSQL DB, conflict-free sync engine, offline mutation queues, optional cloud connection, dedicated Caregiver web portal (<code>caregiver/</code> at <code>caregiver.dosezy.app</code>), remote adherence monitoring, patient-controlled granular sharing permissions.</td>
       <td align="center">⏳ Planned</td>
     </tr>
     <tr>
@@ -375,9 +377,10 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 
-## 👤 Publisher
+## 👤 Credits
 
-Developed and published by **Saad (@saad2134)**.
+- **Core Development** by Saad [@saad2134](https://github.com/saad2134).
+- **Official Publication** by [Attenomy](https://attenomy.com).
 
 ---
 

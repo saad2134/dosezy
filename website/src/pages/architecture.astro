@@ -4,7 +4,10 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 ---
 
-<Layout title="System Architecture & 2D Data Flow ✦ Dosezy Monorepo">
+<Layout 
+	title="System Architecture & 2D Data Flow ✦ Dosezy Monorepo"
+	description="Technical overview of Dosezy's local-first architecture, Room database schema, cryptographic backup protocols, and privacy-preserving sync mechanisms."
+>
 	<Header />
 	<main class="flex-grow pt-28 sm:pt-32 pb-16 bg-[#030407] bg-grid-pattern">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -378,7 +381,7 @@ import Footer from '../components/Footer.astro';
 										<span class="text-lg">🌐</span>
 										<h4 class="font-bold text-white text-sm group-hover/node:text-sky-300">Option A: Cloud Caregiver Portal</h4>
 									</div>
-									<span class="text-[10px] font-mono bg-sky-500/10 text-sky-300 px-2 py-0.5 rounded">app.dosezy.com</span>
+									<span class="text-[10px] font-mono bg-sky-500/10 text-sky-300 px-2 py-0.5 rounded">caregiver.dosezy.app</span>
 								</div>
 
 								<!-- Top to Bottom Stacked Features -->
@@ -601,7 +604,7 @@ import Footer from '../components/Footer.astro';
 		'caregiver-dashboard': {
 			title: 'Caregiver Multi-Patient Dashboard',
 			path: 'caregiver/src',
-			badge: 'app.dosezy.com • React Web',
+			badge: 'caregiver.dosezy.app • React Web',
 			badgeClass: 'bg-sky-500/10 text-sky-300 border-sky-500/20',
 			icon: '🌐',
 			desc: 'Web portal for family members and health practitioners to view patient adherence heatmaps, missed dose alerts, and compliance histories in real-time.',

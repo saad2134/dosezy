@@ -2,9 +2,83 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+
+const faqSchema = {
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Dosezy?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dosezy is a simple, friendly, and smart medication reminder app. It helps you, your family members, and caregivers manage daily medicines, set alarms, track pill inventory, monitor adherence progress, and ensure no dose is ever missed."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need to create an account or have internet?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No! Dosezy is 100% local-first and offline. You do not need to register, log in, or have an internet connection. All your health data and reminders stay safely stored directly on your phone in an offline database."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What happens when I travel across time zones?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dosezy automatically keeps your scheduled medication routine anchored to your daily local routine without time distortion. Your dose reminders shift seamlessly with your active timezone so you never need to manually recalibrate schedules while traveling."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What happens if I take multiple medicines at the same time?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dosezy automatically combines all medicines scheduled for the exact same minute into a single high-priority grouped alarm screen with an interactive checklist, meal instructions, a Take All button, and customizable snooze intervals."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I choose between full-screen alarms and standard notifications?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! You can easily toggle between high-priority full-screen alarms and standard Android status bar notifications directly within Preferences."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does the Notification Reliability Shield work?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The built-in Reliability Shield diagnoses OEM battery killers, power management restrictions, and exact alarm permissions with 1-tap manufacturer setup guides to guarantee 100% alarm reliability."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Dosezy protect my health privacy?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dosezy requests zero internet permissions (PERMISSION_NETWORK = NONE). All medication names, schedules, notes, and doctor details remain encrypted in your local device storage with zero tracking or telemetry."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I export my medical records for my doctor?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! You can export clean, print-ready PDF doctor reports with adherence percentages and missed dose logs, as well as CSV spreadsheets and full encrypted JSON archives anytime."
+      }
+    }
+  ]
+};
 ---
 
-<Layout title="FAQs ✦ Dosezy Frequently Asked Questions">
+<Layout 
+	title="FAQs ✦ Dosezy Frequently Asked Questions"
+	description="Find answers to frequently asked questions about Dosezy: 100% offline privacy, battery optimization, alarm reliability, data backups, and medication schedules."
+	extraSchema={faqSchema}
+>
 	<Header />
 	<main class="flex-grow pt-28 sm:pt-32 pb-16 bg-[#030407] bg-grid-pattern">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

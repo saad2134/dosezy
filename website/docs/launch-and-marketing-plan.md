@@ -28,7 +28,7 @@ Unlike proprietary medication trackers that aggregate or sell prescription routi
 |---|---|---|---|
 | **1. Privacy Advocates & FOSS Enthusiasts** | Commercial health apps harvest & sell medication data; forced cloud logins. | `android.permission.INTERNET` omission; F-Droid release; 100% Open Source. | Hacker News, `r/privacy`, `r/androidapps`, F-Droid |
 | **2. Self-Hosters & Homelab Owners** | Closed SaaS ecosystems with vendor lock-in & subscription creep. | Docker Compose backend node; private PostgreSQL database; zero telemetry. | `r/selfhosted`, GitHub, Awesome-Selfhosted |
-| **3. Family Caregivers & Adult Children** | Worrying about elderly parents missing critical doses while wanting privacy respect. | E2EE Caregiver Web Portal (`app.dosezy.com`); real-time SMS & push alerts. | `r/AgingParents`, `r/CaregiverSupport`, Caregiver Blogs |
+| **3. Family Caregivers & Adult Children** | Worrying about elderly parents missing critical doses while wanting privacy respect. | E2EE Caregiver Web Portal (`caregiver.dosezy.app`); real-time SMS & push alerts. | `r/AgingParents`, `r/CaregiverSupport`, Caregiver Blogs |
 | **4. Elderly & Accessibility Users** | Small circular clock dials causing input errors; complex UI latency. | High-contrast 7.8:1 AAA UI; stationary 12-Hour Grid Time Picker; 200% font scaling. | Senior Care Forums, Nextdoor, Accessibility advocates |
 | **5. Neurodivergent / ADHD Users** | Executive dysfunction triggered by ad popups, push notifications, and cluttered menus. | Minimalist, zero-ad interface; doze-resilient persistent alarm pipeline. | `r/ADHD`, `r/Neurodiversity`, Productivity blogs |
 
