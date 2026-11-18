@@ -587,6 +587,8 @@ class RecordDoseMissedAndUndoTest {
         val shadowPi = Shadows.shadowOf(notif!!.contentIntent)
         assertEquals("medicines", shadowPi.savedIntent.getStringExtra("fragment"))
         assertEquals(testUser.userId, shadowPi.savedIntent.getStringExtra("switch_to_user_id"))
+        val expectedFlags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        assertEquals(expectedFlags, shadowPi.savedIntent.flags)
     }
 
     @Test

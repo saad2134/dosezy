@@ -353,7 +353,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                             context,
                             (previousEntry.medicineId + "_refill_click").hashCode(),
                             Intent(context, com.example.dosezy.MainActivity::class.java).apply {
-                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                // Guard: Use SINGLE_TOP with CLEAR_TOP so tapping refill notification delivers extras to onNewIntent without destroying active MainActivity instance (#BUG-REFILL-SINGLE-TOP)
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                                 // Guard: Pass target user ID and route to medicines screen so tapping refill alert switches profile and navigates to medication list
                                 putExtra("switch_to_user_id", previousEntry.userId)
                                 putExtra("fragment", "medicines")
@@ -834,7 +835,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     context,
                     (freshMedicine.medicineId + "_refill_click").hashCode(),
                     Intent(context, com.example.dosezy.MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        // Guard: Use SINGLE_TOP with CLEAR_TOP so tapping refill notification delivers extras to onNewIntent without destroying active MainActivity instance (#BUG-REFILL-SINGLE-TOP)
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                         // Guard: Pass target user ID and route to medicines screen so tapping refill alert switches profile and navigates to medication list
                         putExtra("switch_to_user_id", freshMedicine.userId)
                         putExtra("fragment", "medicines")

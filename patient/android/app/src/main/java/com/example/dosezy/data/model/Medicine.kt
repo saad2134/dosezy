@@ -196,12 +196,14 @@ data class Medicine(
                 (timesPerDay.coerceAtLeast(1) * days).toDouble()
             }
             FrequencyPattern.WEEKLY -> {
-                val daysPerWk = frequency.selectedDaysOfWeek?.size ?: frequency.daysPerWeek ?: 1
+                // Guard: Use takeIf to ensure empty day collections fall back to daysPerWeek or 1 to prevent 0 refill calculation (#BUG-REFILL-EMPTY-DAYS)
+                val daysPerWk = frequency.selectedDaysOfWeek?.takeIf { it.isNotEmpty() }?.size ?: frequency.daysPerWeek ?: 1
                 val totalDoseDays = kotlin.math.ceil((daysPerWk.toDouble() / 7.0) * days)
                 totalDoseDays * timesPerDay.coerceAtLeast(1)
             }
             FrequencyPattern.MONTHLY -> {
-                val daysPerMo = frequency.selectedDaysOfMonth?.size ?: frequency.daysPerMonth ?: 1
+                // Guard: Use takeIf to ensure empty day collections fall back to daysPerMonth or 1 to prevent 0 refill calculation (#BUG-REFILL-EMPTY-DAYS)
+                val daysPerMo = frequency.selectedDaysOfMonth?.takeIf { it.isNotEmpty() }?.size ?: frequency.daysPerMonth ?: 1
                 val totalDoseDays = kotlin.math.ceil((daysPerMo.toDouble() / 30.0) * days)
                 totalDoseDays * timesPerDay.coerceAtLeast(1)
             }

@@ -299,10 +299,9 @@ object AlarmAudioPlayer {
         }
         mediaPlayer = null
 
+        // Guard: Call stop() unconditionally on fallback Ringtone to prevent stranded playback if isPlaying returns false or throws during lockscreen transitions (#BUG-ALARM-SCREAMING-LOCKSCREEN)
         try {
-            ringtone?.let {
-                if (it.isPlaying) it.stop()
-            }
+            ringtone?.stop()
         } catch (_: Exception) {}
         ringtone = null
 

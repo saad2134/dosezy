@@ -872,6 +872,53 @@ class ScheduleStatusAndUserRepositoryDirectTest {
         assertEquals(LocalDateTime.of(2026, 12, 1, 13, 30, 0), nextRolling!!.scheduledDateTime)
         assertEquals(MedicationStatus.PENDING, nextRolling.status)
     }
+
+    @Test
+    fun recordDoseTaken_lowStockRefillAlert_configuresSingleTopPendingIntent() = runBlocking {
+        // Guard: Verify refill notification pending intent configures FLAG_ACTIVITY_SINGLE_TOP with CLEAR_TOP to prevent destroying MainActivity on click (#BUG-REFILL-SINGLE-TOP)
+        val user = sampleUser("user_refill_intent_test")
+        userDao.insertUser(user)
+
+        val med = sampleMedicine("med_refill_intent", user.userId, "Test Refill Med").copy(
+            currentStock = 2.0,
+            dosage = 1.0,
+            refillThreshold = 2.0,
+            autoDeductOnTake = true
+        )
+        medicineDao.insertMedicine(med)
+
+        val entry = ScheduleEntry(
+            entryId = "entry_refill_intent",
+            userId = user.userId,
+            medicineId = med.medicineId,
+            scheduledDateTime = LocalDateTime.now(),
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        scheduleDao.insertScheduleEntries(listOf(entry))
+
+        val scheduleRepository = com.example.dosezy.data.repository.ScheduleRepository(db)
+        scheduleRepository.recordDoseTaken(
+            entryId = entry.entryId,
+            status = "TAKEN_ON_TIME",
+            takenAt = LocalDateTime.now(),
+            context = context
+        )
+
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val shadowNm = org.robolectric.Shadows.shadowOf(notificationManager)
+        val notif = shadowNm.allNotifications.firstOrNull { it.channelId == MedicineAlarmReceiver.REFILL_CHANNEL_ID }
+        assertNotNull("Refill alert notification must be posted", notif)
+
+        val shadowPi = org.robolectric.Shadows.shadowOf(notif!!.contentIntent)
+        val targetIntent = shadowPi.savedIntent
+        assertNotNull("Target intent must be preserved", targetIntent)
+
+        val expectedFlags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        assertEquals(expectedFlags, targetIntent.flags)
+        assertEquals("medicines", targetIntent.getStringExtra("fragment"))
+        assertEquals(user.userId, targetIntent.getStringExtra("switch_to_user_id"))
+    }
 }
 
 
