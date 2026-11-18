@@ -1,3 +1,21 @@
+<!-- Pull Request Title Formats: -->
+<!-- 1. For New Version Development (feature/fix -> develop): -->
+<!--    v<version>(<component>): <concise description> -->
+<!--    Example: v2.5.14(patient-android): rolling intake intervals, pharmacy custom days, and stock unit precision -->
+<!--    Example: v2.5.14(website): bump version to v2.5.14 and document ecosystem version synchronization protocol -->
+<!-- 2. For Production Releases (develop -> main): -->
+<!--    RELEASE v<version> -->
+<!--    Example: RELEASE v2.5.14 -->
+
+<!-- Pull Request Title Formats: -->
+<!-- 1. For New Version Development (feature/fix -> develop): -->
+<!--    v<version>(<component>): <concise description> -->
+<!--    Example: v2.5.14(patient-android): rolling intake intervals, pharmacy custom days, and stock unit precision -->
+<!--    Example: v2.5.14(website): bump version to v2.5.14 and document ecosystem version synchronization protocol -->
+<!-- 2. For Production Releases (develop -> main): -->
+<!--    RELEASE v<version> -->
+<!--    Example: RELEASE v2.5.14 -->
+
 ## Summary
 
 <!-- Briefly describe what this PR changes. -->
