@@ -52,7 +52,8 @@
     <string name="form_error_course_duration">服用期間は1日以上である必要があります</string>
     <string name="form_error_fix_fields">上記で強調表示されている必須項目を入力してください</string>
     <string name="freq_daily">毎日</string>
-    <string name="freq_weekly">毎週</string>
+    <string name="freq_weekly">毎週（指定の曜日）</string>
+    <string name="freq_weekly_desc">選択した曜日にのみ薬を服用します。</string>
     <string name="freq_monthly">毎月</string>
     <string name="freq_custom">X 週間ごと</string>
     <string name="form_select_days_week">曜日を選択</string>

@@ -52,7 +52,8 @@
     <string name="form_error_course_duration">Kursdauer muss mindestens 1 Tag betragen</string>
     <string name="form_error_fix_fields">Bitte füllen Sie die oben markierten Pflichtfelder aus</string>
     <string name="freq_daily">Täglich</string>
-    <string name="freq_weekly">Wöchentlich</string>
+    <string name="freq_weekly">Wöchentlich (bestimmte Tage)</string>
+    <string name="freq_weekly_desc">Medikament nur an den ausgewählten Wochentagen einnehmen.</string>
     <string name="freq_monthly">Monatlich</string>
     <string name="freq_custom">Alle X Wochen</string>
     <string name="form_select_days_week">Wochentage auswählen</string>

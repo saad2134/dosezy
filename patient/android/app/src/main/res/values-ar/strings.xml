@@ -52,7 +52,8 @@
     <string name="form_error_course_duration">يجب أن تكون مدة العلاج يوماً واحداً على الأقل</string>
     <string name="form_error_fix_fields">يرجى ملء الحقول المطلوبة الموضحة أعلاه</string>
     <string name="freq_daily">يوميًا</string>
-    <string name="freq_weekly">أسبوعيًا</string>
+    <string name="freq_weekly">أسبوعيًا (أيام محددة)</string>
+    <string name="freq_weekly_desc">تناول الدواء فقط في أيام الأسبوع المحددة.</string>
     <string name="freq_monthly">شهريًا</string>
     <string name="freq_custom">كل X أسابيع</string>
     <string name="form_select_days_week">حدد أيام الأسبوع</string>

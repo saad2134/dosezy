@@ -52,7 +52,8 @@
     <string name="form_error_course_duration">La durata del ciclo deve essere di almeno 1 giorno</string>
     <string name="form_error_fix_fields">Compila i campi obbligatori evidenziati sopra</string>
     <string name="freq_daily">Giornaliero</string>
-    <string name="freq_weekly">Settimanale</string>
+    <string name="freq_weekly">Settimanale (giorni specifici)</string>
+    <string name="freq_weekly_desc">Assumere il farmaco solo nei giorni della settimana selezionati.</string>
     <string name="freq_monthly">Mensile</string>
     <string name="freq_custom">Ogni X settimane</string>
     <string name="form_select_days_week">Seleziona i giorni della settimana</string>

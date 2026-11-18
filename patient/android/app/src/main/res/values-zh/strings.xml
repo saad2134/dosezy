@@ -58,7 +58,8 @@
     <string name="form_error_course_duration">疗程必须至少为1天</string>
     <string name="form_error_fix_fields">请填写上方高亮显示的必填项</string>
     <string name="freq_daily">每天</string>
-    <string name="freq_weekly">每周</string>
+    <string name="freq_weekly">每周（指定日期）</string>
+    <string name="freq_weekly_desc">仅在选定的星期几服药。</string>
     <string name="freq_monthly">每月</string>
     <string name="freq_custom">每 X 周</string>
     <string name="form_select_days_week">选择一周中的天数</string>

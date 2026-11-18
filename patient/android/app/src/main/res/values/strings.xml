@@ -58,7 +58,8 @@
     <string name="form_error_course_duration">Course duration must be at least 1 day</string>
     <string name="form_error_fix_fields">Please fill in the required fields highlighted above</string>
     <string name="freq_daily">Daily</string>
-    <string name="freq_weekly">Weekly</string>
+    <string name="freq_weekly">Weekly (Specific Days)</string>
+    <string name="freq_weekly_desc">Take medication only on the selected days of the week.</string>
     <string name="freq_monthly">Monthly</string>
     <string name="freq_custom">Every X Weeks</string>
     <string name="form_select_days_week">Select Days of the Week</string>

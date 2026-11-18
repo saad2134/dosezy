@@ -274,6 +274,13 @@ fun FrequencyConfigSection(
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(6.dp))
+            // Guard: Clarify that medication will only be scheduled on highlighted days of the week (#134)
+            Text(
+                text = stringResource(R.string.freq_weekly_desc),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
 
         if (selectedFrequency == FrequencyPattern.MONTHLY) {

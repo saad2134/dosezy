@@ -58,7 +58,8 @@
     <string name="form_error_course_duration">La duración debe ser de al menos 1 día</string>
     <string name="form_error_fix_fields">Completa los campos obligatorios resaltados arriba</string>
     <string name="freq_daily">Diario</string>
-    <string name="freq_weekly">Semanal</string>
+    <string name="freq_weekly">Semanal (días específicos)</string>
+    <string name="freq_weekly_desc">Tomar el medicamento solo los días seleccionados de la semana.</string>
     <string name="freq_monthly">Mensual</string>
     <string name="freq_custom">Cada X semanas</string>
     <string name="form_select_days_week">Seleccionar días de la semana</string>

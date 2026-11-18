@@ -58,7 +58,8 @@
     <string name="form_error_course_duration">कोर्स की अवधि कम से कम 1 दिन होनी चाहिए</string>
     <string name="form_error_fix_fields">कृपया ऊपर हाइलाइट किए गए आवश्यक फ़ील्ड भरें</string>
     <string name="freq_daily">दैनिक</string>
-    <string name="freq_weekly">साप्ताहिक</string>
+    <string name="freq_weekly">साप्ताहिक (विशिष्ट दिन)</string>
+    <string name="freq_weekly_desc">दवा केवल सप्ताह के चयनित दिनों में लें।</string>
     <string name="freq_monthly">मासिक</string>
     <string name="freq_custom">हर X सप्ताह में</string>
     <string name="form_select_days_week">सप्ताह के दिन चुनें</string>

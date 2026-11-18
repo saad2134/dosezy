@@ -52,7 +52,8 @@
     <string name="form_error_course_duration">La durée du traitement doit être d\'au moins 1 jour</string>
     <string name="form_error_fix_fields">Veuillez remplir les champs obligatoires surlignés ci-dessus</string>
     <string name="freq_daily">Quotidien</string>
-    <string name="freq_weekly">Hebdomadaire</string>
+    <string name="freq_weekly">Hebdomadaire (jours spécifiques)</string>
+    <string name="freq_weekly_desc">Prendre le médicament uniquement les jours sélectionnés de la semaine.</string>
     <string name="freq_monthly">Mensuel</string>
     <string name="freq_custom">Toutes les X semaines</string>
     <string name="form_select_days_week">Sélectionner les jours de la semaine</string>

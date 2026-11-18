@@ -52,7 +52,8 @@
     <string name="form_error_course_duration">A duração do tratamento deve ser de pelo menos 1 dia</string>
     <string name="form_error_fix_fields">Preencha os campos obrigatórios destacados acima</string>
     <string name="freq_daily">Diariamente</string>
-    <string name="freq_weekly">Semanalmente</string>
+    <string name="freq_weekly">Semanal (dias específicos)</string>
+    <string name="freq_weekly_desc">Tomar o medicamento apenas nos dias selecionados da semana.</string>
     <string name="freq_monthly">Mensalmente</string>
     <string name="freq_custom">A cada X semanas</string>
     <string name="form_select_days_week">Selecionar dias da semana</string>

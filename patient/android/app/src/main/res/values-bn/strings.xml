@@ -52,7 +52,8 @@
     <string name="form_error_course_duration">কোর্সের মেয়াদ অন্তত ১ দিন হতে হবে</string>
     <string name="form_error_fix_fields">অনুগ্রহ করে উপরে চিহ্নিত প্রয়োজনীয় তথ্য পূরণ করুন</string>
     <string name="freq_daily">প্রতিদিন</string>
-    <string name="freq_weekly">সাপ্তাহিক</string>
+    <string name="freq_weekly">সাপ্তাহিক (নির্দিষ্ট দিন)</string>
+    <string name="freq_weekly_desc">সপ্তাহের শুধুমাত্র নির্বাচিত দিনগুলিতে ওষুধ সেবন করুন।</string>
     <string name="freq_monthly">মাসিক</string>
     <string name="freq_custom">প্রতি X সপ্তাহ পর পর</string>
     <string name="form_select_days_week">সপ্তাহের দিন নির্বাচন করুন</string>

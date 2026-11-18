@@ -52,7 +52,8 @@
     <string name="form_error_course_duration">Длительность курса должна быть не менее 1 дня</string>
     <string name="form_error_fix_fields">Пожалуйста, заполните обязательные поля, выделенные выше</string>
     <string name="freq_daily">Ежедневно</string>
-    <string name="freq_weekly">Еженедельно</string>
+    <string name="freq_weekly">Еженедельно (выбранные дни)</string>
+    <string name="freq_weekly_desc">Принимать лекарство только в выбранные дни недели.</string>
     <string name="freq_monthly">Ежемесячно</string>
     <string name="freq_custom">Каждые X недель</string>
     <string name="form_select_days_week">Выберите дни недели</string>
