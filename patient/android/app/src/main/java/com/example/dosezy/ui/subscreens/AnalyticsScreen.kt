@@ -618,12 +618,13 @@ fun WeeklyTrendCard(past7Days: List<DayStat>) {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.weight(1f)
                     ) {
+                        // Guard: Show placeholder '-' when 0 doses have come due yet rather than false 0% compliance (#BUG-ANALYTICS-DECIDED)
                         Text(
-                            text = if (stat.total > 0) "${stat.rate}%" else "-",
+                            text = if (stat.decided > 0) "${stat.rate}%" else "-",
                             style = MaterialTheme.typography.labelSmall,
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (stat.rate >= 80) Color(0xFF10B981) else MaterialTheme.colorScheme.onSurfaceVariant
+                            color = if (stat.decided > 0 && stat.rate >= 80) Color(0xFF10B981) else MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
                         Spacer(modifier = Modifier.height(6.dp))
@@ -637,7 +638,7 @@ fun WeeklyTrendCard(past7Days: List<DayStat>) {
                                 .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)),
                             contentAlignment = Alignment.BottomCenter
                         ) {
-                            val barFill = if (stat.total > 0) (stat.rate / 100f).coerceIn(0.15f, 1f) else 0f
+                            val barFill = if (stat.decided > 0) (stat.rate / 100f).coerceIn(0.15f, 1f) else 0f
                             if (barFill > 0f) {
                                 Box(
                                     modifier = Modifier

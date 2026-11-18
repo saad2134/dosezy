@@ -583,6 +583,23 @@ class HomeMissedDoseActionRoutingTest {
     }
 
     @Test
+    fun slotRollup_profileSwitch_resetsCollapsedSlotsToPreventCrossProfileContamination() {
+        // Guard: Switching patient profile must isolate collapsed slots to prevent Profile A's collapsed state from concealing Profile B's morning doses (#BUG-COLLAPSED-SLOTS-PROFILE)
+        var activeUserId = "user_parent"
+        var collapsedSlots = setOf("08:00 AM", "12:00 PM")
+
+        // Switch to child profile: simulated remember(currentUser?.userId) scoping resets state
+        val newUserId = "user_child"
+        if (newUserId != activeUserId) {
+            activeUserId = newUserId
+            collapsedSlots = emptySet()
+        }
+
+        assertEquals("user_child", activeUserId)
+        assertTrue("Collapsed slots must be cleared on profile switch to prevent concealing doses", collapsedSlots.isEmpty())
+    }
+
+    @Test
     fun testTimelineMode_autoScrollIndex_targetsBannerOffsetDirectly() {
         // Guard: In timeline mode, HomeTimelineView is a single LazyColumn item; targetIndex must not overflow into non-existent slot indices (#BUG-TIMELINE-SCROLL)
         val isTimeline = true

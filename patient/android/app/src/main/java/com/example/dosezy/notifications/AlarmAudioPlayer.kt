@@ -113,9 +113,11 @@ object AlarmAudioPlayer {
         var playbackStarted = false
 
         // 1. Try Custom Sound if configured
-        if (sound == AlarmSound.CUSTOM && !customPath.isNullOrEmpty() && File(customPath).exists()) {
+        // Guard: Strip file:// prefix so File(cleanPath).exists() accurately validates custom alarm sounds and prevents silent fallback (#BUG-AUDIO-FILE-URI)
+        val cleanCustomPath = customPath?.removePrefix("file://")
+        if (sound == AlarmSound.CUSTOM && !cleanCustomPath.isNullOrEmpty() && File(cleanCustomPath).exists()) {
             try {
-                Log.d(TAG, "Attempting custom alarm sound from: $customPath")
+                Log.d(TAG, "Attempting custom alarm sound from: $cleanCustomPath")
                 mediaPlayer = MediaPlayer().apply {
                     setAudioAttributes(
                         AudioAttributes.Builder()
@@ -123,7 +125,7 @@ object AlarmAudioPlayer {
                             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                             .build()
                     )
-                    setDataSource(customPath)
+                    setDataSource(cleanCustomPath)
                     isLooping = shouldLoop
                     if (!shouldLoop) {
                         setOnCompletionListener {

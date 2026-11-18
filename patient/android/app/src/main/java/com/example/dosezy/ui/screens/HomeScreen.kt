@@ -120,7 +120,8 @@ fun HomeScreen(
     val listState = rememberLazyListState()
 
     // State for collapsible time slots ("Rollup", #138)
-    var collapsedSlots by remember { mutableStateOf<Set<String>>(emptySet()) }
+    // Guard: Key collapsedSlots by active userId to prevent cross-profile collapse contamination from concealing doses on profile switch (#BUG-COLLAPSED-SLOTS-PROFILE)
+    var collapsedSlots by remember(currentUser?.userId) { mutableStateOf<Set<String>>(emptySet()) }
     val isRollupEnabled = currentUser?.slotRollupEnabled == true
 
     // State for real-time updates

@@ -1,5 +1,7 @@
 package com.example.dosezy.ui.subscreens
 
+import androidx.activity.compose.BackHandler
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -398,6 +400,11 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
                     }
                 }
             }
+        }
+
+        // Guard: Intercept back navigation when country dropdown is expanded so back press closes menu instead of exiting screen (#BUG-EMERGENCY-BACK-DROPDOWN)
+        BackHandler(enabled = countryDropdownExpanded) {
+            countryDropdownExpanded = false
         }
 
         // Country Dropdown Picker (no redundant header - TopBar already shows title)

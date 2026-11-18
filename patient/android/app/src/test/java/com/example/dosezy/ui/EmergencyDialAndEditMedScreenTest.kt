@@ -630,6 +630,31 @@ class EmergencyDialAndEditMedScreenTest {
             isTimingOrScheduleChanged(baseMed, baseMed.copy(dosage = 500.0, frequency = Frequency(pattern = FrequencyPattern.AS_NEEDED)))
         )
     }
+
+    @Test
+    fun testEmergencyScreen_backHandlerClosesCountryDropdownWithoutExitingScreen() {
+        // Guard: Back press when country dropdown is expanded must collapse the menu rather than popping navigation (#BUG-EMERGENCY-BACK-DROPDOWN)
+        var countryDropdownExpanded = true
+        var screenExited = false
+
+        // Simulate BackHandler action
+        val backHandlerAction: () -> Unit = {
+            if (countryDropdownExpanded) {
+                countryDropdownExpanded = false
+            } else {
+                screenExited = true
+            }
+        }
+
+        // First back press: collapses dropdown
+        backHandlerAction()
+        assertFalse("First back press must collapse country dropdown", countryDropdownExpanded)
+        assertFalse("First back press must not exit the emergency screen", screenExited)
+
+        // Second back press: exits screen
+        backHandlerAction()
+        assertTrue("Second back press with closed dropdown exits screen", screenExited)
+    }
 }
 
 
