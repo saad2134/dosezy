@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   verify-source:
@@ -36,3 +37,19 @@ jobs:
                 ;;
             esac
           fi
+
+      - name: Verify No Open PRs Target develop
+        if: github.head_ref == 'develop'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          echo "Verifying that no open pull requests are pointed at 'develop'..."
+          OPEN_PRS=$(gh pr list --repo "$REPO" --base develop --state open --json number,title,headRefName --jq '.[] | "PR #\(.number) [\(.headRefName)]: \(.title)"')
+          if [ -n "$OPEN_PRS" ]; then
+            echo "::error title=Active PRs Target develop::Cannot merge develop into main while open pull requests are targeting develop. All develop-bound PRs must be merged or closed first."
+            echo "Pending pull requests targeting develop:"
+            echo "$OPEN_PRS"
+            exit 1
+          fi
+          echo "Verified: Zero open pull requests targeting develop."
