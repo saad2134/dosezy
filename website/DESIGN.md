@@ -1,4 +1,4 @@
-# DESIGN.md - Dosezy Design System & Aesthetic Standard (v2.5.13)
+# DESIGN.md - Dosezy Design System & Aesthetic Standard (v2.5.14)
 
 ## 1. Vision & Tone
 Dosezy is a high-assurance, open-source, local-first medicine tracking platform. The landing page design features **icon-extracted corner purple & violet aesthetics**: sleek obsidian background, radiant violet/purple ambient glows, glassmorphic surface depth, crisp high-contrast typography, and vibrant status accents (Purple/Violet for primary brand highlights, Cyan for tech precision, Sunset Amber for adherence/late reminders, Crimson for emergency features).
