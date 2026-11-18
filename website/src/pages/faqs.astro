@@ -125,6 +125,48 @@ import Footer from '../components/Footer.astro';
 					</div>
 				</details>
 
+				<!-- Question: Nagging Reminders -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>What are Nagging Reminders and how do they work?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
+						<p>If you tend to sleep through alarms or get sidetracked, turn on <strong>Nagging Reminders</strong> in <strong>Menu &gt; Preferences &gt; Notifications &amp; Alarms</strong>.</p>
+						<p>Dosezy will repeat periodic reminder alarms every 5, 10, or 15 minutes up to 1, 2, 3, 5, or 10 times, or continuously until you confirm the dose as taken.</p>
+					</div>
+				</details>
+
+				<!-- Question: ADHD Intake Safeguard -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>What is the ADHD / Distraction Intake Safeguard?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
+						<p>Designed for busy routines and ADHD focus, the <strong>Intake Countdown Safeguard</strong> starts a timer (60s, 120s, 180s, or 300s) when you tap "Take".</p>
+						<p>If you get distracted or interrupted before actually swallowing your medication, Dosezy triggers an automatic re-alert so no dose is forgotten.</p>
+					</div>
+				</details>
+
+				<!-- Question: Lock Screen Privacy -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>Can I protect my medical privacy on the Android lock screen?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
+						<p>Yes! In <strong>Menu &gt; Preferences &gt; Notifications &amp; Alarms</strong>, turn on <strong>Mask Details on Lock Screen</strong>.</p>
+						<p>The notification alerts you that it is time for your medicine, while keeping specific medication names and dosages concealed until you unlock your phone.</p>
+					</div>
+				</details>
+
 				<!-- Question: Clinical Dose Skipping -->
 				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
 					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
@@ -222,6 +264,20 @@ import Footer from '../components/Footer.astro';
 					</summary>
 					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4">
 						On the <strong>Medicines</strong> screen, an instant search bar is available at the top. Simply type any part of the medication name or instructions to filter your roster in real time.
+					</div>
+				</details>
+
+				<!-- Question: Sorting & Custom Reordering -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>Can I sort or rearrange the order of my medications?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
+						<p>Yes! On the <strong>Medicines</strong> screen, tap the <strong>Sort</strong> button next to the search bar.</p>
+						<p>You can sort prescriptions by <strong>Default</strong> (order added), <strong>Name (A-Z or Z-A)</strong>, <strong>Scheduled Time</strong>, or choose <strong>Custom Reorder</strong> to drag medications up and down into your preferred personal order.</p>
 					</div>
 				</details>
 
@@ -340,6 +396,23 @@ import Footer from '../components/Footer.astro';
 						<p><strong class="text-amber-400">Orange:</strong> Dose is Late (within your customizable late-to-missed window). An orange "Mark Late" action appears.</p>
 						<p><strong class="text-rose-400">Red:</strong> Dose is Missed (past your "Consider Missed After" window).</p>
 						<p><strong class="text-sky-400">Blue:</strong> Dose is Clinically Skipped (shows reason badge with active Undo button).</p>
+					</div>
+				</details>
+
+				<!-- Question: Late & Missed Thresholds -->
+				<details class="faq-item vercel-card rounded-2xl border border-white/10 bg-[#0a0c10]/95 group overflow-hidden">
+					<summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white text-base hover:text-sky-300 transition-colors list-none">
+						<span>Can I customize when a dose is considered "Late" or "Missed"?</span>
+						<svg class="w-5 h-5 text-neutral-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</summary>
+					<div class="px-6 pb-6 text-xs text-neutral-300 leading-relaxed border-t border-white/5 pt-4 space-y-2">
+						<p>Yes! Under <strong>Menu &gt; Preferences &gt; Dose Tracking</strong>, you can fine-tune both time boundaries:</p>
+						<ul class="list-disc list-inside space-y-1 text-neutral-300 text-[11px] pl-1">
+							<li><strong class="text-white">Consider Late After:</strong> Options from 15, 30, 45, 60 minutes up to 4 hours (default is 3 hours).</li>
+							<li><strong class="text-white">Consider Missed After:</strong> Options from 30 minutes up to 12 hours (default is 6 hours).</li>
+						</ul>
 					</div>
 				</details>
 

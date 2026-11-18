@@ -1,11 +1,11 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
-import { socialRedirects } from './src/lib/social-links.ts';
+import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
-  redirects: socialRedirects,
+  integrations: [react()],
   vite: {
     plugins: [tailwindcss()],
   },

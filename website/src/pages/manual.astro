@@ -346,8 +346,9 @@ import Footer from '../components/Footer.astro';
 							</ol>
 
 							<div class="bg-[#030407] p-3.5 rounded-2xl border border-white/10 space-y-1.5 mt-2">
-								<p><strong class="text-sky-300">Live Search & Filter:</strong> Use the top search bar on the Medicines screen to instantly filter pills by name or instructions in real time.</p>
-								<p><strong class="text-sky-300">Discontinue & Archive Accordion:</strong> When a course finishes, tap <em>Edit &gt; Discontinue</em>. The medicine moves to a collapsible accordion at the bottom of your Medicines screen, keeping your active list clutter-free while preserving all past logs and reports.</p>
+								<p><strong class="text-sky-300">Live Search &amp; Filter:</strong> Use the top search bar on the Medicines screen to instantly filter pills by name or instructions in real time.</p>
+								<p><strong class="text-sky-300">Prescription Sorting &amp; Custom Reorder:</strong> Tap the Sort button next to search to organize your list by Default, Name (A-Z or Z-A), Scheduled Time, or choose Custom Reorder to drag and drop medicines into your personal preferred sequence.</p>
+								<p><strong class="text-sky-300">Discontinue &amp; Archive Accordion:</strong> When a course finishes, tap <em>Edit &gt; Discontinue</em>. The medicine moves to a collapsible accordion at the bottom of your Medicines screen, keeping your active list clutter-free while preserving all past logs and reports.</p>
 								<p><strong class="text-sky-300">Flexible Add Button:</strong> When the bottom navigation '+' button is hidden in Preferences, an "Add Medicine" button appears conveniently below your active medications roster.</p>
 							</div>
 						</div>
@@ -391,6 +392,14 @@ import Footer from '../components/Footer.astro';
 								<strong class="text-sky-300 block">Back-Gesture Snooze:</strong>
 								<span class="text-neutral-400 text-[11px]">Pressing the device Back button automatically snoozes the alarm safely, preventing accidental dismissals into a missed state.</span>
 							</div>
+							<div class="bg-[#030407] p-3.5 rounded-2xl border border-white/10 space-y-1">
+								<strong class="text-sky-300 block">Nagging Follow-Up Alarms:</strong>
+								<span class="text-neutral-400 text-[11px]">Repeats reminder alarms every 5, 10, or 15 minutes up to 10 times or until marked taken, ensuring snoozed doses are never forgotten.</span>
+							</div>
+							<div class="bg-[#030407] p-3.5 rounded-2xl border border-white/10 space-y-1">
+								<strong class="text-sky-300 block">ADHD Intake Safeguard:</strong>
+								<span class="text-neutral-400 text-[11px]">Starts a countdown timer upon tapping Take that sounds an automatic re-alert if you get distracted before actually consuming your pills.</span>
+							</div>
 						</div>
 
 						<div class="bg-[#030407] p-3.5 rounded-2xl border border-white/10 text-xs text-neutral-300 space-y-1.5 mt-2">
@@ -400,7 +409,7 @@ import Footer from '../components/Footer.astro';
 								<li><strong class="text-white">Reminder Style:</strong> Choose between <strong class="text-white">Full-Screen Alarm</strong> (rings aloud with slide gestures and volume silencing) or <strong class="text-white">Gentle Notification</strong> (standard notification chime).</li>
 								<li><strong class="text-white">Custom Tones:</strong> Choose built-in alert chimes, system alarms, or your own device ringtones with in-app audio preview playback.</li>
 								<li><strong class="text-white">Alarm Duration:</strong> Choose ring length: 30 seconds, 1 minute, 2 minutes, 3 minutes, 5 minutes, or continuous loop.</li>
-								<li><strong class="text-white">Dynamic Snooze:</strong> Choose 5, 10, 15, 20, or 30 minute snooze intervals.</li>
+								<li><strong class="text-white">Dynamic Snooze:</strong> Choose 5, 10, 15, 20, or 30 minute intervals, or pick custom snooze chips directly on the alarm screen.</li>
 							</ul>
 						</div>
 					</article>
@@ -531,13 +540,13 @@ import Footer from '../components/Footer.astro';
 							<ul class="list-disc list-inside space-y-1.5 text-neutral-300">
 								<li><strong class="text-white">General:</strong> App language (12 languages) and 12h/24h time format.</li>
 								<li><strong class="text-white">Appearance:</strong> Light/Dark theme, Home vertical Timeline Mode, Thicker Calendar Day Highlights, and <em>Hide Navigation Add Button</em> (hides the center '+' button for a symmetrical 4-tab bar and places an "Add Medicine" button on the Medicines screen).</li>
-								<li><strong class="text-white">Notifications &amp; Alarms:</strong> Reminder Style (Full-Screen Alarm vs Gentle Notification), Slide to Take &amp; Snooze gestures, default snooze interval (5-30 min), custom ringtone selection, volume slider, and alarm sound duration (30s-5m/loop).</li>
+								<li><strong class="text-white">Notifications &amp; Alarms:</strong> Reminder Style (Full-Screen Alarm vs Gentle Notification), Slide to Take &amp; Snooze gestures, default snooze interval (5-30 min), Nagging Reminders, ADHD Intake Safeguard, Mask Details on Lock Screen, custom ringtone selection, volume slider, and alarm sound duration (30s-5m/loop).</li>
 								<li><strong class="text-white">Dose Tracking:</strong>
 									<ul class="list-disc list-inside ml-3 mt-1 space-y-1 text-[11px] text-neutral-300">
 										<li><strong class="text-white">Allow Dose Undo:</strong> Toggle whether doses can be undone from cards or snackbars, with a safety confirmation dialog before restoring stock counts (default off).</li>
 										<li><strong class="text-white">Dose Notes:</strong> Master toggle to allow attaching meal context and symptom notes to doses, with optional <em>Prompt on Dose Taken</em> automation (default off; hides "+ Add Note" when disabled).</li>
 										<li><strong class="text-white">Allow Dose Skipping:</strong> Opt-in secondary "Skip" button with mandatory clinical reasons that protect your compliance streak.</li>
-										<li><strong class="text-white">Late &amp; Missed Windows:</strong> Adjust <em>Consider Late After</em> (1h-3h) and <em>Consider Missed After</em> (3h-9h).</li>
+										<li><strong class="text-white">Late &amp; Missed Windows:</strong> Adjust <em>Consider Late After</em> (15m to 4h, default 3h) and <em>Consider Missed After</em> (30m to 12h, default 6h).</li>
 									</ul>
 								</li>
 							</ul>
