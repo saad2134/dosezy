@@ -145,7 +145,7 @@ Dosezy transforms daily medication management into a stress-free experience. Inp
 
 | Module | Platform | Status | Min / Target | Tech Stack |
 | :--- | :--- | :--- | :--- | :--- |
-| **📱 Patient App** | Android | Released (v2.5.12) | Android 7.0+ (API 24+) | Kotlin, Jetpack Compose, Room |
+| **📱 Patient App** | Android | Released (v2.5.13) | Android 7.0+ (API 24+) | Kotlin, Jetpack Compose, Room |
 | **🍎 Patient App** | iOS | Planned | iOS 16+ | Swift, SwiftUI, SwiftData |
 | **☁️ Server Node** | Server / API | In Development | Docker / Self-Host | Node.js, Fastify, TypeScript, SQLite/Postgres |
 | **🩺 Caregiver Portal** | Web | In Development | Modern Browsers | Astro, TypeScript, Tailwind |
@@ -221,7 +221,7 @@ flowchart TB
 dosezy/
 ├── .github/                  # CI/CD workflows, build pipelines, and repository automation
 ├── api/                      # OpenAPI 3.0 contract (openapi.yaml) defining shared client/server schemas
-├── caregiver/                # Caregiver companion application & web dashboard (app.dosezy.com)
+├── caregiver/                # Caregiver companion application & web dashboard (caregiver.dosezy.app)
 ├── docs/                     # Architecture Decision Records (ADRs), domain specifications, and guides
 │   ├── architecture/         # Data layer, sync protocols, and encryption designs
 │   ├── privacy/              # Data safety declarations and health privacy compliance
@@ -263,13 +263,13 @@ dosezy/
       <td><strong>Local-First Android Client & Schema Parity</strong></td>
       <td>Core Adherence & Ecosystem Parity</td>
       <td>Jetpack Compose UI, 12 native localizations, Room offline database v15, time zone travel, manual dose recording, per-dose symptom notes, dose undo confirmation, pharmacy refill orders with smart bottle supplies, full-screen alarms, emergency dialer, shared OpenAPI 3.0 contract.</td>
-      <td align="center">🟢 Released (v2.5.12)<br><sub>🟡 In Dev (v2.5.13)</sub></td>
+      <td align="center">🟢 Released (v2.5.13)<br><sub>🟡 In Dev (v2.5.14)</sub></td>
     </tr>
     <tr>
       <td><strong>v3.0 - v3.9</strong></td>
       <td><strong>Self-Hostable Backend & Caregiver Platform</strong></td>
       <td>Incremental Sync & Web Portal</td>
-      <td>Open-source server (<code>server/</code>), PostgreSQL DB, conflict-free sync engine, offline mutation queues, optional cloud connection, dedicated Caregiver web portal (<code>caregiver/</code> at <code>app.dosezy.com</code>), remote adherence monitoring, patient-controlled granular sharing permissions.</td>
+      <td>Open-source server (<code>server/</code>), PostgreSQL DB, conflict-free sync engine, offline mutation queues, optional cloud connection, dedicated Caregiver web portal (<code>caregiver/</code> at <code>caregiver.dosezy.app</code>), remote adherence monitoring, patient-controlled granular sharing permissions.</td>
       <td align="center">⏳ Planned</td>
     </tr>
     <tr>

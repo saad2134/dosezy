@@ -4,7 +4,10 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 ---
 
-<Layout title="Press & Media Kit ✦ Dosezy Brand Assets & Press Release">
+<Layout 
+	title="Press & Media Kit ✦ Dosezy Brand Assets & Press Release"
+	description="Official press kit and media assets for Dosezy. Download brand marks, high-resolution logos, screenshots, and product announcement releases."
+>
 	<Header />
 	<main class="flex-grow pt-28 sm:pt-32 pb-16 bg-[#030407] bg-grid-pattern">
 		<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -29,7 +32,7 @@ import Footer from '../components/Footer.astro';
 				<div class="p-8 rounded-3xl bg-[#0a0c10]/95 border border-white/10 flex flex-col justify-between space-y-6">
 					<div>
 						<div class="w-16 h-16 rounded-2xl overflow-hidden p-1 bg-gradient-to-tr from-blue-500 via-sky-400 to-indigo-500 shadow-lg mb-4">
-							<img src="/icon-squircle-1000px.png" alt="Dosezy Squircle Icon" class="w-full h-full object-cover rounded-xl" />
+							<img src="/icon-squircle-1000px.png" alt="Dosezy Squircle Icon" class="w-full h-full object-cover rounded-xl" loading="lazy" decoding="async" />
 						</div>
 						<h3 class="text-xl font-bold text-white font-display">Official Squircle Icon</h3>
 						<p class="mt-2 text-xs text-neutral-400 leading-relaxed">
@@ -53,7 +56,7 @@ import Footer from '../components/Footer.astro';
 				<div class="p-8 rounded-3xl bg-[#0a0c10]/95 border border-white/10 flex flex-col justify-between space-y-6">
 					<div>
 						<div class="h-16 flex items-center space-x-3 mb-4">
-							<img src="/icon-squircle-1000px.png" alt="Dosezy Logo" class="w-10 h-10 rounded-xl" />
+							<img src="/icon-squircle-1000px.png" alt="Dosezy Logo" class="w-10 h-10 rounded-xl" loading="lazy" decoding="async" />
 							<span class="font-bold text-3xl text-white">Dosezy<span class="text-sky-400">.</span></span>
 						</div>
 						<h3 class="text-xl font-bold text-white font-display">Full Wordmark & Brand Logo</h3>
@@ -195,7 +198,7 @@ import Footer from '../components/Footer.astro';
 				<div class="pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-neutral-400 border-t border-white/10">
 					<div>
 						<span>For press inquiries & media interviews: </span>
-						<a href="mailto:press@dosezy.com" class="text-sky-300 hover:underline font-mono">press@dosezy.com</a>
+						<a href="mailto:press@dosezy.app" class="text-sky-300 hover:underline font-mono">press@dosezy.app</a>
 					</div>
 					<a href="/contact" class="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold hover:shadow-md transition-all">
 						Contact Press Team →
