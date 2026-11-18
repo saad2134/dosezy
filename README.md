@@ -9,7 +9,7 @@
 
 <div align="center">
 
-[![Android Patient App](https://img.shields.io/badge/Android%20Patient-v2.5.12%20Released-1e293b?style=flat&logo=android&logoColor=white&labelColor=2ea44f)](https://github.com/saad2134/dosezy/releases)
+[![Android Patient App](https://img.shields.io/badge/Android%20Patient-v2.5.13%20Released-1e293b?style=flat&logo=android&logoColor=white&labelColor=2ea44f)](https://github.com/saad2134/dosezy/releases)
 [![iOS Patient App](https://img.shields.io/badge/iOS%20Patient-Planned-1e293b?style=flat&logo=apple&logoColor=white&labelColor=007aff)](https://github.com/saad2134/dosezy)
 [![Server Node](https://img.shields.io/badge/Server%20Node-In%20Dev-1e293b?style=flat&logo=fastify&logoColor=white&labelColor=8b5cf6)](https://github.com/saad2134/dosezy)
 [![Caregiver Web](https://img.shields.io/badge/Caregiver%20Web-In%20Dev-1e293b?style=flat&logo=astro&logoColor=white&labelColor=f59e0b)](https://github.com/saad2134/dosezy)
@@ -20,11 +20,16 @@
 
 ### 💊 Patient App (Free, Open-source, Offline & Private by Default)
 
-> <sub>💡 **Note:** Some stores (such as F-Droid, etc.) may take a few days (usually 2-5 days) to review and publish new releases. For immediate access to the latest updates, download directly from [GitHub Releases](https://github.com/saad2134/dosezy/releases). Also, if you sideload apps from GitHub, APKMirror etc., check out ObtainX. It handles all the updates automatically so you don't have to keep checking the sites manually: https://bikram-agarwal.github.io/obtainx/</sub>
+> 💡 **Note:** New releases may take 2–5 days to appear on stores like F-Droid. Get the latest version directly from [GitHub Releases](https://github.com/saad2134/dosezy/releases). For automatic updates when sideloading, try [ObtainX](https://bikram-agarwal.github.io/obtainx/).
+>
+> **Official Publication Partner:** [Attenomy](https://attenomy.com).
 
 <br>
 
 <div align="center">
+  <a href="https://play.google.com/store/apps/details?id=com.saad2134.dosezy">
+    <img width="197" height="59" alt="Google Play" src="assets/badges/google-play.png" />
+  </a>
   <a href="https://f-droid.org/en/packages/com.saad2134.dosezy">
     <img width="197" height="59" alt="F-Droid" src="assets/badges/fdroid.png" />
   </a>
@@ -54,9 +59,6 @@
 #### Coming Soon On
 
 <div align="center">
-  <a href="https://play.google.com/store/apps/details?id=com.saad2134.dosezy">
-    <img width="197" height="59" alt="Google Play" src="assets/badges/google-play.png" />
-  </a>
   <a href="#">
     <img width="197" height="59" alt="App Store" src="assets/badges/app-store.png" />
   </a>
