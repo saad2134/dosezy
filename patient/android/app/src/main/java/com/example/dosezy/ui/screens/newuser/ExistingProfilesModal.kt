@@ -5,6 +5,7 @@
 
 package com.example.dosezy.ui.screens.newuser
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -56,6 +57,11 @@ fun ExistingProfilesModal(
     onClose: () -> Unit,
     navController: NavController
 ) {
+    // Guard: Intercept system back press when modal is visible so back gesture dismisses the modal instead of navigating away or closing app (#BUG-PROFILES-MODAL-BACK)
+    BackHandler(enabled = true) {
+        onClose()
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()

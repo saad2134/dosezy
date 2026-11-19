@@ -6,6 +6,7 @@
 package com.example.dosezy.ui.components.form
 
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -82,6 +83,12 @@ fun DosageInputSection(
     invalidTimeSlotKeys: Set<String> = emptySet()
 ) {
     var dosageUnitExpanded by remember { mutableStateOf(false) }
+
+    // Guard: Intercept back navigation when dosage unit dropdown is expanded so back press closes menu instead of exiting medication form (#BUG-FORM-BACK-DROPDOWN)
+    BackHandler(enabled = dosageUnitExpanded) {
+        dosageUnitExpanded = false
+    }
+
     val showDifferentDosagesOption = scheduledTimesList.size > 1 && selectedFrequency != FrequencyPattern.AS_NEEDED
 
     Column(modifier = modifier.fillMaxWidth()) {

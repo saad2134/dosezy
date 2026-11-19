@@ -5,6 +5,7 @@
 
 package com.example.dosezy.ui.components.form
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -68,6 +69,11 @@ fun FrequencyConfigSection(
     onRollingIntervalChange: (Boolean) -> Unit = {}
 ) {
     var frequencyExpanded by remember { mutableStateOf(false) }
+
+    // Guard: Intercept back navigation when frequency dropdown is expanded so back press closes menu instead of exiting medication form (#BUG-FORM-BACK-DROPDOWN)
+    BackHandler(enabled = frequencyExpanded) {
+        frequencyExpanded = false
+    }
 
     Column(modifier = modifier.fillMaxWidth()) {
         // Frequency Dropdown

@@ -1,7 +1,9 @@
 package com.example.dosezy
 
+import androidx.compose.ui.graphics.Color
 import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.ScheduleEntry
+import com.example.dosezy.ui.components.getDateStatusColor
 import com.example.dosezy.utils.TimeCalculationUtils
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -461,6 +463,59 @@ class AdherenceAndAnalyticsTest {
         assertEquals(0, statB.decided)
         val displayTextB = if (statB.decided > 0) "${statB.rate}%" else "-"
         assertEquals("-", displayTextB)
+    }
+
+    @Test
+    fun scheduleCalendar_adhocPrnDose_doesNotColorCalendarDayGreen() {
+        // Guard: Ad-hoc PRN doses must not color rest days green or indicate false 100% adherence (#BUG-CALENDAR-PRN)
+        val prnDate = LocalDate.now().minusDays(2)
+        val prnEntry = ScheduleEntry(
+            entryId = "PRN_med_as_needed_${System.currentTimeMillis()}",
+            userId = "usr_1",
+            medicineId = "med_prn",
+            scheduledDateTime = prnDate.atTime(14, 0),
+            status = MedicationStatus.TAKEN_ON_TIME,
+            takenAt = prnDate.atTime(14, 5)
+        )
+
+        // 1. Calling getDateStatusColor directly with only PRN entries returns Color.Transparent
+        val color = getDateStatusColor(listOf(prnEntry))
+        assertEquals(Color.Transparent, color)
+
+        // 2. Pre-grouping entries filters out PRN entries so the date has no scheduled entries
+        val allEntries = listOf(prnEntry)
+        val entriesByDate = allEntries.filter { !it.entryId.startsWith("PRN_") }.groupBy { it.scheduledDateTime.toLocalDate() }
+        val dayEntries = entriesByDate[prnDate] ?: emptyList()
+        assertTrue(dayEntries.isEmpty())
+        assertEquals(Color.Transparent, getDateStatusColor(dayEntries))
+    }
+
+    @Test
+    fun scheduleCalendar_mixedScheduledAndPrnDoses_evaluatesOnlyScheduledRegimen() {
+        // Guard: On a day with scheduled doses and an ad-hoc PRN dose, PRN dose must not mask missed scheduled dose (#BUG-CALENDAR-PRN)
+        val date = LocalDate.now().minusDays(1)
+        val missedScheduledEntry = ScheduleEntry(
+            entryId = "scheduled_morning_dose",
+            userId = "usr_1",
+            medicineId = "med_daily",
+            scheduledDateTime = date.atTime(8, 0),
+            status = MedicationStatus.MISSED
+        )
+        val takenPrnEntry = ScheduleEntry(
+            entryId = "PRN_painkiller_afternoon",
+            userId = "usr_1",
+            medicineId = "med_prn",
+            scheduledDateTime = date.atTime(15, 0),
+            status = MedicationStatus.TAKEN_ON_TIME,
+            takenAt = date.atTime(15, 0)
+        )
+
+        // Both entries present on same day
+        val dayEntries = listOf(missedScheduledEntry, takenPrnEntry)
+        val color = getDateStatusColor(dayEntries)
+
+        // Must be Red (0xFFEF4444) for missed scheduled dose, not green or amber
+        assertEquals(Color(0xFFEF4444), color)
     }
 }
 

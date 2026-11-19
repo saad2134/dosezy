@@ -1,5 +1,6 @@
 package com.example.dosezy.ui.subscreens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 
@@ -558,6 +559,11 @@ fun GenderDropdown(
     modifier: Modifier = Modifier,
     isError: Boolean = false
 ) {
+    // Guard: Intercept back navigation when gender dropdown is expanded so back press closes menu instead of exiting screen (#BUG-PROFILE-BACK-DROPDOWN)
+    BackHandler(enabled = expanded) {
+        onExpandedChange(false)
+    }
+
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = onExpandedChange,

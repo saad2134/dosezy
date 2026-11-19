@@ -5,6 +5,7 @@
 
 package com.example.dosezy.ui.screens.newuser
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -362,6 +363,11 @@ fun GenderDropdown(
     modifier: Modifier = Modifier,
     isError: Boolean = false
 ) {
+    // Guard: Intercept back navigation when gender dropdown is expanded so back press closes menu instead of exiting screen (#BUG-ONBOARDING-BACK-DROPDOWN)
+    BackHandler(enabled = expanded) {
+        onExpandedChange(false)
+    }
+
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = onExpandedChange,

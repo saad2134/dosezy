@@ -7,6 +7,7 @@ package com.example.dosezy.ui.screens
 
 import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -89,6 +90,18 @@ fun NewUserScreen(
     var completeProfileSetup by remember { mutableStateOf({}) }
     var showExistingProfiles by remember { mutableStateOf(false) }
     var showImportSourceDialog by remember { mutableStateOf(false) }
+
+    // Guard: Intercept system back press on initial onboarding frame when existing profiles exist to return to switch profile screen (#BUG-ONBOARDING-BACK)
+    BackHandler(enabled = currentFrame == 1 && users.isNotEmpty()) {
+        navController.navigate("switch_profile") {
+            popUpTo(navController.currentBackStackEntry?.destination?.route ?: "newuser/1") { inclusive = true }
+        }
+    }
+
+    // Guard: Intercept system back press when existing profiles modal is displayed so back gesture dismisses the modal (#BUG-PROFILES-MODAL-BACK)
+    BackHandler(enabled = showExistingProfiles) {
+        showExistingProfiles = false
+    }
 
     val prefs = remember { context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE) }
     var isDisclaimerAccepted by remember {
