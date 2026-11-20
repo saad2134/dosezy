@@ -627,4 +627,101 @@ class ScheduleGenerationTest {
         assertEquals(8, entries.size)
         assertTrue(entries.all { !it.scheduledDateTime.toLocalDate().isAfter(LocalDate.of(2026, 12, 3)) })
     }
+
+    // ───────────────────────────────────────────────────────────────
+    // 12. CYCLICAL frequency (take X days, pause Y days) (#141)
+    // ───────────────────────────────────────────────────────────────
+
+    @Test
+    fun cyclicalMedicine_21_7_generatesEntriesOnlyOnActiveDays() {
+        val startDate = LocalDate.of(2026, 1, 1)
+        val m = med(
+            freq = Frequency(
+                pattern = FrequencyPattern.CYCLICAL,
+                cycleActiveDays = 21,
+                cycleRestDays = 7
+            ),
+            times = listOf(LocalTime.of(9, 0)),
+            start = startDate
+        )
+
+        // Generate for 28 days (days = 27 inclusive, so Jan 1 to Jan 28)
+        val entries = m.generateScheduleEntries(startDateRange = startDate, days = 27)
+
+        // 21 active days in first 28-day cycle
+        assertEquals(21, entries.size)
+
+        // Days 1 through 21 (Jan 1 - Jan 21) must be active
+        for (day in 1..21) {
+            val date = startDate.plusDays((day - 1).toLong())
+            assertTrue("Day $day ($date) should be active", m.shouldTakeOnDate(date))
+        }
+
+        // Days 22 through 28 (Jan 22 - Jan 28) must be break/rest days
+        for (day in 22..28) {
+            val date = startDate.plusDays((day - 1).toLong())
+            assertFalse("Day $day ($date) should be a rest/break day", m.shouldTakeOnDate(date))
+        }
+
+        // Day 29 (Jan 29, cycle 2 day 1) must be active again
+        val day29 = startDate.plusDays(28)
+        assertTrue("Day 29 ($day29) should be active (new cycle start)", m.shouldTakeOnDate(day29))
+
+        // Full 2 cycles (56 days, Jan 1 to Feb 25): 2 * 21 = 42 entries
+        val twoCycles = m.generateScheduleEntries(startDateRange = startDate, days = 55)
+        assertEquals(42, twoCycles.size)
+    }
+
+    @Test
+    fun cyclicalMedicine_24_4_generatesEntriesOnlyOnActiveDays() {
+        val startDate = LocalDate.of(2026, 3, 1)
+        val m = med(
+            freq = Frequency(
+                pattern = FrequencyPattern.CYCLICAL,
+                cycleActiveDays = 24,
+                cycleRestDays = 4
+            ),
+            times = listOf(LocalTime.of(20, 0)),
+            start = startDate
+        )
+
+        // 28-day cycle: 24 active, 4 rest
+        val entries = m.generateScheduleEntries(startDateRange = startDate, days = 27)
+        assertEquals(24, entries.size)
+
+        // Verify day 24 is active, day 25 is rest
+        val day24 = startDate.plusDays(23)
+        val day25 = startDate.plusDays(24)
+        assertTrue(m.shouldTakeOnDate(day24))
+        assertFalse(m.shouldTakeOnDate(day25))
+
+        // Day 29 is start of cycle 2
+        val day29 = startDate.plusDays(28)
+        assertTrue(m.shouldTakeOnDate(day29))
+    }
+
+    @Test
+    fun cyclicalMedicine_negativeDateOffsetHandledSymmetrically() {
+        val m = med(
+            freq = Frequency(
+                pattern = FrequencyPattern.CYCLICAL,
+                cycleActiveDays = 21,
+                cycleRestDays = 7
+            ),
+            times = listOf(LocalTime.of(8, 0)),
+            start = null // No start boundary clamp, test pure cycle recurrence
+        )
+
+        // Date 1 day before reference (28-day cycle length): dayInCycle = 27, which is a rest day (21..27)
+        val dayBefore = LocalDate.of(2020, 1, 1).minusDays(1)
+        assertFalse(m.shouldTakeOnDate(dayBefore))
+
+        // Date 7 days before reference: dayInCycle = 21, which is the 1st rest day
+        val restDay1 = LocalDate.of(2020, 1, 1).minusDays(7)
+        assertFalse(m.shouldTakeOnDate(restDay1))
+
+        // Date 8 days before reference: dayInCycle = 20, which is the last active day
+        val lastActive = LocalDate.of(2020, 1, 1).minusDays(8)
+        assertTrue(m.shouldTakeOnDate(lastActive))
+    }
 }

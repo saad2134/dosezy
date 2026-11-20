@@ -498,6 +498,30 @@
     <string name="freq_rolling_interval_desc">নিরাপদ ব্যবধান বজায় রাখতে ওষুধ খাওয়ার পর পরবর্তী ডোজের টাইমার শুরু হবে</string>
     <string name="freq_rolling_badge">রোলিং</string>
 
+    <!-- Cyclical & Looping Schedules (#141) -->
+    <string name="freq_cyclical">চক্রীয় (ওষুধ সেবন ও বিরতি দিন)</string>
+    <string name="freq_cyclical_desc">ওষুধ সেবনের দিনগুলিতে নিয়মিত খান, তারপর বিরতির দিনগুলিতে বন্ধ রাখুন (যেমন জন্ম নিয়ন্ত্রণ পিল)।</string>
+    <string name="freq_cycle_format">%1$d দিন সেবন, %2$d দিন বিরতি</string>
+    <string name="freq_cycle_active_days">সেবনের দিন</string>
+    <string name="freq_cycle_rest_days">বিরতির দিন</string>
+    <string name="freq_cycle_preset_21_7">21 / 7 (সাধারণ)</string>
+    <string name="freq_cycle_preset_24_4">24 / 4 (বর্ধিত)</string>
+    <string name="freq_cycle_preset_custom">কাস্টম</string>
+    <string name="cycle_presets_label">সাইকেল প্রিসেট</string>
+
+    <!-- PRN Next Dose Eligible Alerts (#142) -->
+    <string name="freq_as_needed_interval_title">ডোজের মধ্যে ন্যূনতম ব্যবধান</string>
+    <string name="freq_as_needed_interval_desc">পরবর্তী ডোজ গ্রহণ নিরাপদ এবং অনুমোদিত হলে বিজ্ঞপ্তি পান।</string>
+    <string name="freq_as_needed_interval_format">প্রয়োজনমতো (ন্যূনতম %1$d ঘণ্টা)</string>
+    <string name="freq_as_needed_notify_eligible">পরবর্তী ডোজের সময় হলে সতর্কবার্তা দিন</string>
+    <string name="freq_as_needed_interval_none">কিছুই নয়</string>
+    <string name="freq_as_needed_interval_hours_label">ন্যূনতম ব্যবধান (ঘণ্টা)</string>
+    <string name="prn_eligible_channel_name">পরবর্তী ডোজ প্রস্তুত (প্রয়োজনমতো ওষুধ)</string>
+    <string name="prn_eligible_channel_desc">প্রয়োজনমতো ওষুধের ন্যূনতম সময়ের ব্যবধান পার হলে বিজ্ঞপ্তি।</string>
+    <string name="prn_eligible_notification_title">পরবর্তী ডোজ প্রস্তুত</string>
+    <string name="prn_eligible_notification_body">%2$s-এর ন্যূনতম %1$d ঘণ্টার ব্যবধান শেষ হয়েছে। প্রয়োজনে পরবর্তী ডোজ গ্রহণ করতে পারেন।</string>
+    <string name="prn_eligible_notification_body_generic">%1$s-এর ন্যূনতম ব্যবধান শেষ হয়েছে। প্রয়োজনে পরবর্তী ডোজ গ্রহণ করতে পারেন।</string>
+
     <string name="btn_log_prn_dose">ডোজ লগ করুন</string>
     <string name="prn_doses_taken_today">আজকে রেকর্ডকৃত ডোজ: %1$d</string>
     <string name="prn_section_title">প্রয়োজনভিত্তিক ওষুধ (PRN)</string>

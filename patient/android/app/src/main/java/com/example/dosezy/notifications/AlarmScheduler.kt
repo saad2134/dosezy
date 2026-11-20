@@ -896,4 +896,58 @@ class AlarmScheduler(private val context: Context) {
         showIntent.cancel()
         Log.d(TAG, "Cancelled intake safeguard alarm for entry: $entryId")
     }
+
+    // Guard: Schedule gentle eligible alert when minimum interval for as-needed (PRN) medicine elapses (#142)
+    fun schedulePrnEligibleNotification(
+        medicineId: String,
+        medicineName: String,
+        triggerEpochMillis: Long,
+        intervalHours: Int,
+        userId: String? = null
+    ) {
+        val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
+            action = MedicineAlarmReceiver.ACTION_PRN_ELIGIBLE_ALERT
+            putExtra(MedicineAlarmReceiver.EXTRA_PRN_MEDICINE_ID, medicineId)
+            putExtra(MedicineAlarmReceiver.EXTRA_PRN_MEDICINE_NAME, medicineName)
+            putExtra(MedicineAlarmReceiver.EXTRA_PRN_INTERVAL_HOURS, intervalHours)
+            userId?.let { putExtra(MedicineAlarmReceiver.EXTRA_USER_ID, it) }
+        }
+        val requestCode = (medicineId + "_prn_eligible").hashCode()
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Non-alarming notification: use setAndAllowWhileIdle or setExactAndAllowWhileIdle if exact permission granted
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (canScheduleExact()) {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerEpochMillis, pendingIntent)
+            } else {
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerEpochMillis, pendingIntent)
+            }
+        } else {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, triggerEpochMillis, pendingIntent)
+        }
+        Log.d(TAG, "Scheduled PRN eligible notification for $medicineName ($medicineId) at $triggerEpochMillis")
+    }
+
+    // Guard: Cancel PRN eligible notification alarm and revoke pending intent (#142)
+    fun cancelPrnEligibleNotification(medicineId: String) {
+        val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
+            action = MedicineAlarmReceiver.ACTION_PRN_ELIGIBLE_ALERT
+            putExtra(MedicineAlarmReceiver.EXTRA_PRN_MEDICINE_ID, medicineId)
+        }
+        val requestCode = (medicineId + "_prn_eligible").hashCode()
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        alarmManager.cancel(pendingIntent)
+        pendingIntent.cancel()
+        Log.d(TAG, "Cancelled PRN eligible notification for medicineId: $medicineId")
+    }
 }

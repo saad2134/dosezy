@@ -498,6 +498,30 @@
     <string name="freq_rolling_interval_desc">يبدأ مؤقت الجرعة التالية بعد تسجيل تناول الجرعة للحفاظ على التباعد الآمن</string>
     <string name="freq_rolling_badge">مرن</string>
 
+    <!-- Cyclical & Looping Schedules (#141) -->
+    <string name="freq_cyclical">دوري (أيام نشطة وأيام راحة)</string>
+    <string name="freq_cyclical_desc">تناول الدواء لأيام محددة، ثم توقف مؤقتًا لأيام الراحة (مثل حبوب منع الحمل).</string>
+    <string name="freq_cycle_format">%1$d أيام تناول، %2$d أيام راحة</string>
+    <string name="freq_cycle_active_days">أيام التناول</string>
+    <string name="freq_cycle_rest_days">أيام الراحة</string>
+    <string name="freq_cycle_preset_21_7">21 / 7 (قياسي)</string>
+    <string name="freq_cycle_preset_24_4">24 / 4 (ممتد)</string>
+    <string name="freq_cycle_preset_custom">مخصص</string>
+    <string name="cycle_presets_label">خيارات الدورة الجاهزة</string>
+
+    <!-- PRN Next Dose Eligible Alerts (#142) -->
+    <string name="freq_as_needed_interval_title">الحد الأدنى للفاصل الزمني بين الجرعات</string>
+    <string name="freq_as_needed_interval_desc">تنبيه عندما يحين وقت الجرعة التالية بأمان وسماح طبي.</string>
+    <string name="freq_as_needed_interval_format">عند الحاجة (حد أدنى %1$d ساعات)</string>
+    <string name="freq_as_needed_notify_eligible">إشعار عند إمكانية تناول الجرعة التالية</string>
+    <string name="freq_as_needed_interval_none">بدون فاصل</string>
+    <string name="freq_as_needed_interval_hours_label">الفاصل الأدنى (ساعات)</string>
+    <string name="prn_eligible_channel_name">الجرعة التالية متاحة (عند الحاجة)</string>
+    <string name="prn_eligible_channel_desc">إشعارات عند انقضاء الحد الأدنى للفاصل الزمني لأدوية الحاجة.</string>
+    <string name="prn_eligible_notification_title">الجرعة التالية متاحة</string>
+    <string name="prn_eligible_notification_body">انقضى الحد الأدنى (%1$d ساعات) لدواء %2$s. يمكنك تناول الجرعة التالية إذا دعت الحاجة.</string>
+    <string name="prn_eligible_notification_body_generic">انقضى الحد الأدنى لدواء %1$s. يمكنك تناول الجرعة التالية إذا دعت الحاجة.</string>
+
     <string name="btn_log_prn_dose">تسجيل جرعة</string>
     <string name="prn_doses_taken_today">الجرعات المسجلة اليوم: %1$d</string>
     <string name="prn_section_title">أدوية تؤخذ عند الحاجة (PRN)</string>

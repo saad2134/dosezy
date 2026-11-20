@@ -498,6 +498,30 @@ Möchten Sie fortfahren?</string>
     <string name="freq_rolling_interval_desc">Der Timer für die nächste Dosis startet erst nach der Einnahme, um sichere Abstände zu wahren</string>
     <string name="freq_rolling_badge">Gleitend</string>
 
+    <!-- Cyclical & Looping Schedules (#141) -->
+    <string name="freq_cyclical">Zyklisch (Einnahme- &amp; Pausentage)</string>
+    <string name="freq_cyclical_desc">Medikament an Einnahmetagen nehmen, dann an Pausentagen pausieren (z. B. Antibabypille).</string>
+    <string name="freq_cycle_format">%1$d Tage Einnahme, %2$d Tage Pause</string>
+    <string name="freq_cycle_active_days">Einnahmetage</string>
+    <string name="freq_cycle_rest_days">Pausentage</string>
+    <string name="freq_cycle_preset_21_7">21 / 7 (Standard)</string>
+    <string name="freq_cycle_preset_24_4">24 / 4 (Erweitert)</string>
+    <string name="freq_cycle_preset_custom">Benutzerdefiniert</string>
+    <string name="cycle_presets_label">Zyklus-Voreinstellungen</string>
+
+    <!-- PRN Next Dose Eligible Alerts (#142) -->
+    <string name="freq_as_needed_interval_title">Mindestabstand zwischen Dosen</string>
+    <string name="freq_as_needed_interval_desc">Benachrichtigen, wenn die nächste Dosis sicher und zulässig ist.</string>
+    <string name="freq_as_needed_interval_format">Bei Bedarf (mind. %1$d Std.)</string>
+    <string name="freq_as_needed_notify_eligible">Benachrichtigen, sobald nächste Dosis möglich</string>
+    <string name="freq_as_needed_interval_none">Keiner</string>
+    <string name="freq_as_needed_interval_hours_label">Mindestabstand (Stunden)</string>
+    <string name="prn_eligible_channel_name">Nächste Dosis möglich (Bedarfsmedikation)</string>
+    <string name="prn_eligible_channel_desc">Benachrichtigungen, wenn der Mindestabstand für Bedarfsmedikation abgelaufen ist.</string>
+    <string name="prn_eligible_notification_title">Nächste Dosis möglich</string>
+    <string name="prn_eligible_notification_body">Der Mindestabstand von %1$d Stunden für %2$s ist abgelaufen. Sie können Ihre nächste Dosis bei Bedarf einnehmen.</string>
+    <string name="prn_eligible_notification_body_generic">Der Mindestabstand für %1$s ist abgelaufen. Sie können Ihre nächste Dosis bei Bedarf einnehmen.</string>
+
     <string name="btn_log_prn_dose">Dosis erfassen</string>
     <string name="prn_doses_taken_today">Heute erfasste Dosen: %1$d</string>
     <string name="prn_section_title">Bedarfsmedikation (PRN)</string>

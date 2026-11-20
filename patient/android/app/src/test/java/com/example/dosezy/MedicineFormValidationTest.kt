@@ -324,5 +324,39 @@ class MedicineFormValidationTest {
         )
         assertFalse("Finite course without days should be invalid", finiteMissingDays.isValid)
         assertFalse("Finite duration should be invalid", finiteMissingDays.isFiniteDurationValid)
+
+        // Cyclical valid 21/7
+        val cyclicalValid = com.example.dosezy.ui.components.validateMedicineForm(
+            medicationName = "Oral Contraceptive",
+            dosage = "1",
+            hasDifferentDosages = false,
+            scheduledTimesList = times,
+            perTimeDosages = emptyMap(),
+            selectedFrequency = FrequencyPattern.CYCLICAL,
+            selectedDaysOfWeek = emptyList(),
+            selectedDaysOfMonth = emptyList(),
+            intervalWeeksText = "",
+            cycleActiveDaysText = "21",
+            cycleRestDaysText = "7"
+        )
+        assertTrue("Cyclical with 21 active and 7 rest days should be valid", cyclicalValid.isValid)
+        assertTrue(cyclicalValid.isFrequencyValid)
+
+        // Cyclical invalid active 0
+        val cyclicalInvalidActive = com.example.dosezy.ui.components.validateMedicineForm(
+            medicationName = "Oral Contraceptive",
+            dosage = "1",
+            hasDifferentDosages = false,
+            scheduledTimesList = times,
+            perTimeDosages = emptyMap(),
+            selectedFrequency = FrequencyPattern.CYCLICAL,
+            selectedDaysOfWeek = emptyList(),
+            selectedDaysOfMonth = emptyList(),
+            intervalWeeksText = "",
+            cycleActiveDaysText = "0",
+            cycleRestDaysText = "7"
+        )
+        assertFalse("Cyclical with 0 active days should be invalid", cyclicalInvalidActive.isValid)
+        assertFalse("Frequency validation should fail for 0 active days", cyclicalInvalidActive.isFrequencyValid)
     }
 }

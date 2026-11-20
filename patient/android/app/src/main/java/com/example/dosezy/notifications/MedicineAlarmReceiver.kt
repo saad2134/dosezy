@@ -35,6 +35,11 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
         const val CHANNEL_ID = "dosezy_medicine_reminders_v4"
         const val NOTIFICATION_CHANNEL_ID = "dosezy_medicine_notifications_v1"
         const val REFILL_CHANNEL_ID = "dosezy_refill_alerts"
+        const val PRN_ELIGIBLE_CHANNEL_ID = "dosezy_prn_eligible_channel"
+        const val ACTION_PRN_ELIGIBLE_ALERT = "com.example.dosezy.PRN_ELIGIBLE_ALERT"
+        const val EXTRA_PRN_MEDICINE_ID = "prn_medicine_id"
+        const val EXTRA_PRN_MEDICINE_NAME = "prn_medicine_name"
+        const val EXTRA_PRN_INTERVAL_HOURS = "prn_interval_hours"
         const val EXTRA_ENTRY_ID = "entry_id"
         const val EXTRA_MEDICINE_NAME = "medicine_name"
         const val EXTRA_SCHEDULED_TIME = "scheduled_time"
@@ -106,6 +111,19 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                     setShowBadge(true)
                 }
                 notificationManager.createNotificationChannel(refillChannel)
+
+                // Guard: Register PRN next dose eligible notification channel for non-alarming gentle alerts (#142)
+                val prnEligibleChannel = NotificationChannel(
+                    PRN_ELIGIBLE_CHANNEL_ID,
+                    context.getString(com.example.dosezy.R.string.prn_eligible_channel_name),
+                    NotificationManager.IMPORTANCE_DEFAULT
+                ).apply {
+                    description = context.getString(com.example.dosezy.R.string.prn_eligible_channel_desc)
+                    enableLights(true)
+                    enableVibration(true)
+                    setShowBadge(true)
+                }
+                notificationManager.createNotificationChannel(prnEligibleChannel)
             }
         }
 
@@ -263,6 +281,18 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
                         pendingResult?.finish()
                     }
                 )
+            }
+            return
+        }
+
+        // Guard: Handle PRN next eligible dose alert broadcast when minimum dosing interval elapses (#142)
+        if (action == ACTION_PRN_ELIGIBLE_ALERT) {
+            val medId = intent.getStringExtra(EXTRA_PRN_MEDICINE_ID)
+            val medName = intent.getStringExtra(EXTRA_PRN_MEDICINE_NAME) ?: "Medicine"
+            val interval = intent.getIntExtra(EXTRA_PRN_INTERVAL_HOURS, 0)
+            val targetUserId = intent.getStringExtra(EXTRA_USER_ID)
+            if (medId != null) {
+                showPrnEligibleNotification(context, medId, medName, interval, targetUserId)
             }
             return
         }
@@ -835,6 +865,75 @@ class MedicineAlarmReceiver : BroadcastReceiver() {
             Log.d(TAG, "Showing reminder notification (isAlarm=$isAlarmMode) for: $medicineName")
         } catch (e: Exception) {
             Log.e(TAG, "Could not post alarm notification", e)
+        }
+    }
+
+    // Guard: Post gentle notification when minimum dosing interval for PRN medicine has passed (#142)
+    fun showPrnEligibleNotification(
+        context: Context,
+        medicineId: String,
+        medicineName: String,
+        intervalHours: Int,
+        userId: String?
+    ) {
+        val targetUser = userId?.let {
+            try {
+                kotlinx.coroutines.runBlocking(kotlinx.coroutines.Dispatchers.IO) {
+                    kotlinx.coroutines.withTimeoutOrNull(500L) {
+                        DosezyDatabase.getInstance(context).userDao().getUserByIdDirect(it)
+                    }
+                }
+            } catch (_: Exception) { null }
+        }
+        val userLang = targetUser?.language ?: com.example.dosezy.utils.LocaleHelper.getSavedLanguage(context)
+        val localizedContext = com.example.dosezy.utils.LocaleHelper.updateContextLocale(context, userLang)
+        createNotificationChannels(context)
+
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            userId?.let { putExtra("switch_to_user_id", it) }
+            putExtra("fragment", "home")
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            (medicineId + "_prn_click").hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val appIconBitmap = runCatching {
+            BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)
+        }.getOrNull()
+
+        val title = localizedContext.getString(R.string.prn_eligible_notification_title)
+        val body = if (intervalHours > 0) {
+            localizedContext.getString(R.string.prn_eligible_notification_body, intervalHours, medicineName)
+        } else {
+            localizedContext.getString(R.string.prn_eligible_notification_body_generic, medicineName)
+        }
+
+        val notification = NotificationCompat.Builder(localizedContext, PRN_ELIGIBLE_CHANNEL_ID)
+            .setSmallIcon(R.mipmap.ic_launcher)
+            .apply {
+                if (appIconBitmap != null) {
+                    setLargeIcon(appIconBitmap)
+                }
+            }
+            .setContentTitle(title)
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .build()
+
+        try {
+            val notificationManager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.notify((medicineId + "_prn_eligible").hashCode(), notification)
+            Log.d(TAG, "Showing PRN eligible notification for: $medicineName")
+        } catch (e: Exception) {
+            Log.e(TAG, "Could not post PRN eligible notification", e)
         }
     }
 

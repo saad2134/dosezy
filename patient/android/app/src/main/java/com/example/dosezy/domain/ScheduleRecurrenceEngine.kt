@@ -241,6 +241,17 @@ object ScheduleRecurrenceEngine {
         return when (medicine.frequency.pattern) {
             FrequencyPattern.DAILY -> true
             FrequencyPattern.AS_NEEDED -> false
+            FrequencyPattern.CYCLICAL -> {
+                // Guard: Take for cycleActiveDays, pause for cycleRestDays, starting from startDate (or 2020-01-01) (#141)
+                val activeDays = (medicine.frequency.cycleActiveDays ?: 21).coerceAtLeast(1)
+                val restDays = (medicine.frequency.cycleRestDays ?: 7).coerceAtLeast(0)
+                val cycleLength = activeDays + restDays
+                if (cycleLength <= 0) return true
+                val baseDate = medicine.startDate ?: LocalDate.of(2020, 1, 1)
+                val daysDiff = ChronoUnit.DAYS.between(baseDate, date)
+                val dayInCycle = Math.floorMod(daysDiff, cycleLength.toLong())
+                dayInCycle < activeDays
+            }
             FrequencyPattern.EVERY_X_HOURS -> true
             FrequencyPattern.EVERY_X_DAYS -> {
                 val interval = (medicine.frequency.intervalDays ?: 2).coerceAtLeast(1)

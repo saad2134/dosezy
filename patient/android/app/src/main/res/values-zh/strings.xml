@@ -514,6 +514,30 @@
     <string name="freq_rolling_interval_desc">记录服药后才开始计算下一次时间，以保持安全用药间隔</string>
     <string name="freq_rolling_badge">滚动</string>
 
+    <!-- Cyclical & Looping Schedules (#141) -->
+    <string name="freq_cyclical">周期循环（服药期与停药期）</string>
+    <string name="freq_cyclical_desc">在服药期内连续服用，随后在停药期暂停（例如避孕药）。</string>
+    <string name="freq_cycle_format">服药 %1$d 天，停药 %2$d 天</string>
+    <string name="freq_cycle_active_days">服药天数</string>
+    <string name="freq_cycle_rest_days">停药天数</string>
+    <string name="freq_cycle_preset_21_7">21 / 7（标准）</string>
+    <string name="freq_cycle_preset_24_4">24 / 4（延长）</string>
+    <string name="freq_cycle_preset_custom">自定义</string>
+    <string name="cycle_presets_label">周期预设</string>
+
+    <!-- PRN Next Dose Eligible Alerts (#142) -->
+    <string name="freq_as_needed_interval_title">两次服药最小间隔</string>
+    <string name="freq_as_needed_interval_desc">当达到安全间隔时间并允许服用下一剂时提醒。</string>
+    <string name="freq_as_needed_interval_format">按需（至少间隔 %1$d 小时）</string>
+    <string name="freq_as_needed_notify_eligible">达到间隔时间时提醒可以服药</string>
+    <string name="freq_as_needed_interval_none">无间隔</string>
+    <string name="freq_as_needed_interval_hours_label">最小间隔（小时）</string>
+    <string name="prn_eligible_channel_name">可服用下一剂（按需药物）</string>
+    <string name="prn_eligible_channel_desc">按需药物达到最小安全服药间隔时间时的通知。</string>
+    <string name="prn_eligible_notification_title">可服用下一剂</string>
+    <string name="prn_eligible_notification_body">%2$s 的最小 %1$d 小时间隔已过。如有需要，您现在可以服用下一剂。</string>
+    <string name="prn_eligible_notification_body_generic">%1$s 的最小间隔已过。如有需要，您现在可以服用下一剂。</string>
+
     <string name="btn_log_prn_dose">记录服药</string>
     <string name="prn_doses_taken_today">今日已记录：%1$d 次</string>
     <string name="prn_section_title">按需服用药品 (PRN)</string>

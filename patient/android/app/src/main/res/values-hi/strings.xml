@@ -514,6 +514,30 @@
     <string name="freq_rolling_interval_desc">सुरक्षित अंतराल बनाए रखने के लिए खुराक लेने के बाद ही अगली खुराक का टाइमर शुरू होगा</string>
     <string name="freq_rolling_badge">रोलिंग</string>
 
+    <!-- Cyclical & Looping Schedules (#141) -->
+    <string name="freq_cyclical">चक्रीय (दवा के दिन और विराम के दिन)</string>
+    <string name="freq_cyclical_desc">सक्रिय दिनों में दवा लें, फिर विराम के दिनों में रोकें (जैसे गर्भनिरोधक गोलियां)।</string>
+    <string name="freq_cycle_format">%1$d दिन दवा, %2$d दिन विराम</string>
+    <string name="freq_cycle_active_days">दवा लेने के दिन</string>
+    <string name="freq_cycle_rest_days">विराम के दिन</string>
+    <string name="freq_cycle_preset_21_7">21 / 7 (मानक)</string>
+    <string name="freq_cycle_preset_24_4">24 / 4 (विस्तारित)</string>
+    <string name="freq_cycle_preset_custom">कस्टम</string>
+    <string name="cycle_presets_label">चक्र प्रीसेट</string>
+
+    <!-- PRN Next Dose Eligible Alerts (#142) -->
+    <string name="freq_as_needed_interval_title">खुराक के बीच न्यूनतम अंतराल</string>
+    <string name="freq_as_needed_interval_desc">अगली खुराक लेने के लिए सुरक्षित और अनुमत समय होने पर सूचित करें।</string>
+    <string name="freq_as_needed_interval_format">ज़रूरत पड़ने पर (न्यूनतम %1$d घंटे)</string>
+    <string name="freq_as_needed_notify_eligible">अगली खुराक योग्य होने पर सूचित करें</string>
+    <string name="freq_as_needed_interval_none">कोई नहीं</string>
+    <string name="freq_as_needed_interval_hours_label">न्यूनतम अंतराल (घंटे)</string>
+    <string name="prn_eligible_channel_name">अगली खुराक उपलब्ध (ज़रूरत अनुसार दवा)</string>
+    <string name="prn_eligible_channel_desc">ज़रूरत अनुसार दवाओं के लिए न्यूनतम अंतराल बीतने पर सूचनाएं।</string>
+    <string name="prn_eligible_notification_title">अगली खुराक उपलब्ध</string>
+    <string name="prn_eligible_notification_body">%2$s के लिए न्यूनतम %1$d घंटे का अंतराल पूरा हो गया है। ज़रूरत पड़ने पर आप अगली खुराक ले सकते हैं।</string>
+    <string name="prn_eligible_notification_body_generic">%1$s के लिए न्यूनतम अंतराल पूरा हो गया है। ज़रूरत पड़ने पर आप अगली खुराक ले सकते हैं।</string>
+
     <string name="btn_log_prn_dose">खुराक दर्ज करें</string>
     <string name="prn_doses_taken_today">आज दर्ज खुराकें: %1$d</string>
     <string name="prn_section_title">ज़रूरत पड़ने पर दवाएं (PRN)</string>

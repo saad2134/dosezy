@@ -108,6 +108,10 @@ fun AddMedScreen(
     var intervalDaysText by remember { mutableStateOf("2") }
     var intervalWeeksText by remember { mutableStateOf("2") }
     var isRollingInterval by remember { mutableStateOf(false) }
+    var cycleActiveDaysText by remember { mutableStateOf("21") }
+    var cycleRestDaysText by remember { mutableStateOf("7") }
+    var asNeededIntervalHoursText by remember { mutableStateOf("") }
+    var asNeededNotifyEligible by remember { mutableStateOf(true) }
     var selectedReminderType by remember { mutableStateOf<ReminderType?>(null) }
 
     var showValidationErrors by remember { mutableStateOf(false) }
@@ -156,7 +160,9 @@ fun AddMedScreen(
                     selectedDaysOfMonth = selectedDaysOfMonth,
                     intervalWeeksText = intervalWeeksText,
                     isFiniteCourse = isFiniteCourse,
-                    durationDaysText = durationDaysText
+                    durationDaysText = durationDaysText,
+                    cycleActiveDaysText = cycleActiveDaysText,
+                    cycleRestDaysText = cycleRestDaysText
                 )
                 val isFormValid = validation.isValid
                 val isNameError = showValidationErrors && !validation.isNameValid
@@ -232,7 +238,15 @@ fun AddMedScreen(
                     isFrequencyError = isFrequencyError,
                     frequencyErrorMessage = frequencyErrorMessage,
                     isRollingInterval = isRollingInterval,
-                    onRollingIntervalChange = { isRollingInterval = it }
+                    onRollingIntervalChange = { isRollingInterval = it },
+                    cycleActiveDaysText = cycleActiveDaysText,
+                    onCycleActiveDaysChange = { cycleActiveDaysText = it },
+                    cycleRestDaysText = cycleRestDaysText,
+                    onCycleRestDaysChange = { cycleRestDaysText = it },
+                    asNeededIntervalHoursText = asNeededIntervalHoursText,
+                    onAsNeededIntervalHoursChange = { asNeededIntervalHoursText = it },
+                    asNeededNotifyEligible = asNeededNotifyEligible,
+                    onAsNeededNotifyEligibleChange = { asNeededNotifyEligible = it }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -339,7 +353,11 @@ fun AddMedScreen(
                                 intervalHours = if (selectedFrequency == FrequencyPattern.EVERY_X_HOURS) intervalHoursText.normalizeArabicDigits().toIntOrNull() else null,
                                 intervalDays = if (selectedFrequency == FrequencyPattern.EVERY_X_DAYS) intervalDaysText.normalizeArabicDigits().toIntOrNull() else null,
                                 intervalWeeks = if (selectedFrequency == FrequencyPattern.CUSTOM) (intervalWeeksText.normalizeArabicDigits().toIntOrNull() ?: 1).coerceAtLeast(1) else null,
-                                isRollingInterval = isRollingInterval && (selectedFrequency == FrequencyPattern.DAILY || selectedFrequency == FrequencyPattern.EVERY_X_HOURS || selectedFrequency == FrequencyPattern.EVERY_X_DAYS)
+                                isRollingInterval = isRollingInterval && (selectedFrequency == FrequencyPattern.DAILY || selectedFrequency == FrequencyPattern.EVERY_X_HOURS || selectedFrequency == FrequencyPattern.EVERY_X_DAYS),
+                                cycleActiveDays = if (selectedFrequency == FrequencyPattern.CYCLICAL) (cycleActiveDaysText.normalizeArabicDigits().toIntOrNull() ?: 21).coerceAtLeast(1) else null,
+                                cycleRestDays = if (selectedFrequency == FrequencyPattern.CYCLICAL) (cycleRestDaysText.normalizeArabicDigits().toIntOrNull() ?: 7).coerceAtLeast(0) else null,
+                                asNeededIntervalHours = if (selectedFrequency == FrequencyPattern.AS_NEEDED) asNeededIntervalHoursText.normalizeArabicDigits().toIntOrNull() else null,
+                                asNeededNotifyEligible = if (selectedFrequency == FrequencyPattern.AS_NEEDED) asNeededNotifyEligible else true
                             ),
                             scheduledTimes = if (selectedFrequency == FrequencyPattern.AS_NEEDED) emptyList() else scheduledTimesList,
                             imageUri = medicineImagePath,

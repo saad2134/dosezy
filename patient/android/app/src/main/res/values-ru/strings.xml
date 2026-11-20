@@ -498,6 +498,30 @@
     <string name="freq_rolling_interval_desc">Таймер следующей дозы запускается после подтверждения приема для соблюдения безопасного интервала</string>
     <string name="freq_rolling_badge">Скользящий</string>
 
+    <!-- Cyclical & Looping Schedules (#141) -->
+    <string name="freq_cyclical">Циклический (приём и перерыв)</string>
+    <string name="freq_cyclical_desc">Принимать препарат в дни приёма, затем делать перерыв (напр., противозачаточные).</string>
+    <string name="freq_cycle_format">%1$d дн. приёма, %2$d дн. перерыва</string>
+    <string name="freq_cycle_active_days">Дни приёма</string>
+    <string name="freq_cycle_rest_days">Дни перерыва</string>
+    <string name="freq_cycle_preset_21_7">21 / 7 (Стандарт)</string>
+    <string name="freq_cycle_preset_24_4">24 / 4 (Расширенный)</string>
+    <string name="freq_cycle_preset_custom">Настроить</string>
+    <string name="cycle_presets_label">Шаблоны цикла</string>
+
+    <!-- PRN Next Dose Eligible Alerts (#142) -->
+    <string name="freq_as_needed_interval_title">Минимальный интервал между дозами</string>
+    <string name="freq_as_needed_interval_desc">Уведомлять, когда безопасно и разрешено принять следующую дозу.</string>
+    <string name="freq_as_needed_interval_format">По необходимости (мин. %1$d ч)</string>
+    <string name="freq_as_needed_notify_eligible">Уведомить о возможности следующего приёма</string>
+    <string name="freq_as_needed_interval_none">Нет</string>
+    <string name="freq_as_needed_interval_hours_label">Мин. интервал (часы)</string>
+    <string name="prn_eligible_channel_name">Доступна следующая доза (по необходимости)</string>
+    <string name="prn_eligible_channel_desc">Уведомления об истечении минимального интервала между дозами при приёме по требованию.</string>
+    <string name="prn_eligible_notification_title">Доступна следующая доза</string>
+    <string name="prn_eligible_notification_body">Минимальный интервал %1$d ч для %2$s истёк. Вы можете принять следующую дозу при необходимости.</string>
+    <string name="prn_eligible_notification_body_generic">Минимальный интервал для %1$s истёк. Вы можете принять следующую дозу при необходимости.</string>
+
     <string name="btn_log_prn_dose">Записать прием</string>
     <string name="prn_doses_taken_today">Приемов записано сегодня: %1$d</string>
     <string name="prn_section_title">Препараты по необходимости (PRN)</string>

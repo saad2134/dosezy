@@ -293,6 +293,10 @@ class DataExporter(
             mObj.put("intervalWeeks", med.frequency.intervalWeeks)
             // Guard: Explicitly export rolling interval setting at root level for flat JSON compatibility and BackupRestoreManager fallback (#119, #BUG-EXPORT-ROLLING)
             mObj.put("isRollingInterval", med.frequency.isRollingInterval)
+            mObj.put("cycleActiveDays", med.frequency.cycleActiveDays)
+            mObj.put("cycleRestDays", med.frequency.cycleRestDays)
+            mObj.put("asNeededIntervalHours", med.frequency.asNeededIntervalHours)
+            mObj.put("asNeededNotifyEligible", med.frequency.asNeededNotifyEligible)
 
             // Guard: Serialize nested frequency object alongside top-level keys for dual compatibility with Gson and BackupRestoreManager
             val freqObj = JSONObject()
@@ -314,6 +318,10 @@ class DataExporter(
             freqObj.put("intervalWeeks", med.frequency.intervalWeeks)
             // Guard: Explicitly export rolling interval setting so restored backup preserves dynamic intake spacing (#119)
             freqObj.put("isRollingInterval", med.frequency.isRollingInterval)
+            freqObj.put("cycleActiveDays", med.frequency.cycleActiveDays)
+            freqObj.put("cycleRestDays", med.frequency.cycleRestDays)
+            freqObj.put("asNeededIntervalHours", med.frequency.asNeededIntervalHours)
+            freqObj.put("asNeededNotifyEligible", med.frequency.asNeededNotifyEligible)
             mObj.put("frequency", freqObj)
             mObj.put("scheduledTimes", JSONArray(med.scheduledTimes.map { it.toString() }))
             mObj.put("imageUri", med.imageUri ?: "")

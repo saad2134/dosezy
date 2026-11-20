@@ -158,6 +158,12 @@ class Converters {
             freq.intervalHours?.let { jsonObject.put("intervalHours", it) }
             freq.intervalDays?.let { jsonObject.put("intervalDays", it) }
             freq.intervalWeeks?.let { jsonObject.put("intervalWeeks", it) }
+            freq.cycleActiveDays?.let { jsonObject.put("cycleActiveDays", it) }
+            freq.cycleRestDays?.let { jsonObject.put("cycleRestDays", it) }
+            freq.asNeededIntervalHours?.let { jsonObject.put("asNeededIntervalHours", it) }
+            if (!freq.asNeededNotifyEligible) {
+                jsonObject.put("asNeededNotifyEligible", false)
+            }
             if (freq.isRollingInterval) {
                 jsonObject.put("isRollingInterval", true)
             }
@@ -202,7 +208,25 @@ class Converters {
                     (0 until arr.length()).map { arr.getInt(it) }
                 } else null
                 val isRollingInterval = if (jsonObject.has("isRollingInterval") && !jsonObject.isNull("isRollingInterval")) jsonObject.getBoolean("isRollingInterval") else false
-                Frequency(pattern, daysPerWeek, daysPerMonth, selectedDaysOfWeek, selectedDaysOfMonth, intervalHours, intervalDays, intervalWeeks, isRollingInterval)
+                val cycleActiveDays = if (jsonObject.has("cycleActiveDays") && !jsonObject.isNull("cycleActiveDays")) jsonObject.getInt("cycleActiveDays") else null
+                val cycleRestDays = if (jsonObject.has("cycleRestDays") && !jsonObject.isNull("cycleRestDays")) jsonObject.getInt("cycleRestDays") else null
+                val asNeededIntervalHours = if (jsonObject.has("asNeededIntervalHours") && !jsonObject.isNull("asNeededIntervalHours")) jsonObject.getInt("asNeededIntervalHours") else null
+                val asNeededNotifyEligible = if (jsonObject.has("asNeededNotifyEligible") && !jsonObject.isNull("asNeededNotifyEligible")) jsonObject.getBoolean("asNeededNotifyEligible") else true
+                Frequency(
+                    pattern = pattern,
+                    daysPerWeek = daysPerWeek,
+                    daysPerMonth = daysPerMonth,
+                    selectedDaysOfWeek = selectedDaysOfWeek,
+                    selectedDaysOfMonth = selectedDaysOfMonth,
+                    intervalHours = intervalHours,
+                    intervalDays = intervalDays,
+                    intervalWeeks = intervalWeeks,
+                    isRollingInterval = isRollingInterval,
+                    cycleActiveDays = cycleActiveDays,
+                    cycleRestDays = cycleRestDays,
+                    asNeededIntervalHours = asNeededIntervalHours,
+                    asNeededNotifyEligible = asNeededNotifyEligible
+                )
             } catch (_: Exception) {
                 Frequency(FrequencyPattern.DAILY)
             }

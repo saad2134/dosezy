@@ -107,7 +107,19 @@ data class Medicine(
     fun getFrequencyDisplay(): String {
         val base = when (frequency.pattern) {
             FrequencyPattern.DAILY -> if (timesPerDay > 1) "${timesPerDay}x Daily" else "Daily"
-            FrequencyPattern.AS_NEEDED -> "As Needed (PRN)"
+            FrequencyPattern.AS_NEEDED -> {
+                val interval = frequency.asNeededIntervalHours
+                if (interval != null && interval > 0) {
+                    "As Needed (min $interval hrs)"
+                } else {
+                    "As Needed (PRN)"
+                }
+            }
+            FrequencyPattern.CYCLICAL -> {
+                val active = frequency.cycleActiveDays ?: 21
+                val rest = frequency.cycleRestDays ?: 7
+                "Cycle ($active on, $rest off)"
+            }
             FrequencyPattern.EVERY_X_HOURS -> "Every ${frequency.intervalHours ?: 4} Hours"
             FrequencyPattern.EVERY_X_DAYS -> "Every ${frequency.intervalDays ?: 2} Days"
             FrequencyPattern.WEEKLY -> {
@@ -221,6 +233,19 @@ data class Medicine(
                 // PRN estimate: safe non-overdose estimate (~1 dose per 3 days)
                 val estimatedDays = kotlin.math.ceil(days.toDouble() / 3.0)
                 estimatedDays.coerceAtLeast(1.0)
+            }
+            FrequencyPattern.CYCLICAL -> {
+                // Guard: Cyclical calculation for active vs rest days (#141)
+                val active = (frequency.cycleActiveDays ?: 21).coerceAtLeast(1)
+                val rest = (frequency.cycleRestDays ?: 7).coerceAtLeast(0)
+                val cycleLength = active + rest
+                val effectiveTimes = timesPerDay.coerceAtLeast(1)
+                val totalDoseDays = if (cycleLength > 0) {
+                    val fullCycles = days / cycleLength
+                    val remainder = days % cycleLength
+                    (fullCycles * active) + minOf(remainder, active)
+                } else days
+                (totalDoseDays * effectiveTimes).toDouble()
             }
             FrequencyPattern.CUSTOM -> {
                 val interval = (frequency.intervalWeeks ?: 1).coerceAtLeast(1)
@@ -340,11 +365,15 @@ data class Frequency(
     val intervalHours: Int? = null,              // for EVERY_X_HOURS (e.g. 4, 6, 8, 12)
     val intervalDays: Int? = null,               // for EVERY_X_DAYS (e.g. 2, 3, 5)
     val intervalWeeks: Int? = null,              // for CUSTOM (e.g. 2 for every 2 weeks)
-    val isRollingInterval: Boolean = false       // for DAILY, EVERY_X_HOURS, EVERY_X_DAYS (#119)
+    val isRollingInterval: Boolean = false,      // for DAILY, EVERY_X_HOURS, EVERY_X_DAYS (#119)
+    val cycleActiveDays: Int? = null,            // for CYCLICAL (e.g. 21) (#141)
+    val cycleRestDays: Int? = null,              // for CYCLICAL (e.g. 7) (#141)
+    val asNeededIntervalHours: Int? = null,      // for AS_NEEDED minimum interval (#142)
+    val asNeededNotifyEligible: Boolean = true   // for AS_NEEDED alert when next dose eligible (#142)
 )
 
 enum class FrequencyPattern {
-    DAILY, WEEKLY, MONTHLY, EVERY_X_HOURS, EVERY_X_DAYS, CUSTOM, AS_NEEDED
+    DAILY, WEEKLY, MONTHLY, EVERY_X_HOURS, EVERY_X_DAYS, CUSTOM, AS_NEEDED, CYCLICAL
 }
 
 @androidx.compose.runtime.Composable
@@ -357,6 +386,7 @@ fun FrequencyPattern.getLocalizedName(): String {
         FrequencyPattern.AS_NEEDED -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_as_needed)
         FrequencyPattern.EVERY_X_HOURS -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_every_x_hours)
         FrequencyPattern.EVERY_X_DAYS -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_every_x_days)
+        FrequencyPattern.CYCLICAL -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_cyclical)
     }
 }
 
@@ -370,7 +400,19 @@ fun Medicine.getLocalizedDosageDisplay(time: LocalTime? = null, dosageOverride: 
 fun Medicine.getLocalizedFrequencyDisplay(): String {
     val base = when (frequency.pattern) {
         FrequencyPattern.DAILY -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_daily)
-        FrequencyPattern.AS_NEEDED -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_as_needed)
+        FrequencyPattern.AS_NEEDED -> {
+            val interval = frequency.asNeededIntervalHours
+            if (interval != null && interval > 0) {
+                androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_as_needed_interval_format, interval)
+            } else {
+                androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_as_needed)
+            }
+        }
+        FrequencyPattern.CYCLICAL -> {
+            val active = frequency.cycleActiveDays ?: 21
+            val rest = frequency.cycleRestDays ?: 7
+            androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_cycle_format, active, rest)
+        }
         FrequencyPattern.EVERY_X_HOURS -> {
             val hours = frequency.intervalHours ?: 4
             androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.freq_every_hours_format, hours)

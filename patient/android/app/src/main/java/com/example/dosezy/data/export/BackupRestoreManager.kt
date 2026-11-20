@@ -972,7 +972,11 @@ class BackupRestoreManager(
                     intervalDays = freqObj.get("intervalDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
                     intervalWeeks = freqObj.get("intervalWeeks")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
                     // Guard: Restore rolling interval flag from frequency JSON object (#119)
-                    isRollingInterval = freqObj.get("isRollingInterval")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false
+                    isRollingInterval = freqObj.get("isRollingInterval")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+                    cycleActiveDays = freqObj.get("cycleActiveDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    cycleRestDays = freqObj.get("cycleRestDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    asNeededIntervalHours = freqObj.get("asNeededIntervalHours")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    asNeededNotifyEligible = freqObj.get("asNeededNotifyEligible")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: true
                 )
             } else if (obj.has("frequencyPattern") || obj.has("pattern")) {
                 // Guard: Support flattened frequency attributes from DataExporter exports and legacy backups to prevent silent schedule corruption
@@ -994,7 +998,11 @@ class BackupRestoreManager(
                     intervalDays = obj.get("intervalDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
                     intervalWeeks = obj.get("intervalWeeks")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
                     // Guard: Restore rolling interval flag from flattened frequency properties (#119)
-                    isRollingInterval = obj.get("isRollingInterval")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false
+                    isRollingInterval = obj.get("isRollingInterval")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+                    cycleActiveDays = obj.get("cycleActiveDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    cycleRestDays = obj.get("cycleRestDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    asNeededIntervalHours = obj.get("asNeededIntervalHours")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    asNeededNotifyEligible = obj.get("asNeededNotifyEligible")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: true
                 )
             } else {
                 Frequency(FrequencyPattern.DAILY)

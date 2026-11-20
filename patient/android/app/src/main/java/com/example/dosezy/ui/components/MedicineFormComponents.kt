@@ -77,7 +77,9 @@ fun validateMedicineForm(
     intervalWeeksText: String,
     isFiniteCourse: Boolean = false,
     durationDaysText: String = "",
-    hasExistingEndDate: Boolean = false
+    hasExistingEndDate: Boolean = false,
+    cycleActiveDaysText: String = "21",
+    cycleRestDaysText: String = "7"
 ): MedicineFormValidationResult {
     val isNameValid = medicationName.isNotBlank()
 
@@ -104,6 +106,11 @@ fun validateMedicineForm(
         FrequencyPattern.WEEKLY -> selectedDaysOfWeek.isNotEmpty()
         FrequencyPattern.MONTHLY -> selectedDaysOfMonth.isNotEmpty()
         FrequencyPattern.CUSTOM -> selectedDaysOfWeek.isNotEmpty() && (intervalWeeksText.normalizeArabicDigits().toIntOrNull() ?: 0) >= 1
+        FrequencyPattern.CYCLICAL -> {
+            val active = cycleActiveDaysText.normalizeArabicDigits().toIntOrNull() ?: 21
+            val rest = cycleRestDaysText.normalizeArabicDigits().toIntOrNull() ?: 7
+            active > 0 && rest >= 0
+        }
     }
 
     val isFiniteValid = !isFiniteCourse || hasExistingEndDate || ((durationDaysText.normalizeArabicDigits().toIntOrNull() ?: 0) > 0)
@@ -191,7 +198,15 @@ fun MedicineTimingsAndDosagesCard(
     isFrequencyError: Boolean = false,
     frequencyErrorMessage: String? = null,
     isRollingInterval: Boolean = false,
-    onRollingIntervalChange: (Boolean) -> Unit = {}
+    onRollingIntervalChange: (Boolean) -> Unit = {},
+    cycleActiveDaysText: String = "21",
+    onCycleActiveDaysChange: (String) -> Unit = {},
+    cycleRestDaysText: String = "7",
+    onCycleRestDaysChange: (String) -> Unit = {},
+    asNeededIntervalHoursText: String = "",
+    onAsNeededIntervalHoursChange: (String) -> Unit = {},
+    asNeededNotifyEligible: Boolean = true,
+    onAsNeededNotifyEligibleChange: (Boolean) -> Unit = {}
 ) = com.example.dosezy.ui.components.form.MedicineTimingsAndDosagesCard(
     selectedFrequency = selectedFrequency,
     onFrequencyChange = onFrequencyChange,
@@ -227,7 +242,15 @@ fun MedicineTimingsAndDosagesCard(
     isFrequencyError = isFrequencyError,
     frequencyErrorMessage = frequencyErrorMessage,
     isRollingInterval = isRollingInterval,
-    onRollingIntervalChange = onRollingIntervalChange
+    onRollingIntervalChange = onRollingIntervalChange,
+    cycleActiveDaysText = cycleActiveDaysText,
+    onCycleActiveDaysChange = onCycleActiveDaysChange,
+    cycleRestDaysText = cycleRestDaysText,
+    onCycleRestDaysChange = onCycleRestDaysChange,
+    asNeededIntervalHoursText = asNeededIntervalHoursText,
+    onAsNeededIntervalHoursChange = onAsNeededIntervalHoursChange,
+    asNeededNotifyEligible = asNeededNotifyEligible,
+    onAsNeededNotifyEligibleChange = onAsNeededNotifyEligibleChange
 )
 
 @RequiresApi(Build.VERSION_CODES.O)

@@ -76,7 +76,15 @@ fun MedicineTimingsAndDosagesCard(
     isFrequencyError: Boolean = false,
     frequencyErrorMessage: String? = null,
     isRollingInterval: Boolean = false,
-    onRollingIntervalChange: (Boolean) -> Unit = {}
+    onRollingIntervalChange: (Boolean) -> Unit = {},
+    cycleActiveDaysText: String = "21",
+    onCycleActiveDaysChange: (String) -> Unit = {},
+    cycleRestDaysText: String = "7",
+    onCycleRestDaysChange: (String) -> Unit = {},
+    asNeededIntervalHoursText: String = "",
+    onAsNeededIntervalHoursChange: (String) -> Unit = {},
+    asNeededNotifyEligible: Boolean = true,
+    onAsNeededNotifyEligibleChange: (Boolean) -> Unit = {}
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -121,7 +129,15 @@ fun MedicineTimingsAndDosagesCard(
                 selectedDaysOfMonth = selectedDaysOfMonth,
                 onDaysOfMonthChange = onDaysOfMonthChange,
                 isRollingInterval = isRollingInterval,
-                onRollingIntervalChange = onRollingIntervalChange
+                onRollingIntervalChange = onRollingIntervalChange,
+                cycleActiveDaysText = cycleActiveDaysText,
+                onCycleActiveDaysChange = onCycleActiveDaysChange,
+                cycleRestDaysText = cycleRestDaysText,
+                onCycleRestDaysChange = onCycleRestDaysChange,
+                asNeededIntervalHoursText = asNeededIntervalHoursText,
+                onAsNeededIntervalHoursChange = onAsNeededIntervalHoursChange,
+                asNeededNotifyEligible = asNeededNotifyEligible,
+                onAsNeededNotifyEligibleChange = onAsNeededNotifyEligibleChange
             )
 
             if (isFrequencyError && !frequencyErrorMessage.isNullOrBlank()) {

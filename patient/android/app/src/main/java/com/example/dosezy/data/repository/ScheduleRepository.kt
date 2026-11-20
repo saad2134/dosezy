@@ -131,6 +131,9 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         }
         // Guard: Dismiss any active refill alert notification for deleted/archived medicine
         nManager?.cancel((medicineId + "_refill").hashCode())
+        // Guard: Cancel PRN next dose eligible alarm and dismiss shade notification for deleted/archived medicine (#142)
+        alarmScheduler.cancelPrnEligibleNotification(medicineId)
+        nManager?.cancel((medicineId + "_prn_eligible").hashCode())
         // Guard: Reconcile active ADHD intake countdown notification if active countdown references deleted medicine (#BUG-SAFEGUARD-PARTIAL-COHORT)
         try {
             val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
@@ -733,6 +736,16 @@ class ScheduleRepository(private val database: DosezyDatabase) {
 
         // 4. Update app widgets and alarms
         if (context != null && previousEntry != null) {
+            // Guard: When undoing a PRN dose, cancel any pending next dose eligible alarm and dismiss shade notification (#142)
+            if (entryId.startsWith("PRN_")) {
+                try {
+                    val alarmScheduler = AlarmScheduler(context)
+                    alarmScheduler.cancelPrnEligibleNotification(previousEntry.medicineId)
+                    val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
+                    nManager?.cancel((previousEntry.medicineId + "_prn_eligible").hashCode())
+                } catch (_: Exception) {}
+            }
+
             // Guard: Ad-hoc PRN doses do not have scheduled alarms or slot notifications; skip alarm/notification resync to prevent phantom alerts (#BUG-PRN-UNDO-ALARM)
             if (!entryId.startsWith("PRN_")) {
                 val now = LocalDateTime.now()
@@ -860,6 +873,25 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     .setContentIntent(contentIntent)
                     .setAutoCancel(true)
                 nManager.notify((freshMedicine.medicineId + "_refill").hashCode(), builder.build())
+            }
+        }
+
+        // Guard: If as-needed medicine has a minimum interval configured, schedule an alert when the next dose is eligible (#142)
+        if (context != null && freshMedicine.frequency.pattern == com.example.dosezy.data.model.FrequencyPattern.AS_NEEDED) {
+            val intervalHours = freshMedicine.frequency.asNeededIntervalHours
+            if (intervalHours != null && intervalHours > 0 && freshMedicine.frequency.asNeededNotifyEligible) {
+                val triggerEpochMillis = dateTime.plusHours(intervalHours.toLong())
+                    .atZone(java.time.ZoneId.systemDefault())
+                    .toInstant()
+                    .toEpochMilli()
+                com.example.dosezy.notifications.AlarmScheduler(context)
+                    .schedulePrnEligibleNotification(
+                        medicineId = freshMedicine.medicineId,
+                        medicineName = freshMedicine.medicationName,
+                        triggerEpochMillis = triggerEpochMillis,
+                        intervalHours = intervalHours,
+                        userId = userId
+                    )
             }
         }
 

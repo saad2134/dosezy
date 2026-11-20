@@ -154,4 +154,33 @@ class AlarmAndNotificationLogicTest {
         assertTrue(snoozeTimeFormatted.isNotBlank())
         assertTrue(snoozeTimeFormatted.contains(":") && (snoozeTimeFormatted.endsWith("AM") || snoozeTimeFormatted.endsWith("PM")))
     }
+
+    // ───────────────────────────────────────────────────────────────
+    // 4. PRN Next Dose Eligible Alert Logic (#142)
+    // ───────────────────────────────────────────────────────────────
+
+    @Test
+    fun prnEligibleAlarmId_isDeterministicAndUniqueFromRefill() {
+        val medId = "med_ibuprofen_456"
+        val prnEligibleRequestCode = (medId + "_prn_eligible").hashCode()
+        val refillRequestCode = (medId + "_refill").hashCode()
+        val prnClickRequestCode = (medId + "_prn_click").hashCode()
+
+        // Same ID yields deterministic hash
+        assertEquals(prnEligibleRequestCode, (medId + "_prn_eligible").hashCode())
+        // Distinct event channels do not collide
+        assertNotEquals(prnEligibleRequestCode, refillRequestCode)
+        assertNotEquals(prnEligibleRequestCode, prnClickRequestCode)
+    }
+
+    @Test
+    fun prnNextDoseTriggerEpoch_computesExactIntervalHours() {
+        val takenAt = LocalDateTime.of(2026, 11, 20, 14, 0, 0)
+        val intervalHours = 6
+        val nextEligibleTime = takenAt.plusHours(intervalHours.toLong())
+
+        assertEquals(LocalDateTime.of(2026, 11, 20, 20, 0, 0), nextEligibleTime)
+        val diffHours = java.time.Duration.between(takenAt, nextEligibleTime).toHours()
+        assertEquals(6L, diffHours)
+    }
 }

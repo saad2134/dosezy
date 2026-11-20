@@ -288,6 +288,36 @@ class ConvertersTest {
     }
 
     @Test
+    fun frequency_cyclicalRoundTrips() {
+        val freq = Frequency(
+            pattern = FrequencyPattern.CYCLICAL,
+            cycleActiveDays = 21,
+            cycleRestDays = 7
+        )
+        val json = converters.fromFrequency(freq)
+        val restored = converters.toFrequency(json)
+        assertNotNull(restored)
+        assertEquals(FrequencyPattern.CYCLICAL, restored!!.pattern)
+        assertEquals(21, restored.cycleActiveDays)
+        assertEquals(7, restored.cycleRestDays)
+    }
+
+    @Test
+    fun frequency_asNeededWithIntervalRoundTrips() {
+        val freq = Frequency(
+            pattern = FrequencyPattern.AS_NEEDED,
+            asNeededIntervalHours = 6,
+            asNeededNotifyEligible = false
+        )
+        val json = converters.fromFrequency(freq)
+        val restored = converters.toFrequency(json)
+        assertNotNull(restored)
+        assertEquals(FrequencyPattern.AS_NEEDED, restored!!.pattern)
+        assertEquals(6, restored.asNeededIntervalHours)
+        assertEquals(false, restored.asNeededNotifyEligible)
+    }
+
+    @Test
     fun frequency_legacyJsonWithoutRollingIntervalDefaultsToFalse() {
         val legacyJson = """{"pattern":"DAILY"}"""
         val restored = converters.toFrequency(legacyJson)

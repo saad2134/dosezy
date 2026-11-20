@@ -498,6 +498,30 @@ Voulez-vous continuer ?</string>
     <string name="freq_rolling_interval_desc">Le minuteur de la prochaine prise commence après l\'enregistrement pour respecter l\'intervalle de sécurité</string>
     <string name="freq_rolling_badge">Glissant</string>
 
+    <!-- Cyclical & Looping Schedules (#141) -->
+    <string name="freq_cyclical">Cyclique (jours actifs et pause)</string>
+    <string name="freq_cyclical_desc">Prendre le médicament pendant les jours actifs, puis faire une pause (ex. pilule contraceptive).</string>
+    <string name="freq_cycle_format">%1$d j prise, %2$d j pause</string>
+    <string name="freq_cycle_active_days">Jours actifs</string>
+    <string name="freq_cycle_rest_days">Jours de pause</string>
+    <string name="freq_cycle_preset_21_7">21 / 7 (Standard)</string>
+    <string name="freq_cycle_preset_24_4">24 / 4 (Prolongé)</string>
+    <string name="freq_cycle_preset_custom">Personnalisé</string>
+    <string name="cycle_presets_label">Préréglages de cycle</string>
+
+    <!-- PRN Next Dose Eligible Alerts (#142) -->
+    <string name="freq_as_needed_interval_title">Intervalle minimal entre les prises</string>
+    <string name="freq_as_needed_interval_desc">Notifier lorsqu\'il est sécuritaire et autorisé de prendre la prochaine dose.</string>
+    <string name="freq_as_needed_interval_format">Au besoin (min %1$d h)</string>
+    <string name="freq_as_needed_notify_eligible">Notifier quand la prochaine dose est autorisée</string>
+    <string name="freq_as_needed_interval_none">Aucun</string>
+    <string name="freq_as_needed_interval_hours_label">Intervalle minimal (heures)</string>
+    <string name="prn_eligible_channel_name">Prochaine dose disponible (au besoin)</string>
+    <string name="prn_eligible_channel_desc">Notifications lorsque l\'intervalle minimal pour les médicaments au besoin est écoulé.</string>
+    <string name="prn_eligible_notification_title">Prochaine dose disponible</string>
+    <string name="prn_eligible_notification_body">L\'intervalle minimal de %1$d heures pour %2$s est écoulé. Vous pouvez prendre votre prochaine dose si nécessaire.</string>
+    <string name="prn_eligible_notification_body_generic">L\'intervalle minimal pour %1$s est écoulé. Vous pouvez prendre votre prochaine dose si nécessaire.</string>
+
     <string name="btn_log_prn_dose">Enregistrer la prise</string>
     <string name="prn_doses_taken_today">Prises enregistrées aujourd\'hui : %1$d</string>
     <string name="prn_section_title">Médicaments au besoin (PRN)</string>

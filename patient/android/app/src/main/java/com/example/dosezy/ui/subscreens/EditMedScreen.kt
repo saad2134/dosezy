@@ -122,6 +122,10 @@ fun EditMedScreen(
     var intervalDaysText by remember { mutableStateOf("2") }
     var intervalWeeksText by remember { mutableStateOf("2") }
     var isRollingInterval by remember { mutableStateOf(false) }
+    var cycleActiveDaysText by remember { mutableStateOf("21") }
+    var cycleRestDaysText by remember { mutableStateOf("7") }
+    var asNeededIntervalHoursText by remember { mutableStateOf("") }
+    var asNeededNotifyEligible by remember { mutableStateOf(true) }
     var selectedReminderType by remember { mutableStateOf<ReminderType?>(null) }
 
     var isDataLoaded by remember { mutableStateOf(false) }
@@ -156,6 +160,10 @@ fun EditMedScreen(
             intervalDaysText = medicineToEdit.frequency.intervalDays?.toString() ?: "2"
             intervalWeeksText = medicineToEdit.frequency.intervalWeeks?.toString() ?: "2"
             isRollingInterval = medicineToEdit.frequency.isRollingInterval
+            cycleActiveDaysText = medicineToEdit.frequency.cycleActiveDays?.toString() ?: "21"
+            cycleRestDaysText = medicineToEdit.frequency.cycleRestDays?.toString() ?: "7"
+            asNeededIntervalHoursText = medicineToEdit.frequency.asNeededIntervalHours?.toString() ?: ""
+            asNeededNotifyEligible = medicineToEdit.frequency.asNeededNotifyEligible
             hasDifferentDosages = medicineToEdit.customDosages != null && medicineToEdit.customDosages.isNotEmpty()
             perTimeDosages = medicineToEdit.customDosages?.entries?.associate { (k, v) ->
                 val normKey = k.normalizeArabicDigits()
@@ -229,7 +237,9 @@ fun EditMedScreen(
                         intervalWeeksText = intervalWeeksText,
                         isFiniteCourse = isFiniteCourse,
                         durationDaysText = durationDaysText,
-                        hasExistingEndDate = medicineToEdit?.endDate != null
+                        hasExistingEndDate = medicineToEdit?.endDate != null,
+                        cycleActiveDaysText = cycleActiveDaysText,
+                        cycleRestDaysText = cycleRestDaysText
                     )
                     val isFormValid = validation.isValid
 
@@ -307,7 +317,15 @@ fun EditMedScreen(
                             isFrequencyError = showValidationErrors && !validation.isFrequencyValid,
                             frequencyErrorMessage = stringResource(R.string.form_error_select_days),
                             isRollingInterval = isRollingInterval,
-                            onRollingIntervalChange = { isRollingInterval = it }
+                            onRollingIntervalChange = { isRollingInterval = it },
+                            cycleActiveDaysText = cycleActiveDaysText,
+                            onCycleActiveDaysChange = { cycleActiveDaysText = it },
+                            cycleRestDaysText = cycleRestDaysText,
+                            onCycleRestDaysChange = { cycleRestDaysText = it },
+                            asNeededIntervalHoursText = asNeededIntervalHoursText,
+                            onAsNeededIntervalHoursChange = { asNeededIntervalHoursText = it },
+                            asNeededNotifyEligible = asNeededNotifyEligible,
+                            onAsNeededNotifyEligibleChange = { asNeededNotifyEligible = it }
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -409,7 +427,11 @@ fun EditMedScreen(
                                         intervalHours = if (selectedFrequency == FrequencyPattern.EVERY_X_HOURS) intervalHoursText.normalizeArabicDigits().toIntOrNull() else null,
                                         intervalDays = if (selectedFrequency == FrequencyPattern.EVERY_X_DAYS) intervalDaysText.normalizeArabicDigits().toIntOrNull() else null,
                                         intervalWeeks = if (selectedFrequency == FrequencyPattern.CUSTOM) (intervalWeeksText.normalizeArabicDigits().toIntOrNull() ?: 1).coerceAtLeast(1) else null,
-                                        isRollingInterval = isRollingInterval && (selectedFrequency == FrequencyPattern.DAILY || selectedFrequency == FrequencyPattern.EVERY_X_HOURS || selectedFrequency == FrequencyPattern.EVERY_X_DAYS)
+                                        isRollingInterval = isRollingInterval && (selectedFrequency == FrequencyPattern.DAILY || selectedFrequency == FrequencyPattern.EVERY_X_HOURS || selectedFrequency == FrequencyPattern.EVERY_X_DAYS),
+                                        cycleActiveDays = if (selectedFrequency == FrequencyPattern.CYCLICAL) (cycleActiveDaysText.normalizeArabicDigits().toIntOrNull() ?: 21).coerceAtLeast(1) else null,
+                                        cycleRestDays = if (selectedFrequency == FrequencyPattern.CYCLICAL) (cycleRestDaysText.normalizeArabicDigits().toIntOrNull() ?: 7).coerceAtLeast(0) else null,
+                                        asNeededIntervalHours = if (selectedFrequency == FrequencyPattern.AS_NEEDED) asNeededIntervalHoursText.normalizeArabicDigits().toIntOrNull() else null,
+                                        asNeededNotifyEligible = if (selectedFrequency == FrequencyPattern.AS_NEEDED) asNeededNotifyEligible else true
                                     ),
                                     scheduledTimes = if (selectedFrequency == FrequencyPattern.AS_NEEDED) emptyList() else scheduledTimesList,
                                     imageUri = medicineImagePath,
