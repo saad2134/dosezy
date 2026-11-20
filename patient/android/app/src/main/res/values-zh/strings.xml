@@ -880,7 +880,7 @@
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">已计划的服药提醒</string>
     <string name="pref_lockscreen_details_title">在锁定屏幕上显示详情</string>
-    <string name="pref_lockscreen_details_desc">解锁设备前在锁定屏幕上隐藏药品名称和剂量。</string>
+    <string name="pref_lockscreen_details_desc">在锁定屏幕上显示药品名称和剂量。关闭时，详细信息将在解锁设备前保持隐藏。</string>
     <string name="disclaimer_dialog_title">医疗与法律免责声明</string>
     <string name="disclaimer_dialog_summary">Dosezy 是一款自动化数字服药日程提醒工具，并非受监管的医疗器械。本应用不提供医疗诊断、剂量计算或临床建议。用药说明请务必遵从您的医生或药剂师指导。</string>
     <string name="disclaimer_checkbox_consent">我已理解并同意医疗免责声明和用户服务协议。</string>
@@ -893,6 +893,7 @@
     <string name="pdf_report_disclaimer_footer">Dosezy 药品追踪器 • 自主申报信息日志（非临床诊断记录）</string>
     <string name="pharmacy_refill_estimation_disclaimer">注意：补充药品数量为根据记录频度计算的参考估算值。请务必咨询您的药师或医生核准。</string>
     <string name="alarm_unlock_to_view_details">解锁以查看详情</string>
+    <string name="alarm_lockscreen_privacy_title">用药详情已隐藏</string>
     <string name="alarm_lockscreen_details_hidden">设备锁定时隐藏药品名称和用量。</string>
 
     <!-- Schedule Effective Date Selector (#105) -->

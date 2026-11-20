@@ -864,7 +864,7 @@
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">تذكير بموعد الدواء المجدول</string>
     <string name="pref_lockscreen_details_title">إظهار التفاصيل على شاشة القفل</string>
-    <string name="pref_lockscreen_details_desc">إخفاء أسماء الأدوية والجرعات حتى يتم إلغاء قفل الجهاز.</string>
+    <string name="pref_lockscreen_details_desc">عرض أسماء الأدوية والجرعات على شاشة القفل. عند إيقاف التشغيل، تظل التفاصيل مخفية حتى يتم إلغاء قفل الجهاز.</string>
     <string name="disclaimer_dialog_title">إخلاء المسؤولية الطبية والقانونية</string>
     <string name="disclaimer_dialog_summary">تطبيق دوزيزي هو أداة تذكير رقمية آلية وليس جهازاً طبياً معتمداً. لا يقدم التطبيق تشخيصاً طبياً أو حسابات جرعات أو نصائح سريرية. استشر دائماً طبيبك أو مقدم الرعاية الصحية للحصول على تعليمات الوصفة الطبية.</string>
     <string name="disclaimer_checkbox_consent">أفهم وأوافق على إخلاء المسؤولية الطبية وشروط الخدمة.</string>
@@ -877,6 +877,7 @@
     <string name="pdf_report_disclaimer_footer">متتبع الأدوية دوزيزي • سجل معلوماتي مسجل ذاتياً (غير سريري)</string>
     <string name="pharmacy_refill_estimation_disclaimer">ملاحظة: كميات إعادة التعبئة هي تقديرات تقريبية بناءً على وتيرة التناول. تحقق مع الصيدلي أو الطبيب.</string>
     <string name="alarm_unlock_to_view_details">قم بإلغاء القفل لعرض التفاصيل</string>
+    <string name="alarm_lockscreen_privacy_title">تفاصيل الدواء مخفية</string>
     <string name="alarm_lockscreen_details_hidden">يتم إخفاء أسماء الأدوية والجرعات أثناء قفل الجهاز.</string>
 
     <!-- Schedule Effective Date Selector (#105) -->

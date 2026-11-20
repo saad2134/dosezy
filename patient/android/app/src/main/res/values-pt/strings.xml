@@ -863,7 +863,7 @@ Deseja continuar?</string>
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">Lembrete de medicamento agendado</string>
     <string name="pref_lockscreen_details_title">Mostrar detalhes na tela de bloqueio</string>
-    <string name="pref_lockscreen_details_desc">Ocultar nomes e doses até desbloquear o dispositivo.</string>
+    <string name="pref_lockscreen_details_desc">Exibir nomes e doses de medicamentos na tela de bloqueio. Quando desativado, os detalhes permanecem ocultos até desbloquear o dispositivo.</string>
     <string name="disclaimer_dialog_title">Aviso médico e legal</string>
     <string name="disclaimer_dialog_summary">O Dosezy é um utilitário digital automatizado e NÃO é um dispositivo médico regulamentado. Não fornece diagnóstico clínico, cálculo de dosagem ou aconselhamento médico. Consulte sempre o seu médico ou farmacêutico para orientações de prescrição.</string>
     <string name="disclaimer_checkbox_consent">Entendo e aceito o aviso médico e os termos de serviço.</string>
@@ -876,6 +876,7 @@ Deseja continuar?</string>
     <string name="pdf_report_disclaimer_footer">Dosezy Rastreador de Medicamentos • Registro informativo autorrelatado (Não clínico)</string>
     <string name="pharmacy_refill_estimation_disclaimer">Aviso: As quantidades de reposição são estimativas aproximadas baseadas na frequência registrada. Confirme com seu farmacêutico ou médico.</string>
     <string name="alarm_unlock_to_view_details">Desbloquear para ver detalhes</string>
+    <string name="alarm_lockscreen_privacy_title">Detalhes do medicamento ocultos</string>
     <string name="alarm_lockscreen_details_hidden">Os nomes dos medicamentos e as dosagens ficam ocultos enquanto o dispositivo estiver bloqueado.</string>
 
     <!-- Schedule Effective Date Selector (#105) -->

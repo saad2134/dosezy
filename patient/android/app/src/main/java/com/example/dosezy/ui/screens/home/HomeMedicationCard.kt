@@ -212,7 +212,10 @@ fun HomeMedicationCard(
 
                 // 4. Refill warning / stock badge
                 medicine?.currentStock?.let { stock ->
-                    val isLow = medicine.refillThreshold != null && stock <= medicine.refillThreshold
+                    val doseAmount = medicine.getStockDeductionAmount(entry.scheduledDateTime.toLocalTime(), entry.dosage)
+                    val threshold = medicine.refillThreshold
+                    // Guard: Trigger low-stock warning if stock is at or below refill threshold, lower than required dose, or depleted (#144)
+                    val isLow = (threshold != null && stock <= threshold) || stock < doseAmount || stock <= 0.0
                     val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
                     val containerBg = if (isLow) {
                         if (isDark) Color(0xFF3F1313) else Color(0xFFFEE2E2)

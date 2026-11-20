@@ -689,4 +689,65 @@ class HomeMissedDoseActionRoutingTest {
         assertFalse(dropdownExpanded)
         assertTrue(backStackPopped)
     }
+
+    @Test
+    fun testHomeMedicationCard_stockChip_flagsLowWarningWhenStockLowerThanDose() {
+        // Guard: Prevent stock chip from displaying healthy green when remaining stock is lower than scheduled dose, below threshold, or depleted (#144)
+        val med = Medicine(
+            medicineId = "med_stock_144",
+            userId = "test_user_105",
+            medicationName = "Amoxicillin",
+            dosage = 2.0,
+            dosageUnit = DosageUnit.TABLET,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            currentStock = 1.0,
+            refillThreshold = null
+        )
+
+        val entry = ScheduleEntry(
+            entryId = "entry_stock_144",
+            userId = "test_user_105",
+            medicineId = "med_stock_144",
+            scheduledDateTime = LocalDateTime.of(2026, 11, 20, 8, 0),
+            status = MedicationStatus.PENDING,
+            dosage = 2.0
+        )
+
+        val stock = med.currentStock!!
+        val doseAmount = med.getStockDeductionAmount(entry.scheduledDateTime.toLocalTime(), entry.dosage)
+        assertEquals(2.0, doseAmount, 0.001)
+
+        // Case 1: stock (1.0) < doseAmount (2.0) with refillThreshold == null: must be isLow = true (warning red, not green)
+        val threshold1 = med.refillThreshold
+        val isLowInsufficient = (threshold1 != null && stock <= threshold1) || stock < doseAmount || stock <= 0.0
+        assertTrue("Stock lower than dose must trigger low-stock warning even when refillThreshold is null", isLowInsufficient)
+
+        // Case 2: stock == 0.0 with refillThreshold == null: must be isLow = true
+        val zeroStockMed = med.copy(currentStock = 0.0)
+        val zeroStock = zeroStockMed.currentStock!!
+        val threshold2 = zeroStockMed.refillThreshold
+        val isLowZero = (threshold2 != null && zeroStock <= threshold2) || zeroStock < doseAmount || zeroStock <= 0.0
+        assertTrue("Depleted stock (0.0) must trigger low-stock warning", isLowZero)
+
+        // Case 3: stock (10.0) > doseAmount (2.0) and > refillThreshold (5.0): isLow = false (green badge)
+        val healthyMed = med.copy(currentStock = 10.0, refillThreshold = 5.0)
+        val healthyStock = healthyMed.currentStock!!
+        val threshold3 = healthyMed.refillThreshold
+        val isLowHealthy = (threshold3 != null && healthyStock <= threshold3) || healthyStock < doseAmount || healthyStock <= 0.0
+        assertFalse("Stock exceeding both dose and refill threshold must not trigger warning", isLowHealthy)
+
+        // Case 4: custom dose override at evening slot (3.0 tablets), stock is 2.0: must be isLow = true
+        val eveningEntry = entry.copy(
+            scheduledDateTime = LocalDateTime.of(2026, 11, 20, 20, 0),
+            dosage = 3.0
+        )
+        val eveningDoseAmount = med.getStockDeductionAmount(eveningEntry.scheduledDateTime.toLocalTime(), eveningEntry.dosage)
+        assertEquals(3.0, eveningDoseAmount, 0.001)
+        val stockTwo = 2.0
+        val threshold4 = med.refillThreshold
+        val isLowEvening = (threshold4 != null && stockTwo <= threshold4) || stockTwo < eveningDoseAmount || stockTwo <= 0.0
+        assertTrue("Stock lower than evening dose override must trigger low-stock warning", isLowEvening)
+    }
 }

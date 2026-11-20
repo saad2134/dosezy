@@ -650,6 +650,20 @@ class AlarmAndNotificationRegressionTest {
     }
 
     @Test
+    fun testLockscreenPrivacy_stringsSemantics_affirmativeToggleAndMaskedAlarmTitle() {
+        // Guard: Verify lockscreen privacy preferences description accurately explains display/hide behavior without contradicting title (#143)
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val title = context.getString(com.example.dosezy.R.string.pref_lockscreen_details_title)
+        val desc = context.getString(com.example.dosezy.R.string.pref_lockscreen_details_desc)
+        val alarmHiddenTitle = context.getString(com.example.dosezy.R.string.alarm_lockscreen_privacy_title)
+
+        assertEquals("Show Details on Lock Screen", title)
+        assertTrue("Description must explain display behavior when enabled", desc.contains("Display"))
+        assertTrue("Description must explain hidden behavior when turned off", desc.contains("turned off") || desc.contains("disabled"))
+        assertEquals("Medication Details Hidden", alarmHiddenTitle)
+    }
+
+    @Test
     fun testCustomSnoozeOptions_whenDisabled_onlyIncludesSingleSnoozeAction() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val snoozeMinutes = 10

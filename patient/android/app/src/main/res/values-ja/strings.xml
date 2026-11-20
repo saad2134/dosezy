@@ -864,7 +864,7 @@
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">予定された服薬リマインダー</string>
     <string name="pref_lockscreen_details_title">ロック画面に詳細を表示</string>
-    <string name="pref_lockscreen_details_desc">端末のロック解除まで薬の名前と用量を非表示にします。</string>
+    <string name="pref_lockscreen_details_desc">ロック画面に薬の名前と用量を表示します。オフにすると、端末のロックを解除するまで詳細が非表示になります。</string>
     <string name="disclaimer_dialog_title">医療および法的免責事項</string>
     <string name="disclaimer_dialog_summary">Dosezyは自動服薬スケジュール補助ツールであり、医療機器ではありません。診断、用量計算、または医学的アドバイスは提供しません。処方薬の服用指示については必ず医師または薬剤師にご相談ください。</string>
     <string name="disclaimer_checkbox_consent">医療免責事項および利用規約を理解し、同意します。</string>
@@ -877,6 +877,7 @@
     <string name="pdf_report_disclaimer_footer">Dosezy 服薬トラッカー • 自己申告情報ログ（非臨床記録）</string>
     <string name="pharmacy_refill_estimation_disclaimer">注：補充薬の数量は登録された頻度に基づく概算です。正確な数量は薬剤師または医師にご確認ください。</string>
     <string name="alarm_unlock_to_view_details">ロックを解除して詳細を表示</string>
+    <string name="alarm_lockscreen_privacy_title">服薬の詳細を非表示中</string>
     <string name="alarm_lockscreen_details_hidden">端末のロック中は薬の名前と用量が非表示になります。</string>
 
     <!-- Schedule Effective Date Selector (#105) -->

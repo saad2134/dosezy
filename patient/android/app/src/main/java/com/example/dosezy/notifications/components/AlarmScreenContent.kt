@@ -352,8 +352,9 @@ fun AlarmScreenContent(
                                     modifier = Modifier.size(34.dp)
                                 )
                             }
+                            // Guard: Display dedicated privacy title instead of preferences toggle title when details are masked on lock screen (#143)
                             Text(
-                                text = stringResource(R.string.pref_lockscreen_details_title),
+                                text = stringResource(R.string.alarm_lockscreen_privacy_title),
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.onSurface
                             )
@@ -474,10 +475,19 @@ fun AlarmScreenContent(
                                         )
                                         med.currentStock?.let { stock ->
                                             val stockFmt = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(stock)
+                                            val doseAmount = med.getStockDeductionAmount(entry.scheduledDateTime.toLocalTime(), entry.dosage)
+                                            val threshold = med.refillThreshold
+                                            // Guard: Display warning color on alarm screen when stock is at/below refill threshold, lower than required dose, or depleted (#144)
+                                            val isLowStock = (threshold != null && stock <= threshold) || stock < doseAmount || stock <= 0.0
+                                            val stockColor = if (isLowStock) {
+                                                if (isDarkTheme) Color(0xFFFCA5A5) else Color(0xFFB91C1C)
+                                            } else {
+                                                if (isDarkTheme) Color(0xFFA7F3D0) else Color(0xFF2E7D32)
+                                            }
                                             Text(
                                                 text = stringResource(R.string.alarm_stock_remaining, stockFmt),
                                                 style = MaterialTheme.typography.bodySmall,
-                                                color = Color(0xFF2E7D32),
+                                                color = stockColor,
                                                 fontWeight = FontWeight.SemiBold
                                             )
                                         }

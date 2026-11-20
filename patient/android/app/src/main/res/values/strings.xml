@@ -893,7 +893,7 @@ Do you want to continue?</string>
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">Scheduled medication reminder</string>
     <string name="pref_lockscreen_details_title">Show Details on Lock Screen</string>
-    <string name="pref_lockscreen_details_desc">Hide medication names and dosages until device is unlocked.</string>
+    <string name="pref_lockscreen_details_desc">Display medication names and dosages on the lock screen. When turned off, details remain hidden until the device is unlocked.</string>
     <string name="disclaimer_dialog_title">Medical &amp; Legal Disclaimer</string>
     <string name="disclaimer_dialog_summary">Dosezy is an automated digital reminder utility and is NOT a regulated medical device. It does not provide medical diagnosis, dosage calculations, or clinical advice. Always consult your physician or healthcare provider for prescription instructions.</string>
     <string name="disclaimer_checkbox_consent">I understand and accept the Medical Disclaimer and Terms of Service.</string>
@@ -906,6 +906,7 @@ Do you want to continue?</string>
     <string name="pdf_report_disclaimer_footer">Dosezy Medicine Tracker • Self-Reported Informational Log (Non-Clinical)</string>
     <string name="pharmacy_refill_estimation_disclaimer">Notice: Refill quantities are estimated approximations based on logged frequency. Verify with your pharmacist or physician.</string>
     <string name="alarm_unlock_to_view_details">Unlock to view details</string>
+    <string name="alarm_lockscreen_privacy_title">Medication Details Hidden</string>
     <string name="alarm_lockscreen_details_hidden">Medication names and dosages are hidden while device is locked.</string>
 
     <!-- Schedule Effective Date Selector (#105) -->

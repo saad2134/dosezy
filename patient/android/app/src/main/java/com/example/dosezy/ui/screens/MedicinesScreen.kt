@@ -914,7 +914,10 @@ fun MedicineItem(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
-                            val isLow = medicine.refillThreshold != null && stock <= medicine.refillThreshold
+                            val doseAmount = medicine.getStockDeductionAmount()
+                            val threshold = medicine.refillThreshold
+                            // Guard: Trigger low-stock warning if stock is at or below refill threshold, lower than required dose, or depleted (#144)
+                            val isLow = (threshold != null && stock <= threshold) || stock < doseAmount || stock <= 0.0
                             val containerBg = if (isLow) {
                                 if (isDark) Color(0xFF3F1313) else Color(0xFFFEE2E2)
                             } else {
