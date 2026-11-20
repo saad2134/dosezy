@@ -3,6 +3,9 @@ package com.example.dosezy.ui.subscreens
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
@@ -77,7 +80,7 @@ import com.example.dosezy.ui.components.TopBar
 import com.example.dosezy.ui.viewmodels.UserViewModel
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ManageProfileScreen(navController: NavController) {
     val userViewModel: UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
@@ -154,6 +157,9 @@ fun ManageProfileScreen(navController: NavController) {
             } else {
                 val scrollState = rememberScrollState()
                 val coroutineScope = rememberCoroutineScope()
+                val nameRequester = remember { BringIntoViewRequester() }
+                val ageRequester = remember { BringIntoViewRequester() }
+                val genderRequester = remember { BringIntoViewRequester() }
 
                 Column(
                     modifier = Modifier
@@ -216,7 +222,11 @@ fun ManageProfileScreen(navController: NavController) {
 
                     // Form Fields
                     // Name Field
-                    Column {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .bringIntoViewRequester(nameRequester)
+                    ) {
                         OutlinedTextField(
                             value = fullName,
                             onValueChange = {
@@ -228,16 +238,17 @@ fun ManageProfileScreen(navController: NavController) {
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(16.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = if (fullNameError) Color.Red else MaterialTheme.colorScheme.primary,
-                                unfocusedBorderColor = if (fullNameError) Color.Red else MaterialTheme.colorScheme.outline,
-                                errorBorderColor = Color.Red
+                                focusedBorderColor = if (fullNameError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = if (fullNameError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
+                                errorBorderColor = MaterialTheme.colorScheme.error
                             ),
-                            isError = fullNameError
+                            isError = fullNameError,
+                            singleLine = true
                         )
                         if (fullNameError) {
                             Text(
                                 text = stringResource(R.string.profile_name_required),
-                                color = Color.Red,
+                                color = MaterialTheme.colorScheme.error,
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(start = 16.dp, top = 4.dp)
                             )
@@ -247,7 +258,11 @@ fun ManageProfileScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Age Field
-                    Column {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .bringIntoViewRequester(ageRequester)
+                    ) {
                         OutlinedTextField(
                             value = age,
                             onValueChange = {
@@ -261,15 +276,17 @@ fun ManageProfileScreen(navController: NavController) {
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             shape = RoundedCornerShape(16.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = if (ageError) Color.Red else MaterialTheme.colorScheme.primary,
-                                unfocusedBorderColor = if (ageError) Color.Red else MaterialTheme.colorScheme.outline
+                                focusedBorderColor = if (ageError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = if (ageError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
+                                errorBorderColor = MaterialTheme.colorScheme.error
                             ),
-                            isError = ageError
+                            isError = ageError,
+                            singleLine = true
                         )
                         if (ageError) {
                             Text(
                                 text = stringResource(R.string.profile_age_required),
-                                color = Color.Red,
+                                color = MaterialTheme.colorScheme.error,
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(start = 16.dp, top = 4.dp)
                             )
@@ -279,7 +296,11 @@ fun ManageProfileScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Gender Field
-                    Column {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .bringIntoViewRequester(genderRequester)
+                    ) {
 
                         GenderDropdown(
                             selectedGender = gender,
@@ -295,7 +316,7 @@ fun ManageProfileScreen(navController: NavController) {
                         if (genderError) {
                             Text(
                                 text = stringResource(R.string.profile_gender_required),
-                                color = Color.Red,
+                                color = MaterialTheme.colorScheme.error,
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(start = 16.dp, top = 4.dp)
                             )
@@ -374,10 +395,18 @@ fun ManageProfileScreen(navController: NavController) {
                                     snackbarHostState.showSnackbar(context.getString(R.string.form_error_fix_fields))
                                 }
                                 coroutineScope.launch {
-                                    when {
-                                        fullName.isBlank() -> scrollState.animateScrollTo(150)
-                                        parsedAge <= 0 -> scrollState.animateScrollTo(230)
-                                        gender == null -> scrollState.animateScrollTo(320)
+                                    try {
+                                        when {
+                                            fullName.isBlank() -> nameRequester.bringIntoView()
+                                            parsedAge <= 0 -> ageRequester.bringIntoView()
+                                            gender == null -> genderRequester.bringIntoView()
+                                        }
+                                    } catch (_: Exception) {
+                                        when {
+                                            fullName.isBlank() -> scrollState.animateScrollTo(150)
+                                            parsedAge <= 0 -> scrollState.animateScrollTo(230)
+                                            gender == null -> scrollState.animateScrollTo(320)
+                                        }
                                     }
                                 }
                                 return@Button
@@ -580,9 +609,9 @@ fun GenderDropdown(
             label = { Text(stringResource(R.string.profile_gender) + " *") },
             shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = if (isError) Color.Red else MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = if (isError) Color.Red else MaterialTheme.colorScheme.outline,
-                errorBorderColor = Color.Red
+                focusedBorderColor = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
+                errorBorderColor = MaterialTheme.colorScheme.error
             ),
             isError = isError
         )
