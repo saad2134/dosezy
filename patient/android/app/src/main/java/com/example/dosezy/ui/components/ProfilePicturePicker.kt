@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -547,14 +548,21 @@ fun MedicinePhotoVisualPicker(
             modifier = Modifier.size(128.dp),
             contentAlignment = Alignment.Center
         ) {
-            // Main Container (Squircle)
+            // Main Container (Squircle) - Unobstructed medication preview
             Surface(
                 shape = RoundedCornerShape(24.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                 border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
                 modifier = Modifier
                     .size(128.dp)
-                    .clickable { showImageSourceDialog = true }
+                    .clickable {
+                        // Guard: Direct frame tap opens relevant editor without redundant overlay badges
+                        if (!imagePath.isNullOrEmpty()) {
+                            showImageSourceDialog = true
+                        } else {
+                            showPillVisualDialog = true
+                        }
+                    }
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -611,92 +619,72 @@ fun MedicinePhotoVisualPicker(
                     }
                 }
             }
-
-            // Bottom-Right: Camera/Photo Picker Button (Squircle badge)
-            Surface(
-                shape = RoundedCornerShape(10.dp),
-                color = MaterialTheme.colorScheme.primary,
-                shadowElevation = 4.dp,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .size(38.dp)
-                    .clickable { showImageSourceDialog = true }
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Default.CameraAlt,
-                        contentDescription = stringResource(R.string.form_upload_img),
-                        tint = Color.White,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-            }
-
-            // Bottom-Left: Pill Shape & Visual Dialog Button (Squircle badge with Palette icon) (#145, F13)
-            Surface(
-                shape = RoundedCornerShape(10.dp),
-                color = parseHexColor(pillColor),
-                shadowElevation = 4.dp,
-                border = BorderStroke(2.dp, Color.White),
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .size(38.dp)
-                    .clickable { showPillVisualDialog = true }
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Default.Palette,
-                        contentDescription = stringResource(R.string.form_pill_appearance),
-                        tint = Color.White,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-            }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        // Labeled action buttons to remove control ambiguity (#145, F13)
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+        // Unified Segmented Dual Action Pill: replaces duplicate corner badges with clean labeled bar
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)),
+            modifier = Modifier.clip(RoundedCornerShape(12.dp))
         ) {
-            OutlinedButton(
-                onClick = { showImageSourceDialog = true },
-                shape = RoundedCornerShape(10.dp),
-                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
-                modifier = Modifier.height(34.dp)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.height(38.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.CameraAlt,
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = if (!imagePath.isNullOrEmpty()) stringResource(R.string.form_change_img) else stringResource(R.string.form_upload_img),
-                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold)
-                )
-            }
+                // Segment 1: Upload / Change Photo
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp))
+                        .clickable { showImageSourceDialog = true }
+                        .padding(horizontal = 14.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CameraAlt,
+                        contentDescription = null,
+                        modifier = Modifier.size(15.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = if (!imagePath.isNullOrEmpty()) stringResource(R.string.form_change_img) else stringResource(R.string.form_upload_img),
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
 
-            OutlinedButton(
-                onClick = { showPillVisualDialog = true },
-                shape = RoundedCornerShape(10.dp),
-                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
-                modifier = Modifier.height(34.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Palette,
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp),
-                    tint = parseHexColor(pillColor)
+                // Subtle vertical divider between segments
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .height(20.dp)
+                        .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.25f))
                 )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = stringResource(R.string.form_pill_appearance),
-                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold)
-                )
+
+                // Segment 2: Pill Visual / Appearance Style
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(topEnd = 12.dp, bottomEnd = 12.dp))
+                        .clickable { showPillVisualDialog = true }
+                        .padding(horizontal = 14.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Palette,
+                        contentDescription = null,
+                        modifier = Modifier.size(15.dp),
+                        tint = parseHexColor(pillColor)
+                    )
+                    Text(
+                        text = stringResource(R.string.form_pill_appearance),
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
         }
     }
