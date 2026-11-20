@@ -896,6 +896,15 @@
     <string name="alarm_lockscreen_privacy_title">用药详情已隐藏</string>
     <string name="alarm_lockscreen_details_hidden">设备锁定时隐藏药品名称和用量。</string>
 
+    <!-- Multi-Step Medicine Form (#145) -->
+    <string name="form_step_what">基本信息</string>
+    <string name="form_step_when">用药时间</string>
+    <string name="form_step_extras">高级选项</string>
+    <string name="form_step_counter">第 %1$d 步，共 %2$d 步</string>
+    <string name="btn_next">下一步</string>
+    <string name="form_pill_appearance">药丸样式</string>
+    <string name="form_dosage_card_title">剂量与规格</string>
+
     <!-- Schedule Effective Date Selector (#105) -->
     <string name="schedule_effective_dialog_title">应用服药时间更改</string>
     <string name="schedule_effective_dialog_message">更新后的服药计划应从何时生效？</string>

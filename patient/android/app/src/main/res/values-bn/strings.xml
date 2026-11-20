@@ -879,6 +879,15 @@
     <string name="alarm_lockscreen_privacy_title">ওষুধের বিবরণ লুকানো আছে</string>
     <string name="alarm_lockscreen_details_hidden">ডিভাইস লক থাকা অবস্থায় ওষুধের নাম ও ডোজ লুকানো থাকে।</string>
 
+    <!-- Multi-Step Medicine Form (#145) -->
+    <string name="form_step_what">কী গ্রহণ করবেন</string>
+    <string name="form_step_when">কখন</string>
+    <string name="form_step_extras">অতিরিক্ত</string>
+    <string name="form_step_counter">ধাপ %1$d এর %2$d</string>
+    <string name="btn_next">পরবর্তী</string>
+    <string name="form_pill_appearance">ওষুধের রূপ</string>
+    <string name="form_dosage_card_title">ডোজ ও মাত্রা</string>
+
     <!-- Schedule Effective Date Selector (#105) -->
     <string name="schedule_effective_dialog_title">সময়সূচীর পরিবর্তন প্রয়োগ করুন</string>
     <string name="schedule_effective_dialog_message">এই আপডেট করা সময়সূচী কখন থেকে কার্যকর হবে?</string>

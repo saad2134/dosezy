@@ -880,6 +880,15 @@ Möchten Sie fortfahren?</string>
     <string name="alarm_lockscreen_privacy_title">Medikamentendetails ausgeblendet</string>
     <string name="alarm_lockscreen_details_hidden">Medikamentennamen und Dosierungen sind bei gesperrtem Gerät ausgeblendet.</string>
 
+    <!-- Multi-Step Medicine Form (#145) -->
+    <string name="form_step_what">Was</string>
+    <string name="form_step_when">Wann</string>
+    <string name="form_step_extras">Extras</string>
+    <string name="form_step_counter">Schritt %1$d von %2$d</string>
+    <string name="btn_next">Weiter</string>
+    <string name="form_pill_appearance">Pillen-Stil</string>
+    <string name="form_dosage_card_title">Dosierung &amp; Stärke</string>
+
     <!-- Schedule Effective Date Selector (#105) -->
     <string name="schedule_effective_dialog_title">Planänderungen anwenden</string>
     <string name="schedule_effective_dialog_message">Wann soll der aktualisierte Plan in Kraft treten?</string>

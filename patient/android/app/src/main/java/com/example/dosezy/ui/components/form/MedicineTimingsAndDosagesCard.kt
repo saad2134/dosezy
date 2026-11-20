@@ -84,7 +84,8 @@ fun MedicineTimingsAndDosagesCard(
     asNeededIntervalHoursText: String = "",
     onAsNeededIntervalHoursChange: (String) -> Unit = {},
     asNeededNotifyEligible: Boolean = true,
-    onAsNeededNotifyEligibleChange: (Boolean) -> Unit = {}
+    onAsNeededNotifyEligibleChange: (Boolean) -> Unit = {},
+    showSingleDosageRow: Boolean = true
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -179,7 +180,8 @@ fun MedicineTimingsAndDosagesCard(
                 timeFormat = timeFormat,
                 isDosageError = isDosageError,
                 dosageErrorMessage = dosageErrorMessage,
-                invalidTimeSlotKeys = invalidTimeSlotKeys
+                invalidTimeSlotKeys = invalidTimeSlotKeys,
+                showSingleDosageRow = showSingleDosageRow
             )
         }
     }

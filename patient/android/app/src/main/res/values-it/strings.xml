@@ -880,6 +880,15 @@ Vuoi continuare?</string>
     <string name="alarm_lockscreen_privacy_title">Dettagli dei farmaci nascosti</string>
     <string name="alarm_lockscreen_details_hidden">I nomi dei farmaci e i dosaggi sono nascosti quando il dispositivo è bloccato.</string>
 
+    <!-- Multi-Step Medicine Form (#145) -->
+    <string name="form_step_what">Cosa</string>
+    <string name="form_step_when">Quando</string>
+    <string name="form_step_extras">Extra</string>
+    <string name="form_step_counter">Passo %1$d di %2$d</string>
+    <string name="btn_next">Avanti</string>
+    <string name="form_pill_appearance">Stile pillola</string>
+    <string name="form_dosage_card_title">Dosaggio e concentrazione</string>
+
     <!-- Schedule Effective Date Selector (#105) -->
     <string name="schedule_effective_dialog_title">Applica modifiche all\'orario</string>
     <string name="schedule_effective_dialog_message">Quando deve entrare in vigore questo orario aggiornato?</string>

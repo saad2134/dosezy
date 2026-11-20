@@ -896,6 +896,15 @@
     <string name="alarm_lockscreen_privacy_title">दवा का विवरण छिपा हुआ है</string>
     <string name="alarm_lockscreen_details_hidden">डिवाइस लॉक होने पर दवा का नाम और खुराक छिपी रहती है।</string>
 
+    <!-- Multi-Step Medicine Form (#145) -->
+    <string name="form_step_what">क्या लेना है</string>
+    <string name="form_step_when">कब</string>
+    <string name="form_step_extras">अतिरिक्त</string>
+    <string name="form_step_counter">चरण %1$d / %2$d</string>
+    <string name="btn_next">आगे</string>
+    <string name="form_pill_appearance">दवा का रूप</string>
+    <string name="form_dosage_card_title">खुराक और क्षमता</string>
+
     <!-- Schedule Effective Date Selector (#105) -->
     <string name="schedule_effective_dialog_title">शेड्यूल परिवर्तन लागू करें</string>
     <string name="schedule_effective_dialog_message">यह अपडेट किया गया शेड्यूल कब से प्रभावी होना चाहिए?</string>

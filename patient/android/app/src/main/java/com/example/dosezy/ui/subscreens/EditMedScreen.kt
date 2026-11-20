@@ -1,7 +1,9 @@
 package com.example.dosezy.ui.subscreens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,9 +15,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -24,6 +25,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -37,6 +39,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -55,13 +58,14 @@ import com.example.dosezy.data.model.normalizeArabicDigits
 import com.example.dosezy.ui.components.EditMedSkeletonView
 import com.example.dosezy.ui.components.GridTimePickerDialog
 import com.example.dosezy.ui.components.MedicineCourseDurationCard
+import com.example.dosezy.ui.components.MedicineDosageCard
+import com.example.dosezy.ui.components.MedicineFormStepProgress
 import com.example.dosezy.ui.components.MedicineIdentificationCard
 import com.example.dosezy.ui.components.MedicineNotesCard
 import com.example.dosezy.ui.components.MedicineReminderStyleCard
 import com.example.dosezy.ui.components.MedicineStockInventoryCard
 import com.example.dosezy.ui.components.MedicineTimingsAndDosagesCard
 import com.example.dosezy.ui.components.TopBar
-import com.example.dosezy.ui.components.isMedicineFormValid
 import com.example.dosezy.ui.components.validateMedicineForm
 import com.example.dosezy.ui.viewmodels.MedicineViewModel
 import com.example.dosezy.ui.viewmodels.UserViewModel
@@ -182,8 +186,38 @@ fun EditMedScreen(
         }
     }
 
+    // Multi-Step Form Wizard State (#145, F13)
+    var currentStep by remember { mutableStateOf(1) }
+    var maxStepUnlocked by remember { mutableStateOf(3) }
+
+    // Guard: Intercept system back gestures to step backward through the form wizard before popping back stack (#145)
+    BackHandler(enabled = currentStep > 1) {
+        currentStep -= 1
+    }
+
     val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
     val snackbarHostState = remember { SnackbarHostState() }
+    val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
+    var showValidationErrors by remember { mutableStateOf(false) }
+
+    val validation = validateMedicineForm(
+        medicationName = medicationName,
+        dosage = dosage,
+        hasDifferentDosages = hasDifferentDosages,
+        scheduledTimesList = scheduledTimesList,
+        perTimeDosages = perTimeDosages,
+        selectedFrequency = selectedFrequency,
+        selectedDaysOfWeek = selectedDaysOfWeek,
+        selectedDaysOfMonth = selectedDaysOfMonth,
+        intervalWeeksText = intervalWeeksText,
+        isFiniteCourse = isFiniteCourse,
+        durationDaysText = durationDaysText,
+        hasExistingEndDate = medicineToEdit?.endDate != null,
+        cycleActiveDaysText = cycleActiveDaysText,
+        cycleRestDaysText = cycleRestDaysText
+    )
+    val isFormValid = validation.isValid
 
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -194,8 +228,236 @@ fun EditMedScreen(
                 currentUser = currentUser,
                 title = stringResource(R.string.form_edit_medicine),
                 showBackButton = true,
-                showNotificationStatus = false
+                showNotificationStatus = false,
+                onBackClick = {
+                    if (currentStep > 1) {
+                        currentStep -= 1
+                    } else {
+                        navController.popBackStack()
+                    }
+                }
             )
+        },
+        bottomBar = {
+            if (isDataLoaded) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding()
+                        .imePadding(),
+                    color = MaterialTheme.colorScheme.surface,
+                    shadowElevation = 8.dp,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f))
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (currentStep > 1) {
+                            OutlinedButton(
+                                onClick = {
+                                    currentStep -= 1
+                                    coroutineScope.launch { scrollState.scrollTo(0) }
+                                },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(52.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
+                            ) {
+                                Text(
+                                    stringResource(R.string.btn_back),
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 15.sp
+                                    ),
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+
+                        if (currentStep < 3) {
+                            Button(
+                                onClick = {
+                                    if (currentStep == 1) {
+                                        if (!validation.isNameValid || !validation.isDosageValid) {
+                                            showValidationErrors = true
+                                            coroutineScope.launch {
+                                                snackbarHostState.showSnackbar(context.getString(R.string.form_error_fix_fields))
+                                            }
+                                            return@Button
+                                        }
+                                        currentStep = 2
+                                        coroutineScope.launch { scrollState.scrollTo(0) }
+                                    } else if (currentStep == 2) {
+                                        val hasSlotErrors = hasDifferentDosages && scheduledTimesList.size > 1 && validation.invalidTimeSlotKeys.isNotEmpty()
+                                        if (!validation.isFrequencyValid || !validation.isFiniteDurationValid || hasSlotErrors) {
+                                            showValidationErrors = true
+                                            coroutineScope.launch {
+                                                snackbarHostState.showSnackbar(context.getString(R.string.form_error_fix_fields))
+                                            }
+                                            return@Button
+                                        }
+                                        currentStep = 3
+                                        coroutineScope.launch { scrollState.scrollTo(0) }
+                                    }
+                                },
+                                modifier = Modifier
+                                    .weight(if (currentStep > 1) 1.5f else 1f)
+                                    .height(52.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF2084E4),
+                                    contentColor = Color.White
+                                )
+                            ) {
+                                Text(
+                                    stringResource(R.string.btn_next),
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 15.sp
+                                    )
+                                )
+                            }
+                        } else {
+                            Button(
+                                onClick = {
+                                    if (!isFormValid) {
+                                        showValidationErrors = true
+                                        coroutineScope.launch {
+                                            snackbarHostState.showSnackbar(context.getString(R.string.form_error_fix_fields))
+                                        }
+                                        return@Button
+                                    }
+
+                                    val baseDose = if (hasDifferentDosages && scheduledTimesList.size > 1) {
+                                        val firstKey = scheduledTimesList.firstOrNull()?.let { String.format(java.util.Locale.US, "%02d:%02d", it.hour, it.minute) }
+                                        val firstVal = (firstKey?.let { perTimeDosages[it] }) ?: (if (dosage.isNotBlank()) dosage else null)
+                                        firstVal?.normalizeArabicDigits()?.toDoubleOrNull() ?: (dosage.normalizeArabicDigits().toDoubleOrNull() ?: 0.0)
+                                    } else {
+                                        dosage.normalizeArabicDigits().toDoubleOrNull() ?: 0.0
+                                    }
+                                    val finalCustomDosages: Map<String, Double>? = if (hasDifferentDosages && scheduledTimesList.size > 1) {
+                                        val map = mutableMapOf<String, Double>()
+                                        scheduledTimesList.forEach { t ->
+                                            val key = String.format(java.util.Locale.US, "%02d:%02d", t.hour, t.minute)
+                                            val entered = (perTimeDosages[key] ?: (if (dosage.isNotBlank()) dosage else null))?.normalizeArabicDigits()?.toDoubleOrNull() ?: baseDose
+                                            map[key] = entered
+                                        }
+                                        if (map.isNotEmpty()) map else null
+                                    } else null
+
+                                    val targetUserId = medicineToEdit?.userId ?: currentUser?.userId?.takeIf { it.isNotBlank() } ?: return@Button
+
+                                    val durationDaysInt = durationDaysText.normalizeArabicDigits().toIntOrNull()
+                                    val calcEndDate = if (isFiniteCourse) {
+                                        if (durationDaysInt != null) {
+                                            selectedStartDate.plusDays((durationDaysInt - 1).toLong().coerceAtLeast(0L))
+                                        } else {
+                                            medicineToEdit?.endDate
+                                        }
+                                    } else null
+
+                                    val updatedMedicine = Medicine(
+                                        medicineId = medicineToEdit?.medicineId ?: UUID.randomUUID().toString(),
+                                        userId = targetUserId,
+                                        medicationName = medicationName.trim(),
+                                        dosage = baseDose,
+                                        dosageUnit = selectedDosageUnit,
+                                        timesPerDay = if (selectedFrequency == FrequencyPattern.AS_NEEDED) 0 else scheduledTimesList.size,
+                                        frequency = com.example.dosezy.data.model.Frequency(
+                                            pattern = selectedFrequency,
+                                            daysPerWeek = if (selectedFrequency == FrequencyPattern.WEEKLY || selectedFrequency == FrequencyPattern.CUSTOM) selectedDaysOfWeek.size else null,
+                                            daysPerMonth = if (selectedFrequency == FrequencyPattern.MONTHLY) selectedDaysOfMonth.size else null,
+                                            selectedDaysOfWeek = if (selectedFrequency == FrequencyPattern.WEEKLY || selectedFrequency == FrequencyPattern.CUSTOM) selectedDaysOfWeek else null,
+                                            selectedDaysOfMonth = if (selectedFrequency == FrequencyPattern.MONTHLY) selectedDaysOfMonth else null,
+                                            intervalHours = if (selectedFrequency == FrequencyPattern.EVERY_X_HOURS) intervalHoursText.normalizeArabicDigits().toIntOrNull() else null,
+                                            intervalDays = if (selectedFrequency == FrequencyPattern.EVERY_X_DAYS) intervalDaysText.normalizeArabicDigits().toIntOrNull() else null,
+                                            intervalWeeks = if (selectedFrequency == FrequencyPattern.CUSTOM) (intervalWeeksText.normalizeArabicDigits().toIntOrNull() ?: 1).coerceAtLeast(1) else null,
+                                            isRollingInterval = isRollingInterval && (selectedFrequency == FrequencyPattern.DAILY || selectedFrequency == FrequencyPattern.EVERY_X_HOURS || selectedFrequency == FrequencyPattern.EVERY_X_DAYS),
+                                            cycleActiveDays = if (selectedFrequency == FrequencyPattern.CYCLICAL) (cycleActiveDaysText.normalizeArabicDigits().toIntOrNull() ?: 21).coerceAtLeast(1) else null,
+                                            cycleRestDays = if (selectedFrequency == FrequencyPattern.CYCLICAL) (cycleRestDaysText.normalizeArabicDigits().toIntOrNull() ?: 7).coerceAtLeast(0) else null,
+                                            asNeededIntervalHours = if (selectedFrequency == FrequencyPattern.AS_NEEDED) asNeededIntervalHoursText.normalizeArabicDigits().toIntOrNull() else null,
+                                            asNeededNotifyEligible = if (selectedFrequency == FrequencyPattern.AS_NEEDED) asNeededNotifyEligible else true
+                                        ),
+                                        scheduledTimes = if (selectedFrequency == FrequencyPattern.AS_NEEDED) emptyList() else scheduledTimesList,
+                                        imageUri = medicineImagePath,
+                                        currentStock = currentStockText.normalizeArabicDigits().toDoubleOrNull(),
+                                        refillThreshold = refillThresholdText.normalizeArabicDigits().toDoubleOrNull(),
+                                        autoDeductOnTake = medicineToEdit?.autoDeductOnTake ?: true,
+                                        notes = doctorNotes.trim().ifBlank { null },
+                                        pillShape = selectedPillShape,
+                                        pillColor = selectedPillColor,
+                                        startDate = selectedStartDate,
+                                        endDate = calcEndDate,
+                                        durationDays = if (isFiniteCourse) (durationDaysInt ?: medicineToEdit?.durationDays) else null,
+                                        isArchived = medicineToEdit?.isArchived ?: false,
+                                        customDosages = if (selectedFrequency == FrequencyPattern.AS_NEEDED) null else finalCustomDosages,
+                                        reminderType = selectedReminderType
+                                    )
+
+                                    if (medicineToEdit != null) {
+                                        val timingOrScheduleChanged = (
+                                            medicineToEdit.scheduledTimes != updatedMedicine.scheduledTimes ||
+                                            medicineToEdit.frequency != updatedMedicine.frequency ||
+                                            medicineToEdit.timesPerDay != updatedMedicine.timesPerDay ||
+                                            medicineToEdit.dosage != updatedMedicine.dosage ||
+                                            medicineToEdit.dosageUnit != updatedMedicine.dosageUnit ||
+                                            medicineToEdit.customDosages != updatedMedicine.customDosages ||
+                                            medicineToEdit.startDate != updatedMedicine.startDate ||
+                                            medicineToEdit.endDate != updatedMedicine.endDate ||
+                                            medicineToEdit.durationDays != updatedMedicine.durationDays
+                                        ) && updatedMedicine.frequency.pattern != FrequencyPattern.AS_NEEDED
+
+                                        if (timingOrScheduleChanged) {
+                                            pendingScheduleUpdateMedicine = updatedMedicine
+                                            return@Button
+                                        }
+
+                                        if (!medicineToEdit.imageUri.isNullOrBlank() && medicineToEdit.imageUri != medicineImagePath) {
+                                            com.example.dosezy.ui.components.deleteOldImage(context, medicineToEdit.imageUri)
+                                        }
+                                        medicineViewModel.updateMedicine(updatedMedicine, com.example.dosezy.data.model.ScheduleEffectiveDate.TODAY)
+                                        navController.previousBackStackEntry?.savedStateHandle?.set(
+                                            "snackbar_message",
+                                            context.getString(R.string.medication_updated_success)
+                                        )
+                                    } else {
+                                        medicineViewModel.addMedicine(updatedMedicine)
+                                        navController.previousBackStackEntry?.savedStateHandle?.set(
+                                            "snackbar_message",
+                                            context.getString(R.string.medication_added_success)
+                                        )
+                                    }
+                                    navController.popBackStack()
+                                },
+                                enabled = medicineToEdit != null || !currentUser?.userId.isNullOrBlank(),
+                                modifier = Modifier
+                                    .weight(if (currentStep > 1) 1.5f else 1f)
+                                    .height(52.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF2084E4),
+                                    contentColor = Color.White,
+                                    disabledContainerColor = Color(0xFF2084E4).copy(alpha = 0.35f),
+                                    disabledContentColor = Color.White.copy(alpha = 0.6f)
+                                )
+                            ) {
+                                Text(
+                                    stringResource(R.string.form_save_changes),
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 15.sp
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         },
         content = { paddingValues ->
             Crossfade(
@@ -210,336 +472,197 @@ fun EditMedScreen(
                 if (!loaded) {
                     EditMedSkeletonView()
                 } else {
-                    val scrollState = rememberScrollState()
-                    val coroutineScope = rememberCoroutineScope()
-                    var showValidationErrors by remember { mutableStateOf(false) }
-
-                    val durationDaysInt = durationDaysText.normalizeArabicDigits().toIntOrNull()
-                    val calcStartDate = selectedStartDate
-                    // Guard: Retain medicineToEdit.endDate if durationDaysInt is null while isFiniteCourse is true to prevent silent conversion to indefinite schedule
-                    val calcEndDate = if (isFiniteCourse) {
-                        if (durationDaysInt != null) {
-                            selectedStartDate.plusDays((durationDaysInt - 1).toLong().coerceAtLeast(0L))
-                        } else {
-                            medicineToEdit?.endDate
-                        }
-                    } else null
-
-                    val validation = validateMedicineForm(
-                        medicationName = medicationName,
-                        dosage = dosage,
-                        hasDifferentDosages = hasDifferentDosages,
-                        scheduledTimesList = scheduledTimesList,
-                        perTimeDosages = perTimeDosages,
-                        selectedFrequency = selectedFrequency,
-                        selectedDaysOfWeek = selectedDaysOfWeek,
-                        selectedDaysOfMonth = selectedDaysOfMonth,
-                        intervalWeeksText = intervalWeeksText,
-                        isFiniteCourse = isFiniteCourse,
-                        durationDaysText = durationDaysText,
-                        hasExistingEndDate = medicineToEdit?.endDate != null,
-                        cycleActiveDaysText = cycleActiveDaysText,
-                        cycleRestDaysText = cycleRestDaysText
-                    )
-                    val isFormValid = validation.isValid
-
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .imePadding()
-                            .clickable(
-                                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
-                                indication = null
-                            ) {
-                                focusManager.clearFocus()
-                            }
-                            .verticalScroll(scrollState)
-                            .padding(16.dp)
                             .background(MaterialTheme.colorScheme.background)
                     ) {
-                        // --- Card 1: Medicine Visual & Name Card ---
-                        MedicineIdentificationCard(
-                            medicineImagePath = medicineImagePath,
-                            selectedPillShape = selectedPillShape,
-                            selectedPillColor = selectedPillColor,
-                            medicationName = medicationName,
-                            onImageSelected = { path -> medicineImagePath = path },
-                            onVisualSelected = { shape, color ->
-                                selectedPillShape = shape
-                                selectedPillColor = color
+                        MedicineFormStepProgress(
+                            currentStep = currentStep,
+                            onStepClick = { step ->
+                                if (step <= maxStepUnlocked) {
+                                    currentStep = step
+                                }
                             },
-                            onMedicationNameChange = { medicationName = it },
-                            isNameError = showValidationErrors && !validation.isNameValid,
-                            nameErrorMessage = stringResource(R.string.form_error_med_name_required)
+                            maxStepUnlocked = maxStepUnlocked
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .imePadding()
+                                .clickable(
+                                    interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                                    indication = null
+                                ) {
+                                    focusManager.clearFocus()
+                                }
+                                .verticalScroll(scrollState)
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            when (currentStep) {
+                                1 -> {
+                                    // --- Step 1: What are you taking? ---
+                                    MedicineIdentificationCard(
+                                        medicineImagePath = medicineImagePath,
+                                        selectedPillShape = selectedPillShape,
+                                        selectedPillColor = selectedPillColor,
+                                        medicationName = medicationName,
+                                        onImageSelected = { path -> medicineImagePath = path },
+                                        onVisualSelected = { shape, color ->
+                                            selectedPillShape = shape
+                                            selectedPillColor = color
+                                        },
+                                        onMedicationNameChange = { medicationName = it },
+                                        isNameError = showValidationErrors && !validation.isNameValid,
+                                        nameErrorMessage = stringResource(R.string.form_error_med_name_required)
+                                    )
 
-                        // --- Card 2: Timings & Dosages Card ---
-                        MedicineTimingsAndDosagesCard(
-                            selectedFrequency = selectedFrequency,
-                            onFrequencyChange = { selectedFrequency = it },
-                            intervalHoursText = intervalHoursText,
-                            onIntervalHoursChange = { intervalHoursText = it },
-                            intervalDaysText = intervalDaysText,
-                            onIntervalDaysChange = { intervalDaysText = it },
-                            intervalWeeksText = intervalWeeksText,
-                            onIntervalWeeksChange = { intervalWeeksText = it },
-                            selectedDaysOfWeek = selectedDaysOfWeek,
-                            onDaysOfWeekChange = { selectedDaysOfWeek = it },
-                            selectedDaysOfMonth = selectedDaysOfMonth,
-                            onDaysOfMonthChange = { selectedDaysOfMonth = it },
-                            scheduledTimesList = scheduledTimesList,
-                            onScheduledTimesChange = { scheduledTimesList = it },
-                            selectedDosePreset = selectedDosePreset,
-                            onDosePresetChange = { selectedDosePreset = it },
-                            hasDifferentDosages = hasDifferentDosages,
-                            onHasDifferentDosagesChange = { hasDifferentDosages = it },
-                            perTimeDosages = perTimeDosages,
-                            onPerTimeDosagesChange = { perTimeDosages = it },
-                            dosage = dosage,
-                            onDosageChange = { dosage = it },
-                            selectedDosageUnit = selectedDosageUnit,
-                            onDosageUnitChange = { selectedDosageUnit = it },
-                            timeFormat = currentUser?.timeFormat ?: com.example.dosezy.data.model.TimeFormat.HOUR_12,
-                            defaultInitialTime = LocalTime.of(8, 0),
-                            onOpenTimePicker = { index, time ->
-                                editingTimeIndex = index
-                                selectedTime = time
-                                showTimePicker = true
-                            },
-                            isDosageError = showValidationErrors && !validation.isDosageValid,
-                            dosageErrorMessage = stringResource(
-                                if (dosage.isBlank() && perTimeDosages.isEmpty()) R.string.form_error_dosage_required
-                                else R.string.form_error_dosage_invalid
-                            ),
-                            invalidTimeSlotKeys = if (showValidationErrors) validation.invalidTimeSlotKeys else emptySet(),
-                            isFrequencyError = showValidationErrors && !validation.isFrequencyValid,
-                            frequencyErrorMessage = stringResource(R.string.form_error_select_days),
-                            isRollingInterval = isRollingInterval,
-                            onRollingIntervalChange = { isRollingInterval = it },
-                            cycleActiveDaysText = cycleActiveDaysText,
-                            onCycleActiveDaysChange = { cycleActiveDaysText = it },
-                            cycleRestDaysText = cycleRestDaysText,
-                            onCycleRestDaysChange = { cycleRestDaysText = it },
-                            asNeededIntervalHoursText = asNeededIntervalHoursText,
-                            onAsNeededIntervalHoursChange = { asNeededIntervalHoursText = it },
-                            asNeededNotifyEligible = asNeededNotifyEligible,
-                            onAsNeededNotifyEligibleChange = { asNeededNotifyEligible = it }
-                        )
+                                    Spacer(modifier = Modifier.height(16.dp))
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                                    MedicineDosageCard(
+                                        dosage = dosage,
+                                        onDosageChange = { dosage = it },
+                                        selectedDosageUnit = selectedDosageUnit,
+                                        onDosageUnitChange = { selectedDosageUnit = it },
+                                        isDosageError = showValidationErrors && !validation.isDosageValid,
+                                        dosageErrorMessage = stringResource(
+                                            if (dosage.isBlank() && perTimeDosages.isEmpty()) R.string.form_error_dosage_required
+                                            else R.string.form_error_dosage_invalid
+                                        )
+                                    )
+                                }
+                                2 -> {
+                                    // --- Step 2: When are you taking it? ---
+                                    MedicineTimingsAndDosagesCard(
+                                        selectedFrequency = selectedFrequency,
+                                        onFrequencyChange = { selectedFrequency = it },
+                                        intervalHoursText = intervalHoursText,
+                                        onIntervalHoursChange = { intervalHoursText = it },
+                                        intervalDaysText = intervalDaysText,
+                                        onIntervalDaysChange = { intervalDaysText = it },
+                                        intervalWeeksText = intervalWeeksText,
+                                        onIntervalWeeksChange = { intervalWeeksText = it },
+                                        selectedDaysOfWeek = selectedDaysOfWeek,
+                                        onDaysOfWeekChange = { selectedDaysOfWeek = it },
+                                        selectedDaysOfMonth = selectedDaysOfMonth,
+                                        onDaysOfMonthChange = { selectedDaysOfMonth = it },
+                                        scheduledTimesList = scheduledTimesList,
+                                        onScheduledTimesChange = { scheduledTimesList = it },
+                                        selectedDosePreset = selectedDosePreset,
+                                        onDosePresetChange = { selectedDosePreset = it },
+                                        hasDifferentDosages = hasDifferentDosages,
+                                        onHasDifferentDosagesChange = { hasDifferentDosages = it },
+                                        perTimeDosages = perTimeDosages,
+                                        onPerTimeDosagesChange = { perTimeDosages = it },
+                                        dosage = dosage,
+                                        onDosageChange = { dosage = it },
+                                        selectedDosageUnit = selectedDosageUnit,
+                                        onDosageUnitChange = { selectedDosageUnit = it },
+                                        timeFormat = currentUser?.timeFormat ?: com.example.dosezy.data.model.TimeFormat.HOUR_12,
+                                        defaultInitialTime = LocalTime.of(8, 0),
+                                        onOpenTimePicker = { index, time ->
+                                            editingTimeIndex = index
+                                            selectedTime = time
+                                            showTimePicker = true
+                                        },
+                                        isDosageError = showValidationErrors && !validation.isDosageValid,
+                                        dosageErrorMessage = stringResource(
+                                            if (dosage.isBlank() && perTimeDosages.isEmpty()) R.string.form_error_dosage_required
+                                            else R.string.form_error_dosage_invalid
+                                        ),
+                                        invalidTimeSlotKeys = if (showValidationErrors) validation.invalidTimeSlotKeys else emptySet(),
+                                        isFrequencyError = showValidationErrors && !validation.isFrequencyValid,
+                                        frequencyErrorMessage = stringResource(R.string.form_error_select_days),
+                                        isRollingInterval = isRollingInterval,
+                                        onRollingIntervalChange = { isRollingInterval = it },
+                                        cycleActiveDaysText = cycleActiveDaysText,
+                                        onCycleActiveDaysChange = { cycleActiveDaysText = it },
+                                        cycleRestDaysText = cycleRestDaysText,
+                                        onCycleRestDaysChange = { cycleRestDaysText = it },
+                                        asNeededIntervalHoursText = asNeededIntervalHoursText,
+                                        onAsNeededIntervalHoursChange = { asNeededIntervalHoursText = it },
+                                        asNeededNotifyEligible = asNeededNotifyEligible,
+                                        onAsNeededNotifyEligibleChange = { asNeededNotifyEligible = it },
+                                        showSingleDosageRow = false
+                                    )
 
-                        // --- Card 3: Course Duration Card ---
-                        MedicineCourseDurationCard(
-                            isFiniteCourse = isFiniteCourse,
-                            onIsFiniteCourseChange = { isFiniteCourse = it },
-                            selectedStartDate = selectedStartDate,
-                            onStartDateChange = { selectedStartDate = it },
-                            durationDaysText = durationDaysText,
-                            onDurationDaysChange = { durationDaysText = it },
-                            calculatedEndDate = calcEndDate,
-                            isDurationError = showValidationErrors && !validation.isFiniteDurationValid,
-                            durationErrorMessage = stringResource(R.string.form_error_course_duration)
-                        )
+                                    Spacer(modifier = Modifier.height(16.dp))
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                                    val durationDaysInt = durationDaysText.normalizeArabicDigits().toIntOrNull()
+                                    val calcEndDate = if (isFiniteCourse) {
+                                        if (durationDaysInt != null) {
+                                            selectedStartDate.plusDays((durationDaysInt - 1).toLong().coerceAtLeast(0L))
+                                        } else {
+                                            medicineToEdit?.endDate
+                                        }
+                                    } else null
 
-                        // --- Card 4: Inventory & Stock Tracking Card ---
-                        MedicineStockInventoryCard(
-                            currentStockText = currentStockText,
-                            onCurrentStockChange = { currentStockText = it },
-                            refillThresholdText = refillThresholdText,
-                            onRefillThresholdChange = { refillThresholdText = it }
-                        )
+                                    MedicineCourseDurationCard(
+                                        isFiniteCourse = isFiniteCourse,
+                                        onIsFiniteCourseChange = { isFiniteCourse = it },
+                                        selectedStartDate = selectedStartDate,
+                                        onStartDateChange = { selectedStartDate = it },
+                                        durationDaysText = durationDaysText,
+                                        onDurationDaysChange = { durationDaysText = it },
+                                        calculatedEndDate = calcEndDate,
+                                        isDurationError = showValidationErrors && !validation.isFiniteDurationValid,
+                                        durationErrorMessage = stringResource(R.string.form_error_course_duration)
+                                    )
+                                }
+                                3 -> {
+                                    // --- Step 3: Extras (Stock, Notes, Reminders, Deletion) ---
+                                    MedicineStockInventoryCard(
+                                        currentStockText = currentStockText,
+                                        onCurrentStockChange = { currentStockText = it },
+                                        refillThresholdText = refillThresholdText,
+                                        onRefillThresholdChange = { refillThresholdText = it }
+                                    )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                                    Spacer(modifier = Modifier.height(16.dp))
 
-                        // --- Card 5: Doctor / Pharmacist Notes Card ---
-                        MedicineNotesCard(
-                            doctorNotes = doctorNotes,
-                            onDoctorNotesChange = { doctorNotes = it }
-                        )
+                                    MedicineNotesCard(
+                                        doctorNotes = doctorNotes,
+                                        onDoctorNotesChange = { doctorNotes = it }
+                                    )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                                    Spacer(modifier = Modifier.height(16.dp))
 
-                        // --- Card 6: Reminder Style Card (Alarm vs Notification) (#111) ---
-                        MedicineReminderStyleCard(
-                            selectedReminderType = selectedReminderType,
-                            onReminderTypeChange = { selectedReminderType = it },
-                            profileDefaultType = currentUser?.reminderType ?: ReminderType.ALARM
-                        )
+                                    MedicineReminderStyleCard(
+                                        selectedReminderType = selectedReminderType,
+                                        onReminderTypeChange = { selectedReminderType = it },
+                                        profileDefaultType = currentUser?.reminderType ?: ReminderType.ALARM
+                                    )
 
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        // Save Changes Button
-                        Button(
-                            onClick = {
-                                if (!isFormValid) {
-                                    showValidationErrors = true
-                                    coroutineScope.launch {
-                                        snackbarHostState.showSnackbar(context.getString(R.string.form_error_fix_fields))
-                                    }
-                                    coroutineScope.launch {
-                                        when {
-                                            !validation.isNameValid -> scrollState.animateScrollTo(0)
-                                            !validation.isDosageValid || !validation.isFrequencyValid -> scrollState.animateScrollTo(280)
-                                            !validation.isFiniteDurationValid -> scrollState.animateScrollTo(680)
+                                    if (medicineToEdit != null) {
+                                        Spacer(modifier = Modifier.height(24.dp))
+                                        Button(
+                                            onClick = {
+                                                showDeleteDialog = true
+                                            },
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(52.dp),
+                                            shape = RoundedCornerShape(16.dp),
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color(0xFFFEE2E2),
+                                                contentColor = Color(0xFFDC2626)
+                                            )
+                                        ) {
+                                            Text(
+                                                stringResource(R.string.form_delete_medicine),
+                                                style = MaterialTheme.typography.bodyLarge.copy(
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 15.sp
+                                                )
+                                            )
                                         }
                                     }
-                                    return@Button
                                 }
-
-                                val baseDose = if (hasDifferentDosages && scheduledTimesList.size > 1) {
-                                    val firstKey = scheduledTimesList.firstOrNull()?.let { String.format(java.util.Locale.US, "%02d:%02d", it.hour, it.minute) }
-                                    val firstVal = (firstKey?.let { perTimeDosages[it] }) ?: (if (dosage.isNotBlank()) dosage else null)
-                                    firstVal?.normalizeArabicDigits()?.toDoubleOrNull() ?: (dosage.normalizeArabicDigits().toDoubleOrNull() ?: 0.0)
-                                } else {
-                                    dosage.normalizeArabicDigits().toDoubleOrNull() ?: 0.0
-                                }
-                                val finalCustomDosages: Map<String, Double>? = if (hasDifferentDosages && scheduledTimesList.size > 1) {
-                                    val map = mutableMapOf<String, Double>()
-                                    scheduledTimesList.forEach { t ->
-                                        val key = String.format(java.util.Locale.US, "%02d:%02d", t.hour, t.minute)
-                                        val entered = (perTimeDosages[key] ?: (if (dosage.isNotBlank()) dosage else null))?.normalizeArabicDigits()?.toDoubleOrNull() ?: baseDose
-                                        map[key] = entered
-                                    }
-                                    if (map.isNotEmpty()) map else null
-                                } else null
-
-                                // Guard: Preserve original medicine owner userId or fallback to active non-blank user; abort if absent to prevent SQLiteConstraintException
-                                val targetUserId = medicineToEdit?.userId ?: currentUser?.userId?.takeIf { it.isNotBlank() } ?: return@Button
-
-                                val updatedMedicine = Medicine(
-                                    medicineId = medicineToEdit?.medicineId ?: UUID.randomUUID().toString(),
-                                    userId = targetUserId,
-                                    // Guard: Trim medication name to avoid duplicate records with trailing whitespace and maintain restore matching
-                                    medicationName = medicationName.trim(),
-                                    dosage = baseDose,
-                                    dosageUnit = selectedDosageUnit,
-                                    timesPerDay = if (selectedFrequency == FrequencyPattern.AS_NEEDED) 0 else scheduledTimesList.size,
-                                    frequency = com.example.dosezy.data.model.Frequency(
-                                        pattern = selectedFrequency,
-                                        daysPerWeek = if (selectedFrequency == FrequencyPattern.WEEKLY || selectedFrequency == FrequencyPattern.CUSTOM) selectedDaysOfWeek.size else null,
-                                        daysPerMonth = if (selectedFrequency == FrequencyPattern.MONTHLY) selectedDaysOfMonth.size else null,
-                                        selectedDaysOfWeek = if (selectedFrequency == FrequencyPattern.WEEKLY || selectedFrequency == FrequencyPattern.CUSTOM) selectedDaysOfWeek else null,
-                                        selectedDaysOfMonth = if (selectedFrequency == FrequencyPattern.MONTHLY) selectedDaysOfMonth else null,
-                                        intervalHours = if (selectedFrequency == FrequencyPattern.EVERY_X_HOURS) intervalHoursText.normalizeArabicDigits().toIntOrNull() else null,
-                                        intervalDays = if (selectedFrequency == FrequencyPattern.EVERY_X_DAYS) intervalDaysText.normalizeArabicDigits().toIntOrNull() else null,
-                                        intervalWeeks = if (selectedFrequency == FrequencyPattern.CUSTOM) (intervalWeeksText.normalizeArabicDigits().toIntOrNull() ?: 1).coerceAtLeast(1) else null,
-                                        isRollingInterval = isRollingInterval && (selectedFrequency == FrequencyPattern.DAILY || selectedFrequency == FrequencyPattern.EVERY_X_HOURS || selectedFrequency == FrequencyPattern.EVERY_X_DAYS),
-                                        cycleActiveDays = if (selectedFrequency == FrequencyPattern.CYCLICAL) (cycleActiveDaysText.normalizeArabicDigits().toIntOrNull() ?: 21).coerceAtLeast(1) else null,
-                                        cycleRestDays = if (selectedFrequency == FrequencyPattern.CYCLICAL) (cycleRestDaysText.normalizeArabicDigits().toIntOrNull() ?: 7).coerceAtLeast(0) else null,
-                                        asNeededIntervalHours = if (selectedFrequency == FrequencyPattern.AS_NEEDED) asNeededIntervalHoursText.normalizeArabicDigits().toIntOrNull() else null,
-                                        asNeededNotifyEligible = if (selectedFrequency == FrequencyPattern.AS_NEEDED) asNeededNotifyEligible else true
-                                    ),
-                                    scheduledTimes = if (selectedFrequency == FrequencyPattern.AS_NEEDED) emptyList() else scheduledTimesList,
-                                    imageUri = medicineImagePath,
-                                    currentStock = currentStockText.normalizeArabicDigits().toDoubleOrNull(),
-                                    // Guard: Preserve configured refillThreshold across edits so low-stock alerts are not wiped to null
-                                    refillThreshold = refillThresholdText.normalizeArabicDigits().toDoubleOrNull(),
-                                    // Guard: Preserve existing autoDeductOnTake preference to prevent inadvertent inventory decrements when editing medication metadata
-                                    autoDeductOnTake = medicineToEdit?.autoDeductOnTake ?: true,
-                                    notes = doctorNotes.trim().ifBlank { null },
-                                    pillShape = selectedPillShape,
-                                    pillColor = selectedPillColor,
-                                    startDate = calcStartDate,
-                                    endDate = calcEndDate,
-                                    // Guard: Preserve computed or existing durationDays when duration text was not modified to maintain finite course integrity
-                                    durationDays = if (isFiniteCourse) (durationDaysInt ?: medicineToEdit?.durationDays) else null,
-                                    isArchived = medicineToEdit?.isArchived ?: false,
-                                    // Guard: Clear customDosages if frequency is AS_NEEDED to prevent leaking orphaned scheduled custom dosages into PRN doses and reports
-                                    customDosages = if (selectedFrequency == FrequencyPattern.AS_NEEDED) null else finalCustomDosages,
-                                    reminderType = selectedReminderType
-                                )
-
-                                // Guard: Detect dosage and dosageUnit changes matching MedicineRepository to prompt ScheduleEffectiveDateDialog (#BUG-EDITMED-DOSAGE-CHANGE)
-                                if (medicineToEdit != null) {
-                                    val timingOrScheduleChanged = (
-                                        medicineToEdit.scheduledTimes != updatedMedicine.scheduledTimes ||
-                                        medicineToEdit.frequency != updatedMedicine.frequency ||
-                                        medicineToEdit.timesPerDay != updatedMedicine.timesPerDay ||
-                                        medicineToEdit.dosage != updatedMedicine.dosage ||
-                                        medicineToEdit.dosageUnit != updatedMedicine.dosageUnit ||
-                                        medicineToEdit.customDosages != updatedMedicine.customDosages ||
-                                        medicineToEdit.startDate != updatedMedicine.startDate ||
-                                        medicineToEdit.endDate != updatedMedicine.endDate ||
-                                        medicineToEdit.durationDays != updatedMedicine.durationDays
-                                    ) && updatedMedicine.frequency.pattern != FrequencyPattern.AS_NEEDED
-
-                                    if (timingOrScheduleChanged) {
-                                        pendingScheduleUpdateMedicine = updatedMedicine
-                                        return@Button
-                                    }
-
-                                    // Guard: Clean up previous active medicine image when saving a new image to prevent disk storage leaks and avoid deleting during uncommitted drafts
-                                    if (!medicineToEdit.imageUri.isNullOrBlank() && medicineToEdit.imageUri != medicineImagePath) {
-                                        com.example.dosezy.ui.components.deleteOldImage(context, medicineToEdit.imageUri)
-                                    }
-                                    medicineViewModel.updateMedicine(updatedMedicine, com.example.dosezy.data.model.ScheduleEffectiveDate.TODAY)
-                                    navController.previousBackStackEntry?.savedStateHandle?.set(
-                                        "snackbar_message",
-                                        context.getString(R.string.medication_updated_success)
-                                    )
-                                } else {
-                                    medicineViewModel.addMedicine(updatedMedicine)
-                                    navController.previousBackStackEntry?.savedStateHandle?.set(
-                                        "snackbar_message",
-                                        context.getString(R.string.medication_added_success)
-                                    )
-                                }
-                                navController.popBackStack()
-                            },
-                            enabled = medicineToEdit != null || !currentUser?.userId.isNullOrBlank(),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF2084E4),
-                                contentColor = Color.White,
-                                disabledContainerColor = Color(0xFF2084E4).copy(alpha = 0.35f),
-                                disabledContentColor = Color.White.copy(alpha = 0.6f)
-                            )
-                        ) {
-                            Text(
-                                stringResource(R.string.form_save_changes),
-                                style = MaterialTheme.typography.bodyLarge.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp
-                                )
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Delete Medication Button (only show for existing medicines)
-                        if (medicineToEdit != null) {
-                            Button(
-                                onClick = {
-                                    showDeleteDialog = true
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(56.dp),
-                                shape = RoundedCornerShape(16.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFFFEE2E2),
-                                    contentColor = Color(0xFFDC2626)
-                                )
-                            ) {
-                                Text(
-                                    stringResource(R.string.form_delete_medicine),
-                                    style = MaterialTheme.typography.bodyLarge.copy(
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 16.sp
-                                    )
-                                )
                             }
-                        }
 
-                        Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
-                        Spacer(modifier = Modifier.height(32.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
                     }
                 }
             }

@@ -206,7 +206,8 @@ fun MedicineTimingsAndDosagesCard(
     asNeededIntervalHoursText: String = "",
     onAsNeededIntervalHoursChange: (String) -> Unit = {},
     asNeededNotifyEligible: Boolean = true,
-    onAsNeededNotifyEligibleChange: (Boolean) -> Unit = {}
+    onAsNeededNotifyEligibleChange: (Boolean) -> Unit = {},
+    showSingleDosageRow: Boolean = true
 ) = com.example.dosezy.ui.components.form.MedicineTimingsAndDosagesCard(
     selectedFrequency = selectedFrequency,
     onFrequencyChange = onFrequencyChange,
@@ -250,7 +251,8 @@ fun MedicineTimingsAndDosagesCard(
     asNeededIntervalHoursText = asNeededIntervalHoursText,
     onAsNeededIntervalHoursChange = onAsNeededIntervalHoursChange,
     asNeededNotifyEligible = asNeededNotifyEligible,
-    onAsNeededNotifyEligibleChange = onAsNeededNotifyEligibleChange
+    onAsNeededNotifyEligibleChange = onAsNeededNotifyEligibleChange,
+    showSingleDosageRow = showSingleDosageRow
 )
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -317,4 +319,37 @@ fun MedicineReminderStyleCard(
     profileDefaultType = profileDefaultType,
     modifier = modifier
 )
+
+@Composable
+fun MedicineDosageCard(
+    dosage: String,
+    onDosageChange: (String) -> Unit,
+    selectedDosageUnit: DosageUnit,
+    onDosageUnitChange: (DosageUnit) -> Unit,
+    modifier: Modifier = Modifier,
+    isDosageError: Boolean = false,
+    dosageErrorMessage: String? = null
+) = com.example.dosezy.ui.components.form.MedicineDosageCard(
+    dosage = dosage,
+    onDosageChange = onDosageChange,
+    selectedDosageUnit = selectedDosageUnit,
+    onDosageUnitChange = onDosageUnitChange,
+    modifier = modifier,
+    isDosageError = isDosageError,
+    dosageErrorMessage = dosageErrorMessage
+)
+
+@Composable
+fun MedicineFormStepProgress(
+    currentStep: Int,
+    onStepClick: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    maxStepUnlocked: Int = currentStep
+) = com.example.dosezy.ui.components.form.MedicineFormStepProgress(
+    currentStep = currentStep,
+    onStepClick = onStepClick,
+    modifier = modifier,
+    maxStepUnlocked = maxStepUnlocked
+)
+
 

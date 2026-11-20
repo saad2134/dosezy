@@ -80,7 +80,8 @@ fun DosageInputSection(
     modifier: Modifier = Modifier,
     isDosageError: Boolean = false,
     dosageErrorMessage: String? = null,
-    invalidTimeSlotKeys: Set<String> = emptySet()
+    invalidTimeSlotKeys: Set<String> = emptySet(),
+    showSingleDosageRow: Boolean = true
 ) {
     var dosageUnitExpanded by remember { mutableStateOf(false) }
 
@@ -90,6 +91,10 @@ fun DosageInputSection(
     }
 
     val showDifferentDosagesOption = scheduledTimesList.size > 1 && selectedFrequency != FrequencyPattern.AS_NEEDED
+
+    if (!showSingleDosageRow && !showDifferentDosagesOption) {
+        return
+    }
 
     Column(modifier = modifier.fillMaxWidth()) {
         Spacer(modifier = Modifier.height(18.dp))
@@ -252,7 +257,7 @@ fun DosageInputSection(
                     )
                 }
             }
-        } else {
+        } else if (showSingleDosageRow) {
             // Single dose and unit row when different dosages is disabled
             Row(
                 modifier = Modifier.fillMaxWidth(),

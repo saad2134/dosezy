@@ -22,6 +22,13 @@ import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Medication
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
 import com.example.dosezy.data.model.PillShape
 
@@ -532,111 +539,163 @@ fun MedicinePhotoVisualPicker(
         }
     }
 
-    Box(
-        modifier = modifier.size(128.dp),
-        contentAlignment = Alignment.Center
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Main Container (Squircle)
-        Surface(
-            shape = RoundedCornerShape(24.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-            border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
-            modifier = Modifier
-                .size(128.dp)
-                .clickable { showImageSourceDialog = true }
+        Box(
+            modifier = Modifier.size(128.dp),
+            contentAlignment = Alignment.Center
         ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+            // Main Container (Squircle)
+            Surface(
+                shape = RoundedCornerShape(24.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
+                modifier = Modifier
+                    .size(128.dp)
+                    .clickable { showImageSourceDialog = true }
             ) {
-                if (!imagePath.isNullOrEmpty()) {
-                    val modelData = remember(imagePath) { com.example.dosezy.utils.ImageUtils.resolveImageModel(imagePath) }
-                    AsyncImage(
-                        model = ImageRequest.Builder(context)
-                            .data(modelData)
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = "Medicine Image",
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(24.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    // Display Selected Pill Shape & Color in the frame!
-                    PillShapeVisual(
-                        shape = pillShape,
-                        colorHex = pillColor,
-                        size = 64.dp
-                    )
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (!imagePath.isNullOrEmpty()) {
+                        val modelData = remember(imagePath) { com.example.dosezy.utils.ImageUtils.resolveImageModel(imagePath) }
+                        AsyncImage(
+                            model = ImageRequest.Builder(context)
+                                .data(modelData)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = "Medicine Image",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(24.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        // Display Selected Pill Shape & Color in the frame!
+                        PillShapeVisual(
+                            shape = pillShape,
+                            colorHex = pillColor,
+                            size = 64.dp
+                        )
+                    }
                 }
             }
-        }
 
-        // Top-Right: Remove photo button (if photo exists - Squircle badge)
-        if (!imagePath.isNullOrEmpty()) {
+            // Top-Right: Remove photo button (if photo exists - Squircle badge)
+            if (!imagePath.isNullOrEmpty()) {
+                Surface(
+                    shape = RoundedCornerShape(10.dp),
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .size(32.dp)
+                        .clickable {
+                            // Guard: Only delete uncommitted draft; defer active saved image deletion until form save to prevent data loss on cancel (#BUG-02)
+                            uncommittedDraftPath?.let { draft ->
+                                deleteOldImage(context, draft)
+                                uncommittedDraftPath = null
+                            }
+                            onImageSelected(null)
+                        }
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = stringResource(R.string.image_picker_remove),
+                            tint = Color.White,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+            }
+
+            // Bottom-Right: Camera/Photo Picker Button (Squircle badge)
             Surface(
                 shape = RoundedCornerShape(10.dp),
-                color = MaterialTheme.colorScheme.error,
+                color = MaterialTheme.colorScheme.primary,
+                shadowElevation = 4.dp,
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .size(32.dp)
-                    .clickable {
-                        // Guard: Only delete uncommitted draft; defer active saved image deletion until form save to prevent data loss on cancel (#BUG-02)
-                        uncommittedDraftPath?.let { draft ->
-                            deleteOldImage(context, draft)
-                            uncommittedDraftPath = null
-                        }
-                        onImageSelected(null)
-                    }
+                    .align(Alignment.BottomEnd)
+                    .size(38.dp)
+                    .clickable { showImageSourceDialog = true }
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = stringResource(R.string.image_picker_remove),
+                        imageVector = Icons.Default.CameraAlt,
+                        contentDescription = stringResource(R.string.form_upload_img),
                         tint = Color.White,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
+
+            // Bottom-Left: Pill Shape & Visual Dialog Button (Squircle badge with Palette icon) (#145, F13)
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = parseHexColor(pillColor),
+                shadowElevation = 4.dp,
+                border = BorderStroke(2.dp, Color.White),
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .size(38.dp)
+                    .clickable { showPillVisualDialog = true }
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Default.Palette,
+                        contentDescription = stringResource(R.string.form_pill_appearance),
+                        tint = Color.White,
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }
         }
 
-        // Bottom-Right: Camera/Photo Picker Button (Squircle badge)
-        Surface(
-            shape = RoundedCornerShape(10.dp),
-            color = MaterialTheme.colorScheme.primary,
-            shadowElevation = 4.dp,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .size(38.dp)
-                .clickable { showImageSourceDialog = true }
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Labeled action buttons to remove control ambiguity (#145, F13)
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(contentAlignment = Alignment.Center) {
+            OutlinedButton(
+                onClick = { showImageSourceDialog = true },
+                shape = RoundedCornerShape(10.dp),
+                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                modifier = Modifier.height(34.dp)
+            ) {
                 Icon(
                     imageVector = Icons.Default.CameraAlt,
-                    contentDescription = stringResource(R.string.form_medicine_image),
-                    tint = Color.White,
-                    modifier = Modifier.size(18.dp)
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = if (!imagePath.isNullOrEmpty()) stringResource(R.string.form_change_img) else stringResource(R.string.form_upload_img),
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold)
                 )
             }
-        }
 
-        // Bottom-Left: Pill Shape & Visual Dialog Button (Squircle badge)
-        Surface(
-            shape = RoundedCornerShape(10.dp),
-            color = parseHexColor(pillColor),
-            shadowElevation = 4.dp,
-            border = BorderStroke(2.dp, Color.White),
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .size(38.dp)
-                .clickable { showPillVisualDialog = true }
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                PillShapeVisual(
-                    shape = pillShape,
-                    colorHex = "#FFFFFF",
-                    size = 20.dp
+            OutlinedButton(
+                onClick = { showPillVisualDialog = true },
+                shape = RoundedCornerShape(10.dp),
+                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                modifier = Modifier.height(34.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Palette,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = parseHexColor(pillColor)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = stringResource(R.string.form_pill_appearance),
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold)
                 )
             }
         }

@@ -897,6 +897,15 @@
     <string name="alarm_lockscreen_privacy_title">Detalles de medicamentos ocultos</string>
     <string name="alarm_lockscreen_details_hidden">Los nombres de los medicamentos y las dosis están ocultos mientras el dispositivo está bloqueado.</string>
 
+    <!-- Multi-Step Medicine Form (#145) -->
+    <string name="form_step_what">Qué</string>
+    <string name="form_step_when">Cuándo</string>
+    <string name="form_step_extras">Extras</string>
+    <string name="form_step_counter">Paso %1$d de %2$d</string>
+    <string name="btn_next">Siguiente</string>
+    <string name="form_pill_appearance">Estilo de pastilla</string>
+    <string name="form_dosage_card_title">Dosis y concentración</string>
+
     <!-- Schedule Effective Date Selector (#105) -->
     <string name="schedule_effective_dialog_title">Aplicar cambios de horario</string>
     <string name="schedule_effective_dialog_message">¿Cuándo debería entrar en vigor este horario actualizado?</string>

@@ -880,6 +880,15 @@
     <string name="alarm_lockscreen_privacy_title">تفاصيل الدواء مخفية</string>
     <string name="alarm_lockscreen_details_hidden">يتم إخفاء أسماء الأدوية والجرعات أثناء قفل الجهاز.</string>
 
+    <!-- Multi-Step Medicine Form (#145) -->
+    <string name="form_step_what">الاسم والجرعة</string>
+    <string name="form_step_when">المواعيد</string>
+    <string name="form_step_extras">إضافات</string>
+    <string name="form_step_counter">الخطوة %1$d من %2$d</string>
+    <string name="btn_next">التالي</string>
+    <string name="form_pill_appearance">شكل الحبة</string>
+    <string name="form_dosage_card_title">الجرعة والقوة</string>
+
     <!-- Schedule Effective Date Selector (#105) -->
     <string name="schedule_effective_dialog_title">تطبيق تغييرات الجدول</string>
     <string name="schedule_effective_dialog_message">متى يجب أن يبدأ سريان هذا الجدول المحدث؟</string>

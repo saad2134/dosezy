@@ -880,6 +880,15 @@
     <string name="alarm_lockscreen_privacy_title">Информация о лекарствах скрыта</string>
     <string name="alarm_lockscreen_details_hidden">Названия препаратов и дозировки скрыты, пока устройство заблокировано.</string>
 
+    <!-- Multi-Step Medicine Form (#145) -->
+    <string name="form_step_what">Что принимать</string>
+    <string name="form_step_when">Когда</string>
+    <string name="form_step_extras">Дополнительно</string>
+    <string name="form_step_counter">Шаг %1$d из %2$d</string>
+    <string name="btn_next">Далее</string>
+    <string name="form_pill_appearance">Стиль таблетки</string>
+    <string name="form_dosage_card_title">Дозировка и концентрация</string>
+
     <!-- Schedule Effective Date Selector (#105) -->
     <string name="schedule_effective_dialog_title">Применить изменения расписания</string>
     <string name="schedule_effective_dialog_message">Когда обновленное расписание должно вступить в силу?</string>
