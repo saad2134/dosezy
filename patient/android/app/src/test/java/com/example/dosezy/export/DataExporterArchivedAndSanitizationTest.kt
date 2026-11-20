@@ -241,6 +241,26 @@ class DataExporterArchivedAndSanitizationTest {
         assertTrue("Order must contain patient name", orderText.contains("John Doe"))
         assertTrue("Order must contain medication name", orderText.contains("Amoxicillin"))
         assertTrue("Order must contain dosage", orderText.contains("500 mg"))
+        // Guard: Verify chemical strength medication (MG) displays stock in countable units instead of raw milligrams (#129)
+        assertTrue("Order must contain current stock in units", orderText.contains("Current stock: 10 units left"))
+        assertFalse("Order must not display current stock in mg", orderText.contains("10 mg left"))
+
+        // Guard: Verify bottle formulation (DROPS) displays stock in bottles
+        val medDrops = med.copy(
+            medicineId = "med_order_drops",
+            medicationName = "Latanoprost",
+            dosage = 1.0,
+            dosageUnit = DosageUnit.DROP,
+            pillShape = com.example.dosezy.data.model.PillShape.DROPS,
+            currentStock = 2.0
+        )
+        val orderTextDrops = exporter.generateConsolidatedPharmacyOrderText(
+            profilesWithMedicines = listOf(Pair(userEn, listOf(medDrops))),
+            supplyDays = 30,
+            includeStock = true,
+            includeDosage = false
+        )
+        assertTrue("Order must contain current stock in bottles", orderTextDrops.contains("Current stock: 2 bottles left"))
 
         // Guard: Verify fractional discrete medication renders with vulgar fractions (½) rather than raw decimal string (0.5)
         val medFractional = med.copy(
@@ -390,5 +410,63 @@ class DataExporterArchivedAndSanitizationTest {
         // Row value assertions
         assertTrue("User row must serialize user reminder type", csv.contains("NOTIFICATION"))
         assertTrue("Medicine row must serialize medicine reminder type override", csv.contains("ALARM"))
+    }
+
+    // Guard: Verify JSON export serializes isRollingInterval at both root and nested frequency levels (#119, #BUG-EXPORT-ROLLING)
+    @Test
+    fun testExportToJson_serializesRollingIntervalAtRootAndNestedLevels() = runTest {
+        val user = User(
+            userId = "u_rolling_json",
+            fullName = "Rolling Export Patient",
+            age = 29,
+            gender = Gender.FEMALE,
+            contactNumber = "+1122334455"
+        )
+        val rollingMed = Medicine(
+            medicineId = "m_rolling_json",
+            userId = user.userId,
+            medicationName = "Tramadol Rolling",
+            dosage = 50.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 4,
+            frequency = com.example.dosezy.data.model.Frequency(
+                pattern = FrequencyPattern.EVERY_X_HOURS,
+                intervalHours = 6,
+                isRollingInterval = true
+            ),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            reminderType = com.example.dosezy.data.model.ReminderType.ALARM
+        )
+        val staticMed = Medicine(
+            medicineId = "m_static_json",
+            userId = user.userId,
+            medicationName = "Lisinopril Static",
+            dosage = 10.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = com.example.dosezy.data.model.Frequency(
+                pattern = FrequencyPattern.DAILY,
+                isRollingInterval = false
+            ),
+            scheduledTimes = listOf(LocalTime.of(9, 0))
+        )
+
+        val mockUserRepo = mockk<UserRepository>(relaxed = true)
+        val mockMedRepo = mockk<MedicineRepository>(relaxed = true)
+        val mockSchedRepo = mockk<ScheduleRepository>(relaxed = true)
+        val exporter = DataExporter(context, mockUserRepo, mockMedRepo, mockSchedRepo)
+
+        val jsonString = exporter.buildJsonContent(user, listOf(rollingMed, staticMed), emptyList())
+        val jsonObj = org.json.JSONObject(jsonString)
+        val medsArray = jsonObj.getJSONArray("medicines")
+        assertEquals(2, medsArray.length())
+
+        val rollingJson = medsArray.getJSONObject(0)
+        assertTrue("Root level isRollingInterval must be true", rollingJson.getBoolean("isRollingInterval"))
+        assertTrue("Nested frequency isRollingInterval must be true", rollingJson.getJSONObject("frequency").getBoolean("isRollingInterval"))
+
+        val staticJson = medsArray.getJSONObject(1)
+        assertFalse("Root level isRollingInterval must be false", staticJson.getBoolean("isRollingInterval"))
+        assertFalse("Nested frequency isRollingInterval must be false", staticJson.getJSONObject("frequency").getBoolean("isRollingInterval"))
     }
 }

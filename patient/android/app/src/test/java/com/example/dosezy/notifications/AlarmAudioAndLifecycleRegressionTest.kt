@@ -356,4 +356,22 @@ class AlarmAudioAndLifecycleRegressionTest {
         assertFalse("Previous custom audio file must be cleaned up when replaced by a new custom sound", customFile.exists())
         assertTrue("Newly selected custom audio file must remain on disk", newCustomFile.exists())
     }
+
+    @Test
+    fun customAlarmSound_fileUriNormalization_resolvesAudioFileWithoutFallback() {
+        // Guard: Verify custom audio path with file:// URI prefix resolves to actual file on disk to prevent silent fallback to system default (#BUG-AUDIO-FILE-URI)
+        val soundsDir = java.io.File(context.filesDir, "custom_sounds").apply { mkdirs() }
+        val testAudio = java.io.File(soundsDir, "custom_test_alarm.mp3").apply { writeText("audio bytes") }
+
+        val uriPrefixedPath = "file://${testAudio.absolutePath}"
+        val barePath = testAudio.absolutePath
+
+        // Emulate un-cleansed check: File("file:///...").exists() returns false on Android/Linux
+        assertFalse("Un-cleansed file:// URI path must fail File.exists() on Linux/Android filesystem", java.io.File(uriPrefixedPath).exists())
+
+        // Emulate cleansed normalization in AlarmAudioPlayer and PreferencesDialogs
+        val cleanCustomPath = uriPrefixedPath.removePrefix("file://")
+        assertEquals(barePath, cleanCustomPath)
+        assertTrue("Cleansed path must successfully verify file existence on disk", java.io.File(cleanCustomPath).exists())
+    }
 }

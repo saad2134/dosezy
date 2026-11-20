@@ -134,6 +134,13 @@ class MedicineLogicTest {
     @Test
     fun frequencyDisplay_asNeeded() {
         assertEquals("As Needed (PRN)", med(freq = Frequency(FrequencyPattern.AS_NEEDED)).getFrequencyDisplay())
+        assertEquals("As Needed (min 4 hrs)", med(freq = Frequency(FrequencyPattern.AS_NEEDED, asNeededIntervalHours = 4)).getFrequencyDisplay())
+    }
+
+    @Test
+    fun frequencyDisplay_cyclical() {
+        assertEquals("Cycle (21 on, 7 off)", med(freq = Frequency(FrequencyPattern.CYCLICAL, cycleActiveDays = 21, cycleRestDays = 7)).getFrequencyDisplay())
+        assertEquals("Cycle (24 on, 4 off)", med(freq = Frequency(FrequencyPattern.CYCLICAL, cycleActiveDays = 24, cycleRestDays = 4)).getFrequencyDisplay())
     }
 
     @Test
@@ -616,6 +623,28 @@ class MedicineLogicTest {
     }
 
     @Test
+    fun refillQuantity_weeklyMedicine_emptyDaysOfWeekFallsBackToDaysPerWeekOrDefault() {
+        // Empty selectedDaysOfWeek with daysPerWeek = 2 -> ceil(2/7 * 30) = 9 tablets
+        val m = med(dosage = 1.0, unit = DosageUnit.TABLET, freq = Frequency(FrequencyPattern.WEEKLY, daysPerWeek = 2, selectedDaysOfWeek = emptyList()))
+        assertEquals(9, m.calculateRefillQuantity(30))
+
+        // Empty selectedDaysOfWeek with no daysPerWeek -> falls back to 1 day per week -> ceil(1/7 * 30) = 5 tablets
+        val m2 = med(dosage = 1.0, unit = DosageUnit.TABLET, freq = Frequency(FrequencyPattern.WEEKLY, daysPerWeek = null, selectedDaysOfWeek = emptyList()))
+        assertEquals(5, m2.calculateRefillQuantity(30))
+    }
+
+    @Test
+    fun refillQuantity_monthlyMedicine_emptyDaysOfMonthFallsBackToDaysPerMonthOrDefault() {
+        // Empty selectedDaysOfMonth with daysPerMonth = 2 -> ceil(2/30 * 30) = 2 tablets
+        val m = med(dosage = 1.0, unit = DosageUnit.TABLET, freq = Frequency(FrequencyPattern.MONTHLY, daysPerMonth = 2, selectedDaysOfMonth = emptyList()))
+        assertEquals(2, m.calculateRefillQuantity(30))
+
+        // Empty selectedDaysOfMonth with no daysPerMonth -> falls back to 1 day per month -> ceil(1/30 * 30) = 1 tablet
+        val m2 = med(dosage = 1.0, unit = DosageUnit.TABLET, freq = Frequency(FrequencyPattern.MONTHLY, daysPerMonth = null, selectedDaysOfMonth = emptyList()))
+        assertEquals(1, m2.calculateRefillQuantity(30))
+    }
+
+    @Test
     fun refillQuantity_everyXDays_preventsOverdose() {
         // Every 3 days, 1 tablet, 30 days -> ceil(30 / 3) = 10 tablets (NOT 30!)
         val m = med(dosage = 1.0, unit = DosageUnit.TABLET, freq = Frequency(FrequencyPattern.EVERY_X_DAYS, intervalDays = 3))
@@ -650,6 +679,33 @@ class MedicineLogicTest {
             times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0))
         )
         assertEquals(3, m.calculateRefillQuantity(30))
+    }
+
+    @Test
+    fun refillQuantity_cyclicalCalculatesActiveDaysAccurately() {
+        // 21/7 birth control: 1 tablet daily
+        val bc21_7 = med(
+            dosage = 1.0,
+            unit = DosageUnit.TABLET,
+            freq = Frequency(FrequencyPattern.CYCLICAL, cycleActiveDays = 21, cycleRestDays = 7),
+            times = listOf(LocalTime.of(9, 0))
+        )
+        // Exactly 28 days = 1 cycle = 21 active tablets
+        assertEquals(21, bc21_7.calculateRefillQuantity(28))
+        // Exactly 56 days = 2 cycles = 42 active tablets
+        assertEquals(42, bc21_7.calculateRefillQuantity(56))
+        // 30 days = 1 cycle (21) + 2 days of cycle 2 = 23 tablets
+        assertEquals(23, bc21_7.calculateRefillQuantity(30))
+
+        // 24/4 extended regimen: 1 tablet daily
+        val bc24_4 = med(
+            dosage = 1.0,
+            unit = DosageUnit.TABLET,
+            freq = Frequency(FrequencyPattern.CYCLICAL, cycleActiveDays = 24, cycleRestDays = 4),
+            times = listOf(LocalTime.of(20, 0))
+        )
+        // Exactly 28 days = 1 cycle = 24 active tablets
+        assertEquals(24, bc24_4.calculateRefillQuantity(28))
     }
 
     @Test

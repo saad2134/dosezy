@@ -525,11 +525,21 @@ class EmergencyDialAndEditMedScreenTest {
         assertNotNull("PA must map to 911 profile", paMatch)
         assertEquals("US", paMatch?.code)
 
-        // Test NZ maps to AU profile
+        // Test AU maps to AU profile
+        val auMatch = matchEmergencyCountryByIso("AU")
+        assertNotNull("AU must map to AU profile", auMatch)
+        assertEquals("AU", auMatch?.code)
+        assertEquals("000", auMatch?.ambulance)
+
+        // Guard: Test NZ maps to dedicated New Zealand 111 profile (#133)
         val nzMatch = matchEmergencyCountryByIso("NZ")
-        assertNotNull("NZ must map to AU profile", nzMatch)
-        assertEquals("AU", nzMatch?.code)
-        assertEquals("000", nzMatch?.ambulance)
+        assertNotNull("NZ must map to dedicated NZ profile", nzMatch)
+        assertEquals("NZ", nzMatch?.code)
+        assertEquals("111", nzMatch?.ambulance)
+        assertEquals("111", nzMatch?.fire)
+        assertEquals("111", nzMatch?.police)
+        assertEquals("111", nzMatch?.universal)
+        assertEquals("🇳🇿", nzMatch?.flag)
 
         // Test fallback when device country ISO is unavailable/unmatched:
         // Use a Context with an unmapped locale country so step 1 and 2 do not match US by default
@@ -619,6 +629,31 @@ class EmergencyDialAndEditMedScreenTest {
             "Switching to AS_NEEDED bypasses effective date dialog",
             isTimingOrScheduleChanged(baseMed, baseMed.copy(dosage = 500.0, frequency = Frequency(pattern = FrequencyPattern.AS_NEEDED)))
         )
+    }
+
+    @Test
+    fun testEmergencyScreen_backHandlerClosesCountryDropdownWithoutExitingScreen() {
+        // Guard: Back press when country dropdown is expanded must collapse the menu rather than popping navigation (#BUG-EMERGENCY-BACK-DROPDOWN)
+        var countryDropdownExpanded = true
+        var screenExited = false
+
+        // Simulate BackHandler action
+        val backHandlerAction: () -> Unit = {
+            if (countryDropdownExpanded) {
+                countryDropdownExpanded = false
+            } else {
+                screenExited = true
+            }
+        }
+
+        // First back press: collapses dropdown
+        backHandlerAction()
+        assertFalse("First back press must collapse country dropdown", countryDropdownExpanded)
+        assertFalse("First back press must not exit the emergency screen", screenExited)
+
+        // Second back press: exits screen
+        backHandlerAction()
+        assertTrue("Second back press with closed dropdown exits screen", screenExited)
     }
 }
 

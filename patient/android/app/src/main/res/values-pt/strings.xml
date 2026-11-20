@@ -52,7 +52,8 @@
     <string name="form_error_course_duration">A duração do tratamento deve ser de pelo menos 1 dia</string>
     <string name="form_error_fix_fields">Preencha os campos obrigatórios destacados acima</string>
     <string name="freq_daily">Diariamente</string>
-    <string name="freq_weekly">Semanalmente</string>
+    <string name="freq_weekly">Semanal (dias específicos)</string>
+    <string name="freq_weekly_desc">Tomar o medicamento apenas nos dias selecionados da semana.</string>
     <string name="freq_monthly">Mensalmente</string>
     <string name="freq_custom">A cada X semanas</string>
     <string name="form_select_days_week">Selecionar dias da semana</string>
@@ -491,6 +492,35 @@ Deseja continuar?</string>
     <string name="custom_recurrence_interval_label">Repetir a cada (semanas)</string>
     <string name="custom_recurrence_summary">Repete a cada %1$d semanas em %2$s</string>
     <string name="validation_select_custom_days">Selecione pelo menos um dia para a repetição personalizada</string>
+    <!-- Rolling Interval Scheduling (#119) -->
+    <string name="freq_rolling_interval_title">Intervalo contínuo</string>
+    <string name="freq_rolling_interval_desc">O temporizador da próxima dose inicia após registrar a ingestão para manter o espaçamento seguro</string>
+    <string name="freq_rolling_badge">Contínuo</string>
+
+    <!-- Cyclical & Looping Schedules (#141) -->
+    <string name="freq_cyclical">Cíclico (dias ativos e pausa)</string>
+    <string name="freq_cyclical_desc">Tomar o medicamento nos dias ativos e pausar nos dias de intervalo (ex.: pílula anticoncepcional).</string>
+    <string name="freq_cycle_format">%1$d dias toma, %2$d dias pausa</string>
+    <string name="freq_cycle_active_days">Dias ativos</string>
+    <string name="freq_cycle_rest_days">Dias de pausa</string>
+    <string name="freq_cycle_preset_21_7">21 / 7 (Padrão)</string>
+    <string name="freq_cycle_preset_24_4">24 / 4 (Estendido)</string>
+    <string name="freq_cycle_preset_custom">Personalizado</string>
+    <string name="cycle_presets_label">Predefinições de ciclo</string>
+
+    <!-- PRN Next Dose Eligible Alerts (#142) -->
+    <string name="freq_as_needed_interval_title">Intervalo mínimo entre doses</string>
+    <string name="freq_as_needed_interval_desc">Notificar quando for seguro e permitido tomar a próxima dose.</string>
+    <string name="freq_as_needed_interval_format">Se necessário (mín. %1$d h)</string>
+    <string name="freq_as_needed_notify_eligible">Notificar quando a próxima dose estiver disponível</string>
+    <string name="freq_as_needed_interval_none">Nenhum</string>
+    <string name="freq_as_needed_interval_hours_label">Intervalo mínimo (horas)</string>
+    <string name="prn_eligible_channel_name">Próxima dose disponível (conforme necessário)</string>
+    <string name="prn_eligible_channel_desc">Notificações quando o intervalo mínimo para medicamentos de uso sob demanda expirar.</string>
+    <string name="prn_eligible_notification_title">Próxima dose disponível</string>
+    <string name="prn_eligible_notification_body">O intervalo mínimo de %1$d horas para %2$s passou. Você pode tomar sua próxima dose se necessário.</string>
+    <string name="prn_eligible_notification_body_generic">O intervalo mínimo para %1$s passou. Você pode tomar sua próxima dose se necessário.</string>
+
     <string name="btn_log_prn_dose">Registar dose</string>
     <string name="prn_doses_taken_today">Doses registadas hoje: %1$d</string>
     <string name="prn_section_title">Medicamentos SOS / Conforme necessário</string>
@@ -683,9 +713,14 @@ Deseja continuar?</string>
     <string name="country_brazil">Brasil</string>
     <string name="country_bangladesh">Bangladesh</string>
     <string name="country_australia">Austrália</string>
+    <string name="country_new_zealand">Nova Zelândia</string>
     <string name="pharmacy_order_refill_filter">Filtro de Reposição</string>
     <string name="pharmacy_order_days_supply">Dias de Suprimento</string>
     <string name="pharmacy_order_days_format_short">%1$d d</string>
+    <string name="pharmacy_order_days_custom">Personalizado</string>
+    <string name="pharmacy_order_custom_days_label">Suprimento personalizado (dias)</string>
+    <string name="pharmacy_order_custom_days_placeholder">ex.: 28</string>
+    <string name="unit_days_suffix">dias</string>
     <string name="pharmacy_order_medicines_include">Medicamentos a Incluir (%1$d/%2$d)</string>
     <string name="pharmacy_order_stock_left">%1$s restantes</string>
     <string name="pharmacy_order_no_stock_tracked">Sem controle de estoque</string>
@@ -828,7 +863,7 @@ Deseja continuar?</string>
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">Lembrete de medicamento agendado</string>
     <string name="pref_lockscreen_details_title">Mostrar detalhes na tela de bloqueio</string>
-    <string name="pref_lockscreen_details_desc">Ocultar nomes e doses até desbloquear o dispositivo.</string>
+    <string name="pref_lockscreen_details_desc">Exibir nomes e doses de medicamentos na tela de bloqueio. Quando desativado, os detalhes permanecem ocultos até desbloquear o dispositivo.</string>
     <string name="disclaimer_dialog_title">Aviso médico e legal</string>
     <string name="disclaimer_dialog_summary">O Dosezy é um utilitário digital automatizado e NÃO é um dispositivo médico regulamentado. Não fornece diagnóstico clínico, cálculo de dosagem ou aconselhamento médico. Consulte sempre o seu médico ou farmacêutico para orientações de prescrição.</string>
     <string name="disclaimer_checkbox_consent">Entendo e aceito o aviso médico e os termos de serviço.</string>
@@ -841,7 +876,17 @@ Deseja continuar?</string>
     <string name="pdf_report_disclaimer_footer">Dosezy Rastreador de Medicamentos • Registro informativo autorrelatado (Não clínico)</string>
     <string name="pharmacy_refill_estimation_disclaimer">Aviso: As quantidades de reposição são estimativas aproximadas baseadas na frequência registrada. Confirme com seu farmacêutico ou médico.</string>
     <string name="alarm_unlock_to_view_details">Desbloquear para ver detalhes</string>
+    <string name="alarm_lockscreen_privacy_title">Detalhes do medicamento ocultos</string>
     <string name="alarm_lockscreen_details_hidden">Os nomes dos medicamentos e as dosagens ficam ocultos enquanto o dispositivo estiver bloqueado.</string>
+
+    <!-- Multi-Step Medicine Form (#145) -->
+    <string name="form_step_what">O que tomar</string>
+    <string name="form_step_when">Quando</string>
+    <string name="form_step_extras">Extras</string>
+    <string name="form_step_counter">Etapa %1$d de %2$d</string>
+    <string name="btn_next">Avançar</string>
+    <string name="form_pill_appearance">Estilo do comprimido</string>
+    <string name="form_dosage_card_title">Dosagem e concentração</string>
 
     <!-- Schedule Effective Date Selector (#105) -->
     <string name="schedule_effective_dialog_title">Aplicar alterações de horário</string>
@@ -891,4 +936,12 @@ Deseja continuar?</string>
     <string name="sort_custom_reorder_desc">Use as setas para ajustar a ordem dos seus medicamentos.</string>
     <string name="sort_move_up">Mover para cima</string>
     <string name="sort_move_down">Mover para baixo</string>
+
+    <!-- Collapsible Time Slots on Home Screen (#138) -->
+    <string name="pref_slot_rollup_title">Horários recolhíveis</string>
+    <string name="pref_slot_rollup_desc">Permite recolher e expandir grupos de medicamentos na tela inicial. Desativado por padrão para evitar doses esquecidas.</string>
+    <string name="home_expand_all">Expandir tudo</string>
+    <string name="home_collapse_all">Recolher tudo</string>
+    <string name="home_slot_expand">Expandir horário</string>
+    <string name="home_slot_collapse">Recolher horário</string>
 </resources>

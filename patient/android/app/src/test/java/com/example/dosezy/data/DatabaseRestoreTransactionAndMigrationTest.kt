@@ -188,6 +188,7 @@ class DatabaseRestoreTransactionAndMigrationTest {
         assertEquals(true, user.slideActionsEnabled)
         assertEquals(false, user.timelineModeEnabled)
         assertEquals(false, user.thickerCalendarDayHighlight)
+        assertEquals(false, user.slotRollupEnabled)
     }
 
     @Test
@@ -198,7 +199,8 @@ class DatabaseRestoreTransactionAndMigrationTest {
               "fullName": "Preferences User",
               "slideActionsEnabled": false,
               "timelineModeEnabled": true,
-              "thickerCalendarDayHighlight": true
+              "thickerCalendarDayHighlight": true,
+              "slotRollupEnabled": true
             }
         """.trimIndent()
 
@@ -207,6 +209,7 @@ class DatabaseRestoreTransactionAndMigrationTest {
         assertEquals(false, user.slideActionsEnabled)
         assertEquals(true, user.timelineModeEnabled)
         assertEquals(true, user.thickerCalendarDayHighlight)
+        assertEquals(true, user.slotRollupEnabled)
     }
 
     @Test
@@ -304,6 +307,41 @@ class DatabaseRestoreTransactionAndMigrationTest {
         assertEquals(5.0, cursor.getDouble(1), 0.001)
         cursor.close()
 
+        sdb.close()
+    }
+
+    @Test
+    fun migration22_23_addsSlotRollupEnabledColumnToUsersTable() {
+        // Guard: Migration 22->23 must alter users table to add slotRollupEnabled with default 0 (#138)
+        val sqliteDb = mockk<SupportSQLiteDatabase>(relaxed = true)
+        DosezyDatabase.MIGRATION_22_23.migrate(sqliteDb)
+
+        verify(exactly = 1) {
+            sqliteDb.execSQL("ALTER TABLE users ADD COLUMN slotRollupEnabled INTEGER NOT NULL DEFAULT 0")
+        }
+    }
+
+    @Test
+    fun migration22_23_withRealSqlite_addsColumnAndDefaultsToFalse() {
+        val helper = androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory().create(
+            androidx.sqlite.db.SupportSQLiteOpenHelper.Configuration.builder(context)
+                .name(null)
+                .callback(object : androidx.sqlite.db.SupportSQLiteOpenHelper.Callback(22) {
+                    override fun onCreate(sdb: SupportSQLiteDatabase) {
+                        sdb.execSQL("CREATE TABLE users (userId TEXT NOT NULL PRIMARY KEY, fullName TEXT NOT NULL, age INTEGER NOT NULL, gender TEXT NOT NULL, isCurrentUser INTEGER NOT NULL)")
+                        sdb.execSQL("INSERT INTO users VALUES ('u1', 'Test Patient', 30, 'MALE', 1)")
+                    }
+                    override fun onUpgrade(sdb: SupportSQLiteDatabase, oldV: Int, newV: Int) {}
+                })
+                .build()
+        )
+        val sdb = helper.writableDatabase
+        DosezyDatabase.MIGRATION_22_23.migrate(sdb)
+
+        val cursor = sdb.query("SELECT slotRollupEnabled FROM users WHERE userId = 'u1'")
+        cursor.moveToFirst()
+        assertEquals("slotRollupEnabled must default to 0 (false) for clinical safety", 0, cursor.getInt(0))
+        cursor.close()
         sdb.close()
     }
 

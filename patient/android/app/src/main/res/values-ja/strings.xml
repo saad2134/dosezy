@@ -52,7 +52,8 @@
     <string name="form_error_course_duration">服用期間は1日以上である必要があります</string>
     <string name="form_error_fix_fields">上記で強調表示されている必須項目を入力してください</string>
     <string name="freq_daily">毎日</string>
-    <string name="freq_weekly">毎週</string>
+    <string name="freq_weekly">毎週（指定の曜日）</string>
+    <string name="freq_weekly_desc">選択した曜日にのみ薬を服用します。</string>
     <string name="freq_monthly">毎月</string>
     <string name="freq_custom">X 週間ごと</string>
     <string name="form_select_days_week">曜日を選択</string>
@@ -492,6 +493,35 @@
     <string name="custom_recurrence_interval_label">繰り返しの間隔 (週数)</string>
     <string name="custom_recurrence_summary">%1$d 週間ごとの %2$s に繰り返し</string>
     <string name="validation_select_custom_days">カスタム繰り返しの曜日を少なくとも1つ選択してください</string>
+    <!-- Rolling Interval Scheduling (#119) -->
+    <string name="freq_rolling_interval_title">服用連動インターバル</string>
+    <string name="freq_rolling_interval_desc">安全な間隔を保つため、実際に服用を記録した時点から次のタイマーを開始します</string>
+    <string name="freq_rolling_badge">連動</string>
+
+    <!-- Cyclical & Looping Schedules (#141) -->
+    <string name="freq_cyclical">周期サイクル（服用期間と休薬期間）</string>
+    <string name="freq_cyclical_desc">服用期間中に服薬を続け、休薬期間中は休止します（例：低用量ピル）。</string>
+    <string name="freq_cycle_format">%1$d日服用、%2$d日休薬</string>
+    <string name="freq_cycle_active_days">服用日数</string>
+    <string name="freq_cycle_rest_days">休薬日数</string>
+    <string name="freq_cycle_preset_21_7">21 / 7（標準）</string>
+    <string name="freq_cycle_preset_24_4">24 / 4（延長）</string>
+    <string name="freq_cycle_preset_custom">カスタム</string>
+    <string name="cycle_presets_label">サイクルプリセット</string>
+
+    <!-- PRN Next Dose Eligible Alerts (#142) -->
+    <string name="freq_as_needed_interval_title">次回服用までの最小間隔</string>
+    <string name="freq_as_needed_interval_desc">安全な服用間隔が経過し、次回の服用が可能になった際に通知します。</string>
+    <string name="freq_as_needed_interval_format">頓服・必要時（最小 %1$d時間間隔）</string>
+    <string name="freq_as_needed_notify_eligible">次回服用可能になったら通知する</string>
+    <string name="freq_as_needed_interval_none">間隔なし</string>
+    <string name="freq_as_needed_interval_hours_label">最小間隔（時間）</string>
+    <string name="prn_eligible_channel_name">次回服用可能（頓服・必要時）</string>
+    <string name="prn_eligible_channel_desc">頓服薬の最小服用間隔が経過した際の通知です。</string>
+    <string name="prn_eligible_notification_title">次回の服用が可能です</string>
+    <string name="prn_eligible_notification_body">%2$s の最小服用間隔（%1$d時間）が経過しました。必要に応じて服用できます。</string>
+    <string name="prn_eligible_notification_body_generic">%1$s の最小服用間隔が経過しました。必要に応じて服用できます。</string>
+
     <string name="btn_log_prn_dose">服用を記録</string>
     <string name="prn_doses_taken_today">本日記録された服用数: %1$d</string>
     <string name="prn_section_title">頓服薬 (PRN)</string>
@@ -684,9 +714,14 @@
     <string name="country_brazil">ブラジル</string>
     <string name="country_bangladesh">バングラデシュ</string>
     <string name="country_australia">オーストラリア</string>
+    <string name="country_new_zealand">ニュージーランド</string>
     <string name="pharmacy_order_refill_filter">補充フィルター</string>
     <string name="pharmacy_order_days_supply">処方日数</string>
     <string name="pharmacy_order_days_format_short">%1$d 日</string>
+    <string name="pharmacy_order_days_custom">カスタム</string>
+    <string name="pharmacy_order_custom_days_label">カスタム日数（日）</string>
+    <string name="pharmacy_order_custom_days_placeholder">例: 28</string>
+    <string name="unit_days_suffix">日分</string>
     <string name="pharmacy_order_medicines_include">対象のお薬 (%1$d/%2$d)</string>
     <string name="pharmacy_order_stock_left">残り %1$s</string>
     <string name="pharmacy_order_no_stock_tracked">在庫追跡なし</string>
@@ -829,7 +864,7 @@
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">予定された服薬リマインダー</string>
     <string name="pref_lockscreen_details_title">ロック画面に詳細を表示</string>
-    <string name="pref_lockscreen_details_desc">端末のロック解除まで薬の名前と用量を非表示にします。</string>
+    <string name="pref_lockscreen_details_desc">ロック画面に薬の名前と用量を表示します。オフにすると、端末のロックを解除するまで詳細が非表示になります。</string>
     <string name="disclaimer_dialog_title">医療および法的免責事項</string>
     <string name="disclaimer_dialog_summary">Dosezyは自動服薬スケジュール補助ツールであり、医療機器ではありません。診断、用量計算、または医学的アドバイスは提供しません。処方薬の服用指示については必ず医師または薬剤師にご相談ください。</string>
     <string name="disclaimer_checkbox_consent">医療免責事項および利用規約を理解し、同意します。</string>
@@ -842,7 +877,17 @@
     <string name="pdf_report_disclaimer_footer">Dosezy 服薬トラッカー • 自己申告情報ログ（非臨床記録）</string>
     <string name="pharmacy_refill_estimation_disclaimer">注：補充薬の数量は登録された頻度に基づく概算です。正確な数量は薬剤師または医師にご確認ください。</string>
     <string name="alarm_unlock_to_view_details">ロックを解除して詳細を表示</string>
+    <string name="alarm_lockscreen_privacy_title">服薬の詳細を非表示中</string>
     <string name="alarm_lockscreen_details_hidden">端末のロック中は薬の名前と用量が非表示になります。</string>
+
+    <!-- Multi-Step Medicine Form (#145) -->
+    <string name="form_step_what">基本情報</string>
+    <string name="form_step_when">スケジュール</string>
+    <string name="form_step_extras">詳細設定</string>
+    <string name="form_step_counter">ステップ %1$d / %2$d</string>
+    <string name="btn_next">次へ</string>
+    <string name="form_pill_appearance">薬の外観</string>
+    <string name="form_dosage_card_title">用量と規格</string>
 
     <!-- Schedule Effective Date Selector (#105) -->
     <string name="schedule_effective_dialog_title">スケジュールの変更を適用</string>
@@ -892,4 +937,12 @@
     <string name="sort_custom_reorder_desc">矢印を使って薬の並び順を変更できます。</string>
     <string name="sort_move_up">上へ移動</string>
     <string name="sort_move_down">下へ移動</string>
+
+    <!-- Collapsible Time Slots on Home Screen (#138) -->
+    <string name="pref_slot_rollup_title">折りたたみ可能な時間枠</string>
+    <string name="pref_slot_rollup_desc">ホーム画面でお薬グループの折りたたみと展開を許可します。服薬忘れを防ぐためデフォルトで無効です。</string>
+    <string name="home_expand_all">すべて展開</string>
+    <string name="home_collapse_all">すべて折りたたむ</string>
+    <string name="home_slot_expand">時間枠を展開</string>
+    <string name="home_slot_collapse">時間枠を折りたたむ</string>
 </resources>

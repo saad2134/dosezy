@@ -261,6 +261,8 @@ class DataExporter(
         userObj.put("customSnoozePopupEnabled", user.customSnoozePopupEnabled)
         // Guard: Explicitly serialize reminderType to retain user alert delivery preference on backup restore (#111)
         userObj.put("reminderType", user.reminderType.name)
+        // Guard: Explicitly serialize slotRollupEnabled to retain collapsible time slots preference on backup restore (#138)
+        userObj.put("slotRollupEnabled", user.slotRollupEnabled)
         root.put("user", userObj)
 
         val medArray = JSONArray()
@@ -289,6 +291,12 @@ class DataExporter(
             mObj.put("intervalHours", med.frequency.intervalHours)
             mObj.put("intervalDays", med.frequency.intervalDays)
             mObj.put("intervalWeeks", med.frequency.intervalWeeks)
+            // Guard: Explicitly export rolling interval setting at root level for flat JSON compatibility and BackupRestoreManager fallback (#119, #BUG-EXPORT-ROLLING)
+            mObj.put("isRollingInterval", med.frequency.isRollingInterval)
+            mObj.put("cycleActiveDays", med.frequency.cycleActiveDays)
+            mObj.put("cycleRestDays", med.frequency.cycleRestDays)
+            mObj.put("asNeededIntervalHours", med.frequency.asNeededIntervalHours)
+            mObj.put("asNeededNotifyEligible", med.frequency.asNeededNotifyEligible)
 
             // Guard: Serialize nested frequency object alongside top-level keys for dual compatibility with Gson and BackupRestoreManager
             val freqObj = JSONObject()
@@ -308,6 +316,12 @@ class DataExporter(
             freqObj.put("intervalHours", med.frequency.intervalHours)
             freqObj.put("intervalDays", med.frequency.intervalDays)
             freqObj.put("intervalWeeks", med.frequency.intervalWeeks)
+            // Guard: Explicitly export rolling interval setting so restored backup preserves dynamic intake spacing (#119)
+            freqObj.put("isRollingInterval", med.frequency.isRollingInterval)
+            freqObj.put("cycleActiveDays", med.frequency.cycleActiveDays)
+            freqObj.put("cycleRestDays", med.frequency.cycleRestDays)
+            freqObj.put("asNeededIntervalHours", med.frequency.asNeededIntervalHours)
+            freqObj.put("asNeededNotifyEligible", med.frequency.asNeededNotifyEligible)
             mObj.put("frequency", freqObj)
             mObj.put("scheduledTimes", JSONArray(med.scheduledTimes.map { it.toString() }))
             mObj.put("imageUri", med.imageUri ?: "")
@@ -397,8 +411,8 @@ class DataExporter(
 
             // Medicines Section
             csvBuilder.append("MEDICINES\n")
-            // Guard: Include Refill Threshold, Auto Deduct Stock, Is Archived, Custom Dosages, and Days of Week/Month to preserve complete inventory and frequency metadata in CSV exports
-            csvBuilder.append("Medicine ID,User ID,Medication Name,Dosage,Dosage Unit,Times Per Day,Frequency Pattern,Interval Hours,Interval Days,Interval Weeks,Days Per Week,Days Per Month,Selected Days Of Week,Selected Days Of Month,Scheduled Times,Pill Shape,Pill Color,Doctor Notes,Start Date,End Date,Duration Days,Stock,Refill Threshold,Auto Deduct Stock,Is Archived,Custom Dosages,Image URI,Reminder Type\n")
+            // Guard: Include Refill Threshold, Auto Deduct Stock, Is Archived, Custom Dosages, Days of Week/Month, and Rolling Interval to preserve complete inventory and frequency metadata in CSV exports
+            csvBuilder.append("Medicine ID,User ID,Medication Name,Dosage,Dosage Unit,Times Per Day,Frequency Pattern,Interval Hours,Interval Days,Interval Weeks,Rolling Interval,Days Per Week,Days Per Month,Selected Days Of Week,Selected Days Of Month,Scheduled Times,Pill Shape,Pill Color,Doctor Notes,Start Date,End Date,Duration Days,Stock,Refill Threshold,Auto Deduct Stock,Is Archived,Custom Dosages,Image URI,Reminder Type\n")
             medicines.forEach { medicine ->
                 val scheduledTimesStr = medicine.scheduledTimes.joinToString(";") { it.toString() }
                 val customDosagesStr = medicine.customDosages?.entries?.joinToString(";") { "${it.key}:${it.value}" } ?: ""
@@ -415,6 +429,7 @@ class DataExporter(
                     "${medicine.frequency.intervalHours ?: ""}," +
                     "${medicine.frequency.intervalDays ?: ""}," +
                     "${medicine.frequency.intervalWeeks ?: ""}," +
+                    "${medicine.frequency.isRollingInterval}," +
                     "${medicine.frequency.daysPerWeek ?: ""}," +
                     "${medicine.frequency.daysPerMonth ?: ""}," +
                     "${escapeCsv(selectedDaysOfWeekStr)}," +
@@ -553,9 +568,6 @@ class DataExporter(
             }
 
             profileMeds.forEachIndexed { index, med ->
-                val isDrop = med.dosageUnit == com.example.dosezy.data.model.DosageUnit.DROP ||
-                        med.pillShape == com.example.dosezy.data.model.PillShape.DROPS
-
                 val totalNeeded = customQuantities[med.medicineId] ?: med.calculateRefillQuantity(supplyDays)
 
                 val showDosageInTitle = includeDosage && when (med.dosageUnit) {
@@ -571,16 +583,13 @@ class DataExporter(
                 } else ""
                 val strengthUnitStr = med.dosageUnit.getLocalizedName(context)
 
-                val orderUnitStr = if (isDrop) {
-                    if (totalNeeded > 1) context.getString(com.example.dosezy.R.string.unit_bottles) else context.getString(com.example.dosezy.R.string.unit_bottle)
-                } else when (med.dosageUnit) {
-                    com.example.dosezy.data.model.DosageUnit.MG,
-                    com.example.dosezy.data.model.DosageUnit.MCG,
-                    com.example.dosezy.data.model.DosageUnit.MEQ -> {
-                        context.getString(com.example.dosezy.R.string.unit_units)
-                    }
-                    else -> med.dosageUnit.getLocalizedName(context)
-                }
+                // Guard: Format order unit via DosageFormatUtils to accurately show countable units instead of chemical strengths (#129)
+                val orderUnitStr = com.example.dosezy.utils.DosageFormatUtils.formatOrderUnit(
+                    context = context,
+                    unit = med.dosageUnit,
+                    shape = med.pillShape,
+                    quantity = totalNeeded
+                )
 
                 sb.append("${index + 1}. *${med.medicationName}*")
                 if (showDosageInTitle && dosageDisplay.isNotBlank()) {
@@ -590,11 +599,13 @@ class DataExporter(
                 sb.append("   • ").append(context.getString(com.example.dosezy.R.string.pharmacy_order_qty_needed, totalNeeded, orderUnitStr)).append("\n")
 
                 if (includeStock && med.currentStock != null) {
-                    val stockUnitStr = if (isDrop) {
-                        context.getString(com.example.dosezy.R.string.unit_drop)
-                    } else {
-                        med.dosageUnit.getLocalizedName(context)
-                    }
+                    // Guard: Use formatStockUnit to display countable units (or bottles) for current stock instead of chemical strengths (#129)
+                    val stockUnitStr = com.example.dosezy.utils.DosageFormatUtils.formatStockUnit(
+                        context = context,
+                        unit = med.dosageUnit,
+                        shape = med.pillShape,
+                        quantity = med.currentStock
+                    )
                     val formattedStock = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(med.currentStock)
                     sb.append("   • ").append(context.getString(com.example.dosezy.R.string.pharmacy_order_current_stock, formattedStock, stockUnitStr)).append("\n")
                 }

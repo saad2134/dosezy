@@ -112,6 +112,11 @@ fun PreferencesScreen(navController: NavController) {
                     currentUser?.let { user ->
                         userViewModel.updateUser(user.copy(hideAddMedicineNavButton = isChecked))
                     }
+                },
+                onSlotRollupChange = { isChecked ->
+                    currentUser?.let { user ->
+                        userViewModel.updateUser(user.copy(slotRollupEnabled = isChecked))
+                    }
                 }
             )
 

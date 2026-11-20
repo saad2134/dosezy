@@ -73,6 +73,24 @@ class AlarmAudioPlayerAnd24HourFormatTest {
     }
 
     @Test
+    fun issue1_alarmAudioPlayer_stop_unconditionallyStopsRingtoneEvenWhenIsPlayingReturnsFalse() {
+        val field = AlarmAudioPlayer::class.java.getDeclaredField("ringtone")
+        field.isAccessible = true
+
+        val mockRingtone = mockk<android.media.Ringtone>(relaxed = true)
+        every { mockRingtone.isPlaying } returns false
+
+        field.set(AlarmAudioPlayer, mockRingtone)
+
+        // Must call stop() unconditionally on fallback Ringtone to prevent screaming alarm after unlock
+        AlarmAudioPlayer.stop()
+
+        verify(exactly = 1) { mockRingtone.stop() }
+        assertNull("ringtone field must be cleared to null after stop()", field.get(AlarmAudioPlayer))
+        assertFalse(AlarmAudioPlayer.isPlaying())
+    }
+
+    @Test
     fun issue1_alarmAudioPlayer_stop_safelyReleasesPlayerWhenStopThrowsIllegalStateException() {
         val field = AlarmAudioPlayer::class.java.getDeclaredField("mediaPlayer")
         field.isAccessible = true

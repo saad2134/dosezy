@@ -22,8 +22,8 @@ android {
         applicationId = "com.saad2134.dosezy"
         minSdk = 24
         targetSdk = 36
-        versionCode = 38
-        versionName = "2.5.13"
+        versionCode = 39
+        versionName = "2.5.14"
         buildConfigField("String", "VERSION_NAME", "\"$versionName\"")
         buildConfigField("int", "VERSION_CODE", "$versionCode")
 
@@ -184,6 +184,9 @@ dependencies {
     implementation("com.google.accompanist:accompanist-permissions:0.30.1")
 
     implementation("com.google.code.gson:gson:2.10.1")
+
+    // Google Play In-App Review (Play flavor only - keeping FOSS builds 100% clean of proprietary Google SDKs)
+    "playImplementation"("com.google.android.play:review-ktx:2.0.2")
 
     // Testing
     testImplementation("junit:junit:4.13.2")

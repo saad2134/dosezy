@@ -1,7 +1,12 @@
 package com.example.dosezy.domain
 
+import android.content.Context
+import com.example.dosezy.R
 import com.example.dosezy.data.model.DosageUnit
+import com.example.dosezy.data.model.PillShape
 import com.example.dosezy.utils.DosageFormatUtils
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -100,5 +105,47 @@ class DosageFormatUtilsTest {
         // Chemical units with float precision
         assertEquals("2", DosageFormatUtils.formatDosageAmount(2.0000000000000004, DosageUnit.MG))
         assertEquals("0", DosageFormatUtils.formatDosageAmount(0.0001, DosageUnit.MG))
+    }
+
+    @Test
+    fun testFormatStockUnit_chemicalStrengthsUseCountableUnitsAndBottles() {
+        val context = mockk<Context>()
+        every { context.getString(R.string.unit_units) } returns "units"
+        every { context.getString(R.string.unit_bottle) } returns "bottle"
+        every { context.getString(R.string.unit_bottles) } returns "bottles"
+        every { context.getString(R.string.unit_tablet) } returns "tablet"
+        every { context.getString(R.string.unit_capsule) } returns "capsule"
+
+        // Guard: Verify chemical strength units return "units" instead of displaying "mg", "mcg", or "mEq" for inventory stock (#129)
+        assertEquals("units", DosageFormatUtils.formatStockUnit(context, DosageUnit.MG, PillShape.ROUND, 10.0))
+        assertEquals("units", DosageFormatUtils.formatStockUnit(context, DosageUnit.MCG, PillShape.CAPSULE, 25.0))
+        assertEquals("units", DosageFormatUtils.formatStockUnit(context, DosageUnit.MEQ, PillShape.ROUND, 15.0))
+
+        // Discrete countable units return their localized name
+        assertEquals("tablet", DosageFormatUtils.formatStockUnit(context, DosageUnit.TABLET, PillShape.ROUND, 40.0))
+        assertEquals("capsule", DosageFormatUtils.formatStockUnit(context, DosageUnit.CAPSULE, PillShape.CAPSULE, 12.0))
+
+        // Bottle formulations return bottle/bottles
+        assertEquals("bottle", DosageFormatUtils.formatStockUnit(context, DosageUnit.DROP, PillShape.DROPS, 1.0))
+        assertEquals("bottles", DosageFormatUtils.formatStockUnit(context, DosageUnit.DROP, PillShape.DROPS, 2.0))
+        assertEquals("bottle", DosageFormatUtils.formatStockUnit(context, DosageUnit.SPRAY, PillShape.SPRAY, 1.0))
+        assertEquals("bottles", DosageFormatUtils.formatStockUnit(context, DosageUnit.SPRAY, PillShape.SPRAY, 3.0))
+    }
+
+    @Test
+    fun testFormatOrderUnit_chemicalStrengthsUseCountableUnitsAndBottles() {
+        val context = mockk<Context>()
+        every { context.getString(R.string.unit_units) } returns "units"
+        every { context.getString(R.string.unit_bottle) } returns "bottle"
+        every { context.getString(R.string.unit_bottles) } returns "bottles"
+        every { context.getString(R.string.unit_tablet) } returns "tablet"
+
+        // Guard: Verify order unit maps chemical strengths to units and drops/sprays to bottles (#129)
+        assertEquals("units", DosageFormatUtils.formatOrderUnit(context, DosageUnit.MG, PillShape.ROUND, 60))
+        assertEquals("units", DosageFormatUtils.formatOrderUnit(context, DosageUnit.MCG, PillShape.ROUND, 30))
+        assertEquals("units", DosageFormatUtils.formatOrderUnit(context, DosageUnit.MEQ, PillShape.ROUND, 15))
+        assertEquals("tablet", DosageFormatUtils.formatOrderUnit(context, DosageUnit.TABLET, PillShape.ROUND, 30))
+        assertEquals("bottle", DosageFormatUtils.formatOrderUnit(context, DosageUnit.DROP, PillShape.DROPS, 1))
+        assertEquals("bottles", DosageFormatUtils.formatOrderUnit(context, DosageUnit.DROP, PillShape.DROPS, 2))
     }
 }

@@ -171,10 +171,12 @@ class DosezyRemoteViewsFactory(
         views.setTextViewText(R.id.widget_item_dose, item.doseLabel)
 
         // Fill-in intent for item click
-        // Guard: Pass fragment=schedule so tapping an item navigates directly to the Schedule tab in MainActivity
+        // Guard: Route tapping widget item directly to Home daily checklist focused on this dose card (#137)
         val fillInIntent = Intent().apply {
             putExtra("switch_to_user_id", item.userId)
-            putExtra("fragment", "schedule")
+            putExtra("fragment", "home")
+            putExtra("target_entry_id", item.entryId)
+            putExtra("target_time", item.timeLabel)
         }
         views.setOnClickFillInIntent(R.id.widget_item_root, fillInIntent)
 

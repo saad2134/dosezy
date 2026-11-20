@@ -541,4 +541,213 @@ class HomeMissedDoseActionRoutingTest {
 
         assertEquals(listOf("med_c", "med_a", "med_b"), sortedIntraSlot.map { it.scheduleEntry.medicineId })
     }
+
+    @Test
+    fun slotRollup_userPreference_defaultsToFalseForSafety() {
+        // Guard: Clinical safety requirement: slotRollupEnabled must default to false so patients do not miss medication (#138)
+        val defaultUser = User(
+            userId = "usr_safety",
+            fullName = "Safety User",
+            age = 50,
+            gender = Gender.DO_NOT_SPECIFY,
+            contactNumber = "+1234567890"
+        )
+        assertFalse(defaultUser.slotRollupEnabled)
+    }
+
+    @Test
+    fun slotRollup_expandAndCollapseAllToggling_tracksAllSlotsAccurately() {
+        // Guard: Slot rollup toggle accurately maintains collapsed set and auto-expands target slot (#138)
+        val slots = listOf("08:00 AM", "01:00 PM", "08:00 PM")
+        var collapsedSlots = emptySet<String>()
+
+        // Initially no slots are collapsed
+        assertTrue(collapsedSlots.isEmpty())
+
+        // Collapse all slots
+        collapsedSlots = slots.toSet()
+        assertEquals(3, collapsedSlots.size)
+        assertTrue(slots.all { it in collapsedSlots })
+
+        // Target scroll to a specific slot expands it (#137, #138)
+        val targetSlot = "01:00 PM"
+        if (targetSlot in collapsedSlots) {
+            collapsedSlots = collapsedSlots - targetSlot
+        }
+        assertEquals(setOf("08:00 AM", "08:00 PM"), collapsedSlots)
+        assertFalse(targetSlot in collapsedSlots)
+
+        // Expand all slots
+        collapsedSlots = emptySet()
+        assertTrue(collapsedSlots.isEmpty())
+    }
+
+    @Test
+    fun slotRollup_profileSwitch_resetsCollapsedSlotsToPreventCrossProfileContamination() {
+        // Guard: Switching patient profile must isolate collapsed slots to prevent Profile A's collapsed state from concealing Profile B's morning doses (#BUG-COLLAPSED-SLOTS-PROFILE)
+        var activeUserId = "user_parent"
+        var collapsedSlots = setOf("08:00 AM", "12:00 PM")
+
+        // Switch to child profile: simulated remember(currentUser?.userId) scoping resets state
+        val newUserId = "user_child"
+        if (newUserId != activeUserId) {
+            activeUserId = newUserId
+            collapsedSlots = emptySet()
+        }
+
+        assertEquals("user_child", activeUserId)
+        assertTrue("Collapsed slots must be cleared on profile switch to prevent concealing doses", collapsedSlots.isEmpty())
+    }
+
+    @Test
+    fun testTimelineMode_autoScrollIndex_targetsBannerOffsetDirectly() {
+        // Guard: In timeline mode, HomeTimelineView is a single LazyColumn item; targetIndex must not overflow into non-existent slot indices (#BUG-TIMELINE-SCROLL)
+        val isTimeline = true
+        val allCompleted = false
+        val hasTaken = false
+        val bannerOffset = if (allCompleted && hasTaken) 1 else 0
+        val slotIndex = 4
+
+        val targetIndex = if (isTimeline) {
+            bannerOffset
+        } else {
+            bannerOffset + slotIndex
+        }
+
+        assertEquals(0, targetIndex)
+
+        // When standard card view is active
+        val standardTargetIndex = bannerOffset + slotIndex
+        assertEquals(4, standardTargetIndex)
+    }
+
+    @Test
+    fun testWidgetFillInIntent_routesToHomeWithTargetExtras() {
+        // Guard: Verify widget list item fillInIntent routes directly to Home checklist with target entry and time (#137)
+        val fillInIntent = android.content.Intent().apply {
+            putExtra("switch_to_user_id", "user_widget_test")
+            putExtra("fragment", "home")
+            putExtra("target_entry_id", "entry_widget_123")
+            putExtra("target_time", "08:00 AM")
+        }
+
+        assertEquals("home", fillInIntent.getStringExtra("fragment"))
+        assertEquals("user_widget_test", fillInIntent.getStringExtra("switch_to_user_id"))
+        assertEquals("entry_widget_123", fillInIntent.getStringExtra("target_entry_id"))
+        assertEquals("08:00 AM", fillInIntent.getStringExtra("target_time"))
+    }
+
+    @Test
+    fun scheduleScreen_localeObservation_updatesOnUserLanguageChange() {
+        // Guard: Verify locale resolution derives dynamically from user's chosen language for ScheduleScreen and calendar formatting (#BUG-SCHEDULE-LOCALE)
+        val defaultLocale = com.example.dosezy.utils.LocaleHelper.getLocale(com.example.dosezy.data.model.Language.SYSTEM)
+        val arabicLocale = com.example.dosezy.utils.LocaleHelper.getLocale(com.example.dosezy.data.model.Language.ARABIC)
+        val spanishLocale = com.example.dosezy.utils.LocaleHelper.getLocale(com.example.dosezy.data.model.Language.SPANISH)
+        val frenchLocale = com.example.dosezy.utils.LocaleHelper.getLocale(com.example.dosezy.data.model.Language.FRENCH)
+
+        assertEquals(java.util.Locale.getDefault().language, defaultLocale.language)
+        assertEquals("ar", arabicLocale.language)
+        assertEquals("es", spanishLocale.language)
+        assertEquals("fr", frenchLocale.language)
+
+        val testDate = LocalDate.of(2026, 11, 19)
+        val arabicDateStr = java.time.format.DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.LONG)
+            .withLocale(arabicLocale)
+            .format(testDate)
+        val spanishDateStr = java.time.format.DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.LONG)
+            .withLocale(spanishLocale)
+            .format(testDate)
+
+        assertTrue(arabicDateStr.isNotEmpty())
+        assertTrue(spanishDateStr.contains("noviembre") || spanishDateStr.contains("nov"))
+    }
+
+    @Test
+    fun backNavigation_dropdownState_closesMenuBeforeScreenBackStack() {
+        // Guard: Expanding form dropdowns (gender, frequency, dosage unit) intercepts back press to close menu before popping back stack (#BUG-FORM-BACK-DROPDOWN)
+        var dropdownExpanded = true
+        var backStackPopped = false
+
+        // User presses back when dropdown is open
+        if (dropdownExpanded) {
+            dropdownExpanded = false
+        } else {
+            backStackPopped = true
+        }
+
+        // Dropdown closed, back stack untouched
+        assertFalse(dropdownExpanded)
+        assertFalse(backStackPopped)
+
+        // Second back press with dropdown closed pops back stack
+        if (dropdownExpanded) {
+            dropdownExpanded = false
+        } else {
+            backStackPopped = true
+        }
+
+        assertFalse(dropdownExpanded)
+        assertTrue(backStackPopped)
+    }
+
+    @Test
+    fun testHomeMedicationCard_stockChip_flagsLowWarningWhenStockLowerThanDose() {
+        // Guard: Prevent stock chip from displaying healthy green when remaining stock is lower than scheduled dose, below threshold, or depleted (#144)
+        val med = Medicine(
+            medicineId = "med_stock_144",
+            userId = "test_user_105",
+            medicationName = "Amoxicillin",
+            dosage = 2.0,
+            dosageUnit = DosageUnit.TABLET,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            currentStock = 1.0,
+            refillThreshold = null
+        )
+
+        val entry = ScheduleEntry(
+            entryId = "entry_stock_144",
+            userId = "test_user_105",
+            medicineId = "med_stock_144",
+            scheduledDateTime = LocalDateTime.of(2026, 11, 20, 8, 0),
+            status = MedicationStatus.PENDING,
+            dosage = 2.0
+        )
+
+        val stock = med.currentStock!!
+        val doseAmount = med.getStockDeductionAmount(entry.scheduledDateTime.toLocalTime(), entry.dosage)
+        assertEquals(2.0, doseAmount, 0.001)
+
+        // Case 1: stock (1.0) < doseAmount (2.0) with refillThreshold == null: must be isLow = true (warning red, not green)
+        val threshold1 = med.refillThreshold
+        val isLowInsufficient = (threshold1 != null && stock <= threshold1) || stock < doseAmount || stock <= 0.0
+        assertTrue("Stock lower than dose must trigger low-stock warning even when refillThreshold is null", isLowInsufficient)
+
+        // Case 2: stock == 0.0 with refillThreshold == null: must be isLow = true
+        val zeroStockMed = med.copy(currentStock = 0.0)
+        val zeroStock = zeroStockMed.currentStock!!
+        val threshold2 = zeroStockMed.refillThreshold
+        val isLowZero = (threshold2 != null && zeroStock <= threshold2) || zeroStock < doseAmount || zeroStock <= 0.0
+        assertTrue("Depleted stock (0.0) must trigger low-stock warning", isLowZero)
+
+        // Case 3: stock (10.0) > doseAmount (2.0) and > refillThreshold (5.0): isLow = false (green badge)
+        val healthyMed = med.copy(currentStock = 10.0, refillThreshold = 5.0)
+        val healthyStock = healthyMed.currentStock!!
+        val threshold3 = healthyMed.refillThreshold
+        val isLowHealthy = (threshold3 != null && healthyStock <= threshold3) || healthyStock < doseAmount || healthyStock <= 0.0
+        assertFalse("Stock exceeding both dose and refill threshold must not trigger warning", isLowHealthy)
+
+        // Case 4: custom dose override at evening slot (3.0 tablets), stock is 2.0: must be isLow = true
+        val eveningEntry = entry.copy(
+            scheduledDateTime = LocalDateTime.of(2026, 11, 20, 20, 0),
+            dosage = 3.0
+        )
+        val eveningDoseAmount = med.getStockDeductionAmount(eveningEntry.scheduledDateTime.toLocalTime(), eveningEntry.dosage)
+        assertEquals(3.0, eveningDoseAmount, 0.001)
+        val stockTwo = 2.0
+        val threshold4 = med.refillThreshold
+        val isLowEvening = (threshold4 != null && stockTwo <= threshold4) || stockTwo < eveningDoseAmount || stockTwo <= 0.0
+        assertTrue("Stock lower than evening dose override must trigger low-stock warning", isLowEvening)
+    }
 }

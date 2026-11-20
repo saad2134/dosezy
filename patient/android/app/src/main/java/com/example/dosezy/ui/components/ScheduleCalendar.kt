@@ -201,9 +201,9 @@ private fun CalendarGrid(
     val daysInMonth = currentMonth.lengthOfMonth()
     val startOffset = (firstDayOfMonth.dayOfWeek.value - firstDayOfWeek.value + 7) % 7
 
-    // Guard: Pre-group schedule entries by LocalDate once per schedule list update to avoid O(N * 42) filter iterations across all calendar cells on every recomposition frame
+    // Guard: Pre-group scheduled entries by LocalDate excluding ad-hoc PRN doses so monthly calendar adherence colors and completion dots reflect strictly scheduled medication regimens (#BUG-CALENDAR-PRN)
     val entriesByDate = remember(scheduleEntries) {
-        scheduleEntries.groupBy { it.scheduledDateTime.toLocalDate() }
+        scheduleEntries.filter { !it.entryId.startsWith("PRN_") }.groupBy { it.scheduledDateTime.toLocalDate() }
     }
 
     Column(
@@ -335,27 +335,29 @@ private fun CalendarDay(
     }
 }
 
-private fun getDateStatusColor(entries: List<ScheduleEntry>, missedAfterMinutes: Int = 360): Color {
-    if (entries.isEmpty()) return Color.Transparent
+// Guard: Exclude ad-hoc PRN doses from status color resolution to prevent as-needed doses skewing scheduled adherence (#BUG-CALENDAR-PRN)
+internal fun getDateStatusColor(entries: List<ScheduleEntry>, missedAfterMinutes: Int = 360): Color {
+    val scheduledEntries = entries.filter { !it.entryId.startsWith("PRN_") }
+    if (scheduledEntries.isEmpty()) return Color.Transparent
 
-    val hasMissed = entries.any { it.status == MedicationStatus.MISSED }
-    val hasLate = entries.any { it.status == MedicationStatus.TAKEN_LATE }
-    val allCompleted = entries.all {
+    val hasMissed = scheduledEntries.any { it.status == MedicationStatus.MISSED }
+    val hasLate = scheduledEntries.any { it.status == MedicationStatus.TAKEN_LATE }
+    val allCompleted = scheduledEntries.all {
         it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE || it.status == MedicationStatus.SKIPPED
     }
-    val hasTaken = entries.any {
+    val hasTaken = scheduledEntries.any {
         it.status == MedicationStatus.TAKEN_ON_TIME || it.status == MedicationStatus.TAKEN_LATE
     }
-    val allSkipped = entries.all { it.status == MedicationStatus.SKIPPED }
+    val allSkipped = scheduledEntries.all { it.status == MedicationStatus.SKIPPED }
 
     // Guard: Only flag pending doses as missed (red) after considerMissedAfter threshold; prevents 1-minute-old pending doses from turning the calendar day red
     val now = java.time.LocalDateTime.now()
-    val hasPastPending = entries.any {
+    val hasPastPending = scheduledEntries.any {
         it.status == MedicationStatus.PENDING &&
                 now.isAfter(it.scheduledDateTime) &&
                 TimeCalculationUtils.isMissed(it.scheduledDateTime, now, missedAfterMinutes)
     }
-    val hasUpcomingPending = entries.any { it.status == MedicationStatus.PENDING }
+    val hasUpcomingPending = scheduledEntries.any { it.status == MedicationStatus.PENDING }
 
     // Guard: Prioritize pending doses ahead of partial hasLate to prevent partially complete days from rendering Amber settled indicators while untaken doses remain (#BUG-CALENDAR-PARTIAL-PENDING)
     return when {

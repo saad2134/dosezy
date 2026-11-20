@@ -324,5 +324,119 @@ class MedicineFormValidationTest {
         )
         assertFalse("Finite course without days should be invalid", finiteMissingDays.isValid)
         assertFalse("Finite duration should be invalid", finiteMissingDays.isFiniteDurationValid)
+
+        // Cyclical valid 21/7
+        val cyclicalValid = com.example.dosezy.ui.components.validateMedicineForm(
+            medicationName = "Oral Contraceptive",
+            dosage = "1",
+            hasDifferentDosages = false,
+            scheduledTimesList = times,
+            perTimeDosages = emptyMap(),
+            selectedFrequency = FrequencyPattern.CYCLICAL,
+            selectedDaysOfWeek = emptyList(),
+            selectedDaysOfMonth = emptyList(),
+            intervalWeeksText = "",
+            cycleActiveDaysText = "21",
+            cycleRestDaysText = "7"
+        )
+        assertTrue("Cyclical with 21 active and 7 rest days should be valid", cyclicalValid.isValid)
+        assertTrue(cyclicalValid.isFrequencyValid)
+
+        // Cyclical invalid active 0
+        val cyclicalInvalidActive = com.example.dosezy.ui.components.validateMedicineForm(
+            medicationName = "Oral Contraceptive",
+            dosage = "1",
+            hasDifferentDosages = false,
+            scheduledTimesList = times,
+            perTimeDosages = emptyMap(),
+            selectedFrequency = FrequencyPattern.CYCLICAL,
+            selectedDaysOfWeek = emptyList(),
+            selectedDaysOfMonth = emptyList(),
+            intervalWeeksText = "",
+            cycleActiveDaysText = "0",
+            cycleRestDaysText = "7"
+        )
+        assertFalse("Cyclical with 0 active days should be invalid", cyclicalInvalidActive.isValid)
+        assertFalse("Frequency validation should fail for 0 active days", cyclicalInvalidActive.isFrequencyValid)
+    }
+
+    @Test
+    fun testMultiStepFormWizard_stepValidationGuards() {
+        val times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0))
+
+        // Guard: Step 1 requires non-blank medication name and positive base dosage (#145, F13)
+        val step1BlankName = com.example.dosezy.ui.components.validateMedicineForm(
+            medicationName = "   ",
+            dosage = "500",
+            hasDifferentDosages = false,
+            scheduledTimesList = times,
+            perTimeDosages = emptyMap(),
+            selectedFrequency = FrequencyPattern.DAILY,
+            selectedDaysOfWeek = emptyList(),
+            selectedDaysOfMonth = emptyList(),
+            intervalWeeksText = ""
+        )
+        assertFalse("Step 1 validation must fail when medication name is blank", step1BlankName.isNameValid)
+        assertTrue("Dosage should be valid in step 1", step1BlankName.isDosageValid)
+        assertFalse("Form should not be valid when step 1 name is blank", step1BlankName.isValid)
+
+        val step1ZeroDosage = com.example.dosezy.ui.components.validateMedicineForm(
+            medicationName = "Metformin",
+            dosage = "0",
+            hasDifferentDosages = false,
+            scheduledTimesList = times,
+            perTimeDosages = emptyMap(),
+            selectedFrequency = FrequencyPattern.DAILY,
+            selectedDaysOfWeek = emptyList(),
+            selectedDaysOfMonth = emptyList(),
+            intervalWeeksText = ""
+        )
+        assertTrue("Name should be valid in step 1", step1ZeroDosage.isNameValid)
+        assertFalse("Step 1 validation must fail when dosage is zero", step1ZeroDosage.isDosageValid)
+        assertFalse("Form should not be valid when step 1 dosage is zero", step1ZeroDosage.isValid)
+
+        // Guard: Step 2 requires valid frequency selections (e.g., non-empty days for weekly) (#145, F13)
+        val step2InvalidWeekly = com.example.dosezy.ui.components.validateMedicineForm(
+            medicationName = "Vitamin D",
+            dosage = "1000",
+            hasDifferentDosages = false,
+            scheduledTimesList = times,
+            perTimeDosages = emptyMap(),
+            selectedFrequency = FrequencyPattern.WEEKLY,
+            selectedDaysOfWeek = emptyList(),
+            selectedDaysOfMonth = emptyList(),
+            intervalWeeksText = ""
+        )
+        assertTrue("Step 1 fields are valid", step2InvalidWeekly.isNameValid && step2InvalidWeekly.isDosageValid)
+        assertFalse("Step 2 validation must fail when weekly pattern has no days selected", step2InvalidWeekly.isFrequencyValid)
+
+        // Guard: Step 2 per-time dosages validation when hasDifferentDosages is enabled (#145, F13)
+        val step2InvalidSlotDose = com.example.dosezy.ui.components.validateMedicineForm(
+            medicationName = "Aspirin",
+            dosage = "100",
+            hasDifferentDosages = true,
+            scheduledTimesList = times,
+            perTimeDosages = mapOf("08:00" to "100", "20:00" to "0"),
+            selectedFrequency = FrequencyPattern.DAILY,
+            selectedDaysOfWeek = emptyList(),
+            selectedDaysOfMonth = emptyList(),
+            intervalWeeksText = ""
+        )
+        assertFalse("Step 2 per-time dosage must reject zero or empty dose slot", step2InvalidSlotDose.isDosageValid)
+        assertTrue("Invalid time slot keys must contain the 20:00 slot", step2InvalidSlotDose.invalidTimeSlotKeys.contains("20:00"))
+
+        // Guard: Step 3 passes when prior steps are valid even if optional extras (notes, stock) are omitted (#145, F13)
+        val step3Complete = com.example.dosezy.ui.components.validateMedicineForm(
+            medicationName = "Lisinopril",
+            dosage = "10",
+            hasDifferentDosages = false,
+            scheduledTimesList = times,
+            perTimeDosages = emptyMap(),
+            selectedFrequency = FrequencyPattern.DAILY,
+            selectedDaysOfWeek = emptyList(),
+            selectedDaysOfMonth = emptyList(),
+            intervalWeeksText = ""
+        )
+        assertTrue("Complete multi-step form must be valid", step3Complete.isValid)
     }
 }

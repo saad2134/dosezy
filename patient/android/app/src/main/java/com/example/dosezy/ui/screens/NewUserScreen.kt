@@ -7,6 +7,7 @@ package com.example.dosezy.ui.screens
 
 import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -23,6 +24,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,9 +32,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -81,7 +85,6 @@ fun NewUserScreen(
     val scheduleRepository = remember { ScheduleRepository(database) }
     val backupManager = remember { BackupRestoreManager(context, database, scheduleRepository) }
 
-    val isProfileSetupValid by newUserViewModel.isProfileValid.collectAsState()
     val isImporting by newUserViewModel.isImporting.collectAsState()
     val loadingMessage by newUserViewModel.loadingMessage.collectAsState()
     val inspectionResult by newUserViewModel.inspectionResult.collectAsState()
@@ -90,10 +93,24 @@ fun NewUserScreen(
     var showExistingProfiles by remember { mutableStateOf(false) }
     var showImportSourceDialog by remember { mutableStateOf(false) }
 
+    // Guard: Intercept system back press on initial onboarding frame when existing profiles exist to return to switch profile screen (#BUG-ONBOARDING-BACK)
+    BackHandler(enabled = currentFrame == 1 && users.isNotEmpty()) {
+        navController.navigate("switch_profile") {
+            popUpTo(navController.currentBackStackEntry?.destination?.route ?: "newuser/1") { inclusive = true }
+        }
+    }
+
+    // Guard: Intercept system back press when existing profiles modal is displayed so back gesture dismisses the modal (#BUG-PROFILES-MODAL-BACK)
+    BackHandler(enabled = showExistingProfiles) {
+        showExistingProfiles = false
+    }
+
     val prefs = remember { context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE) }
     var isDisclaimerAccepted by remember {
         mutableStateOf(prefs.getBoolean("legal_disclaimer_accepted_v1", false))
     }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     val importLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
@@ -117,6 +134,7 @@ fun NewUserScreen(
 
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        snackbarHost = { com.example.dosezy.ui.components.DosezySnackbarHost(snackbarHostState) },
         bottomBar = {
             NewUserBottomBar(
                 currentFrame = currentFrame,
@@ -136,16 +154,7 @@ fun NewUserScreen(
                 },
                 onNext = { onNext(currentFrame + 1) },
                 onCompleteProfileSetup = {
-                    if (isProfileSetupValid) {
-                        completeProfileSetup()
-                        if (isCreatingNewProfile) {
-                            navController.popBackStack("switch_profile", false)
-                        } else {
-                            navController.navigate("home") {
-                                popUpTo("newuser/1") { inclusive = true }
-                            }
-                        }
-                    }
+                    completeProfileSetup()
                 }
             )
         }
@@ -168,9 +177,21 @@ fun NewUserScreen(
                         newUserViewModel.saveUser(user) {
                             userViewModel.addUser(user)
                         }
+                        if (isCreatingNewProfile) {
+                            navController.popBackStack("switch_profile", false)
+                        } else {
+                            navController.navigate("home") {
+                                popUpTo("newuser/1") { inclusive = true }
+                            }
+                        }
                     },
                     onValidationChange = { isValid ->
                         newUserViewModel.setProfileValid(isValid)
+                    },
+                    onValidationError = {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(context.getString(R.string.form_error_fix_fields))
+                        }
                     },
                     setCompleteAction = { action ->
                         completeProfileSetup = action
@@ -297,11 +318,13 @@ fun ProfileSetupPage(
     onComplete: (User) -> Unit,
     isDefaultUser: Boolean = false,
     onValidationChange: (Boolean) -> Unit = {},
+    onValidationError: (() -> Unit)? = null,
     setCompleteAction: (() -> Unit) -> Unit = {}
 ) = com.example.dosezy.ui.screens.newuser.ProfileSetupPage(
     onComplete = onComplete,
     isDefaultUser = isDefaultUser,
     onValidationChange = onValidationChange,
+    onValidationError = onValidationError,
     setCompleteAction = setCompleteAction
 )
 

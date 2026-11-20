@@ -895,5 +895,75 @@ class UserViewModelProfileAlarmTest {
             }
         }
     }
+
+    @Test
+    fun testSetCurrentUser_synchronizesLockscreenDetailsEnabledToAppPrefs() = runTest(testDispatcher) {
+        // Guard: Verify switching current user updates lockscreen_details_enabled in app_prefs (#BUG-LOCKSCREEN-PROFILE-SWITCH)
+        val privateUser = User(
+            userId = "user_switch_priv",
+            fullName = "Private Profile",
+            age = 35,
+            gender = Gender.FEMALE,
+            contactNumber = "1234567890",
+            lockscreenDetailsEnabled = false,
+            isCurrentUser = false
+        )
+        userRepository.insertUser(testUser)
+        userRepository.insertUser(privateUser)
+
+        val vm = UserViewModel(userRepository, medicineRepository, scheduleRepository, medicineNotificationManager, context)
+        advanceUntilIdle()
+
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+
+        // Switch to privateUser
+        vm.setCurrentUser(privateUser)
+        advanceUntilIdle()
+        awaitCondition { !prefs.getBoolean("lockscreen_details_enabled", true) }
+
+        assertFalse(
+            "app_prefs lockscreen_details_enabled must be false after switching to private user",
+            prefs.getBoolean("lockscreen_details_enabled", true)
+        )
+
+        // Switch back to testUser (lockscreenDetailsEnabled = true by default)
+        vm.setCurrentUser(testUser)
+        advanceUntilIdle()
+        awaitCondition { prefs.getBoolean("lockscreen_details_enabled", false) }
+
+        assertTrue(
+            "app_prefs lockscreen_details_enabled must be true after switching to testUser",
+            prefs.getBoolean("lockscreen_details_enabled", false)
+        )
+    }
+
+    @Test
+    fun testAddUser_whenCurrent_synchronizesLockscreenDetailsEnabledToAppPrefs() = runTest(testDispatcher) {
+        // Guard: Verify adding a new current user updates lockscreen_details_enabled in app_prefs (#BUG-LOCKSCREEN-PROFILE-SWITCH)
+        val vm = UserViewModel(userRepository, medicineRepository, scheduleRepository, medicineNotificationManager, context)
+        advanceUntilIdle()
+
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        prefs.edit().putBoolean("lockscreen_details_enabled", true).commit()
+
+        val newPrivateUser = User(
+            userId = "user_new_priv",
+            fullName = "New Private Profile",
+            age = 42,
+            gender = Gender.MALE,
+            contactNumber = "5555555555",
+            lockscreenDetailsEnabled = false,
+            isCurrentUser = true
+        )
+
+        vm.addUser(newPrivateUser)
+        advanceUntilIdle()
+        awaitCondition { !prefs.getBoolean("lockscreen_details_enabled", true) }
+
+        assertFalse(
+            "app_prefs lockscreen_details_enabled must be false after adding new current user with private lockscreen",
+            prefs.getBoolean("lockscreen_details_enabled", true)
+        )
+    }
 }
 

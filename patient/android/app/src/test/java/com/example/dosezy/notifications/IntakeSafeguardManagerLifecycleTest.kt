@@ -973,12 +973,14 @@ class IntakeSafeguardManagerLifecycleTest {
         val prefs = context.getSharedPreferences("dosezy_intake_safeguard", Context.MODE_PRIVATE)
         assertEquals(testUser.userId, prefs.getString("user_id", null))
 
-        // Verify notification intent contains switch_to_user_id
+        // Verify notification intent contains switch_to_user_id and routes to home with target metadata (#137)
         val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
         val statusBarNotif = nManager.activeNotifications.firstOrNull { it.id == IntakeSafeguardManager.INTAKE_NOTIFICATION_BASE_ID }
         assertNotNull("Intake notification must be posted", statusBarNotif)
         val shadowPi = org.robolectric.Shadows.shadowOf(statusBarNotif!!.notification.contentIntent)
-        assertEquals("schedule", shadowPi.savedIntent.getStringExtra("fragment"))
+        assertEquals("home", shadowPi.savedIntent.getStringExtra("fragment"))
+        assertEquals(state.entryId, shadowPi.savedIntent.getStringExtra("target_entry_id"))
+        assertEquals(state.scheduledTime, shadowPi.savedIntent.getStringExtra("target_time"))
         assertEquals(testUser.userId, shadowPi.savedIntent.getStringExtra("switch_to_user_id"))
 
         // Cleanup

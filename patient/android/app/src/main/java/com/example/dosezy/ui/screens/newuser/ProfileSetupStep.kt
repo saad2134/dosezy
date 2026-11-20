@@ -5,6 +5,8 @@
 
 package com.example.dosezy.ui.screens.newuser
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -17,6 +19,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -38,8 +42,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import kotlinx.coroutines.launch
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -52,12 +55,36 @@ import com.example.dosezy.data.model.User
 import com.example.dosezy.data.model.getLocalizedName
 import com.example.dosezy.data.model.normalizeArabicDigits
 import com.example.dosezy.ui.components.ProfilePicturePicker
+import kotlinx.coroutines.launch
 
+data class ProfileValidationResult(
+    val isNameValid: Boolean,
+    val isAgeValid: Boolean,
+    val isGenderValid: Boolean
+) {
+    val isValid: Boolean get() = isNameValid && isAgeValid && isGenderValid
+}
+
+fun validateProfileForm(
+    fullName: String,
+    ageText: String,
+    gender: Gender?
+): ProfileValidationResult {
+    val parsedAge = ageText.normalizeArabicDigits().toIntOrNull() ?: 0
+    return ProfileValidationResult(
+        isNameValid = fullName.isNotBlank(),
+        isAgeValid = parsedAge > 0,
+        isGenderValid = gender != null
+    )
+}
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ProfileSetupPage(
     onComplete: (User) -> Unit,
     isDefaultUser: Boolean = false,
     onValidationChange: (Boolean) -> Unit = {},
+    onValidationError: (() -> Unit)? = null,
     setCompleteAction: (() -> Unit) -> Unit = {}
 ) {
     var fullName by remember { mutableStateOf("") }
@@ -69,22 +96,28 @@ fun ProfileSetupPage(
     var profilePicPath by remember { mutableStateOf<String?>(null) }
     var showGenderDropdown by remember { mutableStateOf(false) }
 
-    // Validation states
-    var fullNameError by remember { mutableStateOf(false) }
-    var ageError by remember { mutableStateOf(false) }
-    var genderError by remember { mutableStateOf(false) }
+    // Validation state
+    var showValidationErrors by remember { mutableStateOf(false) }
 
     // Guard: Normalize Arabic/Indic numerals before parsing age to prevent onboarding lockouts in Arabic locales
     val parsedAge = age.normalizeArabicDigits().toIntOrNull() ?: 0
 
-    // Check if form is valid
-    val isFormValid = remember(fullName, parsedAge, gender) {
-        fullName.isNotBlank() && parsedAge > 0 && gender != null
+    val validation = remember(fullName, age, gender) {
+        validateProfileForm(fullName, age, gender)
     }
+
+    val isNameError = showValidationErrors && !validation.isNameValid
+    val isAgeError = showValidationErrors && !validation.isAgeValid
+    val isGenderError = showValidationErrors && !validation.isGenderValid
 
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
+    val density = LocalDensity.current
+
+    val nameRequester = remember { BringIntoViewRequester() }
+    val ageRequester = remember { BringIntoViewRequester() }
+    val genderRequester = remember { BringIntoViewRequester() }
 
     Column(
         modifier = Modifier
@@ -159,32 +192,29 @@ fun ProfileSetupPage(
 
         // Form Fields with validation
         // Name Field
-        Column {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .bringIntoViewRequester(nameRequester)
+        ) {
             OutlinedTextField(
                 value = fullName,
-                onValueChange = {
-                    fullName = it
-                    fullNameError = it.isBlank()
-                },
+                onValueChange = { fullName = it },
                 label = { Text(stringResource(R.string.profile_full_name) + " *") },
                 placeholder = { Text(stringResource(R.string.profile_name_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = if (fullNameError) Color.Red else MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = if (fullNameError) Color.Red else MaterialTheme.colorScheme.outline,
-                    errorBorderColor = Color.Red
+                    focusedBorderColor = if (isNameError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = if (isNameError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
+                    errorBorderColor = MaterialTheme.colorScheme.error
                 ),
-                isError = fullNameError
+                isError = isNameError,
+                supportingText = if (isNameError) {
+                    { Text(text = stringResource(R.string.profile_name_required), color = MaterialTheme.colorScheme.error) }
+                } else null,
+                singleLine = true
             )
-            if (fullNameError) {
-                Text(
-                    text = stringResource(R.string.profile_name_required),
-                    color = Color.Red,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(start = 16.dp, top = 4.dp)
-                )
-            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -195,13 +225,16 @@ fun ProfileSetupPage(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Age Field
-            Column(modifier = Modifier.weight(1f)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .bringIntoViewRequester(ageRequester)
+            ) {
                 OutlinedTextField(
                     value = age,
                     onValueChange = {
                         if (it.all { char -> char.isDigit() } && it.length <= 3) {
                             age = it
-                            ageError = it.isBlank() || (it.normalizeArabicDigits().toIntOrNull() ?: 0) <= 0
                         }
                     },
                     label = { Text(stringResource(R.string.profile_age) + " *") },
@@ -209,42 +242,34 @@ fun ProfileSetupPage(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     shape = RoundedCornerShape(16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = if (ageError) Color.Red else MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = if (ageError) Color.Red else MaterialTheme.colorScheme.outline
+                        focusedBorderColor = if (isAgeError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = if (isAgeError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
+                        errorBorderColor = MaterialTheme.colorScheme.error
                     ),
-                    isError = ageError
+                    isError = isAgeError,
+                    supportingText = if (isAgeError) {
+                        { Text(text = stringResource(R.string.profile_age_required), color = MaterialTheme.colorScheme.error) }
+                    } else null,
+                    singleLine = true
                 )
-                if (ageError) {
-                    Text(
-                        text = stringResource(R.string.profile_age_required),
-                        color = Color.Red,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
-                    )
-                }
             }
 
             // Gender Field
-            Column(modifier = Modifier.weight(1f)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .bringIntoViewRequester(genderRequester)
+            ) {
                 GenderDropdown(
                     selectedGender = gender,
                     onGenderSelected = {
                         gender = it
-                        genderError = false
                     },
                     expanded = showGenderDropdown,
                     onExpandedChange = { showGenderDropdown = it },
                     modifier = Modifier.fillMaxWidth(),
-                    isError = genderError
+                    isError = isGenderError
                 )
-                if (genderError) {
-                    Text(
-                        text = stringResource(R.string.profile_gender_required),
-                        color = Color.Red,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
-                    )
-                }
             }
         }
 
@@ -262,7 +287,8 @@ fun ProfileSetupPage(
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                )
+                ),
+                singleLine = true
             )
         }
 
@@ -303,26 +329,34 @@ fun ProfileSetupPage(
         }
     }
 
-    // Validation and completion logic
-    LaunchedEffect(Unit) {
-        // Reset errors when component first loads
-        fullNameError = false
-        ageError = false
-        genderError = false
-    }
-
     // Notify parent about validation state
-    LaunchedEffect(isFormValid) {
-        onValidationChange(isFormValid)
+    LaunchedEffect(validation.isValid) {
+        onValidationChange(validation.isValid)
     }
 
     val completeSetup: () -> Unit = {
-        // Validate all fields
-        fullNameError = fullName.isBlank()
-        ageError = age.isBlank() || parsedAge <= 0
-        genderError = gender == null
-
-        if (!fullNameError && !ageError && !genderError) {
+        focusManager.clearFocus()
+        if (!validation.isValid) {
+            showValidationErrors = true
+            onValidationError?.invoke()
+            coroutineScope.launch {
+                try {
+                    when {
+                        !validation.isNameValid -> nameRequester.bringIntoView()
+                        !validation.isAgeValid -> ageRequester.bringIntoView()
+                        !validation.isGenderValid -> genderRequester.bringIntoView()
+                    }
+                } catch (_: Exception) {
+                    val targetDp = when {
+                        !validation.isNameValid -> 280.dp
+                        !validation.isAgeValid || !validation.isGenderValid -> 370.dp
+                        else -> 0.dp
+                    }
+                    val targetPx = with(density) { targetDp.roundToPx() }
+                    scrollState.animateScrollTo(targetPx)
+                }
+            }
+        } else {
             val user = User(
                 profilePicPath = profilePicPath,
                 fullName = fullName.trim(),
@@ -335,14 +369,6 @@ fun ProfileSetupPage(
                 isCurrentUser = isDefaultUser
             )
             onComplete(user)
-        } else {
-            coroutineScope.launch {
-                when {
-                    fullNameError -> scrollState.animateScrollTo(150)
-                    ageError -> scrollState.animateScrollTo(230)
-                    genderError -> scrollState.animateScrollTo(320)
-                }
-            }
         }
     }
 
@@ -362,6 +388,11 @@ fun GenderDropdown(
     modifier: Modifier = Modifier,
     isError: Boolean = false
 ) {
+    // Guard: Intercept back navigation when gender dropdown is expanded so back press closes menu instead of exiting screen (#BUG-ONBOARDING-BACK-DROPDOWN)
+    BackHandler(enabled = expanded) {
+        onExpandedChange(false)
+    }
+
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = onExpandedChange,
@@ -378,11 +409,15 @@ fun GenderDropdown(
             label = { Text(stringResource(R.string.profile_gender) + " *") },
             shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = if (isError) Color.Red else MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = if (isError) Color.Red else MaterialTheme.colorScheme.outline,
-                errorBorderColor = Color.Red
+                focusedBorderColor = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
+                errorBorderColor = MaterialTheme.colorScheme.error
             ),
-            isError = isError
+            isError = isError,
+            supportingText = if (isError) {
+                { Text(text = stringResource(R.string.profile_gender_required), color = MaterialTheme.colorScheme.error) }
+            } else null,
+            singleLine = true
         )
 
         ExposedDropdownMenu(

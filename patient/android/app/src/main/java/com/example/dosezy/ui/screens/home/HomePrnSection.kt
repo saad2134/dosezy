@@ -134,6 +134,14 @@ fun LazyListScope.homePrnSection(
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
+                            if (prnMed.frequency.asNeededIntervalHours != null && prnMed.frequency.asNeededIntervalHours > 0) {
+                                Text(
+                                    text = "⏱️ Min ${prnMed.frequency.asNeededIntervalHours}h interval",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFF1193D4),
+                                    maxLines = 1
+                                )
+                            }
                             if (!prnMed.notes.isNullOrBlank()) {
                                 Text(
                                     text = "📝 ${prnMed.notes}",

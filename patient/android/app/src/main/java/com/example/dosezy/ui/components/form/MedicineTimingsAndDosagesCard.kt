@@ -74,7 +74,18 @@ fun MedicineTimingsAndDosagesCard(
     dosageErrorMessage: String? = null,
     invalidTimeSlotKeys: Set<String> = emptySet(),
     isFrequencyError: Boolean = false,
-    frequencyErrorMessage: String? = null
+    frequencyErrorMessage: String? = null,
+    isRollingInterval: Boolean = false,
+    onRollingIntervalChange: (Boolean) -> Unit = {},
+    cycleActiveDaysText: String = "21",
+    onCycleActiveDaysChange: (String) -> Unit = {},
+    cycleRestDaysText: String = "7",
+    onCycleRestDaysChange: (String) -> Unit = {},
+    asNeededIntervalHoursText: String = "",
+    onAsNeededIntervalHoursChange: (String) -> Unit = {},
+    asNeededNotifyEligible: Boolean = true,
+    onAsNeededNotifyEligibleChange: (Boolean) -> Unit = {},
+    showSingleDosageRow: Boolean = true
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -117,7 +128,17 @@ fun MedicineTimingsAndDosagesCard(
                 selectedDaysOfWeek = selectedDaysOfWeek,
                 onDaysOfWeekChange = onDaysOfWeekChange,
                 selectedDaysOfMonth = selectedDaysOfMonth,
-                onDaysOfMonthChange = onDaysOfMonthChange
+                onDaysOfMonthChange = onDaysOfMonthChange,
+                isRollingInterval = isRollingInterval,
+                onRollingIntervalChange = onRollingIntervalChange,
+                cycleActiveDaysText = cycleActiveDaysText,
+                onCycleActiveDaysChange = onCycleActiveDaysChange,
+                cycleRestDaysText = cycleRestDaysText,
+                onCycleRestDaysChange = onCycleRestDaysChange,
+                asNeededIntervalHoursText = asNeededIntervalHoursText,
+                onAsNeededIntervalHoursChange = onAsNeededIntervalHoursChange,
+                asNeededNotifyEligible = asNeededNotifyEligible,
+                onAsNeededNotifyEligibleChange = onAsNeededNotifyEligibleChange
             )
 
             if (isFrequencyError && !frequencyErrorMessage.isNullOrBlank()) {
@@ -159,7 +180,8 @@ fun MedicineTimingsAndDosagesCard(
                 timeFormat = timeFormat,
                 isDosageError = isDosageError,
                 dosageErrorMessage = dosageErrorMessage,
-                invalidTimeSlotKeys = invalidTimeSlotKeys
+                invalidTimeSlotKeys = invalidTimeSlotKeys,
+                showSingleDosageRow = showSingleDosageRow
             )
         }
     }

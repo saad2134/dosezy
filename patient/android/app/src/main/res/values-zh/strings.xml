@@ -58,7 +58,8 @@
     <string name="form_error_course_duration">疗程必须至少为1天</string>
     <string name="form_error_fix_fields">请填写上方高亮显示的必填项</string>
     <string name="freq_daily">每天</string>
-    <string name="freq_weekly">每周</string>
+    <string name="freq_weekly">每周（指定日期）</string>
+    <string name="freq_weekly_desc">仅在选定的星期几服药。</string>
     <string name="freq_monthly">每月</string>
     <string name="freq_custom">每 X 周</string>
     <string name="form_select_days_week">选择一周中的天数</string>
@@ -508,6 +509,35 @@
     <string name="custom_recurrence_interval_label">重复间隔 (周数)</string>
     <string name="custom_recurrence_summary">每 %1$d 周在 %2$s 重复</string>
     <string name="validation_select_custom_days">请至少选择自定义重复周期的某一天</string>
+    <!-- Rolling Interval Scheduling (#119) -->
+    <string name="freq_rolling_interval_title">服药滚动间隔</string>
+    <string name="freq_rolling_interval_desc">记录服药后才开始计算下一次时间，以保持安全用药间隔</string>
+    <string name="freq_rolling_badge">滚动</string>
+
+    <!-- Cyclical & Looping Schedules (#141) -->
+    <string name="freq_cyclical">周期循环（服药期与停药期）</string>
+    <string name="freq_cyclical_desc">在服药期内连续服用，随后在停药期暂停（例如避孕药）。</string>
+    <string name="freq_cycle_format">服药 %1$d 天，停药 %2$d 天</string>
+    <string name="freq_cycle_active_days">服药天数</string>
+    <string name="freq_cycle_rest_days">停药天数</string>
+    <string name="freq_cycle_preset_21_7">21 / 7（标准）</string>
+    <string name="freq_cycle_preset_24_4">24 / 4（延长）</string>
+    <string name="freq_cycle_preset_custom">自定义</string>
+    <string name="cycle_presets_label">周期预设</string>
+
+    <!-- PRN Next Dose Eligible Alerts (#142) -->
+    <string name="freq_as_needed_interval_title">两次服药最小间隔</string>
+    <string name="freq_as_needed_interval_desc">当达到安全间隔时间并允许服用下一剂时提醒。</string>
+    <string name="freq_as_needed_interval_format">按需（至少间隔 %1$d 小时）</string>
+    <string name="freq_as_needed_notify_eligible">达到间隔时间时提醒可以服药</string>
+    <string name="freq_as_needed_interval_none">无间隔</string>
+    <string name="freq_as_needed_interval_hours_label">最小间隔（小时）</string>
+    <string name="prn_eligible_channel_name">可服用下一剂（按需药物）</string>
+    <string name="prn_eligible_channel_desc">按需药物达到最小安全服药间隔时间时的通知。</string>
+    <string name="prn_eligible_notification_title">可服用下一剂</string>
+    <string name="prn_eligible_notification_body">%2$s 的最小 %1$d 小时间隔已过。如有需要，您现在可以服用下一剂。</string>
+    <string name="prn_eligible_notification_body_generic">%1$s 的最小间隔已过。如有需要，您现在可以服用下一剂。</string>
+
     <string name="btn_log_prn_dose">记录服药</string>
     <string name="prn_doses_taken_today">今日已记录：%1$d 次</string>
     <string name="prn_section_title">按需服用药品 (PRN)</string>
@@ -700,9 +730,14 @@
     <string name="country_brazil">巴西</string>
     <string name="country_bangladesh">孟加拉国</string>
     <string name="country_australia">澳大利亚</string>
+    <string name="country_new_zealand">新西兰</string>
     <string name="pharmacy_order_refill_filter">补药筛选</string>
     <string name="pharmacy_order_days_supply">用药天数</string>
     <string name="pharmacy_order_days_format_short">%1$d 天</string>
+    <string name="pharmacy_order_days_custom">自定义</string>
+    <string name="pharmacy_order_custom_days_label">自定义用药天数（天）</string>
+    <string name="pharmacy_order_custom_days_placeholder">例如 28</string>
+    <string name="unit_days_suffix">天</string>
     <string name="pharmacy_order_medicines_include">包含药品 (%1$d/%2$d)</string>
     <string name="pharmacy_order_stock_left">剩余 %1$s</string>
     <string name="pharmacy_order_no_stock_tracked">未追踪库存</string>
@@ -845,7 +880,7 @@
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">已计划的服药提醒</string>
     <string name="pref_lockscreen_details_title">在锁定屏幕上显示详情</string>
-    <string name="pref_lockscreen_details_desc">解锁设备前在锁定屏幕上隐藏药品名称和剂量。</string>
+    <string name="pref_lockscreen_details_desc">在锁定屏幕上显示药品名称和剂量。关闭时，详细信息将在解锁设备前保持隐藏。</string>
     <string name="disclaimer_dialog_title">医疗与法律免责声明</string>
     <string name="disclaimer_dialog_summary">Dosezy 是一款自动化数字服药日程提醒工具，并非受监管的医疗器械。本应用不提供医疗诊断、剂量计算或临床建议。用药说明请务必遵从您的医生或药剂师指导。</string>
     <string name="disclaimer_checkbox_consent">我已理解并同意医疗免责声明和用户服务协议。</string>
@@ -858,7 +893,17 @@
     <string name="pdf_report_disclaimer_footer">Dosezy 药品追踪器 • 自主申报信息日志（非临床诊断记录）</string>
     <string name="pharmacy_refill_estimation_disclaimer">注意：补充药品数量为根据记录频度计算的参考估算值。请务必咨询您的药师或医生核准。</string>
     <string name="alarm_unlock_to_view_details">解锁以查看详情</string>
+    <string name="alarm_lockscreen_privacy_title">用药详情已隐藏</string>
     <string name="alarm_lockscreen_details_hidden">设备锁定时隐藏药品名称和用量。</string>
+
+    <!-- Multi-Step Medicine Form (#145) -->
+    <string name="form_step_what">基本信息</string>
+    <string name="form_step_when">用药时间</string>
+    <string name="form_step_extras">高级选项</string>
+    <string name="form_step_counter">第 %1$d 步，共 %2$d 步</string>
+    <string name="btn_next">下一步</string>
+    <string name="form_pill_appearance">药丸样式</string>
+    <string name="form_dosage_card_title">剂量与规格</string>
 
     <!-- Schedule Effective Date Selector (#105) -->
     <string name="schedule_effective_dialog_title">应用服药时间更改</string>
@@ -908,4 +953,12 @@
     <string name="sort_custom_reorder_desc">使用箭头调整药品的排列顺序。</string>
     <string name="sort_move_up">上移</string>
     <string name="sort_move_down">下移</string>
+
+    <!-- Collapsible Time Slots on Home Screen (#138) -->
+    <string name="pref_slot_rollup_title">可折叠时间段</string>
+    <string name="pref_slot_rollup_desc">允许在主屏幕上折叠和展开药物分组。默认关闭以防遗漏服药。</string>
+    <string name="home_expand_all">全部展开</string>
+    <string name="home_collapse_all">全部折叠</string>
+    <string name="home_slot_expand">展开时间段</string>
+    <string name="home_slot_collapse">折叠时间段</string>
 </resources>

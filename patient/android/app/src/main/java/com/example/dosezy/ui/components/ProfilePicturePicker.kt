@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,13 @@ import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Medication
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
 import com.example.dosezy.data.model.PillShape
 
@@ -532,112 +540,151 @@ fun MedicinePhotoVisualPicker(
         }
     }
 
-    Box(
-        modifier = modifier.size(128.dp),
-        contentAlignment = Alignment.Center
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Main Container (Squircle)
-        Surface(
-            shape = RoundedCornerShape(24.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-            border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
-            modifier = Modifier
-                .size(128.dp)
-                .clickable { showImageSourceDialog = true }
+        Box(
+            modifier = Modifier.size(128.dp),
+            contentAlignment = Alignment.Center
         ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                if (!imagePath.isNullOrEmpty()) {
-                    val modelData = remember(imagePath) { com.example.dosezy.utils.ImageUtils.resolveImageModel(imagePath) }
-                    AsyncImage(
-                        model = ImageRequest.Builder(context)
-                            .data(modelData)
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = "Medicine Image",
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(24.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    // Display Selected Pill Shape & Color in the frame!
-                    PillShapeVisual(
-                        shape = pillShape,
-                        colorHex = pillColor,
-                        size = 64.dp
-                    )
-                }
-            }
-        }
-
-        // Top-Right: Remove photo button (if photo exists - Squircle badge)
-        if (!imagePath.isNullOrEmpty()) {
+            // Main Container (Squircle) - Unobstructed medication preview
             Surface(
-                shape = RoundedCornerShape(10.dp),
-                color = MaterialTheme.colorScheme.error,
+                shape = RoundedCornerShape(24.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .size(32.dp)
+                    .size(128.dp)
                     .clickable {
-                        // Guard: Only delete uncommitted draft; defer active saved image deletion until form save to prevent data loss on cancel (#BUG-02)
-                        uncommittedDraftPath?.let { draft ->
-                            deleteOldImage(context, draft)
-                            uncommittedDraftPath = null
+                        // Guard: Direct frame tap opens relevant editor without redundant overlay badges
+                        if (!imagePath.isNullOrEmpty()) {
+                            showImageSourceDialog = true
+                        } else {
+                            showPillVisualDialog = true
                         }
-                        onImageSelected(null)
                     }
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = stringResource(R.string.image_picker_remove),
-                        tint = Color.White,
-                        modifier = Modifier.size(16.dp)
-                    )
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (!imagePath.isNullOrEmpty()) {
+                        val modelData = remember(imagePath) { com.example.dosezy.utils.ImageUtils.resolveImageModel(imagePath) }
+                        AsyncImage(
+                            model = ImageRequest.Builder(context)
+                                .data(modelData)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = "Medicine Image",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(24.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        // Display Selected Pill Shape & Color in the frame!
+                        PillShapeVisual(
+                            shape = pillShape,
+                            colorHex = pillColor,
+                            size = 64.dp
+                        )
+                    }
+                }
+            }
+
+            // Top-Right: Remove photo button (if photo exists - Squircle badge)
+            if (!imagePath.isNullOrEmpty()) {
+                Surface(
+                    shape = RoundedCornerShape(10.dp),
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .size(32.dp)
+                        .clickable {
+                            // Guard: Only delete uncommitted draft; defer active saved image deletion until form save to prevent data loss on cancel (#BUG-02)
+                            uncommittedDraftPath?.let { draft ->
+                                deleteOldImage(context, draft)
+                                uncommittedDraftPath = null
+                            }
+                            onImageSelected(null)
+                        }
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = stringResource(R.string.image_picker_remove),
+                            tint = Color.White,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
                 }
             }
         }
 
-        // Bottom-Right: Camera/Photo Picker Button (Squircle badge)
-        Surface(
-            shape = RoundedCornerShape(10.dp),
-            color = MaterialTheme.colorScheme.primary,
-            shadowElevation = 4.dp,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .size(38.dp)
-                .clickable { showImageSourceDialog = true }
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = Icons.Default.CameraAlt,
-                    contentDescription = stringResource(R.string.form_medicine_image),
-                    tint = Color.White,
-                    modifier = Modifier.size(18.dp)
-                )
-            }
-        }
+        Spacer(modifier = Modifier.height(12.dp))
 
-        // Bottom-Left: Pill Shape & Visual Dialog Button (Squircle badge)
+        // Unified Segmented Dual Action Pill: replaces duplicate corner badges with clean labeled bar
         Surface(
-            shape = RoundedCornerShape(10.dp),
-            color = parseHexColor(pillColor),
-            shadowElevation = 4.dp,
-            border = BorderStroke(2.dp, Color.White),
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .size(38.dp)
-                .clickable { showPillVisualDialog = true }
+            shape = RoundedCornerShape(12.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)),
+            modifier = Modifier.clip(RoundedCornerShape(12.dp))
         ) {
-            Box(contentAlignment = Alignment.Center) {
-                PillShapeVisual(
-                    shape = pillShape,
-                    colorHex = "#FFFFFF",
-                    size = 20.dp
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.height(38.dp)
+            ) {
+                // Segment 1: Upload / Change Photo
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp))
+                        .clickable { showImageSourceDialog = true }
+                        .padding(horizontal = 14.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CameraAlt,
+                        contentDescription = null,
+                        modifier = Modifier.size(15.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = if (!imagePath.isNullOrEmpty()) stringResource(R.string.form_change_img) else stringResource(R.string.form_upload_img),
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
+                // Subtle vertical divider between segments
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .height(20.dp)
+                        .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.25f))
                 )
+
+                // Segment 2: Pill Visual / Appearance Style
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(topEnd = 12.dp, bottomEnd = 12.dp))
+                        .clickable { showPillVisualDialog = true }
+                        .padding(horizontal = 14.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Palette,
+                        contentDescription = null,
+                        modifier = Modifier.size(15.dp),
+                        tint = parseHexColor(pillColor)
+                    )
+                    Text(
+                        text = stringResource(R.string.form_pill_appearance),
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
         }
     }
