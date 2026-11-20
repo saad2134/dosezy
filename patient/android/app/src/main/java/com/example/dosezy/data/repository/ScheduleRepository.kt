@@ -427,6 +427,12 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         if (context != null && syncSlotNotification) {
             syncSlotNotificationAndAlarms(entryId, previousEntry, context)
         }
+
+        // 6. Track user dose intake count for smart in-app review prompting (#146)
+        if (context != null && !alreadyTaken && (status == MedicationStatus.TAKEN_ON_TIME.name || status == MedicationStatus.TAKEN_LATE.name || status == "TAKEN_ON_TIME" || status == "TAKEN_LATE")) {
+            // Guard: Record successfully logged dose to satisfy minimum engagement thresholds for review prompts
+            com.example.dosezy.utils.ReviewPreferences.incrementCompletedDoses(context)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -782,6 +788,12 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
             } catch (_: Exception) {}
         }
+
+        // 5. Decrement user dose intake count for review prompting if previously taken (#146)
+        if (context != null && wasTaken) {
+            // Guard: Revert recorded intake count on undo to maintain accurate review eligibility metrics
+            com.example.dosezy.utils.ReviewPreferences.decrementCompletedDoses(context)
+        }
     }
 
     suspend fun updateDoseNotes(entryId: String, notes: String?) {
@@ -899,7 +911,59 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             try {
                 com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
             } catch (_: Exception) {}
+            // Guard: Record successfully logged PRN dose to satisfy minimum engagement thresholds for review prompts (#146)
+            com.example.dosezy.utils.ReviewPreferences.incrementCompletedDoses(context)
         }
+    }
+
+    /**
+     * Calculates the consecutive streak of days where scheduled medications were 100% completed (#146).
+     */
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun calculateAdherenceStreak(userId: String): Int {
+        val allEntries = database.scheduleDao().getAllScheduleEntries(userId)
+            .filter { !it.entryId.startsWith("PRN_") }
+        if (allEntries.isEmpty()) return 0
+
+        val groupedByDate = allEntries.groupBy { it.scheduledDateTime.toLocalDate() }
+        val today = LocalDate.now()
+
+        val todayList = groupedByDate[today]
+        val todayCompleted = todayList != null && todayList.isNotEmpty() &&
+                todayList.all {
+                    it.status == MedicationStatus.TAKEN_ON_TIME ||
+                    it.status == MedicationStatus.TAKEN_LATE ||
+                    it.status == MedicationStatus.SKIPPED
+                } &&
+                todayList.any {
+                    it.status == MedicationStatus.TAKEN_ON_TIME ||
+                    it.status == MedicationStatus.TAKEN_LATE
+                }
+
+        var streak = 0
+        var checkDate = if (todayCompleted) today else today.minusDays(1)
+
+        while (true) {
+            val dayEntries = groupedByDate[checkDate]
+            if (dayEntries.isNullOrEmpty()) break
+
+            val dayCompleted = dayEntries.all {
+                it.status == MedicationStatus.TAKEN_ON_TIME ||
+                it.status == MedicationStatus.TAKEN_LATE ||
+                it.status == MedicationStatus.SKIPPED
+            } && dayEntries.any {
+                it.status == MedicationStatus.TAKEN_ON_TIME ||
+                it.status == MedicationStatus.TAKEN_LATE
+            }
+
+            if (dayCompleted) {
+                streak++
+                checkDate = checkDate.minusDays(1)
+            } else {
+                break
+            }
+        }
+        return streak
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

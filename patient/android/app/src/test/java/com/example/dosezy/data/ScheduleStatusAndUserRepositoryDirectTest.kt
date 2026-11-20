@@ -919,7 +919,75 @@ class ScheduleStatusAndUserRepositoryDirectTest {
         assertEquals("medicines", targetIntent.getStringExtra("fragment"))
         assertEquals(user.userId, targetIntent.getStringExtra("switch_to_user_id"))
     }
+
+    @Test
+    fun calculateAdherenceStreak_evaluatesConsecutiveCompletedDays() = runBlocking {
+        val user = sampleUser("user_streak_test")
+        userDao.insertUser(user)
+
+        val med = sampleMedicine("med_streak_1", user.userId, "Daily Med")
+        medicineDao.insertMedicine(med)
+
+        val scheduleRepo = com.example.dosezy.data.repository.ScheduleRepository(db)
+
+        // 0 entries -> streak is 0
+        assertEquals(0, scheduleRepo.calculateAdherenceStreak(user.userId))
+
+        // Create 7 consecutive days of completed doses (today through today - 6 days)
+        val today = LocalDate.now()
+        val entries = (0L..6L).map { dayOffset ->
+            val date = today.minusDays(dayOffset)
+            ScheduleEntry(
+                entryId = "streak_entry_$dayOffset",
+                userId = user.userId,
+                medicineId = med.medicineId,
+                scheduledDateTime = date.atTime(9, 0),
+                takenAt = date.atTime(9, 5),
+                status = MedicationStatus.TAKEN_ON_TIME,
+                dosage = 1.0
+            )
+        }
+        scheduleDao.insertScheduleEntries(entries)
+
+        // Should detect 7-day adherence streak (#146)
+        val streak = scheduleRepo.calculateAdherenceStreak(user.userId)
+        assertEquals(7, streak)
+    }
+
+    @Test
+    fun recordDoseTaken_and_undoDoseTaken_tracksReviewPreferencesCompletedDoses() = runBlocking {
+        val user = sampleUser("user_review_doses")
+        userDao.insertUser(user)
+
+        val med = sampleMedicine("med_review_1", user.userId, "Review Med")
+        medicineDao.insertMedicine(med)
+
+        val entry = ScheduleEntry(
+            entryId = "entry_review_1",
+            userId = user.userId,
+            medicineId = med.medicineId,
+            scheduledDateTime = LocalDateTime.now(),
+            status = MedicationStatus.PENDING,
+            dosage = 1.0
+        )
+        scheduleDao.insertScheduleEntries(listOf(entry))
+
+        context.getSharedPreferences(com.example.dosezy.utils.ReviewPreferences.PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .clear()
+            .commit()
+
+        val scheduleRepo = com.example.dosezy.data.repository.ScheduleRepository(db)
+        assertEquals(0, com.example.dosezy.utils.ReviewPreferences.getCompletedDoses(context))
+
+        scheduleRepo.recordDoseTaken(entry.entryId, "TAKEN_ON_TIME", LocalDateTime.now(), context)
+        assertEquals(1, com.example.dosezy.utils.ReviewPreferences.getCompletedDoses(context))
+
+        scheduleRepo.undoDoseTaken(entry.entryId, context)
+        assertEquals(0, com.example.dosezy.utils.ReviewPreferences.getCompletedDoses(context))
+    }
 }
+
 
 
 

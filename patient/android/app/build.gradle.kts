@@ -185,6 +185,9 @@ dependencies {
 
     implementation("com.google.code.gson:gson:2.10.1")
 
+    // Google Play In-App Review (Play flavor only - keeping FOSS builds 100% clean of proprietary Google SDKs)
+    "playImplementation"("com.google.android.play:review-ktx:2.0.2")
+
     // Testing
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20231013")

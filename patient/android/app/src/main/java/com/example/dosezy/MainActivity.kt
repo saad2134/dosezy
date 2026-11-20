@@ -58,6 +58,7 @@ import com.example.dosezy.data.model.Theme
 import com.example.dosezy.notifications.AlarmActivity
 import com.example.dosezy.notifications.AlarmAudioPlayer
 import com.example.dosezy.ui.theme.DosezyTheme
+import com.example.dosezy.utils.ReviewPreferences
 import com.example.dosezy.ui.viewmodels.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -114,6 +115,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         // Guard: Do not programmatically lock portrait orientation so tablets, foldables, and desktop displays resize cleanly (#120)
+
+        // Guard: Record initial install epoch timestamp on cold start to gate review prompt eligibility (#146)
+        ReviewPreferences.recordAppLaunch(applicationContext)
 
         // Guard: Stop ringing alarm sound and vibration if cold-started from notification tap or while alarm is playing (#BUG-ALARM-TAP-STOP)
         if (intent.getBooleanExtra("from_alarm", false) || AlarmAudioPlayer.isPlaying()) {

@@ -37,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -83,6 +84,9 @@ import com.example.dosezy.utils.DateUtils
 import com.example.dosezy.utils.LocaleHelper
 import com.example.dosezy.utils.TimeCalculationUtils
 import com.example.dosezy.utils.TimeFormatUtils
+import com.example.dosezy.utils.ReviewPreferences
+import com.example.dosezy.utils.ReviewPrompterImpl
+import com.example.dosezy.utils.findActivity
 import com.example.dosezy.utils.sharedMedicineViewModel
 import com.example.dosezy.utils.sharedScheduleViewModel
 import com.example.dosezy.utils.sharedUserViewModel
@@ -138,6 +142,8 @@ fun HomeScreen(
     var markAllNotePromptSlot by remember { mutableStateOf<Pair<String, List<ScheduleWithMedicine>>?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+    val reviewPrompter = remember(context) { ReviewPrompterImpl(context) }
+    var hasPromptedReviewSession by rememberSaveable { mutableStateOf(false) }
 
     // Auto-refresh every minute for real-time updates and run immediately on load
     LaunchedEffect(currentUser) {
@@ -189,6 +195,27 @@ fun HomeScreen(
     val hasTaken = todayEntries.any {
         it.scheduleEntry.status == MedicationStatus.TAKEN_ON_TIME ||
                 it.scheduleEntry.status == MedicationStatus.TAKEN_LATE
+    }
+
+    // Guard: Present in-app review prompt on celebratory moments (all doses taken or 7/14-day adherence streak) (#146)
+    LaunchedEffect(allCompleted, hasTaken) {
+        if (allCompleted && hasTaken && !hasPromptedReviewSession) {
+            val activity = context.findActivity()
+            if (activity != null && ReviewPreferences.isEligibleForPrompt(context)) {
+                // Wait for celebratory banner animation to render and settle before prompting
+                kotlinx.coroutines.delay(1200L)
+                val streak = scheduleViewModel.getAdherenceStreak()
+                val triggerReason = if (ReviewPreferences.shouldCelebrateStreak(context, streak)) {
+                    val milestone = if (streak >= 14) 14 else 7
+                    ReviewPreferences.recordStreakCelebrated(context, streak)
+                    "streak_$milestone"
+                } else {
+                    "all_doses_taken"
+                }
+                hasPromptedReviewSession = true
+                reviewPrompter.maybePromptReview(activity, triggerReason)
+            }
+        }
     }
 
     // Check if there are any medications
