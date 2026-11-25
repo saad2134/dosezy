@@ -399,16 +399,18 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                         val nextDoseTime = takenAt.plusMinutes(intervalMinutes).withSecond(0).withNano(0)
                         val takenMillis = takenAt.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
 
-                        // Guard: Purge future pending schedule entries after takenAt to prevent schedule stacking (#119)
-                        database.scheduleDao().deleteFuturePendingScheduleEntries(medicine.medicineId, takenMillis)
+                        // Guard: Wrap deletion and re-anchored entry insertion in an atomic transaction to prevent wiped future schedules if process is interrupted (#119)
+                        database.withTransaction {
+                            database.scheduleDao().deleteFuturePendingScheduleEntries(medicine.medicineId, takenMillis)
 
-                        val reanchoredEntries = com.example.dosezy.domain.ScheduleRecurrenceEngine.generateRollingScheduleEntries(
-                            medicine = medicine,
-                            anchorDateTime = nextDoseTime,
-                            daysCount = 30
-                        )
-                        if (reanchoredEntries.isNotEmpty()) {
-                            database.scheduleDao().insertScheduleEntries(reanchoredEntries)
+                            val reanchoredEntries = com.example.dosezy.domain.ScheduleRecurrenceEngine.generateRollingScheduleEntries(
+                                medicine = medicine,
+                                anchorDateTime = nextDoseTime,
+                                daysCount = 30
+                            )
+                            if (reanchoredEntries.isNotEmpty()) {
+                                database.scheduleDao().insertScheduleEntries(reanchoredEntries)
+                            }
                         }
 
                         // Guard: Reschedule alarms whenever rolling interval re-anchoring generates new upcoming doses, regardless of syncSlotNotification, to prevent losing next rolling alarm (#119, #BUG-ROLLING-ALARM-BATCH)
@@ -723,15 +725,17 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     if (intervalMinutes != null && intervalMinutes > 0) {
                         val baseTime = previousEntry.scheduledDateTime
                         val entryMillis = baseTime.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
-                        // Guard: Purge pending schedule entries projected after baseTime to prevent orphaned rolling entries (#119)
-                        database.scheduleDao().deleteFuturePendingScheduleEntries(medicine.medicineId, entryMillis + 1000L)
-                        val restoredEntries = com.example.dosezy.domain.ScheduleRecurrenceEngine.generateRollingScheduleEntries(
-                            medicine = medicine,
-                            anchorDateTime = baseTime.plusMinutes(intervalMinutes),
-                            daysCount = 30
-                        )
-                        if (restoredEntries.isNotEmpty()) {
-                            database.scheduleDao().insertScheduleEntries(restoredEntries)
+                        // Guard: Wrap rolling interval deletion and restored entry insertion in an atomic transaction to prevent wiped future schedules on undo (#119)
+                        database.withTransaction {
+                            database.scheduleDao().deleteFuturePendingScheduleEntries(medicine.medicineId, entryMillis + 1000L)
+                            val restoredEntries = com.example.dosezy.domain.ScheduleRecurrenceEngine.generateRollingScheduleEntries(
+                                medicine = medicine,
+                                anchorDateTime = baseTime.plusMinutes(intervalMinutes),
+                                daysCount = 30
+                            )
+                            if (restoredEntries.isNotEmpty()) {
+                                database.scheduleDao().insertScheduleEntries(restoredEntries)
+                            }
                         }
                     }
                 }

@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.room.withTransaction
 import com.example.dosezy.data.DosezyDatabase
 import com.example.dosezy.data.model.Medicine
 import com.example.dosezy.data.model.ScheduleEffectiveDate
@@ -51,17 +52,13 @@ class MedicineRepository @Inject constructor(
     suspend fun insertMedicine(medicine: Medicine, context: Context? = null) {
         Log.d(TAG, "Inserting medicine: ${medicine.medicationName} for user: ${medicine.userId}")
 
-        // First insert the medicine
-        database.medicineDao().insertMedicine(medicine)
-        Log.d(TAG, "Medicine inserted successfully")
-
-        // Then generate and insert schedule entries for the next 30 days
-        val scheduleEntries = medicine.generateScheduleEntries(LocalDate.now(), 30)
-        Log.d(TAG, "Generated ${scheduleEntries.size} schedule entries")
-
-        // Guard: Batch insert schedule entries in a single Room transaction to eliminate 120+ sequential SQLite fsync operations and UI frame drops
-        database.scheduleDao().insertScheduleEntries(scheduleEntries)
-        Log.d(TAG, "All ${scheduleEntries.size} schedule entries inserted in batch")
+        // Guard: Atomically insert medicine and initial 30-day schedule entries in a single Room transaction
+        database.withTransaction {
+            database.medicineDao().insertMedicine(medicine)
+            val scheduleEntries = medicine.generateScheduleEntries(LocalDate.now(), 30)
+            database.scheduleDao().insertScheduleEntries(scheduleEntries)
+            Log.d(TAG, "Generated and batch inserted ${scheduleEntries.size} schedule entries")
+        }
 
         // SCHEDULE ALARMS IMMEDIATELY
         scheduleRepository.rescheduleAllAlarms(medicine.userId, this.context)
@@ -113,35 +110,44 @@ class MedicineRepository @Inject constructor(
                 scheduleRepository.cancelAlarmsForMedicine(medicine.medicineId, this.context)
 
                 if (effectiveDate == ScheduleEffectiveDate.TOMORROW) {
-                    // Guard: When applying schedule change starting tomorrow, keep today's schedule entries intact and only delete untaken entries from tomorrow 00:00 onwards
-                    val tomorrowStart = LocalDate.now().plusDays(1).atStartOfDay()
-                    val tomorrowEpochMillis = tomorrowStart.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
-                    database.scheduleDao().deleteUntakenScheduleEntriesFrom(medicine.medicineId, tomorrowEpochMillis)
+                    // Guard: When applying schedule change starting tomorrow, keep today's schedule entries intact and atomically delete untaken entries from tomorrow 00:00 onwards in a Room transaction
+                    database.withTransaction {
+                        val tomorrowStart = LocalDate.now().plusDays(1).atStartOfDay()
+                        val tomorrowEpochMillis = tomorrowStart.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+                        database.scheduleDao().deleteUntakenScheduleEntriesFrom(medicine.medicineId, tomorrowEpochMillis)
 
-                    // Generate new schedule entries starting from tomorrow for 30 days
-                    val newEntries = medicine.generateScheduleEntries(LocalDate.now().plusDays(1), 30)
-                    database.scheduleDao().insertScheduleEntries(newEntries)
+                        // Generate new schedule entries starting from tomorrow for 30 days
+                        val newEntries = medicine.generateScheduleEntries(LocalDate.now().plusDays(1), 30)
+                        database.scheduleDao().insertScheduleEntries(newEntries)
+                    }
                 } else {
-                    // Guard: Clamp deletion cutoff to start of today so updating schedules shortly after midnight (00:00-00:15) does not delete yesterday's untaken evening doses (#BUG-MIDNIGHT-CUTOFF)
-                    val startOfToday = LocalDate.now().atStartOfDay()
-                    val startOfTodayEpochMillis = startOfToday.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+                    // Guard: Clamp deletion cutoff to start of today and atomically regenerate entries in a Room transaction to prevent wiped schedules (#BUG-MIDNIGHT-CUTOFF)
+                    database.withTransaction {
+                        val startOfToday = LocalDate.now().atStartOfDay()
+                        val startOfTodayEpochMillis = startOfToday.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
 
-                    // Delete untaken schedule entries from start of today onwards for this medicine
-                    database.scheduleDao().deleteUntakenScheduleEntriesFrom(medicine.medicineId, startOfTodayEpochMillis)
+                        // Delete untaken schedule entries from start of today onwards for this medicine
+                        database.scheduleDao().deleteUntakenScheduleEntriesFrom(medicine.medicineId, startOfTodayEpochMillis)
 
-                    // Generate new schedule entries starting from today for 30 days
-                    val newEntries = medicine.generateScheduleEntries(LocalDate.now(), 30)
+                        // Generate new schedule entries starting from today for 30 days
+                        val newEntries = medicine.generateScheduleEntries(LocalDate.now(), 30)
 
-                    // Insert the new entries (already taken entries are preserved by OnConflictStrategy.IGNORE)
-                    database.scheduleDao().insertScheduleEntries(newEntries)
+                        // Insert the new entries (already taken entries are preserved by OnConflictStrategy.IGNORE)
+                        database.scheduleDao().insertScheduleEntries(newEntries)
+                    }
                 }
             }
         } else {
             // Fallback if old medicine wasn't in DB: cancel existing alarms first
             scheduleRepository.cancelAlarmsForMedicine(medicine.medicineId, this.context)
-            val scheduleEntries = medicine.generateScheduleEntries(LocalDate.now(), 30)
-            database.scheduleDao().deleteScheduleEntriesByMedicine(medicine.medicineId)
-            database.scheduleDao().insertScheduleEntries(scheduleEntries)
+            // Guard: Atomically delete only untaken entries from start of today and insert new entries to protect historical adherence records
+            database.withTransaction {
+                val startOfToday = LocalDate.now().atStartOfDay()
+                val startOfTodayEpochMillis = startOfToday.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+                database.scheduleDao().deleteUntakenScheduleEntriesFrom(medicine.medicineId, startOfTodayEpochMillis)
+                val scheduleEntries = medicine.generateScheduleEntries(LocalDate.now(), 30)
+                database.scheduleDao().insertScheduleEntries(scheduleEntries)
+            }
         }
 
         // Reschedule alarms for user (reconstructs grouped alarms for all active medications)

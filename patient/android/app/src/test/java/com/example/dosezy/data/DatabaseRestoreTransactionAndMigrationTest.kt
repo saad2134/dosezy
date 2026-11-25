@@ -1438,5 +1438,62 @@ class DatabaseRestoreTransactionAndMigrationTest {
         tempDir.deleteRecursively()
         Unit
     }
+
+    @Test
+    fun testRollingIntervalReanchoring_andUndo_executeAtomicallyWithinTransactions() = runBlocking {
+        // Guard: Verify rolling interval re-anchoring on recordDoseTaken and undoDoseTaken update schedules atomically in Room transactions
+        val user = User(
+            userId = "user_rolling_tx",
+            fullName = "Rolling Tx User",
+            age = 45,
+            gender = Gender.FEMALE,
+            contactNumber = "",
+            isCurrentUser = true
+        )
+        db.userDao().insertUser(user)
+
+        val rollingMed = Medicine(
+            medicineId = "med_rolling_tx",
+            userId = user.userId,
+            medicationName = "Rolling Painkiller",
+            dosage = 50.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 3,
+            frequency = Frequency(
+                pattern = FrequencyPattern.EVERY_X_HOURS,
+                intervalHours = 8,
+                isRollingInterval = true
+            ),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            startDate = LocalDate.now()
+        )
+        db.medicineDao().insertMedicine(rollingMed)
+
+        val medRepo = com.example.dosezy.data.repository.MedicineRepository(db, scheduleRepository, context)
+        medRepo.insertMedicine(rollingMed)
+
+        val initialSchedules = db.scheduleDao().getAllScheduleEntries(user.userId)
+        assertTrue("Initial schedules must be populated", initialSchedules.isNotEmpty())
+        val firstEntry = initialSchedules.sortedBy { it.scheduledDateTime }.first()
+
+        // Record dose taken: verifies transaction executes and re-anchors future doses
+        val takenTime = LocalDateTime.now()
+        scheduleRepository.recordDoseTaken(firstEntry.entryId, "TAKEN_ON_TIME", takenTime, context)
+
+        val updatedEntry = db.scheduleDao().getScheduleEntryById(firstEntry.entryId)
+        assertNotNull(updatedEntry)
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, updatedEntry?.status)
+
+        // Undo dose taken: verifies transaction executes and restores rolling interval entries
+        scheduleRepository.undoDoseTaken(firstEntry.entryId, context)
+
+        val restoredEntry = db.scheduleDao().getScheduleEntryById(firstEntry.entryId)
+        assertNotNull(restoredEntry)
+        assertEquals(MedicationStatus.PENDING, restoredEntry?.status)
+
+        // Verify untaken schedules remain intact after undo
+        val pendingCount = db.scheduleDao().getAllScheduleEntries(user.userId).count { it.status == MedicationStatus.PENDING }
+        assertTrue("Pending schedules must exist after undo transaction", pendingCount > 0)
+    }
 }
 

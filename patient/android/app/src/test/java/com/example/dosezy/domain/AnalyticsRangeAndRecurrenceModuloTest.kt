@@ -358,5 +358,43 @@ class AnalyticsRangeAndRecurrenceModuloTest {
         assertFalse("TOTAL must not appear in mini-rings breakdown", miniRingItems.any { it.range == AdherenceRange.TOTAL })
         assertFalse("ALL must not appear in mini-rings breakdown", miniRingItems.any { it.range == AdherenceRange.ALL })
     }
+
+    @Test
+    fun testScheduleRecurrenceEngine_emptyScheduledTimes_fallsBackToSaneDefaultsMatchingTimesPerDay() {
+        // Guard: Verify empty scheduledTimes generates valid reminder slots matching timesPerDay rather than producing 0 doses
+        val tomorrow = LocalDate.now().plusDays(1)
+        val med1x = Medicine(
+            medicineId = "med_empty_times_1x",
+            userId = "user_test",
+            medicationName = "Daily 1x",
+            dosage = 100.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = emptyList(),
+            startDate = tomorrow
+        )
+        val entries1x = ScheduleRecurrenceEngine.generateScheduleEntries(med1x, tomorrow, 0)
+        assertEquals(1, entries1x.size)
+        assertEquals(LocalTime.of(8, 0), entries1x[0].scheduledDateTime.toLocalTime())
+
+        val med2x = med1x.copy(
+            medicineId = "med_empty_times_2x",
+            timesPerDay = 2,
+            medicationName = "Daily 2x"
+        )
+        val entries2x = ScheduleRecurrenceEngine.generateScheduleEntries(med2x, tomorrow, 0)
+        assertEquals(2, entries2x.size)
+        assertEquals(listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)), entries2x.map { it.scheduledDateTime.toLocalTime() })
+
+        val med3x = med1x.copy(
+            medicineId = "med_empty_times_3x",
+            timesPerDay = 3,
+            medicationName = "Daily 3x"
+        )
+        val entries3x = ScheduleRecurrenceEngine.generateScheduleEntries(med3x, tomorrow, 0)
+        assertEquals(3, entries3x.size)
+        assertEquals(listOf(LocalTime.of(8, 0), LocalTime.of(14, 0), LocalTime.of(20, 0)), entries3x.map { it.scheduledDateTime.toLocalTime() })
+    }
 }
 

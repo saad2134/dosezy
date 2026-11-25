@@ -25,25 +25,25 @@ class Converters {
     @TypeConverter
     fun fromGender(gender: Gender): String = gender.name
 
-    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or lowercased enum strings (#BUG-CONVERTER-ENUM-FALLBACK)
+    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or whitespace-padded enum strings (#BUG-CONVERTER-ENUM-FALLBACK)
     @TypeConverter
-    fun toGender(gender: String): Gender = runCatching { enumValueOf<Gender>(gender.uppercase()) }.getOrDefault(Gender.DO_NOT_SPECIFY)
+    fun toGender(gender: String): Gender = runCatching { enumValueOf<Gender>(gender.trim().uppercase()) }.getOrDefault(Gender.DO_NOT_SPECIFY)
 
     // DosageUnit converters
     @TypeConverter
     fun fromDosageUnit(unit: DosageUnit): String = unit.name
 
-    // Guard: Prevent IllegalArgumentException crash on legacy or malformed enum strings; fallback to TABLET
+    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or whitespace-padded enum strings; fallback to TABLET
     @TypeConverter
-    fun toDosageUnit(unit: String): DosageUnit = runCatching { enumValueOf<DosageUnit>(unit.uppercase()) }.getOrDefault(DosageUnit.TABLET)
+    fun toDosageUnit(unit: String): DosageUnit = runCatching { enumValueOf<DosageUnit>(unit.trim().uppercase()) }.getOrDefault(DosageUnit.TABLET)
 
     // MedicationStatus converters
     @TypeConverter
     fun fromMedicationStatus(status: MedicationStatus): String = status.name
 
-    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or lowercased enum strings (#BUG-CONVERTER-ENUM-FALLBACK)
+    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or whitespace-padded enum strings (#BUG-CONVERTER-ENUM-FALLBACK)
     @TypeConverter
-    fun toMedicationStatus(status: String): MedicationStatus = runCatching { enumValueOf<MedicationStatus>(status.uppercase()) }.getOrDefault(MedicationStatus.PENDING)
+    fun toMedicationStatus(status: String): MedicationStatus = runCatching { enumValueOf<MedicationStatus>(status.trim().uppercase()) }.getOrDefault(MedicationStatus.PENDING)
 
     // LocalDateTime converters
     @RequiresApi(Build.VERSION_CODES.O)
@@ -237,23 +237,24 @@ class Converters {
     @TypeConverter
     fun fromTheme(theme: Theme): String = theme.name
 
-    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or lowercased enum strings (#BUG-CONVERTER-ENUM-FALLBACK)
+    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or whitespace-padded enum strings (#BUG-CONVERTER-ENUM-FALLBACK)
     @TypeConverter
-    fun toTheme(themeString: String): Theme = runCatching { Theme.valueOf(themeString.uppercase()) }.getOrDefault(Theme.SYSTEM)
+    fun toTheme(themeString: String): Theme = runCatching { Theme.valueOf(themeString.trim().uppercase()) }.getOrDefault(Theme.SYSTEM)
 
     @TypeConverter
     fun fromTimeFormat(timeFormat: TimeFormat): String = timeFormat.name
 
-    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or lowercased enum strings (#BUG-CONVERTER-ENUM-FALLBACK)
+    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or whitespace-padded enum strings (#BUG-CONVERTER-ENUM-FALLBACK)
     @TypeConverter
-    fun toTimeFormat(timeFormatString: String): TimeFormat = runCatching { TimeFormat.valueOf(timeFormatString.uppercase()) }.getOrDefault(TimeFormat.HOUR_12)
+    fun toTimeFormat(timeFormatString: String): TimeFormat = runCatching { TimeFormat.valueOf(timeFormatString.trim().uppercase()) }.getOrDefault(TimeFormat.HOUR_12)
 
     @TypeConverter
     fun fromLanguage(language: Language): String = language.name
 
+    // Guard: Trim whitespace before uppercase to prevent IllegalArgumentException resetting user language to SYSTEM on padded strings
     @TypeConverter
     fun toLanguage(languageString: String): Language = try {
-        Language.valueOf(languageString.uppercase())
+        Language.valueOf(languageString.trim().uppercase())
     } catch (e: Exception) {
         Language.SYSTEM
     }
@@ -261,9 +262,10 @@ class Converters {
     @TypeConverter
     fun fromAlarmSound(alarmSound: com.example.dosezy.data.model.AlarmSound): String = alarmSound.name
 
+    // Guard: Trim whitespace before uppercase to prevent IllegalArgumentException resetting user alarm sound on padded strings
     @TypeConverter
     fun toAlarmSound(alarmSoundString: String): com.example.dosezy.data.model.AlarmSound = try {
-        com.example.dosezy.data.model.AlarmSound.valueOf(alarmSoundString.uppercase())
+        com.example.dosezy.data.model.AlarmSound.valueOf(alarmSoundString.trim().uppercase())
     } catch (_: Exception) {
         com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT
     }

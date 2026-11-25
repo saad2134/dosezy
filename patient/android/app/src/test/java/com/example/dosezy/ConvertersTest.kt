@@ -493,6 +493,16 @@ class ConvertersTest {
         assertNotNull(parsedWeekly)
         assertEquals(FrequencyPattern.WEEKLY, parsedWeekly!!.pattern)
 
+        // Guard: Verify whitespace-padded parsing across all enum converters to prevent silent reset to defaults (#BUG-CONVERTER-ENUM-FALLBACK)
+        assertEquals(Theme.DARK, converters.toTheme("  dark  "))
+        assertEquals(TimeFormat.HOUR_24, converters.toTimeFormat("  hour_24  "))
+        assertEquals(Gender.FEMALE, converters.toGender("  female  "))
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, converters.toMedicationStatus("  taken_on_time  "))
+        assertEquals(DosageUnit.CAPSULE, converters.toDosageUnit("  capsule  "))
+        assertEquals(Language.ARABIC, converters.toLanguage("  arabic  "))
+        assertEquals(Language.SYSTEM, converters.toLanguage("UNKNOWN_LANGUAGE"))
+        assertEquals(com.example.dosezy.data.model.AlarmSound.GENTLE_CHIME, converters.toAlarmSound("  gentle_chime  "))
+
         // Guard: Verify ReminderType Room conversion round-trips, null safety, and case-insensitivity (#111)
         assertEquals("ALARM", converters.fromReminderType(com.example.dosezy.data.model.ReminderType.ALARM))
         assertEquals("NOTIFICATION", converters.fromReminderType(com.example.dosezy.data.model.ReminderType.NOTIFICATION))

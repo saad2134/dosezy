@@ -63,9 +63,9 @@ class DataExporter(
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun exportAllUsersToCsv(): File = exportUserData(null, ExportFormat.CSV)
 
-    // Guard: Strip directory separators and illegal filesystem characters to prevent FileNotFoundException or invalid paths
+    // Guard: Strip directory separators and illegal filesystem characters while preserving international Unicode letters (\p{L}) and numbers (\p{N}) to prevent renaming non-Latin patient profiles to "user"
     private fun sanitizeFileName(name: String): String {
-        val clean = name.trim().replace(Regex("[^a-zA-Z0-9._-]"), "_").trim('_', '.')
+        val clean = name.trim().replace(Regex("[^\\p{L}\\p{N}._-]"), "_").trim('_', '.')
         return clean.ifBlank { "user" }
     }
 
@@ -394,8 +394,8 @@ class DataExporter(
 
             // User Information Section
             csvBuilder.append("USER INFORMATION\n")
-            // Guard: Include Reminder Type in user and medicine CSV sections to preserve complete reminder configuration in tabular exports (#111)
-            csvBuilder.append("User ID,Full Name,Age,Gender,Contact Number,Allergies,Medical Conditions,Profile Picture Path,Is Current User,Reminder Type\n")
+            // Guard: Include Reminder Type and Slot Rollup in user CSV section to preserve complete configuration in tabular exports (#111, #138)
+            csvBuilder.append("User ID,Full Name,Age,Gender,Contact Number,Allergies,Medical Conditions,Profile Picture Path,Is Current User,Reminder Type,Slot Rollup Enabled\n")
             csvBuilder.append(
                 "${escapeCsv(user.userId)}," +
                 "${escapeCsv(user.fullName)}," +
@@ -406,7 +406,8 @@ class DataExporter(
                 "${escapeCsv(user.medicalConditions ?: "")}," +
                 "${escapeCsv(user.profilePicPath ?: "")}," +
                 "${user.isCurrentUser}," +
-                "${user.reminderType.name}\n\n"
+                "${user.reminderType.name}," +
+                "${user.slotRollupEnabled}\n\n"
             )
 
             // Medicines Section

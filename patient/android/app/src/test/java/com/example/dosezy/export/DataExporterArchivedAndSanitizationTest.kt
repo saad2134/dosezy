@@ -469,4 +469,56 @@ class DataExporterArchivedAndSanitizationTest {
         assertFalse("Root level isRollingInterval must be false", staticJson.getBoolean("isRollingInterval"))
         assertFalse("Nested frequency isRollingInterval must be false", staticJson.getJSONObject("frequency").getBoolean("isRollingInterval"))
     }
+
+    @Test
+    fun testDataExporter_preservesInternationalUnicodeProfileNamesInFilenames() = runTest {
+        // Guard: Verify non-Latin characters (Arabic, Cyrillic, Chinese, French) are preserved in export filenames rather than resetting to "user"
+        val mockUserRepo = mockk<UserRepository>(relaxed = true)
+        val mockMedRepo = mockk<MedicineRepository>(relaxed = true)
+        val mockSchedRepo = mockk<ScheduleRepository>(relaxed = true)
+
+        val internationalUsers = listOf(
+            Pair("أحمد محمد", "أحمد_محمد"),
+            Pair("Иван Иванов", "Иван_Иванов"),
+            Pair("李雷", "李雷"),
+            Pair("Renée Dupont", "Renée_Dupont")
+        )
+
+        val exporter = DataExporter(context, mockUserRepo, mockMedRepo, mockSchedRepo)
+
+        for ((fullName, expectedSubstring) in internationalUsers) {
+            val user = User(
+                userId = "user_${fullName.hashCode()}",
+                fullName = fullName,
+                age = 40,
+                gender = Gender.DO_NOT_SPECIFY,
+                contactNumber = "",
+                isCurrentUser = true
+            )
+            coEvery { mockUserRepo.getUserByIdSync(user.userId) } returns user
+            coEvery { mockMedRepo.getMedicinesByUserDirect(user.userId) } returns emptyList()
+            coEvery { mockSchedRepo.getSchedulesByUserSync(user.userId) } returns emptyList()
+
+            val file = exporter.exportUserToCsv(user.userId)
+            assertTrue("Filename '${file.name}' must contain expected Unicode substring '$expectedSubstring'", file.name.contains(expectedSubstring))
+            assertFalse("Filename '${file.name}' must not fallback to generic 'user'", file.name.startsWith("dosezy_export_user_"))
+        }
+    }
+
+    @Test
+    fun testBuildCsvContent_includesSlotRollupEnabledInUserInformation() {
+        // Guard: Verify Slot Rollup Enabled header and value are included in CSV User Information section (#138)
+        val user = User(
+            userId = "user_rollup",
+            fullName = "Rollup User",
+            age = 35,
+            gender = Gender.FEMALE,
+            contactNumber = "",
+            isCurrentUser = true,
+            slotRollupEnabled = true
+        )
+        val csv = DataExporter.buildCsvContent(user, emptyList(), emptyList())
+        assertTrue("CSV header must include Slot Rollup Enabled", csv.contains("Reminder Type,Slot Rollup Enabled"))
+        assertTrue("CSV row must include slotRollupEnabled value", csv.contains("${user.reminderType.name},true"))
+    }
 }
