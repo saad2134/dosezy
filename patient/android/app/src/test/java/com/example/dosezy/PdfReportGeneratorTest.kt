@@ -315,4 +315,43 @@ class PdfReportGeneratorTest {
         assertTrue("Unbroken token longer than maxWidth must be split across lines", lines.size > 1)
         assertTrue("All split chunks must fit within maxWidth", lines.all { paint.measureText(it) <= maxColWidth })
     }
+
+    @Test
+    fun testPartitionMedicines_correctlySeparatesActiveAndArchivedMedications() {
+        // Guard: Verify partitionMedicines separates active and discontinued medications for clinical PDF headers (#BUG-PDF-MED-PAGEBREAK-HEADERS)
+        val activeMeds = (1..5).map { idx ->
+            Medicine(
+                medicineId = "med_act_$idx",
+                userId = "usr_1",
+                medicationName = "Active $idx",
+                dosage = 10.0,
+                dosageUnit = DosageUnit.MG,
+                timesPerDay = 1,
+                frequency = Frequency(FrequencyPattern.DAILY),
+                scheduledTimes = listOf(LocalTime.of(8, 0)),
+                startDate = LocalDate.now(),
+                isArchived = false
+            )
+        }
+        val archivedMeds = (1..3).map { idx ->
+            Medicine(
+                medicineId = "med_arc_$idx",
+                userId = "usr_1",
+                medicationName = "Archived $idx",
+                dosage = 5.0,
+                dosageUnit = DosageUnit.TABLET,
+                timesPerDay = 1,
+                frequency = Frequency(FrequencyPattern.DAILY),
+                scheduledTimes = listOf(LocalTime.of(12, 0)),
+                startDate = LocalDate.now().minusDays(30),
+                isArchived = true
+            )
+        }
+
+        val (active, archived) = generator.partitionMedicines(activeMeds + archivedMeds)
+        assertEquals(5, active.size)
+        assertEquals(3, archived.size)
+        assertEquals("Active Medications (5)", generator.formatActiveMedicationsHeader(active.size))
+        assertEquals("Discontinued Medications (3)", generator.formatDiscontinuedMedicationsHeader(archived.size))
+    }
 }

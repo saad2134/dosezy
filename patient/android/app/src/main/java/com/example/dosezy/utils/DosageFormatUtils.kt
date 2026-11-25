@@ -28,7 +28,8 @@ object DosageFormatUtils {
      * Uses standard decimals (e.g. 0.5, 1.5, 2.5) for chemical/continuous units (MG, ML, etc.).
      */
     fun formatDosageAmount(dosage: Double, unit: DosageUnit): String {
-        if (dosage <= 0.0) return "0"
+        // Guard: Handle NaN, infinite, and non-positive dosages gracefully to prevent runtime formatting crashes
+        if (dosage <= 0.0 || dosage.isNaN() || dosage.isInfinite()) return "0"
 
         // Discrete units: format common fractional tablet/capsule doses with vulgar fractions
         if (unit == DosageUnit.TABLET || unit == DosageUnit.CAPSULE) {
@@ -89,7 +90,7 @@ object DosageFormatUtils {
      * and fractional stock balances retain exact single decimal precision ("29.5", "14.5").
      */
     fun formatStockQuantity(stock: Double?): String {
-        if (stock == null) return ""
+        if (stock == null || stock.isNaN() || stock.isInfinite()) return ""
         return formatDecimalClean(stock)
     }
 
@@ -174,16 +175,19 @@ object DosageFormatUtils {
         }
     }
 
-    // Guard: Round to 2 decimals and strip all trailing zeros/decimals cleanly to prevent "2.0" or "0.0" output from IEEE 754 float imprecision
+    // Guard: Round to 2 decimals and strip all trailing zeros/decimals cleanly; sanitize negative zero and naked minus (#BUG-DOSAGE-FLOAT-SANITIZATION)
     private fun formatDecimalClean(value: Double): String {
-        val rounded = Math.round(value * 100.0) / 100.0
-        return if (rounded % 1.0 == 0.0) {
-            rounded.toLong().toString()
+        if (value.isNaN() || value.isInfinite()) return "0"
+        val normalized = if (value in -0.005..0.0) 0.0 else value
+        val rounded = Math.round(normalized * 100.0) / 100.0
+        val finalVal = if (rounded == -0.0) 0.0 else rounded
+        return if (finalVal % 1.0 == 0.0) {
+            finalVal.toLong().toString()
         } else {
-            String.format(Locale.US, "%.2f", rounded)
+            val formatted = String.format(Locale.US, "%.2f", finalVal)
                 .trimEnd('0')
                 .trimEnd('.')
-                .ifEmpty { "0" }
+            if (formatted == "-" || formatted == "-0" || formatted.isEmpty()) "0" else formatted
         }
     }
 

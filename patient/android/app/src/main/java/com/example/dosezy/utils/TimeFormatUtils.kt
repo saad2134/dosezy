@@ -26,16 +26,20 @@ object TimeFormatUtils {
         return localTime.format(formatter)
     }
 
+    // Guard: Trim and try fallback patterns (unspaced AM/PM, single-digit 24h) to prevent DateTimeParseException (#BUG-TIME-PARSING-FLEXIBLE)
     fun parseTime(timeString: String, timeFormat: TimeFormat, locale: Locale = Locale.getDefault()): Date? {
-        val formatter = when (timeFormat) {
-            TimeFormat.HOUR_12 -> DateTimeFormatter.ofPattern("h:mm a", locale)
-            TimeFormat.HOUR_24 -> DateTimeFormatter.ofPattern("HH:mm", locale)
+        val trimmed = timeString.trim()
+        val patterns = when (timeFormat) {
+            TimeFormat.HOUR_12 -> listOf("h:mm a", "hh:mm a", "h:mma", "hh:mma")
+            TimeFormat.HOUR_24 -> listOf("HH:mm", "H:mm")
         }
-        return try {
-            val localTime = LocalTime.parse(timeString, formatter)
-            Date.from(localTime.atDate(java.time.LocalDate.now()).atZone(java.time.ZoneId.systemDefault()).toInstant())
-        } catch (e: Exception) {
-            null
+        for (pattern in patterns) {
+            try {
+                val formatter = DateTimeFormatter.ofPattern(pattern, locale)
+                val localTime = LocalTime.parse(trimmed, formatter)
+                return Date.from(localTime.atDate(java.time.LocalDate.now()).atZone(java.time.ZoneId.systemDefault()).toInstant())
+            } catch (_: Exception) {}
         }
+        return null
     }
 }

@@ -29,6 +29,11 @@ class UserPreferencesDataStoreTest {
     @Before
     fun setUp() {
         context = ApplicationProvider.getApplicationContext()
+        context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE).edit().clear().commit()
+        val datastoreFile = java.io.File(context.filesDir, "datastore/dosezy_preferences.preferences_pb")
+        if (datastoreFile.exists()) {
+            datastoreFile.delete()
+        }
         dataStore = UserPreferencesDataStore(context)
     }
 

@@ -148,4 +148,23 @@ class DosageFormatUtilsTest {
         assertEquals("bottle", DosageFormatUtils.formatOrderUnit(context, DosageUnit.DROP, PillShape.DROPS, 1))
         assertEquals("bottles", DosageFormatUtils.formatOrderUnit(context, DosageUnit.DROP, PillShape.DROPS, 2))
     }
+
+    @Test
+    fun testFormatDosageAmount_nanAndInfinity_returnsZero() {
+        // Guard: Verify NaN and Infinite inputs return "0" safely (#BUG-DOSAGE-FLOAT-SANITIZATION)
+        assertEquals("0", DosageFormatUtils.formatDosageAmount(Double.NaN, DosageUnit.TABLET))
+        assertEquals("0", DosageFormatUtils.formatDosageAmount(Double.POSITIVE_INFINITY, DosageUnit.TABLET))
+        assertEquals("0", DosageFormatUtils.formatDosageAmount(Double.NEGATIVE_INFINITY, DosageUnit.MG))
+        assertEquals("0", DosageFormatUtils.formatDosageAmount(-0.0, DosageUnit.MG))
+    }
+
+    @Test
+    fun testFormatStockQuantity_nanAndNegativeZero_sanitized() {
+        // Guard: Verify stock quantity formatting handles null, NaN, and negative zero cleanly (#BUG-DOSAGE-FLOAT-SANITIZATION)
+        assertEquals("", DosageFormatUtils.formatStockQuantity(null))
+        assertEquals("", DosageFormatUtils.formatStockQuantity(Double.NaN))
+        assertEquals("", DosageFormatUtils.formatStockQuantity(Double.POSITIVE_INFINITY))
+        assertEquals("0", DosageFormatUtils.formatStockQuantity(-0.0))
+        assertEquals("0", DosageFormatUtils.formatStockQuantity(-0.004))
+    }
 }

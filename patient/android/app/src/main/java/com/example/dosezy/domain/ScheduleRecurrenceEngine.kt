@@ -200,9 +200,11 @@ object ScheduleRecurrenceEngine {
             // Check if medicine should be taken on this day based on frequency
             if (shouldTakeOnDate(medicine, currentDate)) {
                 val now = LocalDateTime.now()
-                // Guard: Provide default reminder times matching timesPerDay if scheduledTimes list is empty to prevent generating 0 doses for active medicines
+                // Guard: Provide default reminder times matching timesPerDay if scheduledTimes list is empty to prevent generating 0 doses for active medicines; return empty if timesPerDay <= 0 (#BUG-RECURRENCE-ZERO-TIMES)
                 val effectiveTimes = if (medicine.scheduledTimes.isNotEmpty()) {
                     medicine.scheduledTimes
+                } else if (medicine.timesPerDay <= 0) {
+                    emptyList()
                 } else {
                     when (medicine.timesPerDay) {
                         1 -> listOf(LocalTime.of(8, 0))

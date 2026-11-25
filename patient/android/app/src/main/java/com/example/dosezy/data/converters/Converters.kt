@@ -279,6 +279,7 @@ class Converters {
         return obj.toString()
     }
 
+    // Guard: Parse each custom dosage entry defensively with optDouble so a single corrupt or non-numeric slot does not discard all valid dosages (#BUG-CONVERTER-CUSTOM-DOSAGE-ROBUST)
     @TypeConverter
     fun toCustomDosagesMap(value: String?): Map<String, Double>? {
         if (value.isNullOrEmpty()) return null
@@ -289,7 +290,10 @@ class Converters {
             while (keys.hasNext()) {
                 val rawKey = keys.next()
                 val normalizedKey = rawKey.normalizeArabicDigits()
-                map[normalizedKey] = obj.getDouble(rawKey)
+                val dosage = obj.optDouble(rawKey, Double.NaN)
+                if (!dosage.isNaN() && !dosage.isInfinite() && dosage > 0.0) {
+                    map[normalizedKey] = dosage
+                }
             }
             map
         } catch (_: Exception) {

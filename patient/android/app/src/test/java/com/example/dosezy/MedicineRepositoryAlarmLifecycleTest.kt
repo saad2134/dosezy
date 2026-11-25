@@ -31,16 +31,22 @@ import java.time.ZoneOffset
 
 class MedicineRepositoryAlarmLifecycleTest {
 
-    @Test
-    fun updateMedicine_whenScheduleChanges_cancelsAlarmsBEFOREDeletingUntakenEntries() = runBlocking {
+    private fun createMockDatabase(medicineDao: MedicineDao, scheduleDao: ScheduleDao): DosezyDatabase {
         val database = mockk<DosezyDatabase>(relaxed = true)
-        val medicineDao = mockk<MedicineDao>(relaxed = true)
-        val scheduleDao = mockk<ScheduleDao>(relaxed = true)
-        val scheduleRepository = mockk<ScheduleRepository>(relaxed = true)
-        val context = mockk<Context>(relaxed = true)
-
         every { database.medicineDao() } returns medicineDao
         every { database.scheduleDao() } returns scheduleDao
+        // Guard: Return synchronous direct executor to allow Room's withTransaction to execute on mock database without hanging (#BUG-MOCK-TRANSACTION-EXECUTOR)
+        every { database.transactionExecutor } returns java.util.concurrent.Executor { it.run() }
+        return database
+    }
+
+    @Test
+    fun updateMedicine_whenScheduleChanges_cancelsAlarmsBEFOREDeletingUntakenEntries() = runBlocking {
+        val medicineDao = mockk<MedicineDao>(relaxed = true)
+        val scheduleDao = mockk<ScheduleDao>(relaxed = true)
+        val database = createMockDatabase(medicineDao, scheduleDao)
+        val scheduleRepository = mockk<ScheduleRepository>(relaxed = true)
+        val context = mockk<Context>(relaxed = true)
 
         val medId = "med_test_1"
         val userId = "user_test_1"
@@ -83,14 +89,11 @@ class MedicineRepositoryAlarmLifecycleTest {
 
     @Test
     fun updateMedicine_whenScheduleUnchanged_reschedulesWithoutDeletingEntries() = runBlocking {
-        val database = mockk<DosezyDatabase>(relaxed = true)
         val medicineDao = mockk<MedicineDao>(relaxed = true)
         val scheduleDao = mockk<ScheduleDao>(relaxed = true)
+        val database = createMockDatabase(medicineDao, scheduleDao)
         val scheduleRepository = mockk<ScheduleRepository>(relaxed = true)
         val context = mockk<Context>(relaxed = true)
-
-        every { database.medicineDao() } returns medicineDao
-        every { database.scheduleDao() } returns scheduleDao
 
         val medId = "med_test_2"
         val userId = "user_test_2"
@@ -128,14 +131,11 @@ class MedicineRepositoryAlarmLifecycleTest {
 
     @Test
     fun updateMedicine_whenScheduleChanges_clampsCutoffToStartOfToday_preventingDeletionOfYesterdayDoses() = runBlocking {
-        val database = mockk<DosezyDatabase>(relaxed = true)
         val medicineDao = mockk<MedicineDao>(relaxed = true)
         val scheduleDao = mockk<ScheduleDao>(relaxed = true)
+        val database = createMockDatabase(medicineDao, scheduleDao)
         val scheduleRepository = mockk<ScheduleRepository>(relaxed = true)
         val context = mockk<Context>(relaxed = true)
-
-        every { database.medicineDao() } returns medicineDao
-        every { database.scheduleDao() } returns scheduleDao
 
         val medId = "med_test_cutoff"
         val userId = "user_test_cutoff"
@@ -170,14 +170,11 @@ class MedicineRepositoryAlarmLifecycleTest {
 
     @Test
     fun updateMedicine_whenEffectiveDateTomorrow_deletesUntakenEntriesFromTomorrowStartAndGeneratesFromTomorrow() = runBlocking {
-        val database = mockk<DosezyDatabase>(relaxed = true)
         val medicineDao = mockk<MedicineDao>(relaxed = true)
         val scheduleDao = mockk<ScheduleDao>(relaxed = true)
+        val database = createMockDatabase(medicineDao, scheduleDao)
         val scheduleRepository = mockk<ScheduleRepository>(relaxed = true)
         val context = mockk<Context>(relaxed = true)
-
-        every { database.medicineDao() } returns medicineDao
-        every { database.scheduleDao() } returns scheduleDao
 
         val medId = "med_test_tomorrow"
         val userId = "user_test_tomorrow"
@@ -217,14 +214,11 @@ class MedicineRepositoryAlarmLifecycleTest {
 
     @Test
     fun updateMedicine_whenEffectiveDateToday_deletesUntakenEntriesFromStartOfToday() = runBlocking {
-        val database = mockk<DosezyDatabase>(relaxed = true)
         val medicineDao = mockk<MedicineDao>(relaxed = true)
         val scheduleDao = mockk<ScheduleDao>(relaxed = true)
+        val database = createMockDatabase(medicineDao, scheduleDao)
         val scheduleRepository = mockk<ScheduleRepository>(relaxed = true)
         val context = mockk<Context>(relaxed = true)
-
-        every { database.medicineDao() } returns medicineDao
-        every { database.scheduleDao() } returns scheduleDao
 
         val medId = "med_test_today"
         val userId = "user_test_today"

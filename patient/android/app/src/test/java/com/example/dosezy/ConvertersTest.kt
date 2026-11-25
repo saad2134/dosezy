@@ -11,8 +11,10 @@ import com.example.dosezy.data.model.PillShape
 import com.example.dosezy.data.model.Theme
 import com.example.dosezy.data.model.TimeFormat
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -515,6 +517,19 @@ class ConvertersTest {
         assertNull(converters.toReminderType(null))
         assertNull(converters.toReminderType(""))
         assertNull(converters.toReminderType("UNKNOWN_REMINDER_TYPE"))
+    }
+
+    @Test
+    fun toCustomDosagesMap_resilientToCorruptedOrNonNumericEntries() {
+        // Guard: Verify corrupt, string, or negative slot entries do not discard valid slot entries (#BUG-CONVERTER-CUSTOM-DOSAGE-ROBUST)
+        val json = """{"08:00": 20.0, "12:00": "corrupted", "16:00": -5.0, "20:00": 10.0}"""
+        val map = converters.toCustomDosagesMap(json)
+        assertNotNull(map)
+        assertEquals(2, map!!.size)
+        assertEquals(20.0, map["08:00"]!!, 0.001)
+        assertEquals(10.0, map["20:00"]!!, 0.001)
+        assertFalse(map.containsKey("12:00"))
+        assertFalse(map.containsKey("16:00"))
     }
 }
 
