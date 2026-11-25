@@ -70,6 +70,11 @@ object ReviewPreferences {
 
         // Guard: Require minimum 5 days since first app launch before triggering first review prompt
         val firstLaunchTime = prefs.getLong(KEY_FIRST_LAUNCH_TIME, currentTimeMillis)
+        // Guard: If device clock was rolled back prior to first launch, synchronize firstLaunchTime to prevent permanent lockout (#BUG-REVIEW-CLOCK-ROLLBACK)
+        if (firstLaunchTime > currentTimeMillis) {
+            prefs.edit().putLong(KEY_FIRST_LAUNCH_TIME, currentTimeMillis).apply()
+            return false
+        }
         val daysSinceInstall = (currentTimeMillis - firstLaunchTime) / (1000L * 60 * 60 * 24)
         if (daysSinceInstall < MIN_DAYS_BEFORE_FIRST_PROMPT) return false
 
@@ -80,6 +85,10 @@ object ReviewPreferences {
         // Guard: Enforce 30-day cooldown between successive prompt attempts
         val lastPromptTime = prefs.getLong(KEY_LAST_PROMPT_TIME, 0L)
         if (lastPromptTime > 0L) {
+            // Guard: If device clock was rolled back after last prompt, enforce cooldown safely without underflow (#BUG-REVIEW-CLOCK-ROLLBACK)
+            if (lastPromptTime > currentTimeMillis) {
+                return false
+            }
             val daysSinceLastPrompt = (currentTimeMillis - lastPromptTime) / (1000L * 60 * 60 * 24)
             if (daysSinceLastPrompt < COOLDOWN_DAYS_BETWEEN_PROMPTS) return false
         }

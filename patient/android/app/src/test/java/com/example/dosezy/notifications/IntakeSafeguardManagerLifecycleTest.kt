@@ -1733,6 +1733,23 @@ class IntakeSafeguardManagerLifecycleTest {
         IntakeSafeguardManager.cancelCountdown(context)
         assertNull(IntakeSafeguardManager.getPersistedState(context))
     }
+
+    @Test
+    fun testStartCountdown_clampsNonPositiveDurationToSafeBounds() {
+        // Guard: Verify startCountdown clamps non-positive durationSeconds to at least 10s to prevent immediate re-alert (#BUG-SAFEGUARD-DURATION-BOUNDS)
+        val state = IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = "entry_duration_clamp",
+            entryIds = listOf("entry_duration_clamp"),
+            medicineName = "Clamped Med",
+            medicineNames = listOf("Clamped Med"),
+            scheduledTime = "08:00 AM",
+            durationSeconds = 0,
+            userId = "user_clamp"
+        )
+        assertEquals("Duration <= 0 must be clamped to 10s", 10, state.totalDurationSeconds)
+        assertTrue("Target timestamp must be at least 10 seconds ahead of start", state.targetTimestamp >= state.startTimestamp + 10000L)
+    }
 }
 
 

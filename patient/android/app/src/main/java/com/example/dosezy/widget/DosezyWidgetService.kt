@@ -49,12 +49,14 @@ class DosezyRemoteViewsFactory(
         val userId: String
     )
 
-    private val items = mutableListOf<WidgetItem>()
+    // Guard: Maintain items via volatile reference and atomic list assignment to prevent ConcurrentModificationException or IndexOutOfBoundsException during concurrent binder reads (#BUG-WIDGET-FACTORY-CONCURRENCY)
+    @Volatile
+    private var items: List<WidgetItem> = emptyList()
 
     override fun onCreate() {}
 
     override fun onDataSetChanged() {
-        items.clear()
+        val newItems = mutableListOf<WidgetItem>()
         try {
             val targetUserId = DosezyWidgetPrefs.getWidgetProfile(context, appWidgetId)
             isDark = DosezyAppWidgetProvider.isWidgetDark(context, targetUserId)
@@ -137,7 +139,7 @@ class DosezyRemoteViewsFactory(
                 displayEntries.forEach { entry ->
                     val med = medicines[entry.medicineId]
                     val doseStr = if (med != null) med.getDosageDisplay(entry.scheduledDateTime.toLocalTime(), entry.dosage) else ""
-                    items.add(
+                    newItems.add(
                         WidgetItem(
                             entryId = entry.entryId,
                             timeLabel = formatTimeLabel(entry),
@@ -152,17 +154,19 @@ class DosezyRemoteViewsFactory(
         } catch (e: Exception) {
             e.printStackTrace()
         }
+        items = newItems
     }
 
     override fun onDestroy() {
-        items.clear()
+        items = emptyList()
     }
 
     override fun getCount(): Int = items.size
 
     override fun getViewAt(position: Int): RemoteViews? {
-        if (position !in items.indices) return null
-        val item = items[position]
+        val currentItems = items
+        if (position !in currentItems.indices) return null
+        val item = currentItems[position]
 
         val layoutId = if (isDark) R.layout.widget_medicine_item_dark else R.layout.widget_medicine_item_light
         val views = RemoteViews(context.packageName, layoutId)

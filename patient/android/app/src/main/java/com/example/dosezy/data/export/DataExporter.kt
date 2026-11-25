@@ -559,7 +559,9 @@ class DataExporter(
             sb.append(context.getString(com.example.dosezy.R.string.pharmacy_order_patient_header, singleUser.fullName)).append("\n")
         }
         sb.append(context.getString(com.example.dosezy.R.string.pharmacy_order_date_header, dateStr)).append("\n\n")
-        sb.append("*").append(context.getString(com.example.dosezy.R.string.pharmacy_order_supply_header, supplyDays)).append("*\n\n")
+        // Guard: Coerce supplyDays to at least 1 day to prevent 0 or negative supply header text in pharmacy orders (#BUG-PHARMACY-ORDER-BOUNDS)
+        val safeSupplyDays = supplyDays.coerceAtLeast(1)
+        sb.append("*").append(context.getString(com.example.dosezy.R.string.pharmacy_order_supply_header, safeSupplyDays)).append("*\n\n")
 
         profilesWithMedicines.forEach { (profileUser, profileMeds) ->
             if (profileMeds.isEmpty()) return@forEach
@@ -569,7 +571,8 @@ class DataExporter(
             }
 
             profileMeds.forEachIndexed { index, med ->
-                val totalNeeded = customQuantities[med.medicineId] ?: med.calculateRefillQuantity(supplyDays)
+                // Guard: Coerce custom refill quantities to non-negative to prevent ordering negative units (#BUG-PHARMACY-ORDER-BOUNDS)
+                val totalNeeded = customQuantities[med.medicineId]?.coerceAtLeast(0) ?: med.calculateRefillQuantity(safeSupplyDays)
 
                 val showDosageInTitle = includeDosage && when (med.dosageUnit) {
                     com.example.dosezy.data.model.DosageUnit.MG,

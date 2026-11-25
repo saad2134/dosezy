@@ -127,7 +127,9 @@ object IntakeSafeguardManager {
         AlarmAudioPlayer.stop()
 
         val now = System.currentTimeMillis()
-        val target = now + (durationSeconds * 1000L)
+        // Guard: Clamp countdown duration (10..3600 seconds) to prevent non-positive countdown buffer or immediate alarm re-alert (#BUG-SAFEGUARD-DURATION-BOUNDS)
+        val safeDuration = durationSeconds.coerceIn(10, 3600)
+        val target = now + (safeDuration * 1000L)
         val state = IntakeCountdownState(
             entryId = entryId,
             entryIds = allTargetIds,
@@ -136,7 +138,7 @@ object IntakeSafeguardManager {
             scheduledTime = scheduledTime,
             startTimestamp = now,
             targetTimestamp = target,
-            totalDurationSeconds = durationSeconds,
+            totalDurationSeconds = safeDuration,
             userId = userId,
             notes = notes
         )

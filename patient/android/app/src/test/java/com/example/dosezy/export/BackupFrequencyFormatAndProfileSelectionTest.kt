@@ -699,4 +699,75 @@ class BackupFrequencyFormatAndProfileSelectionTest {
         assertEquals(29.5, parsedMeds[0].currentStock ?: 0.0, 0.001)
         assertEquals(5.5, parsedMeds[0].refillThreshold ?: 0.0, 0.001)
     }
+
+    @Test
+    fun testBackupRestoreManager_numericSanitization_boundsAndNanHandling() {
+        // Guard: Verify User JSON with negative or out-of-range numeric fields is clamped safely (#BUG-BACKUP-NUMERIC-SANITIZATION)
+        val userJson = """
+            {
+              "userId": "u_bounds",
+              "fullName": "Bounds User",
+              "age": -15,
+              "snoozeDuration": 0,
+              "naggingIntervalMinutes": -5,
+              "naggingMaxRepeats": 99,
+              "alarmDurationSeconds": 10000,
+              "intakeCountdownSeconds": 2
+            }
+        """.trimIndent()
+        val parsedUser = backupRestoreManager.parseUserFromJson(userJson)
+        assertEquals("Age must be clamped to at least 0", 0, parsedUser.age)
+        assertEquals("Snooze duration must be clamped to at least 1 min", 1, parsedUser.snoozeDuration)
+        assertEquals("Nagging interval must be clamped to at least 1 min", 1, parsedUser.naggingIntervalMinutes)
+        assertEquals("Nagging repeats must be clamped to at most 20", 20, parsedUser.naggingMaxRepeats)
+        assertEquals("Alarm duration must be clamped to 3600 max", 3600, parsedUser.alarmDurationSeconds)
+        assertEquals("Intake countdown must be clamped to at least 10s", 10, parsedUser.intakeCountdownSeconds)
+
+        // Guard: Verify Medicine JSON with negative or NaN values is sanitized (#BUG-BACKUP-NUMERIC-SANITIZATION)
+        val medJson = """
+            [
+              {
+                "medicineId": "m_bad_nums",
+                "userId": "u_bounds",
+                "medicationName": "Sanitized Medicine",
+                "dosage": -5.0,
+                "timesPerDay": 0,
+                "currentStock": -10.0,
+                "refillThreshold": -2.0,
+                "durationDays": -7,
+                "customDosages": {
+                  "08:00": -2.0,
+                  "12:00": 2.5
+                }
+              }
+            ]
+        """.trimIndent()
+        val parsedMeds = backupRestoreManager.parseMedicinesFromJson(medJson)
+        assertEquals(1, parsedMeds.size)
+        val med = parsedMeds[0]
+        assertEquals("Dosage <= 0 must default to 1.0", 1.0, med.dosage, 0.001)
+        assertEquals("TimesPerDay <= 0 must default to 1", 1, med.timesPerDay)
+        assertNull("Negative currentStock must be sanitized to null", med.currentStock)
+        assertNull("Negative refillThreshold must be sanitized to null", med.refillThreshold)
+        assertNull("Negative durationDays must be sanitized to null", med.durationDays)
+        assertNotNull("customDosages should preserve valid entries", med.customDosages)
+        assertFalse("Negative custom dosage must be filtered out", med.customDosages!!.containsKey("08:00"))
+        assertEquals(2.5, med.customDosages!!["12:00"] ?: 0.0, 0.001)
+
+        // Guard: Verify ScheduleEntry JSON with negative dosage is sanitized to null (#BUG-BACKUP-NUMERIC-SANITIZATION)
+        val schedJson = """
+            [
+              {
+                "entryId": "e_bad_dose",
+                "userId": "u_bounds",
+                "medicineId": "m_bad_nums",
+                "scheduledDateTime": "2026-11-26T08:00:00",
+                "dosage": -1.0
+              }
+            ]
+        """.trimIndent()
+        val parsedScheds = backupRestoreManager.parseSchedulesFromJson(schedJson)
+        assertEquals(1, parsedScheds.size)
+        assertNull("Negative schedule dosage override must be sanitized to null", parsedScheds[0].dosage)
+    }
 }

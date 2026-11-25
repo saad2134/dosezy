@@ -21,6 +21,7 @@ import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.data.repository.MedicineOrderPreferences
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -354,6 +355,17 @@ class DosezyAppWidgetProviderTest {
 
         assertEquals("e_z", sortedEntries[0].entryId)
         assertEquals("e_a", sortedEntries[1].entryId)
+    }
+
+    @Test
+    fun testWidgetServiceRemoteViewsFactory_threadSafeSnapshot() {
+        // Guard: Verify factory safely handles empty state and out of bounds position without throwing ConcurrentModificationException (#BUG-WIDGET-FACTORY-CONCURRENCY)
+        val factory = DosezyRemoteViewsFactory(context, 101, isDark = false)
+        assertEquals(0, factory.count)
+        assertNull("Out of bounds index must return null safely without throwing", factory.getViewAt(0))
+        assertNull("Negative index must return null safely", factory.getViewAt(-1))
+        factory.onDestroy()
+        assertEquals(0, factory.count)
     }
 }
 

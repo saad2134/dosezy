@@ -152,5 +152,43 @@ class ReviewPreferencesTest {
         assertFalse(ReviewPreferences.shouldCelebrateStreak(context, 14))
         assertFalse(ReviewPreferences.shouldCelebrateStreak(context, 21))
     }
+
+    @Test
+    fun testIsEligibleForPrompt_clockRollback_recoversFromFutureLaunchTimestamp() {
+        val currentTime = 10_000_000_000L
+        val futureTime = currentTime + (100 * 24 * 60 * 60 * 1000L) // Clock was set 100 days in the future
+
+        // 1. Initial launch recorded in future
+        ReviewPreferences.recordAppLaunch(context, futureTime)
+        repeat(15) { ReviewPreferences.incrementCompletedDoses(context) }
+
+        // 2. User/NTP sync fixes clock back to currentTime (firstLaunchTime > currentTime)
+        // Guard: Verify clock rollback resets firstLaunchTime and prevents permanent lockout (#BUG-REVIEW-CLOCK-ROLLBACK)
+        assertFalse(ReviewPreferences.isEligibleForPrompt(context, currentTime))
+
+        val prefs = context.getSharedPreferences(ReviewPreferences.PREFS_NAME, Context.MODE_PRIVATE)
+        assertEquals(currentTime, prefs.getLong(ReviewPreferences.KEY_FIRST_LAUNCH_TIME, 0L))
+
+        // 3. Advancing 6 days in real time should now become eligible
+        val sixDaysLater = currentTime + (6 * 24 * 60 * 60 * 1000L)
+        assertTrue(ReviewPreferences.isEligibleForPrompt(context, sixDaysLater))
+    }
+
+    @Test
+    fun testIsEligibleForPrompt_clockRollback_handlesFutureLastPromptTime() {
+        val baseTime = 10_000_000_000L
+        val oneDayMillis = 24 * 60 * 60 * 1000L
+        ReviewPreferences.recordAppLaunch(context, baseTime)
+        repeat(15) { ReviewPreferences.incrementCompletedDoses(context) }
+
+        // Future prompt time
+        val futurePromptTime = baseTime + (50 * oneDayMillis)
+        val prefs = context.getSharedPreferences(ReviewPreferences.PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putLong(ReviewPreferences.KEY_LAST_PROMPT_TIME, futurePromptTime).apply()
+
+        // Current time is before last prompt time (clock rollback)
+        val testTime = baseTime + (10 * oneDayMillis)
+        assertFalse(ReviewPreferences.isEligibleForPrompt(context, testTime))
+    }
 }
 

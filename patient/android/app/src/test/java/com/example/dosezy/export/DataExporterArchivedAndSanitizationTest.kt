@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.example.dosezy.data.export.DataExporter
 import com.example.dosezy.ui.components.ExportFormat
 import com.example.dosezy.data.model.DosageUnit
+import com.example.dosezy.data.model.Frequency
 import com.example.dosezy.data.model.FrequencyPattern
 import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.MedicationStatus
@@ -520,5 +521,46 @@ class DataExporterArchivedAndSanitizationTest {
         val csv = DataExporter.buildCsvContent(user, emptyList(), emptyList())
         assertTrue("CSV header must include Slot Rollup Enabled", csv.contains("Reminder Type,Slot Rollup Enabled"))
         assertTrue("CSV row must include slotRollupEnabled value", csv.contains("${user.reminderType.name},true"))
+    }
+
+    @Test
+    fun testConsolidatedPharmacyOrder_negativeSupplyDaysAndCustomQuantities_clampedSafely() {
+        // Guard: Verify non-positive supply days and negative custom quantities are clamped to prevent invalid order text (#BUG-PHARMACY-ORDER-BOUNDS)
+        val mockUserRepo = mockk<UserRepository>()
+        val mockMedRepo = mockk<MedicineRepository>()
+        val mockSchedRepo = mockk<ScheduleRepository>()
+        val exporter = DataExporter(context, mockUserRepo, mockMedRepo, mockSchedRepo)
+
+        val user = User(
+            userId = "u_order_bounds",
+            fullName = "Order Bounds User",
+            age = 45,
+            gender = Gender.MALE,
+            contactNumber = "555-0199"
+        )
+        val medicine = Medicine(
+            medicineId = "med_bounds_refill",
+            userId = user.userId,
+            medicationName = "Lisinopril",
+            dosage = 10.0,
+            dosageUnit = DosageUnit.TABLET,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+
+        // Pass supplyDays = 0 and negative custom quantity
+        val orderText = exporter.generateConsolidatedPharmacyOrderText(
+            profilesWithMedicines = listOf(user to listOf(medicine)),
+            supplyDays = 0,
+            customQuantities = mapOf("med_bounds_refill" to -5)
+        )
+
+        // Header must coerce supplyDays to at least 1 day
+        val expectedHeader = context.getString(com.example.dosezy.R.string.pharmacy_order_supply_header, 1)
+        assertTrue("Header must display at least 1-day supply", orderText.contains(expectedHeader))
+        // Quantity must not be negative
+        assertFalse("Order text must not contain negative quantity", orderText.contains("-5"))
+        assertTrue("Order text must clamp negative quantity to 0", orderText.contains("0"))
     }
 }
