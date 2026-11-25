@@ -164,11 +164,15 @@ class MedicineRepository @Inject constructor(
     suspend fun archiveMedicine(medicine: Medicine) {
         // 1. Cancel future alarms for this medicine
         scheduleRepository.cancelAlarmsForMedicine(medicine.medicineId, this.context)
-        // 2. Delete only future pending schedule entries (preserves all past taken/missed records!)
+        // Guard: Dismiss active refill warning notification from shade when medicine is archived
+        val nManager = this.context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
+        nManager?.cancel((medicine.medicineId + "_refill").hashCode())
+        // Guard: Atomically delete future pending entries and update archived status in a single Room transaction
         val nowMillis = java.time.LocalDateTime.now().atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
-        database.scheduleDao().deleteFuturePendingScheduleEntries(medicine.medicineId, nowMillis)
-        // 3. Mark medicine as archived
-        database.medicineDao().setArchivedStatus(medicine.medicineId, true)
+        database.withTransaction {
+            database.scheduleDao().deleteFuturePendingScheduleEntries(medicine.medicineId, nowMillis)
+            database.medicineDao().setArchivedStatus(medicine.medicineId, true)
+        }
         // 4. Reschedule remaining active alarms for user to ensure sibling medicines in slots are preserved
         scheduleRepository.rescheduleAllAlarms(medicine.userId, this.context)
         // 5. Update home widget
@@ -194,13 +198,20 @@ class MedicineRepository @Inject constructor(
             database.medicineDao().updateMedicine(updated)
             updated
         } else {
-            database.medicineDao().setArchivedStatus(medicine.medicineId, false)
             medicine.copy(isArchived = false)
         }
 
         // 2. Generate new schedule entries starting from today for 30 days
         val newEntries = activeMedicine.generateScheduleEntries(today, 30)
-        database.scheduleDao().insertScheduleEntries(newEntries)
+        // Guard: Atomically update medicine and insert regenerated schedule entries in a Room transaction
+        database.withTransaction {
+            if (activeMedicine.endDate != null && activeMedicine.endDate.isBefore(today)) {
+                database.medicineDao().updateMedicine(activeMedicine)
+            } else {
+                database.medicineDao().setArchivedStatus(medicine.medicineId, false)
+            }
+            database.scheduleDao().insertScheduleEntries(newEntries)
+        }
         // 3. Reschedule all alarms for user so grouped slots are safely reconstructed
         scheduleRepository.rescheduleAllAlarms(medicine.userId, this.context)
         // 4. Update home widget
@@ -213,10 +224,14 @@ class MedicineRepository @Inject constructor(
     suspend fun deleteMedicinePermanently(medicine: Medicine) {
         // Cancel alarms first
         scheduleRepository.cancelAlarmsForMedicine(medicine.medicineId, this.context)
-        // Delete all schedule entries
-        database.scheduleDao().deleteScheduleEntriesByMedicine(medicine.medicineId)
-        // Then delete the medicine
-        database.medicineDao().deleteMedicine(medicine)
+        // Guard: Dismiss active refill warning notification from shade when medicine is permanently deleted
+        val nManager = this.context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
+        nManager?.cancel((medicine.medicineId + "_refill").hashCode())
+        // Guard: Atomically delete schedule entries and medicine entity in a single Room transaction to prevent orphaned records
+        database.withTransaction {
+            database.scheduleDao().deleteScheduleEntriesByMedicine(medicine.medicineId)
+            database.medicineDao().deleteMedicine(medicine)
+        }
 
         // Guard: Prune deleted medicine ID from custom order sequence to prevent orphaned preference leaks in storage (#BUG-MED-REPO-DELETE-ORDER)
         try {
@@ -258,6 +273,8 @@ class MedicineRepository @Inject constructor(
             // Guard: Retrieve userId from orphaned entries before deletion to reschedule sibling alarms for shared time slots
             val orphanedEntries = database.scheduleDao().getScheduleEntriesByMedicine(medicineId)
             val affectedUserId = orphanedEntries.firstOrNull()?.userId
+            val nManager = this.context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
+            nManager?.cancel((medicineId + "_refill").hashCode())
             scheduleRepository.cancelAlarmsForMedicine(medicineId, this.context)
             database.scheduleDao().deleteScheduleEntriesByMedicine(medicineId)
             if (affectedUserId != null) {

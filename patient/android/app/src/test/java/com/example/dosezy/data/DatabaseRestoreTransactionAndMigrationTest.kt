@@ -1495,5 +1495,77 @@ class DatabaseRestoreTransactionAndMigrationTest {
         val pendingCount = db.scheduleDao().getAllScheduleEntries(user.userId).count { it.status == MedicationStatus.PENDING }
         assertTrue("Pending schedules must exist after undo transaction", pendingCount > 0)
     }
+
+    @Test
+    fun testMedicineRepository_archiveUnarchiveAndDelete_executeWithinRoomTransactions() = runBlocking {
+        val user = User(
+            userId = "user_tx_lifecycle",
+            fullName = "Tx Lifecycle User",
+            age = 35,
+            gender = Gender.DO_NOT_SPECIFY,
+            contactNumber = "",
+            isCurrentUser = true
+        )
+        db.userDao().insertUser(user)
+
+        val med = Medicine(
+            medicineId = "med_tx_lifecycle",
+            userId = user.userId,
+            medicationName = "Antibiotic Course",
+            dosage = 500.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 2,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0)),
+            startDate = LocalDate.now(),
+            currentStock = 2.0,
+            refillThreshold = 5.0
+        )
+        val medRepo = com.example.dosezy.data.repository.MedicineRepository(db, scheduleRepository, context)
+        medRepo.insertMedicine(med)
+
+        val initialSchedules = db.scheduleDao().getScheduleEntriesByMedicine(med.medicineId)
+        assertTrue("Initial schedules must be generated", initialSchedules.isNotEmpty())
+
+        // 1. Archive medicine atomically
+        medRepo.archiveMedicine(med)
+        val archivedMed = db.medicineDao().getMedicineByIdDirect(med.medicineId)
+        assertNotNull(archivedMed)
+        assertTrue("Medicine must be marked as archived", archivedMed?.isArchived == true)
+
+        // 2. Unarchive medicine atomically
+        medRepo.unarchiveMedicine(archivedMed!!)
+        val unarchivedMed = db.medicineDao().getMedicineByIdDirect(med.medicineId)
+        assertNotNull(unarchivedMed)
+        assertFalse("Medicine must not be archived after unarchive", unarchivedMed?.isArchived == true)
+
+        // 3. Delete medicine permanently atomically
+        medRepo.deleteMedicinePermanently(unarchivedMed!!)
+        assertNull("Medicine must be deleted from Room", db.medicineDao().getMedicineByIdDirect(med.medicineId))
+        assertTrue("Schedules must be cleared from Room", db.scheduleDao().getScheduleEntriesByMedicine(med.medicineId).isEmpty())
+    }
+
+    @Test
+    fun testSoundUtils_saveCustomAudio_sanitizesMalformedExtension() {
+        val tempFile = File.createTempFile("test_alarm", ".wav-special-123", context.cacheDir)
+        tempFile.writeText("sample audio data")
+
+        try {
+            val uri = android.net.Uri.fromFile(tempFile)
+            val result = com.example.dosezy.utils.SoundUtils.saveCustomAudio(context, uri)
+            assertNotNull("File must be saved successfully", result.first)
+            assertTrue("Target file must exist", result.first?.exists() == true)
+
+            val extension = result.first?.extension
+            assertNotNull(extension)
+            assertTrue(
+                "Sanitized extension must contain alphanumeric characters only",
+                extension?.all { it.isLetterOrDigit() } == true
+            )
+            assertTrue("Extension length must be <= 5 chars", (extension?.length ?: 0) <= 5)
+        } finally {
+            tempFile.delete()
+        }
+    }
 }
 

@@ -377,5 +377,35 @@ class AlarmAudioPlayerAnd24HourFormatTest {
             AlarmAudioPlayer.stop()
         }
     }
+
+    @Test
+    fun alarmAudioPlayer_playAndStop_managesAudioFocusCorrectly() {
+        // Guard: Verify that play() acquires audio focus and stop() releases audio focus (#BUG-AUDIO-FOCUS)
+        try {
+            AlarmAudioPlayer.play(context, com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT, autoSilenceSeconds = 5)
+
+            val amField = AlarmAudioPlayer::class.java.getDeclaredField("audioManager")
+            amField.isAccessible = true
+            val am = amField.get(AlarmAudioPlayer) as? android.media.AudioManager
+            assertNotNull("AudioManager must be initialized during play()", am)
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                val reqField = AlarmAudioPlayer::class.java.getDeclaredField("audioFocusRequest")
+                reqField.isAccessible = true
+                val req = reqField.get(AlarmAudioPlayer)
+                assertNotNull("AudioFocusRequest must be created on Android O+", req)
+            }
+        } finally {
+            AlarmAudioPlayer.stop()
+
+            val amField = AlarmAudioPlayer::class.java.getDeclaredField("audioManager")
+            amField.isAccessible = true
+            assertNull("audioManager must be null after stop()", amField.get(AlarmAudioPlayer))
+
+            val reqField = AlarmAudioPlayer::class.java.getDeclaredField("audioFocusRequest")
+            reqField.isAccessible = true
+            assertNull("audioFocusRequest must be null after stop()", reqField.get(AlarmAudioPlayer))
+        }
+    }
 }
 

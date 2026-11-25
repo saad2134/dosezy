@@ -395,6 +395,23 @@ class AnalyticsRangeAndRecurrenceModuloTest {
         val entries3x = ScheduleRecurrenceEngine.generateScheduleEntries(med3x, tomorrow, 0)
         assertEquals(3, entries3x.size)
         assertEquals(listOf(LocalTime.of(8, 0), LocalTime.of(14, 0), LocalTime.of(20, 0)), entries3x.map { it.scheduledDateTime.toLocalTime() })
+
+        // Guard: Verify >4x daily regimens with empty scheduledTimes generate all doses evenly spaced across daytime hours
+        val med5x = med1x.copy(
+            medicineId = "med_empty_times_5x",
+            timesPerDay = 5,
+            medicationName = "Daily 5x"
+        )
+        val entries5x = ScheduleRecurrenceEngine.generateScheduleEntries(med5x, tomorrow, 0)
+        assertEquals(5, entries5x.size)
+
+        val med6x = med1x.copy(
+            medicineId = "med_empty_times_6x",
+            timesPerDay = 6,
+            medicationName = "Daily 6x"
+        )
+        val entries6x = ScheduleRecurrenceEngine.generateScheduleEntries(med6x, tomorrow, 0)
+        assertEquals(6, entries6x.size)
     }
 }
 

@@ -88,8 +88,10 @@ class MedicineOrderPreferences @Inject constructor(
         fun getSortMode(context: Context, userId: String): MedicineSortMode {
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             val raw = prefs.getString("$KEY_SORT_MODE$userId", MedicineSortMode.DEFAULT.name)
+            // Guard: Trim and uppercase sort mode string to prevent IllegalArgumentException resetting preferences on lowercase or whitespace-padded values
+            val cleaned = raw?.trim()?.uppercase() ?: MedicineSortMode.DEFAULT.name
             return try {
-                MedicineSortMode.valueOf(raw ?: MedicineSortMode.DEFAULT.name)
+                MedicineSortMode.valueOf(cleaned)
             } catch (_: Exception) {
                 MedicineSortMode.DEFAULT
             }
@@ -119,7 +121,8 @@ class MedicineOrderPreferences @Inject constructor(
         fun setCustomOrder(context: Context, userId: String, orderedIds: List<String>) {
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             val array = JSONArray()
-            orderedIds.forEach { array.put(it) }
+            // Guard: Distinct ordered medicine IDs to prevent duplicate ID accumulation in preferences
+            orderedIds.distinct().forEach { array.put(it) }
             prefs.edit().putString("$KEY_CUSTOM_ORDER$userId", array.toString()).apply()
         }
 
@@ -164,7 +167,8 @@ class MedicineOrderPreferences @Inject constructor(
         ) {
             try {
                 val json = org.json.JSONObject(configJson)
-                val sortModeStr = json.optString("sortMode", MedicineSortMode.DEFAULT.name)
+                // Guard: Trim and uppercase sort mode string from JSON backup to prevent resetting to DEFAULT on lowercase values
+                val sortModeStr = json.optString("sortMode", MedicineSortMode.DEFAULT.name).trim().uppercase()
                 val sortMode = try {
                     MedicineSortMode.valueOf(sortModeStr)
                 } catch (_: Exception) {
@@ -201,7 +205,8 @@ class MedicineOrderPreferences @Inject constructor(
                 val json = org.json.JSONObject(configJson)
                 val existingMode = getSortMode(context, userId)
                 if (existingMode == MedicineSortMode.DEFAULT) {
-                    val sortModeStr = json.optString("sortMode", MedicineSortMode.DEFAULT.name)
+                    // Guard: Trim and uppercase sort mode string from JSON backup to prevent resetting to DEFAULT on lowercase values
+                    val sortModeStr = json.optString("sortMode", MedicineSortMode.DEFAULT.name).trim().uppercase()
                     val sortMode = try {
                         MedicineSortMode.valueOf(sortModeStr)
                     } catch (_: Exception) {

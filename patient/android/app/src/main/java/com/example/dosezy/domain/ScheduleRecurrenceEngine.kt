@@ -209,7 +209,14 @@ object ScheduleRecurrenceEngine {
                         2 -> listOf(LocalTime.of(8, 0), LocalTime.of(20, 0))
                         3 -> listOf(LocalTime.of(8, 0), LocalTime.of(14, 0), LocalTime.of(20, 0))
                         4 -> listOf(LocalTime.of(8, 0), LocalTime.of(12, 0), LocalTime.of(16, 0), LocalTime.of(20, 0))
-                        else -> listOf(LocalTime.of(8, 0))
+                        else -> {
+                            // Guard: Evenly space reminder slots between 08:00 and 22:00 for >4x daily regimens when scheduledTimes is omitted (#BUG-RECURRENCE-5X-FALLBACK)
+                            val count = medicine.timesPerDay.coerceIn(1, 12)
+                            val intervalMinutes = (14 * 60) / (count - 1).coerceAtLeast(1)
+                            (0 until count).map { i ->
+                                LocalTime.of(8, 0).plusMinutes((i * intervalMinutes).toLong())
+                            }
+                        }
                     }
                 }
 
