@@ -100,6 +100,9 @@
     <string name="hours_format">%1$d ঘণ্টা পর</string>
 
         <string name="notif_check_title">নোটিফিকেশন নির্ভরযোগ্যতা</string>
+    <string name="notif_check_summary">%2$d টির মধ্যে %1$d টি যাচাই সম্পন্ন</string>
+    <string name="notif_status_group_needs_fixing">সমাধান প্রয়োজন</string>
+    <string name="notif_status_group_all_good">সব ঠিক আছে</string>
     <string name="notif_perm_title">নোটিফিকেশন অনুমতি</string>
     <string name="notif_perm_desc">ওষুধের রিমাইন্ডার ও অ্যালার্ম পাঠানোর জন্য প্রয়োজনীয়।</string>
     <string name="notif_perm_exact_warning">নোটিফিকেশন চালু আছে • সময়মতো বাজার জন্য সঠিক অ্যালার্মের অনুমতি প্রয়োজন (অনুমতি দিতে চাপুন)</string>
@@ -242,6 +245,17 @@
     <string name="home_all_good_desc">আজ কোনো ওষুধ খাওয়ার প্রয়োজন নেই।</string>
     <string name="no_profiles_found">কোনো প্রোফাইল পাওয়া যায়নি</string>
     <string name="status_taken">গৃহীত</string>
+    <string name="status_late">দেরি</string>
+    <string name="status_partial">আংশিক</string>
+    <string name="status_upcoming">আসন্ন</string>
+    <string name="status_missed">মিস হয়েছে</string>
+    <string name="status_skipped">এড়িয়ে গেছে</string>
+    <string name="calendar_view_month">মাস</string>
+    <string name="calendar_view_week">সপ্তাহ</string>
+    <string name="calendar_prev_week">পূর্ববর্তী সপ্তাহ</string>
+    <string name="calendar_next_week">পরবর্তী সপ্তাহ</string>
+    <string name="calendar_prev_month">পূর্ববর্তী মাস</string>
+    <string name="calendar_next_month">পরবর্তী মাস</string>
 
     <string name="image_picker_select_source">ছবির উৎস নির্বাচন করুন</string>
     <string name="image_picker_choose_method">আপনি কীভাবে আপনার ছবি যোগ করতে চান তা চয়ন করুন</string>

@@ -398,7 +398,7 @@ fun ScheduleScreen(navController: NavController) {
         val target = noteEditEntry!!
         DoseNoteDialog(
             medicationName = target.medicine?.medicationName ?: "",
-            initialNote = target.scheduleEntry.doseNotes ?: "",
+            initialNote = com.example.dosezy.utils.DosageFormatUtils.extractUserNote(target.scheduleEntry.doseNotes),
             isEditing = true,
             onConfirm = { note ->
                 val entryId = target.scheduleEntry.entryId

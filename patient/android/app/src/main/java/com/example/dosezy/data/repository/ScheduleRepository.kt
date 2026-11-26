@@ -801,7 +801,20 @@ class ScheduleRepository(private val database: DosezyDatabase) {
     }
 
     suspend fun updateDoseNotes(entryId: String, notes: String?) {
-        database.scheduleDao().updateDoseNotes(entryId, notes)
+        // Guard: Preserve existing partial stock tag when updating clinical dose notes to protect stock reversal symmetry on undo (#123)
+        val existingEntry = database.scheduleDao().getScheduleEntryById(entryId)
+        val partialTag = existingEntry?.doseNotes?.let {
+            Regex("\\[Partial Stock: Took [0-9.]* of [0-9.]*\\]").find(it)?.value
+        }
+        val finalNotes = when {
+            partialTag != null && !notes.isNullOrBlank() -> {
+                val cleanUserNote = notes.replace(Regex("\\[Partial Stock: Took [0-9.]* of [0-9.]*\\]"), "").trim(' ', '|', '-')
+                if (cleanUserNote.isNotBlank()) "$cleanUserNote | $partialTag" else partialTag
+            }
+            partialTag != null -> partialTag
+            else -> notes
+        }
+        database.scheduleDao().updateDoseNotes(entryId, finalNotes)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

@@ -745,7 +745,7 @@ fun HomeScreen(
         val entryId = target.scheduleEntry.entryId
         DoseNoteDialog(
             medicationName = medName,
-            initialNote = target.scheduleEntry.doseNotes ?: "",
+            initialNote = com.example.dosezy.utils.DosageFormatUtils.extractUserNote(target.scheduleEntry.doseNotes),
             isEditing = true,
             onConfirm = { newNote ->
                 noteEditEntry = null

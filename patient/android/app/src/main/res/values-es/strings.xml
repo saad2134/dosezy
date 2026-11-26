@@ -110,6 +110,9 @@
 
     <!-- Notification Check Dialog -->
         <string name="notif_check_title">Fiabilidad de Notificaciones</string>
+    <string name="notif_check_summary">%1$d de %2$d comprobaciones superadas</string>
+    <string name="notif_status_group_needs_fixing">Requiere atención</string>
+    <string name="notif_status_group_all_good">Todo bien</string>
     <string name="notif_perm_title">Permiso de notificación</string>
     <string name="notif_perm_desc">Requerido para enviar recordatorios de dosis y alarmas.</string>
     <string name="notif_perm_exact_warning">Notificaciones activadas • Alarmas exactas necesarias para sonar a tiempo (toca para permitir)</string>
@@ -258,6 +261,17 @@
     <string name="home_all_good_desc">No es necesario tomar medicamentos hoy.</string>
     <string name="no_profiles_found">No se encontraron perfiles</string>
     <string name="status_taken">Tomado</string>
+    <string name="status_late">Tarde</string>
+    <string name="status_partial">Parcial</string>
+    <string name="status_upcoming">Próximo</string>
+    <string name="status_missed">Perdida</string>
+    <string name="status_skipped">Omitida</string>
+    <string name="calendar_view_month">Mes</string>
+    <string name="calendar_view_week">Semana</string>
+    <string name="calendar_prev_week">Semana anterior</string>
+    <string name="calendar_next_week">Semana siguiente</string>
+    <string name="calendar_prev_month">Mes anterior</string>
+    <string name="calendar_next_month">Mes siguiente</string>
 
     <string name="image_picker_select_source">Seleccionar origen de imagen</string>
     <string name="image_picker_choose_method">Elija cómo desea agregar su imagen</string>

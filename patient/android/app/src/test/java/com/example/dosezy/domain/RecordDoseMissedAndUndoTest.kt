@@ -1130,4 +1130,30 @@ class RecordDoseMissedAndUndoTest {
         assertNotNull(medAfterUndo)
         assertEquals(1.0, medAfterUndo!!.currentStock!!, 0.001)
     }
+
+    @Test
+    fun testUpdateDoseNotes_preservesExistingPartialStockTag() = runBlocking {
+        // Guard: Verify updating clinical dose notes preserves partial stock tag for undo symmetry (#123)
+        val entryId = "entry_update_notes_partial"
+        val scheduleEntry = ScheduleEntry(
+            entryId = entryId,
+            userId = testUser.userId,
+            medicineId = testMedicine.medicineId,
+            scheduledDateTime = LocalDateTime.now(),
+            status = MedicationStatus.TAKEN_ON_TIME,
+            dosage = 1.0,
+            doseNotes = "[Partial Stock: Took 1 of 2]"
+        )
+        db.scheduleDao().insertScheduleEntry(scheduleEntry)
+
+        // Updating user clinical note preserves the partial stock tag
+        scheduleRepository.updateDoseNotes(entryId, "Took with a glass of water")
+        val updated = db.scheduleDao().getScheduleEntryById(entryId)
+        assertEquals("Took with a glass of water | [Partial Stock: Took 1 of 2]", updated?.doseNotes)
+
+        // Updating with null or blank keeps the tag
+        scheduleRepository.updateDoseNotes(entryId, null)
+        val afterNull = db.scheduleDao().getScheduleEntryById(entryId)
+        assertEquals("[Partial Stock: Took 1 of 2]", afterNull?.doseNotes)
+    }
 }

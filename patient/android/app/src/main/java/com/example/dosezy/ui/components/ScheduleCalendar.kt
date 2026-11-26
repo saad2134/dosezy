@@ -1,5 +1,9 @@
 package com.example.dosezy.ui.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,33 +24,45 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CalendarViewWeek
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.FastForward
 import androidx.compose.material.icons.filled.HorizontalRule
+import androidx.compose.material.icons.filled.HourglassTop
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.PieChart
+import androidx.compose.material.icons.filled.Upcoming
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dosezy.R
 import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.data.model.ScheduleWithMedicine
@@ -56,6 +72,8 @@ import com.example.dosezy.utils.TimeFormatUtils
 import com.example.dosezy.utils.TimeCalculationUtils
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.temporal.TemporalAdjusters
+import java.time.temporal.WeekFields
 
 @Composable
 fun ScheduleCalendar(
@@ -64,15 +82,9 @@ fun ScheduleCalendar(
     onDateSelected: (LocalDate) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // Guard: Default to week strip view with one-tap month view toggle to prevent calendar from consuming half the screen (#F07)
+    var isMonthView by rememberSaveable { mutableStateOf(false) }
     var currentMonth by remember { mutableStateOf(YearMonth.from(selectedDate)) }
-
-    // Guard: Synchronize currentMonth when selectedDate changes externally (e.g. "Jump to Today" or quick date picker) to prevent stale month display
-    androidx.compose.runtime.LaunchedEffect(selectedDate) {
-        val targetMonth = YearMonth.from(selectedDate)
-        if (currentMonth != targetMonth) {
-            currentMonth = targetMonth
-        }
-    }
 
     val userViewModel: com.example.dosezy.ui.viewmodels.UserViewModel = com.example.dosezy.utils.sharedUserViewModel()
     val currentUser by userViewModel.currentUser.collectAsState()
@@ -80,16 +92,66 @@ fun ScheduleCalendar(
         com.example.dosezy.utils.LocaleHelper.getLocale(currentUser?.language ?: com.example.dosezy.data.model.Language.SYSTEM)
     }
     val firstDayOfWeek = remember(targetLocale) {
-        java.time.temporal.WeekFields.of(targetLocale).firstDayOfWeek
+        WeekFields.of(targetLocale).firstDayOfWeek
     }
 
+    var currentWeekStart by remember(firstDayOfWeek) {
+        mutableStateOf(selectedDate.with(TemporalAdjusters.previousOrSame(firstDayOfWeek)))
+    }
+
+    // Guard: Synchronize currentMonth and currentWeekStart when selectedDate changes externally (e.g. "Jump to Today" or quick date picker) to prevent stale calendar display
+    androidx.compose.runtime.LaunchedEffect(selectedDate, firstDayOfWeek) {
+        val targetMonth = YearMonth.from(selectedDate)
+        if (currentMonth != targetMonth) {
+            currentMonth = targetMonth
+        }
+        val targetWeekStart = selectedDate.with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
+        if (currentWeekStart != targetWeekStart) {
+            currentWeekStart = targetWeekStart
+        }
+    }
+
+    val displayedYearMonth = if (isMonthView) {
+        currentMonth
+    } else {
+        YearMonth.from(currentWeekStart.plusDays(3))
+    }
+
+    val monthDisplay = displayedYearMonth.month.getDisplayName(java.time.format.TextStyle.FULL, targetLocale)
+        .replaceFirstChar { it.titlecase(targetLocale) }
+    val title = "$monthDisplay ${displayedYearMonth.year}"
+
     Column(modifier = modifier) {
-        // Month Navigation
-        MonthNavigation(
-            currentMonth = currentMonth,
-            targetLocale = targetLocale,
-            onPreviousMonth = { currentMonth = currentMonth.minusMonths(1) },
-            onNextMonth = { currentMonth = currentMonth.plusMonths(1) }
+        // Navigation Header with One-Tap View Mode Toggle
+        CalendarNavigation(
+            title = title,
+            isMonthView = isMonthView,
+            prevDescription = stringResource(if (isMonthView) R.string.calendar_prev_month else R.string.calendar_prev_week),
+            nextDescription = stringResource(if (isMonthView) R.string.calendar_next_month else R.string.calendar_next_week),
+            onPrevious = {
+                if (isMonthView) {
+                    currentMonth = currentMonth.minusMonths(1)
+                } else {
+                    currentWeekStart = currentWeekStart.minusWeeks(1)
+                    currentMonth = YearMonth.from(currentWeekStart.plusDays(3))
+                }
+            },
+            onNext = {
+                if (isMonthView) {
+                    currentMonth = currentMonth.plusMonths(1)
+                } else {
+                    currentWeekStart = currentWeekStart.plusWeeks(1)
+                    currentMonth = YearMonth.from(currentWeekStart.plusDays(3))
+                }
+            },
+            onToggleViewMode = {
+                if (!isMonthView) {
+                    currentMonth = YearMonth.from(currentWeekStart.plusDays(3))
+                } else {
+                    currentWeekStart = selectedDate.with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
+                }
+                isMonthView = !isMonthView
+            }
         )
 
         // Weekday headers
@@ -98,64 +160,146 @@ fun ScheduleCalendar(
             targetLocale = targetLocale
         )
 
-        // Calendar grid
-        CalendarGrid(
-            currentMonth = currentMonth,
-            selectedDate = selectedDate,
-            scheduleEntries = scheduleEntries,
-            missedAfterMinutes = currentUser?.missedAfterMinutes ?: 360,
-            thickerHighlight = currentUser?.thickerCalendarDayHighlight == true,
-            firstDayOfWeek = firstDayOfWeek,
-            onDateSelected = { date ->
-                onDateSelected(date)
-                currentMonth = YearMonth.from(date)
+        // Calendar Body: Compact Week Strip (default) or Full Month Grid with smooth animation
+        AnimatedContent(
+            targetState = isMonthView,
+            transitionSpec = {
+                fadeIn() togetherWith fadeOut()
+            },
+            label = "calendar_view_mode"
+        ) { monthViewActive ->
+            if (monthViewActive) {
+                CalendarGrid(
+                    currentMonth = currentMonth,
+                    selectedDate = selectedDate,
+                    scheduleEntries = scheduleEntries,
+                    missedAfterMinutes = currentUser?.missedAfterMinutes ?: 360,
+                    thickerHighlight = currentUser?.thickerCalendarDayHighlight == true,
+                    firstDayOfWeek = firstDayOfWeek,
+                    onDateSelected = { date ->
+                        onDateSelected(date)
+                        currentMonth = YearMonth.from(date)
+                        currentWeekStart = date.with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
+                    }
+                )
+            } else {
+                WeekGrid(
+                    weekStartDate = currentWeekStart,
+                    selectedDate = selectedDate,
+                    scheduleEntries = scheduleEntries,
+                    missedAfterMinutes = currentUser?.missedAfterMinutes ?: 360,
+                    thickerHighlight = currentUser?.thickerCalendarDayHighlight == true,
+                    onDateSelected = { date ->
+                        onDateSelected(date)
+                        currentMonth = YearMonth.from(date)
+                    }
+                )
             }
-        )
+        }
     }
 }
 
 @Composable
-private fun MonthNavigation(
-    currentMonth: YearMonth,
-    targetLocale: java.util.Locale,
-    onPreviousMonth: () -> Unit,
-    onNextMonth: () -> Unit,
+private fun CalendarNavigation(
+    title: String,
+    isMonthView: Boolean,
+    prevDescription: String,
+    nextDescription: String,
+    onPrevious: () -> Unit,
+    onNext: () -> Unit,
+    onToggleViewMode: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 12.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = onPreviousMonth) {
+        IconButton(
+            onClick = onPrevious,
+            modifier = Modifier.size(36.dp)
+        ) {
             Icon(
                 imageVector = Icons.Default.ChevronLeft,
-                contentDescription = "Previous month"
+                contentDescription = prevDescription
             )
         }
 
-        val monthDisplay = currentMonth.month.getDisplayName(java.time.format.TextStyle.FULL, targetLocale).replaceFirstChar { it.titlecase(targetLocale) }
-
-        Text(
-            text = "$monthDisplay ${currentMonth.year}",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
-        )
-
-        IconButton(onClick = onNextMonth) {
-            Icon(
-                imageVector = Icons.Default.ChevronRight,
-                contentDescription = "Next month"
+        // Center: Clickable Month/Year Title with expand/collapse chevron
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
+                .clickable(
+                    role = Role.Button,
+                    onClickLabel = stringResource(if (isMonthView) R.string.calendar_view_week else R.string.calendar_view_month),
+                    onClick = onToggleViewMode
+                )
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
             )
+            Spacer(modifier = Modifier.width(4.dp))
+            Icon(
+                imageVector = if (isMonthView) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            // View Mode Toggle Pill (One-tap Month/Week)
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                modifier = Modifier.clickable(onClick = onToggleViewMode)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        imageVector = if (isMonthView) Icons.Default.CalendarViewWeek else Icons.Default.CalendarMonth,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Text(
+                        text = if (isMonthView) stringResource(R.string.calendar_view_week) else stringResource(R.string.calendar_view_month),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
+            IconButton(
+                onClick = onNext,
+                modifier = Modifier.size(36.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    contentDescription = nextDescription
+                )
+            }
         }
     }
 }
 
 @Composable
 private fun WeekdayHeaders(
-    firstDayOfWeek: java.time.DayOfWeek = java.time.temporal.WeekFields.of(java.util.Locale.getDefault()).firstDayOfWeek,
+    firstDayOfWeek: java.time.DayOfWeek = WeekFields.of(java.util.Locale.getDefault()).firstDayOfWeek,
     targetLocale: java.util.Locale = java.util.Locale.getDefault(),
     modifier: Modifier = Modifier
 ) {
@@ -187,6 +331,52 @@ private fun WeekdayHeaders(
 }
 
 @Composable
+private fun WeekGrid(
+    weekStartDate: LocalDate,
+    selectedDate: LocalDate,
+    scheduleEntries: List<ScheduleEntry>,
+    onDateSelected: (LocalDate) -> Unit,
+    missedAfterMinutes: Int = 360,
+    thickerHighlight: Boolean = false,
+    modifier: Modifier = Modifier
+) {
+    val entriesByDate = remember(scheduleEntries) {
+        scheduleEntries.filter { !it.entryId.startsWith("PRN_") }.groupBy { it.scheduledDateTime.toLocalDate() }
+    }
+
+    val daysOfWeek = remember(weekStartDate) {
+        (0..6).map { weekStartDate.plusDays(it.toLong()) }
+    }
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        daysOfWeek.forEach { date ->
+            val dayEntries = entriesByDate[date] ?: emptyList()
+            val statusColor = getDateStatusColor(dayEntries, missedAfterMinutes)
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .aspectRatio(1f)
+                    .padding(2.dp)
+            ) {
+                CalendarDay(
+                    day = date.dayOfMonth,
+                    isSelected = date == selectedDate,
+                    statusColor = statusColor,
+                    thickerHighlight = thickerHighlight,
+                    onClick = { onDateSelected(date) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun CalendarGrid(
     currentMonth: YearMonth,
     selectedDate: LocalDate,
@@ -194,27 +384,28 @@ private fun CalendarGrid(
     onDateSelected: (LocalDate) -> Unit,
     missedAfterMinutes: Int = 360,
     thickerHighlight: Boolean = false,
-    firstDayOfWeek: java.time.DayOfWeek = java.time.temporal.WeekFields.of(java.util.Locale.getDefault()).firstDayOfWeek,
+    firstDayOfWeek: java.time.DayOfWeek = WeekFields.of(java.util.Locale.getDefault()).firstDayOfWeek,
     modifier: Modifier = Modifier
 ) {
     val firstDayOfMonth = currentMonth.atDay(1)
     val daysInMonth = currentMonth.lengthOfMonth()
     val startOffset = (firstDayOfMonth.dayOfWeek.value - firstDayOfWeek.value + 7) % 7
 
-    // Guard: Pre-group scheduled entries by LocalDate excluding ad-hoc PRN doses so monthly calendar adherence colors and completion dots reflect strictly scheduled medication regimens (#BUG-CALENDAR-PRN)
     val entriesByDate = remember(scheduleEntries) {
         scheduleEntries.filter { !it.entryId.startsWith("PRN_") }.groupBy { it.scheduledDateTime.toLocalDate() }
     }
 
+    val totalSlots = startOffset + daysInMonth
+    val numWeeks = kotlin.math.ceil(totalSlots / 7.0).toInt().coerceIn(4, 6)
+
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        // Create rows for the calendar
         var dayCounter = 1 - startOffset
 
-        repeat(6) { // Maximum 6 weeks in a month
+        repeat(numWeeks) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -247,16 +438,8 @@ private fun CalendarGrid(
                                 thickerHighlight = thickerHighlight,
                                 onClick = { onDateSelected(date) }
                             )
-                        } else if (currentDay > 0 && currentDay <= daysInMonth + 7) {
-                            // Empty cell for days outside current month
-                            Text(
-                                text = if (currentDay > 0 && currentDay <= daysInMonth) currentDay.toString() else "",
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clickable(enabled = false) {},
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                        } else {
+                            Spacer(modifier = Modifier.fillMaxSize())
                         }
                     }
                     dayCounter++
@@ -303,34 +486,32 @@ private fun CalendarDay(
         contentAlignment = Alignment.Center
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Text(
                 text = day.toString(),
                 color = textColor,
-                fontSize = 21.sp,
+                fontSize = 20.sp,
                 fontWeight = if (thickerHighlight && isColored) FontWeight.ExtraBold else FontWeight.Bold
             )
 
-            if (isColored && !thickerHighlight) {
-                Spacer(modifier = Modifier.height(2.dp))
-                Box(
-                    modifier = Modifier
-                        .width(22.dp)
-                        .height(4.dp)
-                        .clip(RoundedCornerShape(2.dp))
-                        .background(if (isSelected) Color.White else statusColor)
-                )
-            } else if (isColored && isSelected) {
-                Spacer(modifier = Modifier.height(2.dp))
-                Box(
-                    modifier = Modifier
-                        .width(22.dp)
-                        .height(4.dp)
-                        .clip(RoundedCornerShape(2.dp))
-                        .background(Color.White)
-                )
-            }
+            // Guard: Always reserve indicator bar slot (2dp spacer + 4dp bar) so all day numbers across all rows remain 100% horizontally aligned whether or not a day has an indicator (#F07)
+            Spacer(modifier = Modifier.height(2.dp))
+            val showIndicatorBar = isColored && (!thickerHighlight || isSelected)
+            Box(
+                modifier = Modifier
+                    .width(22.dp)
+                    .height(4.dp)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(
+                        when {
+                            showIndicatorBar && isSelected -> Color.White
+                            showIndicatorBar -> statusColor
+                            else -> Color.Transparent
+                        }
+                    )
+            )
         }
     }
 }
@@ -446,11 +627,15 @@ fun ScheduleListItem(
                     maxLines = 1
                 )
             }
-            if (!entry.doseNotes.isNullOrBlank()) {
+            // Guard: Cleanly format dose notes, phrasing partial doses as "Took X of Y" without raw debug bracket tags
+            val displayNotes = com.example.dosezy.utils.DosageFormatUtils.formatDoseNoteForDisplay(entry.doseNotes)
+            val isPartialDose = (entry.status == MedicationStatus.TAKEN_ON_TIME || entry.status == MedicationStatus.TAKEN_LATE) &&
+                    (entry.doseNotes?.contains("[Partial Stock:") == true)
+            if (!displayNotes.isNullOrBlank()) {
                 Text(
-                    text = "💬 ${entry.doseNotes}",
+                    text = "💬 $displayNotes",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = if (isPartialDose) Color(0xFF0284C7) else MaterialTheme.colorScheme.primary,
                     maxLines = 1
                 )
             }
@@ -469,37 +654,46 @@ fun ScheduleListItem(
 
         Spacer(modifier = Modifier.width(16.dp))
 
-        // Status Indicator (Read-only status overview on Schedule page)
+        // Status Indicator: Clear set of states (Taken, Late, Missed, Partial, Upcoming, Skipped) with distinct icon, colour and word
         val now = java.time.LocalDateTime.now()
         val isPassed = now.isAfter(entry.scheduledDateTime)
-        
-        val resolvedStatus = when {
-            entry.status == MedicationStatus.TAKEN_ON_TIME || entry.status == MedicationStatus.TAKEN_LATE -> entry.status
-            entry.status == MedicationStatus.SKIPPED -> MedicationStatus.SKIPPED
-            entry.status == MedicationStatus.MISSED -> MedicationStatus.MISSED
-            isPassed && TimeCalculationUtils.isMissed(entry.scheduledDateTime, now, missedAfter) -> MedicationStatus.MISSED
-            else -> MedicationStatus.PENDING
-        }
+        val isTaken = entry.status == MedicationStatus.TAKEN_ON_TIME || entry.status == MedicationStatus.TAKEN_LATE
+        val isSkipped = entry.status == MedicationStatus.SKIPPED
+        val isMissed = entry.status == MedicationStatus.MISSED || (!isTaken && !isSkipped && isPassed && TimeCalculationUtils.isMissed(entry.scheduledDateTime, now, missedAfter))
+        val isPartial = isTaken && (entry.doseNotes?.contains("[Partial Stock:") == true)
+        val isLate = (entry.status == MedicationStatus.TAKEN_LATE && !isPartial) || (!isTaken && !isSkipped && isPassed && !isMissed)
 
-        val (icon, color) = when (resolvedStatus) {
-            MedicationStatus.TAKEN_ON_TIME ->
-                Pair(Icons.Default.Done, MaterialTheme.colorScheme.primary)
-            MedicationStatus.TAKEN_LATE ->
-                Pair(Icons.Default.Done, MaterialTheme.colorScheme.tertiary)
-            MedicationStatus.SKIPPED ->
-                Pair(Icons.Default.FastForward, MaterialTheme.colorScheme.outline)
-            MedicationStatus.MISSED ->
-                Pair(Icons.Default.Close, MaterialTheme.colorScheme.error)
-            MedicationStatus.PENDING ->
-                Pair(Icons.Default.HorizontalRule, MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-
-        val statusDescription = when (resolvedStatus) {
-            MedicationStatus.TAKEN_ON_TIME -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.status_taken)
-            MedicationStatus.TAKEN_LATE -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.analytics_taken_late)
-            MedicationStatus.SKIPPED -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.home_action_skipped)
-            MedicationStatus.MISSED -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.home_action_missed)
-            MedicationStatus.PENDING -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.status_pending)
+        val (icon, color, statusText) = when {
+            isPartial -> Triple(
+                Icons.Default.PieChart,
+                Color(0xFF0284C7), // Cyan / Blue
+                androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.status_partial)
+            )
+            isTaken && !isLate -> Triple(
+                Icons.Default.Done,
+                Color(0xFF10B981), // Emerald Green
+                androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.status_taken)
+            )
+            isLate -> Triple(
+                Icons.Default.HourglassTop,
+                Color(0xFFF59E0B), // Warm Amber
+                androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.status_late)
+            )
+            isMissed -> Triple(
+                Icons.Default.Close,
+                Color(0xFFEF4444), // Rose Red
+                androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.status_missed)
+            )
+            isSkipped -> Triple(
+                Icons.Default.FastForward,
+                Color(0xFF94A3B8), // Muted Slate
+                androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.status_skipped)
+            )
+            else -> Triple(
+                Icons.Default.Upcoming,
+                Color(0xFF64748B), // Slate / Muted
+                androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.status_upcoming)
+            )
         }
 
         val isLocked = entry.scheduledDateTime.isBefore(now.minusHours(48))
@@ -508,20 +702,29 @@ fun ScheduleListItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Status badge icon (Squircle frame)
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(color.copy(alpha = 0.2f)),
-                contentAlignment = Alignment.Center
+            // Status badge: distinct squircle pill with icon, colour and word
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = color.copy(alpha = 0.15f)
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = statusDescription,
-                    tint = color,
-                    modifier = Modifier.size(20.dp)
-                )
+                Row(
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = color,
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Text(
+                        text = statusText,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = color
+                    )
+                }
             }
 
             if (onClick != null) {

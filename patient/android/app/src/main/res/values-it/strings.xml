@@ -100,6 +100,9 @@
     <string name="hours_format">%1$d ora/e</string>
 
         <string name="notif_check_title">Affidabilità notifiche</string>
+    <string name="notif_check_summary">%1$d su %2$d verifiche superate</string>
+    <string name="notif_status_group_needs_fixing">Da risolvere</string>
+    <string name="notif_status_group_all_good">Tutto a posto</string>
     <string name="notif_perm_title">Autorizzazione Notifiche</string>
     <string name="notif_perm_desc">Richiesto per inviare promemoria e allarmi per i farmaci.</string>
     <string name="notif_perm_exact_warning">Notifiche attivate • Allarmi precisi necessari per suonare in orario (tocca per consentire)</string>
@@ -242,6 +245,17 @@
     <string name="home_all_good_desc">Nessun farmaco da assumere oggi.</string>
     <string name="no_profiles_found">Nessun profilo trovato</string>
     <string name="status_taken">Assunto</string>
+    <string name="status_late">In ritardo</string>
+    <string name="status_partial">Parziale</string>
+    <string name="status_upcoming">Imminente</string>
+    <string name="status_missed">Mancata</string>
+    <string name="status_skipped">Saltata</string>
+    <string name="calendar_view_month">Mese</string>
+    <string name="calendar_view_week">Settimana</string>
+    <string name="calendar_prev_week">Settimana precedente</string>
+    <string name="calendar_next_week">Settimana successiva</string>
+    <string name="calendar_prev_month">Mese precedente</string>
+    <string name="calendar_next_month">Mese successivo</string>
 
     <string name="image_picker_select_source">Seleziona origine immagine</string>
     <string name="image_picker_choose_method">Scegli come desideri aggiungere la tua foto</string>

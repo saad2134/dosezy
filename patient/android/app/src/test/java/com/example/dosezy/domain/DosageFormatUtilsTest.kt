@@ -167,4 +167,42 @@ class DosageFormatUtilsTest {
         assertEquals("0", DosageFormatUtils.formatStockQuantity(-0.0))
         assertEquals("0", DosageFormatUtils.formatStockQuantity(-0.004))
     }
+
+    @Test
+    fun testFormatDoseNoteForDisplay_partialStock_phrasedCleanly() {
+        // Guard: Verify raw debug bracketed stock tag is transformed into clean human-readable phrasing
+        assertEquals("Took 2 of 5", DosageFormatUtils.formatDoseNoteForDisplay("[Partial Stock: Took 2 of 5]"))
+        assertEquals("Took 0.5 of 1", DosageFormatUtils.formatDoseNoteForDisplay("[Partial Stock: Took 0.5 of 1]"))
+        assertEquals("Took 1.25 of 2.5", DosageFormatUtils.formatDoseNoteForDisplay("[Partial Stock: Took 1.25 of 2.5]"))
+    }
+
+    @Test
+    fun testFormatDoseNoteForDisplay_userNoteWithPartialStock_cleanSeparators() {
+        // Guard: User clinical notes and partial stock notes are joined with bullet separators
+        assertEquals("Took with food • Took 2 of 5", DosageFormatUtils.formatDoseNoteForDisplay("Took with food | [Partial Stock: Took 2 of 5]"))
+        assertEquals("Took with food • Took 2 of 5", DosageFormatUtils.formatDoseNoteForDisplay("[Partial Stock: Took 2 of 5] | Took with food"))
+        assertEquals("Took with food", DosageFormatUtils.formatDoseNoteForDisplay("Took with food"))
+    }
+
+    @Test
+    fun testFormatDoseNoteForDisplay_internalTagsStripped() {
+        // Guard: Automated internal tags like [Logged retrospectively] are stripped from UI display
+        assertEquals(null, DosageFormatUtils.formatDoseNoteForDisplay("[Logged retrospectively]"))
+        assertEquals("Took with food", DosageFormatUtils.formatDoseNoteForDisplay("Took with food | [Logged retrospectively]"))
+        assertEquals("Took with food • Took 2 of 5", DosageFormatUtils.formatDoseNoteForDisplay("Took with food | [Partial Stock: Took 2 of 5] | [Logged retrospectively]"))
+        assertEquals(null, DosageFormatUtils.formatDoseNoteForDisplay(null))
+        assertEquals(null, DosageFormatUtils.formatDoseNoteForDisplay(""))
+        assertEquals(null, DosageFormatUtils.formatDoseNoteForDisplay("   "))
+    }
+
+    @Test
+    fun testExtractUserNote() {
+        // Guard: Pre-populating note editing dialogs strips system tags and leaves purely user-authored text
+        assertEquals("", DosageFormatUtils.extractUserNote("[Partial Stock: Took 2 of 5]"))
+        assertEquals("With food", DosageFormatUtils.extractUserNote("With food | [Partial Stock: Took 2 of 5]"))
+        assertEquals("With food", DosageFormatUtils.extractUserNote("With food | [Logged retrospectively]"))
+        assertEquals("", DosageFormatUtils.extractUserNote("[Logged retrospectively]"))
+        assertEquals("", DosageFormatUtils.extractUserNote(null))
+        assertEquals("", DosageFormatUtils.extractUserNote(""))
+    }
 }

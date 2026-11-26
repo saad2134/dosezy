@@ -46,6 +46,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -104,7 +107,7 @@ fun NotificationStatusDialog(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.notif_check_title),
+                        text = stringResource(com.example.dosezy.R.string.notif_check_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -113,19 +116,72 @@ fun NotificationStatusDialog(
                     RotatingSyncIcon()
                 }
 
+                val totalChecks = notificationStatuses.size
+                val passedChecks = notificationStatuses.count { it.isPassed && !it.isWarning }
+                val needsFixing = notificationStatuses.filter { !it.isPassed || it.isWarning }
+                val allGood = notificationStatuses.filter { it.isPassed && !it.isWarning }
+
+                // Summary below the title (e.g., "2 of 6 checks passed")
+                if (totalChecks > 0) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(
+                            com.example.dosezy.R.string.notif_check_summary,
+                            passedChecks,
+                            totalChecks
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(14.dp))
 
-                // Status List
+                // Status List: split into Needs Fixing (red items first) and All Good (green items)
                 Column(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    notificationStatuses.forEach { status ->
-                        NotificationStatusItem(
-                            status = status,
-                            onClick = {
-                                status.onFixClick?.invoke()
-                            }
+                    if (needsFixing.isNotEmpty()) {
+                        Text(
+                            text = stringResource(com.example.dosezy.R.string.notif_status_group_needs_fixing),
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 4.dp, top = 2.dp, bottom = 2.dp)
+                                .semantics { heading() }
                         )
+                        needsFixing.forEach { status ->
+                            NotificationStatusItem(
+                                status = status,
+                                onClick = {
+                                    status.onFixClick?.invoke()
+                                }
+                            )
+                        }
+                    }
+
+                    if (allGood.isNotEmpty()) {
+                        Text(
+                            text = stringResource(com.example.dosezy.R.string.notif_status_group_all_good),
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 4.dp, top = if (needsFixing.isNotEmpty()) 10.dp else 2.dp, bottom = 2.dp)
+                                .semantics { heading() }
+                        )
+                        allGood.forEach { status ->
+                            NotificationStatusItem(
+                                status = status,
+                                onClick = {
+                                    status.onFixClick?.invoke()
+                                }
+                            )
+                        }
                     }
                 }
 

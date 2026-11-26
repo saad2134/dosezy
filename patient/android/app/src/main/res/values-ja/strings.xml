@@ -100,6 +100,9 @@
     <string name="hours_format">%1$d 時間後</string>
 
         <string name="notif_check_title">通知の信頼性</string>
+    <string name="notif_check_summary">%2$d 項目中 %1$d 項目合格</string>
+    <string name="notif_status_group_needs_fixing">要修正</string>
+    <string name="notif_status_group_all_good">問題なし</string>
     <string name="notif_perm_title">通知権限</string>
     <string name="notif_perm_desc">服薬リマインダーとアラームを送信するために必要です。</string>
     <string name="notif_perm_exact_warning">通知は有効です • 定刻に鳴らすには正確なアラーム権限が必要です（タップして許可）</string>
@@ -242,6 +245,17 @@
     <string name="home_all_good_desc">今日服用する必要のある薬はありません。</string>
     <string name="no_profiles_found">プロフィールが見つかりません</string>
     <string name="status_taken">服用済み</string>
+    <string name="status_late">遅延</string>
+    <string name="status_partial">一部服用</string>
+    <string name="status_upcoming">予定</string>
+    <string name="status_missed">未服用</string>
+    <string name="status_skipped">スキップ</string>
+    <string name="calendar_view_month">月</string>
+    <string name="calendar_view_week">週</string>
+    <string name="calendar_prev_week">前の週</string>
+    <string name="calendar_next_week">次の週</string>
+    <string name="calendar_prev_month">前の月</string>
+    <string name="calendar_next_month">次の月</string>
 
     <string name="image_picker_select_source">画像ソースの選択</string>
     <string name="image_picker_choose_method">写真の追加方法を選択してください</string>

@@ -110,6 +110,9 @@
 
     <!-- Notification Check Dialog -->
         <string name="notif_check_title">सूचना विश्वसनीयता</string>
+    <string name="notif_check_summary">%2$d में से %1$d जाँच पास हुईं</string>
+    <string name="notif_status_group_needs_fixing">सुधार की आवश्यकता है</string>
+    <string name="notif_status_group_all_good">सब ठीक है</string>
     <string name="notif_perm_title">सूचना अनुमति</string>
     <string name="notif_perm_desc">दवा रिमाइंडर और अलार्म भेजने के लिए आवश्यक।</string>
     <string name="notif_perm_exact_warning">सूचनाएं चालू हैं • समय पर अलार्म बजने के लिए सटीक अलार्म की अनुमति दें (अनुमति देने के लिए टैप करें)</string>
@@ -258,6 +261,17 @@
     <string name="home_all_good_desc">आज कोई दवा लेने की आवश्यकता नहीं है।</string>
     <string name="no_profiles_found">कोई प्रोफ़ाइल नहीं मिली</string>
     <string name="status_taken">लिया गया</string>
+    <string name="status_late">देर से</string>
+    <string name="status_partial">आंशिक</string>
+    <string name="status_upcoming">आगामी</string>
+    <string name="status_missed">छूटी हुई</string>
+    <string name="status_skipped">छोड़ी गई</string>
+    <string name="calendar_view_month">महीना</string>
+    <string name="calendar_view_week">सप्ताह</string>
+    <string name="calendar_prev_week">पिछला सप्ताह</string>
+    <string name="calendar_next_week">अगला सप्ताह</string>
+    <string name="calendar_prev_month">पिछला महीना</string>
+    <string name="calendar_next_month">अगला महीना</string>
 
     <string name="image_picker_select_source">छवि स्रोत चुनें</string>
     <string name="image_picker_choose_method">चुनें कि आप अपनी तस्वीर कैसे जोड़ना चाहते हैं</string>

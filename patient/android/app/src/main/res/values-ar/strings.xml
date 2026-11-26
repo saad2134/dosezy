@@ -100,6 +100,9 @@
     <string name="hours_format">%1$d ساعة</string>
 
         <string name="notif_check_title">فحص موثوقية الإشعارات</string>
+    <string name="notif_check_summary">تم اجتياز %1$d من %2$d فحصاً</string>
+    <string name="notif_status_group_needs_fixing">يحتاج إلى إصلاح</string>
+    <string name="notif_status_group_all_good">كل شيء سليم</string>
     <string name="notif_perm_title">إذن الإشعارات</string>
     <string name="notif_perm_desc">مطلوب لإرسال تذكيرات الجرعات والمنبهات.</string>
     <string name="notif_perm_exact_warning">الإشعارات مفعلة • يلزم إذن المنبهات الدقيقة لتنبيهك في الوقت المحدد (انقر للسماح)</string>
@@ -242,6 +245,17 @@
     <string name="home_all_good_desc">لا توجد أدوية يجب تناولها اليوم.</string>
     <string name="no_profiles_found">لم يتم العثور على ملفات شخصية</string>
     <string name="status_taken">تم تناوله</string>
+    <string name="status_late">متأخر</string>
+    <string name="status_partial">جزئي</string>
+    <string name="status_upcoming">قادم</string>
+    <string name="status_missed">فائت</string>
+    <string name="status_skipped">تم تخطيه</string>
+    <string name="calendar_view_month">شهر</string>
+    <string name="calendar_view_week">أسبوع</string>
+    <string name="calendar_prev_week">الأسبوع السابق</string>
+    <string name="calendar_next_week">الأسبوع التالي</string>
+    <string name="calendar_prev_month">الشهر السابق</string>
+    <string name="calendar_next_month">الشهر التالي</string>
 
     <string name="image_picker_select_source">تحديد مصدر الصورة</string>
     <string name="image_picker_choose_method">اختر طريقة إضافة صورتك</string>

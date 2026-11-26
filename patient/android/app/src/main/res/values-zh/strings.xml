@@ -111,6 +111,9 @@
 
     <!-- Notification Check Dialog -->
         <string name="notif_check_title">通知可靠性检查</string>
+    <string name="notif_check_summary">已通过 %1$d / %2$d 项检查</string>
+    <string name="notif_status_group_needs_fixing">待修复</string>
+    <string name="notif_status_group_all_good">一切正常</string>
     <string name="notif_perm_title">通知权限</string>
     <string name="notif_perm_desc">用于发送服药提醒和闹钟。</string>
     <string name="notif_perm_exact_warning">通知已开启 • 需要精准闹钟权限以准时提醒（点击允许）</string>
@@ -259,6 +262,17 @@
     <string name="home_all_good_desc">今天无需服药。</string>
     <string name="no_profiles_found">未找到个人资料</string>
     <string name="status_taken">已服用</string>
+    <string name="status_late">迟服</string>
+    <string name="status_partial">部分服用</string>
+    <string name="status_upcoming">即将到来</string>
+    <string name="status_missed">已漏服</string>
+    <string name="status_skipped">已跳过</string>
+    <string name="calendar_view_month">按月</string>
+    <string name="calendar_view_week">按周</string>
+    <string name="calendar_prev_week">上一周</string>
+    <string name="calendar_next_week">下一周</string>
+    <string name="calendar_prev_month">上一月</string>
+    <string name="calendar_next_month">下一月</string>
 
     <string name="image_picker_select_source">选择图片来源</string>
     <string name="image_picker_choose_method">选择添加图片的方式</string>

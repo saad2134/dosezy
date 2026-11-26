@@ -174,7 +174,8 @@ fun HomeMedicationCard(
 
                 // 3c. Dose note if taken
                 if (isTaken) {
-                    if (!entry.doseNotes.isNullOrBlank()) {
+                    val displayNotes = com.example.dosezy.utils.DosageFormatUtils.formatDoseNoteForDisplay(entry.doseNotes)
+                    if (!displayNotes.isNullOrBlank()) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
@@ -189,7 +190,7 @@ fun HomeMedicationCard(
                                 .padding(vertical = 2.dp)
                         ) {
                             Text(
-                                text = "💬 " + stringResource(R.string.home_dose_note_label, entry.doseNotes),
+                                text = "💬 " + stringResource(R.string.home_dose_note_label, displayNotes),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.primary,
                                 maxLines = 2

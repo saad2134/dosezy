@@ -26,8 +26,11 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.FastForward
 import androidx.compose.material.icons.filled.HorizontalRule
+import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.PieChart
 import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material.icons.filled.Upcoming
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -52,6 +55,7 @@ import com.example.dosezy.data.model.ScheduleWithMedicine
 import com.example.dosezy.data.model.TimeFormat
 import com.example.dosezy.data.model.User
 import com.example.dosezy.ui.screens.MedicineImage
+import com.example.dosezy.utils.DosageFormatUtils
 import com.example.dosezy.utils.TimeCalculationUtils
 import com.example.dosezy.utils.TimeFormatUtils
 import java.time.LocalDateTime
@@ -86,20 +90,17 @@ fun ScheduleActionDialog(
         now,
         missedAfter
     ))
+    val isPartial = isTaken && (entry.doseNotes?.contains("[Partial Stock:") == true)
+    val isLate = (entry.status == MedicationStatus.TAKEN_LATE && !isPartial) || (!isTaken && !isSkipped && isPassed && !isMissed)
 
-    val resolvedStatus = when {
-        isTaken -> entry.status
-        isSkipped -> MedicationStatus.SKIPPED
-        isMissed -> MedicationStatus.MISSED
-        else -> MedicationStatus.PENDING
-    }
-
-    val (statusText, statusColor) = when (resolvedStatus) {
-        MedicationStatus.TAKEN_ON_TIME -> Pair(stringResource(R.string.status_taken), MaterialTheme.colorScheme.primary)
-        MedicationStatus.TAKEN_LATE -> Pair(stringResource(R.string.analytics_taken_late), MaterialTheme.colorScheme.tertiary)
-        MedicationStatus.SKIPPED -> Pair(stringResource(R.string.home_action_skipped), MaterialTheme.colorScheme.outline)
-        MedicationStatus.MISSED -> Pair(stringResource(R.string.home_action_missed), MaterialTheme.colorScheme.error)
-        MedicationStatus.PENDING -> Pair(stringResource(R.string.status_pending), MaterialTheme.colorScheme.onSurfaceVariant)
+    // Clear set of states: Taken, Late, Missed, Partial, Upcoming (plus Skipped) with distinct icon, colour and word
+    val (statusText, statusColor, statusIcon) = when {
+        isPartial -> Triple(stringResource(R.string.status_partial), Color(0xFF0284C7), Icons.Default.PieChart)
+        isTaken && !isLate -> Triple(stringResource(R.string.status_taken), Color(0xFF10B981), Icons.Default.Done)
+        isLate -> Triple(stringResource(R.string.status_late), Color(0xFFF59E0B), Icons.Default.HourglassTop)
+        isMissed -> Triple(stringResource(R.string.status_missed), Color(0xFFEF4444), Icons.Default.Close)
+        isSkipped -> Triple(stringResource(R.string.status_skipped), Color(0xFF94A3B8), Icons.Default.FastForward)
+        else -> Triple(stringResource(R.string.status_upcoming), Color(0xFF64748B), Icons.Default.Upcoming)
     }
 
     val formattedTime = TimeFormatUtils.formatTime(entry.scheduledDateTime, timeFormat, targetLocale)
@@ -161,18 +162,30 @@ fun ScheduleActionDialog(
                         color = statusColor.copy(alpha = 0.15f),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text(
-                            text = statusText,
-                            color = statusColor,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                        )
+                        Row(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                imageVector = statusIcon,
+                                contentDescription = null,
+                                tint = statusColor,
+                                modifier = Modifier.size(13.dp)
+                            )
+                            Text(
+                                text = statusText,
+                                color = statusColor,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
 
-                // Existing dose note preview
-                if (!entry.doseNotes.isNullOrBlank()) {
+                // Existing dose note preview cleanly formatted without raw debug brackets
+                val displayNotes = DosageFormatUtils.formatDoseNoteForDisplay(entry.doseNotes)
+                if (!displayNotes.isNullOrBlank()) {
                     Surface(
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                         shape = RoundedCornerShape(10.dp),
@@ -183,9 +196,9 @@ fun ScheduleActionDialog(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "💬 ${entry.doseNotes}",
+                                text = "💬 $displayNotes",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = if (isPartial) Color(0xFF0284C7) else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }

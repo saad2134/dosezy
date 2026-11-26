@@ -100,6 +100,9 @@
     <string name="hours_format">%1$d час(ов)</string>
 
         <string name="notif_check_title">Надежность уведомлений</string>
+    <string name="notif_check_summary">Пройдено проверок: %1$d из %2$d</string>
+    <string name="notif_status_group_needs_fixing">Требует исправления</string>
+    <string name="notif_status_group_all_good">Все в порядке</string>
     <string name="notif_perm_title">Разрешение на уведомления</string>
     <string name="notif_perm_desc">Требуется для отправки напоминаний о приеме лекарств и сигналов.</string>
     <string name="notif_perm_exact_warning">Уведомления включены • Точные будильники нужны для звонка вовремя (нажмите, чтобы разрешить)</string>
@@ -242,6 +245,17 @@
     <string name="home_all_good_desc">Сегодня принимать лекарства не нужно.</string>
     <string name="no_profiles_found">Профили не найдены</string>
     <string name="status_taken">Принято</string>
+    <string name="status_late">С опозданием</string>
+    <string name="status_partial">Частично</string>
+    <string name="status_upcoming">Предстоящий</string>
+    <string name="status_missed">Пропущено</string>
+    <string name="status_skipped">Пропущено (вручную)</string>
+    <string name="calendar_view_month">Месяц</string>
+    <string name="calendar_view_week">Неделя</string>
+    <string name="calendar_prev_week">Предыдущая неделя</string>
+    <string name="calendar_next_week">Следующая неделя</string>
+    <string name="calendar_prev_month">Предыдущий месяц</string>
+    <string name="calendar_next_month">Следующий месяц</string>
 
     <string name="image_picker_select_source">Выберите источник изображения</string>
     <string name="image_picker_choose_method">Выберите способ добавления фотографии</string>

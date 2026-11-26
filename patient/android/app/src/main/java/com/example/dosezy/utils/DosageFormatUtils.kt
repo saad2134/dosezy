@@ -205,4 +205,48 @@ object DosageFormatUtils {
             DosageUnit.SPRAY -> "spray"
         }
     }
+
+    /**
+     * Formats dose notes for human-readable UI display.
+     * Replaces automated bracketed tags such as "[Partial Stock: Took 2 of 5]" with clean phrasing ("Took 2 of 5"),
+     * strips internal audit tags such as "[Logged retrospectively]", and preserves user-authored clinical notes.
+     */
+    fun formatDoseNoteForDisplay(doseNotes: String?): String? {
+        if (doseNotes.isNullOrBlank()) return null
+
+        val partialRegex = Regex("\\[Partial Stock: Took ([0-9]+(?:\\.[0-9]+)?) of ([0-9]+(?:\\.[0-9]+)?)\\]")
+        val partialMatch = partialRegex.find(doseNotes)
+
+        val userNotes = doseNotes
+            .replace(partialRegex, "")
+            .replace(Regex("\\[Logged retrospectively\\]"), "")
+            .trim(' ', '|', '-')
+            .ifBlank { null }
+
+        val formattedPartial = partialMatch?.let {
+            val took = it.groupValues[1]
+            val total = it.groupValues[2]
+            "Took $took of $total"
+        }
+
+        return when {
+            formattedPartial != null && userNotes != null -> "$userNotes • $formattedPartial"
+            formattedPartial != null -> formattedPartial
+            else -> userNotes
+        }
+    }
+
+    /**
+     * Extracts user-authored notes by stripping automated system tags such as partial stock and retrospective logging.
+     * Useful when pre-populating note editing dialogs.
+     */
+    fun extractUserNote(doseNotes: String?): String {
+        if (doseNotes.isNullOrBlank()) return ""
+        val partialRegex = Regex("\\[Partial Stock: Took [0-9.]* of [0-9.]*\\]")
+        val retrospectiveRegex = Regex("\\[Logged retrospectively\\]")
+        return doseNotes
+            .replace(partialRegex, "")
+            .replace(retrospectiveRegex, "")
+            .trim(' ', '|', '-')
+    }
 }

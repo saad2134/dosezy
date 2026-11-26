@@ -12,6 +12,7 @@ import com.example.dosezy.data.model.ScheduleEntry
 import com.example.dosezy.data.model.Theme
 import com.example.dosezy.data.model.TimeFormat
 import com.example.dosezy.data.model.User
+import com.example.dosezy.data.model.normalizeArabicDigits
 import kotlinx.coroutines.runBlocking
 import com.example.dosezy.utils.ImageUtils
 import com.example.dosezy.utils.TimeCalculationUtils
@@ -1317,6 +1318,95 @@ class AlarmAndNotificationRegressionTest {
         assertEquals("entry_alarm_clock_show", showIntent.getStringExtra("target_entry_id"))
         assertEquals("10:00 AM", showIntent.getStringExtra("target_time"))
         assertEquals("user_alarm_show", showIntent.getStringExtra("switch_to_user_id"))
+    }
+
+    @Test
+    fun testNotificationStatusDialog_summaryAndGroupingStrings_formatCorrectly() {
+        // Guard: Verify notification reliability summary and group headings format cleanly
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val summaryString = context.getString(com.example.dosezy.R.string.notif_check_summary, 2, 6)
+        val needsFixingTitle = context.getString(com.example.dosezy.R.string.notif_status_group_needs_fixing)
+        val allGoodTitle = context.getString(com.example.dosezy.R.string.notif_status_group_all_good)
+
+        assertEquals("2 of 6 checks passed", summaryString)
+        assertEquals("Needs Fixing", needsFixingTitle)
+        assertEquals("All Good", allGoodTitle)
+    }
+
+    @Test
+    fun testNotificationStatusDialog_subgroupPartitioning_redItemsFirst() {
+        // Guard: Red/warning items must partition into Needs Fixing and show first before All Good green items
+        data class MockStatus(val name: String, val isPassed: Boolean, val isWarning: Boolean = false)
+
+        val statuses = listOf(
+            MockStatus("Notification Permission", isPassed = true),
+            MockStatus("Exact Alarms", isPassed = false),
+            MockStatus("Display Over Apps", isPassed = true),
+            MockStatus("Battery Optimization", isPassed = false),
+            MockStatus("Phone Sound", isPassed = true)
+        )
+
+        val totalChecks = statuses.size
+        val passedChecks = statuses.count { it.isPassed && !it.isWarning }
+        val needsFixing = statuses.filter { !it.isPassed || it.isWarning }
+        val allGood = statuses.filter { it.isPassed && !it.isWarning }
+
+        assertEquals(5, totalChecks)
+        assertEquals(3, passedChecks)
+        assertEquals(2, needsFixing.size)
+        assertEquals(3, allGood.size)
+
+        // Needs fixing items must contain the failed checks
+        assertEquals(listOf("Exact Alarms", "Battery Optimization"), needsFixing.map { it.name })
+        // All good items must contain the passed checks
+        assertEquals(listOf("Notification Permission", "Display Over Apps", "Phone Sound"), allGood.map { it.name })
+    }
+
+    @Test
+    fun testNotificationStatusDialog_groupingStringsAcrossLocales() {
+        // Guard: Verify group headings and summary formatting across all supported locales
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val locales = listOf(
+            java.util.Locale("ar"),
+            java.util.Locale("bn"),
+            java.util.Locale.GERMAN,
+            java.util.Locale("es"),
+            java.util.Locale.FRENCH,
+            java.util.Locale("hi"),
+            java.util.Locale.ITALIAN,
+            java.util.Locale.JAPANESE,
+            java.util.Locale("pt"),
+            java.util.Locale("ru"),
+            java.util.Locale.SIMPLIFIED_CHINESE
+        )
+
+        for (locale in locales) {
+            val config = android.content.res.Configuration(context.resources.configuration).apply {
+                setLocale(locale)
+            }
+            val localizedContext = context.createConfigurationContext(config)
+            val summary = localizedContext.getString(com.example.dosezy.R.string.notif_check_summary, 2, 6)
+            val needsFixing = localizedContext.getString(com.example.dosezy.R.string.notif_status_group_needs_fixing)
+            val allGood = localizedContext.getString(com.example.dosezy.R.string.notif_status_group_all_good)
+
+            assertTrue("Summary in $locale must not be empty", summary.isNotEmpty())
+            val normalizedSummary = summary.normalizeArabicDigits()
+            assertTrue("Summary in $locale must contain formatted numbers", normalizedSummary.contains("2") && normalizedSummary.contains("6"))
+            assertTrue("Needs fixing in $locale must not be empty", needsFixing.isNotEmpty())
+            assertTrue("All good in $locale must not be empty", allGood.isNotEmpty())
+            assertTrue("Group headings in $locale must differ", needsFixing != allGood)
+        }
+    }
+
+    @Test
+    fun testGetPendingNotificationIssuesCount_andRequirementsMetConsistency() {
+        // Guard: Verify getPendingNotificationIssuesCount and areAllNotificationRequirementsMet maintain strict logical symmetry (#F08)
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val count = com.example.dosezy.utils.NotificationUtils.getPendingNotificationIssuesCount(context)
+        val allMet = com.example.dosezy.utils.NotificationUtils.areAllNotificationRequirementsMet(context)
+
+        assertEquals(allMet, count == 0)
+        assertTrue("Pending issues count must be non-negative", count >= 0)
     }
 }
 

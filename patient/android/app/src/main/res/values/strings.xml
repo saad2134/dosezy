@@ -115,6 +115,9 @@
 
     <!-- Notification Check Dialog -->
     <string name="notif_check_title">Notification Reliability</string>
+    <string name="notif_check_summary">%1$d of %2$d checks passed</string>
+    <string name="notif_status_group_needs_fixing">Needs Fixing</string>
+    <string name="notif_status_group_all_good">All Good</string>
     <string name="notif_perm_title">Notification Permission</string>
     <string name="notif_perm_desc">Required to send dose reminders and alarms.</string>
     <string name="notif_perm_exact_warning">Notifications enabled • Exact alarms needed to ring on time (tap to allow)</string>
@@ -267,6 +270,17 @@
     <string name="home_all_good_desc">No medications need to be taken today</string>
     <string name="no_profiles_found">No profiles found</string>
     <string name="status_taken">Taken</string>
+    <string name="status_late">Late</string>
+    <string name="status_partial">Partial</string>
+    <string name="status_upcoming">Upcoming</string>
+    <string name="status_missed">Missed</string>
+    <string name="status_skipped">Skipped</string>
+    <string name="calendar_view_month">Month</string>
+    <string name="calendar_view_week">Week</string>
+    <string name="calendar_prev_week">Previous week</string>
+    <string name="calendar_next_week">Next week</string>
+    <string name="calendar_prev_month">Previous month</string>
+    <string name="calendar_next_month">Next month</string>
 
     <string name="image_picker_select_source">Select Image Source</string>
     <string name="image_picker_choose_method">Choose how you want to add your picture</string>

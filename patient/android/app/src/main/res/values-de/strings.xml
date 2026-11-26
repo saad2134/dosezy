@@ -100,6 +100,9 @@
     <string name="hours_format">%1$d Stunde(n)</string>
 
         <string name="notif_check_title">Benachrichtigungs-Zuverlässigkeit</string>
+    <string name="notif_check_summary">%1$d von %2$d Prüfungen bestanden</string>
+    <string name="notif_status_group_needs_fixing">Handlungsbedarf</string>
+    <string name="notif_status_group_all_good">Alles in Ordnung</string>
     <string name="notif_perm_title">Benachrichtigungsberechtigung</string>
     <string name="notif_perm_desc">Erforderlich, um Medikamentenerinnerungen und Alarme zu senden.</string>
     <string name="notif_perm_exact_warning">Benachrichtigungen aktiv • Genaue Alarme für pünktliche Erinnerungen erforderlich (tippen zum Erlauben)</string>
@@ -242,6 +245,17 @@
     <string name="home_all_good_desc">Heute müssen keine Medikamente eingenommen werden.</string>
     <string name="no_profiles_found">Keine Profile gefunden</string>
     <string name="status_taken">Eingenommen</string>
+    <string name="status_late">Verspätet</string>
+    <string name="status_partial">Teilweise</string>
+    <string name="status_upcoming">Bevorstehend</string>
+    <string name="status_missed">Verpasst</string>
+    <string name="status_skipped">Übersprungen</string>
+    <string name="calendar_view_month">Monat</string>
+    <string name="calendar_view_week">Woche</string>
+    <string name="calendar_prev_week">Vorherige Woche</string>
+    <string name="calendar_next_week">Nächste Woche</string>
+    <string name="calendar_prev_month">Vorheriger Monat</string>
+    <string name="calendar_next_month">Nächster Monat</string>
 
     <string name="image_picker_select_source">Bildquelle auswählen</string>
     <string name="image_picker_choose_method">Wählen Sie, wie Sie Ihr Bild hinzufügen möchten</string>
