@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.outlined.ArrowOutward
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Call
@@ -102,7 +103,8 @@ fun HelpSupportContent(navController: NavController) {
             description = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_faqs_desc),
             onClick = {
                 openUrl(context, "https://github.com/saad2134/dosezy/blob/main/resources/FAQs.md")
-            }
+            },
+            isExternal = true
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -114,31 +116,8 @@ fun HelpSupportContent(navController: NavController) {
             description = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_user_manual_desc),
             onClick = {
                 openUrl(context, "https://github.com/saad2134/dosezy/blob/main/resources/UserManual.md")
-            }
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        // Medical Disclaimer Card (#FDA, #MDR)
-        SupportCard(
-            icon = Icons.Outlined.Info,
-            title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.disclaimer_link_medical),
-            description = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.disclaimer_dialog_title),
-            onClick = {
-                openUrl(context, "https://dosezy.attenomy.com/disclaimer")
-            }
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        // Privacy Policy & Terms Card (#GDPR, #HIPAA)
-        SupportCard(
-            icon = Icons.Outlined.Info,
-            title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.disclaimer_link_privacy),
-            description = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.disclaimer_link_terms),
-            onClick = {
-                openUrl(context, "https://dosezy.attenomy.com/privacy")
-            }
+            },
+            isExternal = true
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -159,7 +138,8 @@ fun HelpSupportContent(navController: NavController) {
             description = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_email_support_desc),
             onClick = {
                 openEmail(context, "reach.saad@outlook.com", "Help & Support Request")
-            }
+            },
+            isExternal = true
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -171,19 +151,21 @@ fun HelpSupportContent(navController: NavController) {
             description = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.help_github_issues_desc),
             onClick = {
                 openUrl(context, "https://github.com/saad2134/dosezy/issues/new/choose")
-            }
+            },
+            isExternal = true
         )
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // About & Support Project Card
+        // About & Support Project Card (Opens in-app About screen: legal policies, developer bio, version)
         SupportCard(
             icon = Icons.Outlined.Info,
             title = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.about_title),
             description = androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.about_tagline),
             onClick = {
                 navController.navigate("about")
-            }
+            },
+            isExternal = false
         )
 
         // Add bottom padding for version info
@@ -246,7 +228,8 @@ fun SupportCard(
     icon: ImageVector,
     title: String,
     description: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    isExternal: Boolean = true
 ) {
     Surface(
         modifier = Modifier
@@ -267,7 +250,7 @@ fun SupportCard(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color(0xFF3B82F6),
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(48.dp)
             )
 
@@ -292,9 +275,10 @@ fun SupportCard(
             Spacer(modifier = Modifier.width(16.dp))
 
             Icon(
-                imageVector = Icons.Outlined.ArrowOutward,
-                contentDescription = "Open",
-                tint = Color(0xFF94A3B8)
+                imageVector = if (isExternal) Icons.Outlined.ArrowOutward else Icons.Default.ChevronRight,
+                contentDescription = if (isExternal) "Open link" else "Navigate",
+                tint = Color(0xFF94A3B8),
+                modifier = Modifier.size(if (isExternal) 20.dp else 24.dp)
             )
         }
     }

@@ -914,6 +914,10 @@
     <string name="disclaimer_link_medical">Descargo de responsabilidad médico</string>
     <string name="disclaimer_link_privacy">Política de privacidad</string>
     <string name="disclaimer_link_terms">Términos del servicio</string>
+    <string name="about_legal_policies_title">Legal y políticas</string>
+    <string name="about_legal_medical_desc">Descargo de responsabilidad de software no clínico</string>
+    <string name="about_legal_privacy_desc">Protección de datos y política de privacidad</string>
+    <string name="about_legal_terms_desc">Términos del servicio y licencia de software</string>
     <string name="emergency_dispatch_warning_title">Aviso de emergencia</string>
     <string name="emergency_dispatch_warning_desc">Dosezy no es un servicio de emergencias ni sustituto del 911/112. En situaciones críticas, llame directamente a los servicios locales de emergencia. Verifique que el número corresponda a su ubicación actual.</string>
     <string name="pdf_report_disclaimer_footer">Dosezy Registro de Medicamentos • Historial informativo autoreportado (No clínico)</string>

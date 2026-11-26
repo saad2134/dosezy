@@ -870,6 +870,32 @@ class EmergencyDialAndEditMedScreenTest {
         assertEquals(BrandPrimaryDark, DarkColorScheme.primary)
         assertEquals(Color(0xFF4FC3F7), DarkColorScheme.primary)
     }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 9. Help & Support and About Screen Navigation & Legal Single-Listing Tests
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testLegalPolicies_stringsAndSingleListingIntegrity() {
+        // Guard: Legal and policy links must reside in AboutScreen with accurate subtitles
+        val legalTitle = context.getString(com.example.dosezy.R.string.about_legal_policies_title)
+        val medicalDesc = context.getString(com.example.dosezy.R.string.about_legal_medical_desc)
+        val privacyDesc = context.getString(com.example.dosezy.R.string.about_legal_privacy_desc)
+        val termsDesc = context.getString(com.example.dosezy.R.string.about_legal_terms_desc)
+
+        assertEquals("Legal & Policies", legalTitle)
+        assertEquals("Non-clinical software utility disclaimer", medicalDesc)
+        assertEquals("Data protection and privacy policy", privacyDesc)
+        assertEquals("Terms of service and software license", termsDesc)
+
+        // Verify Privacy Policy title does not use Terms of Service as its description
+        val privacyTitle = context.getString(com.example.dosezy.R.string.disclaimer_link_privacy)
+        val termsTitle = context.getString(com.example.dosezy.R.string.disclaimer_link_terms)
+        assertEquals("Privacy Policy", privacyTitle)
+        assertEquals("Terms of Service", termsTitle)
+        org.junit.Assert.assertNotEquals(privacyTitle, termsTitle)
+        org.junit.Assert.assertNotEquals(privacyDesc, termsDesc)
+    }
 }
 
 
