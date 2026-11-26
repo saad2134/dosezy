@@ -17,6 +17,7 @@ import com.example.dosezy.data.model.Language
 import com.example.dosezy.data.model.Medicine
 import com.example.dosezy.data.model.User
 import com.example.dosezy.data.model.normalizeArabicDigits
+import com.example.dosezy.data.model.getLocalizedName
 import com.example.dosezy.ui.components.deleteOldImage
 import com.example.dosezy.ui.subscreens.createDialIntent
 import com.example.dosezy.ui.subscreens.createSupportDialIntent
@@ -24,6 +25,10 @@ import com.example.dosezy.ui.subscreens.createSupportEmailIntent
 import com.example.dosezy.ui.subscreens.createSupportUrlIntent
 import com.example.dosezy.ui.subscreens.detectDeviceEmergencyCountry
 import com.example.dosezy.ui.subscreens.matchEmergencyCountryByIso
+import com.example.dosezy.ui.theme.BrandPrimaryDark
+import com.example.dosezy.ui.theme.BrandPrimaryLight
+import com.example.dosezy.ui.theme.DarkColorScheme
+import com.example.dosezy.ui.theme.LightColorScheme
 import com.example.dosezy.ui.theme.NoteAmberDark
 import com.example.dosezy.ui.theme.NoteAmberLight
 import com.example.dosezy.ui.theme.SwitchBorderOffDark
@@ -32,6 +37,8 @@ import com.example.dosezy.ui.theme.SwitchThumbOffDark
 import com.example.dosezy.ui.theme.SwitchThumbOffLight
 import com.example.dosezy.ui.theme.SwitchTrackOffDark
 import com.example.dosezy.ui.theme.SwitchTrackOffLight
+import com.example.dosezy.utils.DosageFormatUtils
+import com.example.dosezy.utils.TimeFormatUtils
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -791,6 +798,77 @@ class EmergencyDialAndEditMedScreenTest {
             "SwitchThumbOffLight on light track must exceed 3.0:1 (was $lightThumbOnTrackRatio)",
             lightThumbOnTrackRatio >= 3.0
         )
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 7. Standard Date Formats, Pluralization, and Note Capitalization (Issue F15)
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testStandardDateFormat_enforcesConsistentFormat() {
+        // Guard: Standard date format must display "20 Nov 2026" (with year) or "20 Nov" (without year) (#F15)
+        val date = LocalDate.of(2026, 11, 20)
+        val usLocale = java.util.Locale.US
+        val withYear = TimeFormatUtils.formatStandardDate(date, usLocale, includeYear = true)
+        val withoutYear = TimeFormatUtils.formatStandardDate(date, usLocale, includeYear = false)
+
+        assertEquals("20 Nov 2026", withYear)
+        assertEquals("20 Nov", withoutYear)
+    }
+
+    @Test
+    fun testDosageUnits_supportTruePluralInflection() {
+        // Guard: Discrete count units must pluralize when quantity > 1.0 (e.g. "8 tablets", "2 capsules") (#F15)
+        assertEquals("tablet", DosageUnit.TABLET.getLocalizedName(context, isPlural = false))
+        assertEquals("tablets", DosageUnit.TABLET.getLocalizedName(context, isPlural = true))
+        assertEquals("capsule", DosageUnit.CAPSULE.getLocalizedName(context, isPlural = false))
+        assertEquals("capsules", DosageUnit.CAPSULE.getLocalizedName(context, isPlural = true))
+        assertEquals("drop", DosageUnit.DROP.getLocalizedName(context, isPlural = false))
+        assertEquals("drops", DosageUnit.DROP.getLocalizedName(context, isPlural = true))
+        assertEquals("puff", DosageUnit.PUFF.getLocalizedName(context, isPlural = false))
+        assertEquals("puffs", DosageUnit.PUFF.getLocalizedName(context, isPlural = true))
+
+        // Chemical units are invariant
+        assertEquals("mg", DosageUnit.MG.getLocalizedName(context, isPlural = false))
+        assertEquals("mg", DosageUnit.MG.getLocalizedName(context, isPlural = true))
+    }
+
+    @Test
+    fun testFrequencyAndHoursStrings_inflectPluralsProperly() {
+        // Guard: Times per day and hours formats must distinguish singular vs plural (#F15)
+        val oneTime = context.getString(com.example.dosezy.R.string.time_per_day_format, 1)
+        val twoTimes = context.getString(com.example.dosezy.R.string.times_per_day_format, 2)
+        assertEquals("1 time a day", oneTime)
+        assertEquals("2 times a day", twoTimes)
+
+        val oneHour = context.getString(com.example.dosezy.R.string.hour_format, 1)
+        val threeHours = context.getString(com.example.dosezy.R.string.hours_format, 3)
+        assertEquals("1 hour", oneHour)
+        assertEquals("3 hours", threeHours)
+    }
+
+    @Test
+    fun testNoteCapitalizationNormalization() {
+        // Guard: Clinical and dose notes must normalize initial letter to sentence-case (#F15)
+        val lowerNote = "take with water"
+        val normalized = DosageFormatUtils.normalizeNoteCapitalization(lowerNote)
+        assertEquals("Take with water", normalized)
+
+        val alreadyCapitalized = "Take it with water"
+        assertEquals("Take it with water", DosageFormatUtils.normalizeNoteCapitalization(alreadyCapitalized))
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 8. Unified Brand Primary Blue Tokens (Issue F16)
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testBrandPrimaryBlueTokens_consistentAcrossThemeSchemes() {
+        // Guard: Project wireframes define BrandPrimaryLight = Color(0xFF2084E4) and BrandPrimaryDark = Color(0xFF4FC3F7) (#F16)
+        assertEquals(BrandPrimaryLight, LightColorScheme.primary)
+        assertEquals(Color(0xFF2084E4), LightColorScheme.primary)
+        assertEquals(BrandPrimaryDark, DarkColorScheme.primary)
+        assertEquals(Color(0xFF4FC3F7), DarkColorScheme.primary)
     }
 }
 

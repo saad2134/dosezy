@@ -71,9 +71,12 @@
     <string name="day_fri">Fri</string>
     <string name="day_sat">Sat</string>
     <string name="day_sun">Sun</string>
-    <string name="times_per_day_format">%1$d time(s) a day</string>
-    <string name="times_per_week_format">%1$d time(s) per week</string>
-    <string name="times_per_month_format">%1$d time(s) per month</string>
+    <string name="time_per_day_format">%1$d time a day</string>
+    <string name="times_per_day_format">%1$d times a day</string>
+    <string name="time_per_week_format">%1$d time per week</string>
+    <string name="times_per_week_format">%1$d times per week</string>
+    <string name="time_per_month_format">%1$d time per month</string>
+    <string name="times_per_month_format">%1$d times per month</string>
 
     <!-- Menu Screen -->
     <string name="menu_title">Menu</string>
@@ -111,7 +114,8 @@
     <string name="time_format_24">24-hour</string>
 
     <string name="pref_mark_missed_after">Consider Missed After</string>
-    <string name="hours_format">%1$d hour(s)</string>
+    <string name="hour_format">%1$d hour</string>
+    <string name="hours_format">%1$d hours</string>
 
     <!-- Notification Check Dialog -->
     <string name="notif_check_title">Notification Reliability</string>
@@ -180,12 +184,18 @@
     <string name="unit_mcg">mcg</string>
     <string name="unit_ml">mL</string>
     <string name="unit_drop">drop</string>
+    <string name="unit_drops">drops</string>
     <string name="unit_tablet">tablet</string>
+    <string name="unit_tablets">tablets</string>
     <string name="unit_capsule">capsule</string>
+    <string name="unit_capsules">capsules</string>
     <string name="unit_meq">mEq</string>
     <string name="unit_puff">puff</string>
+    <string name="unit_puffs">puffs</string>
     <string name="unit_ampule">ampule</string>
+    <string name="unit_ampules">ampules</string>
     <string name="unit_spray">spray</string>
+    <string name="unit_sprays">sprays</string>
 
     <!-- Help &amp; Support -->
     <string name="help_title">Help &amp; Support</string>

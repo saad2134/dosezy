@@ -208,8 +208,10 @@ fun ScheduleScreen(navController: NavController) {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = selectedDate.format(
-                                    DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(currentLocale)
+                                text = com.example.dosezy.utils.TimeFormatUtils.formatStandardDate(
+                                    selectedDate,
+                                    currentLocale,
+                                    includeYear = true
                                 ),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,

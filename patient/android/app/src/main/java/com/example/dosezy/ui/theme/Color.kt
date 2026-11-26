@@ -6,9 +6,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 
-// Light blue color scheme
-val LightBlue80 = Color(0xFF4FC3F7)
-val LightBlue40 = Color(0xFF0277BD)
+// Primary Brand Blue Tokens complying with high-fidelity wireframes (#F16)
+val BrandPrimaryLight = Color(0xFF2084E4)        // High-fidelity wireframe primary blue
+val BrandPrimaryTintLight = Color(0xFFE3F2FD)    // Light mode primary tint / container
+val BrandPrimaryDark = Color(0xFF4FC3F7)         // Dark mode primary blue (high-contrast 9:1 against #1E1E1E)
+val BrandPrimaryTintDark = Color(0xFF0D253F)     // Dark mode primary tint / container
+
+// Deprecated alias compatibility
+val LightBlue80 = BrandPrimaryDark
+val LightBlue40 = BrandPrimaryLight
 
 // Guard: High-contrast clinical note colors complying with WCAG 2.2 AA (>= 4.5:1 text contrast) (#F10)
 val NoteAmberLight = Color(0xFF9A4A00) // 5.6:1 - 6.2:1 against light surface/white
@@ -30,14 +36,14 @@ fun getMedicationNoteColor(): Color {
 }
 
 val LightColorScheme = lightColorScheme(
-    primary = LightBlue40,
+    primary = BrandPrimaryLight,
     onPrimary = Color.White,
-    primaryContainer = LightBlue80,
-    onPrimaryContainer = Color.Black,
-    secondary = LightBlue40,
+    primaryContainer = BrandPrimaryTintLight,
+    onPrimaryContainer = Color(0xFF003258),
+    secondary = BrandPrimaryLight,
     onSecondary = Color.White,
-    secondaryContainer = LightBlue80,
-    onSecondaryContainer = Color.Black,
+    secondaryContainer = BrandPrimaryTintLight,
+    onSecondaryContainer = Color(0xFF003258),
     background = Color(0xFFF8F9FA),
     onBackground = Color.Black,
     surface = Color.White,
@@ -45,18 +51,18 @@ val LightColorScheme = lightColorScheme(
     surfaceTint = Color.Transparent,
     inverseSurface = Color(0xFFFFFFFF),
     inverseOnSurface = Color(0xFF0F172A),
-    inversePrimary = LightBlue40
+    inversePrimary = BrandPrimaryLight
 )
 
 val DarkColorScheme = darkColorScheme(
-    primary = LightBlue80,
-    onPrimary = Color.White,
-    primaryContainer = LightBlue40,
-    onPrimaryContainer = Color.White,
-    secondary = LightBlue80,
-    onSecondary = Color.White,
-    secondaryContainer = LightBlue40,
-    onSecondaryContainer = Color.White,
+    primary = BrandPrimaryDark,
+    onPrimary = Color(0xFF003258),
+    primaryContainer = BrandPrimaryTintDark,
+    onPrimaryContainer = Color(0xFFBEE8FF),
+    secondary = BrandPrimaryDark,
+    onSecondary = Color(0xFF003258),
+    secondaryContainer = BrandPrimaryTintDark,
+    onSecondaryContainer = Color(0xFFBEE8FF),
     background = Color(0xFF121212),
     onBackground = Color(0xFFE0E0E0),
     surface = Color(0xFF1E1E1E),
@@ -72,5 +78,5 @@ val DarkColorScheme = darkColorScheme(
     surfaceTint = Color.Transparent,
     inverseSurface = Color(0xFF24272E),
     inverseOnSurface = Color(0xFFF1F5F9),
-    inversePrimary = LightBlue80
+    inversePrimary = BrandPrimaryDark
 )

@@ -310,8 +310,8 @@ fun EditMedScreen(
                                     .height(52.dp),
                                 shape = RoundedCornerShape(16.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF2084E4),
-                                    contentColor = Color.White
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
                                 )
                             ) {
                                 Text(
@@ -388,7 +388,7 @@ fun EditMedScreen(
                                         currentStock = currentStockText.normalizeArabicDigits().toDoubleOrNull(),
                                         refillThreshold = refillThresholdText.normalizeArabicDigits().toDoubleOrNull(),
                                         autoDeductOnTake = medicineToEdit?.autoDeductOnTake ?: true,
-                                        notes = doctorNotes.trim().ifBlank { null },
+                                        notes = com.example.dosezy.utils.DosageFormatUtils.normalizeNoteCapitalization(doctorNotes),
                                         pillShape = selectedPillShape,
                                         pillColor = selectedPillColor,
                                         startDate = selectedStartDate,
@@ -440,10 +440,10 @@ fun EditMedScreen(
                                     .height(52.dp),
                                 shape = RoundedCornerShape(16.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF2084E4),
-                                    contentColor = Color.White,
-                                    disabledContainerColor = Color(0xFF2084E4).copy(alpha = 0.35f),
-                                    disabledContentColor = Color.White.copy(alpha = 0.6f)
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                                    disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
+                                    disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
                                 )
                             ) {
                                 Text(

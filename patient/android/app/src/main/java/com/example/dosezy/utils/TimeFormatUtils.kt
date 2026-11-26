@@ -42,4 +42,12 @@ object TimeFormatUtils {
         }
         return null
     }
+
+    /**
+     * Standard date formatting helper enforcing consistent date display (e.g. "20 Nov" or "20 Nov 2026") (#F15).
+     */
+    fun formatStandardDate(date: java.time.LocalDate, locale: Locale = Locale.getDefault(), includeYear: Boolean = true): String {
+        val pattern = if (includeYear) "d MMM yyyy" else "d MMM"
+        return date.format(DateTimeFormatter.ofPattern(pattern, locale))
+    }
 }

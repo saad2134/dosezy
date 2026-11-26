@@ -178,7 +178,7 @@ fun CustomNavigationBar(
                             }
                         )
                         .background(
-                            color = Color(0xFF2084E4),
+                            color = MaterialTheme.colorScheme.primary,
                             shape = RoundedCornerShape(16.dp) // Squircle shape
                         )
                 ) {
@@ -242,8 +242,8 @@ fun CustomNavItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val textColor = if (isSelected) Color(0xFF2084E4) else Color(0xFF9CA3AF)
-    val iconColor = if (isSelected) Color(0xFF2084E4) else Color(0xFF9CA3AF)
+    val textColor = if (isSelected) MaterialTheme.colorScheme.primary else Color(0xFF9CA3AF)
+    val iconColor = if (isSelected) MaterialTheme.colorScheme.primary else Color(0xFF9CA3AF)
 
     Box(
         modifier = modifier
@@ -334,7 +334,7 @@ fun CustomNavigationBarPreview() {
                                 clip = false
                             )
                             .background(
-                                color = Color(0xFF2084E4),
+                                color = MaterialTheme.colorScheme.primary,
                                 shape = RoundedCornerShape(16.dp)
                             )
                     ) {
@@ -418,7 +418,7 @@ fun CustomNavigationBarAllUnselectedPreview() {
                                 clip = false
                             )
                             .background(
-                                color = Color(0xFF2084E4),
+                                color = MaterialTheme.colorScheme.primary,
                                 shape = RoundedCornerShape(16.dp)
                             )
                     ) {
@@ -454,8 +454,8 @@ fun PreviewNavItem(
     isSelected: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val textColor = if (isSelected) Color(0xFF2084E4) else Color(0xFF9CA3AF)
-    val iconColor = if (isSelected) Color(0xFF2084E4) else Color(0xFF9CA3AF)
+    val textColor = if (isSelected) MaterialTheme.colorScheme.primary else Color(0xFF9CA3AF)
+    val iconColor = if (isSelected) MaterialTheme.colorScheme.primary else Color(0xFF9CA3AF)
 
     Box(
         modifier = modifier

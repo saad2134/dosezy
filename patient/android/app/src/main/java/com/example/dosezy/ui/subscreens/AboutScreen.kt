@@ -117,7 +117,7 @@ fun AboutScreen(navController: NavController) {
                         modifier = Modifier
                             .size(72.dp)
                             .clip(RoundedCornerShape(18.dp))
-                            .background(Color(0xFF2084E4).copy(alpha = 0.12f)),
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
@@ -251,13 +251,13 @@ fun AboutScreen(navController: NavController) {
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(RoundedCornerShape(14.dp))
-                                .background(Color(0xFF2084E4).copy(alpha = 0.15f)),
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Person,
                                 contentDescription = null,
-                                tint = Color(0xFF2084E4),
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(26.dp)
                             )
                         }
@@ -293,7 +293,7 @@ fun AboutScreen(navController: NavController) {
 
                     AboutLinkCard(
                         icon = Icons.Outlined.Star,
-                        iconTint = Color(0xFF2084E4),
+                        iconTint = MaterialTheme.colorScheme.primary,
                         title = stringResource(R.string.about_developer_github),
                         description = "@${AppSignature.authorHandle}",
                         onClick = {

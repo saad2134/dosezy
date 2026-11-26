@@ -307,33 +307,33 @@ enum class DosageUnit {
 }
 
 @androidx.compose.runtime.Composable
-fun DosageUnit.getLocalizedName(): String {
+fun DosageUnit.getLocalizedName(isPlural: Boolean = false): String {
     return when (this) {
         DosageUnit.MG -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_mg)
         DosageUnit.MCG -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_mcg)
         DosageUnit.ML -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_ml)
-        DosageUnit.DROP -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_drop)
-        DosageUnit.TABLET -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_tablet)
-        DosageUnit.CAPSULE -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_capsule)
+        DosageUnit.DROP -> androidx.compose.ui.res.stringResource(if (isPlural) com.example.dosezy.R.string.unit_drops else com.example.dosezy.R.string.unit_drop)
+        DosageUnit.TABLET -> androidx.compose.ui.res.stringResource(if (isPlural) com.example.dosezy.R.string.unit_tablets else com.example.dosezy.R.string.unit_tablet)
+        DosageUnit.CAPSULE -> androidx.compose.ui.res.stringResource(if (isPlural) com.example.dosezy.R.string.unit_capsules else com.example.dosezy.R.string.unit_capsule)
         DosageUnit.MEQ -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_meq)
-        DosageUnit.PUFF -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_puff)
-        DosageUnit.AMPULE -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_ampule)
-        DosageUnit.SPRAY -> androidx.compose.ui.res.stringResource(com.example.dosezy.R.string.unit_spray)
+        DosageUnit.PUFF -> androidx.compose.ui.res.stringResource(if (isPlural) com.example.dosezy.R.string.unit_puffs else com.example.dosezy.R.string.unit_puff)
+        DosageUnit.AMPULE -> androidx.compose.ui.res.stringResource(if (isPlural) com.example.dosezy.R.string.unit_ampules else com.example.dosezy.R.string.unit_ampule)
+        DosageUnit.SPRAY -> androidx.compose.ui.res.stringResource(if (isPlural) com.example.dosezy.R.string.unit_sprays else com.example.dosezy.R.string.unit_spray)
     }
 }
 
-fun DosageUnit.getLocalizedName(context: android.content.Context): String {
+fun DosageUnit.getLocalizedName(context: android.content.Context, isPlural: Boolean = false): String {
     return when (this) {
         DosageUnit.MG -> context.getString(com.example.dosezy.R.string.unit_mg)
         DosageUnit.MCG -> context.getString(com.example.dosezy.R.string.unit_mcg)
         DosageUnit.ML -> context.getString(com.example.dosezy.R.string.unit_ml)
-        DosageUnit.DROP -> context.getString(com.example.dosezy.R.string.unit_drop)
-        DosageUnit.TABLET -> context.getString(com.example.dosezy.R.string.unit_tablet)
-        DosageUnit.CAPSULE -> context.getString(com.example.dosezy.R.string.unit_capsule)
+        DosageUnit.DROP -> context.getString(if (isPlural) com.example.dosezy.R.string.unit_drops else com.example.dosezy.R.string.unit_drop)
+        DosageUnit.TABLET -> context.getString(if (isPlural) com.example.dosezy.R.string.unit_tablets else com.example.dosezy.R.string.unit_tablet)
+        DosageUnit.CAPSULE -> context.getString(if (isPlural) com.example.dosezy.R.string.unit_capsules else com.example.dosezy.R.string.unit_capsule)
         DosageUnit.MEQ -> context.getString(com.example.dosezy.R.string.unit_meq)
-        DosageUnit.PUFF -> context.getString(com.example.dosezy.R.string.unit_puff)
-        DosageUnit.AMPULE -> context.getString(com.example.dosezy.R.string.unit_ampule)
-        DosageUnit.SPRAY -> context.getString(com.example.dosezy.R.string.unit_spray)
+        DosageUnit.PUFF -> context.getString(if (isPlural) com.example.dosezy.R.string.unit_puffs else com.example.dosezy.R.string.unit_puff)
+        DosageUnit.AMPULE -> context.getString(if (isPlural) com.example.dosezy.R.string.unit_ampules else com.example.dosezy.R.string.unit_ampule)
+        DosageUnit.SPRAY -> context.getString(if (isPlural) com.example.dosezy.R.string.unit_sprays else com.example.dosezy.R.string.unit_spray)
     }
 }
 

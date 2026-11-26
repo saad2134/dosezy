@@ -412,7 +412,8 @@ fun LazyListScope.doseTrackingPreferencesSection(
         val lateLabel = if (lateMins < 60 || lateMins % 60 != 0) {
             stringResource(R.string.minutes_format, lateMins)
         } else {
-            stringResource(R.string.hours_format, lateMins / 60)
+            val hours = lateMins / 60
+            if (hours == 1) stringResource(R.string.hour_format, hours) else stringResource(R.string.hours_format, hours)
         }
         PreferenceItem(
             title = stringResource(R.string.pref_late_after),
@@ -428,7 +429,8 @@ fun LazyListScope.doseTrackingPreferencesSection(
         val missedLabel = if (missedMins < 60 || missedMins % 60 != 0) {
             stringResource(R.string.minutes_format, missedMins)
         } else {
-            stringResource(R.string.hours_format, missedMins / 60)
+            val hours = missedMins / 60
+            if (hours == 1) stringResource(R.string.hour_format, hours) else stringResource(R.string.hours_format, hours)
         }
         PreferenceItem(
             title = stringResource(R.string.pref_missed_after),

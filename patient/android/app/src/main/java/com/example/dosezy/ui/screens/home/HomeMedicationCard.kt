@@ -154,9 +154,10 @@ fun HomeMedicationCard(
 
                 // 3. Note
                 if (!medicine?.notes.isNullOrBlank()) {
+                    val noteText = com.example.dosezy.utils.DosageFormatUtils.normalizeNoteCapitalization(medicine?.notes)
                     // Guard: Use theme-aware high contrast amber (#9A4A00 on light giving >= 5.6:1, #FBBF24 on dark) to satisfy WCAG 2.2 AA (#F10)
                     Text(
-                        text = "📝 ${medicine?.notes}",
+                        text = "📝 $noteText",
                         style = MaterialTheme.typography.labelSmall,
                         color = com.example.dosezy.ui.theme.getMedicationNoteColor(),
                         maxLines = 2

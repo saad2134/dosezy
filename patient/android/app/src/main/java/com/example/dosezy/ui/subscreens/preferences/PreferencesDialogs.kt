@@ -415,7 +415,8 @@ fun LateAfterSelectionDialog(
         val label = if (mins < 60 || mins % 60 != 0) {
             stringResource(R.string.minutes_format, mins)
         } else {
-            stringResource(R.string.hours_format, mins / 60)
+            val hours = mins / 60
+            if (hours == 1) stringResource(R.string.hour_format, hours) else stringResource(R.string.hours_format, hours)
         }
         label to mins
     }
@@ -444,7 +445,8 @@ fun MissedAfterSelectionDialog(
         val label = if (mins < 60 || mins % 60 != 0) {
             stringResource(R.string.minutes_format, mins)
         } else {
-            stringResource(R.string.hours_format, mins / 60)
+            val hours = mins / 60
+            if (hours == 1) stringResource(R.string.hour_format, hours) else stringResource(R.string.hours_format, hours)
         }
         label to mins
     }

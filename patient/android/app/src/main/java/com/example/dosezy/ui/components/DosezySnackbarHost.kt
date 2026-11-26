@@ -22,7 +22,7 @@ fun DosezySnackbarHost(
     val isDark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
     val containerColor = if (isDark) Color(0xFF24272E) else Color(0xFFFFFFFF)
     val contentColor = if (isDark) Color(0xFFF1F5F9) else Color(0xFF0F172A)
-    val actionColor = if (isDark) Color(0xFF4FC3F7) else Color(0xFF0277BD)
+    val actionColor = MaterialTheme.colorScheme.primary
 
     SnackbarHost(
         hostState = hostState,

@@ -252,8 +252,8 @@ fun AnalyticsScreen(
                             value = "${breakdown.totalEntries}",
                             subtitle = stringResource(R.string.status_taken) + ": ${breakdown.totalTaken}",
                             icon = Icons.Default.Medication,
-                            color = Color(0xFF0277BD),
-                            bgColor = Color(0xFF0277BD).copy(alpha = 0.12f)
+                            color = MaterialTheme.colorScheme.primary,
+                            bgColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
                         )
                     }
                 }
@@ -370,7 +370,7 @@ fun UnifiedAdherenceCard(
                                 val ringColor = when {
                                     rData.rate >= 80 -> Color(0xFF10B981)
                                     rData.rate >= 50 -> Color(0xFFF59E0B)
-                                    else -> Color(0xFF0277BD)
+                                    else -> MaterialTheme.colorScheme.primary
                                 }
 
                                 Surface(
@@ -444,7 +444,7 @@ fun UnifiedAdherenceCard(
                     val ringColor = when {
                         selectedData.rate >= 80 -> Color(0xFF10B981)
                         selectedData.rate >= 50 -> Color(0xFFF59E0B)
-                        else -> Color(0xFF0277BD)
+                        else -> MaterialTheme.colorScheme.primary
                     }
                     CircularProgressIndicator(
                         progress = animatedProgress,
@@ -648,7 +648,7 @@ fun WeeklyTrendCard(past7Days: List<DayStat>) {
                                         .background(
                                             if (stat.rate >= 80) Color(0xFF10B981)
                                             else if (stat.rate >= 50) Color(0xFFF59E0B)
-                                            else Color(0xFF0277BD)
+                                            else MaterialTheme.colorScheme.primary
                                         )
                                 )
                             }
@@ -675,7 +675,7 @@ fun InsightCard(adherenceRate: Int, totalEntries: Int) {
     val (insightText, insightColor) = when {
         totalEntries == 0 -> Pair(
             stringResource(R.string.analytics_insights_start),
-            Color(0xFF0277BD)
+            MaterialTheme.colorScheme.primary
         )
         adherenceRate >= 80 -> Pair(
             stringResource(R.string.analytics_insights_excellent),

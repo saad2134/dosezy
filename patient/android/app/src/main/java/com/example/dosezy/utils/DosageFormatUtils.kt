@@ -59,29 +59,32 @@ object DosageFormatUtils {
 
     /**
      * Formats dosage amount with standard unit abbreviation (e.g. "0.5 mg", "½ tablet", "1½ tablets").
+     * Supports true plural inflection for discrete units when dosage exceeds 1.0 (#F15).
      */
     fun formatDosageDisplay(dosage: Double, unit: DosageUnit): String {
         val amountStr = formatDosageAmount(dosage, unit)
-        val unitStr = getUnitAbbreviation(unit)
+        val unitStr = getUnitAbbreviation(unit, dosage)
         return "$amountStr $unitStr"
     }
 
     /**
      * Composable helper formatting dosage amount with localized unit name.
+     * Supports true plural inflection for discrete units when dosage exceeds 1.0 (#F15).
      */
     @Composable
     fun formatLocalizedDosageDisplay(dosage: Double, unit: DosageUnit): String {
         val amountStr = formatDosageAmount(dosage, unit)
-        val unitName = unit.getLocalizedName()
+        val unitName = unit.getLocalizedName(dosage > 1.0)
         return "$amountStr $unitName"
     }
 
     /**
      * Context-based helper formatting dosage amount with localized unit name.
+     * Supports true plural inflection for discrete units when dosage exceeds 1.0 (#F15).
      */
     fun formatLocalizedDosageDisplay(context: Context, dosage: Double, unit: DosageUnit): String {
         val amountStr = formatDosageAmount(dosage, unit)
-        val unitName = unit.getLocalizedName(context)
+        val unitName = unit.getLocalizedName(context, dosage > 1.0)
         return "$amountStr $unitName"
     }
 
@@ -191,25 +194,35 @@ object DosageFormatUtils {
         }
     }
 
-    private fun getUnitAbbreviation(unit: DosageUnit): String {
+    private fun getUnitAbbreviation(unit: DosageUnit, quantity: Double = 1.0): String {
+        val isPlural = quantity > 1.0
         return when (unit) {
             DosageUnit.MG -> "mg"
             DosageUnit.MCG -> "mcg"
             DosageUnit.ML -> "mL"
-            DosageUnit.DROP -> "drop"
-            DosageUnit.TABLET -> "tablet"
-            DosageUnit.CAPSULE -> "capsule"
             DosageUnit.MEQ -> "mEq"
-            DosageUnit.PUFF -> "puff"
-            DosageUnit.AMPULE -> "ampule"
-            DosageUnit.SPRAY -> "spray"
+            DosageUnit.DROP -> if (isPlural) "drops" else "drop"
+            DosageUnit.TABLET -> if (isPlural) "tablets" else "tablet"
+            DosageUnit.CAPSULE -> if (isPlural) "capsules" else "capsule"
+            DosageUnit.PUFF -> if (isPlural) "puffs" else "puff"
+            DosageUnit.AMPULE -> if (isPlural) "ampules" else "ampule"
+            DosageUnit.SPRAY -> if (isPlural) "sprays" else "spray"
         }
+    }
+
+    /**
+     * Normalizes note capitalization so initial letters are sentence-cased (e.g. "take with water" -> "Take with water") (#F15).
+     */
+    fun normalizeNoteCapitalization(note: String?): String? {
+        if (note.isNullOrBlank()) return null
+        val trimmed = note.trim()
+        return trimmed.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
     }
 
     /**
      * Formats dose notes for human-readable UI display.
      * Replaces automated bracketed tags such as "[Partial Stock: Took 2 of 5]" with clean phrasing ("Took 2 of 5"),
-     * strips internal audit tags such as "[Logged retrospectively]", and preserves user-authored clinical notes.
+     * strips internal audit tags such as "[Logged retrospectively]", and normalizes note capitalization (#F15).
      */
     fun formatDoseNoteForDisplay(doseNotes: String?): String? {
         if (doseNotes.isNullOrBlank()) return null
@@ -217,11 +230,13 @@ object DosageFormatUtils {
         val partialRegex = Regex("\\[Partial Stock: Took ([0-9]+(?:\\.[0-9]+)?) of ([0-9]+(?:\\.[0-9]+)?)\\]")
         val partialMatch = partialRegex.find(doseNotes)
 
-        val userNotes = doseNotes
+        val rawUserNotes = doseNotes
             .replace(partialRegex, "")
             .replace(Regex("\\[Logged retrospectively\\]"), "")
             .trim(' ', '|', '-')
             .ifBlank { null }
+
+        val userNotes = normalizeNoteCapitalization(rawUserNotes)
 
         val formattedPartial = partialMatch?.let {
             val took = it.groupValues[1]

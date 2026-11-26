@@ -461,7 +461,7 @@ private fun CalendarDay(
 ) {
     val isColored = statusColor != Color.Transparent
     val backgroundColor = when {
-        isSelected -> Color(0xFF2084E4)
+        isSelected -> MaterialTheme.colorScheme.primary
         thickerHighlight && isColored -> statusColor.copy(alpha = 0.12f)
         else -> Color.Transparent
     }
@@ -620,9 +620,10 @@ fun ScheduleListItem(
                 color = MaterialTheme.colorScheme.onSurface
             )
             if (!medicine?.notes.isNullOrBlank()) {
+                val noteText = com.example.dosezy.utils.DosageFormatUtils.normalizeNoteCapitalization(medicine?.notes)
                 // Guard: Use theme-aware high contrast amber (#9A4A00 on light giving >= 5.6:1, #FBBF24 on dark) to satisfy WCAG 2.2 AA (#F10)
                 Text(
-                    text = "📝 ${medicine?.notes}",
+                    text = "📝 $noteText",
                     style = MaterialTheme.typography.labelSmall,
                     color = com.example.dosezy.ui.theme.getMedicationNoteColor(),
                     maxLines = 1

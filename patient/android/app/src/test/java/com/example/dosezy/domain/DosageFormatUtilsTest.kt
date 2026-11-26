@@ -8,6 +8,7 @@ import com.example.dosezy.utils.DosageFormatUtils
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class DosageFormatUtilsTest {
@@ -54,13 +55,14 @@ class DosageFormatUtilsTest {
         // Discrete units
         assertEquals("½ tablet", DosageFormatUtils.formatDosageDisplay(0.5, DosageUnit.TABLET))
         assertEquals("1 tablet", DosageFormatUtils.formatDosageDisplay(1.0, DosageUnit.TABLET))
-        assertEquals("1½ tablet", DosageFormatUtils.formatDosageDisplay(1.5, DosageUnit.TABLET))
-        assertEquals("2 tablet", DosageFormatUtils.formatDosageDisplay(2.0, DosageUnit.TABLET))
+        assertEquals("1½ tablets", DosageFormatUtils.formatDosageDisplay(1.5, DosageUnit.TABLET))
+        assertEquals("2 tablets", DosageFormatUtils.formatDosageDisplay(2.0, DosageUnit.TABLET))
+        assertEquals("8 tablets", DosageFormatUtils.formatDosageDisplay(8.0, DosageUnit.TABLET))
 
         assertEquals("½ capsule", DosageFormatUtils.formatDosageDisplay(0.5, DosageUnit.CAPSULE))
         assertEquals("1 capsule", DosageFormatUtils.formatDosageDisplay(1.0, DosageUnit.CAPSULE))
-        assertEquals("1½ capsule", DosageFormatUtils.formatDosageDisplay(1.5, DosageUnit.CAPSULE))
-        assertEquals("2 capsule", DosageFormatUtils.formatDosageDisplay(2.0, DosageUnit.CAPSULE))
+        assertEquals("1½ capsules", DosageFormatUtils.formatDosageDisplay(1.5, DosageUnit.CAPSULE))
+        assertEquals("2 capsules", DosageFormatUtils.formatDosageDisplay(2.0, DosageUnit.CAPSULE))
 
         // Chemical strengths
         assertEquals("0.5 mg", DosageFormatUtils.formatDosageDisplay(0.5, DosageUnit.MG))
@@ -74,13 +76,22 @@ class DosageFormatUtilsTest {
 
         // Drops, puffs, sprays, ampules
         assertEquals("1 drop", DosageFormatUtils.formatDosageDisplay(1.0, DosageUnit.DROP))
-        assertEquals("3 drop", DosageFormatUtils.formatDosageDisplay(3.0, DosageUnit.DROP))
+        assertEquals("3 drops", DosageFormatUtils.formatDosageDisplay(3.0, DosageUnit.DROP))
         assertEquals("1 puff", DosageFormatUtils.formatDosageDisplay(1.0, DosageUnit.PUFF))
-        assertEquals("2 puff", DosageFormatUtils.formatDosageDisplay(2.0, DosageUnit.PUFF))
+        assertEquals("2 puffs", DosageFormatUtils.formatDosageDisplay(2.0, DosageUnit.PUFF))
         assertEquals("1 ampule", DosageFormatUtils.formatDosageDisplay(1.0, DosageUnit.AMPULE))
-        assertEquals("2 ampule", DosageFormatUtils.formatDosageDisplay(2.0, DosageUnit.AMPULE))
+        assertEquals("2 ampules", DosageFormatUtils.formatDosageDisplay(2.0, DosageUnit.AMPULE))
         assertEquals("1 spray", DosageFormatUtils.formatDosageDisplay(1.0, DosageUnit.SPRAY))
-        assertEquals("2 spray", DosageFormatUtils.formatDosageDisplay(2.0, DosageUnit.SPRAY))
+        assertEquals("2 sprays", DosageFormatUtils.formatDosageDisplay(2.0, DosageUnit.SPRAY))
+    }
+
+    @Test
+    fun testNormalizeNoteCapitalization() {
+        assertEquals("Take with water", DosageFormatUtils.normalizeNoteCapitalization("take with water"))
+        assertEquals("Take it with water", DosageFormatUtils.normalizeNoteCapitalization("Take it with water"))
+        assertEquals("With food", DosageFormatUtils.normalizeNoteCapitalization("with food"))
+        assertNull(DosageFormatUtils.normalizeNoteCapitalization(""))
+        assertNull(DosageFormatUtils.normalizeNoteCapitalization(null))
     }
 
     @Test

@@ -71,9 +71,12 @@
     <string name="day_fri">Vie</string>
     <string name="day_sat">Sáb</string>
     <string name="day_sun">Dom</string>
-    <string name="times_per_day_format">%1$d vez/veces al día</string>
-    <string name="times_per_week_format">%1$d vez/veces por semana</string>
-    <string name="times_per_month_format">%1$d vez/veces al mes</string>
+    <string name="time_per_day_format">%1$d vez al día</string>
+    <string name="times_per_day_format">%1$d veces al día</string>
+    <string name="time_per_week_format">%1$d vez por semana</string>
+    <string name="times_per_week_format">%1$d veces por semana</string>
+    <string name="time_per_month_format">%1$d vez al mes</string>
+    <string name="times_per_month_format">%1$d veces al mes</string>
 
     <!-- Menu Screen -->
     <string name="menu_title">Menú</string>
@@ -106,7 +109,8 @@
     <string name="time_format_24">24 horas</string>
 
     <string name="pref_mark_missed_after">Considerar omitido después de</string>
-    <string name="hours_format">%1$d hora(s)</string>
+    <string name="hour_format">%1$d hora</string>
+    <string name="hours_format">%1$d horas</string>
 
     <!-- Notification Check Dialog -->
         <string name="notif_check_title">Fiabilidad de Notificaciones</string>
@@ -164,13 +168,19 @@
     <string name="unit_mg">mg</string>
     <string name="unit_mcg">mcg</string>
     <string name="unit_ml">mL</string>
-    <string name="unit_drop">gota(s)</string>
-    <string name="unit_tablet">pastilla(s)</string>
-    <string name="unit_capsule">cápsula(s)</string>
+    <string name="unit_drop">gota</string>
+    <string name="unit_drops">gotas</string>
+    <string name="unit_tablet">pastilla</string>
+    <string name="unit_tablets">pastillas</string>
+    <string name="unit_capsule">cápsula</string>
+    <string name="unit_capsules">cápsulas</string>
     <string name="unit_meq">mEq</string>
-    <string name="unit_puff">inhalación(es)</string>
-    <string name="unit_ampule">ampolla(s)</string>
+    <string name="unit_puff">inhalación</string>
+    <string name="unit_puffs">inhalaciones</string>
+    <string name="unit_ampule">ampolla</string>
+    <string name="unit_ampules">ampollas</string>
     <string name="unit_spray">pulverización</string>
+    <string name="unit_sprays">pulverizaciones</string>
 
     <!-- Help &amp; Support -->
     <string name="help_title">Ayuda y soporte</string>

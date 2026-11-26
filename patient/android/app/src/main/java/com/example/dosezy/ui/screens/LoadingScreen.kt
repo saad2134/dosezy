@@ -52,7 +52,7 @@ fun LoadingScreen(
             if (isLoading && !hasError) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(48.dp),
-                    color = Color(0xFF2084E4)
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.height(24.dp))
             }
