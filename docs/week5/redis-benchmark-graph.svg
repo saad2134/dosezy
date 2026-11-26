@@ -1,0 +1,36 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520">
+  <rect width="900" height="520" fill="white"/>
+  <text x="450" y="42" text-anchor="middle" font-family="Arial" font-size="25" font-weight="bold">Redis Semantic Cache Benchmark</text>
+  <text x="450" y="70" text-anchor="middle" font-family="Arial" font-size="14" fill="#555">100 successful cache lookups | Latency in milliseconds</text>
+  <line x1="110" y1="390" x2="820" y2="390" stroke="#333" stroke-width="2"/>
+  <line x1="110" y1="110" x2="110" y2="390" stroke="#333" stroke-width="2"/>
+  <g font-family="Arial" font-size="13" fill="#555">
+    <text x="100" y="395" text-anchor="end">0</text>
+    <text x="100" y="295" text-anchor="end">0.75</text>
+    <text x="100" y="195" text-anchor="end">1.5</text>
+    <text x="100" y="115" text-anchor="end">2.1</text>
+    <text x="465" y="465" text-anchor="middle">Latency metric</text>
+    <text x="28" y="250" text-anchor="middle" transform="rotate(-90 28 250)">Milliseconds</text>
+  </g>
+  <g stroke="#777" stroke-dasharray="4 5">
+    <line x1="110" y1="290" x2="820" y2="290"/>
+    <line x1="110" y1="190" x2="820" y2="190"/>
+  </g>
+  <g fill="#3976b8">
+    <rect x="175" y="318.1" width="90" height="71.9" rx="4"/>
+    <rect x="335" y="326.4" width="90" height="63.6" rx="4"/>
+    <rect x="495" y="288.7" width="90" height="101.3" rx="4"/>
+    <rect x="655" y="115.3" width="90" height="274.7" rx="4"/>
+  </g>
+  <g font-family="Arial" font-size="15" fill="#222" text-anchor="middle">
+    <text x="220" y="307">0.539</text>
+    <text x="380" y="315">0.477</text>
+    <text x="540" y="278">0.759</text>
+    <text x="700" y="105">2.06</text>
+    <text x="220" y="415">Average</text>
+    <text x="380" y="415">Median</text>
+    <text x="540" y="415">P95</text>
+    <text x="700" y="415">Maximum</text>
+  </g>
+  <text x="450" y="495" text-anchor="middle" font-family="Arial" font-size="12" fill="#666">Cache lookup latency only; excludes embedding and full API processing.</text>
+</svg>
