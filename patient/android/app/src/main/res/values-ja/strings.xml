@@ -419,6 +419,7 @@
     <string name="import_from_server_or_backup">サーバー/バックアップからインポート</string>
     <string name="tab_cloud_server">クラウド / サーバー</string>
     <string name="tab_local_file">ローカルファイル</string>
+    <string name="local_backup_card_title">ローカルファイルから復元</string>
     <string name="cloud_sync_locked_desc">介護者向けクラウド同期およびセルフホストサーバー接続機能は現在開発中であり、今後のアップデートで提供予定です。</string>
     <string name="local_backup_select_desc">端末内またはGoogleドライブから、以前に出力したDosezyの.zipファイルを選択してデータを復元します。</string>
     <string name="local_backup_select_btn">.zip バックアップファイルを選択</string>

@@ -44,6 +44,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -189,7 +191,8 @@ fun ImportSourceDialog(
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = textPrimary,
-                                    textAlign = TextAlign.Center
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.semantics { heading() }
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Box(
@@ -248,11 +251,13 @@ fun ImportSourceDialog(
                                 }
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
+                                    // Guard: WCAG 1.3.1 accessibility - differentiate card heading from tab label to avoid redundant TalkBack announcements (#147)
                                     Text(
-                                        text = stringResource(R.string.tab_local_file),
+                                        text = stringResource(R.string.local_backup_card_title),
                                         style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold,
-                                        color = textPrimary
+                                        color = textPrimary,
+                                        modifier = Modifier.semantics { heading() }
                                     )
                                     Text(
                                         text = stringResource(R.string.backup_storage_note),

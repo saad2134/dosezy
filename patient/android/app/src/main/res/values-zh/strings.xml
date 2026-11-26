@@ -435,6 +435,7 @@
     <string name="import_from_server_or_backup">从服务器/备份文件导入</string>
     <string name="tab_cloud_server">云端 / 服务器</string>
     <string name="tab_local_file">本地文件</string>
+    <string name="local_backup_card_title">从本地文件恢复</string>
     <string name="cloud_sync_locked_desc">看护者云端同步及自建服务器连接功能目前正在开发中，将在后续版本更新中提供。</string>
     <string name="local_backup_select_desc">从您的设备本地或Google Drive中选择先前导出的Dosezy .zip备份文件以恢复档案与药物数据。</string>
     <string name="local_backup_select_btn">选择 .zip 备份文件</string>

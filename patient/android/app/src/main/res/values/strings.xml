@@ -449,6 +449,7 @@ Do you want to continue?</string>
     <string name="import_from_server_or_backup">Import from server/backup</string>
     <string name="tab_cloud_server">Cloud / Server</string>
     <string name="tab_local_file">Local File</string>
+    <string name="local_backup_card_title">Restore from Local File</string>
     <string name="cloud_sync_locked_desc">Automated caregiver cloud sync and self-hosted server connections are currently in development and will be available in an upcoming update.</string>
     <string name="local_backup_select_desc">Select a previously exported Dosezy .zip archive from your device or Google Drive to restore your patient profiles, medications, and schedules.</string>
     <string name="local_backup_select_btn">Select .zip Backup File</string>

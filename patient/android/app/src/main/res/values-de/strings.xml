@@ -419,6 +419,7 @@ Möchten Sie fortfahren?</string>
     <string name="import_from_server_or_backup">Aus Server/Backup importieren</string>
     <string name="tab_cloud_server">Cloud / Server</string>
     <string name="tab_local_file">Lokale Datei</string>
+    <string name="local_backup_card_title">Aus lokaler Datei wiederherstellen</string>
     <string name="cloud_sync_locked_desc">Automatische Cloud-Synchronisation und Serververbindungen befinden sich in der Entwicklung und folgen in einem kommenden Update.</string>
     <string name="local_backup_select_desc">Wählen Sie eine zuvor exportierte Dosezy-.zip-Datei aus, um Profile, Medikamente und Zeitpläne wiederherzustellen.</string>
     <string name="local_backup_select_btn">.zip-Backup-Datei auswählen</string>

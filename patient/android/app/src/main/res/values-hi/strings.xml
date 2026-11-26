@@ -435,6 +435,7 @@
     <string name="import_from_server_or_backup">सर्वर/बैकअप से आयात करें</string>
     <string name="tab_cloud_server">क्लाउड / सर्वर</string>
     <string name="tab_local_file">स्थानीय फ़ाइल</string>
+    <string name="local_backup_card_title">स्थानीय फ़ाइल से पुनर्स्थापित करें</string>
     <string name="cloud_sync_locked_desc">स्वचालित क्लाउड सिंक और सेल्फ-होस्टेड सर्वर कनेक्शन वर्तमान में विकास में हैं और आगामी अपडेट में उपलब्ध होंगे।</string>
     <string name="local_backup_select_desc">अपने रोगी प्रोफाइल, दवाओं और कार्यक्रमों को पुनर्स्थापित करने के लिए अपने डिवाइस या ड्राइव से एक .zip फ़ाइल चुनें।</string>
     <string name="local_backup_select_btn">.zip बैकअप फ़ाइल चुनें</string>

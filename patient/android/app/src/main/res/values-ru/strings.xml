@@ -419,6 +419,7 @@
     <string name="import_from_server_or_backup">Импорт с сервера/из копии</string>
     <string name="tab_cloud_server">Облако / Сервер</string>
     <string name="tab_local_file">Локальный файл</string>
+    <string name="local_backup_card_title">Восстановить из локального файла</string>
     <string name="cloud_sync_locked_desc">Облачная синхронизация для ухода и подключение к собственному серверу находятся в разработке и появятся в следующем обновлении.</string>
     <string name="local_backup_select_desc">Выберите ранее экспортированный .zip-архив Dosezy на устройстве или Google Диске для восстановления данных.</string>
     <string name="local_backup_select_btn">Выбрать файл резервной копии (.zip)</string>

@@ -419,6 +419,7 @@
     <string name="import_from_server_or_backup">استيراد من الخادم / النسخة الاحتياطية</string>
     <string name="tab_cloud_server">السحابة / الخادم</string>
     <string name="tab_local_file">ملف محلي</string>
+    <string name="local_backup_card_title">الاستعادة من ملف محلي</string>
     <string name="cloud_sync_locked_desc">المزامنة السحابية لمقدمي الرعاية والاتصال بالخادم المخصص قيد التطوير حالياً وستكون متاحة في تحديث قادم.</string>
     <string name="local_backup_select_desc">حدد ملف نسخة احتياطية .zip تم تصديره مسبقاً من جهازك أو Google Drive لاستعادة ملفات المرضى والأدوية والجداول.</string>
     <string name="local_backup_select_btn">تحديد ملف النسخة الاحتياطية (.zip)</string>

@@ -419,6 +419,7 @@
     <string name="import_from_server_or_backup">সার্ভার/ব্যাকআপ থেকে আমদানি করুন</string>
     <string name="tab_cloud_server">ক্লাউড / সার্ভার</string>
     <string name="tab_local_file">স্থানীয় ফাইল</string>
+    <string name="local_backup_card_title">স্থানীয় ফাইল থেকে পুনরুদ্ধার করুন</string>
     <string name="cloud_sync_locked_desc">কেয়ারগিভার ক্লাউড সিঙ্ক এবং স্ব-হোস্ট করা সার্ভার সংযোগ বর্তমানে উন্নয়নাধীন এবং আসন্ন আপডেটে উপলব্ধ হবে।</string>
     <string name="local_backup_select_desc">আপনার প্রোফাইল, ওষুধ এবং সময়সূচী পুনরুদ্ধার করতে ডিভাইস বা গুগল ড্রাইভ থেকে একটি ব্যাকআপ (.zip) ফাইল নির্বাচন করুন।</string>
     <string name="local_backup_select_btn">.zip ব্যাকআপ ফাইল নির্বাচন করুন</string>

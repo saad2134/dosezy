@@ -418,6 +418,7 @@ Deseja continuar?</string>
     <string name="import_from_server_or_backup">Importar do servidor/backup</string>
     <string name="tab_cloud_server">Nuvem / Servidor</string>
     <string name="tab_local_file">Arquivo local</string>
+    <string name="local_backup_card_title">Restaurar de arquivo local</string>
     <string name="cloud_sync_locked_desc">A sincronização em nuvem e a conexão com servidores próprios estão em desenvolvimento e chegarão em breve.</string>
     <string name="local_backup_select_desc">Selecione um arquivo .zip do Dosezy exportado anteriormente do seu dispositivo ou Google Drive.</string>
     <string name="local_backup_select_btn">Selecionar arquivo de backup .zip</string>

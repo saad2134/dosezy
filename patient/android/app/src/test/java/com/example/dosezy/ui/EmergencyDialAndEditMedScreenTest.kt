@@ -655,6 +655,54 @@ class EmergencyDialAndEditMedScreenTest {
         backHandlerAction()
         assertTrue("Second back press with closed dropdown exits screen", screenExited)
     }
+
+    @Test
+    fun testImportSourceDialog_cardHeadingDifferentiatesFromTab_wcagAccessibility() {
+        // Guard: WCAG 1.3.1 accessibility - differentiate card heading from tab label to avoid redundant TalkBack announcements (#147)
+        val tabString = context.getString(com.example.dosezy.R.string.tab_local_file)
+        val cardHeadingString = context.getString(com.example.dosezy.R.string.local_backup_card_title)
+
+        assertEquals("Local File", tabString)
+        assertEquals("Restore from Local File", cardHeadingString)
+        assertTrue(
+            "Card heading must be distinct from tab label to prevent duplicate screen reader announcements",
+            tabString != cardHeadingString
+        )
+    }
+
+    @Test
+    fun testImportSourceDialog_cardHeadingDifferentiatesAcrossLocales() {
+        // Guard: Verify card heading and tab label distinction across all supported locales (#147)
+        val locales = listOf(
+            java.util.Locale("ar"),
+            java.util.Locale("bn"),
+            java.util.Locale.GERMAN,
+            java.util.Locale("es"),
+            java.util.Locale.FRENCH,
+            java.util.Locale("hi"),
+            java.util.Locale.ITALIAN,
+            java.util.Locale.JAPANESE,
+            java.util.Locale("pt"),
+            java.util.Locale("ru"),
+            java.util.Locale.SIMPLIFIED_CHINESE
+        )
+
+        for (locale in locales) {
+            val config = android.content.res.Configuration(context.resources.configuration).apply {
+                setLocale(locale)
+            }
+            val localizedContext = context.createConfigurationContext(config)
+            val tab = localizedContext.getString(com.example.dosezy.R.string.tab_local_file)
+            val card = localizedContext.getString(com.example.dosezy.R.string.local_backup_card_title)
+
+            assertTrue("Tab label in $locale must not be empty", tab.isNotEmpty())
+            assertTrue("Card heading in $locale must not be empty", card.isNotEmpty())
+            assertTrue(
+                "Card heading must differ from tab label in $locale to prevent TalkBack duplicate announcements",
+                tab != card
+            )
+        }
+    }
 }
 
 
