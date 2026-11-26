@@ -35,8 +35,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
+import com.example.dosezy.ui.components.AppSwitch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.example.dosezy.data.model.normalizeArabicDigits
@@ -121,13 +120,10 @@ fun DosageInputSection(
                         .weight(1f)
                         .padding(end = 12.dp)
                 )
-                Switch(
+                AppSwitch(
                     checked = hasDifferentDosages,
                     onCheckedChange = { onHasDifferentDosagesChange(it) },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color.White,
-                        checkedTrackColor = Color(0xFF1193D4)
-                    )
+                    checkedTrackColor = Color(0xFF1193D4)
                 )
             }
 

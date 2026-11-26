@@ -21,7 +21,7 @@ import androidx.compose.material.icons.filled.ViewTimeline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
+import com.example.dosezy.ui.components.AppSwitch
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -109,7 +109,7 @@ fun LazyListScope.appearancePreferencesSection(
                         )
                     }
                 }
-                Switch(
+                AppSwitch(
                     checked = currentUser?.timelineModeEnabled == true,
                     onCheckedChange = onTimelineModeChange
                 )
@@ -160,7 +160,7 @@ fun LazyListScope.appearancePreferencesSection(
                         )
                     }
                 }
-                Switch(
+                AppSwitch(
                     checked = currentUser?.thickerCalendarDayHighlight == true,
                     onCheckedChange = onThickerCalendarChange
                 )
@@ -211,7 +211,7 @@ fun LazyListScope.appearancePreferencesSection(
                         )
                     }
                 }
-                Switch(
+                AppSwitch(
                     checked = currentUser?.hideAddMedicineNavButton == true,
                     onCheckedChange = onHideAddNavButtonChange
                 )
@@ -262,7 +262,7 @@ fun LazyListScope.appearancePreferencesSection(
                         )
                     }
                 }
-                Switch(
+                AppSwitch(
                     checked = currentUser?.slotRollupEnabled == true,
                     onCheckedChange = onSlotRollupChange
                 )

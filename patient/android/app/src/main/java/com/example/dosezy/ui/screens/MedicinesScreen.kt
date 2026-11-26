@@ -779,10 +779,11 @@ fun ArchivedMedicineItem(
                 )
                 if (!medicine.notes.isNullOrBlank()) {
                     Spacer(modifier = Modifier.height(2.dp))
+                    // Guard: Use theme-aware high contrast amber (#9A4A00 on light giving >= 5.6:1, #FBBF24 on dark) to satisfy WCAG 2.2 AA (#F10)
                     Text(
                         text = "📝 ${medicine.notes}",
                         style = MaterialTheme.typography.labelSmall,
-                        color = Color(0xFFF59E0B).copy(alpha = 0.8f),
+                        color = com.example.dosezy.ui.theme.getMedicationNoteColor(),
                         maxLines = 1
                     )
                 }
@@ -886,10 +887,11 @@ fun MedicineItem(
                     // Notes / Warnings preview
                     if (!medicine.notes.isNullOrBlank()) {
                         Spacer(modifier = Modifier.height(3.dp))
+                        // Guard: Use theme-aware high contrast amber (#9A4A00 on light giving >= 5.6:1, #FBBF24 on dark) to satisfy WCAG 2.2 AA (#F10)
                         Text(
                             text = "📝 ${medicine.notes}",
                             style = MaterialTheme.typography.labelSmall,
-                            color = Color(0xFFF59E0B),
+                            color = com.example.dosezy.ui.theme.getMedicationNoteColor(),
                             maxLines = 1,
                             fontWeight = FontWeight.Medium
                         )

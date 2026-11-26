@@ -32,7 +32,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
+import com.example.dosezy.ui.components.AppSwitch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -128,7 +128,7 @@ fun LazyListScope.notificationAlarmPreferencesSection(
                         )
                     }
                 }
-                Switch(
+                AppSwitch(
                     checked = currentUser?.slideActionsEnabled != false,
                     onCheckedChange = onSlideActionsChange
                 )
@@ -179,7 +179,7 @@ fun LazyListScope.notificationAlarmPreferencesSection(
                         )
                     }
                 }
-                Switch(
+                AppSwitch(
                     checked = currentUser?.lockscreenDetailsEnabled != false,
                     onCheckedChange = onLockscreenDetailsChange
                 )
@@ -279,7 +279,7 @@ fun LazyListScope.notificationAlarmPreferencesSection(
                         )
                     }
                 }
-                Switch(
+                AppSwitch(
                     checked = currentUser?.customSnoozePopupEnabled == true,
                     onCheckedChange = onCustomSnoozePopupChange
                 )
@@ -329,7 +329,7 @@ fun LazyListScope.notificationAlarmPreferencesSection(
                             )
                         }
                     }
-                    Switch(
+                    AppSwitch(
                         checked = currentUser?.naggingRemindersEnabled == true,
                         onCheckedChange = onNaggingEnabledChange
                     )

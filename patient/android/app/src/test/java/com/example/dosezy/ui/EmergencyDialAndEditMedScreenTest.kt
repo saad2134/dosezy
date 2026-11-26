@@ -7,6 +7,7 @@ package com.example.dosezy.ui
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.ui.graphics.Color
 import androidx.test.core.app.ApplicationProvider
 import com.example.dosezy.data.model.DosageUnit
 import com.example.dosezy.data.model.Frequency
@@ -23,6 +24,14 @@ import com.example.dosezy.ui.subscreens.createSupportEmailIntent
 import com.example.dosezy.ui.subscreens.createSupportUrlIntent
 import com.example.dosezy.ui.subscreens.detectDeviceEmergencyCountry
 import com.example.dosezy.ui.subscreens.matchEmergencyCountryByIso
+import com.example.dosezy.ui.theme.NoteAmberDark
+import com.example.dosezy.ui.theme.NoteAmberLight
+import com.example.dosezy.ui.theme.SwitchBorderOffDark
+import com.example.dosezy.ui.theme.SwitchBorderOffLight
+import com.example.dosezy.ui.theme.SwitchThumbOffDark
+import com.example.dosezy.ui.theme.SwitchThumbOffLight
+import com.example.dosezy.ui.theme.SwitchTrackOffDark
+import com.example.dosezy.ui.theme.SwitchTrackOffLight
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -702,6 +711,86 @@ class EmergencyDialAndEditMedScreenTest {
                 tab != card
             )
         }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 6. WCAG 2.2 Contrast Compliance Tests (Issue F10: Medication Notes and Off-State Switches)
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    private fun calculateRelativeLuminance(color: Color): Double {
+        fun linearize(component: Float): Double {
+            val c = component.toDouble()
+            return if (c <= 0.04045) c / 12.92 else Math.pow((c + 0.055) / 1.055, 2.4)
+        }
+        return 0.2126 * linearize(color.red) + 0.7152 * linearize(color.green) + 0.0722 * linearize(color.blue)
+    }
+
+    private fun calculateContrastRatio(color1: Color, color2: Color): Double {
+        val lum1 = calculateRelativeLuminance(color1)
+        val lum2 = calculateRelativeLuminance(color2)
+        val lighter = maxOf(lum1, lum2)
+        val darker = minOf(lum1, lum2)
+        return (lighter + 0.05) / (darker + 0.05)
+    }
+
+    @Test
+    fun testMedicationNoteColors_complyWithWcag22TextContrastMinimum() {
+        // Guard: WCAG 2.2 Level AA requires at least 4.5:1 contrast for normal body text
+        val lightSurface = Color(0xFFFFFFFF)
+        val lightCardSurface = Color(0xFFF8FAFC)
+        val darkSurface = Color(0xFF1E1E1E)
+        val darkCardSurface = Color(0xFF121212)
+
+        val lightWhiteRatio = calculateContrastRatio(NoteAmberLight, lightSurface)
+        val lightCardRatio = calculateContrastRatio(NoteAmberLight, lightCardSurface)
+        val darkSurfaceRatio = calculateContrastRatio(NoteAmberDark, darkSurface)
+        val darkCardRatio = calculateContrastRatio(NoteAmberDark, darkCardSurface)
+
+        assertTrue(
+            "NoteAmberLight on white must exceed 4.5:1 (was $lightWhiteRatio)",
+            lightWhiteRatio >= 4.5
+        )
+        assertTrue(
+            "NoteAmberLight on light card must exceed 4.5:1 (was $lightCardRatio)",
+            lightCardRatio >= 4.5
+        )
+        assertTrue(
+            "NoteAmberDark on dark surface must exceed 4.5:1 (was $darkSurfaceRatio)",
+            darkSurfaceRatio >= 4.5
+        )
+        assertTrue(
+            "NoteAmberDark on dark card must exceed 4.5:1 (was $darkCardRatio)",
+            darkCardRatio >= 4.5
+        )
+    }
+
+    @Test
+    fun testOffStateSwitchColors_complyWithWcag22NonTextComponentContrastMinimum() {
+        // Guard: WCAG 2.2 Level AA requires at least 3.0:1 contrast for UI components and borders
+        val lightSurface = Color(0xFFFFFFFF)
+        val darkCardSurface = Color(0xFF1E1E1E)
+
+        val darkBorderRatio = calculateContrastRatio(SwitchBorderOffDark, darkCardSurface)
+        val darkThumbRatio = calculateContrastRatio(SwitchThumbOffDark, darkCardSurface)
+        val lightBorderRatio = calculateContrastRatio(SwitchBorderOffLight, lightSurface)
+        val lightThumbOnTrackRatio = calculateContrastRatio(SwitchThumbOffLight, SwitchTrackOffLight)
+
+        assertTrue(
+            "SwitchBorderOffDark on dark card must exceed 3.0:1 (was $darkBorderRatio)",
+            darkBorderRatio >= 3.0
+        )
+        assertTrue(
+            "SwitchThumbOffDark on dark card must exceed 3.0:1 (was $darkThumbRatio)",
+            darkThumbRatio >= 3.0
+        )
+        assertTrue(
+            "SwitchBorderOffLight on light surface must exceed 3.0:1 (was $lightBorderRatio)",
+            lightBorderRatio >= 3.0
+        )
+        assertTrue(
+            "SwitchThumbOffLight on light track must exceed 3.0:1 (was $lightThumbOnTrackRatio)",
+            lightThumbOnTrackRatio >= 3.0
+        )
     }
 }
 

@@ -24,7 +24,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
+import com.example.dosezy.ui.components.AppSwitch
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -103,7 +103,7 @@ fun LazyListScope.doseTrackingPreferencesSection(
                         )
                     }
                 }
-                Switch(
+                AppSwitch(
                     checked = currentUser?.allowDoseSkipping == true,
                     onCheckedChange = onAllowDoseSkippingChange
                 )
@@ -154,7 +154,7 @@ fun LazyListScope.doseTrackingPreferencesSection(
                         )
                     }
                 }
-                Switch(
+                AppSwitch(
                     checked = currentUser?.allowCustomDoseTime == true,
                     onCheckedChange = onAllowCustomDoseTimeChange
                 )
@@ -205,7 +205,7 @@ fun LazyListScope.doseTrackingPreferencesSection(
                         )
                     }
                 }
-                Switch(
+                AppSwitch(
                     checked = currentUser?.allowDoseUndo == true,
                     onCheckedChange = onAllowDoseUndoChange
                 )
@@ -258,7 +258,7 @@ fun LazyListScope.doseTrackingPreferencesSection(
                             )
                         }
                     }
-                    Switch(
+                    AppSwitch(
                         checked = currentUser?.allowDoseNotes == true,
                         onCheckedChange = onAllowDoseNotesChange
                     )
@@ -302,7 +302,7 @@ fun LazyListScope.doseTrackingPreferencesSection(
                                 )
                             }
                         }
-                        Switch(
+                        AppSwitch(
                             checked = currentUser.promptDoseNotes,
                             onCheckedChange = onPromptDoseNotesChange
                         )
@@ -356,7 +356,7 @@ fun LazyListScope.doseTrackingPreferencesSection(
                             )
                         }
                     }
-                    Switch(
+                    AppSwitch(
                         checked = currentUser?.intakeSafeguardEnabled == true,
                         onCheckedChange = onIntakeSafeguardChange
                     )

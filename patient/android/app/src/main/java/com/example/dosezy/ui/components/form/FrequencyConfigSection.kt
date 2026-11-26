@@ -28,8 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
+import com.example.dosezy.ui.components.AppSwitch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -252,13 +251,10 @@ fun FrequencyConfigSection(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
-                    Switch(
+                    AppSwitch(
                         checked = asNeededNotifyEligible,
                         onCheckedChange = onAsNeededNotifyEligibleChange,
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = Color.White,
-                            checkedTrackColor = Color(0xFF1193D4)
-                        )
+                        checkedTrackColor = Color(0xFF1193D4)
                     )
                 }
             }
@@ -601,13 +597,10 @@ fun FrequencyConfigSection(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                Switch(
+                AppSwitch(
                     checked = isRollingInterval,
                     onCheckedChange = onRollingIntervalChange,
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color.White,
-                        checkedTrackColor = Color(0xFF1193D4)
-                    )
+                    checkedTrackColor = Color(0xFF1193D4)
                 )
             }
         }

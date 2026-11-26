@@ -143,10 +143,11 @@ fun LazyListScope.homePrnSection(
                                 )
                             }
                             if (!prnMed.notes.isNullOrBlank()) {
+                                // Guard: Use theme-aware high contrast amber (#9A4A00 on light giving >= 5.6:1, #FBBF24 on dark) to satisfy WCAG 2.2 AA (#F10)
                                 Text(
                                     text = "📝 ${prnMed.notes}",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = Color(0xFFF59E0B),
+                                    color = com.example.dosezy.ui.theme.getMedicationNoteColor(),
                                     maxLines = 1
                                 )
                             }

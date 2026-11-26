@@ -620,10 +620,11 @@ fun ScheduleListItem(
                 color = MaterialTheme.colorScheme.onSurface
             )
             if (!medicine?.notes.isNullOrBlank()) {
+                // Guard: Use theme-aware high contrast amber (#9A4A00 on light giving >= 5.6:1, #FBBF24 on dark) to satisfy WCAG 2.2 AA (#F10)
                 Text(
                     text = "📝 ${medicine?.notes}",
                     style = MaterialTheme.typography.labelSmall,
-                    color = Color(0xFFF59E0B),
+                    color = com.example.dosezy.ui.theme.getMedicationNoteColor(),
                     maxLines = 1
                 )
             }
