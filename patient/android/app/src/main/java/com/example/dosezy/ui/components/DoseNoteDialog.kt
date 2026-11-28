@@ -142,7 +142,10 @@ fun DoseNoteDialog(
         },
         confirmButton = {
             Button(
-                onClick = { onConfirm(noteText.trim()) },
+                onClick = {
+                    val normalized = com.example.dosezy.utils.DosageFormatUtils.normalizeNoteCapitalization(noteText) ?: noteText.trim()
+                    onConfirm(normalized)
+                },
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,

@@ -154,10 +154,12 @@ fun HomeMedicationCard(
 
                 // 3. Note
                 if (!medicine?.notes.isNullOrBlank()) {
+                    val noteText = com.example.dosezy.utils.DosageFormatUtils.normalizeNoteCapitalization(medicine?.notes)
+                    // Guard: Use theme-aware high contrast amber (#9A4A00 on light giving >= 5.6:1, #FBBF24 on dark) to satisfy WCAG 2.2 AA (#F10)
                     Text(
-                        text = "📝 ${medicine?.notes}",
+                        text = "📝 $noteText",
                         style = MaterialTheme.typography.labelSmall,
-                        color = Color(0xFFF59E0B),
+                        color = com.example.dosezy.ui.theme.getMedicationNoteColor(),
                         maxLines = 2
                     )
                 }
@@ -174,7 +176,8 @@ fun HomeMedicationCard(
 
                 // 3c. Dose note if taken
                 if (isTaken) {
-                    if (!entry.doseNotes.isNullOrBlank()) {
+                    val displayNotes = com.example.dosezy.utils.DosageFormatUtils.formatDoseNoteForDisplay(entry.doseNotes)
+                    if (!displayNotes.isNullOrBlank()) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
@@ -189,7 +192,7 @@ fun HomeMedicationCard(
                                 .padding(vertical = 2.dp)
                         ) {
                             Text(
-                                text = "💬 " + stringResource(R.string.home_dose_note_label, entry.doseNotes),
+                                text = "💬 " + stringResource(R.string.home_dose_note_label, displayNotes),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.primary,
                                 maxLines = 2
@@ -212,7 +215,10 @@ fun HomeMedicationCard(
 
                 // 4. Refill warning / stock badge
                 medicine?.currentStock?.let { stock ->
-                    val isLow = medicine.refillThreshold != null && stock <= medicine.refillThreshold
+                    val doseAmount = medicine.getStockDeductionAmount(entry.scheduledDateTime.toLocalTime(), entry.dosage)
+                    val threshold = medicine.refillThreshold
+                    // Guard: Trigger low-stock warning if stock is at or below refill threshold, lower than required dose, or depleted (#144)
+                    val isLow = (threshold != null && stock <= threshold) || stock < doseAmount || stock <= 0.0
                     val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
                     val containerBg = if (isLow) {
                         if (isDark) Color(0xFF3F1313) else Color(0xFFFEE2E2)

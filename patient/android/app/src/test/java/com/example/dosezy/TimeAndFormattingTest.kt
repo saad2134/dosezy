@@ -319,4 +319,15 @@ class TimeAndFormattingTest {
         val parsed = TimeFormatUtils.parseTime("invalid-time", TimeFormat.HOUR_12, Locale.US)
         assertNull(parsed)
     }
+
+    @Test
+    fun parseTime_flexibleFormats_paddedAndUnspaced() {
+        // Guard: Verify flexible parsing handles padded whitespace, unspaced meridians, and single digit 24h hours (#BUG-TIME-PARSING-FLEXIBLE)
+        assertNotNull(TimeFormatUtils.parseTime(" 8:30 AM ", TimeFormat.HOUR_12, Locale.US))
+        assertNotNull(TimeFormatUtils.parseTime("8:30AM", TimeFormat.HOUR_12, Locale.US))
+        assertNotNull(TimeFormatUtils.parseTime("08:30 AM", TimeFormat.HOUR_12, Locale.US))
+        assertNotNull(TimeFormatUtils.parseTime("8:00", TimeFormat.HOUR_24, Locale.US))
+        assertNotNull(TimeFormatUtils.parseTime(" 20:30 ", TimeFormat.HOUR_24, Locale.US))
+        assertNotNull(TimeFormatUtils.parseTime("20:30", TimeFormat.HOUR_24, Locale.US))
+    }
 }

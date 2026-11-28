@@ -16,11 +16,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material.icons.filled.ViewTimeline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
+import com.example.dosezy.ui.components.AppSwitch
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,7 +39,8 @@ fun LazyListScope.appearancePreferencesSection(
     onThemeClick: () -> Unit,
     onTimelineModeChange: (Boolean) -> Unit,
     onThickerCalendarChange: (Boolean) -> Unit,
-    onHideAddNavButtonChange: (Boolean) -> Unit
+    onHideAddNavButtonChange: (Boolean) -> Unit,
+    onSlotRollupChange: (Boolean) -> Unit = {}
 ) {
     item {
         Text(
@@ -107,7 +109,7 @@ fun LazyListScope.appearancePreferencesSection(
                         )
                     }
                 }
-                Switch(
+                AppSwitch(
                     checked = currentUser?.timelineModeEnabled == true,
                     onCheckedChange = onTimelineModeChange
                 )
@@ -158,7 +160,7 @@ fun LazyListScope.appearancePreferencesSection(
                         )
                     }
                 }
-                Switch(
+                AppSwitch(
                     checked = currentUser?.thickerCalendarDayHighlight == true,
                     onCheckedChange = onThickerCalendarChange
                 )
@@ -209,9 +211,60 @@ fun LazyListScope.appearancePreferencesSection(
                         )
                     }
                 }
-                Switch(
+                AppSwitch(
                     checked = currentUser?.hideAddMedicineNavButton == true,
                     onCheckedChange = onHideAddNavButtonChange
+                )
+            }
+        }
+    }
+
+    // Guard: Collapsible Time Slots preference (disabled by default) to ensure dose visibility and clinical safety (#138)
+    item {
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 0.dp,
+            shadowElevation = 2.dp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 6.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    modifier = Modifier.weight(1f).padding(end = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.UnfoldMore,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(36.dp)
+                    )
+                    Column {
+                        Text(
+                            text = stringResource(R.string.pref_slot_rollup_title),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = stringResource(R.string.pref_slot_rollup_desc),
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                AppSwitch(
+                    checked = currentUser?.slotRollupEnabled == true,
+                    onCheckedChange = onSlotRollupChange
                 )
             }
         }

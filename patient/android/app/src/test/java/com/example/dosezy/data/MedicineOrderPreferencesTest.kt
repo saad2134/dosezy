@@ -274,5 +274,52 @@ class MedicineOrderPreferencesTest {
         )
         db.close()
     }
+
+    @Test
+    fun getSortMode_lowercaseAndWhitespaceStrings_correctlyParsesWithoutResettingToDefault() {
+        val userId = "user_case_test"
+        val prefs = context.getSharedPreferences("medicine_order_prefs", Context.MODE_PRIVATE)
+
+        // Lowercase string
+        prefs.edit().putString("sort_mode_$userId", "name_asc").commit()
+        assertEquals(MedicineSortMode.NAME_ASC, MedicineOrderPreferences.getSortMode(context, userId))
+
+        // String with surrounding whitespace
+        prefs.edit().putString("sort_mode_$userId", " custom ").commit()
+        assertEquals(MedicineSortMode.CUSTOM, MedicineOrderPreferences.getSortMode(context, userId))
+
+        // Time asc in lowercase
+        prefs.edit().putString("sort_mode_$userId", "time_asc").commit()
+        assertEquals(MedicineSortMode.TIME_ASC, MedicineOrderPreferences.getSortMode(context, userId))
+    }
+
+    @Test
+    fun restoreAndMergeUserOrderConfig_lowercaseSortMode_correctlyParses() {
+        val userId = "user_restore_case_test"
+        val configJson = org.json.JSONObject().apply {
+            put("sortMode", "name_desc")
+            put("customOrder", org.json.JSONArray(listOf("id_1", "id_2")))
+        }.toString()
+
+        MedicineOrderPreferences.restoreUserOrderConfig(context, userId, configJson, emptyMap())
+        assertEquals(MedicineSortMode.NAME_DESC, MedicineOrderPreferences.getSortMode(context, userId))
+
+        val mergeUserId = "user_merge_case_test"
+        val mergeJson = org.json.JSONObject().apply {
+            put("sortMode", " time_asc ")
+            put("customOrder", org.json.JSONArray(listOf("id_3")))
+        }.toString()
+
+        MedicineOrderPreferences.mergeUserOrderConfig(context, mergeUserId, mergeJson, emptyMap())
+        assertEquals(MedicineSortMode.TIME_ASC, MedicineOrderPreferences.getSortMode(context, mergeUserId))
+    }
+
+    @Test
+    fun setCustomOrder_duplicateIds_deduplicatesCorrectly() {
+        val userId = "user_dedup_test"
+        MedicineOrderPreferences.setCustomOrder(context, userId, listOf("id_1", "id_2", "id_1", "id_3", "id_2"))
+        val result = MedicineOrderPreferences.getCustomOrder(context, userId)
+        assertEquals(listOf("id_1", "id_2", "id_3"), result)
+    }
 }
 

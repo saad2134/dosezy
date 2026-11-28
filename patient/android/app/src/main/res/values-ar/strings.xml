@@ -52,7 +52,8 @@
     <string name="form_error_course_duration">يجب أن تكون مدة العلاج يوماً واحداً على الأقل</string>
     <string name="form_error_fix_fields">يرجى ملء الحقول المطلوبة الموضحة أعلاه</string>
     <string name="freq_daily">يوميًا</string>
-    <string name="freq_weekly">أسبوعيًا</string>
+    <string name="freq_weekly">أسبوعيًا (أيام محددة)</string>
+    <string name="freq_weekly_desc">تناول الدواء فقط في أيام الأسبوع المحددة.</string>
     <string name="freq_monthly">شهريًا</string>
     <string name="freq_custom">كل X أسابيع</string>
     <string name="form_select_days_week">حدد أيام الأسبوع</string>
@@ -99,6 +100,9 @@
     <string name="hours_format">%1$d ساعة</string>
 
         <string name="notif_check_title">فحص موثوقية الإشعارات</string>
+    <string name="notif_check_summary">تم اجتياز %1$d من %2$d فحصاً</string>
+    <string name="notif_status_group_needs_fixing">يحتاج إلى إصلاح</string>
+    <string name="notif_status_group_all_good">كل شيء سليم</string>
     <string name="notif_perm_title">إذن الإشعارات</string>
     <string name="notif_perm_desc">مطلوب لإرسال تذكيرات الجرعات والمنبهات.</string>
     <string name="notif_perm_exact_warning">الإشعارات مفعلة • يلزم إذن المنبهات الدقيقة لتنبيهك في الوقت المحدد (انقر للسماح)</string>
@@ -241,6 +245,17 @@
     <string name="home_all_good_desc">لا توجد أدوية يجب تناولها اليوم.</string>
     <string name="no_profiles_found">لم يتم العثور على ملفات شخصية</string>
     <string name="status_taken">تم تناوله</string>
+    <string name="status_late">متأخر</string>
+    <string name="status_partial">جزئي</string>
+    <string name="status_upcoming">قادم</string>
+    <string name="status_missed">فائت</string>
+    <string name="status_skipped">تم تخطيه</string>
+    <string name="calendar_view_month">شهر</string>
+    <string name="calendar_view_week">أسبوع</string>
+    <string name="calendar_prev_week">الأسبوع السابق</string>
+    <string name="calendar_next_week">الأسبوع التالي</string>
+    <string name="calendar_prev_month">الشهر السابق</string>
+    <string name="calendar_next_month">الشهر التالي</string>
 
     <string name="image_picker_select_source">تحديد مصدر الصورة</string>
     <string name="image_picker_choose_method">اختر طريقة إضافة صورتك</string>
@@ -418,6 +433,7 @@
     <string name="import_from_server_or_backup">استيراد من الخادم / النسخة الاحتياطية</string>
     <string name="tab_cloud_server">السحابة / الخادم</string>
     <string name="tab_local_file">ملف محلي</string>
+    <string name="local_backup_card_title">الاستعادة من ملف محلي</string>
     <string name="cloud_sync_locked_desc">المزامنة السحابية لمقدمي الرعاية والاتصال بالخادم المخصص قيد التطوير حالياً وستكون متاحة في تحديث قادم.</string>
     <string name="local_backup_select_desc">حدد ملف نسخة احتياطية .zip تم تصديره مسبقاً من جهازك أو Google Drive لاستعادة ملفات المرضى والأدوية والجداول.</string>
     <string name="local_backup_select_btn">تحديد ملف النسخة الاحتياطية (.zip)</string>
@@ -492,6 +508,35 @@
     <string name="custom_recurrence_interval_label">التكرار كل (بالأسابيع)</string>
     <string name="custom_recurrence_summary">يتكرر كل %1$d أسابيع في أيام %2$s</string>
     <string name="validation_select_custom_days">يرجى تحديد يوم واحد على الأقل للتكرار المخصص</string>
+    <!-- Rolling Interval Scheduling (#119) -->
+    <string name="freq_rolling_interval_title">فترة مرنة بعد التناول</string>
+    <string name="freq_rolling_interval_desc">يبدأ مؤقت الجرعة التالية بعد تسجيل تناول الجرعة للحفاظ على التباعد الآمن</string>
+    <string name="freq_rolling_badge">مرن</string>
+
+    <!-- Cyclical & Looping Schedules (#141) -->
+    <string name="freq_cyclical">دوري (أيام نشطة وأيام راحة)</string>
+    <string name="freq_cyclical_desc">تناول الدواء لأيام محددة، ثم توقف مؤقتًا لأيام الراحة (مثل حبوب منع الحمل).</string>
+    <string name="freq_cycle_format">%1$d أيام تناول، %2$d أيام راحة</string>
+    <string name="freq_cycle_active_days">أيام التناول</string>
+    <string name="freq_cycle_rest_days">أيام الراحة</string>
+    <string name="freq_cycle_preset_21_7">21 / 7 (قياسي)</string>
+    <string name="freq_cycle_preset_24_4">24 / 4 (ممتد)</string>
+    <string name="freq_cycle_preset_custom">مخصص</string>
+    <string name="cycle_presets_label">خيارات الدورة الجاهزة</string>
+
+    <!-- PRN Next Dose Eligible Alerts (#142) -->
+    <string name="freq_as_needed_interval_title">الحد الأدنى للفاصل الزمني بين الجرعات</string>
+    <string name="freq_as_needed_interval_desc">تنبيه عندما يحين وقت الجرعة التالية بأمان وسماح طبي.</string>
+    <string name="freq_as_needed_interval_format">عند الحاجة (حد أدنى %1$d ساعات)</string>
+    <string name="freq_as_needed_notify_eligible">إشعار عند إمكانية تناول الجرعة التالية</string>
+    <string name="freq_as_needed_interval_none">بدون فاصل</string>
+    <string name="freq_as_needed_interval_hours_label">الفاصل الأدنى (ساعات)</string>
+    <string name="prn_eligible_channel_name">الجرعة التالية متاحة (عند الحاجة)</string>
+    <string name="prn_eligible_channel_desc">إشعارات عند انقضاء الحد الأدنى للفاصل الزمني لأدوية الحاجة.</string>
+    <string name="prn_eligible_notification_title">الجرعة التالية متاحة</string>
+    <string name="prn_eligible_notification_body">انقضى الحد الأدنى (%1$d ساعات) لدواء %2$s. يمكنك تناول الجرعة التالية إذا دعت الحاجة.</string>
+    <string name="prn_eligible_notification_body_generic">انقضى الحد الأدنى لدواء %1$s. يمكنك تناول الجرعة التالية إذا دعت الحاجة.</string>
+
     <string name="btn_log_prn_dose">تسجيل جرعة</string>
     <string name="prn_doses_taken_today">الجرعات المسجلة اليوم: %1$d</string>
     <string name="prn_section_title">أدوية تؤخذ عند الحاجة (PRN)</string>
@@ -684,9 +729,14 @@
     <string name="country_brazil">البرازيل</string>
     <string name="country_bangladesh">بنغلاديش</string>
     <string name="country_australia">أستراليا</string>
+    <string name="country_new_zealand">نيوزيلندا</string>
     <string name="pharmacy_order_refill_filter">تصفية إعادة التعبئة</string>
     <string name="pharmacy_order_days_supply">مدة الإمداد بالأيام</string>
     <string name="pharmacy_order_days_format_short">%1$d يوم</string>
+    <string name="pharmacy_order_days_custom">مخصص</string>
+    <string name="pharmacy_order_custom_days_label">مدة مخصصة (بالأيام)</string>
+    <string name="pharmacy_order_custom_days_placeholder">مثال: 28</string>
+    <string name="unit_days_suffix">يوم</string>
     <string name="pharmacy_order_medicines_include">الأدوية المشمولة (%1$d/%2$d)</string>
     <string name="pharmacy_order_stock_left">المتبقي %1$s</string>
     <string name="pharmacy_order_no_stock_tracked">المخزون غير متتبع</string>
@@ -829,7 +879,7 @@
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">تذكير بموعد الدواء المجدول</string>
     <string name="pref_lockscreen_details_title">إظهار التفاصيل على شاشة القفل</string>
-    <string name="pref_lockscreen_details_desc">إخفاء أسماء الأدوية والجرعات حتى يتم إلغاء قفل الجهاز.</string>
+    <string name="pref_lockscreen_details_desc">عرض أسماء الأدوية والجرعات على شاشة القفل. عند إيقاف التشغيل، تظل التفاصيل مخفية حتى يتم إلغاء قفل الجهاز.</string>
     <string name="disclaimer_dialog_title">إخلاء المسؤولية الطبية والقانونية</string>
     <string name="disclaimer_dialog_summary">تطبيق دوزيزي هو أداة تذكير رقمية آلية وليس جهازاً طبياً معتمداً. لا يقدم التطبيق تشخيصاً طبياً أو حسابات جرعات أو نصائح سريرية. استشر دائماً طبيبك أو مقدم الرعاية الصحية للحصول على تعليمات الوصفة الطبية.</string>
     <string name="disclaimer_checkbox_consent">أفهم وأوافق على إخلاء المسؤولية الطبية وشروط الخدمة.</string>
@@ -842,7 +892,17 @@
     <string name="pdf_report_disclaimer_footer">متتبع الأدوية دوزيزي • سجل معلوماتي مسجل ذاتياً (غير سريري)</string>
     <string name="pharmacy_refill_estimation_disclaimer">ملاحظة: كميات إعادة التعبئة هي تقديرات تقريبية بناءً على وتيرة التناول. تحقق مع الصيدلي أو الطبيب.</string>
     <string name="alarm_unlock_to_view_details">قم بإلغاء القفل لعرض التفاصيل</string>
+    <string name="alarm_lockscreen_privacy_title">تفاصيل الدواء مخفية</string>
     <string name="alarm_lockscreen_details_hidden">يتم إخفاء أسماء الأدوية والجرعات أثناء قفل الجهاز.</string>
+
+    <!-- Multi-Step Medicine Form (#145) -->
+    <string name="form_step_what">الاسم والجرعة</string>
+    <string name="form_step_when">المواعيد</string>
+    <string name="form_step_extras">إضافات</string>
+    <string name="form_step_counter">الخطوة %1$d من %2$d</string>
+    <string name="btn_next">التالي</string>
+    <string name="form_pill_appearance">شكل الحبة</string>
+    <string name="form_dosage_card_title">الجرعة والقوة</string>
 
     <!-- Schedule Effective Date Selector (#105) -->
     <string name="schedule_effective_dialog_title">تطبيق تغييرات الجدول</string>
@@ -892,4 +952,12 @@
     <string name="sort_custom_reorder_desc">استخدم الأسهم لتعديل ترتيب أدويتك.</string>
     <string name="sort_move_up">تحريك لأعلى</string>
     <string name="sort_move_down">تحريك لأسفل</string>
+
+    <!-- Collapsible Time Slots on Home Screen (#138) -->
+    <string name="pref_slot_rollup_title">فترات زمنية قابلة للطي</string>
+    <string name="pref_slot_rollup_desc">السماح بطي وتوسيع مجموعات الأدوية في الشاشة الرئيسية. معطل افتراضياً لتجنب تفويت الجرعات.</string>
+    <string name="home_expand_all">توسيع الكل</string>
+    <string name="home_collapse_all">طي الكل</string>
+    <string name="home_slot_expand">توسيع الفترة</string>
+    <string name="home_slot_collapse">طي الفترة</string>
 </resources>

@@ -74,7 +74,10 @@ fun ScheduleScreen(navController: NavController) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    val currentLocale = remember(context) { com.example.dosezy.utils.LocaleHelper.getCurrentLocale(context) }
+    // Guard: Derive locale from currentUser?.language so date headers, list times, and dialogs dynamically update on profile or language switch (#BUG-SCHEDULE-LOCALE)
+    val currentLocale = remember(currentUser?.language) {
+        com.example.dosezy.utils.LocaleHelper.getLocale(currentUser?.language ?: com.example.dosezy.data.model.Language.SYSTEM)
+    }
 
     // State for interactive dose actions on past and current schedule items (#109)
     var actionDialogEntry by remember { mutableStateOf<ScheduleWithMedicine?>(null) }
@@ -205,8 +208,10 @@ fun ScheduleScreen(navController: NavController) {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = selectedDate.format(
-                                    DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(currentLocale)
+                                text = com.example.dosezy.utils.TimeFormatUtils.formatStandardDate(
+                                    selectedDate,
+                                    currentLocale,
+                                    includeYear = true
                                 ),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
@@ -395,7 +400,7 @@ fun ScheduleScreen(navController: NavController) {
         val target = noteEditEntry!!
         DoseNoteDialog(
             medicationName = target.medicine?.medicationName ?: "",
-            initialNote = target.scheduleEntry.doseNotes ?: "",
+            initialNote = com.example.dosezy.utils.DosageFormatUtils.extractUserNote(target.scheduleEntry.doseNotes),
             isEditing = true,
             onConfirm = { note ->
                 val entryId = target.scheduleEntry.entryId

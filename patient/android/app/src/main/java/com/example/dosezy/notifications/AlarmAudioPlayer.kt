@@ -25,6 +25,8 @@ object AlarmAudioPlayer {
     private var vibrator: Vibrator? = null
     private var wakeLock: PowerManager.WakeLock? = null
     private var autoSilenceJob: Job? = null
+    private var audioManager: android.media.AudioManager? = null
+    private var audioFocusRequest: android.media.AudioFocusRequest? = null
     private val scope = CoroutineScope(Dispatchers.Main)
 
     @Synchronized
@@ -110,12 +112,41 @@ object AlarmAudioPlayer {
 
         startVibration(context, repeat = shouldLoop)
 
+        // Guard: Request transient audio focus so external media (e.g. music/podcasts) pauses or ducks during alarm audio (#BUG-AUDIO-FOCUS)
+        try {
+            val am = context.applicationContext.getSystemService(Context.AUDIO_SERVICE) as? android.media.AudioManager
+            audioManager = am
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val playbackAttributes = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+                val focusReq = android.media.AudioFocusRequest.Builder(android.media.AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+                    .setAudioAttributes(playbackAttributes)
+                    .setOnAudioFocusChangeListener { /* Alarms ignore external focus changes */ }
+                    .build()
+                audioFocusRequest = focusReq
+                am?.requestAudioFocus(focusReq)
+            } else {
+                @Suppress("DEPRECATION")
+                am?.requestAudioFocus(
+                    null,
+                    android.media.AudioManager.STREAM_ALARM,
+                    android.media.AudioManager.AUDIOFOCUS_GAIN_TRANSIENT
+                )
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error requesting audio focus for alarm", e)
+        }
+
         var playbackStarted = false
 
         // 1. Try Custom Sound if configured
-        if (sound == AlarmSound.CUSTOM && !customPath.isNullOrEmpty() && File(customPath).exists()) {
+        // Guard: Strip file:// prefix so File(cleanPath).exists() accurately validates custom alarm sounds and prevents silent fallback (#BUG-AUDIO-FILE-URI)
+        val cleanCustomPath = customPath?.removePrefix("file://")
+        if (sound == AlarmSound.CUSTOM && !cleanCustomPath.isNullOrEmpty() && File(cleanCustomPath).exists()) {
             try {
-                Log.d(TAG, "Attempting custom alarm sound from: $customPath")
+                Log.d(TAG, "Attempting custom alarm sound from: $cleanCustomPath")
                 mediaPlayer = MediaPlayer().apply {
                     setAudioAttributes(
                         AudioAttributes.Builder()
@@ -123,7 +154,7 @@ object AlarmAudioPlayer {
                             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                             .build()
                     )
-                    setDataSource(customPath)
+                    setDataSource(cleanCustomPath)
                     isLooping = shouldLoop
                     if (!shouldLoop) {
                         setOnCompletionListener {
@@ -299,10 +330,9 @@ object AlarmAudioPlayer {
         }
         mediaPlayer = null
 
+        // Guard: Call stop() unconditionally on fallback Ringtone to prevent stranded playback if isPlaying returns false or throws during lockscreen transitions (#BUG-ALARM-SCREAMING-LOCKSCREEN)
         try {
-            ringtone?.let {
-                if (it.isPlaying) it.stop()
-            }
+            ringtone?.stop()
         } catch (_: Exception) {}
         ringtone = null
 
@@ -317,5 +347,19 @@ object AlarmAudioPlayer {
             }
         } catch (_: Exception) {}
         wakeLock = null
+
+        // Guard: Abandon audio focus on stop so external media players can resume playback
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                audioFocusRequest?.let { focusReq ->
+                    audioManager?.abandonAudioFocusRequest(focusReq)
+                }
+                audioFocusRequest = null
+            } else {
+                @Suppress("DEPRECATION")
+                audioManager?.abandonAudioFocus(null)
+            }
+        } catch (_: Exception) {}
+        audioManager = null
     }
 }

@@ -1,0 +1,4 @@
+* Added rolling intake intervals dynamically adjusting future reminders from actual dose times.
+* Added custom supply days selector for pharmacy refill orders with quick increment steppers.
+* Fixed pharmacy refill order stock display to show countable inventory units instead of dosage strength units.
+

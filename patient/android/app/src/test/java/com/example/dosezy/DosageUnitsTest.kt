@@ -73,13 +73,13 @@ class DosageUnitsTest {
         assertEquals("10.5 mEq", meqFractional.getDosageDisplay())
 
         val puffMed = createMedicine(2.0, DosageUnit.PUFF)
-        assertEquals("2 puff", puffMed.getDosageDisplay())
+        assertEquals("2 puffs", puffMed.getDosageDisplay())
 
         val ampuleMed = createMedicine(1.0, DosageUnit.AMPULE)
         assertEquals("1 ampule", ampuleMed.getDosageDisplay())
 
         val sprayMed = createMedicine(2.0, DosageUnit.SPRAY)
-        assertEquals("2 spray", sprayMed.getDosageDisplay())
+        assertEquals("2 sprays", sprayMed.getDosageDisplay())
     }
 
     @Test

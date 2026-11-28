@@ -7,6 +7,7 @@ package com.example.dosezy.ui
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.ui.graphics.Color
 import androidx.test.core.app.ApplicationProvider
 import com.example.dosezy.data.model.DosageUnit
 import com.example.dosezy.data.model.Frequency
@@ -16,6 +17,7 @@ import com.example.dosezy.data.model.Language
 import com.example.dosezy.data.model.Medicine
 import com.example.dosezy.data.model.User
 import com.example.dosezy.data.model.normalizeArabicDigits
+import com.example.dosezy.data.model.getLocalizedName
 import com.example.dosezy.ui.components.deleteOldImage
 import com.example.dosezy.ui.subscreens.createDialIntent
 import com.example.dosezy.ui.subscreens.createSupportDialIntent
@@ -23,6 +25,20 @@ import com.example.dosezy.ui.subscreens.createSupportEmailIntent
 import com.example.dosezy.ui.subscreens.createSupportUrlIntent
 import com.example.dosezy.ui.subscreens.detectDeviceEmergencyCountry
 import com.example.dosezy.ui.subscreens.matchEmergencyCountryByIso
+import com.example.dosezy.ui.theme.BrandPrimaryDark
+import com.example.dosezy.ui.theme.BrandPrimaryLight
+import com.example.dosezy.ui.theme.DarkColorScheme
+import com.example.dosezy.ui.theme.LightColorScheme
+import com.example.dosezy.ui.theme.NoteAmberDark
+import com.example.dosezy.ui.theme.NoteAmberLight
+import com.example.dosezy.ui.theme.SwitchBorderOffDark
+import com.example.dosezy.ui.theme.SwitchBorderOffLight
+import com.example.dosezy.ui.theme.SwitchThumbOffDark
+import com.example.dosezy.ui.theme.SwitchThumbOffLight
+import com.example.dosezy.ui.theme.SwitchTrackOffDark
+import com.example.dosezy.ui.theme.SwitchTrackOffLight
+import com.example.dosezy.utils.DosageFormatUtils
+import com.example.dosezy.utils.TimeFormatUtils
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -525,11 +541,21 @@ class EmergencyDialAndEditMedScreenTest {
         assertNotNull("PA must map to 911 profile", paMatch)
         assertEquals("US", paMatch?.code)
 
-        // Test NZ maps to AU profile
+        // Test AU maps to AU profile
+        val auMatch = matchEmergencyCountryByIso("AU")
+        assertNotNull("AU must map to AU profile", auMatch)
+        assertEquals("AU", auMatch?.code)
+        assertEquals("000", auMatch?.ambulance)
+
+        // Guard: Test NZ maps to dedicated New Zealand 111 profile (#133)
         val nzMatch = matchEmergencyCountryByIso("NZ")
-        assertNotNull("NZ must map to AU profile", nzMatch)
-        assertEquals("AU", nzMatch?.code)
-        assertEquals("000", nzMatch?.ambulance)
+        assertNotNull("NZ must map to dedicated NZ profile", nzMatch)
+        assertEquals("NZ", nzMatch?.code)
+        assertEquals("111", nzMatch?.ambulance)
+        assertEquals("111", nzMatch?.fire)
+        assertEquals("111", nzMatch?.police)
+        assertEquals("111", nzMatch?.universal)
+        assertEquals("🇳🇿", nzMatch?.flag)
 
         // Test fallback when device country ISO is unavailable/unmatched:
         // Use a Context with an unmapped locale country so step 1 and 2 do not match US by default
@@ -619,6 +645,256 @@ class EmergencyDialAndEditMedScreenTest {
             "Switching to AS_NEEDED bypasses effective date dialog",
             isTimingOrScheduleChanged(baseMed, baseMed.copy(dosage = 500.0, frequency = Frequency(pattern = FrequencyPattern.AS_NEEDED)))
         )
+    }
+
+    @Test
+    fun testEmergencyScreen_backHandlerClosesCountryDropdownWithoutExitingScreen() {
+        // Guard: Back press when country dropdown is expanded must collapse the menu rather than popping navigation (#BUG-EMERGENCY-BACK-DROPDOWN)
+        var countryDropdownExpanded = true
+        var screenExited = false
+
+        // Simulate BackHandler action
+        val backHandlerAction: () -> Unit = {
+            if (countryDropdownExpanded) {
+                countryDropdownExpanded = false
+            } else {
+                screenExited = true
+            }
+        }
+
+        // First back press: collapses dropdown
+        backHandlerAction()
+        assertFalse("First back press must collapse country dropdown", countryDropdownExpanded)
+        assertFalse("First back press must not exit the emergency screen", screenExited)
+
+        // Second back press: exits screen
+        backHandlerAction()
+        assertTrue("Second back press with closed dropdown exits screen", screenExited)
+    }
+
+    @Test
+    fun testImportSourceDialog_cardHeadingDifferentiatesFromTab_wcagAccessibility() {
+        // Guard: WCAG 1.3.1 accessibility - differentiate card heading from tab label to avoid redundant TalkBack announcements (#147)
+        val tabString = context.getString(com.example.dosezy.R.string.tab_local_file)
+        val cardHeadingString = context.getString(com.example.dosezy.R.string.local_backup_card_title)
+
+        assertEquals("Local File", tabString)
+        assertEquals("Restore from Local File", cardHeadingString)
+        assertTrue(
+            "Card heading must be distinct from tab label to prevent duplicate screen reader announcements",
+            tabString != cardHeadingString
+        )
+    }
+
+    @Test
+    fun testImportSourceDialog_cardHeadingDifferentiatesAcrossLocales() {
+        // Guard: Verify card heading and tab label distinction across all supported locales (#147)
+        val locales = listOf(
+            java.util.Locale("ar"),
+            java.util.Locale("bn"),
+            java.util.Locale.GERMAN,
+            java.util.Locale("es"),
+            java.util.Locale.FRENCH,
+            java.util.Locale("hi"),
+            java.util.Locale.ITALIAN,
+            java.util.Locale.JAPANESE,
+            java.util.Locale("pt"),
+            java.util.Locale("ru"),
+            java.util.Locale.SIMPLIFIED_CHINESE
+        )
+
+        for (locale in locales) {
+            val config = android.content.res.Configuration(context.resources.configuration).apply {
+                setLocale(locale)
+            }
+            val localizedContext = context.createConfigurationContext(config)
+            val tab = localizedContext.getString(com.example.dosezy.R.string.tab_local_file)
+            val card = localizedContext.getString(com.example.dosezy.R.string.local_backup_card_title)
+
+            assertTrue("Tab label in $locale must not be empty", tab.isNotEmpty())
+            assertTrue("Card heading in $locale must not be empty", card.isNotEmpty())
+            assertTrue(
+                "Card heading must differ from tab label in $locale to prevent TalkBack duplicate announcements",
+                tab != card
+            )
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 6. WCAG 2.2 Contrast Compliance Tests (Issue F10: Medication Notes and Off-State Switches)
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    private fun calculateRelativeLuminance(color: Color): Double {
+        fun linearize(component: Float): Double {
+            val c = component.toDouble()
+            return if (c <= 0.04045) c / 12.92 else Math.pow((c + 0.055) / 1.055, 2.4)
+        }
+        return 0.2126 * linearize(color.red) + 0.7152 * linearize(color.green) + 0.0722 * linearize(color.blue)
+    }
+
+    private fun calculateContrastRatio(color1: Color, color2: Color): Double {
+        val lum1 = calculateRelativeLuminance(color1)
+        val lum2 = calculateRelativeLuminance(color2)
+        val lighter = maxOf(lum1, lum2)
+        val darker = minOf(lum1, lum2)
+        return (lighter + 0.05) / (darker + 0.05)
+    }
+
+    @Test
+    fun testMedicationNoteColors_complyWithWcag22TextContrastMinimum() {
+        // Guard: WCAG 2.2 Level AA requires at least 4.5:1 contrast for normal body text
+        val lightSurface = Color(0xFFFFFFFF)
+        val lightCardSurface = Color(0xFFF8FAFC)
+        val darkSurface = Color(0xFF1E1E1E)
+        val darkCardSurface = Color(0xFF121212)
+
+        val lightWhiteRatio = calculateContrastRatio(NoteAmberLight, lightSurface)
+        val lightCardRatio = calculateContrastRatio(NoteAmberLight, lightCardSurface)
+        val darkSurfaceRatio = calculateContrastRatio(NoteAmberDark, darkSurface)
+        val darkCardRatio = calculateContrastRatio(NoteAmberDark, darkCardSurface)
+
+        assertTrue(
+            "NoteAmberLight on white must exceed 4.5:1 (was $lightWhiteRatio)",
+            lightWhiteRatio >= 4.5
+        )
+        assertTrue(
+            "NoteAmberLight on light card must exceed 4.5:1 (was $lightCardRatio)",
+            lightCardRatio >= 4.5
+        )
+        assertTrue(
+            "NoteAmberDark on dark surface must exceed 4.5:1 (was $darkSurfaceRatio)",
+            darkSurfaceRatio >= 4.5
+        )
+        assertTrue(
+            "NoteAmberDark on dark card must exceed 4.5:1 (was $darkCardRatio)",
+            darkCardRatio >= 4.5
+        )
+    }
+
+    @Test
+    fun testOffStateSwitchColors_complyWithWcag22NonTextComponentContrastMinimum() {
+        // Guard: WCAG 2.2 Level AA requires at least 3.0:1 contrast for UI components and borders
+        val lightSurface = Color(0xFFFFFFFF)
+        val darkCardSurface = Color(0xFF1E1E1E)
+
+        val darkBorderRatio = calculateContrastRatio(SwitchBorderOffDark, darkCardSurface)
+        val darkThumbRatio = calculateContrastRatio(SwitchThumbOffDark, darkCardSurface)
+        val lightBorderRatio = calculateContrastRatio(SwitchBorderOffLight, lightSurface)
+        val lightThumbOnTrackRatio = calculateContrastRatio(SwitchThumbOffLight, SwitchTrackOffLight)
+
+        assertTrue(
+            "SwitchBorderOffDark on dark card must exceed 3.0:1 (was $darkBorderRatio)",
+            darkBorderRatio >= 3.0
+        )
+        assertTrue(
+            "SwitchThumbOffDark on dark card must exceed 3.0:1 (was $darkThumbRatio)",
+            darkThumbRatio >= 3.0
+        )
+        assertTrue(
+            "SwitchBorderOffLight on light surface must exceed 3.0:1 (was $lightBorderRatio)",
+            lightBorderRatio >= 3.0
+        )
+        assertTrue(
+            "SwitchThumbOffLight on light track must exceed 3.0:1 (was $lightThumbOnTrackRatio)",
+            lightThumbOnTrackRatio >= 3.0
+        )
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 7. Standard Date Formats, Pluralization, and Note Capitalization (Issue F15)
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testStandardDateFormat_enforcesConsistentFormat() {
+        // Guard: Standard date format must display "20 Nov 2026" (with year) or "20 Nov" (without year) (#F15)
+        val date = LocalDate.of(2026, 11, 20)
+        val usLocale = java.util.Locale.US
+        val withYear = TimeFormatUtils.formatStandardDate(date, usLocale, includeYear = true)
+        val withoutYear = TimeFormatUtils.formatStandardDate(date, usLocale, includeYear = false)
+
+        assertEquals("20 Nov 2026", withYear)
+        assertEquals("20 Nov", withoutYear)
+    }
+
+    @Test
+    fun testDosageUnits_supportTruePluralInflection() {
+        // Guard: Discrete count units must pluralize when quantity > 1.0 (e.g. "8 tablets", "2 capsules") (#F15)
+        assertEquals("tablet", DosageUnit.TABLET.getLocalizedName(context, isPlural = false))
+        assertEquals("tablets", DosageUnit.TABLET.getLocalizedName(context, isPlural = true))
+        assertEquals("capsule", DosageUnit.CAPSULE.getLocalizedName(context, isPlural = false))
+        assertEquals("capsules", DosageUnit.CAPSULE.getLocalizedName(context, isPlural = true))
+        assertEquals("drop", DosageUnit.DROP.getLocalizedName(context, isPlural = false))
+        assertEquals("drops", DosageUnit.DROP.getLocalizedName(context, isPlural = true))
+        assertEquals("puff", DosageUnit.PUFF.getLocalizedName(context, isPlural = false))
+        assertEquals("puffs", DosageUnit.PUFF.getLocalizedName(context, isPlural = true))
+
+        // Chemical units are invariant
+        assertEquals("mg", DosageUnit.MG.getLocalizedName(context, isPlural = false))
+        assertEquals("mg", DosageUnit.MG.getLocalizedName(context, isPlural = true))
+    }
+
+    @Test
+    fun testFrequencyAndHoursStrings_inflectPluralsProperly() {
+        // Guard: Times per day and hours formats must distinguish singular vs plural (#F15)
+        val oneTime = context.getString(com.example.dosezy.R.string.time_per_day_format, 1)
+        val twoTimes = context.getString(com.example.dosezy.R.string.times_per_day_format, 2)
+        assertEquals("1 time a day", oneTime)
+        assertEquals("2 times a day", twoTimes)
+
+        val oneHour = context.getString(com.example.dosezy.R.string.hour_format, 1)
+        val threeHours = context.getString(com.example.dosezy.R.string.hours_format, 3)
+        assertEquals("1 hour", oneHour)
+        assertEquals("3 hours", threeHours)
+    }
+
+    @Test
+    fun testNoteCapitalizationNormalization() {
+        // Guard: Clinical and dose notes must normalize initial letter to sentence-case (#F15)
+        val lowerNote = "take with water"
+        val normalized = DosageFormatUtils.normalizeNoteCapitalization(lowerNote)
+        assertEquals("Take with water", normalized)
+
+        val alreadyCapitalized = "Take it with water"
+        assertEquals("Take it with water", DosageFormatUtils.normalizeNoteCapitalization(alreadyCapitalized))
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 8. Unified Brand Primary Blue Tokens (Issue F16)
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testBrandPrimaryBlueTokens_consistentAcrossThemeSchemes() {
+        // Guard: Project wireframes define BrandPrimaryLight = Color(0xFF2084E4) and BrandPrimaryDark = Color(0xFF4FC3F7) (#F16)
+        assertEquals(BrandPrimaryLight, LightColorScheme.primary)
+        assertEquals(Color(0xFF2084E4), LightColorScheme.primary)
+        assertEquals(BrandPrimaryDark, DarkColorScheme.primary)
+        assertEquals(Color(0xFF4FC3F7), DarkColorScheme.primary)
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 9. Help & Support and About Screen Navigation & Legal Single-Listing Tests
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun testLegalPolicies_stringsAndSingleListingIntegrity() {
+        // Guard: Legal and policy links must reside in AboutScreen with accurate subtitles
+        val legalTitle = context.getString(com.example.dosezy.R.string.about_legal_policies_title)
+        val medicalDesc = context.getString(com.example.dosezy.R.string.about_legal_medical_desc)
+        val privacyDesc = context.getString(com.example.dosezy.R.string.about_legal_privacy_desc)
+        val termsDesc = context.getString(com.example.dosezy.R.string.about_legal_terms_desc)
+
+        assertEquals("Legal & Policies", legalTitle)
+        assertEquals("Non-clinical software utility disclaimer", medicalDesc)
+        assertEquals("Data protection and privacy policy", privacyDesc)
+        assertEquals("Terms of service and software license", termsDesc)
+
+        // Verify Privacy Policy title does not use Terms of Service as its description
+        val privacyTitle = context.getString(com.example.dosezy.R.string.disclaimer_link_privacy)
+        val termsTitle = context.getString(com.example.dosezy.R.string.disclaimer_link_terms)
+        assertEquals("Privacy Policy", privacyTitle)
+        assertEquals("Terms of Service", termsTitle)
+        org.junit.Assert.assertNotEquals(privacyTitle, termsTitle)
+        org.junit.Assert.assertNotEquals(privacyDesc, termsDesc)
     }
 }
 

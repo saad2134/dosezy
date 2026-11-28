@@ -1,8 +1,14 @@
 package com.example.dosezy.domain
 
+import android.content.Context
+import com.example.dosezy.R
 import com.example.dosezy.data.model.DosageUnit
+import com.example.dosezy.data.model.PillShape
 import com.example.dosezy.utils.DosageFormatUtils
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class DosageFormatUtilsTest {
@@ -49,13 +55,14 @@ class DosageFormatUtilsTest {
         // Discrete units
         assertEquals("½ tablet", DosageFormatUtils.formatDosageDisplay(0.5, DosageUnit.TABLET))
         assertEquals("1 tablet", DosageFormatUtils.formatDosageDisplay(1.0, DosageUnit.TABLET))
-        assertEquals("1½ tablet", DosageFormatUtils.formatDosageDisplay(1.5, DosageUnit.TABLET))
-        assertEquals("2 tablet", DosageFormatUtils.formatDosageDisplay(2.0, DosageUnit.TABLET))
+        assertEquals("1½ tablets", DosageFormatUtils.formatDosageDisplay(1.5, DosageUnit.TABLET))
+        assertEquals("2 tablets", DosageFormatUtils.formatDosageDisplay(2.0, DosageUnit.TABLET))
+        assertEquals("8 tablets", DosageFormatUtils.formatDosageDisplay(8.0, DosageUnit.TABLET))
 
         assertEquals("½ capsule", DosageFormatUtils.formatDosageDisplay(0.5, DosageUnit.CAPSULE))
         assertEquals("1 capsule", DosageFormatUtils.formatDosageDisplay(1.0, DosageUnit.CAPSULE))
-        assertEquals("1½ capsule", DosageFormatUtils.formatDosageDisplay(1.5, DosageUnit.CAPSULE))
-        assertEquals("2 capsule", DosageFormatUtils.formatDosageDisplay(2.0, DosageUnit.CAPSULE))
+        assertEquals("1½ capsules", DosageFormatUtils.formatDosageDisplay(1.5, DosageUnit.CAPSULE))
+        assertEquals("2 capsules", DosageFormatUtils.formatDosageDisplay(2.0, DosageUnit.CAPSULE))
 
         // Chemical strengths
         assertEquals("0.5 mg", DosageFormatUtils.formatDosageDisplay(0.5, DosageUnit.MG))
@@ -69,13 +76,22 @@ class DosageFormatUtilsTest {
 
         // Drops, puffs, sprays, ampules
         assertEquals("1 drop", DosageFormatUtils.formatDosageDisplay(1.0, DosageUnit.DROP))
-        assertEquals("3 drop", DosageFormatUtils.formatDosageDisplay(3.0, DosageUnit.DROP))
+        assertEquals("3 drops", DosageFormatUtils.formatDosageDisplay(3.0, DosageUnit.DROP))
         assertEquals("1 puff", DosageFormatUtils.formatDosageDisplay(1.0, DosageUnit.PUFF))
-        assertEquals("2 puff", DosageFormatUtils.formatDosageDisplay(2.0, DosageUnit.PUFF))
+        assertEquals("2 puffs", DosageFormatUtils.formatDosageDisplay(2.0, DosageUnit.PUFF))
         assertEquals("1 ampule", DosageFormatUtils.formatDosageDisplay(1.0, DosageUnit.AMPULE))
-        assertEquals("2 ampule", DosageFormatUtils.formatDosageDisplay(2.0, DosageUnit.AMPULE))
+        assertEquals("2 ampules", DosageFormatUtils.formatDosageDisplay(2.0, DosageUnit.AMPULE))
         assertEquals("1 spray", DosageFormatUtils.formatDosageDisplay(1.0, DosageUnit.SPRAY))
-        assertEquals("2 spray", DosageFormatUtils.formatDosageDisplay(2.0, DosageUnit.SPRAY))
+        assertEquals("2 sprays", DosageFormatUtils.formatDosageDisplay(2.0, DosageUnit.SPRAY))
+    }
+
+    @Test
+    fun testNormalizeNoteCapitalization() {
+        assertEquals("Take with water", DosageFormatUtils.normalizeNoteCapitalization("take with water"))
+        assertEquals("Take it with water", DosageFormatUtils.normalizeNoteCapitalization("Take it with water"))
+        assertEquals("With food", DosageFormatUtils.normalizeNoteCapitalization("with food"))
+        assertNull(DosageFormatUtils.normalizeNoteCapitalization(""))
+        assertNull(DosageFormatUtils.normalizeNoteCapitalization(null))
     }
 
     @Test
@@ -100,5 +116,104 @@ class DosageFormatUtilsTest {
         // Chemical units with float precision
         assertEquals("2", DosageFormatUtils.formatDosageAmount(2.0000000000000004, DosageUnit.MG))
         assertEquals("0", DosageFormatUtils.formatDosageAmount(0.0001, DosageUnit.MG))
+    }
+
+    @Test
+    fun testFormatStockUnit_chemicalStrengthsUseCountableUnitsAndBottles() {
+        val context = mockk<Context>()
+        every { context.getString(R.string.unit_units) } returns "units"
+        every { context.getString(R.string.unit_bottle) } returns "bottle"
+        every { context.getString(R.string.unit_bottles) } returns "bottles"
+        every { context.getString(R.string.unit_tablet) } returns "tablet"
+        every { context.getString(R.string.unit_capsule) } returns "capsule"
+
+        // Guard: Verify chemical strength units return "units" instead of displaying "mg", "mcg", or "mEq" for inventory stock (#129)
+        assertEquals("units", DosageFormatUtils.formatStockUnit(context, DosageUnit.MG, PillShape.ROUND, 10.0))
+        assertEquals("units", DosageFormatUtils.formatStockUnit(context, DosageUnit.MCG, PillShape.CAPSULE, 25.0))
+        assertEquals("units", DosageFormatUtils.formatStockUnit(context, DosageUnit.MEQ, PillShape.ROUND, 15.0))
+
+        // Discrete countable units return their localized name
+        assertEquals("tablet", DosageFormatUtils.formatStockUnit(context, DosageUnit.TABLET, PillShape.ROUND, 40.0))
+        assertEquals("capsule", DosageFormatUtils.formatStockUnit(context, DosageUnit.CAPSULE, PillShape.CAPSULE, 12.0))
+
+        // Bottle formulations return bottle/bottles
+        assertEquals("bottle", DosageFormatUtils.formatStockUnit(context, DosageUnit.DROP, PillShape.DROPS, 1.0))
+        assertEquals("bottles", DosageFormatUtils.formatStockUnit(context, DosageUnit.DROP, PillShape.DROPS, 2.0))
+        assertEquals("bottle", DosageFormatUtils.formatStockUnit(context, DosageUnit.SPRAY, PillShape.SPRAY, 1.0))
+        assertEquals("bottles", DosageFormatUtils.formatStockUnit(context, DosageUnit.SPRAY, PillShape.SPRAY, 3.0))
+    }
+
+    @Test
+    fun testFormatOrderUnit_chemicalStrengthsUseCountableUnitsAndBottles() {
+        val context = mockk<Context>()
+        every { context.getString(R.string.unit_units) } returns "units"
+        every { context.getString(R.string.unit_bottle) } returns "bottle"
+        every { context.getString(R.string.unit_bottles) } returns "bottles"
+        every { context.getString(R.string.unit_tablet) } returns "tablet"
+
+        // Guard: Verify order unit maps chemical strengths to units and drops/sprays to bottles (#129)
+        assertEquals("units", DosageFormatUtils.formatOrderUnit(context, DosageUnit.MG, PillShape.ROUND, 60))
+        assertEquals("units", DosageFormatUtils.formatOrderUnit(context, DosageUnit.MCG, PillShape.ROUND, 30))
+        assertEquals("units", DosageFormatUtils.formatOrderUnit(context, DosageUnit.MEQ, PillShape.ROUND, 15))
+        assertEquals("tablet", DosageFormatUtils.formatOrderUnit(context, DosageUnit.TABLET, PillShape.ROUND, 30))
+        assertEquals("bottle", DosageFormatUtils.formatOrderUnit(context, DosageUnit.DROP, PillShape.DROPS, 1))
+        assertEquals("bottles", DosageFormatUtils.formatOrderUnit(context, DosageUnit.DROP, PillShape.DROPS, 2))
+    }
+
+    @Test
+    fun testFormatDosageAmount_nanAndInfinity_returnsZero() {
+        // Guard: Verify NaN and Infinite inputs return "0" safely (#BUG-DOSAGE-FLOAT-SANITIZATION)
+        assertEquals("0", DosageFormatUtils.formatDosageAmount(Double.NaN, DosageUnit.TABLET))
+        assertEquals("0", DosageFormatUtils.formatDosageAmount(Double.POSITIVE_INFINITY, DosageUnit.TABLET))
+        assertEquals("0", DosageFormatUtils.formatDosageAmount(Double.NEGATIVE_INFINITY, DosageUnit.MG))
+        assertEquals("0", DosageFormatUtils.formatDosageAmount(-0.0, DosageUnit.MG))
+    }
+
+    @Test
+    fun testFormatStockQuantity_nanAndNegativeZero_sanitized() {
+        // Guard: Verify stock quantity formatting handles null, NaN, and negative zero cleanly (#BUG-DOSAGE-FLOAT-SANITIZATION)
+        assertEquals("", DosageFormatUtils.formatStockQuantity(null))
+        assertEquals("", DosageFormatUtils.formatStockQuantity(Double.NaN))
+        assertEquals("", DosageFormatUtils.formatStockQuantity(Double.POSITIVE_INFINITY))
+        assertEquals("0", DosageFormatUtils.formatStockQuantity(-0.0))
+        assertEquals("0", DosageFormatUtils.formatStockQuantity(-0.004))
+    }
+
+    @Test
+    fun testFormatDoseNoteForDisplay_partialStock_phrasedCleanly() {
+        // Guard: Verify raw debug bracketed stock tag is transformed into clean human-readable phrasing
+        assertEquals("Took 2 of 5", DosageFormatUtils.formatDoseNoteForDisplay("[Partial Stock: Took 2 of 5]"))
+        assertEquals("Took 0.5 of 1", DosageFormatUtils.formatDoseNoteForDisplay("[Partial Stock: Took 0.5 of 1]"))
+        assertEquals("Took 1.25 of 2.5", DosageFormatUtils.formatDoseNoteForDisplay("[Partial Stock: Took 1.25 of 2.5]"))
+    }
+
+    @Test
+    fun testFormatDoseNoteForDisplay_userNoteWithPartialStock_cleanSeparators() {
+        // Guard: User clinical notes and partial stock notes are joined with bullet separators
+        assertEquals("Took with food • Took 2 of 5", DosageFormatUtils.formatDoseNoteForDisplay("Took with food | [Partial Stock: Took 2 of 5]"))
+        assertEquals("Took with food • Took 2 of 5", DosageFormatUtils.formatDoseNoteForDisplay("[Partial Stock: Took 2 of 5] | Took with food"))
+        assertEquals("Took with food", DosageFormatUtils.formatDoseNoteForDisplay("Took with food"))
+    }
+
+    @Test
+    fun testFormatDoseNoteForDisplay_internalTagsStripped() {
+        // Guard: Automated internal tags like [Logged retrospectively] are stripped from UI display
+        assertEquals(null, DosageFormatUtils.formatDoseNoteForDisplay("[Logged retrospectively]"))
+        assertEquals("Took with food", DosageFormatUtils.formatDoseNoteForDisplay("Took with food | [Logged retrospectively]"))
+        assertEquals("Took with food • Took 2 of 5", DosageFormatUtils.formatDoseNoteForDisplay("Took with food | [Partial Stock: Took 2 of 5] | [Logged retrospectively]"))
+        assertEquals(null, DosageFormatUtils.formatDoseNoteForDisplay(null))
+        assertEquals(null, DosageFormatUtils.formatDoseNoteForDisplay(""))
+        assertEquals(null, DosageFormatUtils.formatDoseNoteForDisplay("   "))
+    }
+
+    @Test
+    fun testExtractUserNote() {
+        // Guard: Pre-populating note editing dialogs strips system tags and leaves purely user-authored text
+        assertEquals("", DosageFormatUtils.extractUserNote("[Partial Stock: Took 2 of 5]"))
+        assertEquals("With food", DosageFormatUtils.extractUserNote("With food | [Partial Stock: Took 2 of 5]"))
+        assertEquals("With food", DosageFormatUtils.extractUserNote("With food | [Logged retrospectively]"))
+        assertEquals("", DosageFormatUtils.extractUserNote("[Logged retrospectively]"))
+        assertEquals("", DosageFormatUtils.extractUserNote(null))
+        assertEquals("", DosageFormatUtils.extractUserNote(""))
     }
 }

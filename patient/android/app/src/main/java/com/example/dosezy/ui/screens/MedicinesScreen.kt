@@ -525,7 +525,8 @@ fun MedicinesContent(
                             .height(52.dp),
                         shape = RoundedCornerShape(14.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF2084E4)
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         )
                     ) {
                         Icon(
@@ -779,10 +780,12 @@ fun ArchivedMedicineItem(
                 )
                 if (!medicine.notes.isNullOrBlank()) {
                     Spacer(modifier = Modifier.height(2.dp))
+                    val noteText = com.example.dosezy.utils.DosageFormatUtils.normalizeNoteCapitalization(medicine.notes)
+                    // Guard: Use theme-aware high contrast amber (#9A4A00 on light giving >= 5.6:1, #FBBF24 on dark) to satisfy WCAG 2.2 AA (#F10)
                     Text(
-                        text = "📝 ${medicine.notes}",
+                        text = "📝 $noteText",
                         style = MaterialTheme.typography.labelSmall,
-                        color = Color(0xFFF59E0B).copy(alpha = 0.8f),
+                        color = com.example.dosezy.ui.theme.getMedicationNoteColor(),
                         maxLines = 1
                     )
                 }
@@ -886,10 +889,12 @@ fun MedicineItem(
                     // Notes / Warnings preview
                     if (!medicine.notes.isNullOrBlank()) {
                         Spacer(modifier = Modifier.height(3.dp))
+                        val noteText = com.example.dosezy.utils.DosageFormatUtils.normalizeNoteCapitalization(medicine.notes)
+                        // Guard: Use theme-aware high contrast amber (#9A4A00 on light giving >= 5.6:1, #FBBF24 on dark) to satisfy WCAG 2.2 AA (#F10)
                         Text(
-                            text = "📝 ${medicine.notes}",
+                            text = "📝 $noteText",
                             style = MaterialTheme.typography.labelSmall,
-                            color = Color(0xFFF59E0B),
+                            color = com.example.dosezy.ui.theme.getMedicationNoteColor(),
                             maxLines = 1,
                             fontWeight = FontWeight.Medium
                         )
@@ -898,9 +903,10 @@ fun MedicineItem(
                     // Finite course end date indicator
                     if (medicine.endDate != null) {
                         val isFinished = java.time.LocalDate.now().isAfter(medicine.endDate)
+                        val formattedEndDate = com.example.dosezy.utils.TimeFormatUtils.formatStandardDate(medicine.endDate)
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            text = if (isFinished) "🏁 ${stringResource(R.string.course_completed_badge)}" else "📅 ${stringResource(R.string.course_end_date_label, medicine.endDate.toString())}",
+                            text = if (isFinished) "🏁 ${stringResource(R.string.course_completed_badge)}" else "📅 ${stringResource(R.string.course_end_date_label, formattedEndDate)}",
                             style = MaterialTheme.typography.labelSmall,
                             color = if (isFinished) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold
@@ -914,7 +920,10 @@ fun MedicineItem(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
-                            val isLow = medicine.refillThreshold != null && stock <= medicine.refillThreshold
+                            val doseAmount = medicine.getStockDeductionAmount()
+                            val threshold = medicine.refillThreshold
+                            // Guard: Trigger low-stock warning if stock is at or below refill threshold, lower than required dose, or depleted (#144)
+                            val isLow = (threshold != null && stock <= threshold) || stock < doseAmount || stock <= 0.0
                             val containerBg = if (isLow) {
                                 if (isDark) Color(0xFF3F1313) else Color(0xFFFEE2E2)
                             } else {
@@ -1092,8 +1101,8 @@ fun EmptyMedicinesState(onAddMedicineClick: () -> Unit = {}) {
             onClick = onAddMedicineClick,
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF1193D4),
-                contentColor = Color.White
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             )
         ) {
             Icon(
@@ -1116,7 +1125,11 @@ private fun formatDosageInfo(medicine: Medicine): String {
     if (medicine.frequency.pattern == com.example.dosezy.data.model.FrequencyPattern.AS_NEEDED) {
         return "$dosageText, ${stringResource(R.string.freq_as_needed)}"
     }
-    val timesText = stringResource(R.string.times_per_day_format, medicine.timesPerDay)
+    val timesText = if (medicine.timesPerDay == 1) {
+        stringResource(R.string.time_per_day_format, medicine.timesPerDay)
+    } else {
+        stringResource(R.string.times_per_day_format, medicine.timesPerDay)
+    }
     return "$dosageText, $timesText"
 }
 

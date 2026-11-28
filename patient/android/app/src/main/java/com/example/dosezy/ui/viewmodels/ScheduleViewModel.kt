@@ -363,6 +363,12 @@ class ScheduleViewModel @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getAdherenceStreak(): Int {
+        val userId = _currentUserId.value ?: return 0
+        return scheduleRepository.calculateAdherenceStreak(userId)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     fun getFormattedDate(locale: java.util.Locale = java.util.Locale.getDefault()): String {
         return selectedDate.value.format(
             java.time.format.DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.LONG).withLocale(locale)

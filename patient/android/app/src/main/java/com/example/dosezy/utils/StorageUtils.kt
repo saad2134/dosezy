@@ -19,11 +19,12 @@ object StorageUtils {
 
     /**
      * Checks if internal flash storage has less than CRITICAL_STORAGE_THRESHOLD_BYTES usable space.
+     * Guard: Include 0 bytes in critical range (0L..CRITICAL_STORAGE_THRESHOLD_BYTES) so 100% full flash storage triggers warning dialog (#BUG-CRITICAL-STORAGE-ZERO)
      */
     fun isStorageCriticallyLow(context: Context): Boolean {
         return try {
             val usable = context.filesDir.usableSpace
-            usable in 1..CRITICAL_STORAGE_THRESHOLD_BYTES
+            usable in 0L..CRITICAL_STORAGE_THRESHOLD_BYTES
         } catch (e: Exception) {
             Log.e(TAG, "Failed to check usable space", e)
             false

@@ -417,7 +417,7 @@ fun MenuScreen(navController: NavController) {
                 ) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(48.dp),
-                        color = Color(0xFF2084E4)
+                        color = MaterialTheme.colorScheme.primary
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -504,7 +504,8 @@ fun MenuScreen(navController: NavController) {
                             .height(56.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF2084E4)
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         )
                     ) {
                         Text(
@@ -646,7 +647,7 @@ fun ProfileActionButton(
                 imageVector = icon,
                 contentDescription = text,
                 modifier = Modifier.size(24.dp),
-                tint = Color(0xFF2084E4)
+                tint = MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
@@ -790,7 +791,7 @@ fun ExportDataDialog(
                         imageVector = Icons.Default.Download,
                         contentDescription = "Success",
                         modifier = Modifier.size(32.dp),
-                        tint = Color(0xFF2084E4)
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -856,7 +857,8 @@ fun ExportDataDialog(
                         .height(56.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF2084E4)
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
                     Icon(

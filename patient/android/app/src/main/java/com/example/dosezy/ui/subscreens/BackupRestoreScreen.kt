@@ -774,7 +774,7 @@ fun BackupRestoreScreen(
                             imageVector = Icons.Default.Download,
                             contentDescription = "Success",
                             modifier = Modifier.size(32.dp),
-                            tint = Color(0xFF2084E4)
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
 
@@ -863,7 +863,8 @@ fun BackupRestoreScreen(
                             .height(56.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF2084E4)
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         )
                     ) {
                         Icon(

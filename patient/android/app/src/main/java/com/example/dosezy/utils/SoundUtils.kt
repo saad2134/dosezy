@@ -32,7 +32,9 @@ object SoundUtils {
         val fileName = getFileName(context, uri)
         return try {
             val customSoundsDir = File(context.filesDir, "custom_sounds").apply { mkdirs() }
-            val extension = if (fileName.contains('.')) fileName.substringAfterLast('.') else "mp3"
+            // Guard: Sanitize file extension to alphanumeric only (max 5 chars) to prevent path traversal or malformed files in internal storage
+            val rawExt = if (fileName.contains('.')) fileName.substringAfterLast('.') else "mp3"
+            val extension = rawExt.filter { it.isLetterOrDigit() }.take(5).ifEmpty { "mp3" }
             val targetFile = File(customSoundsDir, "custom_alarm_${System.currentTimeMillis()}.$extension")
 
             context.contentResolver.openInputStream(uri)?.use { input ->

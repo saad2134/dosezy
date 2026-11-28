@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,7 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -318,16 +320,17 @@ private fun NotificationStatusButton(
         }
     }
 
-    val allPassed = remember(refreshCounter, refreshTrigger) {
-        NotificationUtils.areAllNotificationRequirementsMet(context)
+    val pendingCount = remember(refreshCounter, refreshTrigger) {
+        NotificationUtils.getPendingNotificationIssuesCount(context)
     }
+    val allPassed = pendingCount == 0
 
     val buttonColor = if (allPassed) Color(0xFF10B981) else Color(0xFFEF4444)
     val iconColor = Color.White
 
     Box(modifier = modifier) {
 
-        // Main button (background + icon)
+        // Main button (background + bell icon)
         Box(
             modifier = Modifier
                 .size(48.dp)
@@ -338,28 +341,44 @@ private fun NotificationStatusButton(
         ) {
             Icon(
                 imageVector = Icons.Default.Notifications,
-                contentDescription = "Notification Status",
+                contentDescription = if (allPassed) {
+                    stringResource(R.string.notif_status_group_all_good)
+                } else {
+                    stringResource(R.string.notif_status_group_needs_fixing) + ": $pendingCount"
+                },
                 tint = iconColor,
                 modifier = Modifier.size(24.dp)
             )
         }
 
-        // Status indicator ABOVE, overlayed on top-right
+        // Status indicator ABOVE, overlayed on top-right: Shows checkmark if all good, or count of pending issues (2, 3...) instead of ambiguous "x" (#F08)
         Box(
             modifier = Modifier
-                .size(20.dp)
+                .height(20.dp)
+                .defaultMinSize(minWidth = 20.dp)
                 .align(Alignment.TopEnd)           // Position relative to parent Box
                 .offset(x = 4.dp, y = (-4).dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.surface),
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(horizontal = 4.dp),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = if (allPassed) Icons.Default.Check else Icons.Default.Close,
-                contentDescription = if (allPassed) "All Good" else "Issues",
-                tint = buttonColor,
-                modifier = Modifier.size(12.dp)
-            )
+            if (allPassed) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = stringResource(R.string.notif_status_group_all_good),
+                    tint = buttonColor,
+                    modifier = Modifier.size(12.dp)
+                )
+            } else {
+                Text(
+                    text = pendingCount.toString(),
+                    color = buttonColor,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }

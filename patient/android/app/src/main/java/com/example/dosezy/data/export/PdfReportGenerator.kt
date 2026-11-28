@@ -353,21 +353,26 @@ class PdfReportGenerator(private val context: Context) {
         // Guard: Separate active vs discontinued/archived medications so doctors reading clinical reports are not misled into believing stopped drugs are currently active
         val (activeMeds, archivedMeds) = partitionMedicines(medicines)
 
+        val drawActiveMedHeaders: () -> Unit = {
+            subtitlePaint.isFakeBoldText = true
+            canvas.drawText("Medication", 40f, y, subtitlePaint)
+            canvas.drawText("Dosage", 220f, y, subtitlePaint)
+            canvas.drawText("Frequency", 360f, y, subtitlePaint)
+            y += 12f
+            canvas.drawLine(40f, y, 555f, y, linePaint)
+            y += 16f
+            subtitlePaint.isFakeBoldText = false
+        }
+
         checkPageBreak(50f)
         canvas.drawText(formatActiveMedicationsHeader(activeMeds.size), 40f, y, headerPaint)
         y += 18f
 
-        subtitlePaint.isFakeBoldText = true
-        canvas.drawText("Medication", 40f, y, subtitlePaint)
-        canvas.drawText("Dosage", 220f, y, subtitlePaint)
-        canvas.drawText("Frequency", 360f, y, subtitlePaint)
-        y += 12f
-        canvas.drawLine(40f, y, 555f, y, linePaint)
-        y += 16f
+        drawActiveMedHeaders()
 
-        subtitlePaint.isFakeBoldText = false
         activeMeds.forEach { med ->
-            checkPageBreak(20f)
+            // Guard: Re-draw table column headers on page break so multi-page active medication lists retain column definitions (#BUG-PDF-MED-PAGEBREAK-HEADERS)
+            checkPageBreak(20f, onNewPage = drawActiveMedHeaders)
             // Guard: Truncate lengthy medication names to prevent overlapping adjacent Dosage column at 220f
             val displayMed = truncateTextToWidth(med.medicationName, textPaint, 170f)
             canvas.drawText(displayMed, 40f, y, textPaint)
@@ -387,21 +392,26 @@ class PdfReportGenerator(private val context: Context) {
             canvas.drawLine(40f, y, 555f, y, linePaint)
             y += 20f
 
+            val drawArchivedMedHeaders: () -> Unit = {
+                subtitlePaint.isFakeBoldText = true
+                canvas.drawText("Medication", 40f, y, subtitlePaint)
+                canvas.drawText("Dosage", 220f, y, subtitlePaint)
+                canvas.drawText("Status", 360f, y, subtitlePaint)
+                y += 12f
+                canvas.drawLine(40f, y, 555f, y, linePaint)
+                y += 16f
+                subtitlePaint.isFakeBoldText = false
+            }
+
             checkPageBreak(50f)
             canvas.drawText(formatDiscontinuedMedicationsHeader(archivedMeds.size), 40f, y, headerPaint)
             y += 18f
 
-            subtitlePaint.isFakeBoldText = true
-            canvas.drawText("Medication", 40f, y, subtitlePaint)
-            canvas.drawText("Dosage", 220f, y, subtitlePaint)
-            canvas.drawText("Status", 360f, y, subtitlePaint)
-            y += 12f
-            canvas.drawLine(40f, y, 555f, y, linePaint)
-            y += 16f
+            drawArchivedMedHeaders()
 
-            subtitlePaint.isFakeBoldText = false
             archivedMeds.forEach { med ->
-                checkPageBreak(20f)
+                // Guard: Re-draw table column headers on page break so multi-page discontinued medication lists retain column definitions (#BUG-PDF-MED-PAGEBREAK-HEADERS)
+                checkPageBreak(20f, onNewPage = drawArchivedMedHeaders)
                 // Guard: Truncate lengthy medication names to prevent overlapping adjacent Dosage column at 220f
                 val displayMed = truncateTextToWidth(med.medicationName, textPaint, 170f)
                 canvas.drawText(displayMed, 40f, y, textPaint)

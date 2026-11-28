@@ -120,7 +120,9 @@ fun AlarmSoundSelectionDialog(
         try {
             if (sound == AlarmSound.CUSTOM) {
                 val path = customPathToPlay ?: currentCustomPath
-                if (!path.isNullOrEmpty() && File(path).exists()) {
+                // Guard: Strip file:// prefix so File(cleanPath).exists() accurately validates audio preview and prevents silent failure (#BUG-AUDIO-FILE-URI)
+                val cleanPath = path?.removePrefix("file://")
+                if (!cleanPath.isNullOrEmpty() && File(cleanPath).exists()) {
                     val mp = MediaPlayer().apply {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             setAudioAttributes(
@@ -133,7 +135,7 @@ fun AlarmSoundSelectionDialog(
                             @Suppress("DEPRECATION")
                             setAudioStreamType(android.media.AudioManager.STREAM_ALARM)
                         }
-                        setDataSource(path)
+                        setDataSource(cleanPath)
                         setOnCompletionListener {
                             previewingSound = null
                         }
@@ -413,7 +415,8 @@ fun LateAfterSelectionDialog(
         val label = if (mins < 60 || mins % 60 != 0) {
             stringResource(R.string.minutes_format, mins)
         } else {
-            stringResource(R.string.hours_format, mins / 60)
+            val hours = mins / 60
+            if (hours == 1) stringResource(R.string.hour_format, hours) else stringResource(R.string.hours_format, hours)
         }
         label to mins
     }
@@ -442,7 +445,8 @@ fun MissedAfterSelectionDialog(
         val label = if (mins < 60 || mins % 60 != 0) {
             stringResource(R.string.minutes_format, mins)
         } else {
-            stringResource(R.string.hours_format, mins / 60)
+            val hours = mins / 60
+            if (hours == 1) stringResource(R.string.hour_format, hours) else stringResource(R.string.hours_format, hours)
         }
         label to mins
     }

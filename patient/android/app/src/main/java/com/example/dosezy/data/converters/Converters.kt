@@ -25,25 +25,25 @@ class Converters {
     @TypeConverter
     fun fromGender(gender: Gender): String = gender.name
 
-    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or lowercased enum strings (#BUG-CONVERTER-ENUM-FALLBACK)
+    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or whitespace-padded enum strings (#BUG-CONVERTER-ENUM-FALLBACK)
     @TypeConverter
-    fun toGender(gender: String): Gender = runCatching { enumValueOf<Gender>(gender.uppercase()) }.getOrDefault(Gender.DO_NOT_SPECIFY)
+    fun toGender(gender: String): Gender = runCatching { enumValueOf<Gender>(gender.trim().uppercase()) }.getOrDefault(Gender.DO_NOT_SPECIFY)
 
     // DosageUnit converters
     @TypeConverter
     fun fromDosageUnit(unit: DosageUnit): String = unit.name
 
-    // Guard: Prevent IllegalArgumentException crash on legacy or malformed enum strings; fallback to TABLET
+    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or whitespace-padded enum strings; fallback to TABLET
     @TypeConverter
-    fun toDosageUnit(unit: String): DosageUnit = runCatching { enumValueOf<DosageUnit>(unit.uppercase()) }.getOrDefault(DosageUnit.TABLET)
+    fun toDosageUnit(unit: String): DosageUnit = runCatching { enumValueOf<DosageUnit>(unit.trim().uppercase()) }.getOrDefault(DosageUnit.TABLET)
 
     // MedicationStatus converters
     @TypeConverter
     fun fromMedicationStatus(status: MedicationStatus): String = status.name
 
-    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or lowercased enum strings (#BUG-CONVERTER-ENUM-FALLBACK)
+    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or whitespace-padded enum strings (#BUG-CONVERTER-ENUM-FALLBACK)
     @TypeConverter
-    fun toMedicationStatus(status: String): MedicationStatus = runCatching { enumValueOf<MedicationStatus>(status.uppercase()) }.getOrDefault(MedicationStatus.PENDING)
+    fun toMedicationStatus(status: String): MedicationStatus = runCatching { enumValueOf<MedicationStatus>(status.trim().uppercase()) }.getOrDefault(MedicationStatus.PENDING)
 
     // LocalDateTime converters
     @RequiresApi(Build.VERSION_CODES.O)
@@ -158,6 +158,15 @@ class Converters {
             freq.intervalHours?.let { jsonObject.put("intervalHours", it) }
             freq.intervalDays?.let { jsonObject.put("intervalDays", it) }
             freq.intervalWeeks?.let { jsonObject.put("intervalWeeks", it) }
+            freq.cycleActiveDays?.let { jsonObject.put("cycleActiveDays", it) }
+            freq.cycleRestDays?.let { jsonObject.put("cycleRestDays", it) }
+            freq.asNeededIntervalHours?.let { jsonObject.put("asNeededIntervalHours", it) }
+            if (!freq.asNeededNotifyEligible) {
+                jsonObject.put("asNeededNotifyEligible", false)
+            }
+            if (freq.isRollingInterval) {
+                jsonObject.put("isRollingInterval", true)
+            }
             freq.selectedDaysOfWeek?.let { days ->
                 val arr = JSONArray()
                 days.forEach { arr.put(it) }
@@ -198,7 +207,26 @@ class Converters {
                     val arr = jsonObject.getJSONArray("selectedDaysOfMonth")
                     (0 until arr.length()).map { arr.getInt(it) }
                 } else null
-                Frequency(pattern, daysPerWeek, daysPerMonth, selectedDaysOfWeek, selectedDaysOfMonth, intervalHours, intervalDays, intervalWeeks)
+                val isRollingInterval = if (jsonObject.has("isRollingInterval") && !jsonObject.isNull("isRollingInterval")) jsonObject.getBoolean("isRollingInterval") else false
+                val cycleActiveDays = if (jsonObject.has("cycleActiveDays") && !jsonObject.isNull("cycleActiveDays")) jsonObject.getInt("cycleActiveDays") else null
+                val cycleRestDays = if (jsonObject.has("cycleRestDays") && !jsonObject.isNull("cycleRestDays")) jsonObject.getInt("cycleRestDays") else null
+                val asNeededIntervalHours = if (jsonObject.has("asNeededIntervalHours") && !jsonObject.isNull("asNeededIntervalHours")) jsonObject.getInt("asNeededIntervalHours") else null
+                val asNeededNotifyEligible = if (jsonObject.has("asNeededNotifyEligible") && !jsonObject.isNull("asNeededNotifyEligible")) jsonObject.getBoolean("asNeededNotifyEligible") else true
+                Frequency(
+                    pattern = pattern,
+                    daysPerWeek = daysPerWeek,
+                    daysPerMonth = daysPerMonth,
+                    selectedDaysOfWeek = selectedDaysOfWeek,
+                    selectedDaysOfMonth = selectedDaysOfMonth,
+                    intervalHours = intervalHours,
+                    intervalDays = intervalDays,
+                    intervalWeeks = intervalWeeks,
+                    isRollingInterval = isRollingInterval,
+                    cycleActiveDays = cycleActiveDays,
+                    cycleRestDays = cycleRestDays,
+                    asNeededIntervalHours = asNeededIntervalHours,
+                    asNeededNotifyEligible = asNeededNotifyEligible
+                )
             } catch (_: Exception) {
                 Frequency(FrequencyPattern.DAILY)
             }
@@ -209,23 +237,24 @@ class Converters {
     @TypeConverter
     fun fromTheme(theme: Theme): String = theme.name
 
-    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or lowercased enum strings (#BUG-CONVERTER-ENUM-FALLBACK)
+    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or whitespace-padded enum strings (#BUG-CONVERTER-ENUM-FALLBACK)
     @TypeConverter
-    fun toTheme(themeString: String): Theme = runCatching { Theme.valueOf(themeString.uppercase()) }.getOrDefault(Theme.SYSTEM)
+    fun toTheme(themeString: String): Theme = runCatching { Theme.valueOf(themeString.trim().uppercase()) }.getOrDefault(Theme.SYSTEM)
 
     @TypeConverter
     fun fromTimeFormat(timeFormat: TimeFormat): String = timeFormat.name
 
-    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or lowercased enum strings (#BUG-CONVERTER-ENUM-FALLBACK)
+    // Guard: Prevent IllegalArgumentException crash on legacy, malformed, or whitespace-padded enum strings (#BUG-CONVERTER-ENUM-FALLBACK)
     @TypeConverter
-    fun toTimeFormat(timeFormatString: String): TimeFormat = runCatching { TimeFormat.valueOf(timeFormatString.uppercase()) }.getOrDefault(TimeFormat.HOUR_12)
+    fun toTimeFormat(timeFormatString: String): TimeFormat = runCatching { TimeFormat.valueOf(timeFormatString.trim().uppercase()) }.getOrDefault(TimeFormat.HOUR_12)
 
     @TypeConverter
     fun fromLanguage(language: Language): String = language.name
 
+    // Guard: Trim whitespace before uppercase to prevent IllegalArgumentException resetting user language to SYSTEM on padded strings
     @TypeConverter
     fun toLanguage(languageString: String): Language = try {
-        Language.valueOf(languageString.uppercase())
+        Language.valueOf(languageString.trim().uppercase())
     } catch (e: Exception) {
         Language.SYSTEM
     }
@@ -233,9 +262,10 @@ class Converters {
     @TypeConverter
     fun fromAlarmSound(alarmSound: com.example.dosezy.data.model.AlarmSound): String = alarmSound.name
 
+    // Guard: Trim whitespace before uppercase to prevent IllegalArgumentException resetting user alarm sound on padded strings
     @TypeConverter
     fun toAlarmSound(alarmSoundString: String): com.example.dosezy.data.model.AlarmSound = try {
-        com.example.dosezy.data.model.AlarmSound.valueOf(alarmSoundString.uppercase())
+        com.example.dosezy.data.model.AlarmSound.valueOf(alarmSoundString.trim().uppercase())
     } catch (_: Exception) {
         com.example.dosezy.data.model.AlarmSound.SYSTEM_DEFAULT
     }
@@ -249,6 +279,7 @@ class Converters {
         return obj.toString()
     }
 
+    // Guard: Parse each custom dosage entry defensively with optDouble so a single corrupt or non-numeric slot does not discard all valid dosages (#BUG-CONVERTER-CUSTOM-DOSAGE-ROBUST)
     @TypeConverter
     fun toCustomDosagesMap(value: String?): Map<String, Double>? {
         if (value.isNullOrEmpty()) return null
@@ -259,7 +290,10 @@ class Converters {
             while (keys.hasNext()) {
                 val rawKey = keys.next()
                 val normalizedKey = rawKey.normalizeArabicDigits()
-                map[normalizedKey] = obj.getDouble(rawKey)
+                val dosage = obj.optDouble(rawKey, Double.NaN)
+                if (!dosage.isNaN() && !dosage.isInfinite() && dosage > 0.0) {
+                    map[normalizedKey] = dosage
+                }
             }
             map
         } catch (_: Exception) {

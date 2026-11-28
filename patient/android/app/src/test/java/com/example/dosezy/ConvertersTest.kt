@@ -11,8 +11,10 @@ import com.example.dosezy.data.model.PillShape
 import com.example.dosezy.data.model.Theme
 import com.example.dosezy.data.model.TimeFormat
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -275,6 +277,57 @@ class ConvertersTest {
     }
 
     @Test
+    fun frequency_rollingIntervalRoundTrips() {
+        val freq = Frequency(
+            pattern = FrequencyPattern.DAILY,
+            isRollingInterval = true
+        )
+        val json = converters.fromFrequency(freq)
+        val restored = converters.toFrequency(json)
+        assertNotNull(restored)
+        assertEquals(FrequencyPattern.DAILY, restored!!.pattern)
+        assertEquals(true, restored.isRollingInterval)
+    }
+
+    @Test
+    fun frequency_cyclicalRoundTrips() {
+        val freq = Frequency(
+            pattern = FrequencyPattern.CYCLICAL,
+            cycleActiveDays = 21,
+            cycleRestDays = 7
+        )
+        val json = converters.fromFrequency(freq)
+        val restored = converters.toFrequency(json)
+        assertNotNull(restored)
+        assertEquals(FrequencyPattern.CYCLICAL, restored!!.pattern)
+        assertEquals(21, restored.cycleActiveDays)
+        assertEquals(7, restored.cycleRestDays)
+    }
+
+    @Test
+    fun frequency_asNeededWithIntervalRoundTrips() {
+        val freq = Frequency(
+            pattern = FrequencyPattern.AS_NEEDED,
+            asNeededIntervalHours = 6,
+            asNeededNotifyEligible = false
+        )
+        val json = converters.fromFrequency(freq)
+        val restored = converters.toFrequency(json)
+        assertNotNull(restored)
+        assertEquals(FrequencyPattern.AS_NEEDED, restored!!.pattern)
+        assertEquals(6, restored.asNeededIntervalHours)
+        assertEquals(false, restored.asNeededNotifyEligible)
+    }
+
+    @Test
+    fun frequency_legacyJsonWithoutRollingIntervalDefaultsToFalse() {
+        val legacyJson = """{"pattern":"DAILY"}"""
+        val restored = converters.toFrequency(legacyJson)
+        assertNotNull(restored)
+        assertEquals(false, restored!!.isRollingInterval)
+    }
+
+    @Test
     fun frequency_nullRoundTrips() {
         assertNull(converters.fromFrequency(null))
         assertNull(converters.toFrequency(null))
@@ -442,6 +495,16 @@ class ConvertersTest {
         assertNotNull(parsedWeekly)
         assertEquals(FrequencyPattern.WEEKLY, parsedWeekly!!.pattern)
 
+        // Guard: Verify whitespace-padded parsing across all enum converters to prevent silent reset to defaults (#BUG-CONVERTER-ENUM-FALLBACK)
+        assertEquals(Theme.DARK, converters.toTheme("  dark  "))
+        assertEquals(TimeFormat.HOUR_24, converters.toTimeFormat("  hour_24  "))
+        assertEquals(Gender.FEMALE, converters.toGender("  female  "))
+        assertEquals(MedicationStatus.TAKEN_ON_TIME, converters.toMedicationStatus("  taken_on_time  "))
+        assertEquals(DosageUnit.CAPSULE, converters.toDosageUnit("  capsule  "))
+        assertEquals(Language.ARABIC, converters.toLanguage("  arabic  "))
+        assertEquals(Language.SYSTEM, converters.toLanguage("UNKNOWN_LANGUAGE"))
+        assertEquals(com.example.dosezy.data.model.AlarmSound.GENTLE_CHIME, converters.toAlarmSound("  gentle_chime  "))
+
         // Guard: Verify ReminderType Room conversion round-trips, null safety, and case-insensitivity (#111)
         assertEquals("ALARM", converters.fromReminderType(com.example.dosezy.data.model.ReminderType.ALARM))
         assertEquals("NOTIFICATION", converters.fromReminderType(com.example.dosezy.data.model.ReminderType.NOTIFICATION))
@@ -454,6 +517,19 @@ class ConvertersTest {
         assertNull(converters.toReminderType(null))
         assertNull(converters.toReminderType(""))
         assertNull(converters.toReminderType("UNKNOWN_REMINDER_TYPE"))
+    }
+
+    @Test
+    fun toCustomDosagesMap_resilientToCorruptedOrNonNumericEntries() {
+        // Guard: Verify corrupt, string, or negative slot entries do not discard valid slot entries (#BUG-CONVERTER-CUSTOM-DOSAGE-ROBUST)
+        val json = """{"08:00": 20.0, "12:00": "corrupted", "16:00": -5.0, "20:00": 10.0}"""
+        val map = converters.toCustomDosagesMap(json)
+        assertNotNull(map)
+        assertEquals(2, map!!.size)
+        assertEquals(20.0, map["08:00"]!!, 0.001)
+        assertEquals(10.0, map["20:00"]!!, 0.001)
+        assertFalse(map.containsKey("12:00"))
+        assertFalse(map.containsKey("16:00"))
     }
 }
 

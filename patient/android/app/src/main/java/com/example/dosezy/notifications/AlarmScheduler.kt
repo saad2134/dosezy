@@ -35,15 +35,19 @@ class AlarmScheduler(private val context: Context) {
         }
     }
 
-    // Guard: Route alarm clock click to schedule screen under the specific target user profile to prevent taking medicines under the wrong user
-    private fun createAlarmClockShowIntent(
+    // Guard: Route alarm clock click to home daily checklist with target slot extras to prevent opening wrong tab (#137)
+    internal fun createAlarmClockShowIntent(
         requestCode: Int,
-        targetUserId: String? = null
+        targetUserId: String? = null,
+        targetEntryId: String? = null,
+        targetTime: String? = null
     ): PendingIntent {
         val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             targetUserId?.let { putExtra("switch_to_user_id", it) }
-            putExtra("fragment", "schedule")
+            putExtra("fragment", "home")
+            targetEntryId?.let { putExtra("target_entry_id", it) }
+            targetTime?.let { putExtra("target_time", it) }
         }
         return PendingIntent.getActivity(
             context,
@@ -186,9 +190,12 @@ class AlarmScheduler(private val context: Context) {
         val isAlarm = resolveIsAlarm(entries)
 
         if (isAlarm && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
+            val primaryEntry = entries.firstOrNull()
             val showIntent = createAlarmClockShowIntent(
-                slotKey.hashCode() + 500,
-                entries.firstOrNull()?.userId
+                requestCode = slotKey.hashCode() + 500,
+                targetUserId = primaryEntry?.userId,
+                targetEntryId = primaryEntry?.entryId,
+                targetTime = cleanDateTime.toLocalTime().toString()
             )
             alarmManager.setAlarmClock(
                 AlarmManager.AlarmClockInfo(triggerTime, showIntent),
@@ -289,8 +296,9 @@ class AlarmScheduler(private val context: Context) {
 
         if (isAlarm && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
             val showIntent = createAlarmClockShowIntent(
-                primaryId.hashCode() + 1500,
-                targetUserId
+                requestCode = primaryId.hashCode() + 1500,
+                targetUserId = targetUserId,
+                targetEntryId = primaryId
             )
             alarmManager.setAlarmClock(
                 AlarmManager.AlarmClockInfo(triggerTime, showIntent),
@@ -317,7 +325,12 @@ class AlarmScheduler(private val context: Context) {
         Log.d(TAG, "Scheduled grouped snooze for ${entryIds.size} entries in $minutes minutes (primaryId=$primaryId)")
     }
 
-    fun cancelAlarm(entryId: String, userId: String? = null, scheduledDateTime: LocalDateTime? = null) {
+    fun cancelAlarm(
+        entryId: String,
+        userId: String? = null,
+        scheduledDateTime: LocalDateTime? = null,
+        rearmSiblings: Boolean = true
+    ) {
         val intent = Intent(context, MedicineAlarmReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(
             context,
@@ -329,6 +342,9 @@ class AlarmScheduler(private val context: Context) {
         alarmManager.cancel(pendingIntent)
         pendingIntent.cancel()
         Log.d(TAG, "Cancelled alarm for entry: $entryId")
+
+        // Guard: Bypass sequential blocking DB queries when bulk rescheduling cancels all entries before batch recreation (#BUG-CANCEL-REARM-BYPASS)
+        if (!rearmSiblings) return
 
         var resolvedUserId = userId
         var resolvedDateTime = scheduledDateTime
@@ -386,8 +402,8 @@ class AlarmScheduler(private val context: Context) {
         }
     }
 
-    fun cancelAlarm(entry: ScheduleEntry) {
-        cancelAlarm(entry.entryId, entry.userId, entry.scheduledDateTime)
+    fun cancelAlarm(entry: ScheduleEntry, rearmSiblings: Boolean = true) {
+        cancelAlarm(entry.entryId, entry.userId, entry.scheduledDateTime, rearmSiblings)
     }
 
     fun cancelSlotAlarm(userId: String, scheduledDateTime: LocalDateTime) {
@@ -627,8 +643,10 @@ class AlarmScheduler(private val context: Context) {
 
         if (isAlarm && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
             val showIntent = createAlarmClockShowIntent(
-                entryId.hashCode() + 2500,
-                targetUserId
+                requestCode = entryId.hashCode() + 2500,
+                targetUserId = targetUserId,
+                targetEntryId = entryId,
+                targetTime = scheduledTime
             )
             alarmManager.setAlarmClock(
                 AlarmManager.AlarmClockInfo(triggerTime, showIntent),
@@ -834,8 +852,10 @@ class AlarmScheduler(private val context: Context) {
 
         if (isAlarm && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && canScheduleExact()) {
             val showIntent = createAlarmClockShowIntent(
-                entryId.hashCode() + 3500,
-                targetUserId
+                requestCode = entryId.hashCode() + 3500,
+                targetUserId = targetUserId,
+                targetEntryId = entryId,
+                targetTime = scheduledTime
             )
             alarmManager.setAlarmClock(
                 AlarmManager.AlarmClockInfo(triggerTime, showIntent),
@@ -875,5 +895,59 @@ class AlarmScheduler(private val context: Context) {
         )
         showIntent.cancel()
         Log.d(TAG, "Cancelled intake safeguard alarm for entry: $entryId")
+    }
+
+    // Guard: Schedule gentle eligible alert when minimum interval for as-needed (PRN) medicine elapses (#142)
+    fun schedulePrnEligibleNotification(
+        medicineId: String,
+        medicineName: String,
+        triggerEpochMillis: Long,
+        intervalHours: Int,
+        userId: String? = null
+    ) {
+        val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
+            action = MedicineAlarmReceiver.ACTION_PRN_ELIGIBLE_ALERT
+            putExtra(MedicineAlarmReceiver.EXTRA_PRN_MEDICINE_ID, medicineId)
+            putExtra(MedicineAlarmReceiver.EXTRA_PRN_MEDICINE_NAME, medicineName)
+            putExtra(MedicineAlarmReceiver.EXTRA_PRN_INTERVAL_HOURS, intervalHours)
+            userId?.let { putExtra(MedicineAlarmReceiver.EXTRA_USER_ID, it) }
+        }
+        val requestCode = (medicineId + "_prn_eligible").hashCode()
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Non-alarming notification: use setAndAllowWhileIdle or setExactAndAllowWhileIdle if exact permission granted
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (canScheduleExact()) {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerEpochMillis, pendingIntent)
+            } else {
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerEpochMillis, pendingIntent)
+            }
+        } else {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, triggerEpochMillis, pendingIntent)
+        }
+        Log.d(TAG, "Scheduled PRN eligible notification for $medicineName ($medicineId) at $triggerEpochMillis")
+    }
+
+    // Guard: Cancel PRN eligible notification alarm and revoke pending intent (#142)
+    fun cancelPrnEligibleNotification(medicineId: String) {
+        val intent = Intent(context, MedicineAlarmReceiver::class.java).apply {
+            action = MedicineAlarmReceiver.ACTION_PRN_ELIGIBLE_ALERT
+            putExtra(MedicineAlarmReceiver.EXTRA_PRN_MEDICINE_ID, medicineId)
+        }
+        val requestCode = (medicineId + "_prn_eligible").hashCode()
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        alarmManager.cancel(pendingIntent)
+        pendingIntent.cancel()
+        Log.d(TAG, "Cancelled PRN eligible notification for medicineId: $medicineId")
     }
 }

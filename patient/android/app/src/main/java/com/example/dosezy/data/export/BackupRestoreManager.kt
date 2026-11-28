@@ -498,8 +498,8 @@ class BackupRestoreManager(
                             val notifManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
                             val existingSchedules = scheduleRepository.getSchedulesByUserSync(targetUserId)
                             existingSchedules.forEach { entry ->
-                                // Guard: Pass entry directly to cancelAlarm to bypass sequential blocking DB lookups
-                                alarmScheduler.cancelAlarm(entry)
+                                // Guard: Pass rearmSiblings = false to cancelAlarm to eliminate blocking DB lookups when wiping schedules for restore (#BUG-CANCEL-REARM-BYPASS)
+                                alarmScheduler.cancelAlarm(entry, rearmSiblings = false)
                                 alarmScheduler.cancelSnooze(entry.entryId)
                                 alarmScheduler.cancelNagging(entry.entryId)
                                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
@@ -889,8 +889,9 @@ class BackupRestoreManager(
 
         return User(
             userId = json.get("userId")?.takeUnless { it.isJsonNull }?.asString ?: UUID.randomUUID().toString(),
-            fullName = json.get("fullName")?.takeUnless { it.isJsonNull }?.asString ?: "Restored User",
-            age = json.get("age")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 30,
+            fullName = json.get("fullName")?.takeUnless { it.isJsonNull }?.asString?.trim()?.ifBlank { "Restored User" } ?: "Restored User",
+            // Guard: Clamp user age to valid human range (0..150) to sanitize corrupted or negative values (#BUG-BACKUP-NUMERIC-SANITIZATION)
+            age = json.get("age")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()?.coerceIn(0, 150) ?: 30,
             gender = genderVal,
             contactNumber = json.get("contactNumber")?.takeUnless { it.isJsonNull }?.asString ?: "",
             profilePicPath = json.get("profilePicPath")?.let { if (it.isJsonNull) null else it.asString },
@@ -899,21 +900,26 @@ class BackupRestoreManager(
             timeFormat = timeFormatVal,
             language = languageVal,
             considerLateAfter = json.get("considerLateAfter")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()?.let {
-                if (it in 1..14) it * 60 else it
+                val normalized = if (it in 1..14) it * 60 else it
+                normalized.coerceIn(1, 1440)
             } ?: 180,
             considerMissedAfter = json.get("considerMissedAfter")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()?.let {
-                if (it in 1..14) it * 60 else it
+                val normalized = if (it in 1..14) it * 60 else it
+                normalized.coerceIn(1, 1440)
             } ?: 360,
-            snoozeDuration = json.get("snoozeDuration")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 10,
+            // Guard: Clamp snooze duration (1..120 mins) to prevent alarm scheduler overflow or zero intervals (#BUG-BACKUP-NUMERIC-SANITIZATION)
+            snoozeDuration = json.get("snoozeDuration")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()?.coerceIn(1, 120) ?: 10,
             allergies = json.get("allergies")?.let { if (it.isJsonNull) null else it.asString },
             medicalConditions = json.get("medicalConditions")?.let { if (it.isJsonNull) null else it.asString },
             naggingRemindersEnabled = json.get("naggingRemindersEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
-            naggingIntervalMinutes = json.get("naggingIntervalMinutes")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 5,
-            naggingMaxRepeats = json.get("naggingMaxRepeats")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 3,
+            // Guard: Clamp nagging intervals and repeats to sane ranges (#BUG-BACKUP-NUMERIC-SANITIZATION)
+            naggingIntervalMinutes = json.get("naggingIntervalMinutes")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()?.coerceIn(1, 60) ?: 5,
+            naggingMaxRepeats = json.get("naggingMaxRepeats")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()?.coerceIn(1, 20) ?: 3,
             alarmSound = alarmSoundVal,
             customAlarmSoundPath = json.get("customAlarmSoundPath")?.let { if (it.isJsonNull || it.asString.isBlank()) null else it.asString },
             customAlarmSoundTitle = json.get("customAlarmSoundTitle")?.let { if (it.isJsonNull || it.asString.isBlank()) null else it.asString },
-            alarmDurationSeconds = json.get("alarmDurationSeconds")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 0,
+            // Guard: Clamp alarm duration (0..3600 seconds) to prevent integer overflow (#BUG-BACKUP-NUMERIC-SANITIZATION)
+            alarmDurationSeconds = json.get("alarmDurationSeconds")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()?.coerceIn(0, 3600) ?: 0,
             allowDoseSkipping = json.get("allowDoseSkipping")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
             allowCustomDoseTime = json.get("allowCustomDoseTime")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
             hideAddMedicineNavButton = json.get("hideAddMedicineNavButton")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
@@ -926,12 +932,15 @@ class BackupRestoreManager(
             thickerCalendarDayHighlight = json.get("thickerCalendarDayHighlight")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
             // Guard: Defensively parse intake safeguard preferences with non-breaking defaults for legacy backup archives (#104)
             intakeSafeguardEnabled = json.get("intakeSafeguardEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
-            intakeCountdownSeconds = json.get("intakeCountdownSeconds")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 120,
+            // Guard: Clamp intake countdown seconds (10..600s) to prevent zero or negative buffer intervals (#BUG-BACKUP-NUMERIC-SANITIZATION)
+            intakeCountdownSeconds = json.get("intakeCountdownSeconds")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()?.coerceIn(10, 600) ?: 120,
             // Guard: Defensively parse lockscreen privacy and custom snooze popup settings for legacy backup archives
             lockscreenDetailsEnabled = json.get("lockscreenDetailsEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: true,
             customSnoozePopupEnabled = json.get("customSnoozePopupEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
             // Guard: Defensively parse reminder delivery style with fallback to ALARM for legacy backup archives (#111)
-            reminderType = json.get("reminderType")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { com.example.dosezy.data.model.ReminderType.valueOf(it.trim().uppercase()) }.getOrNull() } ?: com.example.dosezy.data.model.ReminderType.ALARM
+            reminderType = json.get("reminderType")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { com.example.dosezy.data.model.ReminderType.valueOf(it.trim().uppercase()) }.getOrNull() } ?: com.example.dosezy.data.model.ReminderType.ALARM,
+            // Guard: Defensively parse slotRollupEnabled with fallback to false for legacy backup archives (#138)
+            slotRollupEnabled = json.get("slotRollupEnabled")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false
         )
     }
 
@@ -968,7 +977,13 @@ class BackupRestoreManager(
                     selectedDaysOfMonth = selectedDaysOfMonth,
                     intervalHours = freqObj.get("intervalHours")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
                     intervalDays = freqObj.get("intervalDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
-                    intervalWeeks = freqObj.get("intervalWeeks")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()
+                    intervalWeeks = freqObj.get("intervalWeeks")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    // Guard: Restore rolling interval flag from frequency JSON object (#119)
+                    isRollingInterval = freqObj.get("isRollingInterval")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+                    cycleActiveDays = freqObj.get("cycleActiveDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    cycleRestDays = freqObj.get("cycleRestDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    asNeededIntervalHours = freqObj.get("asNeededIntervalHours")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    asNeededNotifyEligible = freqObj.get("asNeededNotifyEligible")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: true
                 )
             } else if (obj.has("frequencyPattern") || obj.has("pattern")) {
                 // Guard: Support flattened frequency attributes from DataExporter exports and legacy backups to prevent silent schedule corruption
@@ -988,7 +1003,13 @@ class BackupRestoreManager(
                     selectedDaysOfMonth = selectedDaysOfMonth,
                     intervalHours = obj.get("intervalHours")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
                     intervalDays = obj.get("intervalDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
-                    intervalWeeks = obj.get("intervalWeeks")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()
+                    intervalWeeks = obj.get("intervalWeeks")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    // Guard: Restore rolling interval flag from flattened frequency properties (#119)
+                    isRollingInterval = obj.get("isRollingInterval")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
+                    cycleActiveDays = obj.get("cycleActiveDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    cycleRestDays = obj.get("cycleRestDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    asNeededIntervalHours = obj.get("asNeededIntervalHours")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                    asNeededNotifyEligible = obj.get("asNeededNotifyEligible")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: true
                 )
             } else {
                 Frequency(FrequencyPattern.DAILY)
@@ -1013,7 +1034,8 @@ class BackupRestoreManager(
             val medName = obj.get("medicationName")?.takeUnless { it.isJsonNull }?.asString ?: "Unknown Medication"
             val medId = obj.get("medicineId")?.takeUnless { it.isJsonNull }?.asString ?: UUID.randomUUID().toString()
             val uId = obj.get("userId")?.takeUnless { it.isJsonNull }?.asString ?: ""
-            val dosageVal = obj.get("dosage")?.takeUnless { it.isJsonNull }?.runCatching { asDouble }?.getOrNull() ?: 1.0
+            // Guard: Validate dosage amount to be positive and finite, defaulting to 1.0 to prevent corrupted or NaN dosage calculations (#BUG-BACKUP-NUMERIC-SANITIZATION)
+            val dosageVal = obj.get("dosage")?.takeUnless { it.isJsonNull }?.runCatching { asDouble }?.getOrNull()?.takeIf { it.isFinite() && it > 0.0 } ?: 1.0
             // Guard: Safe-parse dosage unit with normalization for aliases (puffs, actuations, ampules, mEq) and fallback to TABLET
             val dosageUnitVal = obj.get("dosageUnit")?.takeUnless { it.isJsonNull }?.asString?.let { raw ->
                 val normalized = raw.trim().uppercase()
@@ -1025,7 +1047,8 @@ class BackupRestoreManager(
                     else -> runCatching { DosageUnit.valueOf(normalized) }.getOrNull()
                 }
             } ?: DosageUnit.TABLET
-            val timesPerDayVal = obj.get("timesPerDay")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull() ?: 1
+            // Guard: Ensure timesPerDay is at least 1 to prevent division by zero in recurrence calculations (#BUG-BACKUP-NUMERIC-SANITIZATION)
+            val timesPerDayVal = obj.get("timesPerDay")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()?.coerceAtLeast(1) ?: 1
             // Guard: Defensively parse per-medicine reminderType override with fallback to null (#111)
             val reminderTypeVal = obj.get("reminderType")?.takeUnless { it.isJsonNull }?.asString?.let { runCatching { com.example.dosezy.data.model.ReminderType.valueOf(it.trim().uppercase()) }.getOrNull() }
 
@@ -1039,22 +1062,28 @@ class BackupRestoreManager(
                 frequency = frequency,
                 scheduledTimes = timesList,
                 imageUri = obj.get("imageUri")?.takeUnless { it.isJsonNull }?.asString,
-                // Defensively parse stock amounts as Double to support fractional inventory quantities
-                currentStock = obj.get("currentStock")?.takeUnless { it.isJsonNull }?.runCatching { asDouble }?.getOrNull(),
-                refillThreshold = obj.get("refillThreshold")?.takeUnless { it.isJsonNull }?.runCatching { asDouble }?.getOrNull(),
+                // Guard: Defensively parse stock amounts as finite non-negative Double to sanitize NaN or negative values (#BUG-BACKUP-NUMERIC-SANITIZATION)
+                currentStock = obj.get("currentStock")?.takeUnless { it.isJsonNull }?.runCatching { asDouble }?.getOrNull()?.takeIf { it.isFinite() && it >= 0.0 },
+                refillThreshold = obj.get("refillThreshold")?.takeUnless { it.isJsonNull }?.runCatching { asDouble }?.getOrNull()?.takeIf { it.isFinite() && it >= 0.0 },
                 autoDeductOnTake = obj.get("autoDeductOnTake")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: true,
                 pillShape = pillShape,
                 pillColor = pillColor,
                 notes = obj.get("notes")?.takeUnless { it.isJsonNull }?.asString,
                 startDate = startDate,
                 endDate = endDate,
-                durationDays = obj.get("durationDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull(),
+                durationDays = obj.get("durationDays")?.takeUnless { it.isJsonNull }?.runCatching { asInt }?.getOrNull()?.takeIf { it > 0 },
                 isArchived = obj.get("isArchived")?.takeUnless { it.isJsonNull }?.runCatching { asBoolean }?.getOrNull() ?: false,
                 customDosages = if (obj.has("customDosages") && !obj.get("customDosages").isJsonNull && obj.get("customDosages").isJsonObject) {
                     val cObj = obj.getAsJsonObject("customDosages")
                     val map = mutableMapOf<String, Double>()
                     cObj.entrySet().forEach { (k, v) ->
-                        try { map[k] = v.asDouble } catch (_: Exception) {}
+                        try {
+                            val d = v.asDouble
+                            // Guard: Sanitize custom dosage entries to finite positive values only (#BUG-BACKUP-NUMERIC-SANITIZATION)
+                            if (d.isFinite() && d > 0.0) {
+                                map[k] = d
+                            }
+                        } catch (_: Exception) {}
                     }
                     if (map.isNotEmpty()) map else null
                 } else null,
@@ -1110,7 +1139,8 @@ class BackupRestoreManager(
                       ?: runCatching { java.time.Instant.parse(raw).atZone(java.time.ZoneOffset.UTC).toLocalDateTime() }.getOrNull()
                 },
                 skipReason = obj.get("skipReason")?.takeUnless { it.isJsonNull }?.asString,
-                dosage = obj.get("dosage")?.takeUnless { it.isJsonNull }?.runCatching { asDouble }?.getOrNull(),
+                // Guard: Sanitize schedule entry dosage override to positive finite values (#BUG-BACKUP-NUMERIC-SANITIZATION)
+                dosage = obj.get("dosage")?.takeUnless { it.isJsonNull }?.runCatching { asDouble }?.getOrNull()?.takeIf { it.isFinite() && it > 0.0 },
                 doseNotes = obj.get("doseNotes")?.takeUnless { it.isJsonNull }?.asString
             )
             list.add(entry)

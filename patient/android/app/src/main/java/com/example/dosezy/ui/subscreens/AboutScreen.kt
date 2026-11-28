@@ -117,7 +117,7 @@ fun AboutScreen(navController: NavController) {
                         modifier = Modifier
                             .size(72.dp)
                             .clip(RoundedCornerShape(18.dp))
-                            .background(Color(0xFF2084E4).copy(alpha = 0.12f)),
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
@@ -137,7 +137,7 @@ fun AboutScreen(navController: NavController) {
                     )
 
                     Text(
-                        text = stringResource(R.string.about_version_build, versionName ?: "2.5.13", versionCode),
+                        text = stringResource(R.string.about_version_build, versionName ?: "2.5.14", versionCode),
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -251,13 +251,13 @@ fun AboutScreen(navController: NavController) {
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(RoundedCornerShape(14.dp))
-                                .background(Color(0xFF2084E4).copy(alpha = 0.15f)),
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Person,
                                 contentDescription = null,
-                                tint = Color(0xFF2084E4),
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(26.dp)
                             )
                         }
@@ -293,7 +293,7 @@ fun AboutScreen(navController: NavController) {
 
                     AboutLinkCard(
                         icon = Icons.Outlined.Star,
-                        iconTint = Color(0xFF2084E4),
+                        iconTint = MaterialTheme.colorScheme.primary,
                         title = stringResource(R.string.about_developer_github),
                         description = "@${AppSignature.authorHandle}",
                         onClick = {
@@ -333,7 +333,7 @@ fun AboutScreen(navController: NavController) {
 
             // Legal & Policies Section (#FDA, #MDR, #HIPAA, #PlayStore)
             Text(
-                text = "Legal & Policies",
+                text = stringResource(R.string.about_legal_policies_title),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -344,7 +344,7 @@ fun AboutScreen(navController: NavController) {
                 icon = Icons.Default.Security,
                 iconTint = Color(0xFFF59E0B),
                 title = stringResource(R.string.disclaimer_link_medical),
-                description = "Non-clinical software utility disclaimer",
+                description = stringResource(R.string.about_legal_medical_desc),
                 onClick = {
                     openUrl(context, "https://dosezy.attenomy.com/disclaimer")
                 }
@@ -356,7 +356,7 @@ fun AboutScreen(navController: NavController) {
                 icon = Icons.Default.Security,
                 iconTint = Color(0xFF10B981),
                 title = stringResource(R.string.disclaimer_link_privacy),
-                description = "Data protection and privacy policy",
+                description = stringResource(R.string.about_legal_privacy_desc),
                 onClick = {
                     openUrl(context, "https://dosezy.attenomy.com/privacy")
                 }
@@ -368,7 +368,7 @@ fun AboutScreen(navController: NavController) {
                 icon = Icons.Default.Security,
                 iconTint = Color(0xFF0284C7),
                 title = stringResource(R.string.disclaimer_link_terms),
-                description = "Terms of service and software license",
+                description = stringResource(R.string.about_legal_terms_desc),
                 onClick = {
                     openUrl(context, "https://dosezy.attenomy.com/terms")
                 }

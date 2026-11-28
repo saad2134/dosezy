@@ -84,7 +84,7 @@ fun AlarmScreenContent(
     isDarkTheme: Boolean,
     isDetailsMasked: Boolean = false,
     isIntakeReAlert: Boolean = false,
-    onUnlockRequest: () -> Unit = {},
+    onUnlockRequest: ((() -> Unit)?) -> Unit = {},
     onTakeAction: () -> Unit,
     onSnoozeAction: (Int) -> Unit,
     onSkipAction: (String) -> Unit
@@ -352,8 +352,9 @@ fun AlarmScreenContent(
                                     modifier = Modifier.size(34.dp)
                                 )
                             }
+                            // Guard: Display dedicated privacy title instead of preferences toggle title when details are masked on lock screen (#143)
                             Text(
-                                text = stringResource(R.string.pref_lockscreen_details_title),
+                                text = stringResource(R.string.alarm_lockscreen_privacy_title),
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.onSurface
                             )
@@ -364,7 +365,7 @@ fun AlarmScreenContent(
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
                             Button(
-                                onClick = onUnlockRequest,
+                                onClick = { onUnlockRequest(null) },
                                 shape = RoundedCornerShape(14.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color(0xFF1193D4),
@@ -474,10 +475,19 @@ fun AlarmScreenContent(
                                         )
                                         med.currentStock?.let { stock ->
                                             val stockFmt = com.example.dosezy.utils.DosageFormatUtils.formatStockQuantity(stock)
+                                            val doseAmount = med.getStockDeductionAmount(entry.scheduledDateTime.toLocalTime(), entry.dosage)
+                                            val threshold = med.refillThreshold
+                                            // Guard: Display warning color on alarm screen when stock is at/below refill threshold, lower than required dose, or depleted (#144)
+                                            val isLowStock = (threshold != null && stock <= threshold) || stock < doseAmount || stock <= 0.0
+                                            val stockColor = if (isLowStock) {
+                                                if (isDarkTheme) Color(0xFFFCA5A5) else Color(0xFFB91C1C)
+                                            } else {
+                                                if (isDarkTheme) Color(0xFFA7F3D0) else Color(0xFF2E7D32)
+                                            }
                                             Text(
                                                 text = stringResource(R.string.alarm_stock_remaining, stockFmt),
                                                 style = MaterialTheme.typography.bodySmall,
-                                                color = Color(0xFF2E7D32),
+                                                color = stockColor,
                                                 fontWeight = FontWeight.SemiBold
                                             )
                                         }
@@ -518,13 +528,9 @@ fun AlarmScreenContent(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 val useSlideActions = user?.slideActionsEnabled != false
-                // Guard: When lockscreen details are masked, require unlock verification before marking dose taken to protect patient safety
-                val effectiveTakeAction = if (isDetailsMasked) onUnlockRequest else onTakeAction
 
                 if (useSlideActions) {
-                    val slideTakeText = if (isDetailsMasked) {
-                        stringResource(R.string.alarm_unlock_to_view_details)
-                    } else if (medicinesList.size > 1) {
+                    val slideTakeText = if (medicinesList.size > 1) {
                         stringResource(R.string.alarm_slide_to_take_all, medicinesList.size)
                     } else {
                         stringResource(R.string.alarm_slide_to_take)
@@ -532,16 +538,16 @@ fun AlarmScreenContent(
                     // Guard: Mark as taken dragged left-to-right (slideToLeft = false) for natural affirmative gesture
                     SlideToConfirmButton(
                         text = slideTakeText,
-                        icon = if (isDetailsMasked) Icons.Default.LockOpen else Icons.Default.Check,
+                        icon = Icons.Default.Check,
                         trackColor = Color(0xFF10B981),
                         thumbColor = Color(0xFF10B981),
                         slideToLeft = false,
-                        onConfirmed = effectiveTakeAction
+                        onConfirmed = onTakeAction
                     )
                 } else {
                     // Standard Tap Buttons when sliding is turned off in preferences
                     Button(
-                        onClick = effectiveTakeAction,
+                        onClick = onTakeAction,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
@@ -551,12 +557,10 @@ fun AlarmScreenContent(
                             contentColor = Color.White
                         )
                     ) {
-                        Icon(imageVector = if (isDetailsMasked) Icons.Default.LockOpen else Icons.Default.Check, contentDescription = null, tint = Color.White)
+                        Icon(imageVector = Icons.Default.Check, contentDescription = null, tint = Color.White)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = if (isDetailsMasked) {
-                                stringResource(R.string.alarm_unlock_to_view_details)
-                            } else if (medicinesList.size > 1) {
+                            text = if (medicinesList.size > 1) {
                                 stringResource(R.string.alarm_take_all, medicinesList.size)
                             } else {
                                 stringResource(R.string.alarm_take_medicine)
@@ -657,7 +661,11 @@ fun AlarmScreenContent(
                 if (user?.allowDoseSkipping == true) {
                     OutlinedButton(
                         onClick = {
-                            if (isDetailsMasked) onUnlockRequest() else showSkipReasonDialog = true
+                            if (isDetailsMasked) {
+                                onUnlockRequest { showSkipReasonDialog = true }
+                            } else {
+                                showSkipReasonDialog = true
+                            }
                         },
                         modifier = Modifier
                             .fillMaxWidth()

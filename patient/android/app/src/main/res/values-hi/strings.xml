@@ -58,7 +58,8 @@
     <string name="form_error_course_duration">कोर्स की अवधि कम से कम 1 दिन होनी चाहिए</string>
     <string name="form_error_fix_fields">कृपया ऊपर हाइलाइट किए गए आवश्यक फ़ील्ड भरें</string>
     <string name="freq_daily">दैनिक</string>
-    <string name="freq_weekly">साप्ताहिक</string>
+    <string name="freq_weekly">साप्ताहिक (विशिष्ट दिन)</string>
+    <string name="freq_weekly_desc">दवा केवल सप्ताह के चयनित दिनों में लें।</string>
     <string name="freq_monthly">मासिक</string>
     <string name="freq_custom">हर X सप्ताह में</string>
     <string name="form_select_days_week">सप्ताह के दिन चुनें</string>
@@ -109,6 +110,9 @@
 
     <!-- Notification Check Dialog -->
         <string name="notif_check_title">सूचना विश्वसनीयता</string>
+    <string name="notif_check_summary">%2$d में से %1$d जाँच पास हुईं</string>
+    <string name="notif_status_group_needs_fixing">सुधार की आवश्यकता है</string>
+    <string name="notif_status_group_all_good">सब ठीक है</string>
     <string name="notif_perm_title">सूचना अनुमति</string>
     <string name="notif_perm_desc">दवा रिमाइंडर और अलार्म भेजने के लिए आवश्यक।</string>
     <string name="notif_perm_exact_warning">सूचनाएं चालू हैं • समय पर अलार्म बजने के लिए सटीक अलार्म की अनुमति दें (अनुमति देने के लिए टैप करें)</string>
@@ -257,6 +261,17 @@
     <string name="home_all_good_desc">आज कोई दवा लेने की आवश्यकता नहीं है।</string>
     <string name="no_profiles_found">कोई प्रोफ़ाइल नहीं मिली</string>
     <string name="status_taken">लिया गया</string>
+    <string name="status_late">देर से</string>
+    <string name="status_partial">आंशिक</string>
+    <string name="status_upcoming">आगामी</string>
+    <string name="status_missed">छूटी हुई</string>
+    <string name="status_skipped">छोड़ी गई</string>
+    <string name="calendar_view_month">महीना</string>
+    <string name="calendar_view_week">सप्ताह</string>
+    <string name="calendar_prev_week">पिछला सप्ताह</string>
+    <string name="calendar_next_week">अगला सप्ताह</string>
+    <string name="calendar_prev_month">पिछला महीना</string>
+    <string name="calendar_next_month">अगला महीना</string>
 
     <string name="image_picker_select_source">छवि स्रोत चुनें</string>
     <string name="image_picker_choose_method">चुनें कि आप अपनी तस्वीर कैसे जोड़ना चाहते हैं</string>
@@ -434,6 +449,7 @@
     <string name="import_from_server_or_backup">सर्वर/बैकअप से आयात करें</string>
     <string name="tab_cloud_server">क्लाउड / सर्वर</string>
     <string name="tab_local_file">स्थानीय फ़ाइल</string>
+    <string name="local_backup_card_title">स्थानीय फ़ाइल से पुनर्स्थापित करें</string>
     <string name="cloud_sync_locked_desc">स्वचालित क्लाउड सिंक और सेल्फ-होस्टेड सर्वर कनेक्शन वर्तमान में विकास में हैं और आगामी अपडेट में उपलब्ध होंगे।</string>
     <string name="local_backup_select_desc">अपने रोगी प्रोफाइल, दवाओं और कार्यक्रमों को पुनर्स्थापित करने के लिए अपने डिवाइस या ड्राइव से एक .zip फ़ाइल चुनें।</string>
     <string name="local_backup_select_btn">.zip बैकअप फ़ाइल चुनें</string>
@@ -508,6 +524,35 @@
     <string name="custom_recurrence_interval_label">दोहराव अंतराल (सप्ताह)</string>
     <string name="custom_recurrence_summary">प्रत्येक %1$d सप्ताह में %2$s को दोहराया जाएगा</string>
     <string name="validation_select_custom_days">कस्टम पुनरावृत्ति के लिए कृपया कम से कम एक दिन चुनें</string>
+    <!-- Rolling Interval Scheduling (#119) -->
+    <string name="freq_rolling_interval_title">रोलिंग अंतराल</string>
+    <string name="freq_rolling_interval_desc">सुरक्षित अंतराल बनाए रखने के लिए खुराक लेने के बाद ही अगली खुराक का टाइमर शुरू होगा</string>
+    <string name="freq_rolling_badge">रोलिंग</string>
+
+    <!-- Cyclical & Looping Schedules (#141) -->
+    <string name="freq_cyclical">चक्रीय (दवा के दिन और विराम के दिन)</string>
+    <string name="freq_cyclical_desc">सक्रिय दिनों में दवा लें, फिर विराम के दिनों में रोकें (जैसे गर्भनिरोधक गोलियां)।</string>
+    <string name="freq_cycle_format">%1$d दिन दवा, %2$d दिन विराम</string>
+    <string name="freq_cycle_active_days">दवा लेने के दिन</string>
+    <string name="freq_cycle_rest_days">विराम के दिन</string>
+    <string name="freq_cycle_preset_21_7">21 / 7 (मानक)</string>
+    <string name="freq_cycle_preset_24_4">24 / 4 (विस्तारित)</string>
+    <string name="freq_cycle_preset_custom">कस्टम</string>
+    <string name="cycle_presets_label">चक्र प्रीसेट</string>
+
+    <!-- PRN Next Dose Eligible Alerts (#142) -->
+    <string name="freq_as_needed_interval_title">खुराक के बीच न्यूनतम अंतराल</string>
+    <string name="freq_as_needed_interval_desc">अगली खुराक लेने के लिए सुरक्षित और अनुमत समय होने पर सूचित करें।</string>
+    <string name="freq_as_needed_interval_format">ज़रूरत पड़ने पर (न्यूनतम %1$d घंटे)</string>
+    <string name="freq_as_needed_notify_eligible">अगली खुराक योग्य होने पर सूचित करें</string>
+    <string name="freq_as_needed_interval_none">कोई नहीं</string>
+    <string name="freq_as_needed_interval_hours_label">न्यूनतम अंतराल (घंटे)</string>
+    <string name="prn_eligible_channel_name">अगली खुराक उपलब्ध (ज़रूरत अनुसार दवा)</string>
+    <string name="prn_eligible_channel_desc">ज़रूरत अनुसार दवाओं के लिए न्यूनतम अंतराल बीतने पर सूचनाएं।</string>
+    <string name="prn_eligible_notification_title">अगली खुराक उपलब्ध</string>
+    <string name="prn_eligible_notification_body">%2$s के लिए न्यूनतम %1$d घंटे का अंतराल पूरा हो गया है। ज़रूरत पड़ने पर आप अगली खुराक ले सकते हैं।</string>
+    <string name="prn_eligible_notification_body_generic">%1$s के लिए न्यूनतम अंतराल पूरा हो गया है। ज़रूरत पड़ने पर आप अगली खुराक ले सकते हैं।</string>
+
     <string name="btn_log_prn_dose">खुराक दर्ज करें</string>
     <string name="prn_doses_taken_today">आज दर्ज खुराकें: %1$d</string>
     <string name="prn_section_title">ज़रूरत पड़ने पर दवाएं (PRN)</string>
@@ -700,9 +745,14 @@
     <string name="country_brazil">ब्राज़ील</string>
     <string name="country_bangladesh">बांग्लादेश</string>
     <string name="country_australia">ऑस्ट्रेलिया</string>
+    <string name="country_new_zealand">न्यूजीलैंड</string>
     <string name="pharmacy_order_refill_filter">रीफ़िल फ़िल्टर</string>
     <string name="pharmacy_order_days_supply">आपूर्ति के दिन</string>
     <string name="pharmacy_order_days_format_short">%1$d दिन</string>
+    <string name="pharmacy_order_days_custom">कस्टम</string>
+    <string name="pharmacy_order_custom_days_label">कस्टम आपूर्ति (दिन)</string>
+    <string name="pharmacy_order_custom_days_placeholder">उदा. 28</string>
+    <string name="unit_days_suffix">दिन</string>
     <string name="pharmacy_order_medicines_include">शामिल दवाइयां (%1$d/%2$d)</string>
     <string name="pharmacy_order_stock_left">%1$s शेष</string>
     <string name="pharmacy_order_no_stock_tracked">स्टॉक ट्रैक नहीं किया गया</string>
@@ -845,7 +895,7 @@
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">निर्धारित दवा अनुस्मारक</string>
     <string name="pref_lockscreen_details_title">लॉक स्क्रीन पर विवरण दिखाएं</string>
-    <string name="pref_lockscreen_details_desc">डिवाइस अनलॉक होने तक दवा का नाम और खुराक छिपाएं।</string>
+    <string name="pref_lockscreen_details_desc">लॉक स्क्रीन पर दवा के नाम और खुराक दिखाएं। बंद होने पर, डिवाइस अनलॉक होने तक विवरण छिपा रहेगा।</string>
     <string name="disclaimer_dialog_title">चिकित्सा एवं कानूनी अस्वीकरण</string>
     <string name="disclaimer_dialog_summary">डोज़ीज़ी एक स्वचालित डिजिटल रिमाइंडर उपकरण है और यह कोई प्रमाणित मेडिकल डिवाइस नहीं है। यह नैदानिक परामर्श, खुराक गणना या चिकित्सा सलाह प्रदान नहीं करता है। दवा संबंधी निर्देशों के लिए हमेशा अपने चिकित्सक से परामर्श लें।</string>
     <string name="disclaimer_checkbox_consent">मैं चिकित्सा अस्वीकरण और सेवा की शर्तों को समझता/समझती हूं और स्वीकार करता/करती हूं।</string>
@@ -858,7 +908,17 @@
     <string name="pdf_report_disclaimer_footer">डोज़ीज़ी दवा ट्रैकर • स्व-रिपोर्टेड सूचनात्मक लॉग (गैर-चिकित्सकीय)</string>
     <string name="pharmacy_refill_estimation_disclaimer">सूचना: रिफिल मात्रा दर्ज आवृत्ति पर आधारित अनुमान है। अपने फार्मासिस्ट या चिकित्सक से सत्यापित करें।</string>
     <string name="alarm_unlock_to_view_details">विवरण देखने के लिए अनलॉक करें</string>
+    <string name="alarm_lockscreen_privacy_title">दवा का विवरण छिपा हुआ है</string>
     <string name="alarm_lockscreen_details_hidden">डिवाइस लॉक होने पर दवा का नाम और खुराक छिपी रहती है।</string>
+
+    <!-- Multi-Step Medicine Form (#145) -->
+    <string name="form_step_what">क्या लेना है</string>
+    <string name="form_step_when">कब</string>
+    <string name="form_step_extras">अतिरिक्त</string>
+    <string name="form_step_counter">चरण %1$d / %2$d</string>
+    <string name="btn_next">आगे</string>
+    <string name="form_pill_appearance">दवा का रूप</string>
+    <string name="form_dosage_card_title">खुराक और क्षमता</string>
 
     <!-- Schedule Effective Date Selector (#105) -->
     <string name="schedule_effective_dialog_title">शेड्यूल परिवर्तन लागू करें</string>
@@ -908,4 +968,12 @@
     <string name="sort_custom_reorder_desc">अपनी दवाओं का क्रम बदलने के लिए तीरों का उपयोग करें।</string>
     <string name="sort_move_up">ऊपर ले जाएं</string>
     <string name="sort_move_down">नीचे ले जाएं</string>
+
+    <!-- Collapsible Time Slots on Home Screen (#138) -->
+    <string name="pref_slot_rollup_title">संक्षिप्त करने योग्य समय स्लॉट</string>
+    <string name="pref_slot_rollup_desc">होम स्क्रीन पर दवा समूहों को संक्षिप्त और विस्तृत करने की अनुमति दें। छूटी हुई खुराकों को रोकने के लिए डिफ़ॉल्ट रूप से अक्षम।</string>
+    <string name="home_expand_all">सभी विस्तृत करें</string>
+    <string name="home_collapse_all">सभी संक्षिप्त करें</string>
+    <string name="home_slot_expand">स्लॉट विस्तृत करें</string>
+    <string name="home_slot_collapse">स्लॉट संक्षिप्त करें</string>
 </resources>

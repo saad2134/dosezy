@@ -52,7 +52,8 @@
     <string name="form_error_course_duration">Длительность курса должна быть не менее 1 дня</string>
     <string name="form_error_fix_fields">Пожалуйста, заполните обязательные поля, выделенные выше</string>
     <string name="freq_daily">Ежедневно</string>
-    <string name="freq_weekly">Еженедельно</string>
+    <string name="freq_weekly">Еженедельно (выбранные дни)</string>
+    <string name="freq_weekly_desc">Принимать лекарство только в выбранные дни недели.</string>
     <string name="freq_monthly">Ежемесячно</string>
     <string name="freq_custom">Каждые X недель</string>
     <string name="form_select_days_week">Выберите дни недели</string>
@@ -99,6 +100,9 @@
     <string name="hours_format">%1$d час(ов)</string>
 
         <string name="notif_check_title">Надежность уведомлений</string>
+    <string name="notif_check_summary">Пройдено проверок: %1$d из %2$d</string>
+    <string name="notif_status_group_needs_fixing">Требует исправления</string>
+    <string name="notif_status_group_all_good">Все в порядке</string>
     <string name="notif_perm_title">Разрешение на уведомления</string>
     <string name="notif_perm_desc">Требуется для отправки напоминаний о приеме лекарств и сигналов.</string>
     <string name="notif_perm_exact_warning">Уведомления включены • Точные будильники нужны для звонка вовремя (нажмите, чтобы разрешить)</string>
@@ -241,6 +245,17 @@
     <string name="home_all_good_desc">Сегодня принимать лекарства не нужно.</string>
     <string name="no_profiles_found">Профили не найдены</string>
     <string name="status_taken">Принято</string>
+    <string name="status_late">С опозданием</string>
+    <string name="status_partial">Частично</string>
+    <string name="status_upcoming">Предстоящий</string>
+    <string name="status_missed">Пропущено</string>
+    <string name="status_skipped">Пропущено (вручную)</string>
+    <string name="calendar_view_month">Месяц</string>
+    <string name="calendar_view_week">Неделя</string>
+    <string name="calendar_prev_week">Предыдущая неделя</string>
+    <string name="calendar_next_week">Следующая неделя</string>
+    <string name="calendar_prev_month">Предыдущий месяц</string>
+    <string name="calendar_next_month">Следующий месяц</string>
 
     <string name="image_picker_select_source">Выберите источник изображения</string>
     <string name="image_picker_choose_method">Выберите способ добавления фотографии</string>
@@ -418,6 +433,7 @@
     <string name="import_from_server_or_backup">Импорт с сервера/из копии</string>
     <string name="tab_cloud_server">Облако / Сервер</string>
     <string name="tab_local_file">Локальный файл</string>
+    <string name="local_backup_card_title">Восстановить из локального файла</string>
     <string name="cloud_sync_locked_desc">Облачная синхронизация для ухода и подключение к собственному серверу находятся в разработке и появятся в следующем обновлении.</string>
     <string name="local_backup_select_desc">Выберите ранее экспортированный .zip-архив Dosezy на устройстве или Google Диске для восстановления данных.</string>
     <string name="local_backup_select_btn">Выбрать файл резервной копии (.zip)</string>
@@ -492,6 +508,35 @@
     <string name="custom_recurrence_interval_label">Интервал повторения (недели)</string>
     <string name="custom_recurrence_summary">Повторяется каждые %1$d нед.: %2$s</string>
     <string name="validation_select_custom_days">Выберите хотя бы один день для настраиваемого повторения</string>
+    <!-- Rolling Interval Scheduling (#119) -->
+    <string name="freq_rolling_interval_title">Скользящий интервал</string>
+    <string name="freq_rolling_interval_desc">Таймер следующей дозы запускается после подтверждения приема для соблюдения безопасного интервала</string>
+    <string name="freq_rolling_badge">Скользящий</string>
+
+    <!-- Cyclical & Looping Schedules (#141) -->
+    <string name="freq_cyclical">Циклический (приём и перерыв)</string>
+    <string name="freq_cyclical_desc">Принимать препарат в дни приёма, затем делать перерыв (напр., противозачаточные).</string>
+    <string name="freq_cycle_format">%1$d дн. приёма, %2$d дн. перерыва</string>
+    <string name="freq_cycle_active_days">Дни приёма</string>
+    <string name="freq_cycle_rest_days">Дни перерыва</string>
+    <string name="freq_cycle_preset_21_7">21 / 7 (Стандарт)</string>
+    <string name="freq_cycle_preset_24_4">24 / 4 (Расширенный)</string>
+    <string name="freq_cycle_preset_custom">Настроить</string>
+    <string name="cycle_presets_label">Шаблоны цикла</string>
+
+    <!-- PRN Next Dose Eligible Alerts (#142) -->
+    <string name="freq_as_needed_interval_title">Минимальный интервал между дозами</string>
+    <string name="freq_as_needed_interval_desc">Уведомлять, когда безопасно и разрешено принять следующую дозу.</string>
+    <string name="freq_as_needed_interval_format">По необходимости (мин. %1$d ч)</string>
+    <string name="freq_as_needed_notify_eligible">Уведомить о возможности следующего приёма</string>
+    <string name="freq_as_needed_interval_none">Нет</string>
+    <string name="freq_as_needed_interval_hours_label">Мин. интервал (часы)</string>
+    <string name="prn_eligible_channel_name">Доступна следующая доза (по необходимости)</string>
+    <string name="prn_eligible_channel_desc">Уведомления об истечении минимального интервала между дозами при приёме по требованию.</string>
+    <string name="prn_eligible_notification_title">Доступна следующая доза</string>
+    <string name="prn_eligible_notification_body">Минимальный интервал %1$d ч для %2$s истёк. Вы можете принять следующую дозу при необходимости.</string>
+    <string name="prn_eligible_notification_body_generic">Минимальный интервал для %1$s истёк. Вы можете принять следующую дозу при необходимости.</string>
+
     <string name="btn_log_prn_dose">Записать прием</string>
     <string name="prn_doses_taken_today">Приемов записано сегодня: %1$d</string>
     <string name="prn_section_title">Препараты по необходимости (PRN)</string>
@@ -684,9 +729,14 @@
     <string name="country_brazil">Бразилия</string>
     <string name="country_bangladesh">Бангладеш</string>
     <string name="country_australia">Австралия</string>
+    <string name="country_new_zealand">Новая Зеландия</string>
     <string name="pharmacy_order_refill_filter">Фильтр пополнения</string>
     <string name="pharmacy_order_days_supply">Запас на (дней)</string>
     <string name="pharmacy_order_days_format_short">%1$d дн.</string>
+    <string name="pharmacy_order_days_custom">Свой</string>
+    <string name="pharmacy_order_custom_days_label">Свой запас (дней)</string>
+    <string name="pharmacy_order_custom_days_placeholder">напр. 28</string>
+    <string name="unit_days_suffix">дн.</string>
     <string name="pharmacy_order_medicines_include">Включить лекарства (%1$d/%2$d)</string>
     <string name="pharmacy_order_stock_left">Осталось: %1$s</string>
     <string name="pharmacy_order_no_stock_tracked">Запас не отслеживается</string>
@@ -829,7 +879,7 @@
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">Запланированное напоминание о приеме лекарств</string>
     <string name="pref_lockscreen_details_title">Показывать подробности на экране блокировки</string>
-    <string name="pref_lockscreen_details_desc">Скрывать названия и дозировки до разблокировки устройства.</string>
+    <string name="pref_lockscreen_details_desc">Показывать названия и дозировки лекарств на экране блокировки. Если выключено, данные скрыты до разблокировки устройства.</string>
     <string name="disclaimer_dialog_title">Медицинский и юридический отказ от ответственности</string>
     <string name="disclaimer_dialog_summary">Dosezy - это цифровая утилита напоминаний, которая НЕ является медицинским изделием. Приложение не ставит диагнозы, не рассчитывает дозировки и не дает клинических рекомендаций. Всегда консультируйтесь с лечащим врачом или фармацевтом.</string>
     <string name="disclaimer_checkbox_consent">Я понимаю и принимаю медицинский отказ от ответственности и условия обслуживания.</string>
@@ -842,7 +892,17 @@
     <string name="pdf_report_disclaimer_footer">Dosezy Трекер Лекарств • Информационный журнал самоотчета (Неклинический)</string>
     <string name="pharmacy_refill_estimation_disclaimer">Примечание: Количество для пополнения является приблизительным на основе частоты приема. Уточняйте у врача или фармацевта.</string>
     <string name="alarm_unlock_to_view_details">Разблокируйте для просмотра деталей</string>
+    <string name="alarm_lockscreen_privacy_title">Информация о лекарствах скрыта</string>
     <string name="alarm_lockscreen_details_hidden">Названия препаратов и дозировки скрыты, пока устройство заблокировано.</string>
+
+    <!-- Multi-Step Medicine Form (#145) -->
+    <string name="form_step_what">Что принимать</string>
+    <string name="form_step_when">Когда</string>
+    <string name="form_step_extras">Дополнительно</string>
+    <string name="form_step_counter">Шаг %1$d из %2$d</string>
+    <string name="btn_next">Далее</string>
+    <string name="form_pill_appearance">Стиль таблетки</string>
+    <string name="form_dosage_card_title">Дозировка и концентрация</string>
 
     <!-- Schedule Effective Date Selector (#105) -->
     <string name="schedule_effective_dialog_title">Применить изменения расписания</string>
@@ -892,4 +952,12 @@
     <string name="sort_custom_reorder_desc">Используйте стрелки, чтобы настроить порядок приема лекарств.</string>
     <string name="sort_move_up">Переместить вверх</string>
     <string name="sort_move_down">Переместить вниз</string>
+
+    <!-- Collapsible Time Slots on Home Screen (#138) -->
+    <string name="pref_slot_rollup_title">Сворачиваемые временные интервалы</string>
+    <string name="pref_slot_rollup_desc">Разрешить сворачивание и разворачивание групп лекарств на главном экране. Отключено по умолчанию для предотвращения пропуска доз.</string>
+    <string name="home_expand_all">Развернуть все</string>
+    <string name="home_collapse_all">Свернуть все</string>
+    <string name="home_slot_expand">Развернуть интервал</string>
+    <string name="home_slot_collapse">Свернуть интервал</string>
 </resources>

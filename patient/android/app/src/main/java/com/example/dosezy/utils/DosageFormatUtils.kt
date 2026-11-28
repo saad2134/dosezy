@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.example.dosezy.R
 import com.example.dosezy.data.model.DosageUnit
+import com.example.dosezy.data.model.PillShape
 import com.example.dosezy.data.model.getLocalizedName
 import java.util.Locale
 
@@ -27,7 +28,8 @@ object DosageFormatUtils {
      * Uses standard decimals (e.g. 0.5, 1.5, 2.5) for chemical/continuous units (MG, ML, etc.).
      */
     fun formatDosageAmount(dosage: Double, unit: DosageUnit): String {
-        if (dosage <= 0.0) return "0"
+        // Guard: Handle NaN, infinite, and non-positive dosages gracefully to prevent runtime formatting crashes
+        if (dosage <= 0.0 || dosage.isNaN() || dosage.isInfinite()) return "0"
 
         // Discrete units: format common fractional tablet/capsule doses with vulgar fractions
         if (unit == DosageUnit.TABLET || unit == DosageUnit.CAPSULE) {
@@ -57,29 +59,32 @@ object DosageFormatUtils {
 
     /**
      * Formats dosage amount with standard unit abbreviation (e.g. "0.5 mg", "½ tablet", "1½ tablets").
+     * Supports true plural inflection for discrete units when dosage exceeds 1.0 (#F15).
      */
     fun formatDosageDisplay(dosage: Double, unit: DosageUnit): String {
         val amountStr = formatDosageAmount(dosage, unit)
-        val unitStr = getUnitAbbreviation(unit)
+        val unitStr = getUnitAbbreviation(unit, dosage)
         return "$amountStr $unitStr"
     }
 
     /**
      * Composable helper formatting dosage amount with localized unit name.
+     * Supports true plural inflection for discrete units when dosage exceeds 1.0 (#F15).
      */
     @Composable
     fun formatLocalizedDosageDisplay(dosage: Double, unit: DosageUnit): String {
         val amountStr = formatDosageAmount(dosage, unit)
-        val unitName = unit.getLocalizedName()
+        val unitName = unit.getLocalizedName(dosage > 1.0)
         return "$amountStr $unitName"
     }
 
     /**
      * Context-based helper formatting dosage amount with localized unit name.
+     * Supports true plural inflection for discrete units when dosage exceeds 1.0 (#F15).
      */
     fun formatLocalizedDosageDisplay(context: Context, dosage: Double, unit: DosageUnit): String {
         val amountStr = formatDosageAmount(dosage, unit)
-        val unitName = unit.getLocalizedName(context)
+        val unitName = unit.getLocalizedName(context, dosage > 1.0)
         return "$amountStr $unitName"
     }
 
@@ -88,35 +93,175 @@ object DosageFormatUtils {
      * and fractional stock balances retain exact single decimal precision ("29.5", "14.5").
      */
     fun formatStockQuantity(stock: Double?): String {
-        if (stock == null) return ""
+        if (stock == null || stock.isNaN() || stock.isInfinite()) return ""
         return formatDecimalClean(stock)
     }
 
-    // Guard: Round to 2 decimals and strip all trailing zeros/decimals cleanly to prevent "2.0" or "0.0" output from IEEE 754 float imprecision
-    private fun formatDecimalClean(value: Double): String {
-        val rounded = Math.round(value * 100.0) / 100.0
-        return if (rounded % 1.0 == 0.0) {
-            rounded.toLong().toString()
-        } else {
-            String.format(Locale.US, "%.2f", rounded)
-                .trimEnd('0')
-                .trimEnd('.')
-                .ifEmpty { "0" }
+    /**
+     * Resolves the appropriate localized display unit for inventory stock quantities (#129).
+     * When medication dosage is measured in chemical strength (MG, MCG, MEQ), inventory stock counts
+     * discrete physical units (e.g. tablets/pills in the prescription bottle), so R.string.unit_units ("units")
+     * is returned instead of displaying raw milligram strength as inventory stock.
+     * For bottle formulations (DROP, SPRAY), returns bottle or bottles based on quantity.
+     * For discrete physical formulations (TABLET, CAPSULE, etc.), returns their respective localized names.
+     */
+    fun formatStockUnit(context: Context, unit: DosageUnit, shape: PillShape, quantity: Double = 1.0): String {
+        val isBottle = unit == DosageUnit.DROP ||
+                unit == DosageUnit.SPRAY ||
+                shape == PillShape.DROPS ||
+                shape == PillShape.SPRAY
+        // Guard: Use unit_units for chemical strength to prevent displaying stock as "30 mg" instead of "30 units" (#129)
+        return if (isBottle) {
+            if (quantity > 1.0) context.getString(R.string.unit_bottles) else context.getString(R.string.unit_bottle)
+        } else when (unit) {
+            DosageUnit.MG, DosageUnit.MCG, DosageUnit.MEQ -> {
+                context.getString(R.string.unit_units)
+            }
+            else -> unit.getLocalizedName(context)
         }
     }
 
-    private fun getUnitAbbreviation(unit: DosageUnit): String {
+    /**
+     * Composable helper resolving the appropriate localized display unit for inventory stock quantities (#129).
+     */
+    @Composable
+    fun formatLocalizedStockUnit(unit: DosageUnit, shape: PillShape, quantity: Double = 1.0): String {
+        val isBottle = unit == DosageUnit.DROP ||
+                unit == DosageUnit.SPRAY ||
+                shape == PillShape.DROPS ||
+                shape == PillShape.SPRAY
+        // Guard: Use unit_units for chemical strength to prevent displaying stock as "30 mg" instead of "30 units" (#129)
+        return if (isBottle) {
+            if (quantity > 1.0) stringResource(R.string.unit_bottles) else stringResource(R.string.unit_bottle)
+        } else when (unit) {
+            DosageUnit.MG, DosageUnit.MCG, DosageUnit.MEQ -> {
+                stringResource(R.string.unit_units)
+            }
+            else -> unit.getLocalizedName()
+        }
+    }
+
+    /**
+     * Resolves the appropriate localized display unit for pharmacy refill order quantities (#129).
+     */
+    fun formatOrderUnit(context: Context, unit: DosageUnit, shape: PillShape, quantity: Int = 1): String {
+        val isBottle = unit == DosageUnit.DROP ||
+                unit == DosageUnit.SPRAY ||
+                shape == PillShape.DROPS ||
+                shape == PillShape.SPRAY
+        return if (isBottle) {
+            if (quantity > 1) context.getString(R.string.unit_bottles) else context.getString(R.string.unit_bottle)
+        } else when (unit) {
+            DosageUnit.MG, DosageUnit.MCG, DosageUnit.MEQ -> {
+                context.getString(R.string.unit_units)
+            }
+            else -> unit.getLocalizedName(context)
+        }
+    }
+
+    /**
+     * Composable helper resolving the appropriate localized display unit for pharmacy refill order quantities (#129).
+     */
+    @Composable
+    fun formatLocalizedOrderUnit(unit: DosageUnit, shape: PillShape, quantity: Int = 1): String {
+        val isBottle = unit == DosageUnit.DROP ||
+                unit == DosageUnit.SPRAY ||
+                shape == PillShape.DROPS ||
+                shape == PillShape.SPRAY
+        return if (isBottle) {
+            if (quantity > 1) stringResource(R.string.unit_bottles) else stringResource(R.string.unit_bottle)
+        } else when (unit) {
+            DosageUnit.MG, DosageUnit.MCG, DosageUnit.MEQ -> {
+                stringResource(R.string.unit_units)
+            }
+            else -> unit.getLocalizedName()
+        }
+    }
+
+    // Guard: Round to 2 decimals and strip all trailing zeros/decimals cleanly; sanitize negative zero and naked minus (#BUG-DOSAGE-FLOAT-SANITIZATION)
+    private fun formatDecimalClean(value: Double): String {
+        if (value.isNaN() || value.isInfinite()) return "0"
+        val normalized = if (value in -0.005..0.0) 0.0 else value
+        val rounded = Math.round(normalized * 100.0) / 100.0
+        val finalVal = if (rounded == -0.0) 0.0 else rounded
+        return if (finalVal % 1.0 == 0.0) {
+            finalVal.toLong().toString()
+        } else {
+            val formatted = String.format(Locale.US, "%.2f", finalVal)
+                .trimEnd('0')
+                .trimEnd('.')
+            if (formatted == "-" || formatted == "-0" || formatted.isEmpty()) "0" else formatted
+        }
+    }
+
+    private fun getUnitAbbreviation(unit: DosageUnit, quantity: Double = 1.0): String {
+        val isPlural = quantity > 1.0
         return when (unit) {
             DosageUnit.MG -> "mg"
             DosageUnit.MCG -> "mcg"
             DosageUnit.ML -> "mL"
-            DosageUnit.DROP -> "drop"
-            DosageUnit.TABLET -> "tablet"
-            DosageUnit.CAPSULE -> "capsule"
             DosageUnit.MEQ -> "mEq"
-            DosageUnit.PUFF -> "puff"
-            DosageUnit.AMPULE -> "ampule"
-            DosageUnit.SPRAY -> "spray"
+            DosageUnit.DROP -> if (isPlural) "drops" else "drop"
+            DosageUnit.TABLET -> if (isPlural) "tablets" else "tablet"
+            DosageUnit.CAPSULE -> if (isPlural) "capsules" else "capsule"
+            DosageUnit.PUFF -> if (isPlural) "puffs" else "puff"
+            DosageUnit.AMPULE -> if (isPlural) "ampules" else "ampule"
+            DosageUnit.SPRAY -> if (isPlural) "sprays" else "spray"
         }
+    }
+
+    /**
+     * Normalizes note capitalization so initial letters are sentence-cased (e.g. "take with water" -> "Take with water") (#F15).
+     */
+    fun normalizeNoteCapitalization(note: String?): String? {
+        if (note.isNullOrBlank()) return null
+        val trimmed = note.trim()
+        return trimmed.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+    }
+
+    /**
+     * Formats dose notes for human-readable UI display.
+     * Replaces automated bracketed tags such as "[Partial Stock: Took 2 of 5]" with clean phrasing ("Took 2 of 5"),
+     * strips internal audit tags such as "[Logged retrospectively]", and normalizes note capitalization (#F15).
+     */
+    fun formatDoseNoteForDisplay(doseNotes: String?): String? {
+        if (doseNotes.isNullOrBlank()) return null
+
+        val partialRegex = Regex("\\[Partial Stock: Took ([0-9]+(?:\\.[0-9]+)?) of ([0-9]+(?:\\.[0-9]+)?)\\]")
+        val partialMatch = partialRegex.find(doseNotes)
+
+        val rawUserNotes = doseNotes
+            .replace(partialRegex, "")
+            .replace(Regex("\\[Logged retrospectively\\]"), "")
+            .trim(' ', '|', '-')
+            .ifBlank { null }
+
+        val userNotes = normalizeNoteCapitalization(rawUserNotes)
+
+        val formattedPartial = partialMatch?.let {
+            val took = it.groupValues[1]
+            val total = it.groupValues[2]
+            "Took $took of $total"
+        }
+
+        return when {
+            formattedPartial != null && userNotes != null -> "$userNotes • $formattedPartial"
+            formattedPartial != null -> formattedPartial
+            else -> userNotes
+        }
+    }
+
+    /**
+     * Extracts user-authored notes by stripping automated system tags such as partial stock and retrospective logging.
+     * Useful when pre-populating note editing dialogs.
+     */
+    fun extractUserNote(doseNotes: String?): String {
+        if (doseNotes.isNullOrBlank()) return ""
+        val partialRegex = Regex("\\[Partial Stock: Took [0-9.]* of [0-9.]*\\]")
+        val retrospectiveRegex = Regex("\\[Logged retrospectively\\]")
+        return doseNotes
+            .replace(partialRegex, "")
+            .replace(retrospectiveRegex, "")
+            .trim(' ', '|', '-')
     }
 }

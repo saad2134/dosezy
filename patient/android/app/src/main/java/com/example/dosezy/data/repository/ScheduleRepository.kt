@@ -131,6 +131,9 @@ class ScheduleRepository(private val database: DosezyDatabase) {
         }
         // Guard: Dismiss any active refill alert notification for deleted/archived medicine
         nManager?.cancel((medicineId + "_refill").hashCode())
+        // Guard: Cancel PRN next dose eligible alarm and dismiss shade notification for deleted/archived medicine (#142)
+        alarmScheduler.cancelPrnEligibleNotification(medicineId)
+        nManager?.cancel((medicineId + "_prn_eligible").hashCode())
         // Guard: Reconcile active ADHD intake countdown notification if active countdown references deleted medicine (#BUG-SAFEGUARD-PARTIAL-COHORT)
         try {
             val activeCountdown = com.example.dosezy.notifications.IntakeSafeguardManager.activeCountdown.value
@@ -164,8 +167,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 entry.scheduledDateTime.isBefore(activeWindowEnd)
             }
             entriesToCancel.forEach { entry ->
-                // Guard: Pass entry directly to cancelAlarm to bypass sequential blocking DB lookups
-                alarmScheduler.cancelAlarm(entry)
+                // Guard: Pass rearmSiblings = false to cancelAlarm to eliminate redundant sequential blocking DB lookups during full alarm rebuilds (#BUG-CANCEL-REARM-BYPASS)
+                alarmScheduler.cancelAlarm(entry, rearmSiblings = false)
                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
             }
 
@@ -353,7 +356,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                             context,
                             (previousEntry.medicineId + "_refill_click").hashCode(),
                             Intent(context, com.example.dosezy.MainActivity::class.java).apply {
-                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                // Guard: Use SINGLE_TOP with CLEAR_TOP so tapping refill notification delivers extras to onNewIntent without destroying active MainActivity instance (#BUG-REFILL-SINGLE-TOP)
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                                 // Guard: Pass target user ID and route to medicines screen so tapping refill alert switches profile and navigates to medication list
                                 putExtra("switch_to_user_id", previousEntry.userId)
                                 putExtra("fragment", "medicines")
@@ -385,10 +389,51 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             }
         }
 
-        // 4. Synchronize active slot notifications, cancel armed alarms, and update widgets
+        // 4. Dynamic Rolling Interval Schedule Re-anchoring (#119)
+        if (previousEntry != null) {
+            try {
+                val medicine = database.medicineDao().getMedicineByIdDirect(previousEntry.medicineId)
+                if (medicine != null && medicine.frequency.isRollingInterval) {
+                    val intervalMinutes = com.example.dosezy.domain.ScheduleRecurrenceEngine.getRollingIntervalMinutes(medicine)
+                    if (intervalMinutes != null && intervalMinutes > 0) {
+                        val nextDoseTime = takenAt.plusMinutes(intervalMinutes).withSecond(0).withNano(0)
+                        val takenMillis = takenAt.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+
+                        // Guard: Wrap deletion and re-anchored entry insertion in an atomic transaction to prevent wiped future schedules if process is interrupted (#119)
+                        database.withTransaction {
+                            database.scheduleDao().deleteFuturePendingScheduleEntries(medicine.medicineId, takenMillis)
+
+                            val reanchoredEntries = com.example.dosezy.domain.ScheduleRecurrenceEngine.generateRollingScheduleEntries(
+                                medicine = medicine,
+                                anchorDateTime = nextDoseTime,
+                                daysCount = 30
+                            )
+                            if (reanchoredEntries.isNotEmpty()) {
+                                database.scheduleDao().insertScheduleEntries(reanchoredEntries)
+                            }
+                        }
+
+                        // Guard: Reschedule alarms whenever rolling interval re-anchoring generates new upcoming doses, regardless of syncSlotNotification, to prevent losing next rolling alarm (#119, #BUG-ROLLING-ALARM-BATCH)
+                        if (context != null) {
+                            rescheduleAllAlarms(previousEntry.userId, context)
+                        }
+                    }
+                }
+            } catch (ex: Exception) {
+                Log.e(TAG, "Error re-anchoring rolling interval schedule in recordDoseTaken", ex)
+            }
+        }
+
+        // 5. Synchronize active slot notifications, cancel armed alarms, and update widgets
         // Guard: Allow suppressing intermediate slot synchronization during coordinated batch processing (e.g. IntakeSafeguardManager) to avoid redundant notification churn (#BUG-01)
         if (context != null && syncSlotNotification) {
             syncSlotNotificationAndAlarms(entryId, previousEntry, context)
+        }
+
+        // 6. Track user dose intake count for smart in-app review prompting (#146)
+        if (context != null && !alreadyTaken && (status == MedicationStatus.TAKEN_ON_TIME.name || status == MedicationStatus.TAKEN_LATE.name || status == "TAKEN_ON_TIME" || status == "TAKEN_LATE")) {
+            // Guard: Record successfully logged dose to satisfy minimum engagement thresholds for review prompts
+            com.example.dosezy.utils.ReviewPreferences.incrementCompletedDoses(context)
         }
     }
 
@@ -495,7 +540,7 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                             val alarmScheduler = AlarmScheduler(context)
                             alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)
                             slotEntries.forEach { slotEntry ->
-                                alarmScheduler.cancelAlarm(slotEntry)
+                                alarmScheduler.cancelAlarm(slotEntry, rearmSiblings = false)
                                 alarmScheduler.cancelSnooze(slotEntry.entryId)
                                 alarmScheduler.cancelNagging(slotEntry.entryId)
                                 alarmScheduler.cancelIntakeSafeguardAlarm(slotEntry.entryId)
@@ -669,27 +714,68 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             }
         }
 
-        // 3. Update app widgets and alarms
+        // 3. Rolling Interval Undo Re-anchoring (#119)
+        var isRollingMed = false
+        if (wasTaken && previousEntry != null) {
+            try {
+                val medicine = database.medicineDao().getMedicineByIdDirect(previousEntry.medicineId)
+                if (medicine != null && medicine.frequency.isRollingInterval) {
+                    isRollingMed = true
+                    val intervalMinutes = com.example.dosezy.domain.ScheduleRecurrenceEngine.getRollingIntervalMinutes(medicine)
+                    if (intervalMinutes != null && intervalMinutes > 0) {
+                        val baseTime = previousEntry.scheduledDateTime
+                        val entryMillis = baseTime.atZone(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+                        // Guard: Wrap rolling interval deletion and restored entry insertion in an atomic transaction to prevent wiped future schedules on undo (#119)
+                        database.withTransaction {
+                            database.scheduleDao().deleteFuturePendingScheduleEntries(medicine.medicineId, entryMillis + 1000L)
+                            val restoredEntries = com.example.dosezy.domain.ScheduleRecurrenceEngine.generateRollingScheduleEntries(
+                                medicine = medicine,
+                                anchorDateTime = baseTime.plusMinutes(intervalMinutes),
+                                daysCount = 30
+                            )
+                            if (restoredEntries.isNotEmpty()) {
+                                database.scheduleDao().insertScheduleEntries(restoredEntries)
+                            }
+                        }
+                    }
+                }
+            } catch (ex: Exception) {
+                Log.e(TAG, "Error restoring rolling interval schedule on undo", ex)
+            }
+        }
+
+        // 4. Update app widgets and alarms
         if (context != null && previousEntry != null) {
+            // Guard: When undoing a PRN dose, cancel any pending next dose eligible alarm and dismiss shade notification (#142)
+            if (entryId.startsWith("PRN_")) {
+                try {
+                    val alarmScheduler = AlarmScheduler(context)
+                    alarmScheduler.cancelPrnEligibleNotification(previousEntry.medicineId)
+                    val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
+                    nManager?.cancel((previousEntry.medicineId + "_prn_eligible").hashCode())
+                } catch (_: Exception) {}
+            }
+
             // Guard: Ad-hoc PRN doses do not have scheduled alarms or slot notifications; skip alarm/notification resync to prevent phantom alerts (#BUG-PRN-UNDO-ALARM)
             if (!entryId.startsWith("PRN_")) {
                 val now = LocalDateTime.now()
                 val isScheduledToday = previousEntry.scheduledDateTime.toLocalDate() == java.time.LocalDate.now()
-                if (previousEntry.scheduledDateTime.isAfter(now)) {
-                    // Guard: Reschedule alarms for upcoming doses so undoing a mistakenly marked future dose restores future AlarmManager reminders
+                if (previousEntry.scheduledDateTime.isAfter(now) || isRollingMed) {
+                    // Guard: Reschedule alarms for upcoming doses so undoing a dose restores future AlarmManager reminders
                     try {
                         rescheduleAllAlarms(previousEntry.userId, context)
                     } catch (e: Exception) {
                         Log.e(TAG, "Error rescheduling alarms on undoDoseTaken", e)
                     }
-                } else if (isScheduledToday) {
+                }
+                if (isScheduledToday) {
                     // Guard: Re-post shade notification and re-arm reminder for current or overdue undone dose on today's schedule (#BUG-03, #BUG-UNDO-PAST-DATE)
                     try {
                         syncSlotNotificationAndAlarms(entryId, previousEntry.copy(status = MedicationStatus.PENDING), context)
                     } catch (e: Exception) {
                         Log.e(TAG, "Error resyncing slot notification on undoDoseTaken", e)
                     }
-                } else {
+                } else if (!isRollingMed) {
                     // Guard: For historical past-date doses, disarm any lingering notifications or alarms without posting new ones (#BUG-UNDO-PAST-DATE)
                     try {
                         val alarmScheduler = AlarmScheduler(context)
@@ -706,10 +792,29 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                 com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
             } catch (_: Exception) {}
         }
+
+        // 5. Decrement user dose intake count for review prompting if previously taken (#146)
+        if (context != null && wasTaken) {
+            // Guard: Revert recorded intake count on undo to maintain accurate review eligibility metrics
+            com.example.dosezy.utils.ReviewPreferences.decrementCompletedDoses(context)
+        }
     }
 
     suspend fun updateDoseNotes(entryId: String, notes: String?) {
-        database.scheduleDao().updateDoseNotes(entryId, notes)
+        // Guard: Preserve existing partial stock tag when updating clinical dose notes to protect stock reversal symmetry on undo (#123)
+        val existingEntry = database.scheduleDao().getScheduleEntryById(entryId)
+        val partialTag = existingEntry?.doseNotes?.let {
+            Regex("\\[Partial Stock: Took [0-9.]* of [0-9.]*\\]").find(it)?.value
+        }
+        val finalNotes = when {
+            partialTag != null && !notes.isNullOrBlank() -> {
+                val cleanUserNote = notes.replace(Regex("\\[Partial Stock: Took [0-9.]* of [0-9.]*\\]"), "").trim(' ', '|', '-')
+                if (cleanUserNote.isNotBlank()) "$cleanUserNote | $partialTag" else partialTag
+            }
+            partialTag != null -> partialTag
+            else -> notes
+        }
+        database.scheduleDao().updateDoseNotes(entryId, finalNotes)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -772,7 +877,8 @@ class ScheduleRepository(private val database: DosezyDatabase) {
                     context,
                     (freshMedicine.medicineId + "_refill_click").hashCode(),
                     Intent(context, com.example.dosezy.MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        // Guard: Use SINGLE_TOP with CLEAR_TOP so tapping refill notification delivers extras to onNewIntent without destroying active MainActivity instance (#BUG-REFILL-SINGLE-TOP)
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                         // Guard: Pass target user ID and route to medicines screen so tapping refill alert switches profile and navigates to medication list
                         putExtra("switch_to_user_id", freshMedicine.userId)
                         putExtra("fragment", "medicines")
@@ -799,11 +905,82 @@ class ScheduleRepository(private val database: DosezyDatabase) {
             }
         }
 
+        // Guard: If as-needed medicine has a minimum interval configured, schedule an alert when the next dose is eligible (#142)
+        if (context != null && freshMedicine.frequency.pattern == com.example.dosezy.data.model.FrequencyPattern.AS_NEEDED) {
+            val intervalHours = freshMedicine.frequency.asNeededIntervalHours
+            if (intervalHours != null && intervalHours > 0 && freshMedicine.frequency.asNeededNotifyEligible) {
+                val triggerEpochMillis = dateTime.plusHours(intervalHours.toLong())
+                    .atZone(java.time.ZoneId.systemDefault())
+                    .toInstant()
+                    .toEpochMilli()
+                com.example.dosezy.notifications.AlarmScheduler(context)
+                    .schedulePrnEligibleNotification(
+                        medicineId = freshMedicine.medicineId,
+                        medicineName = freshMedicine.medicationName,
+                        triggerEpochMillis = triggerEpochMillis,
+                        intervalHours = intervalHours,
+                        userId = userId
+                    )
+            }
+        }
+
         if (context != null) {
             try {
                 com.example.dosezy.widget.DosezyAppWidgetProvider.updateAppWidgets(context)
             } catch (_: Exception) {}
+            // Guard: Record successfully logged PRN dose to satisfy minimum engagement thresholds for review prompts (#146)
+            com.example.dosezy.utils.ReviewPreferences.incrementCompletedDoses(context)
         }
+    }
+
+    /**
+     * Calculates the consecutive streak of days where scheduled medications were 100% completed (#146).
+     */
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun calculateAdherenceStreak(userId: String): Int {
+        val allEntries = database.scheduleDao().getAllScheduleEntries(userId)
+            .filter { !it.entryId.startsWith("PRN_") }
+        if (allEntries.isEmpty()) return 0
+
+        val groupedByDate = allEntries.groupBy { it.scheduledDateTime.toLocalDate() }
+        val today = LocalDate.now()
+
+        val todayList = groupedByDate[today]
+        val todayCompleted = todayList != null && todayList.isNotEmpty() &&
+                todayList.all {
+                    it.status == MedicationStatus.TAKEN_ON_TIME ||
+                    it.status == MedicationStatus.TAKEN_LATE ||
+                    it.status == MedicationStatus.SKIPPED
+                } &&
+                todayList.any {
+                    it.status == MedicationStatus.TAKEN_ON_TIME ||
+                    it.status == MedicationStatus.TAKEN_LATE
+                }
+
+        var streak = 0
+        var checkDate = if (todayCompleted) today else today.minusDays(1)
+
+        while (true) {
+            val dayEntries = groupedByDate[checkDate]
+            if (dayEntries.isNullOrEmpty()) break
+
+            val dayCompleted = dayEntries.all {
+                it.status == MedicationStatus.TAKEN_ON_TIME ||
+                it.status == MedicationStatus.TAKEN_LATE ||
+                it.status == MedicationStatus.SKIPPED
+            } && dayEntries.any {
+                it.status == MedicationStatus.TAKEN_ON_TIME ||
+                it.status == MedicationStatus.TAKEN_LATE
+            }
+
+            if (dayCompleted) {
+                streak++
+                checkDate = checkDate.minusDays(1)
+            } else {
+                break
+            }
+        }
+        return streak
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

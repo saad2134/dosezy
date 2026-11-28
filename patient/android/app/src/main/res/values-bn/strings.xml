@@ -52,7 +52,8 @@
     <string name="form_error_course_duration">কোর্সের মেয়াদ অন্তত ১ দিন হতে হবে</string>
     <string name="form_error_fix_fields">অনুগ্রহ করে উপরে চিহ্নিত প্রয়োজনীয় তথ্য পূরণ করুন</string>
     <string name="freq_daily">প্রতিদিন</string>
-    <string name="freq_weekly">সাপ্তাহিক</string>
+    <string name="freq_weekly">সাপ্তাহিক (নির্দিষ্ট দিন)</string>
+    <string name="freq_weekly_desc">সপ্তাহের শুধুমাত্র নির্বাচিত দিনগুলিতে ওষুধ সেবন করুন।</string>
     <string name="freq_monthly">মাসিক</string>
     <string name="freq_custom">প্রতি X সপ্তাহ পর পর</string>
     <string name="form_select_days_week">সপ্তাহের দিন নির্বাচন করুন</string>
@@ -99,6 +100,9 @@
     <string name="hours_format">%1$d ঘণ্টা পর</string>
 
         <string name="notif_check_title">নোটিফিকেশন নির্ভরযোগ্যতা</string>
+    <string name="notif_check_summary">%2$d টির মধ্যে %1$d টি যাচাই সম্পন্ন</string>
+    <string name="notif_status_group_needs_fixing">সমাধান প্রয়োজন</string>
+    <string name="notif_status_group_all_good">সব ঠিক আছে</string>
     <string name="notif_perm_title">নোটিফিকেশন অনুমতি</string>
     <string name="notif_perm_desc">ওষুধের রিমাইন্ডার ও অ্যালার্ম পাঠানোর জন্য প্রয়োজনীয়।</string>
     <string name="notif_perm_exact_warning">নোটিফিকেশন চালু আছে • সময়মতো বাজার জন্য সঠিক অ্যালার্মের অনুমতি প্রয়োজন (অনুমতি দিতে চাপুন)</string>
@@ -241,6 +245,17 @@
     <string name="home_all_good_desc">আজ কোনো ওষুধ খাওয়ার প্রয়োজন নেই।</string>
     <string name="no_profiles_found">কোনো প্রোফাইল পাওয়া যায়নি</string>
     <string name="status_taken">গৃহীত</string>
+    <string name="status_late">দেরি</string>
+    <string name="status_partial">আংশিক</string>
+    <string name="status_upcoming">আসন্ন</string>
+    <string name="status_missed">মিস হয়েছে</string>
+    <string name="status_skipped">এড়িয়ে গেছে</string>
+    <string name="calendar_view_month">মাস</string>
+    <string name="calendar_view_week">সপ্তাহ</string>
+    <string name="calendar_prev_week">পূর্ববর্তী সপ্তাহ</string>
+    <string name="calendar_next_week">পরবর্তী সপ্তাহ</string>
+    <string name="calendar_prev_month">পূর্ববর্তী মাস</string>
+    <string name="calendar_next_month">পরবর্তী মাস</string>
 
     <string name="image_picker_select_source">ছবির উৎস নির্বাচন করুন</string>
     <string name="image_picker_choose_method">আপনি কীভাবে আপনার ছবি যোগ করতে চান তা চয়ন করুন</string>
@@ -418,6 +433,7 @@
     <string name="import_from_server_or_backup">সার্ভার/ব্যাকআপ থেকে আমদানি করুন</string>
     <string name="tab_cloud_server">ক্লাউড / সার্ভার</string>
     <string name="tab_local_file">স্থানীয় ফাইল</string>
+    <string name="local_backup_card_title">স্থানীয় ফাইল থেকে পুনরুদ্ধার করুন</string>
     <string name="cloud_sync_locked_desc">কেয়ারগিভার ক্লাউড সিঙ্ক এবং স্ব-হোস্ট করা সার্ভার সংযোগ বর্তমানে উন্নয়নাধীন এবং আসন্ন আপডেটে উপলব্ধ হবে।</string>
     <string name="local_backup_select_desc">আপনার প্রোফাইল, ওষুধ এবং সময়সূচী পুনরুদ্ধার করতে ডিভাইস বা গুগল ড্রাইভ থেকে একটি ব্যাকআপ (.zip) ফাইল নির্বাচন করুন।</string>
     <string name="local_backup_select_btn">.zip ব্যাকআপ ফাইল নির্বাচন করুন</string>
@@ -492,6 +508,35 @@
     <string name="custom_recurrence_interval_label">পুনরাবৃত্তি প্রতি (সপ্তাহে)</string>
     <string name="custom_recurrence_summary">প্রতি %1$d সপ্তাহ পর পর %2$s বারে পুনরাবৃত্তি হবে</string>
     <string name="validation_select_custom_days">কাস্টম পুনরাবৃত্তির জন্য অনুগ্রহ করে কমপক্ষে একটি দিন নির্বাচন করুন</string>
+    <!-- Rolling Interval Scheduling (#119) -->
+    <string name="freq_rolling_interval_title">রোলিং ব্যবধান</string>
+    <string name="freq_rolling_interval_desc">নিরাপদ ব্যবধান বজায় রাখতে ওষুধ খাওয়ার পর পরবর্তী ডোজের টাইমার শুরু হবে</string>
+    <string name="freq_rolling_badge">রোলিং</string>
+
+    <!-- Cyclical & Looping Schedules (#141) -->
+    <string name="freq_cyclical">চক্রীয় (ওষুধ সেবন ও বিরতি দিন)</string>
+    <string name="freq_cyclical_desc">ওষুধ সেবনের দিনগুলিতে নিয়মিত খান, তারপর বিরতির দিনগুলিতে বন্ধ রাখুন (যেমন জন্ম নিয়ন্ত্রণ পিল)।</string>
+    <string name="freq_cycle_format">%1$d দিন সেবন, %2$d দিন বিরতি</string>
+    <string name="freq_cycle_active_days">সেবনের দিন</string>
+    <string name="freq_cycle_rest_days">বিরতির দিন</string>
+    <string name="freq_cycle_preset_21_7">21 / 7 (সাধারণ)</string>
+    <string name="freq_cycle_preset_24_4">24 / 4 (বর্ধিত)</string>
+    <string name="freq_cycle_preset_custom">কাস্টম</string>
+    <string name="cycle_presets_label">সাইকেল প্রিসেট</string>
+
+    <!-- PRN Next Dose Eligible Alerts (#142) -->
+    <string name="freq_as_needed_interval_title">ডোজের মধ্যে ন্যূনতম ব্যবধান</string>
+    <string name="freq_as_needed_interval_desc">পরবর্তী ডোজ গ্রহণ নিরাপদ এবং অনুমোদিত হলে বিজ্ঞপ্তি পান।</string>
+    <string name="freq_as_needed_interval_format">প্রয়োজনমতো (ন্যূনতম %1$d ঘণ্টা)</string>
+    <string name="freq_as_needed_notify_eligible">পরবর্তী ডোজের সময় হলে সতর্কবার্তা দিন</string>
+    <string name="freq_as_needed_interval_none">কিছুই নয়</string>
+    <string name="freq_as_needed_interval_hours_label">ন্যূনতম ব্যবধান (ঘণ্টা)</string>
+    <string name="prn_eligible_channel_name">পরবর্তী ডোজ প্রস্তুত (প্রয়োজনমতো ওষুধ)</string>
+    <string name="prn_eligible_channel_desc">প্রয়োজনমতো ওষুধের ন্যূনতম সময়ের ব্যবধান পার হলে বিজ্ঞপ্তি।</string>
+    <string name="prn_eligible_notification_title">পরবর্তী ডোজ প্রস্তুত</string>
+    <string name="prn_eligible_notification_body">%2$s-এর ন্যূনতম %1$d ঘণ্টার ব্যবধান শেষ হয়েছে। প্রয়োজনে পরবর্তী ডোজ গ্রহণ করতে পারেন।</string>
+    <string name="prn_eligible_notification_body_generic">%1$s-এর ন্যূনতম ব্যবধান শেষ হয়েছে। প্রয়োজনে পরবর্তী ডোজ গ্রহণ করতে পারেন।</string>
+
     <string name="btn_log_prn_dose">ডোজ লগ করুন</string>
     <string name="prn_doses_taken_today">আজকে রেকর্ডকৃত ডোজ: %1$d</string>
     <string name="prn_section_title">প্রয়োজনভিত্তিক ওষুধ (PRN)</string>
@@ -680,9 +725,14 @@
     <string name="country_brazil">ব্রাজিল</string>
     <string name="country_bangladesh">বাংলাদেশ</string>
     <string name="country_australia">অস্ট্রেলিয়া</string>
+    <string name="country_new_zealand">নিউজিল্যান্ড</string>
     <string name="pharmacy_order_refill_filter">রিফিল ফিল্টার</string>
     <string name="pharmacy_order_days_supply">সরবরাহের দিন</string>
     <string name="pharmacy_order_days_format_short">%1$d দিন</string>
+    <string name="pharmacy_order_days_custom">কাস্টম</string>
+    <string name="pharmacy_order_custom_days_label">কাস্টম সরবরাহ (দিন)</string>
+    <string name="pharmacy_order_custom_days_placeholder">যেমন: ২৮</string>
+    <string name="unit_days_suffix">দিন</string>
     <string name="pharmacy_order_medicines_include">অন্তর্ভুক্ত ওষুধ (%1$d/%2$d)</string>
     <string name="pharmacy_order_stock_left">%1$s অবশিষ্ট</string>
     <string name="pharmacy_order_no_stock_tracked">স্টক ট্র্যাক করা নেই</string>
@@ -828,7 +878,7 @@
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">নির্ধারিত ওষুধের অনুস্মারক</string>
     <string name="pref_lockscreen_details_title">লক স্ক্রিনে বিবরণ দেখান</string>
-    <string name="pref_lockscreen_details_desc">ডিভাইস আনলক না করা পর্যন্ত ওষুধের নাম ও ডোজ লুকান।</string>
+    <string name="pref_lockscreen_details_desc">লক স্ক্রিনে ওষুধের নাম ও ডোজ দেখান। বন্ধ থাকলে, ডিভাইস আনলক না হওয়া পর্যন্ত বিবরণ গোপন থাকবে।</string>
     <string name="disclaimer_dialog_title">চিকিৎসা ও আইনি দাবিত্যাগ</string>
     <string name="disclaimer_dialog_summary">ডোজইজি একটি স্বয়ংক্রিয় ডিজিটাল রিমাইন্ডার এবং কোনো নিয়ন্ত্রিত চিকিৎসা ডিভাইস নয়। এটি চিকিৎসা নির্ণয়, ডোজ গণনা বা ক্লিনিকাল পরামর্শ প্রদান করে না। প্রেসক্রিপশন নির্দেশাবলীর জন্য সর্বদা আপনার চিকিৎসকের পরামর্শ নিন।</string>
     <string name="disclaimer_checkbox_consent">আমি চিকিৎসা দাবিত্যাগ এবং পরিষেবার শর্তাবলী বুঝতে পেরেছি এবং গ্রহণ করছি।</string>
@@ -841,7 +891,17 @@
     <string name="pdf_report_disclaimer_footer">ডোজইজি মেডিসিন ট্র্যাকার • স্ব-প্রতিবেদিত তথ্যমূলক লগ (নন-ক্লিনিকাল)</string>
     <string name="pharmacy_refill_estimation_disclaimer">বিজ্ঞপ্তি: রিফিল পরিমাণ নির্ধারিত ফ্রিকোয়েন্সির উপর ভিত্তি করে আনুমানিক গণনা। আপনার ফার্মাসিস্ট বা ডাক্তারের সাথে যাচাই করুন।</string>
     <string name="alarm_unlock_to_view_details">বিস্তারিত দেখতে আনলক করুন</string>
+    <string name="alarm_lockscreen_privacy_title">ওষুধের বিবরণ লুকানো আছে</string>
     <string name="alarm_lockscreen_details_hidden">ডিভাইস লক থাকা অবস্থায় ওষুধের নাম ও ডোজ লুকানো থাকে।</string>
+
+    <!-- Multi-Step Medicine Form (#145) -->
+    <string name="form_step_what">কী গ্রহণ করবেন</string>
+    <string name="form_step_when">কখন</string>
+    <string name="form_step_extras">অতিরিক্ত</string>
+    <string name="form_step_counter">ধাপ %1$d এর %2$d</string>
+    <string name="btn_next">পরবর্তী</string>
+    <string name="form_pill_appearance">ওষুধের রূপ</string>
+    <string name="form_dosage_card_title">ডোজ ও মাত্রা</string>
 
     <!-- Schedule Effective Date Selector (#105) -->
     <string name="schedule_effective_dialog_title">সময়সূচীর পরিবর্তন প্রয়োগ করুন</string>
@@ -891,4 +951,12 @@
     <string name="sort_custom_reorder_desc">ওষুধের ক্রম পরিবর্তন করতে তীর চিহ্ন ব্যবহার করুন।</string>
     <string name="sort_move_up">উপরে সরান</string>
     <string name="sort_move_down">নিচে সরান</string>
+
+    <!-- Collapsible Time Slots on Home Screen (#138) -->
+    <string name="pref_slot_rollup_title">সংকোচনযোগ্য সময় স্লট</string>
+    <string name="pref_slot_rollup_desc">হোম স্ক্রিনে ওষুধের গ্রুপ সংকোচন ও প্রসারণের অনুমতি দিন। ডোজ ভুলে যাওয়া রোধ করতে ডিফল্টভাবে নিষ্ক্রিয়।</string>
+    <string name="home_expand_all">সব প্রসারিত করুন</string>
+    <string name="home_collapse_all">সব সংকোচন করুন</string>
+    <string name="home_slot_expand">স্লট প্রসারিত করুন</string>
+    <string name="home_slot_collapse">স্লট সংকোচন করুন</string>
 </resources>

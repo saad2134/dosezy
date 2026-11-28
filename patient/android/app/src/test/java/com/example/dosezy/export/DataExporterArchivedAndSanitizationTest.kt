@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.example.dosezy.data.export.DataExporter
 import com.example.dosezy.ui.components.ExportFormat
 import com.example.dosezy.data.model.DosageUnit
+import com.example.dosezy.data.model.Frequency
 import com.example.dosezy.data.model.FrequencyPattern
 import com.example.dosezy.data.model.Gender
 import com.example.dosezy.data.model.MedicationStatus
@@ -241,6 +242,26 @@ class DataExporterArchivedAndSanitizationTest {
         assertTrue("Order must contain patient name", orderText.contains("John Doe"))
         assertTrue("Order must contain medication name", orderText.contains("Amoxicillin"))
         assertTrue("Order must contain dosage", orderText.contains("500 mg"))
+        // Guard: Verify chemical strength medication (MG) displays stock in countable units instead of raw milligrams (#129)
+        assertTrue("Order must contain current stock in units", orderText.contains("Current stock: 10 units left"))
+        assertFalse("Order must not display current stock in mg", orderText.contains("10 mg left"))
+
+        // Guard: Verify bottle formulation (DROPS) displays stock in bottles
+        val medDrops = med.copy(
+            medicineId = "med_order_drops",
+            medicationName = "Latanoprost",
+            dosage = 1.0,
+            dosageUnit = DosageUnit.DROP,
+            pillShape = com.example.dosezy.data.model.PillShape.DROPS,
+            currentStock = 2.0
+        )
+        val orderTextDrops = exporter.generateConsolidatedPharmacyOrderText(
+            profilesWithMedicines = listOf(Pair(userEn, listOf(medDrops))),
+            supplyDays = 30,
+            includeStock = true,
+            includeDosage = false
+        )
+        assertTrue("Order must contain current stock in bottles", orderTextDrops.contains("Current stock: 2 bottles left"))
 
         // Guard: Verify fractional discrete medication renders with vulgar fractions (½) rather than raw decimal string (0.5)
         val medFractional = med.copy(
@@ -390,5 +411,156 @@ class DataExporterArchivedAndSanitizationTest {
         // Row value assertions
         assertTrue("User row must serialize user reminder type", csv.contains("NOTIFICATION"))
         assertTrue("Medicine row must serialize medicine reminder type override", csv.contains("ALARM"))
+    }
+
+    // Guard: Verify JSON export serializes isRollingInterval at both root and nested frequency levels (#119, #BUG-EXPORT-ROLLING)
+    @Test
+    fun testExportToJson_serializesRollingIntervalAtRootAndNestedLevels() = runTest {
+        val user = User(
+            userId = "u_rolling_json",
+            fullName = "Rolling Export Patient",
+            age = 29,
+            gender = Gender.FEMALE,
+            contactNumber = "+1122334455"
+        )
+        val rollingMed = Medicine(
+            medicineId = "m_rolling_json",
+            userId = user.userId,
+            medicationName = "Tramadol Rolling",
+            dosage = 50.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 4,
+            frequency = com.example.dosezy.data.model.Frequency(
+                pattern = FrequencyPattern.EVERY_X_HOURS,
+                intervalHours = 6,
+                isRollingInterval = true
+            ),
+            scheduledTimes = listOf(LocalTime.of(8, 0)),
+            reminderType = com.example.dosezy.data.model.ReminderType.ALARM
+        )
+        val staticMed = Medicine(
+            medicineId = "m_static_json",
+            userId = user.userId,
+            medicationName = "Lisinopril Static",
+            dosage = 10.0,
+            dosageUnit = DosageUnit.MG,
+            timesPerDay = 1,
+            frequency = com.example.dosezy.data.model.Frequency(
+                pattern = FrequencyPattern.DAILY,
+                isRollingInterval = false
+            ),
+            scheduledTimes = listOf(LocalTime.of(9, 0))
+        )
+
+        val mockUserRepo = mockk<UserRepository>(relaxed = true)
+        val mockMedRepo = mockk<MedicineRepository>(relaxed = true)
+        val mockSchedRepo = mockk<ScheduleRepository>(relaxed = true)
+        val exporter = DataExporter(context, mockUserRepo, mockMedRepo, mockSchedRepo)
+
+        val jsonString = exporter.buildJsonContent(user, listOf(rollingMed, staticMed), emptyList())
+        val jsonObj = org.json.JSONObject(jsonString)
+        val medsArray = jsonObj.getJSONArray("medicines")
+        assertEquals(2, medsArray.length())
+
+        val rollingJson = medsArray.getJSONObject(0)
+        assertTrue("Root level isRollingInterval must be true", rollingJson.getBoolean("isRollingInterval"))
+        assertTrue("Nested frequency isRollingInterval must be true", rollingJson.getJSONObject("frequency").getBoolean("isRollingInterval"))
+
+        val staticJson = medsArray.getJSONObject(1)
+        assertFalse("Root level isRollingInterval must be false", staticJson.getBoolean("isRollingInterval"))
+        assertFalse("Nested frequency isRollingInterval must be false", staticJson.getJSONObject("frequency").getBoolean("isRollingInterval"))
+    }
+
+    @Test
+    fun testDataExporter_preservesInternationalUnicodeProfileNamesInFilenames() = runTest {
+        // Guard: Verify non-Latin characters (Arabic, Cyrillic, Chinese, French) are preserved in export filenames rather than resetting to "user"
+        val mockUserRepo = mockk<UserRepository>(relaxed = true)
+        val mockMedRepo = mockk<MedicineRepository>(relaxed = true)
+        val mockSchedRepo = mockk<ScheduleRepository>(relaxed = true)
+
+        val internationalUsers = listOf(
+            Pair("أحمد محمد", "أحمد_محمد"),
+            Pair("Иван Иванов", "Иван_Иванов"),
+            Pair("李雷", "李雷"),
+            Pair("Renée Dupont", "Renée_Dupont")
+        )
+
+        val exporter = DataExporter(context, mockUserRepo, mockMedRepo, mockSchedRepo)
+
+        for ((fullName, expectedSubstring) in internationalUsers) {
+            val user = User(
+                userId = "user_${fullName.hashCode()}",
+                fullName = fullName,
+                age = 40,
+                gender = Gender.DO_NOT_SPECIFY,
+                contactNumber = "",
+                isCurrentUser = true
+            )
+            coEvery { mockUserRepo.getUserByIdSync(user.userId) } returns user
+            coEvery { mockMedRepo.getMedicinesByUserDirect(user.userId) } returns emptyList()
+            coEvery { mockSchedRepo.getSchedulesByUserSync(user.userId) } returns emptyList()
+
+            val file = exporter.exportUserToCsv(user.userId)
+            assertTrue("Filename '${file.name}' must contain expected Unicode substring '$expectedSubstring'", file.name.contains(expectedSubstring))
+            assertFalse("Filename '${file.name}' must not fallback to generic 'user'", file.name.startsWith("dosezy_export_user_"))
+        }
+    }
+
+    @Test
+    fun testBuildCsvContent_includesSlotRollupEnabledInUserInformation() {
+        // Guard: Verify Slot Rollup Enabled header and value are included in CSV User Information section (#138)
+        val user = User(
+            userId = "user_rollup",
+            fullName = "Rollup User",
+            age = 35,
+            gender = Gender.FEMALE,
+            contactNumber = "",
+            isCurrentUser = true,
+            slotRollupEnabled = true
+        )
+        val csv = DataExporter.buildCsvContent(user, emptyList(), emptyList())
+        assertTrue("CSV header must include Slot Rollup Enabled", csv.contains("Reminder Type,Slot Rollup Enabled"))
+        assertTrue("CSV row must include slotRollupEnabled value", csv.contains("${user.reminderType.name},true"))
+    }
+
+    @Test
+    fun testConsolidatedPharmacyOrder_negativeSupplyDaysAndCustomQuantities_clampedSafely() {
+        // Guard: Verify non-positive supply days and negative custom quantities are clamped to prevent invalid order text (#BUG-PHARMACY-ORDER-BOUNDS)
+        val mockUserRepo = mockk<UserRepository>()
+        val mockMedRepo = mockk<MedicineRepository>()
+        val mockSchedRepo = mockk<ScheduleRepository>()
+        val exporter = DataExporter(context, mockUserRepo, mockMedRepo, mockSchedRepo)
+
+        val user = User(
+            userId = "u_order_bounds",
+            fullName = "Order Bounds User",
+            age = 45,
+            gender = Gender.MALE,
+            contactNumber = "555-0199"
+        )
+        val medicine = Medicine(
+            medicineId = "med_bounds_refill",
+            userId = user.userId,
+            medicationName = "Lisinopril",
+            dosage = 10.0,
+            dosageUnit = DosageUnit.TABLET,
+            timesPerDay = 1,
+            frequency = Frequency(FrequencyPattern.DAILY),
+            scheduledTimes = listOf(LocalTime.of(8, 0))
+        )
+
+        // Pass supplyDays = 0 and negative custom quantity
+        val orderText = exporter.generateConsolidatedPharmacyOrderText(
+            profilesWithMedicines = listOf(user to listOf(medicine)),
+            supplyDays = 0,
+            customQuantities = mapOf("med_bounds_refill" to -5)
+        )
+
+        // Header must coerce supplyDays to at least 1 day
+        val expectedHeader = context.getString(com.example.dosezy.R.string.pharmacy_order_supply_header, 1)
+        assertTrue("Header must display at least 1-day supply", orderText.contains(expectedHeader))
+        // Quantity must not be negative
+        assertFalse("Order text must not contain negative quantity", orderText.contains("-5"))
+        assertTrue("Order text must clamp negative quantity to 0", orderText.contains("0"))
     }
 }

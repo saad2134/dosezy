@@ -239,12 +239,23 @@ object NotificationUtils {
      * Check if core notification & alarm requirements are met
      */
     fun areAllNotificationRequirementsMet(context: Context): Boolean {
-        return hasNotificationPermission(context) &&
-                canScheduleExactAlarms(context) &&
-                canDrawOverlays(context) &&
-                isIgnoringBatteryOptimizations(context) &&
-                isPhoneNotSilent(context) &&
-                isBatterySufficient(context)
+        return getPendingNotificationIssuesCount(context) == 0
+    }
+
+    /**
+     * Get the count of pending notification & alarm checks that need fixing, aligned with NotificationStatusDialog items.
+     * Replaces ambiguous "x" icon with exact pending count in the top bar bell button badge.
+     */
+    fun getPendingNotificationIssuesCount(context: Context): Int {
+        var count = 0
+        if (!hasNotificationPermission(context)) count++
+        if (!canScheduleExactAlarms(context)) count++
+        if (com.example.dosezy.BuildConfig.SUPPORTS_OVERLAY_PERMISSION && !canDrawOverlays(context)) count++
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && !canUseFullScreenIntent(context)) count++
+        if (!isIgnoringBatteryOptimizations(context)) count++
+        if (!isPhoneNotSilent(context)) count++
+        if (!isBatterySufficient(context)) count++
+        return count
     }
 
     /**

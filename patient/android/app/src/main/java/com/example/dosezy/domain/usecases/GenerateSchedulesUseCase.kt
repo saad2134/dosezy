@@ -53,8 +53,21 @@ class GenerateSchedulesUseCase @Inject constructor(
                         val latestDate = latestEntry?.scheduledDateTime?.toLocalDate()
                         // Guard: Anchor to latestDate rather than plusDays(1) and filter by latestEntry.scheduledDateTime to prevent dropping evening or nocturnal doses
                         val startGenerateFrom = if (latestDate == null || latestDate.isBefore(today)) today else latestDate
-                        val newEntries = ScheduleRecurrenceEngine.generateScheduleEntries(medicine, startGenerateFrom, 30)
-                            .filter { latestEntry == null || it.scheduledDateTime.isAfter(latestEntry.scheduledDateTime) }
+                        // Guard: For rolling interval regimens, extend forward using fixed interval spacing anchored to the latest schedule entry (#119)
+                        val newEntries = if (medicine.frequency.isRollingInterval && latestEntry != null) {
+                            val intervalMinutes = ScheduleRecurrenceEngine.getRollingIntervalMinutes(medicine)
+                            if (intervalMinutes != null && intervalMinutes > 0) {
+                                ScheduleRecurrenceEngine.generateRollingScheduleEntries(
+                                    medicine = medicine,
+                                    anchorDateTime = latestEntry.scheduledDateTime.plusMinutes(intervalMinutes),
+                                    daysCount = 30
+                                )
+                            } else {
+                                ScheduleRecurrenceEngine.generateScheduleEntries(medicine, startGenerateFrom, 30)
+                            }
+                        } else {
+                            ScheduleRecurrenceEngine.generateScheduleEntries(medicine, startGenerateFrom, 30)
+                        }.filter { latestEntry == null || it.scheduledDateTime.isAfter(latestEntry.scheduledDateTime) }
                         if (newEntries.isNotEmpty()) {
                             database.scheduleDao().insertScheduleEntries(newEntries)
                             Log.d(TAG, "Auto-extended schedule for medicine: ${medicine.medicationName} by 30 days starting from $startGenerateFrom")

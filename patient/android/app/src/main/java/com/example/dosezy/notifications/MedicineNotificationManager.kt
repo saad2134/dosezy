@@ -74,8 +74,8 @@ class MedicineNotificationManager @Inject constructor(
             }
             val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
             entriesToCancel.forEach { entry ->
-                // Guard: Pass entry directly to cancelAlarm to bypass sequential blocking DB lookups
-                alarmScheduler.cancelAlarm(entry)
+                // Guard: Pass rearmSiblings = false to cancelAlarm to eliminate blocking DB lookups when cancelling all user alarms (#BUG-CANCEL-REARM-BYPASS)
+                alarmScheduler.cancelAlarm(entry, rearmSiblings = false)
                 alarmScheduler.cancelSnooze(entry.entryId)
                 alarmScheduler.cancelNagging(entry.entryId)
                 alarmScheduler.cancelSlotAlarm(entry.userId, entry.scheduledDateTime)

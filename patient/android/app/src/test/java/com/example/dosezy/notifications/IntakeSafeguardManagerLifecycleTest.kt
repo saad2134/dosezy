@@ -973,12 +973,14 @@ class IntakeSafeguardManagerLifecycleTest {
         val prefs = context.getSharedPreferences("dosezy_intake_safeguard", Context.MODE_PRIVATE)
         assertEquals(testUser.userId, prefs.getString("user_id", null))
 
-        // Verify notification intent contains switch_to_user_id
+        // Verify notification intent contains switch_to_user_id and routes to home with target metadata (#137)
         val nManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
         val statusBarNotif = nManager.activeNotifications.firstOrNull { it.id == IntakeSafeguardManager.INTAKE_NOTIFICATION_BASE_ID }
         assertNotNull("Intake notification must be posted", statusBarNotif)
         val shadowPi = org.robolectric.Shadows.shadowOf(statusBarNotif!!.notification.contentIntent)
-        assertEquals("schedule", shadowPi.savedIntent.getStringExtra("fragment"))
+        assertEquals("home", shadowPi.savedIntent.getStringExtra("fragment"))
+        assertEquals(state.entryId, shadowPi.savedIntent.getStringExtra("target_entry_id"))
+        assertEquals(state.scheduledTime, shadowPi.savedIntent.getStringExtra("target_time"))
         assertEquals(testUser.userId, shadowPi.savedIntent.getStringExtra("switch_to_user_id"))
 
         // Cleanup
@@ -1730,6 +1732,23 @@ class IntakeSafeguardManagerLifecycleTest {
 
         IntakeSafeguardManager.cancelCountdown(context)
         assertNull(IntakeSafeguardManager.getPersistedState(context))
+    }
+
+    @Test
+    fun testStartCountdown_clampsNonPositiveDurationToSafeBounds() {
+        // Guard: Verify startCountdown clamps non-positive durationSeconds to at least 10s to prevent immediate re-alert (#BUG-SAFEGUARD-DURATION-BOUNDS)
+        val state = IntakeSafeguardManager.startCountdown(
+            context = context,
+            entryId = "entry_duration_clamp",
+            entryIds = listOf("entry_duration_clamp"),
+            medicineName = "Clamped Med",
+            medicineNames = listOf("Clamped Med"),
+            scheduledTime = "08:00 AM",
+            durationSeconds = 0,
+            userId = "user_clamp"
+        )
+        assertEquals("Duration <= 0 must be clamped to 10s", 10, state.totalDurationSeconds)
+        assertTrue("Target timestamp must be at least 10 seconds ahead of start", state.targetTimestamp >= state.startTimestamp + 10000L)
     }
 }
 

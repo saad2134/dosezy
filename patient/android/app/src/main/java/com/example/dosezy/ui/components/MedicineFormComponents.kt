@@ -77,7 +77,9 @@ fun validateMedicineForm(
     intervalWeeksText: String,
     isFiniteCourse: Boolean = false,
     durationDaysText: String = "",
-    hasExistingEndDate: Boolean = false
+    hasExistingEndDate: Boolean = false,
+    cycleActiveDaysText: String = "21",
+    cycleRestDaysText: String = "7"
 ): MedicineFormValidationResult {
     val isNameValid = medicationName.isNotBlank()
 
@@ -104,6 +106,11 @@ fun validateMedicineForm(
         FrequencyPattern.WEEKLY -> selectedDaysOfWeek.isNotEmpty()
         FrequencyPattern.MONTHLY -> selectedDaysOfMonth.isNotEmpty()
         FrequencyPattern.CUSTOM -> selectedDaysOfWeek.isNotEmpty() && (intervalWeeksText.normalizeArabicDigits().toIntOrNull() ?: 0) >= 1
+        FrequencyPattern.CYCLICAL -> {
+            val active = cycleActiveDaysText.normalizeArabicDigits().toIntOrNull() ?: 21
+            val rest = cycleRestDaysText.normalizeArabicDigits().toIntOrNull() ?: 7
+            active > 0 && rest >= 0
+        }
     }
 
     val isFiniteValid = !isFiniteCourse || hasExistingEndDate || ((durationDaysText.normalizeArabicDigits().toIntOrNull() ?: 0) > 0)
@@ -189,7 +196,18 @@ fun MedicineTimingsAndDosagesCard(
     dosageErrorMessage: String? = null,
     invalidTimeSlotKeys: Set<String> = emptySet(),
     isFrequencyError: Boolean = false,
-    frequencyErrorMessage: String? = null
+    frequencyErrorMessage: String? = null,
+    isRollingInterval: Boolean = false,
+    onRollingIntervalChange: (Boolean) -> Unit = {},
+    cycleActiveDaysText: String = "21",
+    onCycleActiveDaysChange: (String) -> Unit = {},
+    cycleRestDaysText: String = "7",
+    onCycleRestDaysChange: (String) -> Unit = {},
+    asNeededIntervalHoursText: String = "",
+    onAsNeededIntervalHoursChange: (String) -> Unit = {},
+    asNeededNotifyEligible: Boolean = true,
+    onAsNeededNotifyEligibleChange: (Boolean) -> Unit = {},
+    showSingleDosageRow: Boolean = true
 ) = com.example.dosezy.ui.components.form.MedicineTimingsAndDosagesCard(
     selectedFrequency = selectedFrequency,
     onFrequencyChange = onFrequencyChange,
@@ -223,7 +241,18 @@ fun MedicineTimingsAndDosagesCard(
     dosageErrorMessage = dosageErrorMessage,
     invalidTimeSlotKeys = invalidTimeSlotKeys,
     isFrequencyError = isFrequencyError,
-    frequencyErrorMessage = frequencyErrorMessage
+    frequencyErrorMessage = frequencyErrorMessage,
+    isRollingInterval = isRollingInterval,
+    onRollingIntervalChange = onRollingIntervalChange,
+    cycleActiveDaysText = cycleActiveDaysText,
+    onCycleActiveDaysChange = onCycleActiveDaysChange,
+    cycleRestDaysText = cycleRestDaysText,
+    onCycleRestDaysChange = onCycleRestDaysChange,
+    asNeededIntervalHoursText = asNeededIntervalHoursText,
+    onAsNeededIntervalHoursChange = onAsNeededIntervalHoursChange,
+    asNeededNotifyEligible = asNeededNotifyEligible,
+    onAsNeededNotifyEligibleChange = onAsNeededNotifyEligibleChange,
+    showSingleDosageRow = showSingleDosageRow
 )
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -290,4 +319,37 @@ fun MedicineReminderStyleCard(
     profileDefaultType = profileDefaultType,
     modifier = modifier
 )
+
+@Composable
+fun MedicineDosageCard(
+    dosage: String,
+    onDosageChange: (String) -> Unit,
+    selectedDosageUnit: DosageUnit,
+    onDosageUnitChange: (DosageUnit) -> Unit,
+    modifier: Modifier = Modifier,
+    isDosageError: Boolean = false,
+    dosageErrorMessage: String? = null
+) = com.example.dosezy.ui.components.form.MedicineDosageCard(
+    dosage = dosage,
+    onDosageChange = onDosageChange,
+    selectedDosageUnit = selectedDosageUnit,
+    onDosageUnitChange = onDosageUnitChange,
+    modifier = modifier,
+    isDosageError = isDosageError,
+    dosageErrorMessage = dosageErrorMessage
+)
+
+@Composable
+fun MedicineFormStepProgress(
+    currentStep: Int,
+    onStepClick: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    maxStepUnlocked: Int = currentStep
+) = com.example.dosezy.ui.components.form.MedicineFormStepProgress(
+    currentStep = currentStep,
+    onStepClick = onStepClick,
+    modifier = modifier,
+    maxStepUnlocked = maxStepUnlocked
+)
+
 

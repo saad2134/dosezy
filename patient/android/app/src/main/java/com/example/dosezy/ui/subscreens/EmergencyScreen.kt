@@ -1,5 +1,7 @@
 package com.example.dosezy.ui.subscreens
 
+import androidx.activity.compose.BackHandler
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -86,7 +88,9 @@ val emergencyCountries = listOf(
     CountryEmergency("RU", "🇷🇺", R.string.country_russia, ambulance = "103", fire = "101", police = "102", universal = "112"),
     CountryEmergency("BR", "🇧🇷", R.string.country_brazil, ambulance = "192", fire = "193", police = "190"),
     CountryEmergency("BD", "🇧🇩", R.string.country_bangladesh, ambulance = "999", fire = "999", police = "999", universal = "999"),
-    CountryEmergency("AU", "🇦🇺", R.string.country_australia, ambulance = "000", fire = "000", police = "000", universal = "000")
+    CountryEmergency("AU", "🇦🇺", R.string.country_australia, ambulance = "000", fire = "000", police = "000", universal = "000"),
+    // Guard: Add New Zealand dedicated 111 emergency dispatch profile (#133)
+    CountryEmergency("NZ", "🇳🇿", R.string.country_new_zealand, ambulance = "111", fire = "111", police = "111", universal = "111")
 )
 
 fun detectDeviceEmergencyCountry(context: android.content.Context, userLanguage: com.example.dosezy.data.model.Language): CountryEmergency {
@@ -138,8 +142,10 @@ internal fun matchEmergencyCountryByIso(iso: String): CountryEmergency? {
         // Guard: Map North and Central American 911 jurisdictions (e.g. Mexico MX) to US/CA 911 profile
         "US", "CA", "MX", "CR", "PA", "DO", "EC", "UY" -> emergencyCountries.find { it.code == "US" }
         "IN" -> emergencyCountries.find { it.code == "IN" }
-        // Guard: Map Oceania jurisdictions using 000/111 to AU profile
-        "AU", "NZ" -> emergencyCountries.find { it.code == "AU" }
+        // Guard: Map Australia to AU profile (000)
+        "AU" -> emergencyCountries.find { it.code == "AU" }
+        // Guard: Map New Zealand to dedicated 111 profile to prevent routing to Australia 000 (#133)
+        "NZ" -> emergencyCountries.find { it.code == "NZ" }
         "BD" -> emergencyCountries.find { it.code == "BD" }
         "BR" -> emergencyCountries.find { it.code == "BR" }
         "CN" -> emergencyCountries.find { it.code == "CN" }
@@ -394,6 +400,11 @@ fun EmergencyContent(currentUser: com.example.dosezy.data.model.User?) {
                     }
                 }
             }
+        }
+
+        // Guard: Intercept back navigation when country dropdown is expanded so back press closes menu instead of exiting screen (#BUG-EMERGENCY-BACK-DROPDOWN)
+        BackHandler(enabled = countryDropdownExpanded) {
+            countryDropdownExpanded = false
         }
 
         // Country Dropdown Picker (no redundant header - TopBar already shows title)

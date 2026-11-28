@@ -58,7 +58,8 @@
     <string name="form_error_course_duration">La duración debe ser de al menos 1 día</string>
     <string name="form_error_fix_fields">Completa los campos obligatorios resaltados arriba</string>
     <string name="freq_daily">Diario</string>
-    <string name="freq_weekly">Semanal</string>
+    <string name="freq_weekly">Semanal (días específicos)</string>
+    <string name="freq_weekly_desc">Tomar el medicamento solo los días seleccionados de la semana.</string>
     <string name="freq_monthly">Mensual</string>
     <string name="freq_custom">Cada X semanas</string>
     <string name="form_select_days_week">Seleccionar días de la semana</string>
@@ -70,9 +71,12 @@
     <string name="day_fri">Vie</string>
     <string name="day_sat">Sáb</string>
     <string name="day_sun">Dom</string>
-    <string name="times_per_day_format">%1$d vez/veces al día</string>
-    <string name="times_per_week_format">%1$d vez/veces por semana</string>
-    <string name="times_per_month_format">%1$d vez/veces al mes</string>
+    <string name="time_per_day_format">%1$d vez al día</string>
+    <string name="times_per_day_format">%1$d veces al día</string>
+    <string name="time_per_week_format">%1$d vez por semana</string>
+    <string name="times_per_week_format">%1$d veces por semana</string>
+    <string name="time_per_month_format">%1$d vez al mes</string>
+    <string name="times_per_month_format">%1$d veces al mes</string>
 
     <!-- Menu Screen -->
     <string name="menu_title">Menú</string>
@@ -105,10 +109,14 @@
     <string name="time_format_24">24 horas</string>
 
     <string name="pref_mark_missed_after">Considerar omitido después de</string>
-    <string name="hours_format">%1$d hora(s)</string>
+    <string name="hour_format">%1$d hora</string>
+    <string name="hours_format">%1$d horas</string>
 
     <!-- Notification Check Dialog -->
         <string name="notif_check_title">Fiabilidad de Notificaciones</string>
+    <string name="notif_check_summary">%1$d de %2$d comprobaciones superadas</string>
+    <string name="notif_status_group_needs_fixing">Requiere atención</string>
+    <string name="notif_status_group_all_good">Todo bien</string>
     <string name="notif_perm_title">Permiso de notificación</string>
     <string name="notif_perm_desc">Requerido para enviar recordatorios de dosis y alarmas.</string>
     <string name="notif_perm_exact_warning">Notificaciones activadas • Alarmas exactas necesarias para sonar a tiempo (toca para permitir)</string>
@@ -160,13 +168,19 @@
     <string name="unit_mg">mg</string>
     <string name="unit_mcg">mcg</string>
     <string name="unit_ml">mL</string>
-    <string name="unit_drop">gota(s)</string>
-    <string name="unit_tablet">pastilla(s)</string>
-    <string name="unit_capsule">cápsula(s)</string>
+    <string name="unit_drop">gota</string>
+    <string name="unit_drops">gotas</string>
+    <string name="unit_tablet">pastilla</string>
+    <string name="unit_tablets">pastillas</string>
+    <string name="unit_capsule">cápsula</string>
+    <string name="unit_capsules">cápsulas</string>
     <string name="unit_meq">mEq</string>
-    <string name="unit_puff">inhalación(es)</string>
-    <string name="unit_ampule">ampolla(s)</string>
+    <string name="unit_puff">inhalación</string>
+    <string name="unit_puffs">inhalaciones</string>
+    <string name="unit_ampule">ampolla</string>
+    <string name="unit_ampules">ampollas</string>
     <string name="unit_spray">pulverización</string>
+    <string name="unit_sprays">pulverizaciones</string>
 
     <!-- Help &amp; Support -->
     <string name="help_title">Ayuda y soporte</string>
@@ -257,6 +271,17 @@
     <string name="home_all_good_desc">No es necesario tomar medicamentos hoy.</string>
     <string name="no_profiles_found">No se encontraron perfiles</string>
     <string name="status_taken">Tomado</string>
+    <string name="status_late">Tarde</string>
+    <string name="status_partial">Parcial</string>
+    <string name="status_upcoming">Próximo</string>
+    <string name="status_missed">Perdida</string>
+    <string name="status_skipped">Omitida</string>
+    <string name="calendar_view_month">Mes</string>
+    <string name="calendar_view_week">Semana</string>
+    <string name="calendar_prev_week">Semana anterior</string>
+    <string name="calendar_next_week">Semana siguiente</string>
+    <string name="calendar_prev_month">Mes anterior</string>
+    <string name="calendar_next_month">Mes siguiente</string>
 
     <string name="image_picker_select_source">Seleccionar origen de imagen</string>
     <string name="image_picker_choose_method">Elija cómo desea agregar su imagen</string>
@@ -434,6 +459,7 @@
     <string name="import_from_server_or_backup">Importar desde servidor/copia de seguridad</string>
     <string name="tab_cloud_server">Nube / Servidor</string>
     <string name="tab_local_file">Archivo local</string>
+    <string name="local_backup_card_title">Restaurar desde archivo local</string>
     <string name="cloud_sync_locked_desc">La sincronización en la nube para cuidadores y la conexión con servidores propios están en desarrollo para una próxima actualización.</string>
     <string name="local_backup_select_desc">Selecciona un archivo .zip de Dosezy previamente exportado desde tu dispositivo o Google Drive para restaurar tus datos.</string>
     <string name="local_backup_select_btn">Seleccionar archivo de respaldo .zip</string>
@@ -508,6 +534,35 @@
     <string name="custom_recurrence_interval_label">Repetir cada (semanas)</string>
     <string name="custom_recurrence_summary">Se repite cada %1$d semanas los %2$s</string>
     <string name="validation_select_custom_days">Seleccione al menos un día para la frecuencia personalizada</string>
+    <!-- Rolling Interval Scheduling (#119) -->
+    <string name="freq_rolling_interval_title">Intervalo continuo</string>
+    <string name="freq_rolling_interval_desc">El temporizador de la siguiente dosis inicia tras registrar la toma para mantener el intervalo seguro</string>
+    <string name="freq_rolling_badge">Continuo</string>
+
+    <!-- Cyclical & Looping Schedules (#141) -->
+    <string name="freq_cyclical">Cíclico (días activos y descanso)</string>
+    <string name="freq_cyclical_desc">Tomar el medicamento durante días activos y pausar durante días de descanso (p. ej., anticonceptivos).</string>
+    <string name="freq_cycle_format">%1$d días toma, %2$d días descanso</string>
+    <string name="freq_cycle_active_days">Días activos</string>
+    <string name="freq_cycle_rest_days">Días de descanso</string>
+    <string name="freq_cycle_preset_21_7">21 / 7 (Estándar)</string>
+    <string name="freq_cycle_preset_24_4">24 / 4 (Extendido)</string>
+    <string name="freq_cycle_preset_custom">Personalizado</string>
+    <string name="cycle_presets_label">Ajustes predefinidos de ciclo</string>
+
+    <!-- PRN Next Dose Eligible Alerts (#142) -->
+    <string name="freq_as_needed_interval_title">Intervalo mínimo entre dosis</string>
+    <string name="freq_as_needed_interval_desc">Notificar cuando sea seguro y permitido tomar la siguiente dosis.</string>
+    <string name="freq_as_needed_interval_format">Según necesidad (mín %1$d h)</string>
+    <string name="freq_as_needed_notify_eligible">Notificar cuando la siguiente dosis esté disponible</string>
+    <string name="freq_as_needed_interval_none">Ninguno</string>
+    <string name="freq_as_needed_interval_hours_label">Espaciado mínimo (horas)</string>
+    <string name="prn_eligible_channel_name">Siguiente dosis disponible (a demanda)</string>
+    <string name="prn_eligible_channel_desc">Notificaciones cuando el intervalo mínimo de medicamentos a demanda haya transcurrido.</string>
+    <string name="prn_eligible_notification_title">Siguiente dosis disponible</string>
+    <string name="prn_eligible_notification_body">El intervalo mínimo de %1$d horas para %2$s ha pasado. Puede tomar su siguiente dosis si la necesita.</string>
+    <string name="prn_eligible_notification_body_generic">El intervalo mínimo para %1$s ha pasado. Puede tomar su siguiente dosis si la necesita.</string>
+
     <string name="btn_log_prn_dose">Registrar dosis</string>
     <string name="prn_doses_taken_today">Dosis registradas hoy: %1$d</string>
     <string name="prn_section_title">Medicamentos a demanda (PRN)</string>
@@ -700,9 +755,14 @@
     <string name="country_brazil">Brasil</string>
     <string name="country_bangladesh">Bangladés</string>
     <string name="country_australia">Australia</string>
+    <string name="country_new_zealand">Nueva Zelanda</string>
     <string name="pharmacy_order_refill_filter">Filtro de reposición</string>
     <string name="pharmacy_order_days_supply">Días de suministro</string>
     <string name="pharmacy_order_days_format_short">%1$d d</string>
+    <string name="pharmacy_order_days_custom">Personalizado</string>
+    <string name="pharmacy_order_custom_days_label">Suministro personalizado (días)</string>
+    <string name="pharmacy_order_custom_days_placeholder">p. ej. 28</string>
+    <string name="unit_days_suffix">días</string>
     <string name="pharmacy_order_medicines_include">Medicamentos a incluir (%1$d/%2$d)</string>
     <string name="pharmacy_order_stock_left">%1$s restantes</string>
     <string name="pharmacy_order_no_stock_tracked">Sin seguimiento de stock</string>
@@ -846,7 +906,7 @@
     <!-- Legal, Privacy & Compliance Safeguards -->
     <string name="notif_generic_lockscreen_reminder">Recordatorio de medicamento programado</string>
     <string name="pref_lockscreen_details_title">Mostrar detalles en pantalla de bloqueo</string>
-    <string name="pref_lockscreen_details_desc">Ocultar nombres y dosis hasta desbloquear el dispositivo.</string>
+    <string name="pref_lockscreen_details_desc">Mostrar nombres de medicamentos y dosis en la pantalla de bloqueo. Si se desactiva, los detalles permanecen ocultos hasta desbloquear el dispositivo.</string>
     <string name="disclaimer_dialog_title">Descargo de responsabilidad médico y legal</string>
     <string name="disclaimer_dialog_summary">Dosezy es una utilidad digital de recordatorio automatizada y NO es un dispositivo médico regulado. No proporciona diagnósticos, cálculo de dosis ni asesoramiento clínico. Consulte siempre a su médico o farmacéutico para instrucciones de dosificación.</string>
     <string name="disclaimer_checkbox_consent">Entiendo y acepto el descargo de responsabilidad médico y los términos del servicio.</string>
@@ -854,12 +914,26 @@
     <string name="disclaimer_link_medical">Descargo de responsabilidad médico</string>
     <string name="disclaimer_link_privacy">Política de privacidad</string>
     <string name="disclaimer_link_terms">Términos del servicio</string>
+    <string name="about_legal_policies_title">Legal y políticas</string>
+    <string name="about_legal_medical_desc">Descargo de responsabilidad de software no clínico</string>
+    <string name="about_legal_privacy_desc">Protección de datos y política de privacidad</string>
+    <string name="about_legal_terms_desc">Términos del servicio y licencia de software</string>
     <string name="emergency_dispatch_warning_title">Aviso de emergencia</string>
     <string name="emergency_dispatch_warning_desc">Dosezy no es un servicio de emergencias ni sustituto del 911/112. En situaciones críticas, llame directamente a los servicios locales de emergencia. Verifique que el número corresponda a su ubicación actual.</string>
     <string name="pdf_report_disclaimer_footer">Dosezy Registro de Medicamentos • Historial informativo autoreportado (No clínico)</string>
     <string name="pharmacy_refill_estimation_disclaimer">Aviso: Las cantidades de reposición son estimaciones aproximadas según la frecuencia registrada. Verifique con su farmacéutico o médico.</string>
     <string name="alarm_unlock_to_view_details">Desbloquear para ver detalles</string>
+    <string name="alarm_lockscreen_privacy_title">Detalles de medicamentos ocultos</string>
     <string name="alarm_lockscreen_details_hidden">Los nombres de los medicamentos y las dosis están ocultos mientras el dispositivo está bloqueado.</string>
+
+    <!-- Multi-Step Medicine Form (#145) -->
+    <string name="form_step_what">Qué</string>
+    <string name="form_step_when">Cuándo</string>
+    <string name="form_step_extras">Extras</string>
+    <string name="form_step_counter">Paso %1$d de %2$d</string>
+    <string name="btn_next">Siguiente</string>
+    <string name="form_pill_appearance">Estilo de pastilla</string>
+    <string name="form_dosage_card_title">Dosis y concentración</string>
 
     <!-- Schedule Effective Date Selector (#105) -->
     <string name="schedule_effective_dialog_title">Aplicar cambios de horario</string>
@@ -909,4 +983,12 @@
     <string name="sort_custom_reorder_desc">Use las flechas para ajustar el orden de sus medicamentos.</string>
     <string name="sort_move_up">Mover hacia arriba</string>
     <string name="sort_move_down">Mover hacia abajo</string>
+
+    <!-- Collapsible Time Slots on Home Screen (#138) -->
+    <string name="pref_slot_rollup_title">Grupos horarios desplegables</string>
+    <string name="pref_slot_rollup_desc">Permite colapsar y expandir grupos de medicamentos en la pantalla principal. Desactivado por defecto para evitar dosis olvidadas.</string>
+    <string name="home_expand_all">Expandir todo</string>
+    <string name="home_collapse_all">Colapsar todo</string>
+    <string name="home_slot_expand">Expandir horario</string>
+    <string name="home_slot_collapse">Colapsar horario</string>
 </resources>

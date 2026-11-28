@@ -895,5 +895,138 @@ class UserViewModelProfileAlarmTest {
             }
         }
     }
+
+    @Test
+    fun testSetCurrentUser_synchronizesLockscreenDetailsEnabledToAppPrefs() = runTest(testDispatcher) {
+        // Guard: Verify switching current user updates lockscreen_details_enabled in app_prefs (#BUG-LOCKSCREEN-PROFILE-SWITCH)
+        val privateUser = User(
+            userId = "user_switch_priv",
+            fullName = "Private Profile",
+            age = 35,
+            gender = Gender.FEMALE,
+            contactNumber = "1234567890",
+            lockscreenDetailsEnabled = false,
+            isCurrentUser = false
+        )
+        userRepository.insertUser(testUser)
+        userRepository.insertUser(privateUser)
+
+        val vm = UserViewModel(userRepository, medicineRepository, scheduleRepository, medicineNotificationManager, context)
+        advanceUntilIdle()
+
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+
+        // Switch to privateUser
+        vm.setCurrentUser(privateUser)
+        advanceUntilIdle()
+        awaitCondition { !prefs.getBoolean("lockscreen_details_enabled", true) }
+
+        assertFalse(
+            "app_prefs lockscreen_details_enabled must be false after switching to private user",
+            prefs.getBoolean("lockscreen_details_enabled", true)
+        )
+
+        // Switch back to testUser (lockscreenDetailsEnabled = true by default)
+        vm.setCurrentUser(testUser)
+        advanceUntilIdle()
+        awaitCondition { prefs.getBoolean("lockscreen_details_enabled", false) }
+
+        assertTrue(
+            "app_prefs lockscreen_details_enabled must be true after switching to testUser",
+            prefs.getBoolean("lockscreen_details_enabled", false)
+        )
+    }
+
+    @Test
+    fun testAddUser_whenCurrent_synchronizesLockscreenDetailsEnabledToAppPrefs() = runTest(testDispatcher) {
+        // Guard: Verify adding a new current user updates lockscreen_details_enabled in app_prefs (#BUG-LOCKSCREEN-PROFILE-SWITCH)
+        val vm = UserViewModel(userRepository, medicineRepository, scheduleRepository, medicineNotificationManager, context)
+        advanceUntilIdle()
+
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        prefs.edit().putBoolean("lockscreen_details_enabled", true).commit()
+
+        val newPrivateUser = User(
+            userId = "user_new_priv",
+            fullName = "New Private Profile",
+            age = 42,
+            gender = Gender.MALE,
+            contactNumber = "5555555555",
+            lockscreenDetailsEnabled = false,
+            isCurrentUser = true
+        )
+
+        vm.addUser(newPrivateUser)
+        advanceUntilIdle()
+        awaitCondition { !prefs.getBoolean("lockscreen_details_enabled", true) }
+
+        assertFalse(
+            "app_prefs lockscreen_details_enabled must be false after adding new current user with private lockscreen",
+            prefs.getBoolean("lockscreen_details_enabled", true)
+        )
+    }
+
+    @Test
+    fun testDeleteUser_whenCurrent_promotesNextUserAndSynchronizesLockscreenDetailsEnabled() = runTest(testDispatcher) {
+        // Guard: Verify deleting current user promotes next user and updates lockscreen_details_enabled in app_prefs (#BUG-USER-DELETE-LOCKSCREEN-SYNC)
+        val user1 = testUser.copy(userId = "user_del_curr", isCurrentUser = true, lockscreenDetailsEnabled = false)
+        val user2 = secondUser.copy(userId = "user_del_next", isCurrentUser = false, lockscreenDetailsEnabled = true)
+        userRepository.insertUser(user1)
+        userRepository.insertUser(user2)
+
+        val vm = UserViewModel(userRepository, medicineRepository, scheduleRepository, medicineNotificationManager, context)
+        advanceUntilIdle()
+
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        prefs.edit().putBoolean("lockscreen_details_enabled", false).commit()
+
+        vm.deleteUser(user1)
+        advanceUntilIdle()
+        awaitCondition { prefs.getBoolean("lockscreen_details_enabled", false) }
+
+        assertTrue(
+            "app_prefs lockscreen_details_enabled must be true after deleting current user and promoting user2",
+            prefs.getBoolean("lockscreen_details_enabled", false)
+        )
+    }
+
+    @Test
+    fun testDeleteUser_whenLastUser_resetsLockscreenDetailsEnabledToTrue() = runTest(testDispatcher) {
+        // Guard: Verify deleting the only remaining user resets lockscreen_details_enabled in app_prefs to true (#BUG-USER-DELETE-LOCKSCREEN-SYNC)
+        val soleUser = testUser.copy(userId = "user_del_sole", isCurrentUser = true, lockscreenDetailsEnabled = false)
+        userRepository.insertUser(soleUser)
+
+        val vm = UserViewModel(userRepository, medicineRepository, scheduleRepository, medicineNotificationManager, context)
+        advanceUntilIdle()
+
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        prefs.edit().putBoolean("lockscreen_details_enabled", false).commit()
+
+        vm.deleteUser(soleUser)
+        advanceUntilIdle()
+        awaitCondition { prefs.getBoolean("lockscreen_details_enabled", false) }
+
+        assertTrue(
+            "app_prefs lockscreen_details_enabled must be reset to true when no users remain",
+            prefs.getBoolean("lockscreen_details_enabled", false)
+        )
+    }
+
+    @Test
+    fun testStorageUtils_isStorageCriticallyLow_zeroBytesThreshold() {
+        // Guard: Verify isStorageCriticallyLow returns true when internal storage is critically low or 0 bytes free (#BUG-CRITICAL-STORAGE-ZERO)
+        val mockContext = io.mockk.mockk<Context>()
+        val mockFile = io.mockk.mockk<java.io.File>()
+        io.mockk.every { mockContext.filesDir } returns mockFile
+        io.mockk.every { mockFile.usableSpace } returns 0L
+
+        assertTrue("0 bytes free must evaluate as critically low", com.example.dosezy.utils.StorageUtils.isStorageCriticallyLow(mockContext))
+
+        io.mockk.every { mockFile.usableSpace } returns 1024L * 1024L
+        assertTrue("1MB free must evaluate as critically low", com.example.dosezy.utils.StorageUtils.isStorageCriticallyLow(mockContext))
+
+        io.mockk.every { mockFile.usableSpace } returns 100L * 1024L * 1024L
+        assertFalse("100MB free must not evaluate as critically low", com.example.dosezy.utils.StorageUtils.isStorageCriticallyLow(mockContext))
+    }
 }
 

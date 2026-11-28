@@ -445,7 +445,7 @@ class ScheduleGenerationTest {
 
     @Test
     fun customRecurrence_generateScheduleEntries_generatesSlotsForSelectedDaysOnly() {
-        val startMonday = LocalDate.of(2026, 11, 2) // Future Monday
+        val startMonday = LocalDate.of(2028, 11, 6) // Future Monday
         val m = med(
             Frequency(
                 pattern = FrequencyPattern.CUSTOM,
@@ -456,19 +456,19 @@ class ScheduleGenerationTest {
             start = startMonday
         )
 
-        // Span 14 days (15 days total: Nov 2 to Nov 16 inclusive)
+        // Span 14 days (15 days total: Nov 6 to Nov 20 inclusive)
         val entries = m.generateScheduleEntries(startDateRange = startMonday, days = 14)
-        // Week 0: Nov 2 (Mon), Nov 4 (Wed)
+        // Week 0: Nov 6 (Mon), Nov 8 (Wed)
         // Week 1: None
-        // Week 2: Nov 16 (Mon)
+        // Week 2: Nov 20 (Mon)
         // Total = 3 entries
         assertEquals(3, entries.size)
         val dates = entries.map { it.scheduledDateTime.toLocalDate() }
         assertEquals(
             listOf(
-                LocalDate.of(2026, 11, 2),
-                LocalDate.of(2026, 11, 4),
-                LocalDate.of(2026, 11, 16)
+                LocalDate.of(2028, 11, 6),
+                LocalDate.of(2028, 11, 8),
+                LocalDate.of(2028, 11, 20)
             ),
             dates
         )
@@ -477,7 +477,7 @@ class ScheduleGenerationTest {
     @Test
     fun generateScheduleEntries_futureStartDateBeyond30Days_generatesFullWindowStartingFromStartDate() {
         // Guard: Verify ScheduleRecurrenceEngine generates full window for future-dated medicines beyond 30 days rather than returning empty list (#BUG-RECURRENCE-FUTURE-START)
-        val today = LocalDate.of(2026, 11, 8)
+        val today = LocalDate.of(2028, 11, 8)
         val futureStart = today.plusDays(40)
         val m = med(
             freq = Frequency(FrequencyPattern.DAILY),
@@ -494,7 +494,7 @@ class ScheduleGenerationTest {
     @Test
     fun generateScheduleEntries_futureStartDateWithin30Days_generatesEntriesUpToRangeEnd() {
         // Guard: Verify ScheduleRecurrenceEngine generates entries within range for future-dated medicines starting within the active window (#BUG-RECURRENCE-FUTURE-START)
-        val today = LocalDate.of(2026, 11, 8)
+        val today = LocalDate.of(2028, 11, 8)
         val futureStart = today.plusDays(15)
         val m = med(
             freq = Frequency(FrequencyPattern.DAILY),
@@ -511,7 +511,7 @@ class ScheduleGenerationTest {
     @Test
     fun generateScheduleEntries_futureStartDateWithExplicitEndDate_clampsToEndDate() {
         // Guard: Verify explicit endDate properly clamps the generation window for future-dated medicines
-        val today = LocalDate.of(2026, 11, 8)
+        val today = LocalDate.of(2028, 11, 8)
         val futureStart = today.plusDays(10)
         val explicitEnd = futureStart.plusDays(5)
         val m = med(
@@ -525,5 +525,203 @@ class ScheduleGenerationTest {
         assertEquals(6, entries.size)
         assertEquals(futureStart, entries.first().scheduledDateTime.toLocalDate())
         assertEquals(explicitEnd, entries.last().scheduledDateTime.toLocalDate())
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // 12. Rolling Interval Intake (#119)
+    // ───────────────────────────────────────────────────────────────
+
+    @Test
+    fun getRollingIntervalMinutes_dailyRegimens() {
+        // Daily with 1 slot -> 1440 mins (24h)
+        val m1 = med(
+            freq = Frequency(FrequencyPattern.DAILY, isRollingInterval = true),
+            times = listOf(LocalTime.of(8, 0))
+        )
+        assertEquals(1440L, com.example.dosezy.domain.ScheduleRecurrenceEngine.getRollingIntervalMinutes(m1))
+
+        // Daily with 2 slots -> 720 mins (12h)
+        val m2 = med(
+            freq = Frequency(FrequencyPattern.DAILY, isRollingInterval = true),
+            times = listOf(LocalTime.of(8, 0), LocalTime.of(20, 0))
+        )
+        assertEquals(720L, com.example.dosezy.domain.ScheduleRecurrenceEngine.getRollingIntervalMinutes(m2))
+
+        // Daily with 3 slots -> 480 mins (8h)
+        val m3 = med(
+            freq = Frequency(FrequencyPattern.DAILY, isRollingInterval = true),
+            times = listOf(LocalTime.of(8, 0), LocalTime.of(14, 0), LocalTime.of(20, 0))
+        )
+        assertEquals(480L, com.example.dosezy.domain.ScheduleRecurrenceEngine.getRollingIntervalMinutes(m3))
+    }
+
+    @Test
+    fun getRollingIntervalMinutes_everyXHoursAndDays() {
+        val mHours = med(
+            freq = Frequency(FrequencyPattern.EVERY_X_HOURS, intervalHours = 6, isRollingInterval = true),
+            times = listOf(LocalTime.of(8, 0))
+        )
+        assertEquals(360L, com.example.dosezy.domain.ScheduleRecurrenceEngine.getRollingIntervalMinutes(mHours))
+
+        val mDays = med(
+            freq = Frequency(FrequencyPattern.EVERY_X_DAYS, intervalDays = 3, isRollingInterval = true),
+            times = listOf(LocalTime.of(8, 0))
+        )
+        assertEquals(4320L, com.example.dosezy.domain.ScheduleRecurrenceEngine.getRollingIntervalMinutes(mDays))
+    }
+
+    @Test
+    fun getRollingIntervalMinutes_disabledWhenRollingIsFalse() {
+        val mDailyDisabled = med(
+            freq = Frequency(FrequencyPattern.DAILY, isRollingInterval = false),
+            times = listOf(LocalTime.of(8, 0))
+        )
+        org.junit.Assert.assertNull(com.example.dosezy.domain.ScheduleRecurrenceEngine.getRollingIntervalMinutes(mDailyDisabled))
+
+        val mAsNeeded = med(
+            freq = Frequency(FrequencyPattern.AS_NEEDED, isRollingInterval = true),
+            times = emptyList()
+        )
+        org.junit.Assert.assertNull(com.example.dosezy.domain.ScheduleRecurrenceEngine.getRollingIntervalMinutes(mAsNeeded))
+    }
+
+    @Test
+    fun generateRollingScheduleEntries_spacesAccuratelyFromDynamicAnchor() {
+        val m = med(
+            freq = Frequency(FrequencyPattern.DAILY, isRollingInterval = true),
+            times = listOf(LocalTime.of(8, 0))
+        )
+        // Anchor at 13:45 on Dec 1 (e.g. dose taken late at 13:45, next dose projected at 13:45 Dec 2)
+        val anchor = java.time.LocalDateTime.of(2026, 12, 2, 13, 45, 0)
+        val entries = com.example.dosezy.domain.ScheduleRecurrenceEngine.generateRollingScheduleEntries(
+            medicine = m,
+            anchorDateTime = anchor,
+            daysCount = 5
+        )
+
+        assertEquals(6, entries.size) // Dec 2, 3, 4, 5, 6, 7
+        assertEquals(anchor, entries[0].scheduledDateTime)
+        assertEquals(anchor.plusDays(1), entries[1].scheduledDateTime)
+        assertEquals(anchor.plusDays(2), entries[2].scheduledDateTime)
+        assertEquals(LocalTime.of(13, 45), entries[0].scheduledDateTime.toLocalTime())
+        assertEquals(LocalTime.of(13, 45), entries[1].scheduledDateTime.toLocalTime())
+    }
+
+    @Test
+    fun generateRollingScheduleEntries_clampsToEndDate() {
+        val m = med(
+            freq = Frequency(FrequencyPattern.EVERY_X_HOURS, intervalHours = 8, isRollingInterval = true),
+            times = listOf(LocalTime.of(8, 0)),
+            end = LocalDate.of(2026, 12, 3)
+        )
+        val anchor = java.time.LocalDateTime.of(2026, 12, 1, 8, 0, 0)
+        val entries = com.example.dosezy.domain.ScheduleRecurrenceEngine.generateRollingScheduleEntries(
+            medicine = m,
+            anchorDateTime = anchor,
+            daysCount = 30
+        )
+
+        // Dec 1: 08:00, 16:00
+        // Dec 2: 00:00, 08:00, 16:00
+        // Dec 3: 00:00, 08:00, 16:00
+        assertEquals(8, entries.size)
+        assertTrue(entries.all { !it.scheduledDateTime.toLocalDate().isAfter(LocalDate.of(2026, 12, 3)) })
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // 12. CYCLICAL frequency (take X days, pause Y days) (#141)
+    // ───────────────────────────────────────────────────────────────
+
+    @Test
+    fun cyclicalMedicine_21_7_generatesEntriesOnlyOnActiveDays() {
+        val startDate = LocalDate.of(2026, 1, 1)
+        val m = med(
+            freq = Frequency(
+                pattern = FrequencyPattern.CYCLICAL,
+                cycleActiveDays = 21,
+                cycleRestDays = 7
+            ),
+            times = listOf(LocalTime.of(9, 0)),
+            start = startDate
+        )
+
+        // Generate for 28 days (days = 27 inclusive, so Jan 1 to Jan 28)
+        val entries = m.generateScheduleEntries(startDateRange = startDate, days = 27)
+
+        // 21 active days in first 28-day cycle
+        assertEquals(21, entries.size)
+
+        // Days 1 through 21 (Jan 1 - Jan 21) must be active
+        for (day in 1..21) {
+            val date = startDate.plusDays((day - 1).toLong())
+            assertTrue("Day $day ($date) should be active", m.shouldTakeOnDate(date))
+        }
+
+        // Days 22 through 28 (Jan 22 - Jan 28) must be break/rest days
+        for (day in 22..28) {
+            val date = startDate.plusDays((day - 1).toLong())
+            assertFalse("Day $day ($date) should be a rest/break day", m.shouldTakeOnDate(date))
+        }
+
+        // Day 29 (Jan 29, cycle 2 day 1) must be active again
+        val day29 = startDate.plusDays(28)
+        assertTrue("Day 29 ($day29) should be active (new cycle start)", m.shouldTakeOnDate(day29))
+
+        // Full 2 cycles (56 days, Jan 1 to Feb 25): 2 * 21 = 42 entries
+        val twoCycles = m.generateScheduleEntries(startDateRange = startDate, days = 55)
+        assertEquals(42, twoCycles.size)
+    }
+
+    @Test
+    fun cyclicalMedicine_24_4_generatesEntriesOnlyOnActiveDays() {
+        val startDate = LocalDate.of(2026, 3, 1)
+        val m = med(
+            freq = Frequency(
+                pattern = FrequencyPattern.CYCLICAL,
+                cycleActiveDays = 24,
+                cycleRestDays = 4
+            ),
+            times = listOf(LocalTime.of(20, 0)),
+            start = startDate
+        )
+
+        // 28-day cycle: 24 active, 4 rest
+        val entries = m.generateScheduleEntries(startDateRange = startDate, days = 27)
+        assertEquals(24, entries.size)
+
+        // Verify day 24 is active, day 25 is rest
+        val day24 = startDate.plusDays(23)
+        val day25 = startDate.plusDays(24)
+        assertTrue(m.shouldTakeOnDate(day24))
+        assertFalse(m.shouldTakeOnDate(day25))
+
+        // Day 29 is start of cycle 2
+        val day29 = startDate.plusDays(28)
+        assertTrue(m.shouldTakeOnDate(day29))
+    }
+
+    @Test
+    fun cyclicalMedicine_negativeDateOffsetHandledSymmetrically() {
+        val m = med(
+            freq = Frequency(
+                pattern = FrequencyPattern.CYCLICAL,
+                cycleActiveDays = 21,
+                cycleRestDays = 7
+            ),
+            times = listOf(LocalTime.of(8, 0)),
+            start = null // No start boundary clamp, test pure cycle recurrence
+        )
+
+        // Date 1 day before reference (28-day cycle length): dayInCycle = 27, which is a rest day (21..27)
+        val dayBefore = LocalDate.of(2020, 1, 1).minusDays(1)
+        assertFalse(m.shouldTakeOnDate(dayBefore))
+
+        // Date 7 days before reference: dayInCycle = 21, which is the 1st rest day
+        val restDay1 = LocalDate.of(2020, 1, 1).minusDays(7)
+        assertFalse(m.shouldTakeOnDate(restDay1))
+
+        // Date 8 days before reference: dayInCycle = 20, which is the last active day
+        val lastActive = LocalDate.of(2020, 1, 1).minusDays(8)
+        assertTrue(m.shouldTakeOnDate(lastActive))
     }
 }

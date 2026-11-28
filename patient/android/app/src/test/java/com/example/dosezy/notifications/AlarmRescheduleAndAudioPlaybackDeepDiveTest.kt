@@ -298,4 +298,49 @@ class AlarmRescheduleAndAudioPlaybackDeepDiveTest {
             testDb.close()
         }
     }
+
+    // Guard: Verify cancelAlarm with rearmSiblings = false cancels the PendingIntent directly without invoking blocking sibling DB lookups or rearming grouped alarms (#BUG-CANCEL-REARM-BYPASS)
+    @Test
+    fun cancelAlarm_withRearmSiblingsFalse_bypassesSiblingRearming() = runBlocking {
+        val testDb = androidx.room.Room.inMemoryDatabaseBuilder(context, DosezyDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+        DosezyDatabase.setInstance(testDb)
+
+        try {
+            val testUser = User(
+                userId = "user_rearm_bypass",
+                fullName = "Bypass Test",
+                age = 40,
+                gender = com.example.dosezy.data.model.Gender.MALE,
+                contactNumber = "+111222333"
+            )
+            val now = LocalDateTime.now().plusHours(2).withSecond(0).withNano(0)
+            val med = Medicine(
+                medicineId = "med_bypass",
+                userId = testUser.userId,
+                medicationName = "Aspirin",
+                dosage = 100.0,
+                dosageUnit = com.example.dosezy.data.model.DosageUnit.MG,
+                timesPerDay = 1,
+                frequency = Frequency(FrequencyPattern.DAILY),
+                scheduledTimes = listOf(now.toLocalTime())
+            )
+            val entry = ScheduleEntry(entryId = "entry_bypass", userId = testUser.userId, medicineId = med.medicineId, scheduledDateTime = now, status = MedicationStatus.PENDING)
+
+            testDb.userDao().insertUser(testUser)
+            testDb.medicineDao().insertMedicine(med)
+            testDb.scheduleDao().insertScheduleEntry(entry)
+
+            val schedulerSpy = spyk(AlarmScheduler(context))
+            schedulerSpy.cancelAlarm(entry, rearmSiblings = false)
+
+            // When rearmSiblings = false, no grouped alarm rescheduling and no slot cancellation should occur
+            verify(exactly = 0) { schedulerSpy.scheduleGroupedMedicineAlarm(any(), any(), any(), any()) }
+            verify(exactly = 0) { schedulerSpy.cancelSlotAlarm(any(), any()) }
+        } finally {
+            DosezyDatabase.setInstance(null)
+            testDb.close()
+        }
+    }
 }

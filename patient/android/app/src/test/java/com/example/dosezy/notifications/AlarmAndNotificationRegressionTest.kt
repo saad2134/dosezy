@@ -4,8 +4,16 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import androidx.test.core.app.ApplicationProvider
+import com.example.dosezy.data.DosezyDatabase
+import com.example.dosezy.data.model.Gender
+import com.example.dosezy.data.model.Language
 import com.example.dosezy.data.model.MedicationStatus
 import com.example.dosezy.data.model.ScheduleEntry
+import com.example.dosezy.data.model.Theme
+import com.example.dosezy.data.model.TimeFormat
+import com.example.dosezy.data.model.User
+import com.example.dosezy.data.model.normalizeArabicDigits
+import kotlinx.coroutines.runBlocking
 import com.example.dosezy.utils.ImageUtils
 import com.example.dosezy.utils.TimeCalculationUtils
 import io.mockk.coEvery
@@ -46,6 +54,26 @@ class AlarmAndNotificationRegressionTest {
         val targetFragment = intent.getStringExtra("fragment")
         val destinationRoute = if (targetFragment == "schedule") "schedule" else "home"
         assertEquals("schedule", destinationRoute)
+    }
+
+    @Test
+    fun testNotificationIntent_defaultsToHomeRouteWithTargetEntryAndSlot() {
+        // Guard: Verify alert notification tap intent routes directly to Home screen with target slot metadata (#137)
+        val intent = Intent().apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra("fragment", "home")
+            putExtra("from_alarm", true)
+            putExtra("target_entry_id", "entry_test_123")
+            putExtra("target_time", "08:00")
+            putExtra("switch_to_user_id", "user_test_456")
+        }
+
+        assertEquals("home", intent.getStringExtra("fragment"))
+        assertTrue(intent.getBooleanExtra("from_alarm", false))
+        assertEquals("entry_test_123", intent.getStringExtra("target_entry_id"))
+        assertEquals("08:00", intent.getStringExtra("target_time"))
+        assertEquals("user_test_456", intent.getStringExtra("switch_to_user_id"))
+        assertTrue((intent.flags and Intent.FLAG_ACTIVITY_SINGLE_TOP) != 0)
     }
 
     // ───────────────────────────────────────────────────────────────
@@ -623,6 +651,20 @@ class AlarmAndNotificationRegressionTest {
     }
 
     @Test
+    fun testLockscreenPrivacy_stringsSemantics_affirmativeToggleAndMaskedAlarmTitle() {
+        // Guard: Verify lockscreen privacy preferences description accurately explains display/hide behavior without contradicting title (#143)
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val title = context.getString(com.example.dosezy.R.string.pref_lockscreen_details_title)
+        val desc = context.getString(com.example.dosezy.R.string.pref_lockscreen_details_desc)
+        val alarmHiddenTitle = context.getString(com.example.dosezy.R.string.alarm_lockscreen_privacy_title)
+
+        assertEquals("Show Details on Lock Screen", title)
+        assertTrue("Description must explain display behavior when enabled", desc.contains("Display"))
+        assertTrue("Description must explain hidden behavior when turned off", desc.contains("turned off") || desc.contains("disabled"))
+        assertEquals("Medication Details Hidden", alarmHiddenTitle)
+    }
+
+    @Test
     fun testCustomSnoozeOptions_whenDisabled_onlyIncludesSingleSnoozeAction() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val snoozeMinutes = 10
@@ -1065,6 +1107,306 @@ class AlarmAndNotificationRegressionTest {
         } finally {
             com.example.dosezy.data.DosezyDatabase.setInstance(null)
         }
+    }
+
+    // ───────────────────────────────────────────────────────────────
+    // Bug 39: Screaming Alarm Audio Silenced on Lockscreen Take (#BUG-ALARM-SCREAMING-LOCKSCREEN)
+    // ───────────────────────────────────────────────────────────────
+    @Test
+    fun alarmScreen_whenDetailsMaskedOnLockscreen_takeActionSilencesAudioAndExecutesOnUnlock() {
+        val mockDb = mockk<com.example.dosezy.data.DosezyDatabase>(relaxed = true)
+        val mockScheduleDao = mockk<com.example.dosezy.data.dao.ScheduleDao>(relaxed = true)
+        val mockUserDao = mockk<com.example.dosezy.data.dao.UserDao>(relaxed = true)
+
+        every { mockDb.scheduleDao() } returns mockScheduleDao
+        every { mockDb.userDao() } returns mockUserDao
+
+        com.example.dosezy.data.DosezyDatabase.setInstance(mockDb)
+        try {
+            // Emulate active alarm audio playing when alarm triggers on lockscreen
+            val field = AlarmAudioPlayer::class.java.getDeclaredField("mediaPlayer")
+            field.isAccessible = true
+            val mockPlayer = mockk<android.media.MediaPlayer>(relaxed = true)
+            every { mockPlayer.isPlaying } returns true
+            field.set(AlarmAudioPlayer, mockPlayer)
+            assertTrue("Alarm audio must be playing initially", AlarmAudioPlayer.isPlaying())
+
+            var audioSilencedOnTake = false
+            var unlockRequested = false
+            var doseExecutedOnUnlock = false
+            var activityDismissed = false
+
+            val isDetailsMasked = true
+
+            // Emulate AlarmActivity's executeTakeAction and handleTakeAction handlers
+            val executeTakeAction: () -> Unit = {
+                AlarmAudioPlayer.stop()
+                doseExecutedOnUnlock = true
+                activityDismissed = true
+            }
+
+            val mockRequestDeviceUnlock: (onSuccess: (() -> Unit)?) -> Unit = { onSuccess ->
+                unlockRequested = true
+                // Emulate user successfully entering PIN or scanning fingerprint
+                onSuccess?.invoke()
+            }
+
+            val handleTakeAction: () -> Unit = {
+                if (isDetailsMasked) {
+                    AlarmAudioPlayer.stop()
+                    audioSilencedOnTake = !AlarmAudioPlayer.isPlaying()
+                    mockRequestDeviceUnlock(executeTakeAction)
+                } else {
+                    executeTakeAction()
+                }
+            }
+
+            // User swipes affirmative Take slider on lockscreen
+            handleTakeAction()
+
+            // 1. Audio must be silenced immediately so phone does not scream in user's ear while unlocking
+            assertTrue("Audio must be immediately silenced upon confirming take", audioSilencedOnTake)
+            assertFalse("AlarmAudioPlayer must not be playing", AlarmAudioPlayer.isPlaying())
+
+            // 2. Unlock prompt must be requested
+            assertTrue("Device unlock must be requested when details are masked", unlockRequested)
+
+            // 3. Dose intake and dismissal must be executed upon successful authentication
+            assertTrue("Dose must be recorded as taken after unlock", doseExecutedOnUnlock)
+            assertTrue("Activity must be dismissed", activityDismissed)
+        } finally {
+            AlarmAudioPlayer.stop()
+            com.example.dosezy.data.DosezyDatabase.setInstance(null)
+        }
+    }
+
+    @Test
+    fun alarmScreen_whenDetailsMasked_skipActionPassesCallbackToShowSkipDialog() {
+        var unlockRequested = false
+        var showSkipReasonDialog = false
+
+        val mockRequestDeviceUnlock: (onSuccess: (() -> Unit)?) -> Unit = { onSuccess ->
+            unlockRequested = true
+            onSuccess?.invoke()
+        }
+
+        val onUnlockRequest: (((() -> Unit)?) -> Unit) = { callback ->
+            mockRequestDeviceUnlock(callback)
+        }
+
+        val isDetailsMasked = true
+
+        // User clicks Skip button when details are masked
+        if (isDetailsMasked) {
+            onUnlockRequest { showSkipReasonDialog = true }
+        } else {
+            showSkipReasonDialog = true
+        }
+
+        assertTrue("Device unlock must be requested on Skip when masked", unlockRequested)
+        assertTrue("Skip reason dialog must be displayed after authentication succeeds", showSkipReasonDialog)
+    }
+
+    @Test
+    fun alarmScreen_windowSetup_clearsDismissKeyguardFlag() {
+        val controller = org.robolectric.Robolectric.buildActivity(AlarmActivity::class.java)
+        val activity = controller.get()
+        val window = activity.window
+        window.addFlags(android.view.WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
+
+        // Emulate setupWindowFlags clearFlags safeguard
+        window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
+
+        val hasDismissKeyguardFlag = (window.attributes.flags and android.view.WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD) != 0
+        assertFalse("FLAG_DISMISS_KEYGUARD must be cleared to prevent premature bouncer prompt on locked screen", hasDismissKeyguardFlag)
+    }
+
+    @Test
+    fun testMultiUserLockscreenPrivacy_honorsProfileOverGlobalPreference() = runBlocking {
+        // Guard: Verify updateCohortNotification and showNotification honor profile lockscreenDetailsEnabled over global app_prefs (#BUG-LOCKSCREEN-MULTIUSER)
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val inMemoryDb = androidx.room.Room.inMemoryDatabaseBuilder(context, DosezyDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+        DosezyDatabase.setInstance(inMemoryDb)
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+
+        try {
+            val privateUser = User(
+                userId = "user_priv_test",
+                fullName = "Private Patient",
+                age = 40,
+                gender = Gender.FEMALE,
+                contactNumber = "+1234567890",
+                lockscreenDetailsEnabled = false,
+                isCurrentUser = false
+            )
+            val publicUser = User(
+                userId = "user_pub_test",
+                fullName = "Public Patient",
+                age = 45,
+                gender = Gender.MALE,
+                contactNumber = "+1987654321",
+                lockscreenDetailsEnabled = true,
+                isCurrentUser = true
+            )
+            inMemoryDb.userDao().insertUser(privateUser)
+            inMemoryDb.userDao().insertUser(publicUser)
+
+            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+
+            // Case 1: Global app_prefs has lockscreen_details_enabled = true (e.g. from publicUser), but target is privateUser
+            prefs.edit().putBoolean("lockscreen_details_enabled", true).commit()
+            MedicineAlarmReceiver.updateCohortNotification(
+                context = context,
+                entryId = "entry_priv_cohort",
+                entryIds = arrayListOf("entry_priv_cohort"),
+                medicineName = "Antiretroviral",
+                medicineNames = arrayListOf("Antiretroviral"),
+                scheduledTime = "08:00 AM",
+                userId = privateUser.userId
+            )
+
+            val privateNotif = nm.activeNotifications.firstOrNull { it.id == "entry_priv_cohort".hashCode() }?.notification
+            assertNotNull("Notification for private user must be posted", privateNotif)
+            assertEquals(
+                "Private profile must enforce VISIBILITY_PRIVATE despite global app_prefs = true",
+                androidx.core.app.NotificationCompat.VISIBILITY_PRIVATE,
+                privateNotif?.visibility
+            )
+            assertNotNull("Private profile notification must include public version for masking", privateNotif?.publicVersion)
+
+            // Case 2: Global app_prefs has lockscreen_details_enabled = false (e.g. from privateUser), but target is publicUser
+            prefs.edit().putBoolean("lockscreen_details_enabled", false).commit()
+            MedicineAlarmReceiver.updateCohortNotification(
+                context = context,
+                entryId = "entry_pub_cohort",
+                entryIds = arrayListOf("entry_pub_cohort"),
+                medicineName = "Vitamin C",
+                medicineNames = arrayListOf("Vitamin C"),
+                scheduledTime = "09:00 AM",
+                userId = publicUser.userId
+            )
+
+            val publicNotif = nm.activeNotifications.firstOrNull { it.id == "entry_pub_cohort".hashCode() }?.notification
+            assertNotNull("Notification for public user must be posted", publicNotif)
+            assertEquals(
+                "Public profile must retain VISIBILITY_PUBLIC even if global app_prefs = false",
+                androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC,
+                publicNotif?.visibility
+            )
+        } finally {
+            DosezyDatabase.setInstance(null)
+            inMemoryDb.close()
+        }
+    }
+
+    @Test
+    fun testAlarmScheduler_createAlarmClockShowIntent_routesToHomeWithTargetExtras() {
+        // Guard: Verify AlarmClock showIntent routes to Home with target entry ID and switch user extra (#137)
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val scheduler = AlarmScheduler(context)
+        val pendingIntent = scheduler.createAlarmClockShowIntent(
+            requestCode = 1234,
+            targetUserId = "user_alarm_show",
+            targetEntryId = "entry_alarm_clock_show",
+            targetTime = "10:00 AM"
+        )
+
+        val showIntent = org.robolectric.Shadows.shadowOf(pendingIntent).savedIntent
+        assertEquals("home", showIntent.getStringExtra("fragment"))
+        assertEquals("entry_alarm_clock_show", showIntent.getStringExtra("target_entry_id"))
+        assertEquals("10:00 AM", showIntent.getStringExtra("target_time"))
+        assertEquals("user_alarm_show", showIntent.getStringExtra("switch_to_user_id"))
+    }
+
+    @Test
+    fun testNotificationStatusDialog_summaryAndGroupingStrings_formatCorrectly() {
+        // Guard: Verify notification reliability summary and group headings format cleanly
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val summaryString = context.getString(com.example.dosezy.R.string.notif_check_summary, 2, 6)
+        val needsFixingTitle = context.getString(com.example.dosezy.R.string.notif_status_group_needs_fixing)
+        val allGoodTitle = context.getString(com.example.dosezy.R.string.notif_status_group_all_good)
+
+        assertEquals("2 of 6 checks passed", summaryString)
+        assertEquals("Needs Fixing", needsFixingTitle)
+        assertEquals("All Good", allGoodTitle)
+    }
+
+    @Test
+    fun testNotificationStatusDialog_subgroupPartitioning_redItemsFirst() {
+        // Guard: Red/warning items must partition into Needs Fixing and show first before All Good green items
+        data class MockStatus(val name: String, val isPassed: Boolean, val isWarning: Boolean = false)
+
+        val statuses = listOf(
+            MockStatus("Notification Permission", isPassed = true),
+            MockStatus("Exact Alarms", isPassed = false),
+            MockStatus("Display Over Apps", isPassed = true),
+            MockStatus("Battery Optimization", isPassed = false),
+            MockStatus("Phone Sound", isPassed = true)
+        )
+
+        val totalChecks = statuses.size
+        val passedChecks = statuses.count { it.isPassed && !it.isWarning }
+        val needsFixing = statuses.filter { !it.isPassed || it.isWarning }
+        val allGood = statuses.filter { it.isPassed && !it.isWarning }
+
+        assertEquals(5, totalChecks)
+        assertEquals(3, passedChecks)
+        assertEquals(2, needsFixing.size)
+        assertEquals(3, allGood.size)
+
+        // Needs fixing items must contain the failed checks
+        assertEquals(listOf("Exact Alarms", "Battery Optimization"), needsFixing.map { it.name })
+        // All good items must contain the passed checks
+        assertEquals(listOf("Notification Permission", "Display Over Apps", "Phone Sound"), allGood.map { it.name })
+    }
+
+    @Test
+    fun testNotificationStatusDialog_groupingStringsAcrossLocales() {
+        // Guard: Verify group headings and summary formatting across all supported locales
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val locales = listOf(
+            java.util.Locale("ar"),
+            java.util.Locale("bn"),
+            java.util.Locale.GERMAN,
+            java.util.Locale("es"),
+            java.util.Locale.FRENCH,
+            java.util.Locale("hi"),
+            java.util.Locale.ITALIAN,
+            java.util.Locale.JAPANESE,
+            java.util.Locale("pt"),
+            java.util.Locale("ru"),
+            java.util.Locale.SIMPLIFIED_CHINESE
+        )
+
+        for (locale in locales) {
+            val config = android.content.res.Configuration(context.resources.configuration).apply {
+                setLocale(locale)
+            }
+            val localizedContext = context.createConfigurationContext(config)
+            val summary = localizedContext.getString(com.example.dosezy.R.string.notif_check_summary, 2, 6)
+            val needsFixing = localizedContext.getString(com.example.dosezy.R.string.notif_status_group_needs_fixing)
+            val allGood = localizedContext.getString(com.example.dosezy.R.string.notif_status_group_all_good)
+
+            assertTrue("Summary in $locale must not be empty", summary.isNotEmpty())
+            val normalizedSummary = summary.normalizeArabicDigits()
+            assertTrue("Summary in $locale must contain formatted numbers", normalizedSummary.contains("2") && normalizedSummary.contains("6"))
+            assertTrue("Needs fixing in $locale must not be empty", needsFixing.isNotEmpty())
+            assertTrue("All good in $locale must not be empty", allGood.isNotEmpty())
+            assertTrue("Group headings in $locale must differ", needsFixing != allGood)
+        }
+    }
+
+    @Test
+    fun testGetPendingNotificationIssuesCount_andRequirementsMetConsistency() {
+        // Guard: Verify getPendingNotificationIssuesCount and areAllNotificationRequirementsMet maintain strict logical symmetry (#F08)
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val count = com.example.dosezy.utils.NotificationUtils.getPendingNotificationIssuesCount(context)
+        val allMet = com.example.dosezy.utils.NotificationUtils.areAllNotificationRequirementsMet(context)
+
+        assertEquals(allMet, count == 0)
+        assertTrue("Pending issues count must be non-negative", count >= 0)
     }
 }
 

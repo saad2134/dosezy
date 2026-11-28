@@ -89,14 +89,6 @@ fun MedicineIdentificationCard(
                     onImageSelected = onImageSelected,
                     onVisualSelected = onVisualSelected
                 )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = if (medicineImagePath != null) stringResource(R.string.form_change_img) else stringResource(R.string.form_upload_img),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))

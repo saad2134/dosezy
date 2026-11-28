@@ -87,12 +87,21 @@ class UserViewModel @Inject constructor(
                         _currentUser.value = current
                         if (current != null) {
                             try {
-                                syncAppTheme(current.theme.name.lowercase())
-                                com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, current.userId, current.theme.name.lowercase(), isCurrentProfile = true)
                                 // Guard: Persist lock screen privacy toggle synchronously to app_prefs for receivers
                                 context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
                                     .edit()
                                     .putBoolean("lockscreen_details_enabled", current.lockscreenDetailsEnabled)
+                                    .commit()
+                            } catch (_: Exception) {}
+                            try {
+                                syncAppTheme(current.theme.name.lowercase())
+                                com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, current.userId, current.theme.name.lowercase(), isCurrentProfile = true)
+                            } catch (_: Exception) {}
+                        } else if (userList.isEmpty()) {
+                            try {
+                                context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                                    .edit()
+                                    .putBoolean("lockscreen_details_enabled", true)
                                     .commit()
                             } catch (_: Exception) {}
                         }
@@ -128,6 +137,13 @@ class UserViewModel @Inject constructor(
                     // Guard: Core library desugaring supports API 24+; schedule alarms across all supported OS versions
                     medicineNotificationManager.scheduleAlarmsForUser(updatedUser.userId)
 
+                    try {
+                        // Guard: Persist lock screen privacy toggle synchronously to app_prefs on profile switch (#BUG-LOCKSCREEN-PROFILE-SWITCH)
+                        context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                            .edit()
+                            .putBoolean("lockscreen_details_enabled", updatedUser.lockscreenDetailsEnabled)
+                            .commit()
+                    } catch (_: Exception) {}
                     try {
                         syncAppTheme(updatedUser.theme.name.lowercase())
                         com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, updatedUser.userId, updatedUser.theme.name.lowercase(), isCurrentProfile = true)
@@ -175,6 +191,13 @@ class UserViewModel @Inject constructor(
                         }
                         // Guard: Core library desugaring supports API 24+; schedule alarms for new profile across all supported OS versions
                         medicineNotificationManager.scheduleAlarmsForUser(userToInsert.userId)
+                        try {
+                            // Guard: Persist lock screen privacy toggle synchronously to app_prefs for newly added active profile (#BUG-LOCKSCREEN-PROFILE-SWITCH)
+                            context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                                .edit()
+                                .putBoolean("lockscreen_details_enabled", userToInsert.lockscreenDetailsEnabled)
+                                .commit()
+                        } catch (_: Exception) {}
                         try {
                             syncAppTheme(userToInsert.theme.name.lowercase())
                             com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, userToInsert.userId, userToInsert.theme.name.lowercase(), isCurrentProfile = shouldBeCurrent)
@@ -300,12 +323,13 @@ class UserViewModel @Inject constructor(
                         // Guard: Atomically set nextUser as current to reset all other profiles to inactive and prevent multiple active profiles in SQLite
                         userRepository.setCurrentUser(nextUser.userId)
 
-                        withContext(Dispatchers.Main) {
-                            _currentUser.value = nextUser
-                            onNextUserSelected?.invoke(nextUser)
-                        }
-
-                        // Guard: Synchronize app theme and widget preferences for promoted active profile to prevent theme lock on deleted profile
+                        // Guard: Synchronize lockscreen privacy setting to app_prefs for promoted active profile (#BUG-USER-DELETE-LOCKSCREEN-SYNC)
+                        try {
+                            context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                                .edit()
+                                .putBoolean("lockscreen_details_enabled", nextUser.lockscreenDetailsEnabled)
+                                .commit()
+                        } catch (_: Exception) {}
                         try {
                             syncAppTheme(nextUser.theme.name.lowercase())
                             com.example.dosezy.widget.DosezyWidgetPrefs.saveWidgetProfileTheme(context, nextUser.userId, nextUser.theme.name.lowercase(), isCurrentProfile = true)
@@ -313,15 +337,27 @@ class UserViewModel @Inject constructor(
 
                         // Guard: Core library desugaring supports API 24+; schedule alarms for next active profile across all OS versions
                         medicineNotificationManager.scheduleAlarmsForUser(nextUser.userId)
+
+                        withContext(Dispatchers.Main) {
+                            _currentUser.value = nextUser
+                            onNextUserSelected?.invoke(nextUser)
+                        }
                     } else if (remainingUsers.isEmpty()) {
+                        // Guard: Clean up app theme back to system default and reset lockscreen privacy when no user profiles remain (#BUG-USER-DELETE-LOCKSCREEN-SYNC)
+                        try {
+                            context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                                .edit()
+                                .putBoolean("lockscreen_details_enabled", true)
+                                .commit()
+                        } catch (_: Exception) {}
+                        try {
+                            syncAppTheme("system")
+                        } catch (_: Exception) {}
+
                         withContext(Dispatchers.Main) {
                             _currentUser.value = null
                             onNextUserSelected?.invoke(null)
                         }
-                        // Guard: Clean up app theme back to system default when no user profiles remain
-                        try {
-                            syncAppTheme("system")
-                        } catch (_: Exception) {}
                     } else {
                         // Guard: When deleting a secondary profile, notify completion with the unchanged active current profile
                         withContext(Dispatchers.Main) {

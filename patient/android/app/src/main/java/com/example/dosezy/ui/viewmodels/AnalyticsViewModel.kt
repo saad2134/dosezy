@@ -57,7 +57,8 @@ data class DayStat(
     val dayLabel: String,
     val total: Int,
     val taken: Int,
-    val rate: Int
+    val rate: Int,
+    val decided: Int = 0
 )
 
 data class AnalyticsBreakdown(
@@ -244,12 +245,14 @@ class AnalyticsViewModel @Inject constructor(
             }
             val dayDecided = dayTaken + dayMissed + dayOverduePending
             val dayRate = if (dayDecided > 0) ((dayTaken.toDouble() / dayDecided.toDouble()) * 100).toInt() else 0
+            // Guard: Track dayDecided so weekly trend bar displays placeholder '-' when no doses have come due yet rather than false 0% (#BUG-ANALYTICS-DECIDED)
             DayStat(
                 date = date,
                 dayLabel = date.dayOfWeek.getDisplayName(TextStyle.SHORT, targetLocale).uppercase(targetLocale),
                 total = dayEntries.size,
                 taken = dayTaken,
-                rate = dayRate
+                rate = dayRate,
+                decided = dayDecided
             )
         }
 

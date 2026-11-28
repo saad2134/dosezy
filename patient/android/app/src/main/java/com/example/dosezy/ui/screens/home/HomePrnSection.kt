@@ -134,11 +134,20 @@ fun LazyListScope.homePrnSection(
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
+                            if (prnMed.frequency.asNeededIntervalHours != null && prnMed.frequency.asNeededIntervalHours > 0) {
+                                Text(
+                                    text = "⏱️ Min ${prnMed.frequency.asNeededIntervalHours}h interval",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFF1193D4),
+                                    maxLines = 1
+                                )
+                            }
                             if (!prnMed.notes.isNullOrBlank()) {
+                                // Guard: Use theme-aware high contrast amber (#9A4A00 on light giving >= 5.6:1, #FBBF24 on dark) to satisfy WCAG 2.2 AA (#F10)
                                 Text(
                                     text = "📝 ${prnMed.notes}",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = Color(0xFFF59E0B),
+                                    color = com.example.dosezy.ui.theme.getMedicationNoteColor(),
                                     maxLines = 1
                                 )
                             }

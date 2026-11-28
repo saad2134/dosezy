@@ -25,6 +25,82 @@ import java.time.temporal.TemporalAdjusters
 object ScheduleRecurrenceEngine {
 
     /**
+     * pure domain engine responsible for computing recurring medication dose schedules,
+     * interval timelines across midnight boundaries, and frequency evaluations.
+     */
+    /**
+     * Calculates the duration in minutes for a single rolling intake interval based on medicine frequency pattern.
+     * Returns null if the medicine is not configured for rolling intervals or has an incompatible pattern (#119).
+     */
+    fun getRollingIntervalMinutes(medicine: Medicine): Long? {
+        if (!medicine.frequency.isRollingInterval) return null
+        return when (medicine.frequency.pattern) {
+            FrequencyPattern.DAILY -> {
+                val times = medicine.timesPerDay.coerceAtLeast(1)
+                1440L / times
+            }
+            FrequencyPattern.EVERY_X_HOURS -> {
+                val hours = (medicine.frequency.intervalHours ?: 4).coerceIn(1, 23)
+                hours * 60L
+            }
+            FrequencyPattern.EVERY_X_DAYS -> {
+                val days = (medicine.frequency.intervalDays ?: 1).coerceAtLeast(1)
+                days * 1440L
+            }
+            else -> null
+        }
+    }
+
+    /**
+     * Projects future schedule entries anchored dynamically from a specific date-time
+     * (such as takenAt + interval) using fixed rolling interval spacing (#119).
+     *
+     * @param medicine Target medicine entity.
+     * @param anchorDateTime Starting date-time for the first projected future entry.
+     * @param daysCount Number of days forward to project entries (default: 30 days).
+     * @return List of generated [ScheduleEntry] items.
+     */
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun generateRollingScheduleEntries(
+        medicine: Medicine,
+        anchorDateTime: LocalDateTime,
+        daysCount: Int = 30
+    ): List<ScheduleEntry> {
+        val intervalMinutes = getRollingIntervalMinutes(medicine) ?: return emptyList()
+        if (medicine.isArchived || medicine.frequency.pattern == FrequencyPattern.AS_NEEDED) return emptyList()
+
+        val entries = mutableListOf<ScheduleEntry>()
+        val endDateTime = anchorDateTime.plusDays(daysCount.toLong())
+        val effectiveEnd = if (medicine.endDate != null) {
+            val medEnd = medicine.endDate.atTime(LocalTime.MAX)
+            if (medEnd.isBefore(endDateTime)) medEnd else endDateTime
+        } else {
+            endDateTime
+        }
+
+        var cursor = anchorDateTime.withSecond(0).withNano(0)
+        while (!cursor.isAfter(effectiveEnd)) {
+            val itemDate = cursor.toLocalDate()
+            val cleanTime = cursor.toLocalTime().withSecond(0).withNano(0)
+            val scheduledDateTime = cursor.withSecond(0).withNano(0)
+            val entryId = "${medicine.medicineId}_${itemDate}_${cleanTime}".replace(":", "_").replace("-", "_")
+
+            entries.add(
+                ScheduleEntry(
+                    entryId = entryId,
+                    userId = medicine.userId,
+                    medicineId = medicine.medicineId,
+                    scheduledDateTime = scheduledDateTime,
+                    status = MedicationStatus.PENDING,
+                    dosage = medicine.getDosageForTime(cleanTime)
+                )
+            )
+            cursor = cursor.plusMinutes(intervalMinutes)
+        }
+        return entries
+    }
+
+    /**
      * Generates schedule entries for a medicine across a given date range.
      *
      * @param medicine The target medicine entity.
@@ -124,7 +200,27 @@ object ScheduleRecurrenceEngine {
             // Check if medicine should be taken on this day based on frequency
             if (shouldTakeOnDate(medicine, currentDate)) {
                 val now = LocalDateTime.now()
-                val effectiveTimes = medicine.scheduledTimes
+                // Guard: Provide default reminder times matching timesPerDay if scheduledTimes list is empty to prevent generating 0 doses for active medicines; return empty if timesPerDay <= 0 (#BUG-RECURRENCE-ZERO-TIMES)
+                val effectiveTimes = if (medicine.scheduledTimes.isNotEmpty()) {
+                    medicine.scheduledTimes
+                } else if (medicine.timesPerDay <= 0) {
+                    emptyList()
+                } else {
+                    when (medicine.timesPerDay) {
+                        1 -> listOf(LocalTime.of(8, 0))
+                        2 -> listOf(LocalTime.of(8, 0), LocalTime.of(20, 0))
+                        3 -> listOf(LocalTime.of(8, 0), LocalTime.of(14, 0), LocalTime.of(20, 0))
+                        4 -> listOf(LocalTime.of(8, 0), LocalTime.of(12, 0), LocalTime.of(16, 0), LocalTime.of(20, 0))
+                        else -> {
+                            // Guard: Evenly space reminder slots between 08:00 and 22:00 for >4x daily regimens when scheduledTimes is omitted (#BUG-RECURRENCE-5X-FALLBACK)
+                            val count = medicine.timesPerDay.coerceIn(1, 12)
+                            val intervalMinutes = (14 * 60) / (count - 1).coerceAtLeast(1)
+                            (0 until count).map { i ->
+                                LocalTime.of(8, 0).plusMinutes((i * intervalMinutes).toLong())
+                            }
+                        }
+                    }
+                }
 
                 effectiveTimes.forEach { time ->
                     val cleanTime = time.withSecond(0).withNano(0)
@@ -165,6 +261,17 @@ object ScheduleRecurrenceEngine {
         return when (medicine.frequency.pattern) {
             FrequencyPattern.DAILY -> true
             FrequencyPattern.AS_NEEDED -> false
+            FrequencyPattern.CYCLICAL -> {
+                // Guard: Take for cycleActiveDays, pause for cycleRestDays, starting from startDate (or 2020-01-01) (#141)
+                val activeDays = (medicine.frequency.cycleActiveDays ?: 21).coerceAtLeast(1)
+                val restDays = (medicine.frequency.cycleRestDays ?: 7).coerceAtLeast(0)
+                val cycleLength = activeDays + restDays
+                if (cycleLength <= 0) return true
+                val baseDate = medicine.startDate ?: LocalDate.of(2020, 1, 1)
+                val daysDiff = ChronoUnit.DAYS.between(baseDate, date)
+                val dayInCycle = Math.floorMod(daysDiff, cycleLength.toLong())
+                dayInCycle < activeDays
+            }
             FrequencyPattern.EVERY_X_HOURS -> true
             FrequencyPattern.EVERY_X_DAYS -> {
                 val interval = (medicine.frequency.intervalDays ?: 2).coerceAtLeast(1)
