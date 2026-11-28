@@ -1,0 +1,2072 @@
+[
+  {
+    "content": "# dosezy : frequently asked questions ( faq ) welcome to the * * dosezy faq * *! here you will find clear, easy - to - understand answers to common questions about using dosezy, managing prescriptions, setting reliable alarms, tracking pill inventory, handling dose skipping, and protecting your health data. - - - # # getting started, privacy & travel # # # what is dosezy? dosezy is a simple, friendly, and smart medication reminder app designed for everyday use. it helps you, your family members, and caregivers manage daily medicines, set alarms, track tablet stock, monitor adherence, and ensure no dose is ever forgotten. # # # do i need to create an account or connect to the internet? no! dosezy is * * 100 % local - first and offline * *. you do not need to register an account, log in, or have an internet connection. all your medicines, schedules, and adherence logs stay privately stored directly on your phone in an offline database. # # # does dosezy support my language? yes! dosezy includes full native translations in * * 12 languages * * : - english, spanish ( espanol ), hindi ( हिनद",
+    "source": "resources/FAQs.md",
+    "chunk_index": 0,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "##zy includes full native translations in * * 12 languages * * : - english, spanish ( espanol ), hindi ( हिनदी ), chinese ( 中 文 ), portuguese ( portugues ), arabic ( العربية ), french ( francais ), german ( deutsch ), japanese ( 日 本 語 ), russian ( русскии ), italian ( italiano ), and bengali ( বাংলা ). the app automatically opens in your phone ' s system language, and you can change languages anytime in * * menu > preferences > general > language * *. # # # what happens when i travel across time zones? dosezy automatically keeps your scheduled medication routine anchored to your daily local routine without time distortion. your dose reminders shift seamlessly with your active timezone so you never need to manually recalibrate schedules while traveling. - - - # # adding & managing medications # # # how do i add a new medicine? 1. open the app and tap * * medicines * * in the bottom navigation bar. 2. tap * * \" + add medicine \" * * ( or * * \" add",
+    "source": "resources/FAQs.md",
+    "chunk_index": 1,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "app and tap * * medicines * * in the bottom navigation bar. 2. tap * * \" + add medicine \" * * ( or * * \" add your first medication \" * * if your list is empty ). 3. enter your medicine name and select your dose unit ( ` tablet `, ` capsule `, ` mg `, ` mcg `, ` g `, ` ml `, ` drops `, ` puffs `, ` units ` ). 4. ( optional ) tap the camera icon to photograph your pill box or choose an image from your gallery. 5. select a meal instruction ( * before food *, * with food *, * after food *, or * no food instructions * ). 6. choose your frequency : * * daily * *, * * weekly * * ( select specific days ), or * * monthly * * ( select dates ). 7. tap on * * 1x, 2x, 3x, or 4x daily * * quick preset chips to automatically populate multiple dose times. 8. tap any time chip to adjust it with the * * 12 - first grid time picker * * ( where 12 is placed at the top for natural morning / night selection )",
+    "source": "resources/FAQs.md",
+    "chunk_index": 2,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "chip to adjust it with the * * 12 - first grid time picker * * ( where 12 is placed at the top for natural morning / night selection ). 9. ( optional ) enter your current tablet count and low - stock refill threshold under * * track stock inventory * *. 10. tap * * save medicine * *. # # # how do i search or find a medicine if i take many prescriptions? on the * * medicines * * screen, use the search bar at the top. simply type the name of your medication or instructions to instantly filter your roster in real - time. if no items match, tap \" clear search \" to reset the list. # # # can i sort or rearrange the order of my medications? yes! on the * * medicines * * screen, tap the * * sort * * button next to search. you can sort prescriptions by default ( order added ), name ( a - z or z - a ), scheduled time, or choose custom reorder to move medicines up and down into your preferred personal order. # # # what should i do when a doctor stops or changes my prescription? rather than deleting the medicine and losing past compliance history, open the medication from the medicines",
+    "source": "resources/FAQs.md",
+    "chunk_index": 3,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "what should i do when a doctor stops or changes my prescription? rather than deleting the medicine and losing past compliance history, open the medication from the medicines screen, tap * * edit * *, and select * * discontinue / archive * *. this moves the medicine to your * * discontinued medications * * section at the bottom of the medicines screen, neatly organized in an expandable and collapsible accordion. past calendar logs and adherence analytics remain completely intact, and you can expand the section to reactivate any medication at any time. # # # can i customize the bottom navigation bar or hide the ' + ' button? yes! in * * menu > preferences > appearance * *, turn on * * hide navigation add button * *. the 4 main tabs ( ` home `, ` schedule `, ` medicines `, ` menu ` ) expand symmetrically across the bar ( 25 % width each ), and a convenient * * \" add medicine \" * * button appears cleanly directly below your active medications on the medicines screen. # # # does dosezy support sprays or inhalers? yes! dosezy supports spray formulations with a dedicated ` spray ` dosage unit and an intuitive ` spray ` bottle shape icon",
+    "source": "resources/FAQs.md",
+    "chunk_index": 4,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "##s or inhalers? yes! dosezy supports spray formulations with a dedicated ` spray ` dosage unit and an intuitive ` spray ` bottle shape icon, ideal for nasal, throat, and topical spray medications. # # # can i view today ' s medication schedule as a timeline? yes! dosezy offers an optional vertical * * timeline mode * * that displays the day ' s medications sequentially along a continuous progress line with color - coded status nodes. you can switch between the standard card layout and timeline mode anytime by tapping the timeline icon on the home top bar or toggling * * timeline mode * * in * * menu > preferences > appearance * *. - - - # # critical full - screen alarms & physical controls # # # can i choose between full - screen alarms and standard notifications? yes! in * * menu > preferences > notifications & alarms > reminder style * *, you can select whether your reminders ring as * * alarms * * ( high - priority full - screen alerts with continuous sound that bypass do not disturb ) or * * notifications * * ( standard heads - up notification banners with audio chimes that respect do not disturb ). you can also set this individually per medication when adding or editing a",
+    "source": "resources/FAQs.md",
+    "chunk_index": 5,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "* ( standard heads - up notification banners with audio chimes that respect do not disturb ). you can also set this individually per medication when adding or editing a prescription. # # # what happens if i take multiple medicines at the same time? dosezy automatically groups medicines scheduled for the exact same minute ( e. g., 8 : 00 am ) into a single grouped alarm screen. you will see an interactive checklist of every medicine in that time slot with photos and meal instructions, along with a green * * \" take all \" * * button and an orange * * \" snooze \" * * button, preventing overlapping or conflicting alarms. # # # can i silence an active alarm using physical buttons? yes! simply press the * * volume up * * or * * volume down * * button on your device. dosezy intercepts the physical volume key to immediately silence audio and stop vibration without dismissing the alarm or requiring you to unlock your phone. # # # what happens if i press the back button or use the back gesture during an alarm? dosezy automatically triggers a safe snooze for your configured duration. this ensures that accidental back gestures or device handling do not dismiss alarms into an unmonitored pending or missed state. # #",
+    "source": "resources/FAQs.md",
+    "chunk_index": 6,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "##e for your configured duration. this ensures that accidental back gestures or device handling do not dismiss alarms into an unmonitored pending or missed state. # # # how do slide to take and slide to snooze gestures work? to prevent accidental dismissals when waking up half - asleep, dosezy ' s alarms feature dedicated sliding gesture tracks by default : slide the green track left to record doses as taken ( or \" take all \" ), and slide the orange track right to snooze. the actions are never combined, keeping each intent distinct and safe. if you prefer immediate single - tap buttons, you can turn off * * slide to take & snooze * * anytime in * * menu > preferences > notifications & alarms * *. # # # can i customize alarm sounds, duration, and volume? yes! go to * * menu > preferences > notifications & alarms * * : - * * alarm sound * * : choose between dosezy ' s built - in alert tones ( * gentle chime *, * crystal pulse *, etc. ), system alarms, or your own custom device ringtones with in - app audio preview playback. - * * alarm sound duration * * : set how long the alarm rings",
+    "source": "resources/FAQs.md",
+    "chunk_index": 7,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "alarms, or your own custom device ringtones with in - app audio preview playback. - * * alarm sound duration * * : set how long the alarm rings before stopping ( ` 30s `, ` 1m `, ` 2m `, ` 3m `, ` 5m `, or continuous loop ). - * * alarm sound volume * * : adjust the dedicated audio volume slider. # # # can i change how long the snooze button pauses alarms? yes! in * * menu > preferences > notifications & alarms > default snooze duration * *, choose between * * 5, 10, 15, 20, or 30 minutes * *. your chosen duration dynamically applies to full - screen alarm popups and notification action buttons. you can also enable * * custom snooze options * * to choose between 5m, 10m, 15m, 20m, or 30m chips directly on the alarm screen when it rings. # # # what are nagging reminders and how do they work? if you tend to sleep through alarms or get sidetracked, turn on * * nagging reminders * * in * * menu > preferences > notifications & alarms * *. dosezy will repeat",
+    "source": "resources/FAQs.md",
+    "chunk_index": 8,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "sidetracked, turn on * * nagging reminders * * in * * menu > preferences > notifications & alarms * *. dosezy will repeat periodic reminder alarms every 5, 10, or 15 minutes up to 1, 2, 3, 5, or 10 times, or continuously until you confirm the dose as taken. # # # what is the intake countdown safeguard? designed for adhd and busy routines, the * * intake countdown safeguard * * starts a timer ( 60s, 120s, 180s, or 300s ) when you tap \" take \". if you get distracted and walk away before actually consuming your medication, dosezy sounds an automatic re - alert so no dose is forgotten. # # # can i mask sensitive prescription names on my lock screen? yes! in * * menu > preferences > notifications & alarms * *, turn on * * mask details on lock screen * *. the notification alerts you to take your medicine while keeping specific medication names and dosages hidden until your phone is unlocked. - - - # # clinical dose skipping, intake undo & past dose logging # # # can i mark a dose from yesterday or a previous day as taken? yes! on the * * schedule * * screen, navigate to the",
+    "source": "resources/FAQs.md",
+    "chunk_index": 9,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "logging # # # can i mark a dose from yesterday or a previous day as taken? yes! on the * * schedule * * screen, navigate to the past date on the calendar. dosezy allows you to tap any missed dose within a 48 - hour clinical window ( yesterday or today ) to record it as taken or skipped with an explanation. when recorded, your pill inventory stock is automatically decremented and an audit tag ` [ logged retrospectively ] ` is added to ensure transparency in reports for your doctor. entries older than 48 hours are permanently locked to preserve the clinical authenticity of historical records. # # # what if i took my medicine earlier but forgot to log it? dosezy allows you to manually record your exact dose time. when confirming a dose later in the day, you can select the actual past time you consumed the medication instead of recording the current moment. this keeps your daily timeline and compliance records strictly accurate. # # # can i skip a dose if i am unwell, fasting, or advised by my doctor? yes! dosezy provides an opt - in * * clinical dose skipping * * feature : 1. go to * * menu > preferences > dose tracking * * and enable * * allow dose skipping * *. 2. a secondary",
+    "source": "resources/FAQs.md",
+    "chunk_index": 10,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "* * feature : 1. go to * * menu > preferences > dose tracking * * and enable * * allow dose skipping * *. 2. a secondary * * \" skip \" * * button will appear on your home dose cards and full - screen alarm screens. 3. tapping skip requires selecting a standardized clinical reason : - * doctor advised pause * - * side effects / adverse reaction * - * fasting / medical procedure * - * nausea / vomiting / illness * - * ran out of medicine * - * other reason * 4. skipped doses display an informative ` skipped : < reason > ` badge and do * * not * * penalize your compliance streak in analytics adherence calculations. # # # what if i accidentally tap \" take \" or \" skip \" by mistake? dosezy provides a configurable * * dose undo * * safety feature : 1. to enable undo, go to * * menu > preferences > dose tracking * * and switch on * * allow dose undo * * ( disabled by default to prevent accidental reversals ). 2. when enabled, if you mark a dose as taken or late, you can tap * * \" undo \" * * on the 5 - second reminder snackbar or directly on the dose card. 3",
+    "source": "resources/FAQs.md",
+    "chunk_index": 11,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "dose as taken or late, you can tap * * \" undo \" * * on the 5 - second reminder snackbar or directly on the dose card. 3. dosezy displays a quick confirmation prompt asking you to confirm the undo. once confirmed, your dose reverts back to pending and any deducted pills are safely returned to your stock inventory. # # # can i add a note or record symptoms when taking a dose? yes! dosezy lets you record meal details, symptoms, or side effects for every dose : 1. go to * * menu > preferences * * and turn on * * dose notes * *. ( when turned off, notes are completely disabled and \" + add note \" is hidden ). 2. with dose notes enabled, a * * \" + add note \" * * button appears on taken doses. you can also turn on * * prompt on dose taken * * if you want dosezy to automatically open the note prompt whenever you mark a dose as taken or late. 3. you can quickly tap suggested tags ( like * \" with food \" *, * \" empty stomach \" *, * \" before meal \" *, * \" mild nausea \" *, * \" headache \" *, * \" dizziness \" * ) or type",
+    "source": "resources/FAQs.md",
+    "chunk_index": 12,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "\" *, * \" before meal \" *, * \" mild nausea \" *, * \" headache \" *, * \" dizziness \" * ) or type your own custom notes. 4. if you do not need a note for that dose, simply tap * * skip * * to continue without saving notes. 5. your notes appear directly on the dose card and schedule calendar. you can also tap the note text anytime on a taken card or calendar item to view or update your note later. # # # can i customize when a dose is considered \" late \" or \" missed \"? yes! go to * * menu > preferences > dose tracking * * : - * * consider late after * * : choose from granular intervals including 15, 30, 45 minutes, 1 hour, 1. 5 hours, 2 hours, 3 hours, or 4 hours ( default is 3 hours ). - * * consider missed after * * : choose from intervals including 30, 45 minutes, 1 hour, 1. 5 hours, 2 hours, 3 hours, 4 hours, 6 hours, 8 hours, or 12 hours ( default is 6 hours ). - - - # # reliability shield & notification troubleshooting # # # what is the green shield icon at the",
+    "source": "resources/FAQs.md",
+    "chunk_index": 13,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "hours ( default is 6 hours ). - - - # # reliability shield & notification troubleshooting # # # what is the green shield icon at the top of the screen? the shield on the top bar is the * * notification reliability status * * button. it stays accessible on every main screen and subpage. tapping it opens a live system diagnostic checklist : - * * exact alarms * * : checks if android allows precision alarms to wake your device on time. - * * notifications * * : checks if notifications are permitted. - * * battery optimization * * : checks if background power restrictions are disabled so android does not sleep dosezy when your screen is turned off. if any system setting is preventing alarms, the shield displays a warning color and provides 1 - tap links directly to your device settings ( including manufacturer - specific guides for samsung, xiaomi, etc. ). - - - # # pill stock inventory & refill warnings # # # how does tablet stock tracking work? when adding or editing a medicine : 1. turn on * * track stock inventory * *. 2. enter your * * current stock * * ( e. g., ` 60 ` pills ) and * * refill warning threshold * * ( e.",
+    "source": "resources/FAQs.md",
+    "chunk_index": 14,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": ". enter your * * current stock * * ( e. g., ` 60 ` pills ) and * * refill warning threshold * * ( e. g., ` 10 ` pills ). 3. every time you mark a dose as * * taken * *, dosezy automatically deducts your dosage count from your stock. 4. when stock reaches or falls below your threshold, an orange * * refill warning : x left * * badge appears on your home screen and medicines list so you remember to refill your prescription. # # # can i compile and send prescription refill orders to my pharmacy? yes! dosezy includes a built - in * * pharmacy refill order generator * * : 1. open the * * menu * * tab and select * * pharmacy refill order * * under data management. 2. * * multi - profile family consolidation * * : combine prescriptions for multiple family members into a single unified refill order, or generate an order for an individual profile. 3. filter by * * low stock only * * ( prescriptions at or under warning threshold ) or * * all active * * medications. 4. select your desired supply duration ( * * 15 days * *, * * 30 days",
+    "source": "resources/FAQs.md",
+    "chunk_index": 15,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "under warning threshold ) or * * all active * * medications. 4. select your desired supply duration ( * * 15 days * *, * * 30 days * *, * * 60 days * *, or * * 90 days * * ). 5. * * smart bottle supply * * : for liquids and eye drops, dosezy automatically computes orders in whole bottles rather than raw drops or milliliters, accounting for standard bottle volumes. 6. review the formatted checklist in the live preview box with clean whatsapp markdown formatting. 7. tap * * share via chat * * to instantly send the formatted order to your pharmacist via whatsapp, telegram, or sms, or tap * * copy to clipboard * * to paste it anywhere. - - - # # calendar & adherence analytics # # # how do i check past days or upcoming schedules? tap the * * schedule * * tab at the bottom to view the interactive day and month calendar. colored adherence dots on each calendar day indicate whether past doses were taken on time ( green ), late ( orange ), missed ( red ), or skipped ( blue ). tapping any day instantly displays the chronological schedule for that date. # # # is",
+    "source": "resources/FAQs.md",
+    "chunk_index": 16,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "late ( orange ), missed ( red ), or skipped ( blue ). tapping any day instantly displays the chronological schedule for that date. # # # is the schedule calendar accessible with talkback screen readers? yes! dosezy provides full accessibility support on the calendar. talkback announces the exact status of each dose ( * \" taken \" *, * \" late \" *, * \" skipped \" *, * \" missed \" *, * \" pending \" * ) rather than generic status indicators. # # # can i make scheduled days more visible on the calendar? yes! in * * menu > preferences > appearance * *, turn on * * thicker calendar day highlight * *. this outlines every day that has scheduled doses with a full color - coded border frame and subtle container tint instead of only displaying an underline, making active medication days stand out immediately. # # # where can i see my adherence percentage score? go to * * menu > analytics * *. you will see your overall adherence percentage ring ( e. g., ` 94 % adherence ` ), multi - ring comparisons, and total breakdowns of on - time, late, skipped, and missed doses across * * today * *, * * 7 days * *, * * 30",
+    "source": "resources/FAQs.md",
+    "chunk_index": 17,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "total breakdowns of on - time, late, skipped, and missed doses across * * today * *, * * 7 days * *, * * 30 days * *, * * 90 days * *, and * * all time * *. - - - # # emergency calling & personal contacts # # # how do i call emergency services or personal contacts? 1. open * * menu > emergency contacts * *. 2. * * official emergency services * * : dosezy automatically detects your country ( india, usa / canada, uk, eu, china, japan, russia, brazil, bangladesh, australia ) to dial ambulance, fire, or police in 1 tap. 3. * * personal emergency contacts * * : tap * * \" + add emergency contact \" * * to save your family doctor, daughter / son, or caregiver ' s phone number for instant 1 - tap dialing. 4. each family profile manages its own private list of emergency contacts, keeping personal doctor numbers isolated between household members. - - - # # family profiles, backups & doctor reports # # # can i manage medicines for multiple family members? yes! tap * * menu > switch profile * * to create separate profiles for parents, children, or",
+    "source": "resources/FAQs.md",
+    "chunk_index": 18,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "# # can i manage medicines for multiple family members? yes! tap * * menu > switch profile * * to create separate profiles for parents, children, or partners. each profile tracks its own medicines, dosages, stock counts, personal emergency contacts, and compliance logs completely independently. - * * accidental deletion safeguards * * : single - profile accounts cannot delete their only profile. deleting secondary profiles requires a deliberate * * 5 - second safety countdown * * before the confirmation button activates, preventing accidental loss of medical records. # # # how do i back up my data or transfer it to a new phone? 1. go to * * menu > backup & restore * *. 2. tap * * export backup * * to generate a complete encrypted backup zip archive containing all your profiles, medications, logs, and emergency contacts. 3. save the file or share it directly to google drive, internal storage, or email. 4. on your new phone, install dosezy, open * * menu > backup & restore * *, tap * * restore backup * *, and select your zip file. # # # what happens if the backup contains profiles that already exist on my phone? dosezy includes an intelligent * * profile",
+    "source": "resources/FAQs.md",
+    "chunk_index": 19,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": ", and select your zip file. # # # what happens if the backup contains profiles that already exist on my phone? dosezy includes an intelligent * * profile import dialog * * with granular conflict resolution : - * * create new profile * * : imports the profile under a new name without overwriting existing data. - * * merge records * * : merges incoming medicines and history into your existing profile. - * * replace profile * * : overwrites the existing profile with the backup data. # # # how do i share my medicine logs with my doctor? 1. go to * * menu > export data * *. 2. choose * * pdf report * * to generate a clean, printable medical report with current prescriptions, dosages, food instructions, skipped dose summaries, and adherence rates. 3. tap * * export * * and share it via whatsapp, email, or print it directly for your appointment. 4. you can also export a * * csv * * spreadsheet or * * json backup * * for digital record - keeping. # # # can i add a dosezy widget to my android home screen? yes! dosezy includes an interactive home screen widget : 1.",
+    "source": "resources/FAQs.md",
+    "chunk_index": 20,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": ". # # # can i add a dosezy widget to my android home screen? yes! dosezy includes an interactive home screen widget : 1. long - press any empty space on your android home screen and tap * * widgets * *. 2. locate * * dosezy * * and drag it onto your screen. 3. select whether the widget should follow your * * active app profile * * dynamically or lock onto a * * specific family member profile * * ( such as a parent or child ). 4. the widget displays the day ' s scheduled medicines, dosage details, and intake times in a scrollable list. tapping the widget opens dosezy and automatically selects that profile. - - - # # # need further assistance? contact support from * * menu > more > help & support * * inside the app or email * * reach. saad @ outlook. com * *.",
+    "source": "resources/FAQs.md",
+    "chunk_index": 21,
+    "token_count": 189,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "faq",
+      "source_status": "active",
+      "filename": "FAQs.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "# dosezy user manual welcome to * * dosezy * *! dosezy is your personal, accessible, and 100 % private companion for managing daily medications, setting critical reminders, tracking pill inventory, monitoring adherence, and keeping your whole family healthy. this guide provides a complete, step - by - step walkthrough of all features in dosezy in clear, everyday language. - - - # # table of contents 1. [ app overview, 12 languages & dark / light themes ] ( # 1 - app - overview - 12 - languages - - darklight - themes ) 2. [ home dashboard, live status badges & intake undo ] ( # 2 - home - dashboard - live - status - badges - - intake - undo ) 3. [ clinical dose skipping & mandatory reason logging ] ( # 3 - clinical - dose - skipping - - mandatory - reason - logging ) 4. [ daily completion banner & full schedule review ] ( # 4 - daily - completion - banner - - full - schedule - review ) 5. [ adding, editing, searching & archiving medications ] ( # 5 - adding - editing - searching - - archiving - medications ) - [ live medication search & instant feedback ] ( # live - medication - search - - instant -",
+    "source": "resources/UserManual.md",
+    "chunk_index": 0,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "adding - editing - searching - - archiving - medications ) - [ live medication search & instant feedback ] ( # live - medication - search - - instant - feedback ) - [ medicine photos & food instructions ] ( # medicine - photos - - food - instructions ) - [ dosage units & frequency patterns ] ( # dosage - units - - frequency - patterns ) - [ multi - dose quick presets ( 1x, 2x, 3x, 4x ) ] ( # multi - dose - quick - presets - 1x - 2x - 3x - 4x ) - [ 12 - first grid time picker ] ( # 12 - first - grid - time - picker ) - [ sorting & custom reordering ] ( # sorting - - custom - reordering ) - [ discontinuing & archiving medications ] ( # discontinuing - - archiving - medications ) - [ form validation feedback & confirmation ] ( # form - validation - feedback - - confirmation ) 6. [ critical full - screen alarms, volume rocker silence & custom tones ] ( # 6 - critical - full - screen - alarms - volume - rocker - silence - - custom - tones ) - [ grouped alarms & \" take all \" ]",
+    "source": "resources/UserManual.md",
+    "chunk_index": 1,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "# 6 - critical - full - screen - alarms - volume - rocker - silence - - custom - tones ) - [ grouped alarms & \" take all \" ] ( # grouped - alarms - - take - all ) - [ hardware volume rocker silence ] ( # hardware - volume - rocker - silence ) - [ back - gesture snooze ] ( # back - gesture - snooze ) - [ persistent nagging alarms ] ( # persistent - nagging - alarms ) - [ adhd & distraction intake safeguard ] ( # adhd - - distraction - intake - safeguard ) - [ on - the - fly custom snooze options ] ( # on - the - fly - custom - snooze - options ) - [ customizable alarm duration & audio volume ] ( # customizable - alarm - duration - - audio - volume ) - [ custom ringtone selection ] ( # custom - ringtone - selection ) - [ dynamic snooze presets ] ( # dynamic - snooze - presets ) 7. [ notification reliability shield & diagnostics ] ( # 7 - notification - reliability - shield - - diagnostics ) 8. [ pill inventory, automatic refill warnings & pharmacy refill orders ] (",
+    "source": "resources/UserManual.md",
+    "chunk_index": 2,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "] ( # 7 - notification - reliability - shield - - diagnostics ) 8. [ pill inventory, automatic refill warnings & pharmacy refill orders ] ( # 8 - pill - inventory - automatic - refill - warnings - - pharmacy - refill - orders ) 9. [ interactive schedule calendar & talkback accessibility ] ( # 9 - interactive - schedule - calendar - - talkback - accessibility ) 10. [ adherence analytics & multi - ring scores ] ( # 10 - adherence - analytics - - multi - ring - scores ) 11. [ structured preferences & dose tracking settings ] ( # 11 - structured - preferences - - dose - tracking - settings ) 12. [ international emergency dialing & profile contacts ] ( # 12 - international - emergency - dialing - - profile - contacts ) 13. [ managing multiple family profiles & deletion safeguards ] ( # 13 - managing - multiple - family - profiles - - deletion - safeguards ) 14. [ full zip backup, selective restore & conflict resolution ] ( # 14 - full - zip - backup - selective - restore - - conflict - resolution ) 15. [ doctor pdf reports & csv adherence logs ] ( # 15 - doctor - pdf - reports - - csv - adherence - logs ) 16",
+    "source": "resources/UserManual.md",
+    "chunk_index": 3,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": ") 15. [ doctor pdf reports & csv adherence logs ] ( # 15 - doctor - pdf - reports - - csv - adherence - logs ) 16. [ home screen widget & profile binding ] ( # 16 - home - screen - widget - - profile - binding ) 17. [ help, support, about dosezy & updates ] ( # 17 - help - support - about - dosezy - - updates ) - - - # # 1. app overview, 12 languages & dark / light themes dosezy is built with accessibility and visual clarity as foundational principles : high - contrast color palettes, large typography, direct navigation, and zero confusing multi - tier submenus. # # # 12 supported world languages : dosezy is fully translated across all screens, notification actions, alarms, and settings in * * 12 native languages * * : - english - spanish ( espanol ) - hindi ( हिनदी ) - chinese ( 中 文 ) - portuguese ( portugues ) - arabic ( العربية ) - french ( francais ) - german ( deutsch ) - japanese ( 日 本 語 ) - russian ( русскии",
+    "source": "resources/UserManual.md",
+    "chunk_index": 4,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "- french ( francais ) - german ( deutsch ) - japanese ( 日 本 語 ) - russian ( русскии ) - italian ( italiano ) - bengali ( বাংলা ) # # # changing language, theme, or time format : 1. tap the * * menu * * tab at the bottom right. 2. tap * * preferences * *. 3. under the * * general * * section : - * * language * * : select your preferred language. - * * time format * * : select * * 12 - hour ( am / pm ) * * or * * 24 - hour * * display. 4. under the * * appearance * * section : - * * theme * * : choose between * * system default * *, * * light mode * *, or sleek * * dark mode * *. - * * timeline mode * * : toggle the vertical progress timeline mode on the home screen. - * * thicker calendar day highlight * * : toggle full - frame outlines for scheduled calendar days. - * * hide navigation add button * * : symmetrically distribute bottom navigation tabs and place the add button on the medicines screen. - - - # #",
+    "source": "resources/UserManual.md",
+    "chunk_index": 5,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "- * * hide navigation add button * * : symmetrically distribute bottom navigation tabs and place the add button on the medicines screen. - - - # # 2. home dashboard, live status badges & intake undo the * * home * * screen displays your daily schedule in two clean visual layouts that you can switch between instantly : - * * standard card view * * : doses grouped by chronological time headers ( ` 08 : 00 am `, ` 01 : 00 pm `, etc. ) with countdown badges. - * * timeline mode * * : an expanded vertical timeline view displaying the day ' s medications along a continuous progress line with color - coded status nodes ( green for taken, amber for late, red for missed, blue for pending ). tap the timeline icon in the top app bar or toggle it in * * menu > preferences > appearance * *. # # # time section headers ( standard view ) : below each time header, dosezy displays real - time countdown badges : - ` to be taken in 45m ` : an upcoming dose. - ` 1h 15m ago ` : a dose whose time has passed. - ` all medications taken ` : all pills in this time slot are logged. # # # medication card badges &",
+    "source": "resources/UserManual.md",
+    "chunk_index": 6,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "` : a dose whose time has passed. - ` all medications taken ` : all pills in this time slot are logged. # # # medication card badges & actions : each medicine card displays its pill visual, name, dosage, meal instructions, stock warning, and direct action buttons : - * * taken * * : green button displaying the recorded completion timestamp ( e. g., ` taken at 08 : 05 am ` ). - * * take * * : primary action button for due or upcoming medications. - * * mark late * * : appears when a dose is past due but within your configured late window. - * * missed * * : indicates a dose that passed your missed window. - * * skipped * * : shows when a dose was paused for clinical reasons with its recorded explanation ( e. g., ` skipped : doctor advised pause ` ). # # # configurable dose undo with safety confirmation : to prevent accidental reversals, dosezy includes an optional dose undo safety setting : 1. enable * * allow dose undo * * under * * menu > preferences > dose tracking * * ( disabled by default to protect your stock counts and compliance logs ). 2. when enabled, if you mark",
+    "source": "resources/UserManual.md",
+    "chunk_index": 7,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "* * menu > preferences > dose tracking * * ( disabled by default to protect your stock counts and compliance logs ). 2. when enabled, if you mark a dose as taken or late : - a 5 - second snackbar appears at the bottom with an * * \" undo \" * * button. - the medication card also displays an interactive * * \" undo \" * * button. 3. tapping undo displays a confirmation dialog asking you to confirm the reversal. once confirmed, dosezy resets the dose status back to * * pending * * and safely returns any deducted tablet counts to your inventory. 4. when disabled, recorded doses remain safely locked to prevent inadvertent taps. # # # per - dose notes & meal logging : track how your medications affect you or record meal conditions at intake : 1. enable * * dose notes * * in * * menu > preferences * *. when turned off, note - taking is completely disabled and \" + add note \" is hidden for a clean, distraction - free home screen. 2. when dose notes is enabled : - a * * \" + add note \" * * button appears beneath taken doses, allowing you to attach notes or symptoms whenever you want. - you can also toggle * * prompt",
+    "source": "resources/UserManual.md",
+    "chunk_index": 8,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "+ add note \" * * button appears beneath taken doses, allowing you to attach notes or symptoms whenever you want. - you can also toggle * * prompt on dose taken * * to automatically open the note prompt whenever a dose is marked as taken or late. 3. tap quick suggestion tags ( such as * \" with food \" *, * \" empty stomach \" *, * \" before meal \" *, * \" after meal \" *, * \" mild nausea \" *, * \" headache \" *, * \" dizziness \" * ) or type custom symptoms and notes. 4. tap * * save note * * to log the note with your dose, or tap * * skip * * if you do not need to add notes. 5. recorded notes appear directly on the dose card and in your schedule calendar. 6. * * view & edit anytime * * : tap the note text or icon on any taken card or calendar item to update your notes whenever needed. # # # manually record dose time : if you took a medication earlier but forgot to mark it on time, you can record the exact past time you took the dose : 1. when logging a dose, select or enter the exact time the medication was consumed. 2. if note logging is enabled",
+    "source": "resources/UserManual.md",
+    "chunk_index": 9,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "past time you took the dose : 1. when logging a dose, select or enter the exact time the medication was consumed. 2. if note logging is enabled, you can also attach intake notes directly within the time picker dialog. 3. dosezy logs your specified intake time rather than just the current moment, ensuring your adherence timeline and medical compliance history remain strictly accurate. # # # crossing time zones ( doses shift with you ) : when traveling across time zones : - dosezy automatically keeps your scheduled medication routine anchored to your daily local routine without time distortion. - reminders shift seamlessly with your active timezone so you never have to manually recalibrate schedules while traveling. - - - # # 3. clinical dose skipping & mandatory reason logging patients occasionally need to pause medications due to adverse reactions, doctor instructions, fasting, or illness. dosezy provides a medically sound dose skipping workflow that protects both clinical safety and adherence records. # # # enabling dose skipping : 1. tap * * menu > preferences * *. 2. scroll to the * * dose tracking * * section. 3. switch on * * allow dose skipping * *. # # # skipping a dose : 1. on your home screen dose cards or on full - screen alarm",
+    "source": "resources/UserManual.md",
+    "chunk_index": 10,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": ". switch on * * allow dose skipping * *. # # # skipping a dose : 1. on your home screen dose cards or on full - screen alarm alerts, an outlined * * \" skip \" * * button will appear. 2. tapping skip opens the * * clinical skip reason * * dialog. 3. select from 6 standardized clinical reasons : - * * doctor advised pause * * : temporary suspension recommended by your physician. - * * side effects / adverse reaction * * : experiencing intolerance, allergy, or adverse symptoms. - * * fasting / medical procedure * * : required to fast before lab tests or clinical procedures. - * * nausea / vomiting / illness * * : acute sickness preventing oral intake. - * * ran out of medicine * * : awaiting pharmacy refills. - * * other reason * * : freeform clinical notes. 4. tap * * confirm skip * *. the dose card is marked with a clear ` skipped : < reason > ` badge. 5. * * adherence protection * * : clinically skipped doses are intentionally excluded from missed penalties in your analytics compliance score. 6. * * reversible undo * * : if taken later or logged in error",
+    "source": "resources/UserManual.md",
+    "chunk_index": 11,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "skipped doses are intentionally excluded from missed penalties in your analytics compliance score. 6. * * reversible undo * * : if taken later or logged in error, tap * * undo * * on the skipped card to reset status back to pending. - - - # # 4. daily completion banner & full schedule review when all medications scheduled for today are logged : - a cheerful * * all good * * completion banner is displayed at the top of the home screen. - crucially, * * today ' s full medication list remains visible underneath * * in a clean, checked review state. - patients and caregivers can inspect exact dosages, meal notes, and timestamps throughout the day, or tap undo if any entry was logged by mistake. - - - # # 5. adding, editing, searching & archiving medications # # # adding a medication : 1. tap * * medicines * * in the bottom navigation bar. 2. tap * * \" + add medicine \" * * ( or the * * \" add your first medication \" * * button on an empty list ). 3. enter the * * medicine name * * ( e. g., * metformin *, * atorvastatin *, * lisinop",
+    "source": "resources/UserManual.md",
+    "chunk_index": 12,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "enter the * * medicine name * * ( e. g., * metformin *, * atorvastatin *, * lisinopril * ). # # # live medication search & instant feedback : at the top of the * * medicines * * screen, an instant search bar filters large prescription lists in real time by medicine name or instructions. if no medications match your query, dosezy presents an encouraging empty state with a 1 - tap * * \" clear search \" * * action button. # # # medicine photos & food instructions : - * * medicine photo * * : tap the camera icon to photograph your pill box or choose an image from your gallery with built - in cropping. - * * meal instructions * * : choose between : - * before food * - * with food * - * after food * - * no food instructions * # # # dosage units & frequency patterns : - * * dosage * * : enter the quantity ( e. g., ` 1 `, ` 500 ` ) and select the unit : - ` tablet `, ` capsule `, ` mg `, ` mcg `, ` g `, ` ml `, ` drops `, ` puffs `,",
+    "source": "resources/UserManual.md",
+    "chunk_index": 13,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "`, ` capsule `, ` mg `, ` mcg `, ` g `, ` ml `, ` drops `, ` puffs `, ` spray `, or ` units `. - * * pill shape icons * * : choose from 9 distinct medication shapes : round, capsule, oval, liquid, inhaler, injection, drops, patch, and spray bottle. - * * frequency pattern * * : - * * daily * * : every day. - * * weekly * * : choose specific days of the week ( e. g., mon, wed, fri ). - * * monthly * * : choose specific dates of the month ( e. g., 1st, 15th ). - * * as needed ( prn ) * * : for pain relievers or temporary medications taken only when needed. # # # multi - dose quick presets ( 1x, 2x, 3x, 4x ) : populate standard time intervals with a single tap : - * * 1x daily * * : ` 08 : 00 am ` - * * 2x daily * * : ` 08 : 00 am `, ` 08 : 00 pm ` - * * 3x daily * * : ` 08 : 00",
+    "source": "resources/UserManual.md",
+    "chunk_index": 14,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "2x daily * * : ` 08 : 00 am `, ` 08 : 00 pm ` - * * 3x daily * * : ` 08 : 00 am `, ` 02 : 00 pm `, ` 08 : 00 pm ` - * * 4x daily * * : ` 08 : 00 am `, ` 12 : 00 pm `, ` 04 : 00 pm `, ` 08 : 00 pm ` # # # 12 - first grid time picker : tap any dose time chip to open the intuitive time picker : - * * 12 is at the top * * : hour numbers start with 12 followed by 1 to 11 for natural morning / night selection. - * * am / pm toggle * * : 1 - tap switching. - * * quick minute chips * * : tap ` : 00 `, ` : 15 `, ` : 30 `, or ` : 45 `, or slide the minute bar for exact minute precision. # # # sorting & custom reordering : keep your medicines organized just the way you like : 1. on the * * medicines * * screen, tap the * * sort * * button next to search. 2. choose from 5 sorting options : - * * default * * : order medicines were added.",
+    "source": "resources/UserManual.md",
+    "chunk_index": 15,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "tap the * * sort * * button next to search. 2. choose from 5 sorting options : - * * default * * : order medicines were added. - * * name ( a - z ) * * : alphabetical from a to z. - * * name ( z - a ) * * : alphabetical from z to a. - * * scheduled time * * : ordered by earliest scheduled dose of the day. - * * custom reorder * * : manually arrange medications into your personal preferred order using simple up and down arrows. # # # discontinuing & archiving medications : when a treatment course finishes : 1. open the medication from the medicines screen and tap * * edit * *. 2. tap * * discontinue / archive * *. 3. the medicine moves to your * * discontinued medications * * section at the bottom of the medicines screen. it is neatly organized within an expandable and collapsible accordion so active medications remain clutter - free. its past calendar logs, historical compliance rates, and doctor reports are preserved permanently. you can expand the section and reactivate any medication at any time. # # # flexible add medicine placement : when the navigation ' + ' button is hidden via preferences,",
+    "source": "resources/UserManual.md",
+    "chunk_index": 16,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "expand the section and reactivate any medication at any time. # # # flexible add medicine placement : when the navigation ' + ' button is hidden via preferences, an * * \" add medicine \" * * button appears cleanly directly below your active medications roster ( and above the discontinued medications section ). on an empty roster, the friendly initial \" add your first medication \" button guides you. # # # form validation feedback & confirmation : when adding or editing a medication or patient profile, dosezy immediately highlights any missing or invalid required fields ( such as medicine name, dosage, or scheduled days ) with clear red border frames and helpful error labels. this guides you directly to the required correction instead of leaving the save button disabled without explanation. - - - # # 6. critical full - screen alarms, volume rocker silence & custom tones # # # grouped alarms & \" take all \" : when multiple medications are scheduled for the exact same minute : - dosezy rings with a * * single grouped full - screen alarm * * instead of multiple overlapping sound alerts. - the screen displays an interactive checklist with pill names, dosages, meal instructions, and photos. - * * take all ( green button ) * * : confirms all scheduled medicines in that slot with 1 tap",
+    "source": "resources/UserManual.md",
+    "chunk_index": 17,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": ", dosages, meal instructions, and photos. - * * take all ( green button ) * * : confirms all scheduled medicines in that slot with 1 tap and deducts stock automatically. - * * snooze ( orange button ) * * : pauses the alarm for your chosen snooze duration. - individual pills can also be checked off one by one if taking only a subset. # # # slide to take & slide to snooze : to prevent accidental dismissals when waking up or half - asleep : - dosezy features dedicated sliding action tracks : slide the green slider to the left to confirm intake ( or \" take all \" ), and slide the orange slider to the right to snooze. - the two sliding actions are separated into distinct full - width tracks with clear directional arrows. - if you prefer immediate 1 - tap buttons instead of gestures, you can turn off * * slide to take & snooze * * in * * menu > preferences > notifications & alarms * *. # # # hardware volume rocker silence : if an alarm rings during a meeting or while resting, press the * * volume up * * or * * volume down * * button on your phone. dosezy instantly silence",
+    "source": "resources/UserManual.md",
+    "chunk_index": 18,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "rings during a meeting or while resting, press the * * volume up * * or * * volume down * * button on your phone. dosezy instantly silences the ringtone and stops vibration without dismissing the alarm or requiring you to unlock your screen. # # # back - gesture snooze : pressing your device ' s physical or gesture * * back * * button during an active alarm automatically triggers a safe snooze for your configured duration, ensuring doses are never accidentally dismissed into a missed state. # # # persistent nagging alarms : if you tend to sleep through alarms or get sidetracked when a reminder rings : 1. in * * menu > preferences > notifications & alarms * *, turn on * * nagging reminders * *. 2. choose your * * nagging interval * * : repeat every ` 5 minutes `, ` 10 minutes `, or ` 15 minutes `. 3. choose your * * maximum repeats * * : set the alarm to repeat ` 1 `, ` 2 `, ` 3 `, ` 5 `, or ` 10 ` times, or select * * until taken * * for continuous follow - up until you confirm the dose. # # # adhd & distraction intake safeguard : have you ever",
+    "source": "resources/UserManual.md",
+    "chunk_index": 19,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "or select * * until taken * * for continuous follow - up until you confirm the dose. # # # adhd & distraction intake safeguard : have you ever tapped \" take \" on a pill reminder, walked toward the kitchen, gotten distracted, and wondered later if you actually took it? dosezy includes a dedicated countdown timer safeguard : 1. in * * menu > preferences > notifications & alarms * *, switch on * * intake countdown safeguard * *. 2. select a countdown length : ` 60 seconds `, ` 120 seconds ` ( 2 minutes ), ` 180 seconds ` ( 3 minutes ), or ` 300 seconds ` ( 5 minutes ). 3. when you mark a dose as taken, dosezy starts a quiet countdown timer on your screen. if you confirm, the dose is completed. if you get distracted and the countdown expires without final confirmation, dosezy sounds an automatic re - alert to ensure you never miss your medicine. # # # on - the - fly custom snooze options : need more or less time to take your pills? turn on * * custom snooze options * * in * * menu > preferences > notifications & alarms * *. when an alarm rings, dosezy displays quick chips ( `",
+    "source": "resources/UserManual.md",
+    "chunk_index": 20,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "##nooze options * * in * * menu > preferences > notifications & alarms * *. when an alarm rings, dosezy displays quick chips ( ` 5m `, ` 10m `, ` 15m `, ` 20m `, ` 30m ` ) directly on the alert screen so you can pick the exact pause time you need on the fly. # # # customizable reminder styles ( alarms vs notifications ) : under * * menu > preferences > notifications & alarms > reminder style * *, you can customize how reminders alert you : - * * full - screen alarm * * : rings with high - priority full - screen alerts and continuous audio that bypasses do not disturb. ideal for critical medications. - * * notification * * : delivers a standard notification banner with a gentle alert tone, respecting do not disturb. ideal for vitamins and supplements. - * * per - medicine override * * : when adding or editing any medication, you can override your profile default to set specific medications to alarm or notification independently. # # # customizable alarm duration & audio volume : go to * * menu > preferences > notifications & alarms * * : - * * alarm sound duration * * : choose how long",
+    "source": "resources/UserManual.md",
+    "chunk_index": 21,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "duration & audio volume : go to * * menu > preferences > notifications & alarms * * : - * * alarm sound duration * * : choose how long alarms ring before auto - stopping : - ` 30 seconds `, ` 1 minute `, ` 2 minutes `, ` 3 minutes `, ` 5 minutes `, or * * continuous loop * *. - * * alarm sound volume * * : dedicated slider to set the ideal volume level. # # # custom ringtone selection : choose the exact sound you want to wake you up : - select from dosezy ' s built - in alert chimes ( * gentle chime *, * crystal pulse *, * alert beep *, * harmonic rise * ), system alarms, notification tones, or your own custom device ringtones. - includes live audio preview playback directly inside the selector. # # # dynamic snooze presets : configure your preferred snooze duration under * * menu > preferences > notifications & alarms > default snooze duration * * : - choose ` 5 minutes `, ` 10 minutes `, ` 15 minutes `, ` 20 minutes `, or ` 30 minutes `. your preferred duration is dynamically reflected on alarm buttons and",
+    "source": "resources/UserManual.md",
+    "chunk_index": 22,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "` 10 minutes `, ` 15 minutes `, ` 20 minutes `, or ` 30 minutes `. your preferred duration is dynamically reflected on alarm buttons and notification actions. - - - # # 7. notification reliability shield & diagnostics to guarantee alarms ring reliably even during android deep sleep ( doze mode ) : - a persistent * * notification reliability shield * * button is visible on the top bar across all main screens. - when green, all system permissions are verified. - tapping the shield opens a live diagnostic checklist : - * * exact alarms * * : verifies precision alarm dispatch permission. - * * notifications * * : verifies notification channel status. - * * battery optimization * * : checks if background power restrictions are disabled so android does not kill dosezy in the background. - direct links provide 1 - tap access to your device ' s settings, including manufacturer - specific guides for samsung, xiaomi, huawei, oneplus, and oppo devices. - - - # # 8. pill inventory, automatic refill warnings & pharmacy refill orders dosezy includes automatic inventory management and prescription refill order generation so you never run out of vital medications : # # # tracking inventory & refill warnings : 1",
+    "source": "resources/UserManual.md",
+    "chunk_index": 23,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "dosezy includes automatic inventory management and prescription refill order generation so you never run out of vital medications : # # # tracking inventory & refill warnings : 1. in the add / edit medicine screen, turn on * * track stock inventory * *. 2. enter your * * current stock * * count ( e. g., ` 60 ` tablets ). 3. enter your * * refill warning threshold * * ( e. g., ` 10 ` tablets ). 4. * * auto - deduction * * : whenever you tap * * taken * * ( from alarms or the home screen ), dosezy automatically subtracts your dosage amount from your stock. 5. * * low stock alerts * * : when remaining stock reaches or drops below your threshold, an orange * * ` refill warning : x left ` * * badge is displayed on your home screen and medicines list. # # # dosezy pharmacy refill order : when you need to reorder medicines from your local pharmacy or doctor : 1. tap the * * menu * * tab at the bottom right. 2. under the * * data management * * section, tap * * pharmacy refill order * *. 3. * * multi - profile",
+    "source": "resources/UserManual.md",
+    "chunk_index": 24,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "bottom right. 2. under the * * data management * * section, tap * * pharmacy refill order * *. 3. * * multi - profile family consolidation * * : combine prescriptions for multiple family members into a single unified refill order, or generate an order for a single profile. 4. choose your filter : - * * low stock only * * : quickly displays only medications currently at or below their refill warning threshold. - * * all active * * : displays all currently active prescriptions in your profile. 5. select your * * supply duration * * : - choose ` 15 days `, ` 30 days `, ` 60 days `, or ` 90 days `. - * * smart bottle supply * * : for liquid medications and eye drops, dosezy automatically computes orders in whole bottles rather than raw drops or milliliters, accounting for standard bottle volumes. 6. review individual medications using checkboxes, or tap * * select all / deselect all * *. 7. * * live preview * * : check the formatted prescription order in the preview box with clean whatsapp markdown formatting ( patient name, date, required supplies, current stock, and dosage instructions ). 8. tap *",
+    "source": "resources/UserManual.md",
+    "chunk_index": 25,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "box with clean whatsapp markdown formatting ( patient name, date, required supplies, current stock, and dosage instructions ). 8. tap * * share via chat * * to instantly send the order via whatsapp, telegram, sms, or any installed messaging app, or tap * * copy to clipboard * * to paste it anywhere. - - - # # 9. interactive schedule calendar & talkback accessibility tap * * schedule * * in the bottom navigation bar to view your full medication calendar : - * * week & month views * * : tap any day ( mon - sun ) or date on the calendar to view past or future schedules. - * * retrospective missed dose logging & 48 - hour clinical guard * * : missed doses from yesterday or earlier within a 48 - hour clinical window can be tapped directly on the calendar to open an interactive action sheet. you can mark the dose as taken ( which automatically decrements medicine stock and tags the dose note with ` [ logged retrospectively ] ` for physician audit transparency ) or skipped with an explanation. entries older than 48 hours are permanently locked to preserve clinical authenticity and prevent record tampering. - * * color - coded adherence dots * * : - * * green * * : all",
+    "source": "resources/UserManual.md",
+    "chunk_index": 26,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "locked to preserve clinical authenticity and prevent record tampering. - * * color - coded adherence dots * * : - * * green * * : all scheduled doses taken on time. - * * orange * * : taken late. - * * red * * : missed doses. - * * blue * * : clinically skipped doses. - * * fast date switching * * : tapping any day instantly loads that date ' s chronological schedule. - * * dose notes in schedule view * * : taken medications display their recorded meal and symptom notes directly under each entry. tap any entry or note to review or update notes for that day. - * * thicker calendar day highlight * * : in * * menu > preferences > appearance * *, turn on * * thicker calendar day highlight * * to display a full color - coded border frame around every calendar day with scheduled medications, rather than only bottom underlines. - * * talkback screen reader support * * : for visually impaired users, every status badge and icon announces its exact status ( e. g., * \" taken \" *, * \" late \" *, * \" skipped \" *, * \" missed \" *, * \" pending \" * ), rather than generic labels",
+    "source": "resources/UserManual.md",
+    "chunk_index": 27,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "\" *, * \" late \" *, * \" skipped \" *, * \" missed \" *, * \" pending \" * ), rather than generic labels. - - - # # 10. adherence analytics & multi - ring scores tap * * analytics * * from the menu to view comprehensive compliance charts : - * * time range selector * * : view metrics across * * today * *, * * 7 days * *, * * 30 days * *, * * 90 days * *, and * * all time * *. - * * multi - ring breakdown * * : compares adherence rates across multiple timeframes side - by - side. - * * total progress ring * * : displays your cumulative adherence percentage ( e. g., ` 94 % adherence ` ). - * * detailed dose metrics * * : total counts of * * on - time * *, * * late * *, * * skipped * *, and * * missed * * doses. - * * per - medicine compliance * * : see individual compliance rates for each medicine to identify specific challenges. - - - # # 11. structured preferences & dose tracking settings the * * preferences * * screen is organized into dedicated categories : - * * general * *",
+    "source": "resources/UserManual.md",
+    "chunk_index": 28,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "- - - # # 11. structured preferences & dose tracking settings the * * preferences * * screen is organized into dedicated categories : - * * general * * : - * * language * * : selection across 12 languages. - * * time format * * : 12 - hour ( am / pm ) or 24 - hour. - * * appearance * * : - * * theme * * : system default, light mode, or dark mode. - * * timeline mode * * : clean vertical progress timeline for daily medications on the home screen ( can also be toggled from the home top bar ). - * * thicker calendar day highlight * * : outlines all days with scheduled doses on the calendar with full color - coded frames instead of only bottom underlines. - * * hide navigation add button * * : toggle to hide the center ' + ' button from the bottom navigation bar. when enabled, the remaining 4 tabs ( ` home `, ` schedule `, ` medicines `, ` menu ` ) expand symmetrically across the bar ( 25 % each ), and an \" add medicine \" button is cleanly placed on the medicines screen below your active prescriptions. - * * notifications & alarms * * : - * * reminder style * *",
+    "source": "resources/UserManual.md",
+    "chunk_index": 29,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "button is cleanly placed on the medicines screen below your active prescriptions. - * * notifications & alarms * * : - * * reminder style * * : choose between full - screen alarms ( continuous ringtones bypassing do not disturb ) and standard notifications ( alert tone respecting do not disturb ), with per - medication overrides. - * * slide to take & snooze * * : dedicated sliding action tracks on full - screen alarms to prevent accidental dismissals ( enabled by default ; turn off for standard tap buttons ). - * * nagging reminders * * : repeat reminders every 5, 10, or 15 minutes up to 10 times or until confirmed taken. - * * intake countdown safeguard * * : automatically re - alerts after 60s, 120s, 180s, or 300s if you get distracted before taking your medicine. - * * mask details on lock screen * * : protect sensitive prescription names and strengths from displaying on your lock screen until unlocked. - * * default snooze duration * * : choose 5, 10, 15, 20, or 30 minutes. - * * alarm sound * * : select custom ringtones, system alerts, or built - in chimes with audio preview. - *",
+    "source": "resources/UserManual.md",
+    "chunk_index": 30,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "30 minutes. - * * alarm sound * * : select custom ringtones, system alerts, or built - in chimes with audio preview. - * * alarm sound duration * * : set ring length ( 30s to 5m or continuous loop ). - * * sound volume * * : dedicated alarm volume slider. - * * dose tracking * * : - * * allow dose undo * * : toggle whether taken or late doses can be undone from dose cards or reminder snackbars ( default is disabled for safety ). includes a confirmation dialog before reversing status and restoring pill stock. - * * add note on dose taken * * : prompt for notes ( meal context, side effects, symptoms ) whenever a dose is marked as taken ( default is disabled ). - * * allow dose skipping * * : toggle the clinical dose skipping option. - * * consider late after * * : select how long after the scheduled time a dose is considered late before shifting from pending. choose from granular intervals : ` 15 minutes `, ` 30 minutes `, ` 45 minutes `, ` 1 hour `, ` 1. 5 hours `, ` 2 hours `, ` 3 hours `, or ` 4 hours ` ( default is *",
+    "source": "resources/UserManual.md",
+    "chunk_index": 31,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": ", ` 1 hour `, ` 1. 5 hours `, ` 2 hours `, ` 3 hours `, or ` 4 hours ` ( default is * * 3 hours * * ). - * * consider missed after * * : select when an untaken dose transitions to missed. choose between ` 30 minutes `, ` 45 minutes `, ` 1 hour `, ` 1. 5 hours `, ` 2 hours `, ` 3 hours `, ` 4 hours `, ` 6 hours `, ` 8 hours `, or ` 12 hours ` ( default is * * 6 hours * * ). - - - # # 12. international emergency dialing & profile contacts in urgent situations, dosezy provides rapid, 1 - tap emergency calling : 1. tap * * menu > emergency contacts * *. 2. * * official emergency services * * : - dosezy automatically detects your country or lets you select from 10 regions : - * * india * * ( 108 / 101 / 100 / 112 ) - * * usa & canada * * ( 911 ) - * * united kingdom * * ( 999 / 112 ) - * * european union * * ( 112 ) - * * china * * ( 120 / 119 / 110 )",
+    "source": "resources/UserManual.md",
+    "chunk_index": 32,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "* * ( 999 / 112 ) - * * european union * * ( 112 ) - * * china * * ( 120 / 119 / 110 ) - * * japan * * ( 119 / 110 ) - * * russia * * ( 103 / 101 / 102 / 112 ) - * * brazil * * ( 192 / 193 / 190 ) - * * bangladesh * * ( 999 ) - * * australia * * ( 000 ) 3. * * personal emergency contacts * * : - tap * * \" + add emergency contact \" * * to save personal numbers ( family doctor, primary caregiver, son, daughter, neighbor ). - emergency contacts are scoped per user profile, ensuring personal doctor numbers remain isolated between household members. - - - # # 13. managing multiple family profiles & deletion safeguards manage medications for your whole household on a single phone : 1. tap * * menu > switch profile * *. 2. tap * * add profile * * to create a profile for an elderly parent, child, or partner. 3. enter their name, age, gender, and optional profile picture. 4. tap any profile card to switch active users. tapping the currently selected profile returns smoothly to your dashboard.",
+    "source": "resources/UserManual.md",
+    "chunk_index": 33,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": ", age, gender, and optional profile picture. 4. tap any profile card to switch active users. tapping the currently selected profile returns smoothly to your dashboard. each profile maintains its own separate medicine list, schedules, stock counts, personal emergency contacts, and adherence history. 5. * * deletion safeguards & countdown protection * * : - single - profile accounts cannot delete their only profile ( at least one profile must always remain active ). - deleting a secondary profile requires opening profile settings and waiting through a deliberate * * 5 - second safety countdown * * before the confirm button enables with an explicit * * \" delete profile \" * * action, eliminating accidental loss of medical histories. - - - # # 14. full zip backup, selective restore & conflict resolution protect your records or transfer them seamlessly to a new phone : # # # automatic cloud & self - hosted server backups : 1. go to * * menu > backup & restore * *. 2. the * * automatic * * tab displays network and cloud backup options, including upcoming end - to - end encrypted cloud sync and self - hosted server backups. # # # exporting manual backups : 1. go to * * menu > backup & restore *",
+    "source": "resources/UserManual.md",
+    "chunk_index": 34,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "##ted cloud sync and self - hosted server backups. # # # exporting manual backups : 1. go to * * menu > backup & restore * * and select the * * manual * * tab. 2. tap * * export backup * * to generate a complete encrypted zip archive containing all profiles, active & archived medicines, compliance logs, and emergency contacts. 3. use the direct system share sheet or save the file to google drive, internal storage, or email. # # # selective profile restore & conflict resolution : 1. on your new phone, install dosezy, open * * menu > backup & restore * *, and switch to the * * manual * * tab. 2. tap * * restore backup * * and select your backup zip file. dosezy inspects the archive with an in - front loading spinner. 3. the * * select profiles to import * * dialog displays each profile found in the archive. 4. for each conflicting profile, choose your preferred strategy : - * * create new profile * * : imports the profile as a separate new user with an updated name. - * * merge records * * : intelligently merges incoming medicines and history into the existing profile. - * * replace profile *",
+    "source": "resources/UserManual.md",
+    "chunk_index": 35,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "with an updated name. - * * merge records * * : intelligently merges incoming medicines and history into the existing profile. - * * replace profile * * : overwrites existing data with the backup ' s state. 5. tap * * import selected * * to complete the restore. - - - # # 15. doctor pdf reports & csv adherence logs export health records for doctor visits or personal analysis : 1. * * doctor pdf report * * : go to * * menu > export data * * and select * * pdf report * * to generate a clean, printable medical report with current prescriptions, dosages, meal instructions, skipped dose summaries, and adherence rates. 2. * * csv adherence data * * : export a spreadsheet - compatible csv file containing full timestamps, statuses, and clinical skip reasons. 3. * * json raw archive * * : export standard json data for clinical integration or offline archiving. - - - # # 16. home screen widget & profile binding dosezy includes an interactive home screen widget that lets you review your daily medication schedule at a glance without opening the app : # # # adding the widget to your home screen : 1.",
+    "source": "resources/UserManual.md",
+    "chunk_index": 36,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "widget that lets you review your daily medication schedule at a glance without opening the app : # # # adding the widget to your home screen : 1. long - press any empty space on your android home screen and select * * widgets * *. 2. scroll to * * dosezy * * and drag the widget onto your home screen. 3. the * * widget profile selection * * configuration screen will automatically appear. # # # choosing a widget profile : - * * active app profile ( dynamic ) * * : the widget automatically displays the medication schedule of whichever patient profile is currently selected inside the app. - * * specific family member profile * * : lock the widget to a specific family member ( e. g., mom, dad, child ). the profile name is prominently displayed in the header ( ` dosezy • dad ` ), allowing family caregivers to place distinct widgets side - by - side for different members of the household. # # # widget features & interaction : - * * smooth vertical scrolling * * : when multiple medications are scheduled throughout the day, scroll vertically directly on the widget to view all upcoming doses. - * * real - time dose status * * : displays medicine name,",
+    "source": "resources/UserManual.md",
+    "chunk_index": 37,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "throughout the day, scroll vertically directly on the widget to view all upcoming doses. - * * real - time dose status * * : displays medicine name, scheduled intake time ( with 12 - hour or 24 - hour formatting ), and prescribed dose. - * * completed & empty states * * : when all doses for the day are taken, the widget displays a clean checkmark confirmation. - * * one - tap app navigation & profile switching * * : tap anywhere on the widget or on a specific medicine row to launch dosezy. if the widget is configured for a specific family member, dosezy immediately switches to that family member ' s profile upon opening. - - - # # 17. help, support, about dosezy & updates under the * * more * * section in * * menu * * : - * * help & support * * : step - by - step guides, faqs, and developer contact. - * * about dosezy * * : - * * core pillars * * : highlights dosezy ' s core architectural commitments : - * 100 % offline & private * ( zero accounts, zero cloud dependencies, on - device encryption ). - * reliable alarms & timezones * ( exact",
+    "source": "resources/UserManual.md",
+    "chunk_index": 38,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "offline & private * ( zero accounts, zero cloud dependencies, on - device encryption ). - * reliable alarms & timezones * ( exact alarm dispatch, deep sleep bypass, timezone preservation ). - * multi - profile family care * ( independent medicines, logs, and emergency contacts for every family member ). - * accessibility first * ( 48dp touch targets, high contrast, talkback screen reader support ). - * * meet the developer * * : creator and lead maintainer attribution ( ` saad ` / ` @ saad2134 ` ) with direct github repository links. - * * open - source license * * : licensed under the mit license with tamper - resistant bytecode author attribution. - * * check for updates * * : 1 - tap check across google play, f - droid, or github releases. - - - # # # need help? go to * * menu > more > help & support * * in the app or contact developer support at * * reach. saad @ outlook. com * *.",
+    "source": "resources/UserManual.md",
+    "chunk_index": 39,
+    "token_count": 227,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "user_manual",
+      "source_status": "active",
+      "filename": "UserManual.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "# dosezy fail - safe alarm system architecture > * * document status : * * active specification > * * target version : * * v2. 5. 7 + > * * core principle : * * accuracy & performance > > > efficiency > * * guarantee : * * zero double ringtones, 100 % reliable sound over foreground apps, cascading audio fallbacks, and complete lifecycle synchronization. - - - # # 1. overview & core philosophy in a medication adherence application, alarm delivery is life - critical. a missed alarm or silent failure can directly compromise patient health. dosezy ’ s alarm subsystem is engineered according to a strict design rule : * * accuracy & performance > > > efficiency * *. the system guarantees : 1. * * never - silent execution : * * if an alarm fires, sound and vibration will always execute regardless of whether the phone is locked, unlocked, deep in doze mode, or actively running another app ( such as whatsapp, youtube, or phone call ). 2. * * mathematical single - source audio : * * audio playback and vibration are completely decoupled from notifications and ui activities. exactly one audio engine instance exists at any time, eliminating double ring",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 0,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": ": * * audio playback and vibration are completely decoupled from notifications and ui activities. exactly one audio engine instance exists at any time, eliminating double ringtones. 3. * * graceful fallbacks : * * if a custom user sound file is corrupted, deleted, or in an unsupported format, the system cascades down four fallback tiers to ensure audible alerting. 4. * * state reactivity & multi - medication aggregation : * * if multiple medications are scheduled for the same time or triggered in rapid succession, alarms are grouped dynamically without crashing, screen flashes, or race conditions. - - - # # 2. architecture & end - to - end flow ` ` ` mermaid sequencediagram autonumber participant os as android alarmmanager participant receiver as medicinealarmreceiver participant audio as alarmaudioplayer ( singleton ) participant channel as silent notification channel v3 participant activity as alarmactivity ( singleinstance ) participant db as room database / stock engine os - > > receiver : trigger pendingintent ( exact & allowwhileidle ) activate receiver receiver - > > receiver : acquire partial wakelock & extract entry ids receiver - > > db : query user sound prefs & schedules receiver - >",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 1,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "receiver receiver - > > receiver : acquire partial wakelock & extract entry ids receiver - > > db : query user sound prefs & schedules receiver - > > audio : play ( sound, custompath, duration ) activate audio audio - > > audio : acquire wakelock + start usage _ alarm stream receiver - > > channel : post silent notification (. setsilent ( true ), fullscreenintent ) receiver - > > activity : startactivity ( alarmintent, optionsbundle ) deactivate receiver alt screen is locked or overlay granted activity - > > activity : oncreate ( ) / onnewintent ( ) activity - > > activity : set window flags ( showwhenlocked, turnscreenon ) activity - > > activity : display full - screen grouped alarm ui else whatsapp / foreground app active ( overlay pending ) channel - - > > activity : displays high - priority heads - up banner note over activity : custom sound plays at full volume from receiver! < br > tapping banner opens alarmactivity. end alt user taps \" taken \" ( banner or activity ) activity - > > audio : stop ( ) deactivate audio activity - > > db : recorddosetaken ( ) &",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 2,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "\" ( banner or activity ) activity - > > audio : stop ( ) deactivate audio activity - > > db : recorddosetaken ( ) & auto - deduct stock activity - > > channel : cancel ( notificationid ) else user taps \" snooze \" ( banner or activity ) activity - > > audio : stop ( ) deactivate audio activity - > > os : schedule 10 - minute snooze via alarmmanager activity - > > channel : cancel ( notificationid ) else auto - silence timeout reached audio - > > audio : auto - silence timer triggers stop ( ) deactivate audio audio - > > activity : alarmactivity. stopactivealarm ( ) end ` ` ` - - - # # 3. core components # # # a. [ ` alarmaudioplayer. kt ` ] ( file : / / / patient / android / app / src / main / java / com / example / dosezy / notifications / alarmaudioplayer. kt ) ( decoupled audio engine ) a thread - safe kotlin singleton responsible for sound playback, vibration, wakelocks, and auto - silence timers. - * * independence : * * deco",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 3,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "- safe kotlin singleton responsible for sound playback, vibration, wakelocks, and auto - silence timers. - * * independence : * * decoupled entirely from ` alarmactivity `. audio begins immediately when the ` broadcastreceiver ` wakes up. - * * audio attributes : * * ` ` ` kotlin audioattributes. builder ( ). setusage ( audioattributes. usage _ alarm ). setcontenttype ( audioattributes. content _ type _ sonification ). build ( ) ` ` ` this configuration forces android to route playback through the physical alarm stream, bypassing silent / vibration switches, media volume, and do not disturb ( dnd ). - * * auto - silence timer : * * managed through a cancellable coroutine scope. if a user sets auto - silence to 60 seconds, the audio automatically cuts off and dismisses the activity when the timer expires. if a secondary alarm triggers while the first is active, the timer is refreshed without resetting the sound. - * * power management : * * holds a ` powermanager. partial _ wake _ lock ` with a safety buffer ( ` duration + 30s",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 4,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": ". - * * power management : * * holds a ` powermanager. partial _ wake _ lock ` with a safety buffer ( ` duration + 30s ` ) so the cpu cannot sleep while ringing. # # # b. [ ` medicinealarmreceiver. kt ` ] ( file : / / / patient / android / app / src / main / java / com / example / dosezy / notifications / medicinealarmreceiver. kt ) ( alarm orchestrator ) the entry point triggered by ` alarmmanager `. - runs via ` goasync ( ) ` to safely query user preferences and medication schedules on ` dispatchers. io `. - dispatches ` alarmaudioplayer. play (... ) ` with the user ' s selected ringtone before any ui interaction. - creates and manages the silent notification channel ` dosezy _ medicine _ reminders _ v3 `. - attaches ` activityoptions. setpendingintentcreatorbackgroundactivitystartmode ( mode _ background _ activity _ start _ allowed ) ` when building the full - screen pendingintent on android 14 + ( ` upside _ down _ cake ` ). - automatically reschedules all patient",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 5,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": ") ` when building the full - screen pendingintent on android 14 + ( ` upside _ down _ cake ` ). - automatically reschedules all patient alarms following device reboots ( ` boot _ completed `, ` locked _ boot _ completed `, ` timezone _ changed `, ` time _ set ` ). # # # c. [ ` alarmactivity. kt ` ] ( file : / / / patient / android / app / src / main / java / com / example / dosezy / notifications / alarmactivity. kt ) ( interactive full - screen ui ) the user - facing compose activity displayed when medication is due. - * * manifest configuration : * * - ` launchmode = \" singleinstance \" ` - ` showwhenlocked = \" true \" ` - ` turnscreenon = \" true \" ` - ` showforallusers = \" true \" ` - ` excludefromrecents = \" true \" ` - * * lock screen bypass flags : * * ` ` ` kotlin if ( build. version. sdk _ int > = build. version _ codes. o _ mr1 ) { setshowwhenlocked ( true ) setturnscreen",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 6,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "version. sdk _ int > = build. version _ codes. o _ mr1 ) { setshowwhenlocked ( true ) setturnscreenon ( true ) val keyguardmanager = getsystemservice ( context. keyguard _ service ) as keyguardmanager keyguardmanager. requestdismisskeyguard ( this, null ) } window. addflags ( windowmanager. layoutparams. flag _ show _ when _ locked or windowmanager. layoutparams. flag _ dismiss _ keyguard or windowmanager. layoutparams. flag _ turn _ screen _ on or windowmanager. layoutparams. flag _ keep _ screen _ on or windowmanager. layoutparams. flag _ allow _ lock _ while _ screen _ on ) ` ` ` - * * ` onnewintent ( intent : intent ) ` dynamic handling : * * when multiple alarms trigger sequentially, ` onnewintent ` combines incoming medication ids into reactive compose state ( ` activeentryidsstate ` ), ensuring the ui dynamically aggregates medicines into a single checklist without flickering or restarting. - * * safe silence hook : * * ` alarmactivity",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 7,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "ensuring the ui dynamically aggregates medicines into a single checklist without flickering or restarting. - * * safe silence hook : * * ` alarmactivity. stopactivealarm ( ) ` unconditionally invokes ` alarmaudioplayer. stop ( ) `, ensuring sound stops even if the activity reference is null. # # # d. [ ` notificationactionreceiver. kt ` ] ( file : / / / patient / android / app / src / main / java / com / example / dosezy / notifications / notificationactionreceiver. kt ) ( banner action handler ) handles interactive button taps from the heads - up notification banner ( ` taken ` and ` snooze ` ). - immediately calls ` alarmaudioplayer. stop ( ) ` and ` alarmactivity. stopactivealarm ( ) `. - cancels the notification and any active nagging reminder timers. - for * * taken * * : logs dose as ` taken _ on _ time ` in room db and triggers automatic stock inventory decrement. - for * * snooze * * : queries medicine details and calls ` alarmscheduler. schedulesnooze (",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 8,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "decrement. - for * * snooze * * : queries medicine details and calls ` alarmscheduler. schedulesnooze ( entryid, 10, medicinename ) ` via ` alarmmanager. setexactandallowwhileidle `. - - - # # 4. root - cause analysis of previous bugs prior releases encountered recurrent issues with double ringtones and silent alarms over active applications. here is the exact technical forensic audit : | version | commit | attempted change | real - world failure mode | | : - - - | : - - - | : - - - | : - - - | | * * v2. 4. 3 * * | ` 9745efc ` | switched ` mediaplayer ` to use ` openrawresourcefd ` and partial wakelocks, but kept sound playback inside ` alarmactivity. oncreate ( ) `. | * * silence over active apps ( whatsapp ) : * * < br > on android 10 + ( api 29 + ), background activity launches are restricted ( ` bal ` ). when the user was active in whatsapp, android suppressed ` alarmactivity ` and degraded it to a notification banner",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 9,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "are restricted ( ` bal ` ). when the user was active in whatsapp, android suppressed ` alarmactivity ` and degraded it to a notification banner. because ` alarmactivity. oncreate ( ) ` never ran, the custom sound never started. | | * * v2. 4. 4 * * | ` d4c682e ` | attached alarm audio to both ` notificationchannel ` and ` notificationcompat. builder ` ( ` setsound ( alarmsounduri ) ` ) to ensure sound played if ` alarmactivity ` was suppressed. | * * double ringtones & zombie audio : * * < br > 1. on lock screens, both the notification system and ` alarmactivity ` played audio concurrently, creating an out - of - sync double ringtone. < br > 2. android notification channels permanently lock audio settings in system sqlite upon creation ; runtime updates to ` setsound ( ) ` were ignored. < br > 3. tapping \" taken \" on the notification banner failed to silence the notification ringtone because ` alarmactivity ` ' s instance was null. | - - - # # 5. cascading audio fallback hierarchy to guarantee that an alarm is * * never silent *",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 10,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "s instance was null. | - - - # # 5. cascading audio fallback hierarchy to guarantee that an alarm is * * never silent * * under any operating condition, ` alarmaudioplayer ` implements a 4 - tier cascading fallback : ` ` ` mermaid graph td a [ alarm triggered ] - - > b { user selected custom? } b - - yes - - > c [ load custom audio file from internal storage ] c - - > d { file exists & playable? } d - - yes - - > e [ play via mediaplayer loop ] d - - no / error - - > f { has built - in raw mp3? } b - - no - - > f f - - yes - - > g [ load built - in raw resource via openrawresourcefd ] g - - > h { resource playable? } h - - yes - - > e h - - no / error - - > i [ query ringtonemanager type _ alarm ] f - - no - - > i i - - > j { system alarm uri available? } j - - yes - - > k [ play system alarm tone via mediaplayer / ringtone ] j -",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 11,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "j { system alarm uri available? } j - - yes - - > k [ play system alarm tone via mediaplayer / ringtone ] j - - no / error - - > l [ query ringtonemanager type _ notification ] l - - > m [ play notification ringtone fallback ] ` ` ` 1. * * tier 1 ( custom sound ) : * * plays user - specified audio from application storage using ` audioattributes. usage _ alarm `. 2. * * tier 2 ( built - in raw mp3 ) : * * if custom audio is corrupt or deleted, seamlessly falls back to bundled raw assets ( e. g. ` marimba. mp3 `, ` beacon. mp3 ` ). 3. * * tier 3 ( system default alarm ) : * * if raw audio fails to decode, falls back to ` ringtonemanager. getdefaulturi ( ringtonemanager. type _ alarm ) `. 4. * * tier 4 ( system notification ringtone ) : * * if system alarm tone is unavailable ( e. g. vendor rom stripped ), falls back to ` ringtonemanager. getdefaulturi ( ringtonemanager. type _ notification ) `.",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 12,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": ". vendor rom stripped ), falls back to ` ringtonemanager. getdefaulturi ( ringtonemanager. type _ notification ) `. - - - # # 6. android os version compatibility & edge cases | os level | api | challenge | dosezy implementation solution | | : - - - | : - - - | : - - - | : - - - | | * * android 8. 0 - 9. 0 * * | api 26 - 28 | notification channel sound caching | notification channel bumped to ` dosezy _ medicine _ reminders _ v3 `. older channels ` _ v2 ` and original are explicitly deleted via ` deletenotificationchannel ( ) ` on cold start. | | * * android 10 - 13 * * | api 29 - 33 | background activity launch ( bal ) restrictions | ` system _ alert _ window ` ( \" display over other apps \" ) prompt in ` mainactivity. kt `. if permission is withheld, ` alarmaudioplayer ` plays sound from receiver and banner tap opens ` alarmactivity `. | | * * android 14 - 15 + * * | api 34 - 35 + | pendingintent background launch restrictions | requires ` activityoptions",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 13,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "`. | | * * android 14 - 15 + * * | api 34 - 35 + | pendingintent background launch restrictions | requires ` activityoptions. setpendingintentcreatorbackgroundactivitystartmode ( mode _ background _ activity _ start _ allowed ) ` on ` pendingintent. fullscreenintent ` creation. | | * * all versions * * | any | doze mode / deep sleep | alarms scheduled via ` alarmmanager. setexactandallowwhileidle ( ) `. receiver and player hold cpu ` partial _ wake _ lock `. | | * * all versions * * | any | device reboots & time travel | manifest receivers listen for ` boot _ completed `, ` locked _ boot _ completed `, ` quickboot _ poweron `, ` reboot `, ` time _ set `, and ` timezone _ changed `. all alarms are recalculated and rescheduled automatically. | - - - # # 7. testing & verification protocol before signing any release apk / aab, verify all 7 verification gates : - [ ] * * gate 1 ( lock screen ) : * * schedule alarm for + 1 min. lock device. confirm screen",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 14,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "verify all 7 verification gates : - [ ] * * gate 1 ( lock screen ) : * * schedule alarm for + 1 min. lock device. confirm screen turns on, keyguard dismisses, custom audio loops, and \" take medicine \" silences audio. - [ ] * * gate 2 ( foreground whatsapp ) : * * schedule alarm for + 1 min. keep whatsapp actively open and type in a chat. confirm custom audio rings immediately, popup appears ( or heads - up banner displays ), and tapping banner or \" taken \" works instantly. - [ ] * * gate 3 ( zero double ringtone ) : * * set volume to high. listen closely to verify only one distinct sound stream is playing. - [ ] * * gate 4 ( corrupted audio ) : * * set custom sound to a dummy text file renamed to `. mp3 `. trigger alarm. verify system cascades cleanly to default alarm audio without crashing. - [ ] * * gate 5 ( back - to - back alarms ) : * * schedule two medicines at the exact same minute. confirm ` alarmactivity ` aggregates both into ` take all ( 2 ) ` without flashing. - [ ] * * gate 6 ( auto - silence ) : *",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 15,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "alarmactivity ` aggregates both into ` take all ( 2 ) ` without flashing. - [ ] * * gate 6 ( auto - silence ) : * * set auto - silence to 30s. leave phone ringing untouched. confirm audio stops and activity finishes after exactly 30s. - [ ] * * gate 7 ( device reboot ) : * * schedule alarm, reboot phone, check ` adb logcat - s medicinealarmreceiver ` to verify ` rescheduleallalarms ` executed successfully. - - - # # 8. reliability guarantees & real - world failure boundaries # # # a. what dosezy ' s code level guarantees ( 100 % controlled ) within the scope of android application development, all programmatic points of failure have been identified and engineered out : | point of failure | previous failure mode | v2. 4. 5 hardened guarantee | | : - - - | : - - - | : - - - | | * * active foreground apps ( whatsapp, youtube, calls ) * * | activity launch blocked by os $ \\ to $ sound never triggered ( ` oncreate ` never ran ). | * * 100 % guaranteed : * * audio playback is completely decoupled from the ui",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 16,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "sound never triggered ( ` oncreate ` never ran ). | * * 100 % guaranteed : * * audio playback is completely decoupled from the ui. it triggers inside ` medicinealarmreceiver. onreceive ( ) ` the exact millisecond ` alarmmanager ` fires, regardless of what app is on screen. | | * * double ringtones * * | channel played system audio + activity played ` mediaplayer `. | * * 100 % guaranteed : * * the notification channel is silent ( ` setsound ( null, null ) ` ), builder is `. setsilent ( true ) `. exactly * * one * * centralized player exists ( ` alarmaudioplayer ` ). double ringtone is mathematically impossible. | | * * silent / vibrate / dnd mode * * | system ringer volume could mute alerts. | * * 100 % guaranteed : * * audio stream is set to ` audioattributes. usage _ alarm `. android routes it through physical alarm stream hardware, overriding silent switches and do not disturb filters. | | * * corrupted or deleted audio files * * | app threw exception $ \\ to $ silence. | * * 100 % guaranteed",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 17,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "do not disturb filters. | | * * corrupted or deleted audio files * * | app threw exception $ \\ to $ silence. | * * 100 % guaranteed : * * 4 - tier cascading fallback : ` custom audio ` $ \\ to $ ` built - in raw mp3 ` $ \\ to $ ` system default alarm ` $ \\ to $ ` system default notification `. an alarm will never fail silently. | | * * cpu sleep / doze mode * * | phone put cpu to sleep mid - alarm, cutting off sound. | * * 100 % guaranteed : * * holds a cpu ` partial _ wake _ lock ` for the alarm duration ( + 30s buffer ) to prevent os throttling. | | * * zombie audio on notification dismissal * * | tapping \" taken \" on banner didn ' t stop sound if activity wasn ' t running. | * * 100 % guaranteed : * * ` alarmactivity. stopactivealarm ( ) ` now terminates ` alarmaudioplayer. stop ( ) ` unconditionally, whether the activity instance is alive or null. | | * * simultaneous / back - to - back alarms * * | second alarm could crash or freeze activity. | * * 100 % guaranteed : *",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 18,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": ". | | * * simultaneous / back - to - back alarms * * | second alarm could crash or freeze activity. | * * 100 % guaranteed : * * handled via ` onnewintent ` and dynamic compose state. medicines are aggregated into a single checklist ( ` take all ` ) without ui restarts or race conditions. | | * * device reboots & clock changes * * | alarms wiped on reboot or daylight savings. | * * 100 % guaranteed : * * broadcast receiver listens for ` boot _ completed `, ` locked _ boot _ completed `, ` quickboot _ poweron `, ` reboot `, ` time _ set `, and ` timezone _ changed ` to reschedule all entries automatically. | # # # b. the 3 external variables outside any android app ' s sandbox no application running on android ( including system apps like google clock or alarmy ) can bypass physical hardware limits or system - level revocations without user permissions. here is how dosezy protects against them : 1. * * aggressive oem battery task killers ( xiaomi hyperos / miui, samsung oneui, huawei ) * * : - * the risk : * certain phone manufacturers enforce proprietary battery",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 19,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "killers ( xiaomi hyperos / miui, samsung oneui, huawei ) * * : - * the risk : * certain phone manufacturers enforce proprietary battery managers that freeze or kill background applications if the user has not marked the app as * * unrestricted * *. - * dosezy ' s defense : * dosezy includes a built - in diagnostic engine ( * * notification reliability dialog * * ) that prompts for ` request _ ignore _ battery _ optimizations ` and alerts users if battery restrictions threaten alarm delivery. 2. * * revoked exact alarm permission ( ` schedule _ exact _ alarm ` ) * * : - * the risk : * on android 12 +, if a user manually opens android settings $ \\ to $ apps $ \\ to $ special app access $ \\ to $ alarms & reminders and toggles off dosezy, the os delays alarms by 15 - 30 minutes to batch them with other system tasks. - * dosezy ' s defense : * dosezy actively checks ` alarmmanager. canscheduleexactalarms ( ) ` and displays an interactive prompt redirecting the user to system settings if revoked. 3. * * physical hardware state * * : - * the risk : * completely drained battery ( 0",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 20,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "redirecting the user to system settings if revoked. 3. * * physical hardware state * * : - * the risk : * completely drained battery ( 0 % ), powered - off phone, or damaged physical speaker. - * dosezy ' s defense : * dosezy stores state locally in sqlite, so as soon as the phone recharges and powers on, all missed and future schedules are instantly restored. # # # c. redundancy safety net : never miss a dose to protect patients in real - life situations where they might sleep through an alarm or accidentally swipe away a banner : 1. * * nagging reminders * * : if the initial alarm is ignored or dismissed without marking the dose as taken, dosezy ' s automated follow - up engine triggers repeated nagging alarms ( e. g. every 5 minutes up to 3 - 5 times ). 2. * * 100 % local - first resilience * * : dosezy operates entirely offline on a local room database. it will never fail because of aws / firebase downtime, unstable wifi, flight mode, or lost cellular connectivity.",
+    "source": "docs/AlarmSystem.md",
+    "chunk_index": 21,
+    "token_count": 232,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "scheduling_rules",
+      "source_status": "active",
+      "filename": "AlarmSystem.md",
+      "format": "md"
+    }
+  },
+  {
+    "content": "openapi : 3. 0. 3 info : title : dosezy api description : | official openapi 3. 0 specification for * * dosezy * * - open - source, offline - first medicine tracking & caregiver cloud platform. # # # domain alignment - * * api base url : * * ` https : / / api. dosezy. app ` - * * status page : * * ` https : / / status. dosezy. app ` - * * documentation : * * ` https : / / docs. dosezy. app ` - * * patient web app : * * ` https : / / patient. dosezy. app ` - * * caregiver portal : * * ` https : / / caregiver. dosezy. app ` version : 2. 5. 13 contact : name : dosezy maintainers email : reach. saad @ outlook. com url : https : / / dosezy. app license : name : mit license url : https : / / opensource. org / licenses / mit security : - bearerauth : [ ] servers : - url : https : / / api. dosezy. app description : official hosted cloud production server - ur",
+    "source": "api/openapi.yaml",
+    "chunk_index": 0,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "- bearerauth : [ ] servers : - url : https : / / api. dosezy. app description : official hosted cloud production server - url : https : / / api. stage. dosezy. app description : staging environment server tags : - name : health & system description : server health checks, system status, and info - name : user profiles description : patient profile management and metadata - name : medicines description : medication definitions, dosages, and schedules - name : schedule logs description : historical dose tracking, adherence logs, and status updates - name : incremental sync description : local - first delta synchronization protocol - name : caregiver platform description : caregiver pairing, patient monitoring, and adherence metrics paths : / health : get : security : [ ] tags : - health & system summary : get server health and status operationid : gethealthstatus responses : ' 200 ' : description : server is healthy and operational content : application / json : schema : type : object properties : status : type : string example : ok version : type : string example : 2. 5. 13 timestamp : type : string format : date - time example : ' 2026 - 09 - 03t18 :",
+    "source": "api/openapi.yaml",
+    "chunk_index": 1,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "string example : 2. 5. 13 timestamp : type : string format : date - time example : ' 2026 - 09 - 03t18 : 45 : 00z ' ' 400 ' : $ ref : ' # / components / responses / badrequest ' ' 500 ' : description : internal server error content : application / json : schema : $ ref : ' # / components / schemas / errorresponse ' ' 503 ' : description : service temporarily unavailable or in maintenance mode content : application / json : schema : $ ref : ' # / components / schemas / errorresponse ' / v1 / users : get : tags : - user profiles summary : list all user profiles operationid : listusers responses : ' 200 ' : description : list of user profiles content : application / json : schema : type : array items : $ ref : ' # / components / schemas / user ' ' 400 ' : $ ref : ' # / components / responses / badrequest ' post : tags : - user profiles summary : create a new patient profile operationid : createuser requestbody : required : true content : application / json : schema : $ ref : ' #",
+    "source": "api/openapi.yaml",
+    "chunk_index": 2,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": ": create a new patient profile operationid : createuser requestbody : required : true content : application / json : schema : $ ref : ' # / components / schemas / usercreateinput ' responses : ' 201 ' : description : user profile created successfully content : application / json : schema : $ ref : ' # / components / schemas / user ' ' 400 ' : $ ref : ' # / components / responses / badrequest ' / v1 / users / { userid } : parameters : - name : userid in : path required : true schema : type : string get : tags : - user profiles summary : get user profile details operationid : getuserbyid responses : ' 200 ' : description : user profile details content : application / json : schema : $ ref : ' # / components / schemas / user ' ' 404 ' : $ ref : ' # / components / responses / notfound ' put : tags : - user profiles summary : update user profile operationid : updateuser requestbody : required : true content : application / json : schema : $ ref : ' # / components / schemas / usercreateinput ' responses : '",
+    "source": "api/openapi.yaml",
+    "chunk_index": 3,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "true content : application / json : schema : $ ref : ' # / components / schemas / usercreateinput ' responses : ' 200 ' : description : user profile updated content : application / json : schema : $ ref : ' # / components / schemas / user ' ' 400 ' : $ ref : ' # / components / responses / badrequest ' ' 404 ' : $ ref : ' # / components / responses / notfound ' delete : tags : - user profiles summary : delete user profile operationid : deleteuser responses : ' 204 ' : description : profile deleted successfully ' 404 ' : $ ref : ' # / components / responses / notfound ' / v1 / users / { userid } / medicines : parameters : - name : userid in : path required : true schema : type : string get : tags : - medicines summary : list medicines for a user operationid : listmedicines responses : ' 200 ' : description : list of medications content : application / json : schema : type : array items : $ ref : ' # / components / schemas / medicine ' ' 404 ' : $ ref : ' # / components / responses / not",
+    "source": "api/openapi.yaml",
+    "chunk_index": 4,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "array items : $ ref : ' # / components / schemas / medicine ' ' 404 ' : $ ref : ' # / components / responses / notfound ' post : tags : - medicines summary : add a new medicine operationid : createmedicine requestbody : required : true content : application / json : schema : $ ref : ' # / components / schemas / medicineinput ' responses : ' 201 ' : description : medicine created successfully content : application / json : schema : $ ref : ' # / components / schemas / medicine ' ' 400 ' : $ ref : ' # / components / responses / badrequest ' ' 404 ' : $ ref : ' # / components / responses / notfound ' / v1 / medicines / { medicineid } : parameters : - name : medicineid in : path required : true schema : type : string get : tags : - medicines summary : get medicine details operationid : getmedicinebyid responses : ' 200 ' : description : medicine details content : application / json : schema : $ ref : ' # / components / schemas / medicine ' ' 404 ' : $ ref : ' # / components / responses / not",
+    "source": "api/openapi.yaml",
+    "chunk_index": 5,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "schema : $ ref : ' # / components / schemas / medicine ' ' 404 ' : $ ref : ' # / components / responses / notfound ' put : tags : - medicines summary : update medicine operationid : updatemedicine requestbody : required : true content : application / json : schema : $ ref : ' # / components / schemas / medicineinput ' responses : ' 200 ' : description : medicine updated successfully content : application / json : schema : $ ref : ' # / components / schemas / medicine ' ' 400 ' : $ ref : ' # / components / responses / badrequest ' ' 404 ' : $ ref : ' # / components / responses / notfound ' delete : tags : - medicines summary : delete medicine operationid : deletemedicine responses : ' 204 ' : description : medicine deleted successfully ' 404 ' : $ ref : ' # / components / responses / notfound ' / v1 / users / { userid } / schedules : parameters : - name : userid in : path required : true schema : type : string get : tags : - schedule logs summary : get dose schedule history operationid : listscheduleent",
+    "source": "api/openapi.yaml",
+    "chunk_index": 6,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "in : path required : true schema : type : string get : tags : - schedule logs summary : get dose schedule history operationid : listscheduleentries parameters : - name : from in : query required : false schema : type : string format : date - time - name : to in : query required : false schema : type : string format : date - time - name : status in : query required : false schema : $ ref : ' # / components / schemas / medicationstatus ' responses : ' 200 ' : description : list of dose schedule history entries content : application / json : schema : type : array items : $ ref : ' # / components / schemas / scheduleentry ' ' 404 ' : $ ref : ' # / components / responses / notfound ' post : tags : - schedule logs summary : log a dose action ( taken, snoozed, missed ) operationid : createscheduleentry requestbody : required : true content : application / json : schema : $ ref : ' # / components / schemas / scheduleentryinput ' responses : ' 201 ' : description : dose action logged successfully content : application / json : schema :",
+    "source": "api/openapi.yaml",
+    "chunk_index": 7,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "schemas / scheduleentryinput ' responses : ' 201 ' : description : dose action logged successfully content : application / json : schema : $ ref : ' # / components / schemas / scheduleentry ' ' 400 ' : $ ref : ' # / components / responses / badrequest ' ' 404 ' : $ ref : ' # / components / responses / notfound ' / v1 / sync : post : tags : - incremental sync summary : incremental delta sync ( offline - first ) operationid : performdeltasync description : push local database changes and receive remote updates since ` lastsyncedat `. requestbody : required : true content : application / json : schema : $ ref : ' # / components / schemas / syncpushrequest ' responses : ' 200 ' : description : sync completed successfully with deltas returned content : application / json : schema : $ ref : ' # / components / schemas / syncpullresponse ' ' 400 ' : $ ref : ' # / components / responses / badrequest ' / v1 / caregiver / pair : post : tags : - caregiver platform summary : generate or",
+    "source": "api/openapi.yaml",
+    "chunk_index": 8,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "/ components / responses / badrequest ' / v1 / caregiver / pair : post : tags : - caregiver platform summary : generate or redeem a caregiver pairing code operationid : paircaregiver requestbody : required : true content : application / json : schema : $ ref : ' # / components / schemas / pairingrequest ' responses : ' 200 ' : description : pairing code generated or redeemed successfully content : application / json : schema : $ ref : ' # / components / schemas / pairingresponse ' ' 400 ' : $ ref : ' # / components / responses / badrequest ' / v1 / caregiver / patients : get : tags : - caregiver platform summary : list monitored patients & adherence metrics for caregiver operationid : listmonitoredpatients responses : ' 200 ' : description : list of monitored patients and adherence metrics content : application / json : schema : type : array items : $ ref : ' # / components / schemas / caregiverpatientsummary ' ' 401 ' : description : unauthorized caregiver access content : application / json : schema : $ ref :",
+    "source": "api/openapi.yaml",
+    "chunk_index": 9,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "caregiverpatientsummary ' ' 401 ' : description : unauthorized caregiver access content : application / json : schema : $ ref : ' # / components / schemas / errorresponse ' components : schemas : gender : type : string enum : [ male, female, do _ not _ specify ] theme : type : string enum : [ light, dark, system ] default : system timeformat : type : string enum : [ hour _ 12, hour _ 24 ] default : hour _ 12 language : type : string enum : [ system, english, spanish, hindi, chinese, portuguese, arabic, french, german, japanese, russian, italian, bengali ] default : system dosageunit : type : string enum : [ mg, mcg, ml, drop, tablet, capsule, meq, puff, ampule, spray ] frequencypattern : type : string description : recurrence cadence pattern for medication scheduling ( daily, weekly, monthly, every _ x _ hours, every _ x _ days, custom [ every x weeks ], as _ needed [ prn ] ) enum : [ daily, weekly, monthly, every _ x _ hours, every _",
+    "source": "api/openapi.yaml",
+    "chunk_index": 10,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "[ every x weeks ], as _ needed [ prn ] ) enum : [ daily, weekly, monthly, every _ x _ hours, every _ x _ days, custom, as _ needed ] frequency : type : object required : - pattern properties : pattern : $ ref : ' # / components / schemas / frequencypattern ' daysperweek : type : integer nullable : true example : 3 dayspermonth : type : integer nullable : true example : 15 selecteddaysofweek : type : array nullable : true description : iso standard day of week numbers ( 1 = monday.. 7 = sunday ) items : type : integer example : [ 1, 3, 5 ] selecteddaysofmonth : type : array nullable : true description : specific calendar days of the month ( 1 - 31 ) items : type : integer example : [ 1, 15, 30 ] intervalhours : type : integer nullable : true description : hourly interval for every _ x _ hours pattern example : 6 intervaldays : type : integer nullable : true description : day interval for every _ x _ days pattern example : 2 intervalweeks : type : integer nullable : true description : week interval for custom recur",
+    "source": "api/openapi.yaml",
+    "chunk_index": 11,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": ": day interval for every _ x _ days pattern example : 2 intervalweeks : type : integer nullable : true description : week interval for custom recurrence pattern ( e. g. 2 for every 2 weeks ) example : 2 medicationstatus : type : string enum : [ pending, taken _ on _ time, taken _ late, missed, skipped ] pillshape : type : string enum : [ round, capsule, oval, liquid, inhaler, injection, drops, patch, spray ] default : round example : round remindertype : type : string description : reminder alert delivery mechanism ( alarm for full - screen alarm activity bypassing dnd, notification for notification shade chime respecting dnd ) enum : [ alarm, notification ] default : alarm example : alarm alarmsound : type : string enum : [ system _ default, gentle _ chime, medical _ marimba, brisk _ pulse, calm _ bell, custom ] default : system _ default example : system _ default user : type : object required : - userid - fullname - age - gender - contactnumber properties : userid : type : string example : usr _ 8f9a2b1c fullname : type : string example : john",
+    "source": "api/openapi.yaml",
+    "chunk_index": 12,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "##number properties : userid : type : string example : usr _ 8f9a2b1c fullname : type : string example : john doe age : type : integer example : 45 gender : $ ref : ' # / components / schemas / gender ' contactnumber : type : string example : ' + 1234567890 ' profilepicpath : type : string nullable : true iscurrentuser : type : boolean example : true theme : $ ref : ' # / components / schemas / theme ' timeformat : $ ref : ' # / components / schemas / timeformat ' language : $ ref : ' # / components / schemas / language ' considerlateafter : type : integer description : minutes after scheduled time to consider dose late ( options 15, 30, 45, 60, 90, 120, 180, 240 ; legacy 1 - 14 interpreted as hours ) default : 180 example : 180 considermissedafter : type : integer description : minutes after scheduled time to consider dose missed ( options 30, 45, 60, 90, 120, 180, 240, 360, 480, 720 ; legacy 1 - 14 interpreted as hours ) default : 360 example : 360",
+    "source": "api/openapi.yaml",
+    "chunk_index": 13,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "45, 60, 90, 120, 180, 240, 360, 480, 720 ; legacy 1 - 14 interpreted as hours ) default : 360 example : 360 snoozeduration : type : integer description : snooze duration in minutes ( options 5, 10, 15, 20, 30 ) default : 10 example : 10 allergies : type : string nullable : true description : known patient drug or substance allergies example : penicillin, sulfa drugs medicalconditions : type : string nullable : true description : diagnosed medical conditions or comorbidities example : hypertension, type 2 diabetes naggingremindersenabled : type : boolean description : whether nagging periodic reminder alarms are enabled default : false example : false naggingintervalminutes : type : integer description : interval in minutes between nagging alarms ( 5, 10, 15 ) default : 5 example : 5 naggingmaxrepeats : type : integer description : maximum number of nagging reminder repeats ( 0 = continuous / until taken, 1, 2, 3, 5, 10 repeats ) default : 3 example : 3 alarmsound : $ ref : ' # / components / schemas / alarmsound ' customalarmso",
+    "source": "api/openapi.yaml",
+    "chunk_index": 14,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": ", 10 repeats ) default : 3 example : 3 alarmsound : $ ref : ' # / components / schemas / alarmsound ' customalarmsoundpath : type : string nullable : true description : file path to custom imported alarm sound customalarmsoundtitle : type : string nullable : true description : display title of custom alarm sound alarmdurationseconds : type : integer description : alarm auto - silence duration in seconds ( - 1 = once, 0 = continuous, 15, 30, 60, 120, 300 ) default : 0 example : 0 allowdoseskipping : type : boolean description : whether patient is allowed to log a dose as skipped with a clinical reason default : false example : false allowcustomdosetime : type : boolean description : whether patient can record a custom backdated or forward timestamp when taking a dose default : false example : false hideaddmedicinenavbutton : type : boolean description : whether the bottom navigation bar hides the center add button default : false example : false allowdoseundo : type : boolean description : whether user can revert a recorded dose back to pending default : false example : false allowdosenotes : type : boo",
+    "source": "api/openapi.yaml",
+    "chunk_index": 15,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": ": type : boolean description : whether user can revert a recorded dose back to pending default : false example : false allowdosenotes : type : boolean description : whether user is allowed to log optional symptom and meal notes with doses default : false example : false promptdosenotes : type : boolean description : whether to prompt for an optional note or symptom log whenever a dose is marked as taken default : false example : false slideactionsenabled : type : boolean description : whether sliding gestures are required to confirm taking or snoozing doses in alarms default : true example : true timelinemodeenabled : type : boolean description : whether home page displays today ' s schedule in an expanded vertical timeline view default : false example : false thickercalendardayhighlight : type : boolean description : whether schedule calendar renders a full colored border frame around each scheduled day default : false example : false intakesafeguardenabled : type : boolean description : whether adhd intake countdown timer safeguard with automatic re - alert is enabled default : false example : false intakecountdownseconds : type : integer description : countdown timer duration in seconds for intake confirmation before re - alerting ( 60, 120",
+    "source": "api/openapi.yaml",
+    "chunk_index": 16,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": ": false intakecountdownseconds : type : integer description : countdown timer duration in seconds for intake confirmation before re - alerting ( 60, 120, 180, 300 ) default : 120 example : 120 lockscreendetailsenabled : type : boolean description : whether sensitive prescription details are masked on the lock screen default : true example : true customsnoozepopupenabled : type : boolean description : whether multiple custom snooze duration chips are presented in alarm alert default : false example : false remindertype : $ ref : ' # / components / schemas / remindertype ' usercreateinput : type : object required : - fullname - age - gender - contactnumber properties : fullname : type : string example : jane doe age : type : integer example : 38 gender : $ ref : ' # / components / schemas / gender ' contactnumber : type : string example : ' + 1234567890 ' profilepicpath : type : string nullable : true iscurrentuser : type : boolean default : false example : false theme : $ ref : ' # / components / schemas / theme ' timeformat : $ ref : ' # / components /",
+    "source": "api/openapi.yaml",
+    "chunk_index": 17,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "false example : false theme : $ ref : ' # / components / schemas / theme ' timeformat : $ ref : ' # / components / schemas / timeformat ' language : $ ref : ' # / components / schemas / language ' considerlateafter : type : integer description : ' minutes after scheduled time to consider dose late ( default : 180 ) ' default : 180 example : 180 considermissedafter : type : integer description : ' minutes after scheduled time to consider dose missed ( default : 360 ) ' default : 360 example : 360 snoozeduration : type : integer allergies : type : string nullable : true example : penicillin medicalconditions : type : string nullable : true example : asthma naggingremindersenabled : type : boolean naggingintervalminutes : type : integer naggingmaxrepeats : type : integer description : maximum number of nagging reminder repeats ( 0 = continuous / until taken, 1, 2, 3, 5, 10 repeats ) default : 3 example : 3 alarmsound : $ ref : ' # / components / schemas / alarmsound ' customalarmsoundpath : type : string null",
+    "source": "api/openapi.yaml",
+    "chunk_index": 18,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "example : 3 alarmsound : $ ref : ' # / components / schemas / alarmsound ' customalarmsoundpath : type : string nullable : true customalarmsoundtitle : type : string nullable : true alarmdurationseconds : type : integer description : alarm auto - silence duration in seconds ( - 1 = once, 0 = continuous, 15, 30, 60, 120, 300 ) allowdoseskipping : type : boolean allowcustomdosetime : type : boolean hideaddmedicinenavbutton : type : boolean allowdoseundo : type : boolean allowdosenotes : type : boolean promptdosenotes : type : boolean slideactionsenabled : type : boolean timelinemodeenabled : type : boolean thickercalendardayhighlight : type : boolean intakesafeguardenabled : type : boolean intakecountdownseconds : type : integer lockscreendetailsenabled : type : boolean default : true example : true customsnoozepopupenabled : type : boolean default : false example : false remindertype : $ ref : ' # / components / schemas",
+    "source": "api/openapi.yaml",
+    "chunk_index": 19,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "##noozepopupenabled : type : boolean default : false example : false remindertype : $ ref : ' # / components / schemas / remindertype ' medicine : type : object required : - medicineid - userid - medicationname - dosage - dosageunit - timesperday - frequency - scheduledtimes properties : medicineid : type : string example : med _ 1a2b3c userid : type : string example : usr _ 8f9a2b1c medicationname : type : string example : amoxicillin dosage : type : number format : double example : 500. 0 dosageunit : $ ref : ' # / components / schemas / dosageunit ' timesperday : type : integer example : 2 frequency : $ ref : ' # / components / schemas / frequency ' scheduledtimes : type : array items : type : string example : ' 08 : 00 ' imageuri : type : string nullable : true pillshape : $ ref : ' # / components / schemas / pillshape ' pillcolor : type : string description : hex representation of medicine visual color example : ' # 1193d4 ' startdate : type",
+    "source": "api/openapi.yaml",
+    "chunk_index": 20,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "/ pillshape ' pillcolor : type : string description : hex representation of medicine visual color example : ' # 1193d4 ' startdate : type : string format : date nullable : true description : start date of medication course ( yyyy - mm - dd ) example : ' 2026 - 09 - 01 ' enddate : type : string format : date nullable : true description : end date of medication course ( yyyy - mm - dd ) example : ' 2026 - 09 - 30 ' durationdays : type : integer nullable : true description : total duration of prescription in days example : 30 isarchived : type : boolean description : whether medication has been discontinued / archived default : false example : false notes : type : string nullable : true description : clinical or patient instructions example : take with food or a full glass of water currentstock : type : number format : double nullable : true description : current medicine inventory units available ( supports fractional quantities, e. g. 29. 5 or 0. 5 ) example : 30. 0 refillthreshold : type : number format : double nullable : true description : stock count threshold that triggers a low - stock refill alert ( supports fraction",
+    "source": "api/openapi.yaml",
+    "chunk_index": 21,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "##illthreshold : type : number format : double nullable : true description : stock count threshold that triggers a low - stock refill alert ( supports fractional quantities ) example : 5. 0 autodeductontake : type : boolean description : automatically decrement currentstock when a scheduled dose is taken default : true example : true customdosages : type : object additionalproperties : type : number format : double nullable : true description : optional variable dosage amounts mapped by scheduled time hh : mm example : \" 08 : 00 \" : 20. 0 \" 20 : 00 \" : 40. 0 remindertype : $ ref : ' # / components / schemas / remindertype ' medicineinput : type : object required : - medicationname - dosage - dosageunit - timesperday - frequency - scheduledtimes properties : medicationname : type : string example : amoxicillin dosage : type : number format : double example : 500. 0 dosageunit : $ ref : ' # / components / schemas / dosageunit ' timesperday : type : integer example : 2 frequency : $ ref : ' # / components / schemas / frequency ' scheduledtimes : type",
+    "source": "api/openapi.yaml",
+    "chunk_index": 22,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "' timesperday : type : integer example : 2 frequency : $ ref : ' # / components / schemas / frequency ' scheduledtimes : type : array items : type : string example : ' 08 : 00 ' imageuri : type : string nullable : true pillshape : $ ref : ' # / components / schemas / pillshape ' pillcolor : type : string example : ' # 1193d4 ' startdate : type : string format : date nullable : true example : ' 2026 - 09 - 01 ' enddate : type : string format : date nullable : true example : ' 2026 - 09 - 30 ' durationdays : type : integer nullable : true example : 30 isarchived : type : boolean default : false notes : type : string nullable : true example : take with food currentstock : type : number format : double nullable : true example : 30. 0 refillthreshold : type : number format : double nullable : true example : 5. 0 autodeductontake : type : boolean default : true customdosages : type : object additionalproperties : type : number format : double nullable : true example : \" 08 : 00",
+    "source": "api/openapi.yaml",
+    "chunk_index": 23,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "##lean default : true customdosages : type : object additionalproperties : type : number format : double nullable : true example : \" 08 : 00 \" : 20. 0 \" 20 : 00 \" : 40. 0 remindertype : $ ref : ' # / components / schemas / remindertype ' scheduleentry : type : object required : - entryid - userid - medicineid - scheduleddatetime - status properties : entryid : type : string example : sch _ 998877 userid : type : string example : usr _ 8f9a2b1c medicineid : type : string example : med _ 1a2b3c scheduleddatetime : type : string format : date - time example : ' 2026 - 09 - 03t08 : 00 : 00z ' status : $ ref : ' # / components / schemas / medicationstatus ' takenat : type : string format : date - time nullable : true skipreason : type : string nullable : true description : reason why dose was marked skipped example : doctor advised to pause dosage : type : number format : double nullable : true description : resolved dosage strength for this specific scheduled slot example : 20.",
+    "source": "api/openapi.yaml",
+    "chunk_index": 24,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "doctor advised to pause dosage : type : number format : double nullable : true description : resolved dosage strength for this specific scheduled slot example : 20. 0 dosenotes : type : string nullable : true description : clinical or patient note recorded when taking the dose example : taken after light breakfast, felt fine scheduleentryinput : type : object required : - medicineid - scheduleddatetime - status properties : medicineid : type : string scheduleddatetime : type : string format : date - time status : $ ref : ' # / components / schemas / medicationstatus ' takenat : type : string format : date - time nullable : true skipreason : type : string nullable : true example : fasting for lab test dosage : type : number format : double nullable : true example : 20. 0 dosenotes : type : string nullable : true example : taken after light breakfast syncpushrequest : type : object required : - lastsyncedat properties : lastsyncedat : type : string format : date - time users : type : array items : $ ref : ' # / components / schemas / user ' medicines : type : array items : $ ref : ' # / components / schema",
+    "source": "api/openapi.yaml",
+    "chunk_index": 25,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": ": $ ref : ' # / components / schemas / user ' medicines : type : array items : $ ref : ' # / components / schemas / medicine ' schedules : type : array items : $ ref : ' # / components / schemas / scheduleentry ' syncpullresponse : type : object required : - synctimestamp properties : synctimestamp : type : string format : date - time users : type : array items : $ ref : ' # / components / schemas / user ' medicines : type : array items : $ ref : ' # / components / schemas / medicine ' schedules : type : array items : $ ref : ' # / components / schemas / scheduleentry ' pairingrequest : type : object properties : pairingcode : type : string example : ' 8f9a2b ' role : type : string enum : [ patient, caregiver ] pairingresponse : type : object properties : pairingcode : type : string example : ' 8f9a2b ' expiresat : type : string format : date - time status : type : string example : pending caregiverpatientsummary : type : object properties : user",
+    "source": "api/openapi.yaml",
+    "chunk_index": 26,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "##sat : type : string format : date - time status : type : string example : pending caregiverpatientsummary : type : object properties : userid : type : string example : usr _ 8f9a2b1c fullname : type : string example : john doe adherencerate : type : number format : double example : 94. 5 activemedicinescount : type : integer example : 4 misseddosescount : type : integer example : 1 todaypendingcount : type : integer example : 2 todaytakencount : type : integer example : 3 todaylatecount : type : integer example : 0 allergies : type : string nullable : true example : penicillin chronicconditions : type : string nullable : true example : hypertension emergencycontactname : type : string nullable : true example : jane doe emergencycontactphone : type : string nullable : true example : ' + 1234567890 ' lastsyncedat : type : string format : date - time nullable : true example : ' 2026 - 11 - 09t18 : 00 : 00z ' errorresponse : type : object required : - error - message properties :",
+    "source": "api/openapi.yaml",
+    "chunk_index": 27,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": ": ' 2026 - 11 - 09t18 : 00 : 00z ' errorresponse : type : object required : - error - message properties : error : type : string example : not _ found message : type : string example : the requested resource was not found. # semantic cross - schema aliases medication : allof : - $ ref : ' # / components / schemas / medicine ' description : canonical alias for medicine schema schedule : allof : - $ ref : ' # / components / schemas / frequency ' description : canonical alias for frequency recurrence schema doseevent : allof : - $ ref : ' # / components / schemas / scheduleentry ' description : canonical alias for scheduleentry dose event history schema caregiverconsent : allof : - $ ref : ' # / components / schemas / pairingrequest ' description : canonical alias for pairingrequest consent exchange schema securityschemes : bearerauth : type : http scheme : bearer bearerformat : jwt description : optional jwt bearer token for cloud - authenticated sync and caregiver access responses : notfound : description : resource not found content : application / json : sc",
+    "source": "api/openapi.yaml",
+    "chunk_index": 28,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "bearer token for cloud - authenticated sync and caregiver access responses : notfound : description : resource not found content : application / json : schema : $ ref : ' # / components / schemas / errorresponse ' badrequest : description : invalid request parameters or body validation error content : application / json : schema : $ ref : ' # / components / schemas / errorresponse '",
+    "source": "api/openapi.yaml",
+    "chunk_index": 29,
+    "token_count": 91,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "api_schema",
+      "source_status": "active",
+      "filename": "openapi.yaml",
+      "format": "yaml"
+    }
+  },
+  {
+    "content": "- - - import layout from '.. / layouts / layout. astro ' ; import header from '.. / components / header. astro ' ; import footer from '.. / components / footer. astro ' ; - - - < layout title = \" privacy policy dosezy zero - telemetry & data sovereignty guarantee \" description = \" dosezy privacy policy. we collect zero analytics, zero crash logs, and zero health data. read our strict zero - telemetry and data sovereignty guarantee. \" > < header / > < main class = \" flex - grow pt - 28 sm : pt - 32 pb - 16 bg - [ # 030407 ] bg - grid - pattern \" > < div class = \" max - w - 4xl mx - auto px - 4 sm : px - 6 lg : px - 8 \" > <! - - header - - > < div class = \" mb - 10 \" > < span class = \" px - 3. 5 py - 1 rounded - full text - xs font - mono font - bold bg - sky - 500 / 10 text - sky - 300 border border - sky - 500 / 20 \" > privacy",
+    "source": "website/src/pages/privacy.astro",
+    "chunk_index": 0,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "privacy_policy",
+      "source_status": "active",
+      "filename": "privacy.astro",
+      "format": "astro"
+    }
+  },
+  {
+    "content": "xs font - mono font - bold bg - sky - 500 / 10 text - sky - 300 border border - sky - 500 / 20 \" > privacy by design & zero telemetry < / span > < h1 class = \" mt - 4 text - 3xl sm : text - 5xl font - extrabold text - white font - display tracking - tight \" > privacy policy < / h1 > < p class = \" mt - 3 text - xs font - mono text - neutral - 400 \" > effective date : september 7, 2026 | document revision 2. 4 < / p > < / div > <! - - main container card - - > < div class = \" vercel - card p - 6 sm : p - 12 rounded - 3xl border border - white / 10 bg - [ # 0a0c10 ] / 95 space - y - 8 \" > <! - - highlight banner - - > < div class = \" p - 4 sm : p - 5 rounded - 2xl bg - sky - 500 / 10 border border - sky - 500 / 30 text - sky - 200 text - xs leading - relaxed flex items - start space - x - 3",
+    "source": "website/src/pages/privacy.astro",
+    "chunk_index": 1,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "privacy_policy",
+      "source_status": "active",
+      "filename": "privacy.astro",
+      "format": "astro"
+    }
+  },
+  {
+    "content": "500 / 10 border border - sky - 500 / 30 text - sky - 200 text - xs leading - relaxed flex items - start space - x - 3 \" > < span class = \" text - lg shrink - 0 \" > < / span > < div class = \" space - y - 1 \" > < strong class = \" font - bold text - white \" > absolute privacy guarantee : < / strong > < p > dosezy is engineered around a strict local - first architecture. the core application contains zero analytics sdks, zero advertising trackers, zero telemetry, and intentionally omits internet permission from its offline manifest. your health logs never leave your physical device hardware unless you explicitly configure encrypted cloud sync. < / p > < / div > < / div > <! - - legal clauses - - > < div class = \" space - y - 8 text - xs text - neutral - 300 leading - relaxed border - t border - white / 10 pt - 8 \" > < section class = \" space - y - 3 \" > < h2 class = \" text - base font - bold text - white font - display flex items - center space - x - 2 \" >",
+    "source": "website/src/pages/privacy.astro",
+    "chunk_index": 2,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "privacy_policy",
+      "source_status": "active",
+      "filename": "privacy.astro",
+      "format": "astro"
+    }
+  },
+  {
+    "content": "3 \" > < h2 class = \" text - base font - bold text - white font - display flex items - center space - x - 2 \" > < span class = \" text - sky - 400 font - mono \" > 01. < / span > < span > zero telemetry & zero network permissions < / span > < / h2 > < p > dosezy enforces a strict zero - telemetry policy. unlike standard health apps, dosezy does not contain any third - party analytics libraries ( such as google analytics, firebase, mixpanel, or sentry ). the core android application intentionally omits < code class = \" text - sky - 300 font - mono \" > android. permission. internet < / code > from its manifest. < / p > < p > we collect 0 bytes of usage metrics, crash reports, ip addresses, device identifiers ( imei / android id ), or behavioral interaction data. your use of dosezy is completely invisible to us and any third parties. < / p > < / section > < section class = \" space - y - 3 \" > < h2 class = \" text - base font - bold text - white font - display flex items - center space",
+    "source": "website/src/pages/privacy.astro",
+    "chunk_index": 3,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "privacy_policy",
+      "source_status": "active",
+      "filename": "privacy.astro",
+      "format": "astro"
+    }
+  },
+  {
+    "content": "= \" space - y - 3 \" > < h2 class = \" text - base font - bold text - white font - display flex items - center space - x - 2 \" > < span class = \" text - sky - 400 font - mono \" > 02. < / span > < span > local hardware storage & data ownership < / span > < / h2 > < p > all data entered into dosezy ( including medication names, schedules, dosage histories, emergency contact details, doctor notes, and adherence rates ) remains stored exclusively in an encrypted sqlite room database on your physical device hardware. < / p > < p > you hold 100 % legal ownership and physical control over your medical records. because data is stored locally, the developers and maintainers of dosezy cannot access, view, restore, or modify your stored information under any circumstances. < / p > < / section > < section class = \" space - y - 3 \" > < h2 class = \" text - base font - bold text - white font - display flex items - center space - x - 2 \" > < span class = \" text - sky - 400 font - mono \" > 03. < / span > < span > optional caregiver cloud",
+    "source": "website/src/pages/privacy.astro",
+    "chunk_index": 4,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "privacy_policy",
+      "source_status": "active",
+      "filename": "privacy.astro",
+      "format": "astro"
+    }
+  },
+  {
+    "content": "2 \" > < span class = \" text - sky - 400 font - mono \" > 03. < / span > < span > optional caregiver cloud sync & end - to - end encryption ( e2ee ) < / span > < / h2 > < p > if you voluntarily opt into using the managed dosezy caregiver cloud or deploy your own docker self - host node, synchronization is protected by zero - knowledge end - to - end encryption ( e2ee ) : < / p > < ul class = \" list - disc pl - 5 space - y - 1. 5 text - neutral - 400 \" > < li > data payloads are encrypted on your local device before transmission using aes - 256 - gcm encryption and argon2 key derivation. < / li > < li > our cloud sync servers act solely as blind encrypted relay nodes and store zero plain - text data or decryption keys. < / li > < li > only authorized caregiver devices holding your private passphrase can decrypt your sync payloads. < / li > < / ul > < / section > < section class = \" space - y - 3 \" > < h2 class",
+    "source": "website/src/pages/privacy.astro",
+    "chunk_index": 5,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "privacy_policy",
+      "source_status": "active",
+      "filename": "privacy.astro",
+      "format": "astro"
+    }
+  },
+  {
+    "content": "sync payloads. < / li > < / ul > < / section > < section class = \" space - y - 3 \" > < h2 class = \" text - base font - bold text - white font - display flex items - center space - x - 2 \" > < span class = \" text - sky - 400 font - mono \" > 04. < / span > < span > zero commercial data selling or aggregation < / span > < / h2 > < p > dosezy does not monetize, license, rent, trade, or sell user personal health information to third - party data brokers, pharmaceutical companies, advertisers, or insurance providers. we explicitly comply with the california consumer privacy act ( ccpa ) \" do not sell my info \" mandates and eu gdpr article 13 / 14 requirements. < / p > < / section > < section class = \" space - y - 3 \" > < h2 class = \" text - base font - bold text - white font - display flex items - center space - x - 2 \" > < span class = \" text - sky - 400 font - mono \" > 05. < / span > < span > children ' s privacy protection ( coppa & gdpr ) <",
+    "source": "website/src/pages/privacy.astro",
+    "chunk_index": 6,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "privacy_policy",
+      "source_status": "active",
+      "filename": "privacy.astro",
+      "format": "astro"
+    }
+  },
+  {
+    "content": "text - sky - 400 font - mono \" > 05. < / span > < span > children ' s privacy protection ( coppa & gdpr ) < / span > < / h2 > < p > dosezy is a general audience health scheduling utility. we do not knowingly collect personal information from children under the age of 13 ( or 16 in the european union ). because dosezy operates offline without central data collection, no child data is ever transmitted to or stored by dosezy maintainers. < / p > < / section > < section class = \" space - y - 3 \" > < h2 class = \" text - base font - bold text - white font - display flex items - center space - x - 2 \" > < span class = \" text - sky - 400 font - mono \" > 06. < / span > < span > disclaimer of physical device hardware security liability < / span > < / h2 > < p > while dosezy implements local sqlite database encryption, you are responsible for securing your physical smartphone ( e. g., biometrics, device screen passcode ). dosezy maintainers are not liable for unauthorized access to your health records resulting from stolen hardware, unencrypted device",
+    "source": "website/src/pages/privacy.astro",
+    "chunk_index": 7,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "privacy_policy",
+      "source_status": "active",
+      "filename": "privacy.astro",
+      "format": "astro"
+    }
+  },
+  {
+    "content": ", device screen passcode ). dosezy maintainers are not liable for unauthorized access to your health records resulting from stolen hardware, unencrypted device backups, or malware on your local operating system. < / p > < / section > < section class = \" space - y - 3 \" > < h2 class = \" text - base font - bold text - white font - display flex items - center space - x - 2 \" > < span class = \" text - sky - 400 font - mono \" > 07. < / span > < span > policy updates & contact information < / span > < / h2 > < p > we reserve the right to modify this privacy policy to reflect technical or legal advancements. any updates will be posted on this page with a revised effective date. for privacy inquiries or technical questions, contact our maintainers at < a href = \" mailto : privacy @ dosezy. app \" class = \" text - sky - 300 hover : underline font - mono \" > privacy @ dosezy. app < / a >. < / p > < / section > < / div > < / div > < / div > < / main > < footer / > < /",
+    "source": "website/src/pages/privacy.astro",
+    "chunk_index": 8,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "privacy_policy",
+      "source_status": "active",
+      "filename": "privacy.astro",
+      "format": "astro"
+    }
+  },
+  {
+    "content": "p > < / section > < / div > < / div > < / div > < / main > < footer / > < / layout >",
+    "source": "website/src/pages/privacy.astro",
+    "chunk_index": 9,
+    "token_count": 34,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "privacy_policy",
+      "source_status": "active",
+      "filename": "privacy.astro",
+      "format": "astro"
+    }
+  },
+  {
+    "content": "/ * * copyright ( c ) 2026 saad < reach. saad @ outlook. com > ( @ saad2134 ) * licensed under the mit license. see license in the project root for license information. * / package com. example. dosezy. data import android. content. context import androidx. room. database import androidx. room. room import androidx. room. roomdatabase import androidx. room. typeconverters import androidx. room. migration. migration import androidx. sqlite. db. supportsqlitedatabase import com. example. dosezy. data. converters. converters import com. example. dosezy. data. dao. medicinedao import com. example. dosezy. data. dao. scheduledao import com. example. dosezy. data. dao. userdao import com. example. dosezy. data. model. medicine import com. example. dosezy. data. model. scheduleentry import com. example. dosezy. data. model. user @ database ( entities = [ user : : class, medicine : : class, scheduleentry : : class ], version = 22, exportschema = false",
+    "source": "patient/android/app/src/main/java/com/example/dosezy/data/DosezyDatabase.kt",
+    "chunk_index": 0,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "database_schema",
+      "source_status": "active",
+      "filename": "DosezyDatabase.kt",
+      "format": "kt"
+    }
+  },
+  {
+    "content": "database ( entities = [ user : : class, medicine : : class, scheduleentry : : class ], version = 22, exportschema = false ) @ typeconverters ( converters : : class ) abstract class dosezydatabase : roomdatabase ( ) { abstract fun userdao ( ) : userdao abstract fun medicinedao ( ) : medicinedao abstract fun scheduledao ( ) : scheduledao companion object { @ volatile private var instance : dosezydatabase? = null val migration _ 4 _ 5 = object : migration ( 4, 5 ) { override fun migrate ( db : supportsqlitedatabase ) { db. execsql ( \" alter table medicines add column currentstock integer default null \" ) db. execsql ( \" alter table medicines add column refillthreshold integer default null \" ) db. execsql ( \" alter table medicines add column autodeductontake integer not null default 1 \" ) } } val migration _ 5 _ 6 = object : migration ( 5, 6 ) { override fun migrate ( db : supportsqlitedatabase ) { / / user table additions db. execsql (",
+    "source": "patient/android/app/src/main/java/com/example/dosezy/data/DosezyDatabase.kt",
+    "chunk_index": 1,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "database_schema",
+      "source_status": "active",
+      "filename": "DosezyDatabase.kt",
+      "format": "kt"
+    }
+  },
+  {
+    "content": ", 6 ) { override fun migrate ( db : supportsqlitedatabase ) { / / user table additions db. execsql ( \" alter table users add column allergies text default null \" ) db. execsql ( \" alter table users add column medicalconditions text default null \" ) db. execsql ( \" alter table users add column naggingremindersenabled integer not null default 0 \" ) db. execsql ( \" alter table users add column naggingintervalminutes integer not null default 5 \" ) db. execsql ( \" alter table users add column naggingmaxrepeats integer not null default 3 \" ) / / medicine table additions db. execsql ( \" alter table medicines add column notes text default null \" ) db. execsql ( \" alter table medicines add column pillshape text not null default ' round ' \" ) db. execsql ( \" alter table medicines add column pillcolor text not null default ' # 1193d4 ' \" ) db. execsql ( \" alter table medicines add column startdate integer default null \" ) db. ex",
+    "source": "patient/android/app/src/main/java/com/example/dosezy/data/DosezyDatabase.kt",
+    "chunk_index": 2,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "database_schema",
+      "source_status": "active",
+      "filename": "DosezyDatabase.kt",
+      "format": "kt"
+    }
+  },
+  {
+    "content": "' # 1193d4 ' \" ) db. execsql ( \" alter table medicines add column startdate integer default null \" ) db. execsql ( \" alter table medicines add column enddate integer default null \" ) db. execsql ( \" alter table medicines add column durationdays integer default null \" ) } } val migration _ 6 _ 7 = object : migration ( 6, 7 ) { override fun migrate ( db : supportsqlitedatabase ) { db. execsql ( \" alter table users add column alarmsound text not null default ' system _ default ' \" ) } } val migration _ 7 _ 8 = object : migration ( 7, 8 ) { override fun migrate ( db : supportsqlitedatabase ) { db. execsql ( \" alter table medicines add column isarchived integer not null default 0 \" ) } } val migration _ 8 _ 9 = object : migration ( 8, 9 ) { override fun migrate ( db : supportsqlitedatabase ) { db. execsql ( \" alter table users add column alarmdurationseconds integer not null default 0 \" ) } } val migration _ 9",
+    "source": "patient/android/app/src/main/java/com/example/dosezy/data/DosezyDatabase.kt",
+    "chunk_index": 3,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "database_schema",
+      "source_status": "active",
+      "filename": "DosezyDatabase.kt",
+      "format": "kt"
+    }
+  },
+  {
+    "content": ". execsql ( \" alter table users add column alarmdurationseconds integer not null default 0 \" ) } } val migration _ 9 _ 10 = object : migration ( 9, 10 ) { override fun migrate ( db : supportsqlitedatabase ) { db. execsql ( \" alter table users add column customalarmsoundpath text default null \" ) db. execsql ( \" alter table users add column customalarmsoundtitle text default null \" ) } } val migration _ 10 _ 11 = object : migration ( 10, 11 ) { override fun migrate ( db : supportsqlitedatabase ) { db. execsql ( \" alter table users add column allowdoseskipping integer not null default 0 \" ) db. execsql ( \" alter table schedule _ entries add column skipreason text default null \" ) } } val migration _ 11 _ 12 = object : migration ( 11, 12 ) { override fun migrate ( db : supportsqlitedatabase ) { db. execsql ( \" alter table users add column allowcustomdosetime integer not null default 0 \" ) } } val",
+    "source": "patient/android/app/src/main/java/com/example/dosezy/data/DosezyDatabase.kt",
+    "chunk_index": 4,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "database_schema",
+      "source_status": "active",
+      "filename": "DosezyDatabase.kt",
+      "format": "kt"
+    }
+  },
+  {
+    "content": ") { db. execsql ( \" alter table users add column allowcustomdosetime integer not null default 0 \" ) } } val migration _ 12 _ 13 = object : migration ( 12, 13 ) { override fun migrate ( db : supportsqlitedatabase ) { db. execsql ( \" alter table users add column hideaddmedicinenavbutton integer not null default 0 \" ) } } val migration _ 13 _ 14 = object : migration ( 13, 14 ) { override fun migrate ( db : supportsqlitedatabase ) { db. execsql ( \" alter table medicines add column customdosages text default null \" ) db. execsql ( \" alter table schedule _ entries add column dosage real default null \" ) } } val migration _ 14 _ 15 = object : migration ( 14, 15 ) { override fun migrate ( db : supportsqlitedatabase ) { db. execsql ( \" alter table users add column allowdoseundo integer not null default 0 \" ) db. execsql ( \" alter table users add column promptdosenotes integer not null default 0 \" ) db. ex",
+    "source": "patient/android/app/src/main/java/com/example/dosezy/data/DosezyDatabase.kt",
+    "chunk_index": 5,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "database_schema",
+      "source_status": "active",
+      "filename": "DosezyDatabase.kt",
+      "format": "kt"
+    }
+  },
+  {
+    "content": "default 0 \" ) db. execsql ( \" alter table users add column promptdosenotes integer not null default 0 \" ) db. execsql ( \" alter table schedule _ entries add column dosenotes text default null \" ) } } val migration _ 15 _ 16 = object : migration ( 15, 16 ) { override fun migrate ( db : supportsqlitedatabase ) { db. execsql ( \" alter table users add column allowdosenotes integer not null default 0 \" ) } } / / guard : migration 16 - > 17 adds slideactionsenabled, timelinemodeenabled, and thickercalendardayhighlight columns with non - destructive defaults val migration _ 16 _ 17 = object : migration ( 16, 17 ) { override fun migrate ( db : supportsqlitedatabase ) { db. execsql ( \" alter table users add column slideactionsenabled integer not null default 1 \" ) db. execsql ( \" alter table users add column timelinemodeenabled integer not null default 0 \" ) db. execsql ( \" alter table users add column thickercalendardayhighlight integer",
+    "source": "patient/android/app/src/main/java/com/example/dosezy/data/DosezyDatabase.kt",
+    "chunk_index": 6,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "database_schema",
+      "source_status": "active",
+      "filename": "DosezyDatabase.kt",
+      "format": "kt"
+    }
+  },
+  {
+    "content": "##nabled integer not null default 0 \" ) db. execsql ( \" alter table users add column thickercalendardayhighlight integer not null default 0 \" ) } } / / guard : migration 17 - > 18 adds intakesafeguardenabled and intakecountdownseconds columns with non - destructive defaults ( # 104 ) val migration _ 17 _ 18 = object : migration ( 17, 18 ) { override fun migrate ( db : supportsqlitedatabase ) { db. execsql ( \" alter table users add column intakesafeguardenabled integer not null default 0 \" ) db. execsql ( \" alter table users add column intakecountdownseconds integer not null default 120 \" ) } } / / guard : migration 18 - > 19 adds lockscreendetailsenabled and customsnoozepopupenabled columns with safe defaults val migration _ 18 _ 19 = object : migration ( 18, 19 ) { override fun migrate ( db : supportsqlitedatabase ) { db. execsql ( \" alter table users add column lockscreendetailsenabled integer not null default 1 \" ) db. execs",
+    "source": "patient/android/app/src/main/java/com/example/dosezy/data/DosezyDatabase.kt",
+    "chunk_index": 7,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "database_schema",
+      "source_status": "active",
+      "filename": "DosezyDatabase.kt",
+      "format": "kt"
+    }
+  },
+  {
+    "content": "db. execsql ( \" alter table users add column lockscreendetailsenabled integer not null default 1 \" ) db. execsql ( \" alter table users add column customsnoozepopupenabled integer not null default 0 \" ) } } / / guard : migration 19 - > 20 adds remindertype column to users ( default alarm ) and medicines ( default null ) ( # 111 ) val migration _ 19 _ 20 = object : migration ( 19, 20 ) { override fun migrate ( db : supportsqlitedatabase ) { db. execsql ( \" alter table users add column remindertype text not null default ' alarm ' \" ) db. execsql ( \" alter table medicines add column remindertype text default null \" ) } } / / guard : migration 20 - > 21 converts legacy hour - based considerlateafter and considermissedafter ( < 15 ) to minutes ( # 119 ) val migration _ 20 _ 21 = object : migration ( 20, 21 ) { override fun migrate ( db : supportsqlitedatabase ) { db. execsql ( \" update users set considerlateafter = considerlateafter * 60 where consider",
+    "source": "patient/android/app/src/main/java/com/example/dosezy/data/DosezyDatabase.kt",
+    "chunk_index": 8,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "database_schema",
+      "source_status": "active",
+      "filename": "DosezyDatabase.kt",
+      "format": "kt"
+    }
+  },
+  {
+    "content": "##qlitedatabase ) { db. execsql ( \" update users set considerlateafter = considerlateafter * 60 where considerlateafter > 0 and considerlateafter < 15 \" ) db. execsql ( \" update users set considermissedafter = considermissedafter * 60 where considermissedafter > 0 and considermissedafter < 15 \" ) } } / / guard : migration 21 - > 22 migrates currentstock and refillthreshold to real to support half doses and fractional inventory tracking ( # 123 ) / / guard : explicitly disable foreign keys before dropping medicines table to prevent sqlite on delete cascade from wiping schedule _ entries val migration _ 21 _ 22 = object : migration ( 21, 22 ) { override fun migrate ( db : supportsqlitedatabase ) { db. execsql ( \" pragma foreign _ keys = off \" ) db. execsql ( \" create table if not exists ` medicines _ new ` ( ` medicineid ` text not null, ` userid ` text not null, ` medicationname ` text not null, ` dosage ` real not null, ` dosage",
+    "source": "patient/android/app/src/main/java/com/example/dosezy/data/DosezyDatabase.kt",
+    "chunk_index": 9,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "database_schema",
+      "source_status": "active",
+      "filename": "DosezyDatabase.kt",
+      "format": "kt"
+    }
+  },
+  {
+    "content": "` text not null, ` userid ` text not null, ` medicationname ` text not null, ` dosage ` real not null, ` dosageunit ` text not null, ` timesperday ` integer not null, ` frequency ` text not null, ` scheduledtimes ` text not null, ` imageuri ` text, ` currentstock ` real, ` refillthreshold ` real, ` autodeductontake ` integer not null, ` notes ` text, ` pillshape ` text not null, ` pillcolor ` text not null, ` startdate ` integer, ` enddate ` integer, ` durationdays ` integer, ` isarchived ` integer not null, ` customdosages ` text, ` remindertype ` text, primary key ( ` medicineid ` ), foreign key ( ` userid ` ) references ` users ` ( ` userid ` ) on update no action on delete cascade ) \" ) db. execsql ( \" insert into ` medicines _ new ` ( ` medicineid `, ` userid `, ` medicationname `, ` dosage `, ` dosageunit `, ` timesperday `, ` frequency `, ` scheduledtimes",
+    "source": "patient/android/app/src/main/java/com/example/dosezy/data/DosezyDatabase.kt",
+    "chunk_index": 10,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "database_schema",
+      "source_status": "active",
+      "filename": "DosezyDatabase.kt",
+      "format": "kt"
+    }
+  },
+  {
+    "content": ", ` medicationname `, ` dosage `, ` dosageunit `, ` timesperday `, ` frequency `, ` scheduledtimes `, ` imageuri `, ` currentstock `, ` refillthreshold `, ` autodeductontake `, ` notes `, ` pillshape `, ` pillcolor `, ` startdate `, ` enddate `, ` durationdays `, ` isarchived `, ` customdosages `, ` remindertype ` ) select ` medicineid `, ` userid `, ` medicationname `, ` dosage `, ` dosageunit `, ` timesperday `, ` frequency `, ` scheduledtimes `, ` imageuri `, ` currentstock `, ` refillthreshold `, ` autodeductontake `, ` notes `, ` pillshape `, ` pillcolor `, ` startdate `, ` enddate `, ` durationdays `, ` isarchived `, ` customdosages `, ` remindertype ` from ` medicines ` \" ) db. execsql ( \" drop table ` medicines ` \" ) db. execsql",
+    "source": "patient/android/app/src/main/java/com/example/dosezy/data/DosezyDatabase.kt",
+    "chunk_index": 11,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "database_schema",
+      "source_status": "active",
+      "filename": "DosezyDatabase.kt",
+      "format": "kt"
+    }
+  },
+  {
+    "content": "remindertype ` from ` medicines ` \" ) db. execsql ( \" drop table ` medicines ` \" ) db. execsql ( \" alter table ` medicines _ new ` rename to ` medicines ` \" ) db. execsql ( \" create index if not exists ` index _ medicines _ userid ` on ` medicines ` ( ` userid ` ) \" ) db. execsql ( \" pragma foreign _ keys = on \" ) } } / / guard : visible for testing to inject in - memory database instance into broadcast receivers and static managers @ androidx. annotation. visiblefortesting fun setinstance ( db : dosezydatabase? ) { instance = db } fun getinstance ( context : context ) : dosezydatabase { return instance? : synchronized ( this ) { val instance = room. databasebuilder ( context. applicationcontext, dosezydatabase : : class. java, \" dosezy _ database \" ). addmigrations ( migration _ 4 _ 5, migration _ 5 _ 6, migration _ 6 _ 7, migration _ 7 _ 8, migration _ 8 _ 9, migration _ 9 _ 10",
+    "source": "patient/android/app/src/main/java/com/example/dosezy/data/DosezyDatabase.kt",
+    "chunk_index": 12,
+    "token_count": 256,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "database_schema",
+      "source_status": "active",
+      "filename": "DosezyDatabase.kt",
+      "format": "kt"
+    }
+  },
+  {
+    "content": "_ 5, migration _ 5 _ 6, migration _ 6 _ 7, migration _ 7 _ 8, migration _ 8 _ 9, migration _ 9 _ 10, migration _ 10 _ 11, migration _ 11 _ 12, migration _ 12 _ 13, migration _ 13 _ 14, migration _ 14 _ 15, migration _ 15 _ 16, migration _ 16 _ 17, migration _ 17 _ 18, migration _ 18 _ 19, migration _ 19 _ 20, migration _ 20 _ 21, migration _ 21 _ 22 ). addcallback ( object : roomdatabase. callback ( ) { override fun onopen ( db : supportsqlitedatabase ) { super. onopen ( db ) db. execsql ( \" pragma foreign _ keys = on ; \" ) } } ) / / guard : only permit destructive migration on app version downgrades ; prevent silent patient data wipe on forward upgrades ( # iso13485, # patientsafety ). fallbacktodestructivemigrationondowngrade ( ). build ( ) instance = instance instance } } } }",
+    "source": "patient/android/app/src/main/java/com/example/dosezy/data/DosezyDatabase.kt",
+    "chunk_index": 13,
+    "token_count": 230,
+    "metadata": {
+      "chunk_size": 256,
+      "overlap": 32,
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "source_type": "database_schema",
+      "source_status": "active",
+      "filename": "DosezyDatabase.kt",
+      "format": "kt"
+    }
+  }
+]
