@@ -1,4 +1,6 @@
+
 from fastapi.testclient import TestClient
+from prometheus_client import generate_latest
 
 from rag_engine.telemetry.app import create_app
 from rag_engine.telemetry.metrics import TelemetryMetrics
@@ -57,17 +59,21 @@ def test_metrics_endpoint_exposes_prometheus_metrics():
     response = client.get("/metrics")
 
     assert response.status_code == 200
-    assert "dosezy_requests_total" in response.text
-    assert "dosezy_request_latency_seconds" in response.text
+    assert "dosezy_chat_requests_total" in response.text
+    assert "dosezy_chat_latency_seconds_bucket" in response.text
+    assert "dosezy_chat_cache_lookups_total" in response.text
+    assert "dosezy_chat_cache_hits_total" in response.text
 
 
-def test_cache_metrics_record_hit_ratio():
+def test_cache_metrics_record_lookup_and_hits():
     metrics = TelemetryMetrics()
 
     metrics.record_cache_lookup(hit=True)
     metrics.record_cache_lookup(hit=False)
     metrics.record_cache_lookup(hit=True)
 
-    assert metrics.cache_lookups._value.get() == 3
-    assert metrics.cache_hits._value.get() == 2
-    assert abs(metrics.cache_hit_ratio._value.get() - (2 / 3)) < 0.0001
+    output = generate_latest(metrics.registry).decode("utf-8")
+
+    assert "dosezy_chat_cache_lookups_total 3.0" in output
+    assert "dosezy_chat_cache_hits_total 2.0" in output
+    assert "dosezy_cache_hit_ratio" not in output

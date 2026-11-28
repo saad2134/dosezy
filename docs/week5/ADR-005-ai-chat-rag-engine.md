@@ -1,53 +1,37 @@
-﻿# ADR-005: AI Chat RAG Engine
+### Semantic Medical Safety Evaluation
 
-- **Status:** Accepted
-- **Date:** 26 November 2026
-- **Project:** Dosezy
-- **Branch:** `feature/ai-chat-rag-engine`
+An offline semantic-similarity experiment was conducted using the existing `sentence-transformers/all-MiniLM-L6-v2` embedding model.
 
-## Context
+**Evaluation methodology**
+- Embedding model: `sentence-transformers/all-MiniLM-L6-v2`
+- Reference vectors: 8
+- Calibration prompts: 24
+- Held-out test prompts: 24
+- Similarity metric: Cosine similarity
+- Experimentally selected threshold: 0.3246
 
-Dosezy needs a documentation-grounded support query engine that can retrieve relevant application information while preventing unsafe medical guidance. The implementation must support semantic retrieval, caching, safety checks and observability.
+**Held-out evaluation results**
 
-## Decisions
+| Metric | Result |
+|---|---:|
+| Accuracy | 91.67% |
+| Precision | 91.67% |
+| Recall | 91.67% |
+| Specificity | 91.67% |
+| F1 score | 91.67% |
+| True positives | 11 |
+| True negatives | 11 |
+| False positives | 1 |
+| False negatives | 1 |
 
-### 1. Documentation ingestion and retrieval
-- Load the configured FAQs, user manual, alarm documentation, OpenAPI specification, privacy policy and database schema.
-- Split documents into chunks of 256 tokens with 32-token overlap.
-- Generate embeddings using `sentence-transformers/all-MiniLM-L6-v2`.
-- Store normalized 384-dimensional vectors and chunk metadata in NumPy and JSON files.
-- Use cosine similarity and retrieve the top three relevant chunks.
+**Error analysis**
 
-### 2. Medical safety
-- Evaluate incoming messages with safety guardrails before cache lookup or retrieval.
-- Refuse diagnosis, prescription changes and clinical treatment advice.
-- Redirect clinical questions to qualified healthcare professionals.
-- Test against 20 adversarial medical prompts.
+The experiment identified:
+- A medical-intent prompt involving a confused person who was hard to wake, classified as safe by the embedding similarity experiment.
+- A harmless medication-reminder management question, classified as medical.
 
-### 3. Semantic caching
-- Use Redis to cache responses with normalized embeddings.
-- Use cosine similarity threshold 0.92.
-- Set a 24-hour TTL.
-- Support cache invalidation, including old index versions.
-- Fail open when Redis is unavailable so the application can continue without caching.
+The production rule-based guardrails were subsequently expanded to detect the hard-to-wake emergency wording. A corresponding regression test was added and passed.
 
-### 4. Telemetry
-- Expose Prometheus metrics through `/metrics`.
-- Track request counts by response status.
-- Record request latency histograms.
-- Track cache lookups, hits and hit ratio.
+**Limitations**
 
-## Consequences
-
-- Documentation updates require rebuilding the vector index.
-- Redis improves repeated and semantically similar query performance.
-- The current vector cache scans stored entries, which is suitable for this prototype but may need optimization at larger scale.
-- Safety rules reduce the risk of unsafe responses but do not replace clinical review.
-- The current query service retrieves and returns documentation context; it does not yet generate a final answer using an integrated LLM.
-
-## Validation
-
-- Automated test suite: 63 passed.
-- Adversarial medical safety tests: 20 passed.
-- Live Redis cache hit, TTL and invalidation checks completed.
-- Cache lookup benchmark: 100 successful hits.
+This was a small, curated offline experiment and is not a clinically validated safety system. The experimental threshold is not used as a production blocking rule. The semantic classifier is not integrated into the `/query` endpoint. Further evaluation using a larger, independently curated dataset is required.
